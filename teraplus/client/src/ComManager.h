@@ -16,6 +16,8 @@
 
 #include <QJsonDocument>
 #include <QJsonParseError>
+#include <QJsonArray>
+#include <QJsonValue>
 
 #include <QUrl>
 #include <QTimer>
@@ -41,6 +43,10 @@ public:
     TeraUser &getCurrentUser();
 
 protected:
+    bool handleLoginReply(const QString& reply_data);
+    bool handleUsersReply(const QString& reply_data);
+
+
     QUrl                    m_serverUrl;
     QNetworkAccessManager*  m_netManager;
     QNetworkCookieJar       m_cookieJar;
@@ -61,6 +67,10 @@ signals:
     void networkError(QNetworkReply::NetworkError, QString);
 
     void loginResult(bool logged_in);
+
+    void currentUserUpdated();
+
+    void usersReceived(QList<TeraUser> user_list);
 
 public slots:
 

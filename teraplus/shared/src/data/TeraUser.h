@@ -2,15 +2,27 @@
 #define TERA_USER_H_
 
 #include "SharedLib.h"
+#include "TeraData.h"
+
 #include <QObject>
 #include <QString>
 #include <QUuid>
 #include <QDateTime>
+#include <QJsonValue>
 
-class SHAREDLIB_EXPORT TeraUser : public QObject
+enum UserType{
+    TERA_USERTYPE_NORMAL=1,
+    TERA_USERTYPE_KIT=2,
+    TERA_USERTYPE_ROBOT=3
+};
+
+Q_DECLARE_METATYPE(UserType)
+
+class SHAREDLIB_EXPORT TeraUser : public TeraData
 {
     Q_OBJECT
 
+    Q_PROPERTY(int id_user READ getId WRITE setId NOTIFY idChanged)
     Q_PROPERTY(QString user_username READ getUserPseudo WRITE setUserPseudo NOTIFY userPseudoChanged)
     Q_PROPERTY(QString user_firstname READ getFirstName WRITE setFirstName NOTIFY firstNameChanged)
     Q_PROPERTY(QString user_lastname READ getLastName WRITE setLastName NOTIFY lastNameChanged)
@@ -25,17 +37,14 @@ class SHAREDLIB_EXPORT TeraUser : public QObject
 
 public:
 
-    enum UserType{
-        TERA_USERTYPE_NORMAL,
-        TERA_USERTYPE_KIT,
-        TERA_USERTYPE_ROBOT
-    };
+
+
 
     TeraUser(QObject *parent = nullptr);
-
+    TeraUser(const TeraUser& copy, QObject *parent=nullptr);
     TeraUser(const QString &pseudo, const QString &firstName, const QString &lastName, const QString &email, UserType type, const QUuid &uuid,
              const bool &enabled, const QString &notes, const QString &profile, const QDateTime &last_online, const bool &superadmin, QObject *parent=nullptr)
-        :   QObject(parent),
+        :   TeraData(parent),
           m_userPseudo(pseudo),
           m_firstName(firstName),
           m_lastName(lastName),
@@ -51,18 +60,25 @@ public:
 
     }
 
+    TeraUser(const QJsonValue& json, QObject *parent = nullptr);
+
     //Getters
-    QString     getUserPseudo();
-    QString     getFirstName();
-    QString     getLastName();
-    QString     getEmail();
-    UserType    getUserType();
-    QUuid       getUuid();
-    bool        getEnabled();
-    QString     getNotes();
-    QString     getProfile();
-    QDateTime   getLastOnline();
-    bool        getSuperAdmin();
+    QString     getUserPseudo() const;
+    QString     getFirstName() const;
+    QString     getLastName() const;
+    QString     getEmail() const;
+    UserType    getUserType() const;
+    QUuid       getUuid() const;
+    bool        getEnabled() const;
+    QString     getNotes() const;
+    QString     getProfile() const;
+    QDateTime   getLastOnline() const;
+    bool        getSuperAdmin() const;
+
+    QString     getName() const;
+
+    // Utils
+    QJsonObject toJson();
 
 public Q_SLOTS:
 

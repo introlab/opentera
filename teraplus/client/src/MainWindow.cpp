@@ -12,3 +12,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::updateCurrentUser(const TeraUser &user)
+{
+    ui->lblUser->setText(user.getName());
+}
