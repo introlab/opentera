@@ -8,6 +8,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	python3-pip sudo vim
 
 # Clone repository
+ARG CACHE_DATE=2019-03-12
 RUN git clone -b dev https://github.com/introlab/opentera.git
 
 # Install python packages
@@ -52,8 +53,7 @@ WORKDIR /opentera/teraserver/python
 EXPOSE 4040:4040
 
 # Run the required services and python script
-CMD service postgresql start && service redis-server start && sleep 5000
-#  && python3.6 ./TeraServer.py
+CMD ls -l && ./start.sh
 
 
 
