@@ -43,10 +43,11 @@ class FlaskModule:
     @auth.login_required
     def users():
         if request.method == 'GET':
-            if not request.args:
-                # Return current user information
-                user = TeraUser.get_user_by_uuid(session['user_id'])
-                return jsonify([user.to_json()])
+            current_user = TeraUser.get_user_by_uuid(session['user_id'])
+            # if not request.args:
+            #     # Return current user information
+            #     user = TeraUser.get_user_by_uuid(session['user_id'])
+            #     return jsonify([user.to_json()])
 
             # Parse query items
             # TODO: Check access rights

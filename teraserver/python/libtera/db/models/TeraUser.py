@@ -5,6 +5,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from passlib.hash import bcrypt
 from enum import Enum
 import uuid
+import datetime
 
 
 class TeraUserTypes(Enum):
@@ -57,6 +58,10 @@ class TeraUser(db.Model, BaseModel):
 
     def get_id(self):
         return self.user_uuid
+
+    def update_last_online(self):
+        self.user_lastonline = datetime.datetime.now()
+        db.session.commit()
 
     def __str__(self):
         return '<TeraUser ' + str(self.user_username) + ', ' + str(self.user_email) + ' >'
