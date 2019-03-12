@@ -41,6 +41,7 @@ class LoginModule:
         if TeraUser.verify_password(username=username, password=password):
             registered_user = TeraUser.get_user_by_username(username)
             print('Found user: ', registered_user)
+            registered_user.update_last_online()
 
             login_user(registered_user, remember=True)
             print('Setting key with expiration in 60s', session['_id'], session['user_id'])

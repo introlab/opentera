@@ -57,6 +57,13 @@ void ComManager::connectToServer(QString username, QString password)
 
 }
 
+void ComManager::disconnectFromServer()
+{
+    QUrl logout_url = m_serverUrl;
+    logout_url.setPath(WEB_LOGOUT_PATH);
+    m_netManager->get(QNetworkRequest(logout_url));
+}
+
 bool ComManager::processNetworkReply(QNetworkReply *reply)
 {
     QString reply_path = reply->url().path();
@@ -65,18 +72,20 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
 
     bool handled = false;
 
-
-    //TODO: Restructure - this is going to be a big "mess" of url replies!!
-    ///////////////////////////////////////////////////////////////////////
     if (reply_path == WEB_LOGIN_PATH){
         // Initialize cookies
         m_cookieJar.cookiesForUrl(reply->url());
 
-        return handleLoginReply(reply_data);
+        handled=handleLoginReply(reply_data);
     }
-    ///////////////////////////////////////////////////////////////////////
+
     if (reply_path == WEB_USERINFO_PATH){
-        return handleUsersReply(reply_data);
+        handled=handleUsersReply(reply_data);
+    }
+
+    if (reply_path == WEB_LOGOUT_PATH){
+        emit serverDisconnected();
+        handled = true;
     }
 
     return handled;

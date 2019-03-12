@@ -8,6 +8,7 @@ set(headers
     LoginDialog.h
     ComManager.h
     MainWindow.h
+    NotificationWindow.h
 )
 
 set(srcs
@@ -17,11 +18,13 @@ set(srcs
     LoginDialog.cpp
     ComManager.cpp
     MainWindow.cpp
+    NotificationWindow.cpp
 )
 
 SET(uis
     LoginDialog.ui
     MainWindow.ui
+    notification.ui
 )
 
 SET(qrcs

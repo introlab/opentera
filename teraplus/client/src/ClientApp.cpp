@@ -89,15 +89,20 @@ void ClientApp::showLogin()
 
 void ClientApp::showMainWindow()
 {
-    if (m_mainWindow == nullptr){
-        m_mainWindow = new MainWindow();
+    if (m_mainWindow != nullptr){
+        m_mainWindow->deleteLater();
     }
+    m_mainWindow = new MainWindow(m_comMan);
 
     // Delete login window, if present
     if (m_loginDiag){
         m_loginDiag->deleteLater();
         m_loginDiag = nullptr;
     }
+
+    // Connect signals
+    connect(m_mainWindow, &MainWindow::logout_request, this, &ClientApp::logoutRequested);
+
     m_mainWindow->showMaximized();
 }
 
@@ -117,11 +122,15 @@ void ClientApp::loginRequested(QString username, QString password, QString serve
     connect(m_comMan, &ComManager::serverDisconnected, this, &ClientApp::on_serverDisconnected);
     connect(m_comMan, &ComManager::loginResult, this, &ClientApp::on_loginResult);
     connect(m_comMan, &ComManager::networkError, this, &ClientApp::on_networkError);
-    connect(m_comMan, &ComManager::currentUserUpdated, this, &ClientApp::on_currentUserUpdated);
 
     // Connect to server
     m_comMan->connectToServer(username, password);
 
+}
+
+void ClientApp::logoutRequested()
+{
+    m_comMan->disconnectFromServer();
 }
 
 void ClientApp::on_loginResult(bool logged)
@@ -134,16 +143,9 @@ void ClientApp::on_loginResult(bool logged)
     }
 }
 
-void ClientApp::on_currentUserUpdated()
-{
-    if (m_mainWindow){
-        m_mainWindow->updateCurrentUser(m_comMan->getCurrentUser());
-    }
-}
-
 void ClientApp::on_serverDisconnected()
 {
-
+    showLogin();
 }
 
 void ClientApp::on_serverError(QAbstractSocket::SocketError error, QString error_str)
