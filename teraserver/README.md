@@ -19,8 +19,12 @@ Please follow those steps to setup your development environment.
 5.  Install [PyCharm Community Edition](https://www.jetbrains.com/pycharm/)
 
 6.  Install PostgreSQL with default parameters
-
-7.  Install redis server
+    1. Download and install from : https://www.postgresql.org/download/
+ 
+7.  Install redis server. 
+    1. Recommanded: Install redis from [Docker](https://hub.docker.com/_/redis)
+    2. Linux, Install redis with apt with `sudo apt-get install redis-server`
+    3. Windows: install [redis binaries](https://github.com/MicrosoftArchive/redis/releases)
 
 ### Step 1 : Open the root CMakeLists.txt in QtCreator
 1.  Opening the root teraserver/CMakeLists.txt will allow to create and build the project
