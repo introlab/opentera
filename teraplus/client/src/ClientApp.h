@@ -37,8 +37,8 @@ protected:
 
 private slots:
     void loginRequested(QString username, QString password, QString server_name);
+    void logoutRequested();
     void on_loginResult(bool logged);
-    void on_currentUserUpdated();
 
     void on_serverDisconnected();
     void on_serverError(QAbstractSocket::SocketError error, QString error_str);

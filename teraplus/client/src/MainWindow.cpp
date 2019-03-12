@@ -1,11 +1,19 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    m_comManager = com_manager;
+
+    // Initial UI state
+    // Disable top docker title
+    ui->dockerTop->setTitleBarWidget(new QWidget());
+
+    // Connect signals
+    connectSignals();
 }
 
 MainWindow::~MainWindow()
@@ -13,7 +21,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::updateCurrentUser(const TeraUser &user)
+void MainWindow::connectSignals()
 {
-    ui->lblUser->setText(user.getName());
+    connect(m_comManager, &ComManager::currentUserUpdated, this, &MainWindow::updateCurrentUser);
+}
+
+void MainWindow::updateCurrentUser()
+{
+    ui->lblUser->setText(m_comManager->getCurrentUser().getName());
+}
+
+void MainWindow::on_btnLogout_clicked()
+{
+    emit logout_request();
 }

@@ -24,7 +24,7 @@
 #include <QUuid>
 
 #include "Logger.h"
-#include "WebAPI.h"
+#include "webapi.h"
 
 #include "TeraUser.h"
 
@@ -37,6 +37,7 @@ public:
     ~ComManager();
 
     void connectToServer(QString username, QString password);
+    void disconnectFromServer();
 
     bool processNetworkReply(QNetworkReply* reply);
 
