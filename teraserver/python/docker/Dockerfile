@@ -41,7 +41,9 @@ RUN service postgresql start &&\
 	sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"&&\
 	sudo -u postgres psql -c "create database test" &&\
 	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"&&\
-	sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"
+	sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"&&\
+	sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"&&\
+	sudo -u postgres psql -c "\l"
 
 WORKDIR /opentera/teraserver/python
 
