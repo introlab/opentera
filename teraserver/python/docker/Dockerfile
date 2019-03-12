@@ -49,8 +49,8 @@ WORKDIR /opentera/teraserver/python
 # Private and public mapping
 EXPOSE 4040:4040
 
-# Run the python script
-CMD [ "python3.6", "./TeraServer.py" ]
+# Run the required services and python script
+CMD service postgresql start && service redis start && python3.6 ./TeraServer.py
 
 
 
