@@ -63,7 +63,7 @@ if __name__ == '__main__':
         db_man.open(POSTGRES, True)
     except OperationalError:
         print("Unable to connect to database - please check settings in config file!")
-        quit()
+        # quit()
 
     # Create default values, if required
     db_man.create_defaults()
