@@ -18,6 +18,10 @@ Please follow those steps to setup your development environment.
     
 5.  Install [PyCharm Community Edition](https://www.jetbrains.com/pycharm/)
 
+6.  Install PostgreSQL with default parameters
+
+7.  Install redis server
+
 ### Step 1 : Open the root CMakeLists.txt in QtCreator
 1.  Opening the root teraserver/CMakeLists.txt will allow to create and build the project
     1. Build the project, it will automatically generate the Python environment in env/python-3.6
