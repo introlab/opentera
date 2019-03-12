@@ -117,6 +117,7 @@ void ClientApp::loginRequested(QString username, QString password, QString serve
     connect(m_comMan, &ComManager::serverDisconnected, this, &ClientApp::on_serverDisconnected);
     connect(m_comMan, &ComManager::loginResult, this, &ClientApp::on_loginResult);
     connect(m_comMan, &ComManager::networkError, this, &ClientApp::on_networkError);
+    connect(m_comMan, &ComManager::currentUserUpdated, this, &ClientApp::on_currentUserUpdated);
 
     // Connect to server
     m_comMan->connectToServer(username, password);
@@ -130,6 +131,13 @@ void ClientApp::on_loginResult(bool logged)
     }else{
         m_loginDiag->setStatusMessage(tr("Bienvenue!"));
         showMainWindow();
+    }
+}
+
+void ClientApp::on_currentUserUpdated()
+{
+    if (m_mainWindow){
+        m_mainWindow->updateCurrentUser(m_comMan->getCurrentUser());
     }
 }
 

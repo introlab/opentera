@@ -61,10 +61,10 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
 {
     QString reply_path = reply->url().path();
     QString reply_data = reply->readAll();
-    qDebug() << reply_data;
+    qDebug() << reply_path << " ---> " << reply_data;
 
-    QJsonParseError json_error;
     bool handled = false;
+
 
     //TODO: Restructure - this is going to be a big "mess" of url replies!!
     ///////////////////////////////////////////////////////////////////////
@@ -72,33 +72,75 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
         // Initialize cookies
         m_cookieJar.cookiesForUrl(reply->url());
 
-        // Process reply
-        QJsonDocument login_info = QJsonDocument::fromJson(reply_data.toUtf8(), &json_error);
-        if (json_error.error!= QJsonParseError::NoError)
-            return false;
-
-        // Connect websocket
-        QString web_socket_url = login_info["websocket_url"].toString();
-        m_connectTimer.setInterval(60000);
-        m_connectTimer.start();
-        m_webSocket->open(QUrl(web_socket_url));
-
-        // Query connected user information
-        QString user_uuid = login_info["user_uuid"].toString();
-        QUrl query = m_serverUrl;
-
-        query.setPath(QString(WEB_USERINFO_PATH) + "?user_uuid=" + user_uuid);
-        m_netManager->get(QNetworkRequest(query));
-
-        handled = true;
+        return handleLoginReply(reply_data);
     }
     ///////////////////////////////////////////////////////////////////////
+    if (reply_path == WEB_USERINFO_PATH){
+        return handleUsersReply(reply_data);
+    }
+
     return handled;
 }
 
 TeraUser& ComManager::getCurrentUser()
 {
     return m_currentUser;
+}
+
+bool ComManager::handleLoginReply(const QString &reply_data)
+{
+    QJsonParseError json_error;
+
+    // Process reply
+    QJsonDocument login_info = QJsonDocument::fromJson(reply_data.toUtf8(), &json_error);
+    if (json_error.error!= QJsonParseError::NoError)
+        return false;
+
+    // Connect websocket
+    QString web_socket_url = login_info["websocket_url"].toString();
+    m_connectTimer.setInterval(60000);
+    m_connectTimer.start();
+    m_webSocket->open(QUrl(web_socket_url));
+
+    // Query connected user information
+    QString user_uuid = login_info["user_uuid"].toString();
+    m_currentUser.setUuid(QUuid(user_uuid));
+    QUrl query = m_serverUrl;
+
+    query.setPath(QString(WEB_USERINFO_PATH));
+    query.setQuery("user_uuid=" + user_uuid);
+    m_netManager->get(QNetworkRequest(query));
+
+    return true;
+}
+
+bool ComManager::handleUsersReply(const QString &reply_data)
+{
+    QJsonParseError json_error;
+
+    // Process reply
+    QJsonDocument users = QJsonDocument::fromJson(reply_data.toUtf8(), &json_error);
+    if (json_error.error!= QJsonParseError::NoError)
+        return false;
+
+    // Browse each users
+    QList<TeraUser> users_data;
+    for (QJsonValue user:users.array()){
+        TeraUser user_data(user);
+        if (m_currentUser.getUuid()==user_data.getUuid()){
+            m_currentUser = user_data;
+            emit currentUserUpdated();
+        }
+        users_data.append(user_data);
+    }
+
+    // Emit signal
+    if (!users_data.isEmpty()){
+        emit usersReceived(users_data);
+    }
+
+
+    return true;
 }
 
 

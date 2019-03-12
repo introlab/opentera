@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>OpenTera</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resources/TeraClient.qrc">
+    <normaloff>:/icons/ESTRAD.ico</normaloff>:/icons/ESTRAD.ico</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">QWidget#MainWindow{background-image: url(://TeRA_Background.png); }
 QWidget{background-color: rgba(0,0,0,0);color:white;border-radius:5px;}
@@ -148,7 +152,7 @@ QStatusBar::item{border: 1px transparent black;}</string>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="txtUser">
+                <widget class="QLabel" name="lblUser">
                  <property name="font">
                   <font>
                    <weight>75</weight>
