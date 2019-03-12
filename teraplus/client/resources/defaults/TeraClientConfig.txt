@@ -1,0 +1,25 @@
+{
+	"Settings": {
+		"showServers": true
+	},	
+	"Servers": {
+		"Local": {
+			"url": "localhost",
+			"port": 4040,
+			"webport": 40001, 
+			"pref": 1
+		},
+		"3IT": {
+			"url": "telesante.3it.usherbrooke.ca",
+			"port": 40000,
+			"webport": 40001,
+			"pref": 2
+		},
+		"Test": {
+			"url": "10.0.1.12",
+			"port": 40000,
+			"webport": 40001,
+			"pref": 3
+		}
+	}
+}
