@@ -52,7 +52,7 @@ WORKDIR /opentera/teraserver/python
 EXPOSE 4040:4040
 
 # Run the required services and python script
-CMD ./start.sh
+CMD ls -l && ./start.sh
 
 
 
