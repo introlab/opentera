@@ -5,7 +5,7 @@ FROM ubuntu:18.04
 # Install build dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	postgresql redis-server build-essential cmake python3.6 git \
-	python3-pip
+	python3-pip sudo
 
 # Clone repository
 RUN git clone -b dev https://github.com/introlab/opentera.git
@@ -35,6 +35,13 @@ RUN pip3 install twisted \
     PyInstaller \
     pyopenssl \
     service_identity
+
+#Create db and user
+RUN service postgresql start &&\
+	sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"&&\
+	sudo -u postgres psql -c "create database test" &&\
+	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"&&\
+	sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"
 
 WORKDIR /root
 
