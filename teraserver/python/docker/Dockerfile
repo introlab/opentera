@@ -43,7 +43,14 @@ RUN service postgresql start &&\
 	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"&&\
 	sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"
 
-WORKDIR /root
+WORKDIR /opentera/teraserver/python
+
+
+# Private and public mapping
+EXPOSE 4040:4040
+
+# Run the python script
+CMD [ "python3.6", "./TeraServer.py" ]
 
 
 
