@@ -75,7 +75,7 @@ class TeraUser(db.Model, BaseModel):
         user = TeraUser()
         user.user_enabled = True
         user.user_firstname = "Administrateur"
-        user.user_lastname = "Système"
+        user.user_lastname = "Systeme"
         user.user_profile = ""
         user.user_password = bcrypt.encrypt("admin")
         user.user_superadmin = True
