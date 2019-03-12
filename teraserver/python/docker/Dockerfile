@@ -40,7 +40,7 @@ RUN pip3 install twisted \
 RUN service postgresql start &&\
 	sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"&&\
 	sudo -u postgres psql -c "create database test" &&\
-	sudo -u postgres psql -c "create user TeraAgent with password 'tera';"&&\
+	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"&&\
 	sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"
 
 WORKDIR /opentera/teraserver/python
