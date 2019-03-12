@@ -52,7 +52,7 @@ WORKDIR /opentera/teraserver/python
 EXPOSE 4040:4040
 
 # Run the required services and python script
-CMD service postgresql start && redis-server& && sleep 10 && python3.6 ./TeraServer.py
+CMD ./start.sh
 
 
 
