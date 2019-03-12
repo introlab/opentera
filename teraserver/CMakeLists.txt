@@ -7,7 +7,7 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
 endif(NOT CMAKE_BUILD_TYPE)
 
-add_subdirectory(cpp)
+# add_subdirectory(cpp)
 
 #Disabled for now.
 #This is en experimental HTTP server
