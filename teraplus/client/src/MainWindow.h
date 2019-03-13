@@ -2,8 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QPropertyAnimation>
+#include <QMovie>
+
 #include "data/TeraUser.h"
 #include "ComManager.h"
+#include "Message.h"
 
 namespace Ui {
 class MainWindow;
@@ -13,7 +17,9 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+
 public:
+
     explicit MainWindow(ComManager* com_manager, QWidget *parent = nullptr);
     ~MainWindow();
 
@@ -23,14 +29,29 @@ signals:
 private slots:
     void updateCurrentUser();
 
+    void com_serverError(QAbstractSocket::SocketError error, QString error_msg);
+    void com_networkError(QNetworkReply::NetworkError error, QString error_msg);
+
+    void addMessage(Message::MessageType msg_type, QString msg);
+    void addMessage(const Message& msg);
+    void showNextMessage();
+
+    void on_btnCloseMessage_clicked();
     void on_btnLogout_clicked();
 
 private:
     void connectSignals();
+    void initUi();
+
 
     Ui::MainWindow *ui;
 
     ComManager* m_comManager;
+
+    // Message system
+    QList<Message>  m_messages;
+    QMovie*         m_loadingIcon;
+    QTimer          m_msgTimer;
 
 };
 

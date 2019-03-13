@@ -9,6 +9,7 @@ set(headers
     ComManager.h
     MainWindow.h
     NotificationWindow.h
+    Message.h
 )
 
 set(srcs
@@ -19,6 +20,7 @@ set(srcs
     ComManager.cpp
     MainWindow.cpp
     NotificationWindow.cpp
+    Message.cpp
 )
 
 SET(uis

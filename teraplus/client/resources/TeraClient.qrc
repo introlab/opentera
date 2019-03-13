@@ -74,5 +74,7 @@
         <file>icons/video_add.png</file>
         <file>icons/warning.png</file>
         <file>TeRA_Background.png</file>
+        <file>icons/error.png</file>
+        <file>icons/ok.png</file>
     </qresource>
 </RCC>
