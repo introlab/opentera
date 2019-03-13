@@ -16,11 +16,23 @@ from modules.RedisModule import get_redis
 
 class RedisClient:
 
-    def __init__(self):
-        print('Init RedisClient', self)
+    def __init__(self, config=None):
+        print('Init RedisClient', self, config)
         self.protocol = None
-        self.redis = redis.Redis(host='localhost', port=6379, db=0)
-        reactor.connectTCP("localhost", 6379, RedisProtocolFactory(parent=self, protocol=redisProtocol))
+        self.config = config
+
+        # Fill config
+        if self.config is None:
+            print('RedisClient - Warning, using default redis configuration')
+            self.config = {'hostname': 'localhost', 'port': 6379, 'db': 0}
+
+        # Redis client (synchronous)
+        self.redis = redis.Redis(host=self.config['hostname'], port=self.config['port'], db=self.config['db'])
+
+        # Redis client (async)
+        reactor.connectTCP(self.config['hostname'], self.config['port'], RedisProtocolFactory(parent=self, protocol=redisProtocol))
+
+
 
     # @defer.inlineCallbacks
     # def getConnection(self):
@@ -58,6 +70,9 @@ class RedisClient:
 
     def redisSet(self, key, value, ex=None):
         self.redis.set(key, value, ex=ex)
+
+    def redisDelete(self, key):
+        self.redis.delete(key)
 
 
 # Debug
