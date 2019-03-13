@@ -5,6 +5,7 @@ class ConfigManager:
 
     server_config = {}  # name, port, ssl_path
     db_config = {}      # name, url, port, username, password
+    redis_config = {}
 
     def __init__(self):
         pass
@@ -31,6 +32,9 @@ class ConfigManager:
         if self.validate_database_config(config_json['Database']):
             self.db_config = config_json["Database"]
 
+        if self.validate_redis_config(config_json['Redis']):
+            self.redis_config = config_json["Redis"]
+
     @staticmethod
     def validate_server_config(config):
         rval = True
@@ -38,6 +42,7 @@ class ConfigManager:
         for field in required_fields:
             if field not in config:
                 print('ERROR: Server Config - missing server ' + field)
+                rval = False
         return rval
 
     @staticmethod
@@ -47,4 +52,19 @@ class ConfigManager:
         for field in required_fields:
             if field not in config:
                 print('ERROR: Database Config - missing database ' + field)
+                rval = False
+        return rval
+
+    @staticmethod
+    def validate_redis_config(config):
+        """
+        :param config:
+        :return:
+        """
+        rval = True
+        required_fields = ['hostname', 'port', 'db', 'username', 'password']
+        for field in required_fields:
+            if field not in config:
+                print('ERROR: Redis Config - missing database ' + field)
+                rval = False
         return rval

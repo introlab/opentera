@@ -4,10 +4,13 @@ from libtera.ConfigManager import ConfigManager
 red = None
 
 
-def setup_redis(config : ConfigManager):
-    print('setup_redis', config )
+def setup_redis(config: ConfigManager):
+    print('setup_redis', config)
     global red
-    red = redis.Redis(host='localhost', port=6379, db=0)
+    # For now we are not using username, password
+    red = redis.Redis(host=config.redis_config['hostname'],
+                      port=config.redis_config['port'],
+                      db=config.redis_config['db'])
     print(red)
 
 

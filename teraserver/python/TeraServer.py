@@ -74,9 +74,9 @@ if __name__ == '__main__':
     login_module.setup()
 
     # Twisted will run flask
-    twisted_module = TwistedModule(config_man.server_config)
+    twisted_module = TwistedModule(config_man)
 
-    user_manager_module = UserManagerModule()
+    user_manager_module = UserManagerModule(config_man)
     user_manager_module.setup()
 
     # This is blocking, running event loop
