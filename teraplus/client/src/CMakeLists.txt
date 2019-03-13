@@ -1,6 +1,7 @@
 find_package(Qt5Core REQUIRED)
 find_package(Qt5WebEngine REQUIRED)
 find_package(Qt5WebEngineWidgets REQUIRED)
+find_package(Qt5Multimedia  REQUIRED)
 
 set(headers
     ClientApp.h
@@ -10,6 +11,8 @@ set(headers
     MainWindow.h
     NotificationWindow.h
     Message.h
+    editors/DataEditorWidget.h
+    editors/UserWidget.h
 )
 
 set(srcs
@@ -21,12 +24,15 @@ set(srcs
     MainWindow.cpp
     NotificationWindow.cpp
     Message.cpp
+    editors/DataEditorWidget.cpp
+    editors/UserWidget.cpp
 )
 
 SET(uis
     LoginDialog.ui
     MainWindow.ui
     notification.ui
+    editors/UserWidget.ui
 )
 
 SET(qrcs

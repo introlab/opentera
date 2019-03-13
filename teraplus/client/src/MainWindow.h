@@ -4,6 +4,9 @@
 #include <QMainWindow>
 #include <QPropertyAnimation>
 #include <QMovie>
+#include <QDialog>
+
+#include "editors/UserWidget.h"
 
 #include "data/TeraUser.h"
 #include "ComManager.h"
@@ -38,6 +41,8 @@ private slots:
 
     void on_btnCloseMessage_clicked();
     void on_btnLogout_clicked();
+
+    void on_btnEditUser_clicked();
 
 private:
     void connectSignals();

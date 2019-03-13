@@ -26,7 +26,6 @@ ComManager::ComManager(QUrl serverUrl, QObject *parent) : QObject(parent)
     connect(m_netManager, &QNetworkAccessManager::sslErrors, this, &ComManager::onNetworkSslErrors);
 
     // Other objects
-
     connect(&m_connectTimer, &QTimer::timeout, this, &ComManager::onTimerConnectTimeout);
 
     // Create correct server url
@@ -48,20 +47,13 @@ void ComManager::connectToServer(QString username, QString password)
 
     m_loggingInProgress = true; // Indicate that a login request was sent, but not processed
 
-    QUrl login_url = m_serverUrl;
-    login_url.setPath(WEB_LOGIN_PATH);
-    m_netManager->get(QNetworkRequest(login_url));
-
-    //m_connectTimer.setInterval(8000);
-    //m_connectTimer.start();
+    doQuery(QString(WEB_LOGIN_PATH));
 
 }
 
 void ComManager::disconnectFromServer()
 {
-    QUrl logout_url = m_serverUrl;
-    logout_url.setPath(WEB_LOGOUT_PATH);
-    m_netManager->get(QNetworkRequest(logout_url));
+    doQuery(QString(WEB_LOGOUT_PATH));
 }
 
 bool ComManager::processNetworkReply(QNetworkReply *reply)
@@ -69,6 +61,8 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
     QString reply_path = reply->url().path();
     QString reply_data = reply->readAll();
     qDebug() << reply_path << " ---> " << reply_data;
+
+    emit waitingForReply(false);
 
     bool handled = false;
 
@@ -91,6 +85,18 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
     return handled;
 }
 
+void ComManager::doQuery(const QString &path, const QString &query_args)
+{
+    QUrl query = m_serverUrl;
+
+    query.setPath(path);
+    if (!query_args.isEmpty()){
+        query.setQuery(query_args);
+    }
+    m_netManager->get(QNetworkRequest(query));
+    emit waitingForReply(true);
+}
+
 TeraUser& ComManager::getCurrentUser()
 {
     return m_currentUser;
@@ -107,18 +113,14 @@ bool ComManager::handleLoginReply(const QString &reply_data)
 
     // Connect websocket
     QString web_socket_url = login_info["websocket_url"].toString();
-    m_connectTimer.setInterval(60000);
+    m_connectTimer.setInterval(60000); //TODO: Reduce this delay - was set that high because of the time required to connect in MAC OS
     m_connectTimer.start();
     m_webSocket->open(QUrl(web_socket_url));
 
     // Query connected user information
     QString user_uuid = login_info["user_uuid"].toString();
     m_currentUser.setUuid(QUuid(user_uuid));
-    QUrl query = m_serverUrl;
-
-    query.setPath(QString(WEB_USERINFO_PATH));
-    query.setQuery("user_uuid=" + user_uuid);
-    m_netManager->get(QNetworkRequest(query));
+    doQuery(QString(WEB_USERINFO_PATH), "user_uuid=" + user_uuid);
 
     return true;
 }

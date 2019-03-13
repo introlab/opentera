@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+
 #include "ui_MainWindow.h"
 
 MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
@@ -130,4 +131,15 @@ void MainWindow::addMessage(const Message &msg)
 void MainWindow::on_btnCloseMessage_clicked()
 {
     showNextMessage();
+}
+
+void MainWindow::on_btnEditUser_clicked()
+{
+    QDialog diag(this);
+    UserWidget* user_editor = new UserWidget(m_comManager, m_comManager->getCurrentUser(), &diag);
+    user_editor->setLimited(true);
+
+    diag.setWindowTitle(tr("Votre compte"));
+
+    diag.exec();
 }

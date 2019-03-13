@@ -40,6 +40,7 @@ public:
     void disconnectFromServer();
 
     bool processNetworkReply(QNetworkReply* reply);
+    void doQuery(const QString &path, const QString &query_args = QString());
 
     TeraUser &getCurrentUser();
 
@@ -66,6 +67,7 @@ signals:
     void serverDisconnected();
     void serverError(QAbstractSocket::SocketError, QString);
     void networkError(QNetworkReply::NetworkError, QString);
+    void waitingForReply(bool waiting);
 
     void loginResult(bool logged_in);
 
