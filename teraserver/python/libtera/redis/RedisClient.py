@@ -11,7 +11,7 @@ import txredisapi as txredis
 # Blocking redis
 import redis
 
-from modules.RedisModule import get_redis
+from modules.RedisModule.RedisModule import get_redis
 
 
 class RedisClient:

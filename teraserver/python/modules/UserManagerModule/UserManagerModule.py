@@ -1,4 +1,4 @@
-from modules.RedisModule import get_redis
+from modules.RedisModule.RedisModule import get_redis
 from flask import jsonify
 
 from libtera.redis.RedisClient import RedisClient

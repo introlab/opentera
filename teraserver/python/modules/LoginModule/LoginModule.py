@@ -2,13 +2,13 @@
 from flask_login import LoginManager, login_user, logout_user
 from flask import session, jsonify
 
-from modules.FlaskModule import flask_app
+from modules.FlaskModule.FlaskModule import flask_app
 
 from libtera.redis.RedisClient import RedisClient
 from libtera.db.models.TeraUser import TeraUser
 
 from modules.Globals import auth
-from modules.RedisModule import get_redis
+from modules.RedisModule.RedisModule import get_redis
 
 
 class LoginModule:

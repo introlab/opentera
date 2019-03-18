@@ -2,7 +2,7 @@ from libtera.db.Base import db
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraUserGroup import TeraUserGroup
 
-from modules.FlaskModule import flask_app
+from modules.FlaskModule.FlaskModule import flask_app
 
 
 class DBManager:

@@ -1,4 +1,4 @@
-from modules.FlaskModule import flask_app
+from modules.FlaskModule.FlaskModule import flask_app
 
 # WebSockets
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
@@ -109,12 +109,11 @@ class TwistedModuleWebSocketServerFactory(WebSocketServerFactory):
 
     def buildProtocol(self, addr):
         """
-        This overloaded function is called when a new protocol (effective connection to the redis server) is
+        This overloaded function is called when a new protocol (effective connection to the websocket server) is
         performed.
         :param addr:
         :return:
         """
-        print('buildProtocol')
         p = TeraWebSocketServerProtocol(config=self.config)
         p.factory = self
         return p
