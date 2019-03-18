@@ -11,17 +11,22 @@ class QueryUsers(Resource):
         Resource.__init__(self)
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('user_username', type=str, help='username')
+        self.parser.add_argument('user_uuid', type=str, help='uuid')
 
     @auth.login_required
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
-
         args = self.parser.parse_args()
 
-        print(args)
+        my_args = {}
+
+        # Make sure we remove the None, safe?
+        for key in args:
+            if args[key] is not None:
+                my_args[key] = args[key]
 
         try:
-            users = TeraUser.query_data(args)
+            users = TeraUser.query_data(my_args)
             users_list = []
             for user in users:
                 users_list.append(user.to_json())
@@ -30,10 +35,10 @@ class QueryUsers(Resource):
             return '', 500
 
     def post(self):
-        return 501
+        return '', 501
 
     def delete(self):
-        return 501
+        return '', 501
 
 
 
