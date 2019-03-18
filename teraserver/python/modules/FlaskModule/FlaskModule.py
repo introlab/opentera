@@ -22,11 +22,14 @@ class FlaskModule:
         self.init_api()
 
     def init_api(self):
-        from .API.Index import Index
+        # from .API.Index import Index
         from .API.QueryUsers import QueryUsers
         from .API.Profile import Profile
+        self.api.add_resource(QueryUsers, '/api/users', resource_class_args=[self])
+        self.api.add_resource(Profile, '/api/profile', resource_class_args=[self])
 
-        # Index for testing...
-        self.api.add_resource(Index, '/')
-        self.api.add_resource(QueryUsers, '/api/users')
-        self.api.add_resource(Profile, '/api/profile')
+    # Index for testing...
+    @flask_app.route('/', methods=['GET', 'POST'])
+    @auth.login_required
+    def index():
+        return render_template('index.html')
