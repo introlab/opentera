@@ -225,7 +225,7 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
       <item>
        <widget class="QTabWidget" name="tabMain">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tabInfos">
          <attribute name="title">
@@ -612,7 +612,7 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                  <property name="geometry">
                   <rect>
                    <x>0</x>
-                   <y>0</y>
+                   <y>-534</y>
                    <width>678</width>
                    <height>876</height>
                   </rect>

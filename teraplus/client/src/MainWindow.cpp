@@ -138,6 +138,7 @@ void MainWindow::on_btnEditUser_clicked()
     QDialog diag(this);
     UserWidget* user_editor = new UserWidget(m_comManager, m_comManager->getCurrentUser(), &diag);
     user_editor->setLimited(true);
+    connect(user_editor, &UserWidget::closeRequest, &diag, &QDialog::close);
 
     diag.setWindowTitle(tr("Votre compte"));
 

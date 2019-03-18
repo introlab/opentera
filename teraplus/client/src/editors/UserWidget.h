@@ -32,6 +32,8 @@ public:
 
     void setLimited(bool limited);
 
+    void connectSignals();
+
 private:
     Ui::UserWidget* ui;
 
@@ -61,11 +63,11 @@ private slots:
     void showPassword(bool show);
     void comboItemChanged();
 
-    void on_btnEdit_clicked();
-    void on_btnDelete_clicked();
-    void on_btnSave_clicked();
-    void on_txtPassword_textChanged(const QString &new_pass);
-    void on_btnUndo_clicked();
+    void btnEdit_clicked();
+    void btnDelete_clicked();
+    void btnSave_clicked();
+    void txtPassword_textChanged(const QString &new_pass);
+    void btnUndo_clicked();
 };
 
 

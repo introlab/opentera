@@ -16,9 +16,11 @@ UserWidget::UserWidget(ComManager *comMan, const TeraUser &data, QWidget *parent
 {
     setData(data);
 
-    if (parent)
+    if (parent){
         ui->setupUi(parent);
-    else {
+        ui->btnEdit->hide();
+        ui->btnDelete->hide();
+    }else {
         ui->setupUi(this);
     }
     setAttribute(Qt::WA_StyledBackground); //Required to set a background image
@@ -53,6 +55,7 @@ UserWidget::UserWidget(ComManager *comMan, const TeraUser &data, QWidget *parent
 
 
     // Connect signals and slots
+    connectSignals();
 
     // UI signals
     /*connect(chkCamControl1,SIGNAL(stateChanged(int)),this,SLOT(componentChecked(int)));
@@ -183,7 +186,7 @@ void UserWidget::saveData(bool signal){
     if (signal)
         emit dataWasChanged();
 
-    if (m_limited)
+    if (parent())
         emit closeRequest(); // Ask to close that editor
 }
 
@@ -635,17 +638,27 @@ void UserWidget::setLimited(bool limited){
     setEditing();
 
 }
-void UserWidget::on_btnEdit_clicked()
+
+void UserWidget::connectSignals()
+{
+    connect(ui->btnEdit, &QPushButton::clicked, this, &UserWidget::btnEdit_clicked);
+    connect(ui->btnDelete, &QPushButton::clicked, this, &UserWidget::btnDelete_clicked);
+    connect(ui->btnUndo, &QPushButton::clicked, this, &UserWidget::btnUndo_clicked);
+    connect(ui->btnSave, &QPushButton::clicked, this, &UserWidget::btnSave_clicked);
+    connect(ui->txtPassword, &QLineEdit::textChanged, this, &UserWidget::txtPassword_textChanged);
+
+}
+void UserWidget::btnEdit_clicked()
 {
     setEditing(true);
 }
 
-void UserWidget::on_btnDelete_clicked()
+void UserWidget::btnDelete_clicked()
 {
     undoOrDeleteData();
 }
 
-void UserWidget::on_btnSave_clicked()
+void UserWidget::btnSave_clicked()
 {
     /* if (!dataIsNew())//btnExisting->isChecked())
          m_data->setUuid(m_profile.getUUID());
@@ -658,9 +671,10 @@ void UserWidget::on_btnSave_clicked()
      if (!dataIsNew())
          setEditing(false); // This will save TeRA related stuff
          */
+
 }
 
-void UserWidget::on_txtPassword_textChanged(const QString &new_pass)
+void UserWidget::txtPassword_textChanged(const QString &new_pass)
 {
     Q_UNUSED(new_pass)
     if (ui->txtPassword->text().isEmpty()){
@@ -671,11 +685,11 @@ void UserWidget::on_txtPassword_textChanged(const QString &new_pass)
     }
 }
 
-void UserWidget::on_btnUndo_clicked()
+void UserWidget::btnUndo_clicked()
 {
     undoOrDeleteData();
 
-    if (m_limited)
+    if (parent())
         emit closeRequest();
 
 
