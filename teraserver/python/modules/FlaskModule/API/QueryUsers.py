@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, abort, session
-from flask_restful import Resource, Api, reqparse
+from flask import jsonify, session
+from flask_restful import Resource, reqparse
 from modules.Globals import auth
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
@@ -7,7 +7,7 @@ from libtera.db.models.TeraUser import TeraUser
 
 class QueryUsers(Resource):
 
-    def __init__(self):
+    def __init__(self, flaskModule=None):
         Resource.__init__(self)
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('user_username', type=str, help='username')
