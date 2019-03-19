@@ -56,6 +56,7 @@ include_directories(
     ${OPENTERA_MESSAGES_INCLUDES}
     ${OPENTERA_SHARED_INCLUDES}
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/editors
     ${CMAKE_CURRENT_BINARY_DIR})
 
 # create an executable file named "TeraClient" from the source files
