@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QDebug>
 #include <QVariantList>
+#include <QVariantMap>
 
 #include "Logger.h"
 
@@ -32,10 +33,19 @@ void TeraForm::buildUiFromStructure(const QString &structure)
     }
 
     // Sections
-    QVariantList test = struct_info.array().toVariantList();
-    qDebug() << test;
-/*    for (QJsonValue section:struct_info.array()){
-
-    }*/
+    QVariantList struct_data = struct_info.array().toVariantList();
+    int page_index = 0;
+    for (QVariant section:struct_data){
+        if (section.canConvert(QMetaType::QVariantMap)){
+            QVariantMap section_data = section.toMap();
+            if (page_index>0){
+                QWidget* new_page = new QWidget(ui->toolboxMain);
+                new_page->setObjectName("pageSection" + QString::number(page_index+1));
+                ui->toolboxMain->addItem(new_page,"");
+            }
+            ui->toolboxMain->setItemText(page_index, section_data["label"].toString());
+            page_index++;
+        }
+    }
 
 }
