@@ -2,10 +2,9 @@ import string
 
 
 class TeraForm:
-    sections = []
 
     def __init__(self):
-        return
+        self.sections = []
 
     def add_section(self, section):
         self.sections.append(section)

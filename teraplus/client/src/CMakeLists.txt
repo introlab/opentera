@@ -13,6 +13,7 @@ set(headers
     Message.h
     editors/DataEditorWidget.h
     editors/UserWidget.h
+    editors/TeraForm.h
 )
 
 set(srcs
@@ -26,6 +27,7 @@ set(srcs
     Message.cpp
     editors/DataEditorWidget.cpp
     editors/UserWidget.cpp
+    editors/TeraForm.cpp
 )
 
 SET(uis
@@ -33,6 +35,7 @@ SET(uis
     MainWindow.ui
     notification.ui
     editors/UserWidget.ui
+    editors/TeraForm.ui
 )
 
 SET(qrcs

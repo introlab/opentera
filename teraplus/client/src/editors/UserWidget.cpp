@@ -118,6 +118,10 @@ void UserWidget::setData(const TeraUser &data){
         m_data->deleteLater();
 
     m_data = new TeraUser(data);
+
+    // Query profile definition
+    m_comManager->doQuery(WEB_USERPROFILEDEF_PATH);
+
     /*
     if (m_data_type==TERADATA_KIT){
         m_data->setUserType(UserInfo::USERTYPE_KIT);
@@ -381,7 +385,7 @@ void UserWidget::hideValidationIcons(){
 //////////////////////////////////////////////////////////
 void UserWidget::initProfileUI(){
     // Initial view
-    hideProfileValidationIcons();
+   /* hideProfileValidationIcons();
 
     ui->tabProfile->setVisible(true);
     ui->btnDelExternal->setEnabled(false);
@@ -417,12 +421,12 @@ void UserWidget::initProfileUI(){
     ui->lblAudioMissing->setVisible(false);
     ui->txtVirtualCamAdr->setText("");
 
-    ui->lstExternal->clear();
+    ui->lstExternal->clear();*/
 
 }
 
 void UserWidget::componentChecked(int state){
-    bool check = (state == Qt::Checked);
+    /*bool check = (state == Qt::Checked);
     // Find emitting widget
     QCheckBox* checkbox = dynamic_cast<QCheckBox*>(sender());
 
@@ -454,7 +458,7 @@ void UserWidget::componentChecked(int state){
         if (checkbox->objectName()=="chkExternalPrograms"){
             ui->frmExternalPrograms->setVisible(check);
         }
-    }
+    }*/
 }
 
 void UserWidget::changeFieldType(){
@@ -499,7 +503,7 @@ void UserWidget::changeFieldType(){
 
 void UserWidget::showPassword(bool show){
     // Find emitting widget
-    QPushButton* btn = dynamic_cast<QPushButton*>(sender());
+    /*QPushButton* btn = dynamic_cast<QPushButton*>(sender());
 
     if (btn){
         if (btn->objectName()=="btnControlPass1"){
@@ -509,7 +513,7 @@ void UserWidget::showPassword(bool show){
                 ui->txtControlPass1->setEchoMode(QLineEdit::Password);
         }
 
-    }
+    }*/
 }
 
 void UserWidget::comboItemChanged(){
@@ -599,15 +603,20 @@ void UserWidget::comboItemChanged(){
             }
         }*/
 
-        if (combo->objectName()=="cmbControl1"){
+       /* if (combo->objectName()=="cmbControl1"){
             ui->frmONVIF1->setVisible(ui->cmbControl1->currentData()=="ONVIF");
         }
 
         if (combo->objectName() == "cmbVirtualCam"){
             ui->frmVirtualCamNetwork->setVisible(ui->cmbVirtualCam->currentIndex()==0);
             ui->frmVirtualCamScreen->setVisible(ui->cmbVirtualCam->currentIndex()==1);
-        }
+        }*/
     }
+}
+
+void UserWidget::profileDefReceived(const QString& def)
+{
+    ui->wdgProfile->buildUiFromStructure(def);
 }
 
 void UserWidget::updateProfileUI(){
@@ -617,8 +626,8 @@ void UserWidget::updateProfileUI(){
 }
 
 void UserWidget::hideProfileValidationIcons(){
-    ui->valControlAdr1->setVisible(false);
-    ui->valControlPort1->setVisible(false);
+    /*ui->valControlAdr1->setVisible(false);
+    ui->valControlPort1->setVisible(false);*/
 }
 
 bool UserWidget::validateProfile(){
@@ -646,6 +655,8 @@ void UserWidget::connectSignals()
     connect(ui->btnUndo, &QPushButton::clicked, this, &UserWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &UserWidget::btnSave_clicked);
     connect(ui->txtPassword, &QLineEdit::textChanged, this, &UserWidget::txtPassword_textChanged);
+
+    connect(m_comManager, &ComManager::profileDefReceived, this, &UserWidget::profileDefReceived);
 
 }
 void UserWidget::btnEdit_clicked()

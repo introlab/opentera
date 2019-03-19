@@ -27,6 +27,7 @@ void MainWindow::connectSignals()
     connect(m_comManager, &ComManager::currentUserUpdated, this, &MainWindow::updateCurrentUser);
     connect(m_comManager, &ComManager::networkError, this, &MainWindow::com_networkError);
     connect(m_comManager, &ComManager::serverError, this, &MainWindow::com_serverError);
+    connect(m_comManager, &ComManager::waitingForReply, this, &MainWindow::com_waitingForReply);
     connect(&m_msgTimer, &QTimer::timeout, this, &MainWindow::showNextMessage);
 }
 
@@ -79,7 +80,8 @@ void MainWindow::showNextMessage()
         m_loadingIcon->start();
         break;
     }
-    ui->lblMessage->setStyleSheet("background-color: " + background_color + ";");
+    ui->frameMessages->setStyleSheet("background-color: " + background_color + ";");
+    ui->lblMessage->setText(msg.getMessageText());
     m_msgTimer.start();
 
     QPropertyAnimation *animate = new QPropertyAnimation(ui->frameMessages,"windowOpacity",this);
@@ -107,6 +109,17 @@ void MainWindow::com_networkError(QNetworkReply::NetworkError error, QString err
 {
     Q_UNUSED(error)
     addMessage(Message::MESSAGE_ERROR, error_msg);
+}
+
+void MainWindow::com_waitingForReply(bool waiting)
+{
+    if (waiting){
+        addMessage(Message::MESSAGE_WORKING, "");
+    }else{
+        showNextMessage();
+    }
+    ui->btnEditUser->setEnabled(!waiting);
+    ui->btnConfig->setEnabled(!waiting);
 }
 
 void MainWindow::on_btnLogout_clicked()

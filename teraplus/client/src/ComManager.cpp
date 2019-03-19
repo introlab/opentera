@@ -60,7 +60,7 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
 {
     QString reply_path = reply->url().path();
     QString reply_data = reply->readAll();
-    qDebug() << reply_path << " ---> " << reply_data;
+    //qDebug() << reply_path << " ---> " << reply_data;
 
     emit waitingForReply(false);
 
@@ -79,6 +79,11 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
 
     if (reply_path == WEB_LOGOUT_PATH){
         emit serverDisconnected();
+        handled = true;
+    }
+
+    if (reply_path == WEB_USERPROFILEDEF_PATH){
+        emit profileDefReceived(reply_data);
         handled = true;
     }
 

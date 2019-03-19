@@ -34,6 +34,7 @@ private slots:
 
     void com_serverError(QAbstractSocket::SocketError error, QString error_msg);
     void com_networkError(QNetworkReply::NetworkError error, QString error_msg);
+    void com_waitingForReply(bool waiting);
 
     void addMessage(Message::MessageType msg_type, QString msg);
     void addMessage(const Message& msg);
