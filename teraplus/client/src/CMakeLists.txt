@@ -61,7 +61,7 @@ include_directories(
 
 # create an executable file named "TeraClient" from the source files
 add_executable(TeraClient ${srcs} ${headers} ${moc_srcs} ${client_qrc} ${moc_uis})
-qt5_use_modules(TeraClient Core Network WebSockets WebEngine WebEngineWidgets WebSockets)
+qt5_use_modules(TeraClient Core Network Multimedia WebSockets WebEngine WebEngineWidgets WebSockets)
 
 # Linking with Qt libraries and others
 target_link_libraries(TeraClient ${OPENTERA_SHARED_LIBS})

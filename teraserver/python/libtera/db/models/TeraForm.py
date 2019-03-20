@@ -48,7 +48,7 @@ class TeraFormValue:
 
 class TeraFormItemCondition:
 
-    def __init__(self, condition_item: string,  condition_operator: string, condition_condition: string):
+    def __init__(self, condition_item: string,  condition_operator, condition_condition: string):
         self.condition = condition_condition
         self.item = condition_item
         self.operator = condition_operator

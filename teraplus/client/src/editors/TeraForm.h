@@ -1,7 +1,24 @@
 #ifndef TERAFORM_H
 #define TERAFORM_H
 
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonArray>
+#include <QJsonObject>
+
+#include <QVariantList>
+#include <QVariantMap>
+
 #include <QWidget>
+#include <QLabel>
+#include <QComboBox>
+#include <QFormLayout>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QSpinBox>
+
+#include <QtMultimedia/QCameraInfo>
+#include <QtMultimedia/QAudioDeviceInfo>
 
 namespace Ui {
 class TeraForm;
@@ -18,8 +35,25 @@ public:
     void buildUiFromStructure(const QString& structure);
 
 private:
-    Ui::TeraForm *ui;
+    Ui::TeraForm            *ui;
+    QMap<QString, QWidget*> m_widgets;
 
+    void buildFormFromStructure(QWidget* page, const QVariantList &structure);
+    void setDefaultValues();
+
+    QWidget* createVideoInputsWidget(const QVariantMap& structure);
+    QWidget* createAudioInputsWidget(const QVariantMap& structure);
+    QWidget* createArrayWidget(const QVariantMap& structure);
+    QWidget* createTextWidget(const QVariantMap& structure, bool is_masked);
+    QWidget* createBooleanWidget(const QVariantMap& structure);
+    QWidget* createNumericWidget(const QVariantMap& structure);
+
+    void checkConditions();
+    void setWidgetVisibility(QWidget* widget, bool visible);
+    void getWidgetValues(QWidget *widget, QVariant *id, QVariant* value);
+
+private slots:
+    void widgetValueChanged();
 
 };
 
