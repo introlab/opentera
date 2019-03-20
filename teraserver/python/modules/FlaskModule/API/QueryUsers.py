@@ -9,6 +9,7 @@ class QueryUsers(Resource):
 
     def __init__(self, flaskModule=None):
         Resource.__init__(self)
+        self.module = flaskModule
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('user_username', type=str, help='username')
         self.parser.add_argument('user_uuid', type=str, help='uuid')
@@ -40,39 +41,3 @@ class QueryUsers(Resource):
     def delete(self):
         return '', 501
 
-
-
-"""
-# Queries
-    @staticmethod
-    @flask_app.route('/api/query/users', methods=['GET', 'POST', 'DELETE'])
-    @auth.login_required
-    def users():
-        if request.method == 'GET':
-            current_user = TeraUser.get_user_by_uuid(session['user_id'])
-            # if not request.args:
-            #     # Return current user information
-            #     user = TeraUser.get_user_by_uuid(session['user_id'])
-            #     return jsonify([user.to_json()])
-
-            # Parse query items
-            # TODO: Check access rights
-            try:
-                users = TeraUser.query_data(request.args.to_dict())
-                users_list = []
-                for user in users:
-                    users_list.append(user.to_json())
-                return jsonify(users_list)
-            except InvalidRequestError:
-                abort(500)
-
-            return
-
-        if request.method == 'POST':
-            abort(501)
-
-        if request.method == 'DELETE':
-            abort(501)
-
-
-"""

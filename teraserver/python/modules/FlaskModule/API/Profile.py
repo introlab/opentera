@@ -7,6 +7,7 @@ from libtera.db.models.TeraUser import TeraUser
 class Profile(Resource):
 
     def __init__(self, flaskModule=None):
+        self.module = flaskModule
         Resource.__init__(self)
         self.parser = reqparse.RequestParser()
 
