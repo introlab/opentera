@@ -23,12 +23,11 @@
    <string>Utilisateur</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#UserWidget{background-image: url(:/pictures/TeRA_Background.png); }
-QPushButton#btnConnect{background-color:rgb(80,180,80)}
+   <string notr="true">QPushButton#btnConnect{background-color:rgb(80,180,80)}
 QWidget{background-color: rgba(0,0,0,0);color:white;border-radius:5px}
 QWidget#mainWidget{background-color:rgba(128,128,128,25%);}
 QWidget#frmProfile,QWidget#pageProfile{background-color:rgba(108,8,156,25%);}
-QPlainTextEdit,QLineEdit,QListWidget,QComboBox,QTextEdit{background-color: rgba(255,255,255,50%); color: black;}
+QPlainTextEdit,QLineEdit,QListWidget,QComboBox,QTextEdit,QSpinBox{background-color: rgba(255,255,255,50%); color: black;}
 
 QTableWidget{
 background-color: rgba(0,0,0,50%);

@@ -143,34 +143,34 @@ class TeraUser(db.Model, BaseModel):
                             "0", TeraFormItemCondition("camera", "=", "TeraCam"))
         section1.add_item(item)
 
-        item = TeraFormItem("teracam_src", "Adresse du flux de la caméra", "string", True,
-                            item_condition=TeraFormItemCondition("teracam_type", "=", "0"))
+        item = TeraFormItem("teracam_src", "Adresse du flux de la caméra", "text", True,
+                            item_condition=TeraFormItemCondition("teracam_type", "=", 0))
         section1.add_item(item)
 
         item = TeraFormItem("teracam_screen_fps", "Trames par seconde", "array", True, ["Maximum", "5", "10", "15",
                                                                                         "20", "24", "30"],
-                            item_condition=TeraFormItemCondition("teracam_type", "=", "1"))
+                            item_condition=TeraFormItemCondition("teracam_type", "=", 1))
         section1.add_item(item)
         item = TeraFormItem("teracam_screen_res", "Résolution", "array", True, ["Maximum", "160x120", "320x240",
                                                                                 "640x480", "720x480", "800x600",
                                                                                 "1024x768", "1280x720", "1440x900",
                                                                                 "1680x1050", "1920x1080"],
-                            item_condition=TeraFormItemCondition("teracam_type", "=", "1"))
+                            item_condition=TeraFormItemCondition("teracam_type", "=", 1))
         section1.add_item(item)
 
         section1.add_item(TeraFormItem("camera_ptz", "Caméra contrôlable (PTZ)", "boolean"))
-        item = TeraFormItem("camera_ptz_type", "Type de caméra", "array", True, [TeraFormValue("0", "Vivotek"),
-                                                                                 TeraFormValue("1", "ONVIF (générique)")
-                                                                                 ],
+        item = TeraFormItem("camera_ptz_type", "Type de contrôle", "array", True, [TeraFormValue("0", "Vivotek"),
+                                                                                   TeraFormValue("1",
+                                                                                                 "ONVIF (générique)")],
                             item_condition=TeraFormItemCondition("camera_ptz", "=", True))
         section1.add_item(item)
-        item = TeraFormItem("camera_ptz_ip", "Adresse réseau", "string", True,
+        item = TeraFormItem("camera_ptz_ip", "Adresse réseau", "text", True,
                             item_condition=TeraFormItemCondition("camera_ptz", "=", True))
         section1.add_item(item)
         item = TeraFormItem("camera_ptz_port", "Port", "numeric", True,
                             item_condition=TeraFormItemCondition("camera_ptz", "=", True))
         section1.add_item(item)
-        item = TeraFormItem("camera_ptz_username", "Nom utilisateur", "string", True,
+        item = TeraFormItem("camera_ptz_username", "Nom utilisateur", "text", True,
                             item_condition=TeraFormItemCondition("camera_ptz", "=", True))
         section1.add_item(item)
         item = TeraFormItem("camera_ptz_password", "Mot de passe", "password", True,

@@ -13,6 +13,23 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QToolBox::tab {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 grey, stop: 0.2  black, stop:1 grey);
+    border-radius: 5px;
+    color: darkgray;
+}
+
+QToolBox::tab:selected { /* italicize selected tabs */
+    font: bold;
+    color: white;
+}
+
+QWidget#pageSection1{
+ 	border: 1px solid white;
+	border-radius: 5px;
+}</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
     <number>4</number>
