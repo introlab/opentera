@@ -5,7 +5,7 @@ from modules.Globals import auth
 
 class Index(MethodView):
     # Decorators everywhere?
-    # decorators = [auth.login_required]
+    decorators = [auth.login_required]
 
     def __init__(self, *args, **kwargs):
         print('Index.__init__', args, kwargs)

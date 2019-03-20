@@ -119,19 +119,21 @@ class TwistedModuleWebSocketServerFactory(WebSocketServerFactory):
         return p
 
 
-class TwistedModule:
+class TwistedModule(RedisClient):
 
     def __init__(self, config: ConfigManager):
         # Copy  configuration
-        self.redis_config = config.redis_config
-        self.server_config = config.server_config
+        self.config = config
+
+        # Init Redis
+        RedisClient.__init__(self, config=self.config.redis_config)
 
         print('setup_twisted')
 
         # create a Twisted Web resource for our WebSocket server
         wss_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % ('localhost',
-                                                                            self.server_config['port']),
-                                                          redis_config=self.redis_config)
+                                                          self.config.server_config['port']),
+                                                          redis_config=self.config.redis_config)
 
         wss_factory.protocol = TeraWebSocketServerProtocol
         wss_resource = WebSocketResource(wss_factory)
@@ -154,9 +156,9 @@ class TwistedModule:
         # application = service.Application(__name__)
         # web_service.setServiceParent(application)
 
-        reactor.listenSSL(self.server_config['port'], site,
-                          ssl.DefaultOpenSSLContextFactory(privateKeyFileName=self.server_config['ssl_path'] + '/key.pem',
-                                                           certificateFileName=self.server_config['ssl_path'] + '/cert.crt'))
+        reactor.listenSSL(self.config.server_config['port'], site,
+                          ssl.DefaultOpenSSLContextFactory(privateKeyFileName=self.config.server_config['ssl_path'] + '/key.pem',
+                                                           certificateFileName=self.config.server_config['ssl_path'] + '/cert.crt'))
         print('setup_twisted done')
 
     def run(self):

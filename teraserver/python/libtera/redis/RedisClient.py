@@ -19,18 +19,18 @@ class RedisClient:
     def __init__(self, config=None):
         print('Init RedisClient', self, config)
         self.protocol = None
-        self.config = config
+        # self.redisConfig = config
 
         # Fill config
-        if self.config is None:
+        if config is None:
             print('RedisClient - Warning, using default redis configuration')
-            self.config = {'hostname': 'localhost', 'port': 6379, 'db': 0}
+            config = {'hostname': 'localhost', 'port': 6379, 'db': 0}
 
         # Redis client (synchronous)
-        self.redis = redis.Redis(host=self.config['hostname'], port=self.config['port'], db=self.config['db'])
+        self.redis = redis.Redis(host=config['hostname'], port=config['port'], db=config['db'])
 
         # Redis client (async)
-        reactor.connectTCP(self.config['hostname'], self.config['port'], RedisProtocolFactory(parent=self, protocol=redisProtocol))
+        reactor.connectTCP(config['hostname'], config['port'], RedisProtocolFactory(parent=self, protocol=redisProtocol))
 
 
 

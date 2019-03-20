@@ -31,9 +31,6 @@ class UserManagerModule(RedisClient):
         super().__init__(config=self.redis_config)
         self.registry = OnlineUserRegistry()
 
-    def setup(self):
-        pass
-
     def redisConnectionMade(self):
         print('UserManagerModule.connectionMade')
         self.subscribe('websocket.*')

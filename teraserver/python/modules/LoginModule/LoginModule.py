@@ -9,16 +9,23 @@ from libtera.db.models.TeraUser import TeraUser
 
 from modules.Globals import auth
 from modules.RedisModule.RedisModule import get_redis
+from libtera.ConfigManager import ConfigManager
 
 
-class LoginModule:
+class LoginModule(RedisClient):
 
     login_manager = LoginManager()
 
-    def __init__(self):
-        pass
+    def __init__(self, config: ConfigManager):
+        self.config = config
 
-    def setup(self):
+        # Init RedisClient
+        RedisClient.__init__(self, config=self.config.redis_config)
+
+        # Setup login manager
+        self.setup_login_manager()
+
+    def setup_login_manager(self):
         self.login_manager.init_app(flask_app)
         self.login_manager.session_protection = "strong"
 
@@ -27,9 +34,8 @@ class LoginModule:
                                  'REMEMBER_COOKIE_SECURE': True,
                                  'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
 
-    @staticmethod
     @login_manager.user_loader
-    def load_user(user_id):
+    def load_user(self, user_id):
         print('LoginModule - Loading user')
         return TeraUser.get_user_by_uuid(user_id)
 

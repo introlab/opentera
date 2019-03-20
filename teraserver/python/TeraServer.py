@@ -26,10 +26,7 @@ if __name__ == '__main__':
 
     db_man = DBManager()
     config_man = ConfigManager()
-    login_module = LoginModule()
 
-    # Main Flask module
-    flask = FlaskModule()
 
     # SERVER CONFIG
     ###############
@@ -44,7 +41,9 @@ if __name__ == '__main__':
     config_file = application_path + os.sep + 'config' + os.sep + 'TeraServerConfig.ini'
     config_man.load_config(config_file)
 
+    # We should remove that soon...
     setup_redis(config_man)
+
     print('Rdis started:', get_redis())
     if get_redis() is None:
         print('error...')
@@ -68,17 +67,18 @@ if __name__ == '__main__':
     # Create default values, if required
     db_man.create_defaults()
 
+    # Main Flask module
+    flask_module = FlaskModule(config_man)
+
     # LOGIN MANAGER
     ###############
-    login_module = LoginModule()
-    login_module.setup()
+    login_module = LoginModule(config_man)
 
     # Twisted will run flask
     twisted_module = TwistedModule(config_man)
 
     user_manager_module = UserManagerModule(config_man)
-    user_manager_module.setup()
-
+    
     # This is blocking, running event loop
     # reactor.addSystemEventTrigger('before', 'shutdown', reactor_is_shutting_down)
     twisted_module.run()

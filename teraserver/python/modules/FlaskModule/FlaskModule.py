@@ -1,13 +1,21 @@
 from flask import Flask, render_template, jsonify, request, abort, session
 from flask_session import Session
 from flask_restful import Api
+from libtera.redis.RedisClient import RedisClient
+from libtera.ConfigManager import ConfigManager
 
 flask_app = Flask("OpenTera")
 
 
-class FlaskModule:
+class FlaskModule(RedisClient):
 
-    def __init__(self):
+    def __init__(self,  config: ConfigManager):
+
+        self.config = config
+
+        # Init RedisClient
+        RedisClient.__init__(self, config=self.config.redis_config)
+
         flask_app.debug = True
         flask_app.secret_key = 'development'
         flask_app.config.update({'SESSION_TYPE': 'redis'})
