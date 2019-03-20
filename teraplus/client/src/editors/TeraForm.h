@@ -16,6 +16,7 @@
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QSpinBox>
+#include <QFrame>
 
 #include <QtMultimedia/QCameraInfo>
 #include <QtMultimedia/QAudioDeviceInfo>
@@ -35,8 +36,9 @@ public:
     void buildUiFromStructure(const QString& structure);
 
 private:
-    Ui::TeraForm            *ui;
-    QMap<QString, QWidget*> m_widgets;
+    Ui::TeraForm*                                   ui;
+    QMap<QString, QWidget*>                         m_widgets;
+    QMap<QWidget*, QFormLayout::TakeRowResult>      m_hidden_rows;
 
     void buildFormFromStructure(QWidget* page, const QVariantList &structure);
     void setDefaultValues();

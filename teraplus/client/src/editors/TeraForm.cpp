@@ -106,7 +106,6 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
 
     // Set layout alignement
     layout->setAlignment(Qt::AlignTop);
-
     page->setLayout(layout);
 
     // Set default values
@@ -281,13 +280,28 @@ void TeraForm::checkConditions()
 
 void TeraForm::setWidgetVisibility(QWidget *widget, bool visible)
 {
-    widget->setVisible(visible);
+
     if (widget->parentWidget()){
         if (QFormLayout* form_layout = dynamic_cast<QFormLayout*>(widget->parentWidget()->layout())){
-            QWidget* label = form_layout->labelForField(widget);
-            label->setVisible(visible);
+            if (visible){
+                // Check if is a removed row
+                if (m_hidden_rows.contains(widget)){
+                    QFormLayout::TakeRowResult row = m_hidden_rows[widget];
+                    form_layout->addRow(row.labelItem->widget(), row.fieldItem->widget());
+                    row.labelItem->widget()->show();
+                    row.fieldItem->widget()->show();
+                    m_hidden_rows.remove(widget);
+                }
+            }else{
+                if (!m_hidden_rows.contains(widget)){
+                    m_hidden_rows[widget] = form_layout->takeRow(widget);
+                    widget->hide();
+                    m_hidden_rows[widget].labelItem->widget()->hide();
+                }
+            }
         }
     }
+
 }
 
 void TeraForm::getWidgetValues(QWidget* widget, QVariant *id, QVariant *value)
