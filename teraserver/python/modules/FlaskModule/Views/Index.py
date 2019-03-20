@@ -6,8 +6,8 @@ from modules.Globals import auth
 class Index(MethodView):
     def __init__(self, *args, **kwargs):
         print('Index.__init__', args, kwargs)
-        self.module = kwargs.get('module', None)
-        print(self.module)
+        self.flaskModule = kwargs.get('flaskModule', None)
+        print(self.flaskModule)
 
     @auth.login_required
     def get(self):

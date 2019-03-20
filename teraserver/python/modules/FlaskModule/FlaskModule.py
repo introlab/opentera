@@ -4,6 +4,7 @@ from flask_restful import Api
 
 flask_app = Flask("OpenTera")
 
+
 class FlaskModule:
 
     def __init__(self):
@@ -31,7 +32,7 @@ class FlaskModule:
 
         # Default arguments
         args = []
-        kwargs = {'module': self}
+        kwargs = {'flaskModule': self}
 
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
