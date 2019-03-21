@@ -10,7 +10,7 @@ from libtera.db.models.TeraUser import TeraUser
 from modules.Globals import auth
 from modules.RedisModule.RedisModule import get_redis
 from libtera.ConfigManager import ConfigManager
-
+import datetime
 
 class LoginModule(RedisClient):
 
@@ -28,15 +28,18 @@ class LoginModule(RedisClient):
     def setup_login_manager(self):
         self.login_manager.init_app(flask_app)
         self.login_manager.session_protection = "strong"
+        # self.login_manager.request_loader(self.load_user)
 
         flask_app.config.update({'REMEMBER_COOKIE_NAME': 'OpenTera',
                                  'REMEMBER_COOKIE_DURATION': 14,
                                  'REMEMBER_COOKIE_SECURE': True,
+                                 'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
                                  'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
 
+    @staticmethod
     @login_manager.user_loader
-    def load_user(self, user_id):
-        print('LoginModule - Loading user')
+    def load_user(user_id):
+        print('LoginModule - load_user', user_id)
         return TeraUser.get_user_by_uuid(user_id)
 
     @staticmethod

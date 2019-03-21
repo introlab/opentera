@@ -1,6 +1,6 @@
 from flask_login import logout_user
 from flask_restful import Resource, reqparse
-
+from flask import session
 
 class Logout(Resource):
     def __init__(self, flaskModule=None):
@@ -11,4 +11,5 @@ class Logout(Resource):
     def get(self):
         print('logout user')
         logout_user()
+        session.clear()
         return "User logged out."

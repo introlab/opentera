@@ -49,12 +49,20 @@ class TeraUserGroup(db.Model, BaseModel):
         access = TeraAccess("users", True, True, True, True)
         group.usergroup_access.append(access)
         db.session.add(group)
+
         group = TeraUserGroup()
         group.usergroup_name = "Cliniciens"
         db.session.add(group)
+
         group = TeraUserGroup()
         group.usergroup_name = "Patients"
         db.session.add(group)
+
+        group = TeraUserGroup()
+        group.usergroup_name = "Users"
+        db.session.add(group)
+
+
         db.session.commit()
 
     @staticmethod

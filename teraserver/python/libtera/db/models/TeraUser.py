@@ -78,18 +78,35 @@ class TeraUser(db.Model, BaseModel):
 
     @staticmethod
     def create_default_account():
+
+        # Admin
+        admin = TeraUser()
+        admin.user_enabled = True
+        admin.user_firstname = "Administrateur"
+        admin.user_lastname = "Systeme"
+        admin.user_profile = ""
+        admin.user_password = bcrypt.encrypt("admin")
+        admin.user_superadmin = True
+        admin.user_type = TeraUserTypes.USER.value
+        admin.user_username = "admin"
+        admin.user_uuid = str(uuid.uuid4())
+        admin.user_usergroups.append(TeraUserGroup.get_usergroup_by_name('Administrateurs'))
+        db.session.add(admin)
+
+        # User
         user = TeraUser()
         user.user_enabled = True
-        user.user_firstname = "Administrateur"
+        user.user_firstname = "User"
         user.user_lastname = "Systeme"
         user.user_profile = ""
-        user.user_password = bcrypt.encrypt("admin")
-        user.user_superadmin = True
+        user.user_password = bcrypt.encrypt("user")
+        user.user_superadmin = False
         user.user_type = TeraUserTypes.USER.value
-        user.user_username = "admin"
+        user.user_username = "user"
         user.user_uuid = str(uuid.uuid4())
-        user.user_usergroups.append(TeraUserGroup.get_usergroup_by_name('Administrateurs'))
+        user.user_usergroups.append(TeraUserGroup.get_usergroup_by_name('Users'))
         db.session.add(user)
+
         db.session.commit()
 
     @staticmethod
