@@ -66,7 +66,8 @@ class TeraFormItemCondition:
 class TeraFormItem:
 
     def __init__(self, item_id: string, item_label: string, item_type: string, item_required: bool = False,
-                 item_values: list = None, item_default: string = None, item_condition: TeraFormItemCondition = None):
+                 item_values: list = None, item_default: string = None, item_condition: TeraFormItemCondition = None,
+                 item_options={}):
         self.id = item_id
         self.label = item_label
         self.type = item_type
@@ -74,6 +75,7 @@ class TeraFormItem:
         self.values = item_values
         self.default = item_default
         self.condition = item_condition
+        self.options = item_options
 
     def set_condition(self, condition: TeraFormItemCondition):
         self.condition = condition
@@ -103,6 +105,10 @@ class TeraFormItem:
 
         if self.condition:
             item["condition"] = self.condition.to_dict()
+
+        if len(self.options) > 0:
+            for option in self.options:
+                item[option] = self.options[option]
 
         return item
 

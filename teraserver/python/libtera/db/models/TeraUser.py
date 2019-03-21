@@ -217,3 +217,27 @@ class TeraUser(db.Model, BaseModel):
 
         return form.to_dict()
 
+    @staticmethod
+    def get_user_def():
+        form = TeraForm("user")
+
+        # Sections
+        section = TeraFormSection("informations", "Informations")
+        form.add_section(section)
+
+        # Items
+        section.add_item(TeraFormItem("id_user", "ID Utilisateur", "hidden", True))
+        section.add_item(TeraFormItem("user_uuid", "UUID Utilisateur", "hidden"))
+        section.add_item(TeraFormItem("user_username", "Code utilisateur", "text", True))
+        section.add_item(TeraFormItem("user_enabled", "Activé", "boolean", True))
+        section.add_item(TeraFormItem("user_firstname", "Prénom", "text", True))
+        section.add_item(TeraFormItem("user_lastname", "Nom", "text", True))
+        section.add_item(TeraFormItem("user_email", "Courriel", "text"))
+        section.add_item(TeraFormItem("user_password", "Mot de passe", "password", item_options={"confirm": True}))
+        section.add_item(TeraFormItem("user_usergroups", "Groupe(s) utilisateur(s)", "checklist", True))
+        section.add_item(TeraFormItem("user_superadmin", "Super administrateur", "boolean", True))
+        section.add_item(TeraFormItem("user_notes", "Notes", "longtext"))
+        section.add_item(TeraFormItem("user_lastonline", "Dernière connexion", "datetime",
+                                      item_options={"readonly": True}))
+
+        return form.to_dict()
