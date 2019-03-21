@@ -19,7 +19,7 @@ class TeraUser(db.Model, BaseModel):
     __tablename__ = 't_users'
     id_user = db.Column(db.Integer, db.Sequence('id_user_sequence'), primary_key=True, autoincrement=True)
     user_username = db.Column(db.String(50), nullable=False, unique=True)
-    user_uuid = db.Column(UUID, nullable=False, unique=True)
+    user_uuid = db.Column(db.String(36), nullable=False, unique=True)
     user_email = db.Column(db.String, nullable=True)
     user_firstname = db.Column(db.String, nullable=False)
     user_lastname = db.Column(db.String, nullable=False)
@@ -85,7 +85,7 @@ class TeraUser(db.Model, BaseModel):
         admin.user_firstname = "Administrateur"
         admin.user_lastname = "Systeme"
         admin.user_profile = ""
-        admin.user_password = bcrypt.encrypt("admin")
+        admin.user_password = bcrypt.hash("admin")
         admin.user_superadmin = True
         admin.user_type = TeraUserTypes.USER.value
         admin.user_username = "admin"
@@ -99,7 +99,7 @@ class TeraUser(db.Model, BaseModel):
         user.user_firstname = "User"
         user.user_lastname = "Systeme"
         user.user_profile = ""
-        user.user_password = bcrypt.encrypt("user")
+        user.user_password = bcrypt.hash("user")
         user.user_superadmin = False
         user.user_type = TeraUserTypes.USER.value
         user.user_username = "user"
