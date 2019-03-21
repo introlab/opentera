@@ -34,10 +34,12 @@ class FlaskModule(RedisClient):
         from .API.Logout import Logout
         from .API.QueryUsers import QueryUsers
         from .API.Profile import Profile
+        from .API.OnlineUsers import OnlineUsers
         self.api.add_resource(Login, '/api/login', resource_class_args=[self])
         self.api.add_resource(Logout, '/api/logout', resource_class_args=[self])
         self.api.add_resource(QueryUsers, '/api/users', resource_class_args=[self])
         self.api.add_resource(Profile, '/api/profile', resource_class_args=[self])
+        self.api.add_resource(OnlineUsers, '/api/online', resource_class_args=[self])
 
     def init_views(self):
         from .Views.Index import Index
