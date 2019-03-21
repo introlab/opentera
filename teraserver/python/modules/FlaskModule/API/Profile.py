@@ -11,7 +11,6 @@ class Profile(Resource):
         Resource.__init__(self)
         self.parser = reqparse.RequestParser()
 
-
     @auth.login_required
     def get(self):
         return jsonify(TeraUser.get_profile_def())

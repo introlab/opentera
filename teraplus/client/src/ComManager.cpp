@@ -62,8 +62,6 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
     QString reply_data = reply->readAll();
     //qDebug() << reply_path << " ---> " << reply_data;
 
-    emit waitingForReply(false);
-
     bool handled = false;
 
     if (reply_path == WEB_LOGIN_PATH){
@@ -82,7 +80,7 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
         handled = true;
     }
 
-    if (reply_path == WEB_USERPROFILEDEF_PATH){
+    if (reply_path == WEB_DEF_PROFILE_PATH){
         emit profileDefReceived(reply_data);
         handled = true;
     }
@@ -224,6 +222,8 @@ void ComManager::onNetworkEncrypted(QNetworkReply *reply)
 
 void ComManager::onNetworkFinished(QNetworkReply *reply)
 {
+    emit waitingForReply(false);
+
     if (reply->error() == QNetworkReply::NoError)
     {
         if (!processNetworkReply(reply)){
