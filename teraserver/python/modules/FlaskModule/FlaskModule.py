@@ -12,6 +12,7 @@ class FlaskModule(RedisClient):
     def __init__(self,  config: ConfigManager):
 
         self.config = config
+        self.callbacks_dict = dict()
 
         # Init RedisClient
         RedisClient.__init__(self, config=self.config.redis_config)
@@ -51,3 +52,12 @@ class FlaskModule(RedisClient):
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
 
+    def subscribe_pattern_with_callback(self, pattern, function):
+        self.callbacks_dict[pattern] = function
+        self.subscribe(pattern)
+
+    def redisMessageReceived(self, pattern, channel, message):
+        print(self, 'redisMessageReceived', pattern, channel, message)
+        if pattern in self.callbacks_dict:
+            # Call function.
+            self.callbacks_dict[pattern](pattern, channel, message)

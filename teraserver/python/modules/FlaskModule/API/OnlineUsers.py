@@ -7,10 +7,13 @@ from libtera.db.models.TeraUser import TeraUser
 
 class OnlineUsers(Resource):
 
-    def __init__(self, flaskModule=None):
+    def __init__(self, flaskModule):
         Resource.__init__(self)
         self.flaskModule = flaskModule
         self.parser = reqparse.RequestParser()
+
+        # Register all callback for redis messages
+        self.flaskModule.subscribe_pattern_with_callback('server.OnlineUsers.*', self.pattern_callback)
 
     @auth.login_required
     def get(self):
@@ -34,3 +37,6 @@ class OnlineUsers(Resource):
 
     def delete(self):
         return '', 501
+
+    def pattern_callback(self, pattern, channel, data):
+        print(self, 'pattern_callback', pattern, channel, data)
