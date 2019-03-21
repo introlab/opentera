@@ -36,7 +36,7 @@ void MainWindow::initUi()
     // Setup messages
     ui->frameMessages->hide();
     m_msgTimer.setSingleShot(true);
-    m_msgTimer.setInterval(5000);
+    m_msgTimer.setInterval(8000);
 
     // Disable docker titles
     ui->dockerTop->setTitleBarWidget(new QWidget());

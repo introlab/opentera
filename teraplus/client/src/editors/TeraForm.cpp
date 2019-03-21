@@ -27,25 +27,32 @@ void TeraForm::buildUiFromStructure(const QString &structure)
 
     m_widgets.clear();
 
+    QJsonObject struct_object = struct_info.object();
+    //qDebug() << struct_info.object().keys();
+    if (struct_object.contains("objecttype"))
+        m_objectType = struct_object["objecttype"].toString();
+
     // Sections
-    QVariantList struct_data = struct_info.array().toVariantList();
-    int page_index = 0;
-    for (QVariant section:struct_data){
-        if (section.canConvert(QMetaType::QVariantMap)){
-            QVariantMap section_data = section.toMap();
-            if (page_index>0){
-                QWidget* new_page = new QWidget(ui->toolboxMain);
-                new_page->setObjectName("pageSection" + QString::number(page_index+1));
-                new_page->setStyleSheet("QWidget#" + new_page->objectName() + "{border: 1px solid white; border-radius: 5px;}");
-                ui->toolboxMain->addItem(new_page,"");
-            }
-            ui->toolboxMain->setItemText(page_index, section_data["label"].toString());
-            if (section_data.contains("items")){
-                if (section_data["items"].canConvert(QMetaType::QVariantList)){
-                    buildFormFromStructure(ui->toolboxMain->widget(page_index), section_data["items"].toList());
+    if (struct_object.contains("sections")){
+        QVariantList struct_data =struct_object["sections"].toArray().toVariantList();
+        int page_index = 0;
+        for (QVariant section:struct_data){
+            if (section.canConvert(QMetaType::QVariantMap)){
+                QVariantMap section_data = section.toMap();
+                if (page_index>0){
+                    QWidget* new_page = new QWidget(ui->toolboxMain);
+                    new_page->setObjectName("pageSection" + QString::number(page_index+1));
+                    new_page->setStyleSheet("QWidget#" + new_page->objectName() + "{border: 1px solid white; border-radius: 5px;}");
+                    ui->toolboxMain->addItem(new_page,"");
                 }
+                ui->toolboxMain->setItemText(page_index, section_data["label"].toString());
+                if (section_data.contains("items")){
+                    if (section_data["items"].canConvert(QMetaType::QVariantList)){
+                        buildFormFromStructure(ui->toolboxMain->widget(page_index), section_data["items"].toList());
+                    }
+                }
+                page_index++;
             }
-            page_index++;
         }
     }
 }

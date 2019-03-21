@@ -3,8 +3,9 @@ import string
 
 class TeraForm:
 
-    def __init__(self):
+    def __init__(self, object_name):
         self.sections = []
+        self.object_name = object_name
 
     def add_section(self, section):
         self.sections.append(section)
@@ -13,7 +14,9 @@ class TeraForm:
         sections = []
         for section in self.sections:
             sections.append(section.to_dict())
-        return sections
+        object_dict = {'objecttype': self.object_name,
+                       'sections': sections}
+        return object_dict
 
 
 class TeraFormSection:

@@ -78,31 +78,6 @@ UserWidget::UserWidget(ComManager *comMan, const TeraUser &data, QWidget *parent
 
     updateFieldsValue();
 
-    // Fill camera sources
-    /*cmbWebVideoSrc->clear();
-    cmb2ndVideoSrc->clear();
-    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-    for (int i=0; i<cameras.count(); i++){
-        QCamera camera(cameras.at(i));
-        camera.load();
-        //cmbSrc1->addItem(cameras.at(i).description(),cameras.at(i).deviceName());
-        //cmbSrc2->addItem(cameras.at(i).description(),cameras.at(i).deviceName());
-        cmbWebVideoSrc->addItem(cameras.at(i).description(),cameras.at(i).deviceName());
-        cmb2ndVideoSrc->addItem(cameras.at(i).description(),cameras.at(i).deviceName());
-        camera.unload();
-    }
-
-    // Fill audio sources
-    cmbWebAudioSrc->clear();
-    cmb2ndAudioSrc->clear();
-    cmbWebAudioSrc->addItem("Default");
-    cmb2ndAudioSrc->addItem("Default");
-    QList<QAudioDeviceInfo> micros = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
-    for (int i=0; i<micros.count(); i++){
-        //qDebug() << micros.at(i).deviceName();
-        cmbWebAudioSrc->addItem(micros.at(i).deviceName());
-        cmb2ndAudioSrc->addItem(micros.at(i).deviceName());
-    }*/
 }
 
 UserWidget::~UserWidget()
@@ -120,7 +95,7 @@ void UserWidget::setData(const TeraUser &data){
     m_data = new TeraUser(data);
 
     // Query profile definition
-    m_comManager->doQuery(WEB_USERPROFILEDEF_PATH);
+    m_comManager->doQuery(WEB_DEFINITIONS_PATH, WEB_DEFINITIONS_PROFILE);
 
     /*
     if (m_data_type==TERADATA_KIT){
@@ -614,9 +589,10 @@ void UserWidget::comboItemChanged(){
     }
 }
 
-void UserWidget::profileDefReceived(const QString& def)
+void UserWidget::objectDefReceived(const QString& def, const QString &type)
 {
-    ui->wdgProfile->buildUiFromStructure(def);
+    if (type == WEB_DEFINITIONS_PROFILE)
+        ui->wdgProfile->buildUiFromStructure(def);
 }
 
 void UserWidget::updateProfileUI(){
@@ -656,7 +632,7 @@ void UserWidget::connectSignals()
     connect(ui->btnSave, &QPushButton::clicked, this, &UserWidget::btnSave_clicked);
     connect(ui->txtPassword, &QLineEdit::textChanged, this, &UserWidget::txtPassword_textChanged);
 
-    connect(m_comManager, &ComManager::profileDefReceived, this, &UserWidget::profileDefReceived);
+    connect(m_comManager, &ComManager::objectDefinitionReceived, this, &UserWidget::objectDefReceived);
 
 }
 void UserWidget::btnEdit_clicked()

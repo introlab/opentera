@@ -74,7 +74,7 @@ signals:
     void currentUserUpdated();
 
     void usersReceived(QList<TeraUser> user_list);
-    void profileDefReceived(QString profile);
+    void objectDefinitionReceived(QString object, QString object_type);
 
 public slots:
 

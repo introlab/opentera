@@ -63,7 +63,7 @@ private slots:
     void showPassword(bool show);
     void comboItemChanged();
 
-    void profileDefReceived(const QString &def);
+    void objectDefReceived(const QString &def, const QString &type);
 
     void btnEdit_clicked();
     void btnDelete_clicked();
