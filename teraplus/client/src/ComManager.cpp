@@ -60,7 +60,8 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
 {
     QString reply_path = reply->url().path();
     QString reply_data = reply->readAll();
-    //qDebug() << reply_path << " ---> " << reply_data;
+    QString reply_query = reply->url().query();
+    //qDebug() << reply_path << " ---> " << reply_data << ": " << reply_query;
 
     bool handled = false;
 
@@ -80,8 +81,9 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
         handled = true;
     }
 
-    if (reply_path == WEB_DEF_PROFILE_PATH){
-        emit profileDefReceived(reply_data);
+    if (reply_path == WEB_DEFINITIONS_PATH){
+
+        emit objectDefinitionReceived(reply_data, reply_query);
         handled = true;
     }
 

@@ -95,7 +95,7 @@ void UserWidget::setData(const TeraUser &data){
     m_data = new TeraUser(data);
 
     // Query profile definition
-    m_comManager->doQuery(WEB_DEF_PROFILE_PATH);
+    m_comManager->doQuery(WEB_DEFINITIONS_PATH, WEB_DEFINITIONS_PROFILE);
 
     /*
     if (m_data_type==TERADATA_KIT){
@@ -589,9 +589,10 @@ void UserWidget::comboItemChanged(){
     }
 }
 
-void UserWidget::profileDefReceived(const QString& def)
+void UserWidget::objectDefReceived(const QString& def, const QString &type)
 {
-    ui->wdgProfile->buildUiFromStructure(def);
+    if (type == WEB_DEFINITIONS_PROFILE)
+        ui->wdgProfile->buildUiFromStructure(def);
 }
 
 void UserWidget::updateProfileUI(){
@@ -631,7 +632,7 @@ void UserWidget::connectSignals()
     connect(ui->btnSave, &QPushButton::clicked, this, &UserWidget::btnSave_clicked);
     connect(ui->txtPassword, &QLineEdit::textChanged, this, &UserWidget::txtPassword_textChanged);
 
-    connect(m_comManager, &ComManager::profileDefReceived, this, &UserWidget::profileDefReceived);
+    connect(m_comManager, &ComManager::objectDefinitionReceived, this, &UserWidget::objectDefReceived);
 
 }
 void UserWidget::btnEdit_clicked()

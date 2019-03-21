@@ -147,7 +147,7 @@ class TeraUser(db.Model, BaseModel):
 
     @staticmethod
     def get_profile_def():
-        form = TeraForm()
+        form = TeraForm("profile")
 
         # Sections
         section1 = TeraFormSection("main_audio_video", "Configuration audio-vidéo")

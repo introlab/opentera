@@ -41,6 +41,7 @@ private:
     Ui::TeraForm*                                   ui;
     QMap<QString, QWidget*>                         m_widgets;
     QMap<QWidget*, QFormLayout::TakeRowResult>      m_hidden_rows;
+    QString                                         m_objectType;
 
     void buildFormFromStructure(QWidget* page, const QVariantList &structure);
     void setDefaultValues();

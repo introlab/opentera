@@ -6,6 +6,7 @@
 #define WEB_LOGOUT_PATH         "/api/logout"
 #define WEB_USERINFO_PATH       "/api/users"
 
-#define WEB_DEF_PROFILE_PATH "/api/definitions/profile"
+#define WEB_DEFINITIONS_PATH    "/api/definitions"
+#define WEB_DEFINITIONS_PROFILE "type=profile"
 
 #endif // WEBAPI_H
