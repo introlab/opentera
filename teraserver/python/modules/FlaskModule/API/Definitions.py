@@ -20,7 +20,9 @@ class Definitions(Resource):
             return 'No definition type specified', 500
 
         if args['type'] == 'profile':
-            profile_def = TeraUser.get_profile_def()
-            return jsonify(profile_def)
+            return jsonify(TeraUser.get_profile_def())
+
+        if args['type'] == 'user':
+            return jsonify(TeraUser.get_user_def())
 
         return 'Unknown definition type: ' + args['type'], 500
