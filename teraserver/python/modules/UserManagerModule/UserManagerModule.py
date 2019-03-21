@@ -36,13 +36,13 @@ class UserManagerModule(RedisClient):
         self.subscribe('websocket.*')
         self.subscribe('api.*')
 
-    def handle_api_messages(self, uuid, message):
-        print('handle_api_messages', uuid, message)
+    def handle_api_messages(self, module, uuid, message):
+        print('handle_api_messages', module, uuid, message)
         if message == b'list' or message == 'list':
             online_users = str(self.registry.online_users())
             # Answer
-            print('answering', 'server.' + str(uuid) + '.answer', online_users)
-            get_redis().publish('server.' + str(uuid) + '.answer', online_users)
+            print('answering', 'server.' + module + '.' + str(uuid) + '.answer', online_users)
+            get_redis().publish('server.' + module + '.' + str(uuid) + '.answer', online_users)
             return True
 
     def handle_websocket_messages(self, uuid, message):
@@ -69,6 +69,6 @@ class UserManagerModule(RedisClient):
         if 'websocket' in parts[0]:
             self.handle_websocket_messages(parts[1], message)
         elif 'api' in parts[0]:
-            self.handle_api_messages(parts[1], message)
+            self.handle_api_messages(parts[1], parts[2], message)
 
 

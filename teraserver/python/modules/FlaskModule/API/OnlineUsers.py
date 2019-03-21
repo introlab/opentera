@@ -22,7 +22,7 @@ class OnlineUsers(Resource):
         try:
 
             if self.flaskModule is not None:
-                self.flaskModule.publish('api.' + session['user_id'] + '.request', b'list')
+                self.flaskModule.publish('api.OnlineUsers.' + session['user_id'] + '.request', b'list')
 
             users_list = []
             return jsonify(users_list)
