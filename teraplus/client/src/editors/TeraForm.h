@@ -35,6 +35,8 @@ public:
 
     void buildUiFromStructure(const QString& structure);
 
+    bool validateFormData(bool ignore_hidden=false);
+
 private:
     Ui::TeraForm*                                   ui;
     QMap<QString, QWidget*>                         m_widgets;
@@ -51,8 +53,11 @@ private:
     QWidget* createNumericWidget(const QVariantMap& structure);
 
     void checkConditions();
-    void setWidgetVisibility(QWidget* widget, bool visible);
+    void checkConditionsForItem(QWidget* item);
+    void setWidgetVisibility(QWidget* widget, QWidget *linked_widget, bool visible);
     void getWidgetValues(QWidget *widget, QVariant *id, QVariant* value);
+
+    bool validateWidget(QWidget* widget, bool ignore_hidden=false);
 
 private slots:
     void widgetValueChanged();

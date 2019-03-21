@@ -14,7 +14,77 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QToolBox::tab {
+   <string notr="true">QWidget{background-color: rgba(0,0,0,0);color:white;border-radius:5px}
+QPlainTextEdit,QLineEdit,QListWidget,QComboBox,QTextEdit,QSpinBox{background-color: rgba(255,255,255,50%); color: black;}
+
+QTableWidget{
+background-color: rgba(0,0,0,50%);
+color: white;
+border: 1px solid rgba(255,255,255,50%);
+}
+
+QLineEdit:!enabled, QListWidget:!enabled,QComboBox:!enabled,QTextEdit:!enabled,QPlainTextEdit:!enabled{background-color: rgba(0,0,0,30%);color:white;border:0}
+QDateEdit::down-arrow:!enabled,QTimeEdit::down-arrow:!enabled,QDateEdit::up-arrow:!enabled,QTimeEdit::up-arrow:!enabled,QComboBox::drop-down:!enabled{background-color:rgba(0,0,0,0%);}
+
+QCheckBox::indicator:unchecked:!enabled { background-color:rgba(128,0,0,100%);}
+QCheckBox::indicator:checked:!enabled { background-color:green;}
+QCheckBox::indicator:unchecked{ background-color:red;border-radius:3px;}
+QCheckBox::indicator:checked {background-color:rgb(0,255,0);border-radius:3px;}
+QCheckBox:checked{color:lightgreen;background-color:rgba(0,0,0,0%);}
+QCheckBox:!checked{color:red;background-color:rgba(0,0,0,0%);}
+
+QPushButton{background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #2198c0, stop: 1 #0d5ca6);}
+QPushButton:checked{background-color:rgb(128,128,128); border:1px solid rgba(255,255,255,50%);}
+QPushButton:hover,QPushButton:checked{background-color:  rgba(255,255,255,75%);color:black;}
+
+QToolButton:hover{background-color:  rgba(255,255,255,50);}
+
+QTabWidget::pane { /* The tab widget frame */
+	/*background-color:  rgba(0,128,200,30%);*/
+	/* background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0  rgba(0,128,200,50%), 
+								stop: 0.5  rgba(0,128,200,25%)
+								stop: 1.0  rgba(0,128,200,25%));*/
+	background-color: rgba(128,128,140,25%);
+	border-radius: 5px;
+    border: 2px solid rgba(128,128,140,50%);
+ }
+
+ QTabWidget::tab-bar {
+     left: 5px; /* move to the right by 5px */
+ }
+
+/* Style the tab using the tab sub-control. Note that
+     it reads QTabBar _not_ QTabWidget */
+ QTabBar::tab,QTableWidget::tab,QHeaderView::section {
+     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0  rgba(128,128,140,50%),  stop: 1.0  rgba(128,128,140,25%));
+     border: 2px solid  rgba(128,128,140,50%);
+     border-bottom: 0px;
+     border-top-left-radius: 4px;
+     border-top-right-radius: 4px;
+     padding: 2px;
+min-height:25px;
+ }
+
+ QTabBar::tab:selected, QTabBar::tab:hover {
+/*     background-color: rgba(0,128,200,70%);*/
+background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0  rgba(128,128,140,70%),  stop: 1.0  rgba(128,128,140,50%));
+ }
+
+ QTabBar::tab:selected {
+     border-color:rgba(128,128,140,60%);
+     border-bottom-color:rgba(128,128,140,60%); /* same as pane color */
+ }
+
+ QTabBar::tab:!selected {
+     margin-top: 2px; /* make non-selected tabs look smaller */
+ }
+
+QToolBox{background-color:  rgba(128,128,140,25%);}
+
+QToolBox::tab {
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 grey, stop: 0.2  black, stop:1 grey);
     border-radius: 5px;
     color: darkgray;

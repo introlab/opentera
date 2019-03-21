@@ -36,6 +36,7 @@ void TeraForm::buildUiFromStructure(const QString &structure)
             if (page_index>0){
                 QWidget* new_page = new QWidget(ui->toolboxMain);
                 new_page->setObjectName("pageSection" + QString::number(page_index+1));
+                new_page->setStyleSheet("QWidget#" + new_page->objectName() + "{border: 1px solid white; border-radius: 5px;}");
                 ui->toolboxMain->addItem(new_page,"");
             }
             ui->toolboxMain->setItemText(page_index, section_data["label"].toString());
@@ -49,15 +50,31 @@ void TeraForm::buildUiFromStructure(const QString &structure)
     }
 }
 
+bool TeraForm::validateFormData(bool ignore_hidden)
+{
+    bool rval = true;
+    for (QWidget* item:m_widgets.values()){
+       rval &= validateWidget(item, ignore_hidden);
+    }
+    return rval;
+}
+
 void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structure)
 {
     QFormLayout* layout = new QFormLayout(page);
+    layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
 
     for (QVariant item:structure){
         if (item.canConvert(QMetaType::QVariantMap)){
             QVariantMap item_data = item.toMap();
             QWidget* item_widget = nullptr;
             QLabel* item_label = new QLabel(item_data["label"].toString());
+            QFrame* item_frame = new QFrame();
+            QHBoxLayout* item_frame_layout = new QHBoxLayout();
+            item_label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            item_frame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            item_frame_layout->addWidget(item_label);
+            item_frame->setLayout(item_frame_layout);
 
             // Build widget according to item type
             QString item_type = item_data["type"].toString().toLower();
@@ -88,14 +105,18 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
                 // Set widget properties
                 if (item_data.contains("id"))
                     item_widget->setProperty("id", item_data["id"]);
-                if (item_data.contains("required"))
+                if (item_data.contains("required")){
                     item_widget->setProperty("required", item_data["required"]);
-                if (item_data.contains("condition"))
+                    item_label->setText("<font color=red>*</font> " + item_label->text());
+                }
+                if (item_data.contains("condition")){
                     item_widget->setProperty("condition", item_data["condition"]);
+                    item_frame->setStyleSheet("background-color:darkgrey;");
+                }
                 item_widget->setMinimumHeight(30);
 
                 // Add widget to layout
-                layout->addRow(item_label, item_widget);
+                layout->addRow(item_frame, item_widget);
 
                 // Add widget to list
                 m_widgets[item_data["id"].toString()] = item_widget;
@@ -111,6 +132,7 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
     // Set default values
     setDefaultValues();
     checkConditions();
+    validateFormData(true);
 
 
 }
@@ -240,45 +262,55 @@ void TeraForm::checkConditions()
     for (QWidget* item:m_widgets.values()){
         if (!item)
             continue;
-        if (item->property("condition").isValid()){
-            // Item has a condition
-            if (item->property("condition").canConvert(QMetaType::QVariantMap)){
-                QVariantMap condition = item->property("condition").toMap();
-                QString check_id = condition["item"].toString();
-                if (!check_id.isNull()){
-                    QWidget* check_item = m_widgets[check_id];
-                    if (check_item){
-                        if (check_item->isHidden()){
-                            setWidgetVisibility(item, false);
-                        }
+        checkConditionsForItem(item);
+    }
+}
 
-                        // Check if condition is met or not for that item
-                        QString op = condition["op"].toString();
-                        QVariant value = condition["condition"];
-                        QVariant sender_index;
-                        QVariant sender_value;
-                        getWidgetValues(check_item, &sender_index, &sender_value);
+void TeraForm::checkConditionsForItem(QWidget *item)
+{
+    if (item->property("condition").isValid()){
+        // Item has a condition
+        if (item->property("condition").canConvert(QMetaType::QVariantMap)){
+            QVariantMap condition = item->property("condition").toMap();
+            QString check_id = condition["item"].toString();
+            if (!check_id.isNull()){
+                QWidget* check_item = m_widgets[check_id];
+                if (check_item){
+                    if (check_item->property("condition").isValid())
+                        checkConditionsForItem(check_item);
+                    if (check_item->isHidden()){
+                        setWidgetVisibility(item, check_item, false);
+                        return;
+                    }
 
-                        bool condition_met = false;
-                        //TODO: Other operators...
-                        if (op == "="){
-                            if (sender_index == value || sender_value == value){
-                                condition_met = true;
-                            }
-                        }
+                    // Check if condition is met or not for that item
+                    QString op = condition["op"].toString();
+                    QVariant value = condition["condition"];
+                    QVariant sender_index;
+                    QVariant sender_value;
+                    getWidgetValues(check_item, &sender_index, &sender_value);
 
-                        // Hide/show that item
-                        if (item->isVisible() != condition_met){
-                            setWidgetVisibility(item, condition_met);
+                    bool condition_met = false;
+                    //TODO: Other operators...
+                    if (op == "="){
+                        if (sender_index == value || sender_value == value){
+                            condition_met = true;
                         }
                     }
+
+                    // Hide/show that item
+                    //if (item->isVisible() != condition_met){
+                        setWidgetVisibility(item, check_item, condition_met);
+                        //qDebug() << "Hiding...";
+                    //}
                 }
             }
         }
     }
+
 }
 
-void TeraForm::setWidgetVisibility(QWidget *widget, bool visible)
+void TeraForm::setWidgetVisibility(QWidget *widget, QWidget *linked_widget, bool visible)
 {
 
     if (widget->parentWidget()){
@@ -287,7 +319,9 @@ void TeraForm::setWidgetVisibility(QWidget *widget, bool visible)
                 // Check if is a removed row
                 if (m_hidden_rows.contains(widget)){
                     QFormLayout::TakeRowResult row = m_hidden_rows[widget];
-                    form_layout->addRow(row.labelItem->widget(), row.fieldItem->widget());
+                    int parent_row;
+                    form_layout->getWidgetPosition(linked_widget, &parent_row, nullptr);
+                    form_layout->insertRow(parent_row+1, row.labelItem->widget(), row.fieldItem->widget());
                     row.labelItem->widget()->show();
                     row.fieldItem->widget()->show();
                     m_hidden_rows.remove(widget);
@@ -324,14 +358,42 @@ void TeraForm::getWidgetValues(QWidget* widget, QVariant *id, QVariant *value)
     }
 }
 
+bool TeraForm::validateWidget(QWidget *widget, bool ignore_hidden)
+{
+
+    bool rval = true;
+
+    if (widget->isVisible() || ignore_hidden){
+        if (widget->property("required").isValid()){
+            if (widget->property("required").toBool()){
+                QVariant id, value;
+                getWidgetValues(widget, &id, &value);
+                if (value.isNull() || id.isNull() || value.toInt()==-1 || value.toString().isEmpty()){
+                    rval = false;
+                }
+            }
+        }
+    }
+
+    if (rval){
+        widget->setStyleSheet("");
+    }else{
+        widget->setStyleSheet("background-color: #ffaaaa;");
+    }
+    return rval;
+}
+
 void TeraForm::widgetValueChanged()
 {
-    /*// This will work only if the sender is in the same thread, which is always the case here.
+    // This will work only if the sender is in the same thread, which is always the case here.
     QObject* sender = QObject::sender();
     if (!sender)
-        return;*/
+        return;
+
+    if (QWidget* sender_widget = dynamic_cast<QWidget*>(sender)){
+        validateWidget(sender_widget);
+    }
 
     checkConditions();
-
 
 }
