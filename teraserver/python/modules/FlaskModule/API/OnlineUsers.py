@@ -3,17 +3,14 @@ from flask_restful import Resource, reqparse
 from modules.Globals import auth
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
+from libtera.redis.AsyncRedisSubscribeWait import AsyncRedisSubscribeWait
 
 
 class OnlineUsers(Resource):
-
     def __init__(self, flaskModule):
         Resource.__init__(self)
         self.flaskModule = flaskModule
         self.parser = reqparse.RequestParser()
-
-        # Register all callback for redis messages
-        self.flaskModule.subscribe_pattern_with_callback('server.OnlineUsers.*', self.pattern_callback)
 
     @auth.login_required
     def get(self):
@@ -24,11 +21,20 @@ class OnlineUsers(Resource):
 
         try:
 
-            if self.flaskModule is not None:
-                self.flaskModule.publish('api.OnlineUsers.' + session['user_id'] + '.request', b'list')
+            req = AsyncRedisSubscribeWait('server.OnlineUsers.*', self.flaskModule)
+            req.listen()
 
-            users_list = []
-            return jsonify(users_list)
+            # Publish request
+            self.flaskModule.publish('api.OnlineUsers.' + session['user_id'] + '.request', b'list')
+
+            # Wait for answer, no timeout
+            (pattern, channel, data) = req.wait()
+
+            req.stop()
+
+            print('event received', pattern, channel, data)
+
+            return jsonify(data)
         except InvalidRequestError:
             return '', 500
 
@@ -38,5 +44,3 @@ class OnlineUsers(Resource):
     def delete(self):
         return '', 501
 
-    def pattern_callback(self, pattern, channel, data):
-        print(self, 'pattern_callback', pattern, channel, data)
