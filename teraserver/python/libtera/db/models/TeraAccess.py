@@ -34,6 +34,9 @@ class TeraAccess(db.Model, BaseModel):
 
         return rval
 
+    def __str__(self):
+        return self.to_json()
+
     @staticmethod
     def get_count():
         count = db.session.query(db.func.count(TeraAccess.id_access))
