@@ -21,7 +21,7 @@ class OnlineUsers(Resource):
 
         try:
 
-            req = AsyncRedisSubscribeWait('server.OnlineUsers.*', self.flaskModule)
+            req = AsyncRedisSubscribeWait('server.OnlineUsers.' + session['user_id'] + '.*', self.flaskModule)
             req.listen()
 
             # Publish request

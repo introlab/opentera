@@ -1,8 +1,5 @@
-from modules.RedisModule.RedisModule import get_redis
 from flask import jsonify
-
 from libtera.redis.RedisClient import RedisClient
-
 from libtera.ConfigManager import ConfigManager
 
 
@@ -42,7 +39,7 @@ class UserManagerModule(RedisClient):
             online_users = str(self.registry.online_users())
             # Answer
             print('answering', 'server.' + module + '.' + str(uuid) + '.answer', online_users)
-            get_redis().publish('server.' + module + '.' + str(uuid) + '.answer', online_users)
+            self.publish('server.' + module + '.' + str(uuid) + '.answer', online_users)
             return True
 
     def handle_websocket_messages(self, uuid, message):
@@ -57,7 +54,7 @@ class UserManagerModule(RedisClient):
             online_users = str(self.registry.online_users())
             # Answer
             print('answering', 'server.' + str(uuid) + '.answer', online_users)
-            get_redis().publish('server.' + str(uuid) + '.answer', online_users)
+            self.publish('server.' + str(uuid) + '.answer', online_users)
             return True
 
         print('Error unhandled message ', uuid, message)
