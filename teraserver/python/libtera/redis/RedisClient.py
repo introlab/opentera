@@ -19,6 +19,7 @@ class RedisClient:
     def __init__(self, config=None):
         print('Init RedisClient', self, config)
         self.protocol = None
+        self.callbacks_dict = dict()
         # self.redisConfig = config
 
         # Fill config
@@ -44,8 +45,10 @@ class RedisClient:
         pass
 
     def redisMessageReceived(self, pattern, channel, message):
-        print('RedisClient message received', pattern, channel, message)
-        pass
+        print(self, 'redisMessageReceived', pattern, channel, message)
+        if pattern in self.callbacks_dict:
+            # Call function.
+            self.callbacks_dict[pattern](pattern, channel, message)
 
     def redisConnectionLost(self, reason):
         print("RedisClient lost connection", reason)
@@ -62,6 +65,10 @@ class RedisClient:
         else:
             print('Error, no protocol')
 
+    def unsubscribe(self, topic):
+        if self.protocol:
+            self.protocol.punsubscribe(topic)
+
     def publish(self, topic, message):
         self.redis.publish(topic, message)
 
@@ -73,6 +80,16 @@ class RedisClient:
 
     def redisDelete(self, key):
         self.redis.delete(key)
+
+    def subscribe_pattern_with_callback(self, pattern, function):
+        print(self, 'subscribe_pattern_with_callback', pattern, function)
+        self.callbacks_dict[pattern] = function
+        self.subscribe(pattern)
+
+    def unsubscribe_pattern_with_callback(self, pattern, function):
+        print(self, 'unsubscribe_pattern_with_callback', pattern, function)
+        self.unsubscribe(pattern)
+        del self.callbacks_dict[pattern]
 
 
 # Debug
