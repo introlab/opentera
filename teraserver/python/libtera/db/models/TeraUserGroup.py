@@ -26,16 +26,24 @@ class TeraUserGroup(db.Model, BaseModel):
             users_list = []
             for user in self.usergroup_users:
                 users_list.append(user.to_json(ignore_fields=['user_usergroups']))
-            rval['user_usergroups'] = users_list
+            rval['usergroup_users'] = users_list
 
         # Add access in json format, if needed
         if 'usergroup_access' in rval:
             access_list = []
             for access in self.usergroup_access:
                 access_list.append(access.to_json(ignore_fields=['access_usergroups']))
-            rval['usergroupe_access'] = access_list
+            rval['usergroup_access'] = access_list
 
         return rval
+
+    @staticmethod
+    def query_data(filter_args):
+        if isinstance(filter_args, tuple):
+            return TeraUserGroup.query.filter_by(*filter_args).all()
+        if isinstance(filter_args, dict):
+            return TeraUserGroup.query.filter_by(**filter_args).all()
+        return None
 
     @staticmethod
     def get_count():
