@@ -47,8 +47,6 @@ private:
 
     bool validateData();
 
-    void initProfileUI();
-    void updateProfileUI();
     void hideProfileValidationIcons();
     bool validateProfile();
     void buildProfileFromUI();
@@ -58,11 +56,6 @@ public slots:
 
 private slots:
     // Profile editor items
-    void componentChecked(int state);
-    void changeFieldType();
-    void showPassword(bool show);
-    void comboItemChanged();
-
     void objectDefReceived(const QString &def, const QString &type);
 
     void btnEdit_clicked();

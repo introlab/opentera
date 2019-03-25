@@ -115,6 +115,9 @@ QWidget#pageSection1{
    </property>
    <item>
     <widget class="QToolBox" name="toolboxMain">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>

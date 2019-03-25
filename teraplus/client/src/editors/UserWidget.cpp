@@ -51,7 +51,7 @@ UserWidget::UserWidget(ComManager *comMan, const TeraUser &data, QWidget *parent
     }*/
 
     hideValidationIcons();
-    ui->txtCPassword->setVisible(false);
+    //ui->txtCPassword->setVisible(false);
 
 
     // Connect signals and slots
@@ -94,8 +94,9 @@ void UserWidget::setData(const TeraUser &data){
 
     m_data = new TeraUser(data);
 
-    // Query profile definition
+    // Query forms definition
     m_comManager->doQuery(WEB_DEFINITIONS_PATH, WEB_DEFINITIONS_PROFILE);
+    m_comManager->doQuery(WEB_DEFINITIONS_PATH, WEB_DEFINITIONS_USER);
 
     /*
     if (m_data_type==TERADATA_KIT){
@@ -176,7 +177,7 @@ void UserWidget::updateControlsState(){
 
     //txtFirstName->setEnabled(false); // Always disabled, since managed globally
     //txtLastName->setEnabled(false);
-    ui->txtFirstName->setEnabled(edit);
+    /*ui->txtFirstName->setEnabled(edit);
     ui->txtLastName->setEnabled(edit);
     ui->txtCPassword->setEnabled(edit);
     ui->txtPassword->setEnabled(edit);
@@ -191,7 +192,7 @@ void UserWidget::updateControlsState(){
     }
 
     ui->chkEnabled->setEnabled(edit);
-    ui->chkAdmin->setEnabled(edit);
+    ui->chkAdmin->setEnabled(edit);*/
 
     if (edit)
         ui->tabMain->setVisible(true);
@@ -226,8 +227,8 @@ void UserWidget::updateFieldsValue(){
         }else{
             txtLastName->setText(m_data->name());
         }*/
-        ui->txtFirstName->setText(m_data->getFirstName());
-        ui->txtLastName->setText(m_data->getLastName());
+        /*ui->txtFirstName->setText(m_data->getFirstName());
+        ui->txtLastName->setText(m_data->getLastName());*/
 
        /* chkEnabled->setChecked(m_data->enabled());
         chkAdmin->setChecked(m_data->isSuperAdmin());
@@ -355,250 +356,13 @@ void UserWidget::hideValidationIcons(){
 
 }
 
-//////////////////////////////////////////////////////////
-// "Simplified" profile editor items
-//////////////////////////////////////////////////////////
-void UserWidget::initProfileUI(){
-    // Initial view
-   /* hideProfileValidationIcons();
-
-    ui->tabProfile->setVisible(true);
-    ui->btnDelExternal->setEnabled(false);
-
-    ui->frmCamControl1->setVisible(false);
-    ui->frmONVIF1->setVisible(false);
-    ui->frmWebRTC->setVisible(false);
-    ui->frmVirtualCam->setVisible(false);
-    ui->frmVirtualCamScreen->setVisible(false);
-    ui->frmExternalPrograms->setVisible(false);
-
-    ui->chkCamControl1->setChecked(false);
-    ui->chkWebRTC->setChecked(false);
-    ui->chkVirtualCam->setChecked(false);
-    ui->chk2ndAudioSrc->setChecked(false);
-    ui->chk2ndVideoSrc->setChecked(false);
-    ui->chkTeraWeb->setChecked(false);
-    ui->chkExternalPrograms->setChecked(false);
-
-    // Combobox values
-    ui->cmbControl1->clear();
-    ui->cmbControl1->addItem("Vivotek 8111","VIVOTEK8111");
-    ui->cmbControl1->addItem("ONVIF (Générique)","ONVIF");
-    ui->cmbControl1->setCurrentIndex(0);
-
-    ui->cmb2ndAudioSrc->setVisible(false);
-    ui->cmb2ndVideoSrc->setVisible(false);
-
-    // Fill available cameras
-    ui->cmbWebVideoSrc->setCurrentIndex(-1);
-
-    ui->lblCamMissing->setVisible(false);
-    ui->lblAudioMissing->setVisible(false);
-    ui->txtVirtualCamAdr->setText("");
-
-    ui->lstExternal->clear();*/
-
-}
-
-void UserWidget::componentChecked(int state){
-    /*bool check = (state == Qt::Checked);
-    // Find emitting widget
-    QCheckBox* checkbox = dynamic_cast<QCheckBox*>(sender());
-
-    if (checkbox){
-        if (checkbox->objectName()=="chkTeraWeb"){
-            //clientConfigArea->setVisible(!check);
-        }
-        // Sections
-
-        if (checkbox->objectName()=="chkCamControl1")
-            ui->frmCamControl1->setVisible(check);
-        if (checkbox->objectName()=="chkWebRTC"){
-            ui->frmWebRTC->setVisible(check);
-
-        }
-
-        if (checkbox->objectName()=="chkVirtualCam"){
-            ui->frmVirtualCam->setVisible(check);
-        }
-
-        if (checkbox->objectName()=="chk2ndAudioSrc"){
-            ui->cmb2ndAudioSrc->setVisible(check);
-        }
-
-        if (checkbox->objectName()=="chk2ndVideoSrc"){
-            ui->cmb2ndVideoSrc->setVisible(check);
-        }
-
-        if (checkbox->objectName()=="chkExternalPrograms"){
-            ui->frmExternalPrograms->setVisible(check);
-        }
-    }*/
-}
-
-void UserWidget::changeFieldType(){
-    // Find emitting widget
-    QPushButton* btn = dynamic_cast<QPushButton*>(sender());
-
-    if (btn){
-        /*if (btn->objectName()=="btnSrcCam1"){
-            if (stkCam1->currentIndex()==1){
-                stkCam1->setCurrentIndex(0);
-                frmCam1Params->setVisible(false);
-            }else{
-                stkCam1->setCurrentIndex(1);
-                if (cmbSrc1->currentIndex()!=-1)
-                    frmCam1Params->setVisible(true);
-            }
-        }*/
-        /*if (btn->objectName()=="btnSrcCam2"){
-            if (stkCam2->currentIndex()==1){
-                stkCam2->setCurrentIndex(0);
-                frmCam2Params->setVisible(false);
-            }else{
-                stkCam2->setCurrentIndex(1);
-                if (cmbSrc2->currentIndex()!=-1)
-                    frmCam2Params->setVisible(true);
-            }
-        }*/
-        /*if (btn->objectName()=="btnECGSerial"){
-            if (stkECG->currentIndex()==1)
-                stkECG->setCurrentIndex(0);
-            else
-                stkECG->setCurrentIndex(1);
-        }
-        if (btn->objectName()=="btnOxySerial"){
-            if (stkOxy->currentIndex()==1)
-                stkOxy->setCurrentIndex(0);
-            else
-                stkOxy->setCurrentIndex(1);
-        }*/
-    }
-}
-
-void UserWidget::showPassword(bool show){
-    // Find emitting widget
-    /*QPushButton* btn = dynamic_cast<QPushButton*>(sender());
-
-    if (btn){
-        if (btn->objectName()=="btnControlPass1"){
-            if (show)
-                ui->txtControlPass1->setEchoMode(QLineEdit::Normal);
-            else
-                ui->txtControlPass1->setEchoMode(QLineEdit::Password);
-        }
-
-    }*/
-}
-
-void UserWidget::comboItemChanged(){
-    // Find emitting widget
-    QComboBox* combo = dynamic_cast<QComboBox*>(sender());
-
-    if (combo){
-        /*if (combo->objectName()=="cmbAudioSrc"){
-            lblAudioAdr->setVisible(combo->currentData().toInt()==-2); // MCOM
-            txtAudioAdr->setVisible(combo->currentData().toInt()==-2); // MCOM
-        }*/
-
-        /*if (combo->objectName()=="cmbSrc1"){
-            frmCam1Params->setVisible(combo->currentIndex()!=-1);
-            if (combo->currentIndex()!=-1){
-                // Fill available resolution
-                cmbCam1Res->clear();
-                cmbCam1FPS->clear();
-                cmbCam1FPS->setEnabled(false);
-                cmbCam1FPS->setCurrentIndex(-1);
-
-                QCamera camera(combo->currentData().toByteArray());
-                camera.load();
-                QList<QSize> res = camera.supportedViewfinderResolutions();
-                for (int i=0; i<res.count(); i++){
-                    cmbCam1Res->addItem(QString::number(res.at(i).width()) +"x"+QString::number(res.at(i).height()),res.at(i));
-                }
-                camera.unload();
-            }
-        }*/
-
-        /*if (combo->objectName()=="cmbSrc2"){
-            frmCam2Params->setVisible(combo->currentIndex()!=-1);
-            if (combo->currentIndex()!=-1){
-                // Fill available resolution
-                cmbCam2Res->clear();
-                cmbCam2FPS->clear();
-                cmbCam2FPS->setEnabled(false);
-                cmbCam2FPS->setCurrentIndex(-1);
-
-                QCamera camera(combo->currentData().toByteArray());
-                camera.load();
-                QList<QSize> res = camera.supportedViewfinderResolutions();
-                for (int i=0; i<res.count(); i++){
-                    cmbCam2Res->addItem(QString::number(res.at(i).width()) +"x"+QString::number(res.at(i).height()),res.at(i));
-                }
-                camera.unload();
-            }
-        }*/
-
-        /*if (combo->objectName()=="cmbCam1Res"){
-            // Get Available FPS for selected resolution
-            if (combo->currentIndex()!=-1){
-                cmbCam1FPS->clear();
-                cmbCam1FPS->setEnabled(true);
-                QCamera camera(cmbSrc1->currentData().toByteArray());
-                QCameraViewfinderSettings settings;
-                settings.setResolution(combo->currentData().toSize());
-                camera.load();
-                QList<QCamera::FrameRateRange> fps = camera.supportedViewfinderFrameRateRanges(settings);
-                for (int i=0; i<fps.count(); i++){
-                    cmbCam1FPS->addItem(QString::number(fps.at(i).maximumFrameRate),fps.at(i).maximumFrameRate);
-                }
-                // Select max FPS by default
-                cmbCam1FPS->setCurrentIndex(cmbCam1FPS->count()-1);
-                camera.unload();
-            }
-
-        }*/
-
-        /*if (combo->objectName()=="cmbCam2Res"){
-            // Get Available FPS for selected resolution
-            if (combo->currentIndex()!=-1){
-                cmbCam2FPS->clear();
-                cmbCam2FPS->setEnabled(true);
-                QCamera camera(cmbSrc1->currentData().toByteArray());
-                QCameraViewfinderSettings settings;
-                settings.setResolution(combo->currentData().toSize());
-                camera.load();
-                QList<QCamera::FrameRateRange> fps = camera.supportedViewfinderFrameRateRanges(settings);
-                for (int i=0; i<fps.count(); i++){
-                    cmbCam2FPS->addItem(QString::number(fps.at(i).maximumFrameRate),fps.at(i).maximumFrameRate);
-                }
-                // Select max FPS by default
-                cmbCam2FPS->setCurrentIndex(cmbCam2FPS->count()-1);
-                camera.unload();
-            }
-        }*/
-
-       /* if (combo->objectName()=="cmbControl1"){
-            ui->frmONVIF1->setVisible(ui->cmbControl1->currentData()=="ONVIF");
-        }
-
-        if (combo->objectName() == "cmbVirtualCam"){
-            ui->frmVirtualCamNetwork->setVisible(ui->cmbVirtualCam->currentIndex()==0);
-            ui->frmVirtualCamScreen->setVisible(ui->cmbVirtualCam->currentIndex()==1);
-        }*/
-    }
-}
-
 void UserWidget::objectDefReceived(const QString& def, const QString &type)
 {
     if (type == WEB_DEFINITIONS_PROFILE)
         ui->wdgProfile->buildUiFromStructure(def);
-}
 
-void UserWidget::updateProfileUI(){
-    // Update the "simplified" profile UI from the local profile
-    initProfileUI(); // Reset the UI
-
+    if (type == WEB_DEFINITIONS_USER)
+        ui->wdgUser->buildUiFromStructure(def);
 }
 
 void UserWidget::hideProfileValidationIcons(){
@@ -630,7 +394,7 @@ void UserWidget::connectSignals()
     connect(ui->btnDelete, &QPushButton::clicked, this, &UserWidget::btnDelete_clicked);
     connect(ui->btnUndo, &QPushButton::clicked, this, &UserWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &UserWidget::btnSave_clicked);
-    connect(ui->txtPassword, &QLineEdit::textChanged, this, &UserWidget::txtPassword_textChanged);
+    //connect(ui->txtPassword, &QLineEdit::textChanged, this, &UserWidget::txtPassword_textChanged);
 
     connect(m_comManager, &ComManager::objectDefinitionReceived, this, &UserWidget::objectDefReceived);
 
@@ -664,12 +428,12 @@ void UserWidget::btnSave_clicked()
 void UserWidget::txtPassword_textChanged(const QString &new_pass)
 {
     Q_UNUSED(new_pass)
-    if (ui->txtPassword->text().isEmpty()){
+    /*if (ui->txtPassword->text().isEmpty()){
         ui->txtCPassword->setVisible(false);
         ui->txtCPassword->clear();
     }else{
         ui->txtCPassword->setVisible(true);
-    }
+    }*/
 }
 
 void UserWidget::btnUndo_clicked()

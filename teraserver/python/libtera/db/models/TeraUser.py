@@ -226,7 +226,7 @@ class TeraUser(db.Model, BaseModel):
         section.add_item(TeraFormItem("user_usergroups", "Groupe(s) utilisateur(s)", "checklist", True))
         section.add_item(TeraFormItem("user_superadmin", "Super administrateur", "boolean", True))
         section.add_item(TeraFormItem("user_notes", "Notes", "longtext"))
-        section.add_item(TeraFormItem("user_lastonline", "Dernière connexion", "datetime",
+        section.add_item(TeraFormItem("user_lastonline", "Dernière connexion", "label",
                                       item_options={"readonly": True}))
 
         return form.to_dict()

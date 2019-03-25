@@ -17,6 +17,8 @@
 #include <QCheckBox>
 #include <QSpinBox>
 #include <QFrame>
+#include <QListWidget>
+#include <QTextEdit>
 
 #include <QtMultimedia/QCameraInfo>
 #include <QtMultimedia/QAudioDeviceInfo>
@@ -52,6 +54,9 @@ private:
     QWidget* createTextWidget(const QVariantMap& structure, bool is_masked);
     QWidget* createBooleanWidget(const QVariantMap& structure);
     QWidget* createNumericWidget(const QVariantMap& structure);
+    QWidget* createLabelWidget(const QVariantMap& structure, bool is_hidden);
+    QWidget* createListWidget(const QVariantMap& structure);
+    QWidget* createLongTextWidget(const QVariantMap& structure);
 
     void checkConditions();
     void checkConditionsForItem(QWidget* item);

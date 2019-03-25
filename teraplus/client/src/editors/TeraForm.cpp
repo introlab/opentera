@@ -55,6 +55,7 @@ void TeraForm::buildUiFromStructure(const QString &structure)
             }
         }
     }
+
 }
 
 bool TeraForm::validateFormData(bool ignore_hidden)
@@ -106,6 +107,18 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
             if (item_type == "numeric"){
                 item_widget = createNumericWidget(item_data);
             }
+            if (item_type == "hidden"){
+                item_widget = createLabelWidget(item_data, true);
+            }
+            if (item_type == "checklist"){
+                item_widget = createListWidget(item_data);
+            }
+            if (item_type == "longtext"){
+                item_widget = createLongTextWidget(item_data);
+            }
+            if (item_type == "label"){
+                item_widget = createLabelWidget(item_data, false);
+            }
 
 
             if (item_widget){
@@ -120,6 +133,11 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
                     item_widget->setProperty("condition", item_data["condition"]);
                     item_frame->setStyleSheet("background-color:darkgrey;");
                 }
+                if (item_data.contains("readonly")){
+                    item_widget->setProperty("readonly", item_data["readonly"].toBool());
+                    item_widget->setEnabled(item_data["readonly"].toBool());
+                }
+
                 item_widget->setMinimumHeight(30);
 
                 // Add widget to layout
@@ -128,6 +146,13 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
                 // Add widget to list
                 m_widgets[item_data["id"].toString()] = item_widget;
 
+                // Remove row if hidden
+                if (item_type == "hidden"){
+                    setWidgetVisibility(item_widget, nullptr, false);
+                }
+
+            }else{
+                LOG_WARNING("Unknown item type: " + item_type, "TeraForm::buildFormFromStructure");
             }
         }
     }
@@ -264,6 +289,34 @@ QWidget *TeraForm::createNumericWidget(const QVariantMap &structure)
     return item_spin;
 }
 
+QWidget *TeraForm::createLabelWidget(const QVariantMap &structure, bool is_hidden)
+{
+    Q_UNUSED(structure)
+    QLabel* item_label = new QLabel();
+
+    item_label->setHidden(is_hidden);
+
+    return item_label;
+}
+
+QWidget *TeraForm::createListWidget(const QVariantMap &structure)
+{
+    QListWidget* item_list = new QListWidget();
+
+    if (structure.contains("values")){
+        // TODO.
+    }
+
+    return item_list;
+}
+
+QWidget *TeraForm::createLongTextWidget(const QVariantMap &structure)
+{
+    Q_UNUSED(structure)
+    QTextEdit* item_text = new QTextEdit();
+    return item_text;
+}
+
 void TeraForm::checkConditions()
 {
     for (QWidget* item:m_widgets.values()){
@@ -327,7 +380,11 @@ void TeraForm::setWidgetVisibility(QWidget *widget, QWidget *linked_widget, bool
                 if (m_hidden_rows.contains(widget)){
                     QFormLayout::TakeRowResult row = m_hidden_rows[widget];
                     int parent_row;
-                    form_layout->getWidgetPosition(linked_widget, &parent_row, nullptr);
+                    if (linked_widget){
+                        form_layout->getWidgetPosition(linked_widget, &parent_row, nullptr);
+                    }else {
+                        form_layout->getWidgetPosition(ui->toolboxMain, &parent_row, nullptr);
+                    }
                     form_layout->insertRow(parent_row+1, row.labelItem->widget(), row.fieldItem->widget());
                     row.labelItem->widget()->show();
                     row.fieldItem->widget()->show();
@@ -347,6 +404,8 @@ void TeraForm::setWidgetVisibility(QWidget *widget, QWidget *linked_widget, bool
 
 void TeraForm::getWidgetValues(QWidget* widget, QVariant *id, QVariant *value)
 {
+    *id = QVariant("");
+
     if (QComboBox* combo = dynamic_cast<QComboBox*>(widget)){
         *id = combo->currentData();
         *value = combo->currentText();
