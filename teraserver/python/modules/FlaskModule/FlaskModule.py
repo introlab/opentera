@@ -13,7 +13,6 @@ class FlaskModule(RedisClient):
 
         self.config = config
 
-
         # Init RedisClient
         RedisClient.__init__(self, config=self.config.redis_config)
 

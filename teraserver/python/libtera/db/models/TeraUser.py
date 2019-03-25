@@ -1,5 +1,6 @@
 from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraUserGroup import users_usergroups_table, TeraUserGroup
+from libtera.db.models.TeraAccess import TeraAccess
 from libtera.db.models.TeraForm import TeraForm, TeraFormSection, TeraFormItem, TeraFormItemCondition, TeraFormValue
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -144,6 +145,16 @@ class TeraUser(db.Model, BaseModel):
         if isinstance(filter_args, dict):
             return TeraUser.query.filter_by(**filter_args).all()
         return None
+
+    @staticmethod
+    def get_all_user_access(u_uuid):
+        access_list = []
+        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
+        if user:
+            for group in user.user_usergroups:
+                access_list.append(group.usergroup_access)
+
+        return access_list
 
     @staticmethod
     def get_profile_def():
