@@ -5,7 +5,7 @@ class TeraSiteAccess(db.Model, BaseModel):
     __tablename__ = 't_sites_access'
     id_site_access = db.Column(db.Integer, db.Sequence('id_site_access_sequence'), primary_key=True, autoincrement=True)
     id_sitegroup = db.Column(db.Integer, db.ForeignKey('t_sitegroups.id_sitegroup'), nullable=False)
-    access_name = db.Column(db.String(100), nullable=False, unique=True)
+    access_name = db.Column(db.String(100), nullable=False, unique=False)
     access_create = db.Column(db.BOOLEAN, nullable=False, default=False)
     access_update = db.Column(db.BOOLEAN, nullable=False, default=False)
     access_read = db.Column(db.BOOLEAN, nullable=False, default=False)
@@ -13,8 +13,13 @@ class TeraSiteAccess(db.Model, BaseModel):
 
     access_sitegroups = db.relationship('TeraSiteGroup', back_populates='sitegroup_access')
 
-    def __init__(self, name, create=False, update=False, read=False, delete=False):
+    access_list = ['projects', 'projectgroups', 'users', 'kits', 'sessiontypes', 'tests']
+
+    def __init__(self, name, create=False, read=False, update=False, delete=False):
         self.access_name = name
+        self.set_access(create=create, update=update, read=read, delete=delete)
+
+    def set_access(self, create=False, read=False, update=False, delete=False):
         self.access_create = create
         self.access_update = update
         self.access_read = read
@@ -42,3 +47,11 @@ class TeraSiteAccess(db.Model, BaseModel):
         count = db.session.query(db.func.count(TeraSiteAccess.id_access))
         return count.first()[0]
 
+    @staticmethod
+    def create_defaults():
+        default_access = []
+        for access in TeraSiteAccess.access_list:
+            site_access = TeraSiteAccess(access)
+            default_access.append(site_access)
+
+        return default_access

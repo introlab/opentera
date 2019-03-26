@@ -1,6 +1,6 @@
 from libtera.db.Base import db, BaseModel
-from libtera.db.models.TeraSiteGroup import users_sitegroups_table
-from libtera.db.models.TeraProjectGroup import users_projectgroups_table
+from libtera.db.models.TeraSiteGroup import users_sitegroups_table, TeraSiteGroup
+from libtera.db.models.TeraProjectGroup import users_projectgroups_table, TeraProjectGroup
 from libtera.db.models.TeraForm import TeraForm, TeraFormSection, TeraFormItem, TeraFormItemCondition, TeraFormValue
 
 from passlib.hash import bcrypt
@@ -80,13 +80,13 @@ class TeraUser(db.Model, BaseModel):
         return user_count.first()[0]
 
     @staticmethod
-    def create_default_account():
+    def create_defaults():
 
         # Admin
         admin = TeraUser()
         admin.user_enabled = True
-        admin.user_firstname = "Administrateur"
-        admin.user_lastname = "Systeme"
+        admin.user_firstname = "Super"
+        admin.user_lastname = "Admin"
         admin.user_profile = ""
         admin.user_password = bcrypt.hash("admin")
         admin.user_superadmin = True
@@ -96,18 +96,50 @@ class TeraUser(db.Model, BaseModel):
         # admin.user_usergroups.append(TeraUserGroup.get_usergroup_by_name('Administrateurs'))
         db.session.add(admin)
 
-        # User
+        # Site admin
+        admin = TeraUser()
+        admin.user_enabled = True
+        admin.user_firstname = "Site"
+        admin.user_lastname = "Admin"
+        admin.user_profile = ""
+        admin.user_password = bcrypt.hash("siteadmin")
+        admin.user_superadmin = False
+        admin.user_type = TeraUserTypes.USER.value
+        admin.user_username = "siteadmin"
+        admin.user_uuid = str(uuid.uuid4())
+        admin.user_sitegroups.append(TeraSiteGroup.get_sitegroup_by_name('Admin - Default Site'))
+        admin.user_projectgroups.append(TeraProjectGroup.get_projectgroup_by_name('Admin - Default Project #1'))
+        db.session.add(admin)
+
+        # Site User
         user = TeraUser()
         user.user_enabled = True
-        user.user_firstname = "User"
-        user.user_lastname = "Systeme"
+        user.user_firstname = "Site"
+        user.user_lastname = "User"
         user.user_profile = ""
         user.user_password = bcrypt.hash("user")
         user.user_superadmin = False
         user.user_type = TeraUserTypes.USER.value
         user.user_username = "user"
         user.user_uuid = str(uuid.uuid4())
-        # user.user_usergroups.append(TeraUserGroup.get_usergroup_by_name('Users'))
+        user.user_sitegroups.append(TeraSiteGroup.get_sitegroup_by_name('User - Default Site'))
+        user.user_projectgroups.append(TeraProjectGroup.get_projectgroup_by_name('User - Default Project #1'))
+        db.session.add(user)
+
+        # Site User
+        user = TeraUser()
+        user.user_enabled = True
+        user.user_firstname = "MultiSite"
+        user.user_lastname = "User"
+        user.user_profile = ""
+        user.user_password = bcrypt.hash("user2")
+        user.user_superadmin = False
+        user.user_type = TeraUserTypes.USER.value
+        user.user_username = "user2"
+        user.user_uuid = str(uuid.uuid4())
+        user.user_sitegroups.append(TeraSiteGroup.get_sitegroup_by_name('User - Default Site'))
+        user.user_projectgroups.append(TeraProjectGroup.get_projectgroup_by_name('User - Default Project #1'))
+        user.user_projectgroups.append(TeraProjectGroup.get_projectgroup_by_name('User - Default Project #2'))
         db.session.add(user)
 
         db.session.commit()

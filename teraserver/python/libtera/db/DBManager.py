@@ -25,13 +25,25 @@ class DBManager:
 
     @staticmethod
     def create_defaults():
+        if TeraSite.get_count() == 0:
+            print('No sites - creating defaults')
+            TeraSite.create_defaults()
+
         if TeraSiteGroup.get_count() == 0:
-            print("No sitegroups - creating default usergroups")
-            # TeraSiteGroup.create_default_usergroups()
+            print("No sitegroups - creating defaults")
+            TeraSiteGroup.create_defaults()
+
+        if TeraProject.get_count() == 0:
+            print("No projects - creating defaults")
+            TeraProject.create_defaults()
+
+        if TeraProjectGroup.get_count() == 0:
+            print("No project groups - creating defaults")
+            TeraProjectGroup.create_defaults()
 
         if TeraUser.get_count() == 0:
-            print('No users - creating default admin user')
-            TeraUser.create_default_account()
+            print('No users - creating defaults')
+            TeraUser.create_defaults()
 
     @staticmethod
     def open(db_infos, echo=False):
