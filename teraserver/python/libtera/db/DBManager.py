@@ -1,6 +1,11 @@
 from libtera.db.Base import db
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraUserGroup import TeraUserGroup
+from libtera.db.models.TeraSiteGroup import TeraSiteGroup
+from libtera.db.models.TeraSiteAccess import TeraSiteAccess
+from libtera.db.models.TeraSite import TeraSite
+from libtera.db.models.TeraProject import TeraProject
+from libtera.db.models.TeraProjectAccess import TeraProjectAccess
+from libtera.db.models.TeraProjectGroup import TeraProjectGroup
 
 from modules.FlaskModule.FlaskModule import flask_app
 
@@ -20,9 +25,9 @@ class DBManager:
 
     @staticmethod
     def create_defaults():
-        if TeraUserGroup.get_count() == 0:
-            print("No usergroups - creating default usergroups")
-            TeraUserGroup.create_default_usergroups()
+        if TeraSiteGroup.get_count() == 0:
+            print("No sitegroups - creating default usergroups")
+            # TeraSiteGroup.create_default_usergroups()
 
         if TeraUser.get_count() == 0:
             print('No users - creating default admin user')
@@ -43,6 +48,7 @@ class DBManager:
         db.app = flask_app
 
         # Init tables
+        db.drop_all()
         db.create_all()
 
     @staticmethod

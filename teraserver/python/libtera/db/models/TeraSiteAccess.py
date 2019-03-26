@@ -1,17 +1,17 @@
 from libtera.db.Base import db, BaseModel
 
 
-class TeraAccess(db.Model, BaseModel):
-    __tablename__ = 't_access'
-    id_access = db.Column(db.Integer, db.Sequence('id_access_sequence'), primary_key=True, autoincrement=True)
-    id_usergroup = db.Column(db.Integer, db.ForeignKey('t_usergroups.id_usergroup'), nullable=False)
+class TeraSiteAccess(db.Model, BaseModel):
+    __tablename__ = 't_sites_access'
+    id_site_access = db.Column(db.Integer, db.Sequence('id_site_access_sequence'), primary_key=True, autoincrement=True)
+    id_sitegroup = db.Column(db.Integer, db.ForeignKey('t_sitegroups.id_sitegroup'), nullable=False)
     access_name = db.Column(db.String(100), nullable=False, unique=True)
     access_create = db.Column(db.BOOLEAN, nullable=False, default=False)
     access_update = db.Column(db.BOOLEAN, nullable=False, default=False)
     access_read = db.Column(db.BOOLEAN, nullable=False, default=False)
     access_delete = db.Column(db.BOOLEAN, nullable=False, default=False)
 
-    access_usergroups = db.relationship('TeraUserGroup', back_populates='usergroup_access')
+    access_sitegroups = db.relationship('TeraSiteGroup', back_populates='sitegroup_access')
 
     def __init__(self, name, create=False, update=False, read=False, delete=False):
         self.access_name = name
@@ -26,11 +26,11 @@ class TeraAccess(db.Model, BaseModel):
         rval = super().to_json(ignore_fields=ignore_fields)
 
         # Add access in json format, if needed
-        if 'access_usergroups' in rval:
+        if 'access_sitegroups' in rval:
             access_list = []
             for group in self.access_usergroups:
-                access_list.append(group.to_json(ignore_fields=['usergroups_access']))
-            rval['user_usergroups'] = access_list
+                access_list.append(group.to_json(ignore_fields=['sitegroup_access']))
+            rval['access_sitegroups'] = access_list
 
         return rval
 
@@ -39,6 +39,6 @@ class TeraAccess(db.Model, BaseModel):
 
     @staticmethod
     def get_count():
-        count = db.session.query(db.func.count(TeraAccess.id_access))
+        count = db.session.query(db.func.count(TeraSiteAccess.id_access))
         return count.first()[0]
 

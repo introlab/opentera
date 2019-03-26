@@ -35,11 +35,9 @@ class FlaskModule(RedisClient):
         from .API.QueryUsers import QueryUsers
         from .API.Definitions import Definitions
         from .API.OnlineUsers import OnlineUsers
-        from .API.QueryUserGroups import QueryUserGroups
         self.api.add_resource(Login, '/api/login', resource_class_args=[self])
         self.api.add_resource(Logout, '/api/logout', resource_class_args=[self])
         self.api.add_resource(QueryUsers, '/api/users', resource_class_args=[self])
-        self.api.add_resource(QueryUserGroups, '/api/usergroups', resource_class_args=[self])
         self.api.add_resource(Definitions, '/api/definitions', resource_class_args=[self])
         self.api.add_resource(OnlineUsers, '/api/online', resource_class_args=[self])
 

@@ -1,8 +1,7 @@
 from libtera.db.Base import db, BaseModel
-from libtera.db.models.TeraUserGroup import users_usergroups_table, TeraUserGroup
-from libtera.db.models.TeraAccess import TeraAccess
+from libtera.db.models.TeraSiteGroup import users_sitegroups_table
+from libtera.db.models.TeraProjectGroup import users_projectgroups_table
 from libtera.db.models.TeraForm import TeraForm, TeraFormSection, TeraFormItem, TeraFormItemCondition, TeraFormValue
-from sqlalchemy.dialects.postgresql import UUID
 
 from passlib.hash import bcrypt
 from enum import Enum
@@ -32,8 +31,11 @@ class TeraUser(db.Model, BaseModel):
     user_lastonline = db.Column(db.TIMESTAMP, nullable=True)
     user_superadmin = db.Column(db.Boolean, nullable=False)
 
-    user_usergroups = db.relationship("TeraUserGroup", secondary=users_usergroups_table,
-                                      back_populates="usergroup_users", cascade="all,delete")
+    user_sitegroups = db.relationship("TeraSiteGroup", secondary=users_sitegroups_table,
+                                      back_populates="sitegroup_users", cascade="all,delete")
+
+    user_projectgroups = db.relationship("TeraProjectGroup", secondary=users_projectgroups_table,
+                                         back_populates="projectgroup_users", cascade="all,delete")
 
     authenticated = False
 
@@ -44,11 +46,11 @@ class TeraUser(db.Model, BaseModel):
         rval = super().to_json(ignore_fields=ignore_fields)
 
         # Add usergroups in json format, if needed
-        if 'user_usergroups' in rval:
-            usergroups_list = []
-            for usergroup in self.user_usergroups:
-                usergroups_list.append(usergroup.to_json(ignore_fields=['usergroup_users', 'usergroup_access']))
-            rval['user_usergroups'] = usergroups_list
+        if 'user_sitegroups' in rval:
+            usersitegroups_list = []
+            for usersitegroup in self.user_usergroups:
+                usersitegroups_list.append(usersitegroup.to_json(ignore_fields=['sitegroup_users']))
+            rval['user_sitegroups'] = usersitegroups_list
 
         return rval
 
@@ -91,7 +93,7 @@ class TeraUser(db.Model, BaseModel):
         admin.user_type = TeraUserTypes.USER.value
         admin.user_username = "admin"
         admin.user_uuid = str(uuid.uuid4())
-        admin.user_usergroups.append(TeraUserGroup.get_usergroup_by_name('Administrateurs'))
+        # admin.user_usergroups.append(TeraUserGroup.get_usergroup_by_name('Administrateurs'))
         db.session.add(admin)
 
         # User
@@ -105,7 +107,7 @@ class TeraUser(db.Model, BaseModel):
         user.user_type = TeraUserTypes.USER.value
         user.user_username = "user"
         user.user_uuid = str(uuid.uuid4())
-        user.user_usergroups.append(TeraUserGroup.get_usergroup_by_name('Users'))
+        # user.user_usergroups.append(TeraUserGroup.get_usergroup_by_name('Users'))
         db.session.add(user)
 
         db.session.commit()
