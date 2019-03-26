@@ -70,6 +70,29 @@ class TeraUser(db.Model, BaseModel):
     def __str__(self):
         return '<TeraUser ' + str(self.user_username) + ', ' + str(self.user_email) + ' >'
 
+    def get_accessible_sites(self):
+        sites = []
+        for group in self.user_sitegroups:
+            sites.append(group.id_site)
+
+        return sites
+
+    def get_accessible_projects(self, create_access=False, read_access=False, update_access=False, delete_access=False):
+        projects = []
+
+        for group in self.user_sitegroups:
+
+            valid = group.has_create_access('projects') & create_access or \
+                    group.has_read_access('projects') & read_access or \
+                    group.has_update_access('projects') & update_access or \
+                    group.has_delete_access('projects') & delete_access
+
+            if valid:
+                for project in self.user_projectgroups:
+                    projects.append(project.id_project)
+
+        return projects
+
     @staticmethod
     def is_anonymous():
         return False

@@ -10,14 +10,11 @@ class Definitions(Resource):
         self.module = flaskModule
         Resource.__init__(self)
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('type', type=str, help='Definition type required')
+        self.parser.add_argument('type', type=str, help='Definition type required', required=True)
 
     @auth.login_required
     def get(self):
         args = self.parser.parse_args(strict=True)
-
-        if args['type'] is None:
-            return 'No definition type specified', 500
 
         if args['type'] == 'profile':
             return jsonify(TeraUser.get_profile_def())

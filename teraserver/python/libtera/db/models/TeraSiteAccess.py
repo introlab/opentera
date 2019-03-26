@@ -55,3 +55,5 @@ class TeraSiteAccess(db.Model, BaseModel):
             default_access.append(site_access)
 
         return default_access
+
+

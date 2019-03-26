@@ -1,6 +1,7 @@
 from flask import jsonify
 from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
+from modules.FlaskModule.FlaskModule import flask_app
 
 
 class OnlineUserRegistry:
@@ -23,6 +24,7 @@ class OnlineUserRegistry:
 
 # Will use twisted Async Redis client
 class UserManagerModule(RedisClient):
+
     def __init__(self, config: ConfigManager):
         self.redis_config = config.redis_config
         super().__init__(config=self.redis_config)

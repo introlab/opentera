@@ -47,6 +47,7 @@ set (pip_packages
     PyInstaller
     pyopenssl
     service_identity
+    jsonrpcclient
 )
 
 # Create environment, will produce python executable

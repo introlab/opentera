@@ -25,3 +25,11 @@ class TeraSite(db.Model, BaseModel):
     @staticmethod
     def get_site_by_sitename(sitename):
         return TeraSite.query.filter_by(site_name=sitename).first()
+
+    @staticmethod
+    def query_data(filter_args):
+        if isinstance(filter_args, tuple):
+            return TeraSite.query.filter_by(*filter_args).all()
+        if isinstance(filter_args, dict):
+            return TeraSite.query.filter_by(**filter_args).all()
+        return None

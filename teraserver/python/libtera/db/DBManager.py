@@ -79,3 +79,19 @@ class DBManager:
 
         # Init tables
         db.create_all()
+
+    @staticmethod
+    def get_user_sites(user: TeraUser, **kwargs):
+        if user.user_superadmin:
+            return TeraSite.query.filter_by(**kwargs).all()
+        else:
+            # Only super user can create sites, by default we can list our sites only
+            return TeraSite.query.filter(TeraSite.id_site.in_(user.get_accessible_sites())).filter_by(**kwargs).all()
+
+    @staticmethod
+    def get_user_projects(user: TeraUser, **kwargs):
+        if user.user_superadmin:
+            return TeraProject.query.filter_by(**kwargs).all()
+        else:
+            return TeraProject.query.filter(TeraProject.id_project.in_
+                                            (user.get_accessible_projects(read_access=True))).filter_by(**kwargs).all()

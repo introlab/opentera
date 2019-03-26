@@ -5,7 +5,7 @@ from modules.FlaskModule.FlaskModule import FlaskModule
 from modules.TwistedModule.TwistedModule import TwistedModule
 
 from libtera.ConfigManager import ConfigManager
-from libtera.db.DBManager import DBManager
+from modules.Globals import db_man
 from modules.RedisModule.RedisModule import setup_redis
 from modules.RedisModule.RedisModule import get_redis
 from modules.UserManagerModule.UserManagerModule import UserManagerModule
@@ -24,9 +24,7 @@ def reactor_is_shutting_down():
 
 if __name__ == '__main__':
 
-    db_man = DBManager()
     config_man = ConfigManager()
-
 
     # SERVER CONFIG
     ###############

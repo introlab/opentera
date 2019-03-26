@@ -46,3 +46,26 @@ class TeraSiteGroup(db.Model, BaseModel):
 
         db.session.commit()
 
+    def has_create_access(self, access_name):
+        for access in self.sitegroup_access:
+            if access.access_name == access_name and access.access_create:
+                return True
+        return False
+
+    def has_read_access(self, access_name):
+        for access in self.sitegroup_access:
+            if access.access_name == access_name and access.access_read:
+                return True
+        return False
+
+    def has_update_access(self, access_name):
+        for access in self.sitegroup_access:
+            if access.access_name == access_name and access.access_update:
+                return True
+        return False
+
+    def has_delete_access(self, access_name):
+        for access in self.sitegroup_access:
+            if access.access_name == access_name and access.access_delete:
+                return True
+        return False
