@@ -1,4 +1,6 @@
 from libtera.db.Base import db
+
+# Must include all Database objects here to be properly initialized and created if needed
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSiteGroup import TeraSiteGroup
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
@@ -6,6 +8,7 @@ from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.models.TeraProjectGroup import TeraProjectGroup
+from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 
 from modules.FlaskModule.FlaskModule import flask_app
 
@@ -40,6 +43,10 @@ class DBManager:
         if TeraProjectGroup.get_count() == 0:
             print("No project groups - creating defaults")
             TeraProjectGroup.create_defaults()
+
+        if TeraParticipantGroup.get_count() == 0:
+            print("No participant groups - creating defaults")
+            TeraParticipantGroup.create_defaults()
 
         if TeraUser.get_count() == 0:
             print('No users - creating defaults')

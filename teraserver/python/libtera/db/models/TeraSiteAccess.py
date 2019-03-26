@@ -4,7 +4,7 @@ from libtera.db.Base import db, BaseModel
 class TeraSiteAccess(db.Model, BaseModel):
     __tablename__ = 't_sites_access'
     id_site_access = db.Column(db.Integer, db.Sequence('id_site_access_sequence'), primary_key=True, autoincrement=True)
-    id_sitegroup = db.Column(db.Integer, db.ForeignKey('t_sitegroups.id_sitegroup'), nullable=False)
+    id_sitegroup = db.Column(db.Integer, db.ForeignKey('t_sites_groups.id_sitegroup'), nullable=False)
     access_name = db.Column(db.String(100), nullable=False, unique=False)
     access_create = db.Column(db.BOOLEAN, nullable=False, default=False)
     access_update = db.Column(db.BOOLEAN, nullable=False, default=False)

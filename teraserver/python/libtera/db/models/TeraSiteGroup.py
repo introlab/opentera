@@ -2,13 +2,13 @@ from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraSite import TeraSite
 
-users_sitegroups_table = db.Table('t_users_sitegroups', db.Column('id_user', db.Integer,
-                                                                  db.ForeignKey('t_users.id_user')),
-                                  db.Column('id_sitegroup', db.Integer, db.ForeignKey('t_sitegroups.id_sitegroup')))
+users_sitegroups_table = db.Table('t_users_sites_groups', db.Column('id_user', db.Integer,
+                                                                    db.ForeignKey('t_users.id_user')),
+                                  db.Column('id_sitegroup', db.Integer, db.ForeignKey('t_sites_groups.id_sitegroup')))
 
 
 class TeraSiteGroup(db.Model, BaseModel):
-    __tablename__ = 't_sitegroups'
+    __tablename__ = 't_sites_groups'
     id_sitegroup = db.Column(db.Integer, db.Sequence('id_sitegroup_sequence'), primary_key=True, autoincrement=True)
     id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site'), nullable=False)
     sitegroup_name = db.Column(db.String, nullable=False, unique=True)

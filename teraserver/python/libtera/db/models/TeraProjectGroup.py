@@ -2,14 +2,14 @@ from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 
-users_projectgroups_table = db.Table('t_users_projectgroups', db.Column('id_user', db.Integer,
+users_projectgroups_table = db.Table('t_users_projects_groups', db.Column('id_user', db.Integer,
                                                                         db.ForeignKey('t_users.id_user')),
                                      db.Column('id_projectgroup', db.Integer,
-                                               db.ForeignKey('t_projectgroups.id_projectgroup')))
+                                               db.ForeignKey('t_projects_groups.id_projectgroup')))
 
 
 class TeraProjectGroup(db.Model, BaseModel):
-    __tablename__ = 't_projectgroups'
+    __tablename__ = 't_projects_groups'
     id_projectgroup = db.Column(db.Integer, db.Sequence('id_projectgroup_sequence'), primary_key=True,
                                 autoincrement=True)
     id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project'), nullable=False)

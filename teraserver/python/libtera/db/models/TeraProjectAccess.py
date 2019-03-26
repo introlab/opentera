@@ -5,7 +5,7 @@ class TeraProjectAccess(db.Model, BaseModel):
     __tablename__ = 't_projects_access'
     id_project_access = db.Column(db.Integer, db.Sequence('id_project_access_sequence'), primary_key=True,
                                   autoincrement=True)
-    id_projectgroup = db.Column(db.Integer, db.ForeignKey('t_projectgroups.id_projectgroup'), nullable=False)
+    id_projectgroup = db.Column(db.Integer, db.ForeignKey('t_projects_groups.id_projectgroup'), nullable=False)
     access_name = db.Column(db.String(100), nullable=False, unique=False)
     access_create = db.Column(db.BOOLEAN, nullable=False, default=False)
     access_update = db.Column(db.BOOLEAN, nullable=False, default=False)
@@ -14,7 +14,7 @@ class TeraProjectAccess(db.Model, BaseModel):
 
     access_projectgroups = db.relationship('TeraProjectGroup', back_populates='projectgroup_access')
 
-    access_list = ['users', 'kits', 'sessions', 'tests', 'participants', 'participantgroups']
+    access_list = ['users', 'kits', 'sessions', 'tests', 'participants', 'participantgroups', 'devices']
 
     def __init__(self, name, create=False, read=False, update=False, delete=False):
         self.access_name = name
