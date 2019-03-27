@@ -19,6 +19,13 @@ class TeraProject(db.Model, BaseModel):
         base_project2.project_name = 'Default Project #2'
         base_project2.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
         db.session.add(base_project2)
+
+        secret_project = TeraProject()
+        secret_project.project_name = "Secret Project #1"
+        secret_project.id_site = TeraSite.get_site_by_sitename('Top Secret Site').id_site
+        db.session.add(secret_project)
+
+        # Commit
         db.session.commit()
 
     @staticmethod
