@@ -2,6 +2,7 @@ from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraSiteGroup import users_sitegroups_table, TeraSiteGroup
 from libtera.db.models.TeraProjectGroup import users_projectgroups_table, TeraProjectGroup
 from libtera.db.models.TeraForm import TeraForm, TeraFormSection, TeraFormItem, TeraFormItemCondition, TeraFormValue
+from libtera.db.models.TeraProject import TeraProject
 
 from passlib.hash import bcrypt
 from enum import Enum
@@ -91,7 +92,10 @@ class TeraUser(db.Model, BaseModel):
                     group.has_delete_access('projects') & delete_access
 
             if valid:
-                for project in self.user_projectgroups:
+                # Query all projects from this site
+                all_projects = TeraProject.query.filter_by(id_site=group.id_site).all()
+
+                for project in all_projects:
                     projects.append(project.id_project)
 
         return projects

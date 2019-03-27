@@ -30,3 +30,10 @@ class TeraProject(db.Model, BaseModel):
     def get_project_by_projectname(projectname):
         return TeraProject.query.filter_by(project_name=projectname).first()
 
+    @staticmethod
+    def query_data(filter_args):
+        if isinstance(filter_args, tuple):
+            return TeraProject.query.filter_by(*filter_args).all()
+        if isinstance(filter_args, dict):
+            return TeraProject.query.filter_by(**filter_args).all()
+        return None
