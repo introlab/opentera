@@ -17,6 +17,12 @@ class TeraSiteGroup(db.Model, BaseModel):
                                       cascade="all,delete")
     sitegroup_access = db.relationship('TeraSiteAccess', back_populates='access_sitegroups')
 
+    def __str__(self):
+        return '<TeraSiteGroup name="' + self.sitegroup_name + '">'
+
+    def __repr__(self):
+        return self.__str__()
+
     @staticmethod
     def get_count():
         count = db.session.query(db.func.count(TeraSiteGroup.id_sitegroup))

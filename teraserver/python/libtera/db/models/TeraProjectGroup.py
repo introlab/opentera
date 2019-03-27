@@ -19,6 +19,12 @@ class TeraProjectGroup(db.Model, BaseModel):
                                          back_populates="user_projectgroups", cascade="all,delete")
     projectgroup_access = db.relationship('TeraProjectAccess', back_populates='access_projectgroups')
 
+    def __str__(self):
+        return '<TeraProjectGroup name="' + self.projectgroup_name + '">'
+
+    def __repr__(self):
+        return self.__str__()
+
     @staticmethod
     def get_count():
         count = db.session.query(db.func.count(TeraProjectGroup.id_projectgroup))

@@ -70,6 +70,9 @@ class TeraUser(db.Model, BaseModel):
     def __str__(self):
         return '<TeraUser ' + str(self.user_username) + ', ' + str(self.user_email) + ' >'
 
+    def __repr__(self):
+        return self.__str__()
+
     def get_accessible_sites(self):
         sites = []
         for group in self.user_sitegroups:

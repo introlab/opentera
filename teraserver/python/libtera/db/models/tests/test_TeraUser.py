@@ -47,3 +47,23 @@ class TeraUserTest(unittest.TestCase):
         # Verify that superadmin can access all projects
         projects = self.db_man.get_user_projects(admin)
         self.assertEqual(len(projects), TeraProject.get_count())
+
+    def test_siteadmin(self):
+        # Site admin should have access to the site
+        siteadmin = TeraUser.get_user_by_username('siteadmin')
+        self.assertNotEqual(siteadmin, None, 'siteadmin user not None')
+        self.assertEqual(True, isinstance(siteadmin, TeraUser), 'siteadmin user is a TeraUser')
+        self.assertFalse(siteadmin.user_superadmin, 'siteadmin user is not superadmin')
+        self.assertTrue(TeraUser.verify_password('siteadmin', 'siteadmin'),
+                        'siteadmin user default password is admin')
+
+        # Verify that site can access only its site
+        sites = self.db_man.get_user_sites(siteadmin)
+        self.assertEqual(len(sites), 1, 'siteadmin user can access 1 site')
+        self.assertEqual(sites[0].site_name, 'Default Site')
+
+        # Verify that we are only part of one group
+        print(siteadmin.user_projectgroups)
+        print(siteadmin.user_sitegroups)
+
+
