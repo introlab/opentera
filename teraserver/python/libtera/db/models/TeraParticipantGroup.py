@@ -12,12 +12,12 @@ class TeraParticipantGroup(db.Model, BaseModel):
     @staticmethod
     def create_defaults():
         base_pgroup = TeraParticipantGroup()
-        base_pgroup.participantgroup_name = 'Default Group'
+        base_pgroup.participantgroup_name = 'Default Participant Group'
         base_pgroup.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
         db.session.add(base_pgroup)
 
         base_pgroup2 = TeraParticipantGroup()
-        base_pgroup2.participantgroup_name = 'Default Group'
+        base_pgroup2.participantgroup_name = 'Default Participant Group'
         base_pgroup2.id_project = TeraProject.get_project_by_projectname('Default Project #2').id_project
         db.session.add(base_pgroup2)
         db.session.commit()

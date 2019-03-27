@@ -1,6 +1,11 @@
 from libtera.db.Base import db
 
 # Must include all Database objects here to be properly initialized and created if needed
+
+
+# All at once to make sure all files ar registered.
+from libtera.db.models import *
+
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSiteGroup import TeraSiteGroup
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
@@ -9,6 +14,7 @@ from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.models.TeraProjectGroup import TeraProjectGroup
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
+
 
 from modules.FlaskModule.FlaskModule import flask_app
 

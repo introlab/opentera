@@ -3,6 +3,9 @@ from libtera.db.Base import db, BaseModel
 
 class TeraParticipant(db.Model, BaseModel):
     __tablename__ = 't_participants'
+    id_participant= db.Column(db.Integer, db.Sequence('id_participant_sequence'),
+                              primary_key=True, autoincrement=True)
+
     # id_participant_group = db.Column(db.Integer, db.Sequence('id_participantgroup_sequence'), primary_key=True,
     #                                  autoincrement=True)
     # id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project'), nullable=False)

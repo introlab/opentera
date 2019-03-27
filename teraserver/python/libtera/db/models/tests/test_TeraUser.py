@@ -1,6 +1,8 @@
 import unittest
 from libtera.db.DBManager import DBManager
 from libtera.db.models.TeraUser import TeraUser, TeraUserTypes
+from libtera.db.models.TeraSite import TeraSite
+from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.Base import db
 import uuid
@@ -16,70 +18,32 @@ class TeraUserTest(unittest.TestCase):
         'filename': filename
     }
 
-    man = DBManager()
+    db_man = DBManager()
 
     def setUp(self):
         if os.path.isfile(self.filename):
             print('removing database')
             os.remove(self.filename)
 
-        self.man.open_local(self.SQLITE)
-        self.man.create_defaults()
+        self.db_man.open_local(self.SQLITE)
+        # Creating default users / tests.
+        self.db_man.create_defaults()
 
     def tearDown(self):
         pass
 
-    def test_groups(self):
-        pass
-        # usergroup_name
-        # usergroup_users
-        # usergroup_access
-        # group1 = TeraUserGroup()
-        # group1.usergroup_name = 'TestGroup1'
-        # access1 = TeraAccess('TestGroup1:admin', True, True, True, True)
-        # group1.usergroup_access.append(access1)
-        # db.session.add(group1)
-        #
-        # group2 = TeraUserGroup()
-        # group2.usergroup_name = 'TestGroup2'
-        # access2 = TeraAccess('TestGroup2:admin', True, True, True, True)
-        # group2.usergroup_access.append(access2)
-        # db.session.add(group2)
-        #
-        # user1 = TeraUser()
-        # user1.user_enabled = True
-        # user1.user_firstname = "User1_FirstName"
-        # user1.user_lastname = "User1_LastName"
-        # user1.user_profile = ""
-        # user1.user_password = bcrypt.hash("admin")
-        # user1.user_superadmin = True
-        # user1.user_type = TeraUserTypes.USER.value
-        # user1.user_username = "user1"
-        # user1.user_uuid = str(uuid.uuid4())
-        #
-        # user1.user_usergroups.append(group1)
-        # user1.user_usergroups.append(group2)
-        # db.session.add(user1)
-        #
-        # user2 = TeraUser()
-        # user2.user_enabled = True
-        # user2.user_firstname = "User2_FirstName"
-        # user2.user_lastname = "User2_LastName"
-        # user2.user_profile = ""
-        # user2.user_password = bcrypt.hash("admin")
-        # user2.user_superadmin = True
-        # user2.user_type = TeraUserTypes.USER.value
-        # user2.user_username = "user2"
-        # user2.user_uuid = str(uuid.uuid4())
-        #
-        # user2.user_usergroups.append(group1)
-        #
-        # db.session.add(user2)
-        #
-        # db.session.commit()
-        #
-        # filter_args = dict()
-        #
-        # print(TeraUser.get_all_user_access(user1.user_uuid))
-        # print(TeraUser.get_all_user_access(user2.user_uuid))
+    def test_superadmin(self):
+        # Superadmin should have access to everything.
+        admin = TeraUser.get_user_by_username('admin')
+        self.assertNotEqual(admin, None, 'admin user not None')
+        self.assertEqual(True, isinstance(admin, TeraUser), 'admin user is a TeraUser')
+        self.assertTrue(admin.user_superadmin, 'admin user is superadmin')
+        self.assertTrue(TeraUser.verify_password('admin', 'admin'), 'admin user default password is admin')
 
+        # Verify that superadmin can access all sites
+        sites = self.db_man.get_user_sites(admin)
+        self.assertEqual(len(sites), TeraSite.get_count(), 'admin user can access all sites')
+
+        # Verify that superadmin can access all projects
+        projects = self.db_man.get_user_projects(admin)
+        self.assertEqual(len(projects), TeraProject.get_count())
