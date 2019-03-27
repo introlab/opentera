@@ -48,6 +48,10 @@ class TeraUserTest(unittest.TestCase):
         projects = self.db_man.get_user_projects(admin)
         self.assertEqual(len(projects), TeraProject.get_count())
 
+        # Verify that we are not part of any groups
+        self.assertEqual(len(admin.user_projectgroups), 0)
+        self.assertEqual(len(admin.user_sitegroups), 0)
+
     def test_siteadmin(self):
         # Site admin should have access to the site
         siteadmin = TeraUser.get_user_by_username('siteadmin')
@@ -62,8 +66,31 @@ class TeraUserTest(unittest.TestCase):
         self.assertEqual(len(sites), 1, 'siteadmin user can access 1 site')
         self.assertEqual(sites[0].site_name, 'Default Site')
 
+        # Verify that siteadmin can access all sites project
+        projects = self.db_man.get_user_projects(siteadmin)
+        self.assertEqual(len(projects), 2)
+
         # Verify that we are only part of one group
-        print(siteadmin.user_projectgroups)
-        print(siteadmin.user_sitegroups)
+        self.assertEqual(len(siteadmin.user_projectgroups), 1)
+        self.assertEqual(len(siteadmin.user_sitegroups), 1)
 
+    def test_multisite_user(self):
+        multi = TeraUser.get_user_by_username('user2')
+        self.assertNotEqual(multi, None, 'user2 user not None')
+        self.assertEqual(True, isinstance(multi, TeraUser), 'user2 user is a TeraUser')
+        self.assertFalse(multi.user_superadmin, 'user2 user is not superadmin')
+        self.assertTrue(TeraUser.verify_password('user2', 'user2'),
+                        'user2 user default password is user2')
 
+        # Verify that site can access only its site
+        sites = self.db_man.get_user_sites(multi)
+        self.assertEqual(len(sites), 1, 'multi user can access 1 site')
+        self.assertEqual(sites[0].site_name, 'Default Site')
+
+        # Verify that multi can access 2 projects
+        projects = self.db_man.get_user_projects(multi)
+        self.assertEqual(len(projects), 2)
+
+        # Verify that we are only part of one group
+        self.assertEqual(len(multi.user_projectgroups), len(projects))
+        self.assertEqual(len(multi.user_sitegroups), len(sites))
