@@ -30,7 +30,7 @@ class TeraUser(db.Model, BaseModel):
     def to_json(self, ignore_fields=None):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['authenticated', 'user_password'])
+        ignore_fields.extend(['authenticated', 'user_password', 'user_sites_access', 'user_projects_access'])
         rval = super().to_json(ignore_fields=ignore_fields)
 
         # Add usergroups in json format, if needed
@@ -159,16 +159,6 @@ class TeraUser(db.Model, BaseModel):
         if isinstance(filter_args, dict):
             return TeraUser.query.filter_by(**filter_args).all()
         return None
-
-    @staticmethod
-    def get_all_user_access(u_uuid):
-        access_list = []
-        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
-        if user:
-            for group in user.user_usergroups:
-                access_list.append(group.usergroup_access)
-
-        return access_list
 
     @staticmethod
     def get_profile_def():
