@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-03-28 10:31-0400\n"
+"POT-Creation-Date: 2019-03-28 11:59-0400\n"
 "PO-Revision-Date: 2019-03-28 10:09-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -750,51 +750,51 @@ msgstr ""
 msgid "Not a valid time value"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:293
+#: libtera/db/models/TeraUser.py:292
 msgid "ID Utilisateur"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:294
+#: libtera/db/models/TeraUser.py:293
 msgid "UUID Utilisateur"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:295
+#: libtera/db/models/TeraUser.py:294
 msgid "Code utilisateur"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:296
+#: libtera/db/models/TeraUser.py:295
 msgid "Activé"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:297
+#: libtera/db/models/TeraUser.py:296
 msgid "Prénom"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:298
+#: libtera/db/models/TeraUser.py:297
 msgid "Nom"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:299
+#: libtera/db/models/TeraUser.py:298
 msgid "Courriel"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:300
+#: libtera/db/models/TeraUser.py:299
 msgid "Mot de passe"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:301
+#: libtera/db/models/TeraUser.py:300
 msgid "Groupe(s) utilisateur(s)"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:302
+#: libtera/db/models/TeraUser.py:301
 msgid "Super administrateur"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:303
+#: libtera/db/models/TeraUser.py:302
 msgid "Notes"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:304
+#: libtera/db/models/TeraUser.py:303
 msgid "Dernière connexion"
 msgstr ""
 

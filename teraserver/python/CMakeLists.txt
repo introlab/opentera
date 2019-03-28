@@ -24,17 +24,23 @@ add_subdirectory(messages)
 
 # Generate protobuf python files
 
+set (translation_pot_file ${CMAKE_CURRENT_BINARY_DIR}/translations.pot)
 
-add_custom_command(
-    OUTPUT translations.pot
-    COMMAND ${PYBABEL_EXECUTABLE} extract -F babel.cfg -o translations.pot .
-    DEPENDS python-env babel.cfg
+message(STATUS "PYBABEL EXECUTABLE : ${PYBABEL_EXECUTABLE}")
+
+# Will always be considered out of date...
+add_custom_target(
+    python_translations
+    COMMAND ${PYBABEL_EXECUTABLE} extract -F babel.cfg -o ${translation_pot_file} .
+    COMMAND ${PYBABEL_EXECUTABLE} update -i ${translation_pot_file} -d translations
+    COMMAND ${PYBABEL_EXECUTABLE} compile -d translations
+    DEPENDS ${PYBABEL_EXECUTABLE} python-env
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-add_custom_target(python_translations
     SOURCES babel.cfg
 )
 
-add_custom_target(python-all DEPENDS python-messages python-env python-translations translations.pot)
+
+# Will always be considered out of date...
+# Removed python-messages for now...
+add_custom_target(python-all DEPENDS  python-env python_translations)
 
