@@ -1,7 +1,7 @@
 from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraSiteGroup import users_sitegroups_table, TeraSiteGroup
 from libtera.db.models.TeraProjectGroup import users_projectgroups_table, TeraProjectGroup
-from libtera.db.models.TeraForm import TeraForm, TeraFormSection, TeraFormItem, TeraFormItemCondition, TeraFormValue
+from libtera.forms.TeraForm import TeraForm, TeraFormSection, TeraFormItem, TeraFormItemCondition, TeraFormValue
 from libtera.db.models.TeraProject import TeraProject
 
 from passlib.hash import bcrypt

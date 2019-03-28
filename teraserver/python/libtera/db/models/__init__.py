@@ -1,7 +1,6 @@
 
 # All modules
-__all__ = ['TeraForm',
-           'TeraDevice',
+__all__ = ['TeraDevice',
            'TeraKit',
            'TeraParticipant',
            'TeraParticipantGroup',
