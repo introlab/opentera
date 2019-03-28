@@ -37,6 +37,7 @@ set (pip_packages
     flask-restful
     flask-security
     flask-babel
+    flask-migrate
     redis
     txredisapi
     eventlet
