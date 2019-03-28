@@ -1,12 +1,11 @@
 from libtera.db.Base import db, BaseModel
 from libtera.forms.TeraForm import TeraForm, TeraFormSection, TeraFormItem, TeraFormItemCondition, TeraFormValue
-from libtera.db.models.TeraProject import TeraProject
-from libtera.db.models.TeraSite import TeraSite
 
 from passlib.hash import bcrypt
 import uuid
 import datetime
 from flask_babel import gettext, ngettext
+
 
 class TeraUser(db.Model, BaseModel):
     __tablename__ = 't_users'
@@ -61,54 +60,6 @@ class TeraUser(db.Model, BaseModel):
 
     def __repr__(self):
         return self.__str__()
-
-    def get_accessible_sites_ids(self):
-        sites = []
-        for site in self.user_sites_access:
-            sites.append(site.id_site)
-
-        return sites
-
-    def get_accessible_projects_ids(self):
-        projects = []
-
-        for project in self.user_projects_access:
-            projects.append(project.id_project)
-            # valid = group.has_create_access('projects') & create_access or \
-            #         group.has_read_access('projects') & read_access or \
-            #         group.has_update_access('projects') & update_access or \
-            #         group.has_delete_access('projects') & delete_access
-            #
-            # if valid:
-            #     # Query all projects from this site
-            #     all_projects = TeraProject.query.filter_by(id_site=group.id_site).all()
-            #
-            #     for project in all_projects:
-            #         projects.append(project.id_project)
-
-        return projects
-
-    def get_projects_roles(self):
-        projects_roles = {}
-        for project_access in self.user_projects_access:
-            projects_roles[project_access.project_access_project.project_name] = project_access.project_access_role
-        return projects_roles
-
-    def get_project_role(self, project: TeraProject):
-        for project_access in self.user_projects_access:
-            if project_access.id_project == project.id_project:
-                return project_access.project_access_role
-
-    def get_sites_roles(self):
-        sites_roles = {}
-        for site_access in self.user_sites_access:
-            sites_roles[site_access.site_access_site.site_name] = site_access.site_access_role
-        return sites_roles
-
-    def get_site_role(self, site: TeraSite):
-        for site_access in self.user_sites_access:
-            if site_access.id_site == site.id_site:
-                return site_access.site_access_role
 
     @staticmethod
     def is_anonymous():

@@ -27,10 +27,9 @@ class QueryProjects(Resource):
             if args[key] is not None:
                 my_args[key] = args[key]
         try:
-            projects = db_man.get_user_projects(current_user, **my_args)
+            projects = TeraProjectAccess.get_accessible_projects_for_user(current_user)
             projects_list = []
-            print("**********")
-            print(current_user.get_projects_roles())
+
             for project in projects:
                 project_json = project.to_json()
                 project_json['project_role'] = TeraProjectAccess.get_project_role_for_user(current_user, project)

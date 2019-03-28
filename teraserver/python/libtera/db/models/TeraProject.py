@@ -8,6 +8,23 @@ class TeraProject(db.Model, BaseModel):
     id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site'), nullable=False)
     project_name = db.Column(db.String, nullable=False, unique=False)
 
+    project_site = db.relationship("TeraSite")
+
+    def to_json(self, ignore_fields=None):
+        if ignore_fields is None:
+            ignore_fields = []
+        ignore_fields.extend(['project_site'])
+        rval = super().to_json(ignore_fields=ignore_fields)
+
+        # Add usergroups in json format, if needed
+        # if 'user_sitegroups' in rval:
+        #     usersitegroups_list = []
+        #     for usersitegroup in self.user_usergroups:
+        #         usersitegroups_list.append(usersitegroup.to_json(ignore_fields=['sitegroup_users']))
+        #     rval['user_sitegroups'] = usersitegroups_list
+
+        return rval
+
     @staticmethod
     def create_defaults():
         base_project = TeraProject()

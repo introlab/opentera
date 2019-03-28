@@ -14,8 +14,45 @@ class TeraSiteAccess(db.Model, BaseModel):
 
     @staticmethod
     def get_site_role_for_user(user: TeraUser, site: TeraSite):
-        role = TeraSiteAccess.query.filter_by(id_user=user.id_user, id_site=site.id_site).first().site_access_role
-        return role
+        if user.user_superadmin:
+            # SuperAdmin is always admin.
+            return 'admin'
+
+        role = TeraSiteAccess.query.filter_by(id_user=user.id_user, id_site=site.id_site).first()
+        if role is not None:
+            role_name = role.site_access_role
+        else:
+            role_name = None
+        return role_name
+
+    @staticmethod
+    def get_accessible_sites_for_user(user: TeraUser):
+        if user.user_superadmin:
+            site_list = TeraSite.query.all()
+        else:
+            site_list = []
+            for site_access in user.user_sites_access:
+                site_list.append(site_access.site_access_site)
+
+        return site_list
+
+    @staticmethod
+    def get_accessible_sites_ids_for_user(user: TeraUser):
+        sites_ids = []
+
+        for site in TeraSiteAccess.get_accessible_sites_for_user(user):
+            sites_ids.append(site.id_site)
+
+        return sites_ids
+
+    @staticmethod
+    def get_sites_roles_for_user(user: TeraUser):
+        sites_roles = {}
+
+        for site in TeraSiteAccess.get_accessible_sites_for_user(user):
+            sites_roles[site] = TeraSiteAccess.get_site_role_for_user(user, site)
+
+        return sites_roles
 
     @staticmethod
     def get_count():

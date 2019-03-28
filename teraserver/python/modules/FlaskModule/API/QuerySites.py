@@ -29,9 +29,7 @@ class QuerySites(Resource):
 
         try:
 
-            sites = db_man.get_user_sites(current_user, **my_args)
-            print("**********")
-            print(current_user.get_sites_roles())
+            sites = TeraSiteAccess.get_accessible_sites_for_user(current_user)
 
             sites_list = []
             for site in sites:
