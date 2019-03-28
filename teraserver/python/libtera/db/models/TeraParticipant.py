@@ -1,16 +1,20 @@
 from libtera.db.Base import db, BaseModel
+from libtera.db.models.TeraKit import kits_participants_table
 
 
 class TeraParticipant(db.Model, BaseModel):
     __tablename__ = 't_participants'
-    id_participant= db.Column(db.Integer, db.Sequence('id_participant_sequence'),
-                              primary_key=True, autoincrement=True)
+    id_participant = db.Column(db.Integer, db.Sequence('id_participant_sequence'), primary_key=True, autoincrement=True)
+    participant_uuid = db.Column(db.String(36), nullable=False, unique=True)
+    participant_name = db.Column(db.String, nullable=False)
+    participant_token = db.Column(db.String(36), nullable=False)
+    participant_lastonline = db.Column(db.TIMESTAMP, nullable=True)
+    participant_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group'),
+                                              nullable=False)
 
-    # id_participant_group = db.Column(db.Integer, db.Sequence('id_participantgroup_sequence'), primary_key=True,
-    #                                  autoincrement=True)
-    # id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project'), nullable=False)
-    # participantgroup_name = db.Column(db.String, nullable=False, unique=False)
-    #
+    participant_kits = db.relationship("TeraKit", secondary=kits_participants_table, back_populates="kit_participants",
+                                       cascade="all,delete")
+
     # @staticmethod
     # def create_defaults():
     #     base_pgroup = TeraParticipantGroup()
