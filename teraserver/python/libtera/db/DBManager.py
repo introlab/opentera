@@ -8,10 +8,8 @@ from libtera.db.models import *
 
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSiteGroup import TeraSiteGroup
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.models.TeraProjectGroup import TeraProjectGroup
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 

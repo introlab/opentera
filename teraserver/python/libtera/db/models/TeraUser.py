@@ -5,16 +5,9 @@ from libtera.forms.TeraForm import TeraForm, TeraFormSection, TeraFormItem, Tera
 from libtera.db.models.TeraProject import TeraProject
 
 from passlib.hash import bcrypt
-from enum import Enum
 import uuid
 import datetime
 from flask_babel import gettext, ngettext
-
-class TeraUserTypes(Enum):
-    USER = 1
-    KIT = 2
-    ROBOT = 3
-
 
 class TeraUser(db.Model, BaseModel):
     __tablename__ = 't_users'
@@ -26,7 +19,6 @@ class TeraUser(db.Model, BaseModel):
     user_lastname = db.Column(db.String, nullable=False)
     user_password = db.Column(db.String, nullable=False)
     user_enabled = db.Column(db.Boolean, nullable=False)
-    user_type = db.Column(db.SmallInteger, nullable=False)
     user_profile = db.Column(db.String, nullable=False)
     user_notes = db.Column(db.String, nullable=True)
     user_lastonline = db.Column(db.TIMESTAMP, nullable=True)
@@ -120,7 +112,6 @@ class TeraUser(db.Model, BaseModel):
         admin.user_profile = ""
         admin.user_password = bcrypt.hash("admin")
         admin.user_superadmin = True
-        admin.user_type = TeraUserTypes.USER.value
         admin.user_username = "admin"
         admin.user_uuid = str(uuid.uuid4())
         # admin.user_usergroups.append(TeraUserGroup.get_usergroup_by_name('Administrateurs'))
@@ -134,7 +125,6 @@ class TeraUser(db.Model, BaseModel):
         admin.user_profile = ""
         admin.user_password = bcrypt.hash("siteadmin")
         admin.user_superadmin = False
-        admin.user_type = TeraUserTypes.USER.value
         admin.user_username = "siteadmin"
         admin.user_uuid = str(uuid.uuid4())
         admin.user_sitegroups.append(TeraSiteGroup.get_sitegroup_by_name('Admin - Default Site'))
@@ -149,7 +139,6 @@ class TeraUser(db.Model, BaseModel):
         user.user_profile = ""
         user.user_password = bcrypt.hash("user")
         user.user_superadmin = False
-        user.user_type = TeraUserTypes.USER.value
         user.user_username = "user"
         user.user_uuid = str(uuid.uuid4())
         user.user_sitegroups.append(TeraSiteGroup.get_sitegroup_by_name('User - Default Site'))
@@ -164,7 +153,6 @@ class TeraUser(db.Model, BaseModel):
         user.user_profile = ""
         user.user_password = bcrypt.hash("user2")
         user.user_superadmin = False
-        user.user_type = TeraUserTypes.USER.value
         user.user_username = "user2"
         user.user_uuid = str(uuid.uuid4())
         user.user_sitegroups.append(TeraSiteGroup.get_sitegroup_by_name('User - Default Site'))
