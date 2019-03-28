@@ -11,16 +11,30 @@ if(WIN32)
     set(PYTHON_PIP_EXECUTABLE ${PYTHON_ENV_DIRECTORY}/bin/pip.exe)
     set(PYTHON_INSTALLER_EXECUTABLE ${PYTHON_ENV_DIRECTORY}/Scripts/pyinstaller.exe)
     set(PROTOC_EXECUTABLE ${PYTHON_ENV_DIRECTORY}/Library/bin/protoc.exe)
+    set(PYBABEL_EXECUTABLE ${PYTHON_ENV_DIRECTORY}/Scripts/pybabel.exe)
 else(WIN32)
     set(PYTHON_EXECUTABLE ${PYTHON_ENV_DIRECTORY}/bin/python)
     set(PYTHON_PIP_EXECUTABLE ${PYTHON_ENV_DIRECTORY}/bin/pip)
     set(PYTHON_INSTALLER_EXECUTABLE ${PYTHON_ENV_DIRECTORY}/bin/pyinstaller)
     set(PROTOC_EXECUTABLE ${PYTHON_ENV_DIRECTORY}/bin/protoc)
+    set(PYBABEL_EXECUTABLE ${PYTHON_ENV_DIRECTORY}/bin/pybabel)
 endif(WIN32)
 
 add_subdirectory(messages)
 
 # Generate protobuf python files
 
-add_custom_target(python-all DEPENDS python-messages python-env)
+
+add_custom_command(
+    OUTPUT translations.pot
+    COMMAND ${PYBABEL_EXECUTABLE} extract -F babel.cfg -o translations.pot .
+    DEPENDS python-env babel.cfg
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_custom_target(python_translations
+    SOURCES babel.cfg
+)
+
+add_custom_target(python-all DEPENDS python-messages python-env python-translations translations.pot)
 
