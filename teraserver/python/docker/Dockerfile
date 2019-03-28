@@ -8,11 +8,11 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	python3-pip sudo vim
 
 # Clone repository
-ARG CACHE_DATE=2019-03-12
+ARG CACHE_DATE=2019-03-28
 RUN git clone -b dev https://github.com/introlab/opentera.git
 
 # Install python packages
-RUN pip3 install twisted \
+RUN pip3 install  twisted \
     autobahn \
     sqlalchemy \
     psycopg2-binary \
@@ -25,6 +25,10 @@ RUN pip3 install twisted \
     flask-httpauth \
     flask-socketio \
     flask-session \
+    flask-restful \
+    flask-security \
+    flask-babel \
+    flask-migrate \
     redis \
     txredisapi \
     eventlet \
@@ -35,7 +39,8 @@ RUN pip3 install twisted \
     wtforms \
     PyInstaller \
     pyopenssl \
-    service_identity
+    service_identity \
+    jsonrpcclient
 
 #Create db and user
 RUN service postgresql start &&\
@@ -48,6 +53,10 @@ RUN service postgresql start &&\
 
 WORKDIR /opentera/teraserver/python
 
+# Generate translations
+RUN pybabel extract -F babel.cfg -o translations.pot .
+RUN pybabel update -i translations.pot -d translations
+RUN pybabel compile -d translations
 
 # Private and public mapping
 EXPOSE 4040:4040
