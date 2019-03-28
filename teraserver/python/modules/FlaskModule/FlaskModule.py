@@ -1,10 +1,33 @@
-from flask import Flask
+from flask import Flask, request, g
 from flask_session import Session
 from flask_restful import Api
 from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
+from flask_babel import Babel
 
 flask_app = Flask("OpenTera")
+
+# Translations
+babel = Babel(flask_app)
+
+
+@babel.localeselector
+def get_locale():
+    # if a user is logged in, use the locale from the user settings
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.locale
+    # otherwise try to guess the language from the user accept
+    # header the browser transmits.  We support de/fr/en in this
+    # example.  The best match wins.
+    return request.accept_languages.best_match(['fr', 'en'])
+
+
+@babel.timezoneselector
+def get_timezone():
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.timezone
 
 
 class FlaskModule(RedisClient):
@@ -19,6 +42,10 @@ class FlaskModule(RedisClient):
         flask_app.debug = True
         flask_app.secret_key = 'development'
         flask_app.config.update({'SESSION_TYPE': 'redis'})
+        flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
+        # Not sure.
+        # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
+
         self.session = Session(flask_app)
         self.api = Api(flask_app)
 
@@ -56,3 +83,4 @@ class FlaskModule(RedisClient):
 
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
+

@@ -8,7 +8,7 @@ from passlib.hash import bcrypt
 from enum import Enum
 import uuid
 import datetime
-
+from flask_babel import gettext, ngettext
 
 class TeraUserTypes(Enum):
     USER = 1
@@ -290,18 +290,18 @@ class TeraUser(db.Model, BaseModel):
         form.add_section(section)
 
         # Items
-        section.add_item(TeraFormItem("id_user", "ID Utilisateur", "hidden", True))
-        section.add_item(TeraFormItem("user_uuid", "UUID Utilisateur", "hidden"))
-        section.add_item(TeraFormItem("user_username", "Code utilisateur", "text", True))
-        section.add_item(TeraFormItem("user_enabled", "Activé", "boolean", True))
-        section.add_item(TeraFormItem("user_firstname", "Prénom", "text", True))
-        section.add_item(TeraFormItem("user_lastname", "Nom", "text", True))
-        section.add_item(TeraFormItem("user_email", "Courriel", "text"))
-        section.add_item(TeraFormItem("user_password", "Mot de passe", "password", item_options={"confirm": True}))
-        section.add_item(TeraFormItem("user_usergroups", "Groupe(s) utilisateur(s)", "checklist", True))
-        section.add_item(TeraFormItem("user_superadmin", "Super administrateur", "boolean", True))
-        section.add_item(TeraFormItem("user_notes", "Notes", "longtext"))
-        section.add_item(TeraFormItem("user_lastonline", "Dernière connexion", "label",
+        section.add_item(TeraFormItem("id_user", gettext("ID Utilisateur"), "hidden", True))
+        section.add_item(TeraFormItem("user_uuid", gettext("UUID Utilisateur"), "hidden"))
+        section.add_item(TeraFormItem("user_username", gettext("Code utilisateur"), "text", True))
+        section.add_item(TeraFormItem("user_enabled", gettext("Activé"), "boolean", True))
+        section.add_item(TeraFormItem("user_firstname", gettext("Prénom"), "text", True))
+        section.add_item(TeraFormItem("user_lastname", gettext("Nom"), "text", True))
+        section.add_item(TeraFormItem("user_email", gettext("Courriel"), "text"))
+        section.add_item(TeraFormItem("user_password", gettext("Mot de passe"), "password", item_options={"confirm": True}))
+        section.add_item(TeraFormItem("user_usergroups", gettext("Groupe(s) utilisateur(s)"), "checklist", True))
+        section.add_item(TeraFormItem("user_superadmin", gettext("Super administrateur"), "boolean", True))
+        section.add_item(TeraFormItem("user_notes", gettext("Notes"), "longtext"))
+        section.add_item(TeraFormItem("user_lastonline", gettext("Dernière connexion"), "label",
                                       item_options={"readonly": True}))
 
         return form.to_dict()
