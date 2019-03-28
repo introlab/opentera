@@ -32,6 +32,9 @@ message(STATUS "PYBABEL EXECUTABLE : ${PYBABEL_EXECUTABLE}")
 add_custom_target(
     python_translations
     COMMAND ${PYBABEL_EXECUTABLE} extract -F babel.cfg -o ${translation_pot_file} .
+    # TO REINITIALIZE TRANSLATION FILES (comment the two lines, or the translations will be overwritten)
+    # COMMAND ${PYBABEL_EXECUTABLE} init -i ${translation_pot_file} -d translations -l fr
+    # COMMAND ${PYBABEL_EXECUTABLE} init -i ${translation_pot_file} -d translations -l en
     COMMAND ${PYBABEL_EXECUTABLE} update -i ${translation_pot_file} -d translations
     COMMAND ${PYBABEL_EXECUTABLE} compile -d translations
     DEPENDS ${PYBABEL_EXECUTABLE} python-env

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-03-28 16:04-0400\n"
-"PO-Revision-Date: 2019-03-28 10:09-0400\n"
+"POT-Creation-Date: 2019-03-28 16:26-0400\n"
+"PO-Revision-Date: 2019-03-28 16:24-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -18,601 +18,135 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#~ msgid "usage: "
-#~ msgstr ""
-
-#~ msgid ".__call__() not defined"
-#~ msgstr ""
-
-#~ msgid "unknown parser %(parser_name)r (choices: %(choices)s)"
-#~ msgstr ""
-
-#~ msgid "argument \"-\" with mode %r"
-#~ msgstr ""
-
-#~ msgid "can't open '%s': %s"
-#~ msgstr ""
-
-#~ msgid "cannot merge actions - two groups are named %r"
-#~ msgstr ""
-
-#~ msgid "'required' is an invalid argument for positionals"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "invalid option string %(option)r: must "
-#~ "start with a character %(prefix_chars)r"
-#~ msgstr ""
-
-#~ msgid "dest= is required for options like %r"
-#~ msgstr ""
-
-#~ msgid "invalid conflict_resolution value: %r"
-#~ msgstr ""
-
-#~ msgid "conflicting option string: %s"
-#~ msgid_plural "conflicting option strings: %s"
-#~ msgstr[0] ""
-#~ msgstr[1] ""
-
-#~ msgid "mutually exclusive arguments must be optional"
-#~ msgstr ""
-
-#~ msgid "positional arguments"
-#~ msgstr ""
-
-#~ msgid "optional arguments"
-#~ msgstr ""
-
-#~ msgid "show this help message and exit"
-#~ msgstr ""
-
-#~ msgid "cannot have multiple subparser arguments"
-#~ msgstr ""
-
-#~ msgid "unrecognized arguments: %s"
-#~ msgstr ""
-
-#~ msgid "not allowed with argument %s"
-#~ msgstr ""
-
-#~ msgid "ignored explicit argument %r"
-#~ msgstr ""
-
-#~ msgid "the following arguments are required: %s"
-#~ msgstr ""
-
-#~ msgid "one of the arguments %s is required"
-#~ msgstr ""
-
-#~ msgid "expected one argument"
-#~ msgstr ""
-
-#~ msgid "expected at most one argument"
-#~ msgstr ""
-
-#~ msgid "expected at least one argument"
-#~ msgstr ""
-
-#~ msgid "expected %s argument"
-#~ msgid_plural "expected %s arguments"
-#~ msgstr[0] ""
-#~ msgstr[1] ""
-
-#~ msgid "ambiguous option: %(option)s could match %(matches)s"
-#~ msgstr ""
-
-#~ msgid "unexpected option string: %s"
-#~ msgstr ""
-
-#~ msgid "%r is not callable"
-#~ msgstr ""
-
-#~ msgid "invalid %(type)s value: %(value)r"
-#~ msgstr ""
-
-#~ msgid "invalid choice: %(value)r (choose from %(choices)s)"
-#~ msgstr ""
-
-#~ msgid "%(prog)s: error: %(message)s\n"
-#~ msgstr ""
-
-#~ msgid "option --%s requires argument"
-#~ msgstr ""
-
-#~ msgid "option --%s must not have an argument"
-#~ msgstr ""
-
-#~ msgid "option --%s not recognized"
-#~ msgstr ""
-
-#~ msgid "option --%s not a unique prefix"
-#~ msgstr ""
-
-#~ msgid "option -%s requires argument"
-#~ msgstr ""
-
-#~ msgid "option -%s not recognized"
-#~ msgstr ""
-
-#~ msgid "no such option: %s"
-#~ msgstr ""
-
-#~ msgid "ambiguous option: %s (%s?)"
-#~ msgstr ""
-
-#~ msgid "Usage: %s\n"
-#~ msgstr ""
-
-#~ msgid "Usage"
-#~ msgstr ""
-
-#~ msgid "integer"
-#~ msgstr ""
-
-#~ msgid "floating-point"
-#~ msgstr ""
-
-#~ msgid "complex"
-#~ msgstr ""
-
-#~ msgid "option %s: invalid %s value: %r"
-#~ msgstr ""
-
-#~ msgid "option %s: invalid choice: %r (choose from %s)"
-#~ msgstr ""
-
-#~ msgid "show program's version number and exit"
-#~ msgstr ""
-
-#~ msgid "%prog [options]"
-#~ msgstr ""
-
-#~ msgid "%(option)s option requires %(number)d argument"
-#~ msgid_plural "%(option)s option requires %(number)d arguments"
-#~ msgstr[0] ""
-#~ msgstr[1] ""
-
-#~ msgid "%s option does not take a value"
-#~ msgstr ""
-
-#~ msgid "Options"
-#~ msgstr ""
-
-#~ msgid "Login Required"
-#~ msgstr ""
-
-#~ msgid "Welcome"
-#~ msgstr ""
-
-#~ msgid "Please confirm your email"
-#~ msgstr ""
-
-#~ msgid "Login instructions"
-#~ msgstr ""
-
-#~ msgid "Your password has been reset"
-#~ msgstr ""
-
-#~ msgid "Your password has been changed"
-#~ msgstr ""
-
-#~ msgid "Password reset instructions"
-#~ msgstr ""
-
-#~ msgid "You do not have permission to view this resource."
-#~ msgstr ""
-
-#~ msgid "Thank you. Confirmation instructions have been sent to %(email)s."
-#~ msgstr ""
-
-#~ msgid "Thank you. Your email has been confirmed."
-#~ msgstr ""
-
-#~ msgid "Your email has already been confirmed."
-#~ msgstr ""
-
-#~ msgid "Invalid confirmation token."
-#~ msgstr ""
-
-#~ msgid "%(email)s is already associated with an account."
-#~ msgstr ""
-
-#~ msgid "Password does not match"
-#~ msgstr ""
-
-#~ msgid "Passwords do not match"
-#~ msgstr ""
-
-#~ msgid "Redirections outside the domain are forbidden"
-#~ msgstr ""
-
-#~ msgid "Instructions to reset your password have been sent to %(email)s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You did not reset your password "
-#~ "within %(within)s. New instructions have "
-#~ "been sent to %(email)s."
-#~ msgstr ""
-
-#~ msgid "Invalid reset password token."
-#~ msgstr ""
-
-#~ msgid "Email requires confirmation."
-#~ msgstr ""
-
-#~ msgid "Confirmation instructions have been sent to %(email)s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You did not confirm your email "
-#~ "within %(within)s. New instructions to "
-#~ "confirm your email have been sent "
-#~ "to %(email)s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You did not login within %(within)s. "
-#~ "New instructions to login have been "
-#~ "sent to %(email)s."
-#~ msgstr ""
-
-#~ msgid "Instructions to login have been sent to %(email)s."
-#~ msgstr ""
-
-#~ msgid "Invalid login token."
-#~ msgstr ""
-
-#~ msgid "Account is disabled."
-#~ msgstr ""
-
-#~ msgid "Email not provided"
-#~ msgstr ""
-
-#~ msgid "Invalid email address"
-#~ msgstr ""
-
-#~ msgid "Password not provided"
-#~ msgstr ""
-
-#~ msgid "No password is set for this user"
-#~ msgstr ""
-
-#~ msgid "Password must be at least 6 characters"
-#~ msgstr ""
-
-#~ msgid "Specified user does not exist"
-#~ msgstr ""
-
-#~ msgid "Invalid password"
-#~ msgstr ""
-
-#~ msgid "You have successfully logged in."
-#~ msgstr ""
-
-#~ msgid "Forgot password?"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You successfully reset your password and"
-#~ " you have been logged in "
-#~ "automatically."
-#~ msgstr ""
-
-#~ msgid "Your new password must be different than your previous password."
-#~ msgstr ""
-
-#~ msgid "You successfully changed your password."
-#~ msgstr ""
-
-#~ msgid "Please log in to access this page."
-#~ msgstr ""
-
-#~ msgid "Please reauthenticate to access this page."
-#~ msgstr ""
-
-#~ msgid "Email Address"
-#~ msgstr ""
-
-#~ msgid "Password"
-#~ msgstr ""
-
-#~ msgid "Remember Me"
-#~ msgstr ""
-
-#~ msgid "Login"
-#~ msgstr ""
-
-#~ msgid "Register"
-#~ msgstr ""
-
-#~ msgid "Resend Confirmation Instructions"
-#~ msgstr ""
-
-#~ msgid "Recover Password"
-#~ msgstr ""
-
-#~ msgid "Reset Password"
-#~ msgstr ""
-
-#~ msgid "Retype Password"
-#~ msgstr ""
-
-#~ msgid "New Password"
-#~ msgstr ""
-
-#~ msgid "Change Password"
-#~ msgstr ""
-
-#~ msgid "Send Login Link"
-#~ msgstr ""
-
-#~ msgid "Menu"
-#~ msgstr ""
-
-#~ msgid "Forgot password"
-#~ msgstr ""
-
-#~ msgid "Confirm account"
-#~ msgstr ""
-
-#~ msgid "Change password"
-#~ msgstr ""
-
-#~ msgid "Send password reset instructions"
-#~ msgstr ""
-
-#~ msgid "Reset password"
-#~ msgstr ""
-
-#~ msgid "Resend confirmation instructions"
-#~ msgstr ""
-
-#~ msgid "Your password has been changed."
-#~ msgstr ""
-
-#~ msgid "If you did not change your password,"
-#~ msgstr ""
-
-#~ msgid "click here to reset it"
-#~ msgstr ""
-
-#~ msgid "Please confirm your email through the link below:"
-#~ msgstr ""
-
-#~ msgid "Confirm my account"
-#~ msgstr ""
-
-#~ msgid "Welcome %(email)s!"
-#~ msgstr ""
-
-#~ msgid "You can log into your account through the link below:"
-#~ msgstr ""
-
-#~ msgid "Login now"
-#~ msgstr ""
-
-#~ msgid "Click here to reset your password"
-#~ msgstr ""
-
-#~ msgid "You can confirm your email through the link below:"
-#~ msgstr ""
-
-#~ msgid "This field is required."
-#~ msgstr ""
-
-#~ msgid "File does not have an approved extension: {extensions}"
-#~ msgstr ""
-
-#~ msgid "File does not have an approved extension."
-#~ msgstr ""
-
-#~ msgid "algorithm"
-#~ msgstr ""
-
-#~ msgid "Invalid field name '%s'."
-#~ msgstr ""
-
-#~ msgid "Field must be equal to %(other_name)s."
-#~ msgstr ""
-
-#~ msgid "Field must be at least %(min)d character long."
-#~ msgid_plural "Field must be at least %(min)d characters long."
-#~ msgstr[0] ""
-#~ msgstr[1] ""
-
-#~ msgid "Field cannot be longer than %(max)d character."
-#~ msgid_plural "Field cannot be longer than %(max)d characters."
-#~ msgstr[0] ""
-#~ msgstr[1] ""
-
-#~ msgid "Field must be between %(min)d and %(max)d characters long."
-#~ msgstr ""
-
-#~ msgid "Number must be at least %(min)s."
-#~ msgstr ""
-
-#~ msgid "Number must be at most %(max)s."
-#~ msgstr ""
-
-#~ msgid "Number must be between %(min)s and %(max)s."
-#~ msgstr ""
-
-#~ msgid "Invalid input."
-#~ msgstr ""
-
-#~ msgid "Invalid email address."
-#~ msgstr ""
-
-#~ msgid "Invalid IP address."
-#~ msgstr ""
-
-#~ msgid "Invalid Mac address."
-#~ msgstr ""
-
-#~ msgid "Invalid URL."
-#~ msgstr ""
-
-#~ msgid "Invalid UUID."
-#~ msgstr ""
-
-#~ msgid "Invalid value, must be one of: %(values)s."
-#~ msgstr ""
-
-#~ msgid "Invalid value, can't be any of: %(values)s."
-#~ msgstr ""
-
-#~ msgid "Invalid CSRF Token"
-#~ msgstr ""
-
-#~ msgid "CSRF token missing"
-#~ msgstr ""
-
-#~ msgid "CSRF failed"
-#~ msgstr ""
-
-#~ msgid "CSRF token expired"
-#~ msgstr ""
-
-#~ msgid "Not a valid choice"
-#~ msgstr ""
-
-#~ msgid "Not a valid list"
-#~ msgstr ""
-
-#~ msgid "Not a valid integer list"
-#~ msgstr ""
-
-#~ msgid "Please input a date/time value"
-#~ msgstr ""
-
-#~ msgid "Invalid date/time input"
-#~ msgstr ""
-
-#~ msgid "Invalid Choice: could not coerce"
-#~ msgstr ""
-
-#~ msgid "Invalid choice(s): one or more data inputs could not be coerced"
-#~ msgstr ""
-
-#~ msgid "'%(value)s' is not a valid choice for this field"
-#~ msgstr ""
-
-#~ msgid "Not a valid integer value"
-#~ msgstr ""
-
-#~ msgid "Not a valid decimal value"
-#~ msgstr ""
-
-#~ msgid "Not a valid float value"
-#~ msgstr ""
-
-#~ msgid "Not a valid datetime value"
-#~ msgstr ""
-
-#~ msgid "Not a valid date value"
-#~ msgstr ""
-
-#~ msgid "Not a valid time value"
-#~ msgstr ""
-
-#~ msgid "Configuration audio-vidéo"
-#~ msgstr ""
-
-#~ msgid "Caméra"
-#~ msgstr ""
-
-#~ msgid "Type de caméra"
-#~ msgstr ""
-
-#~ msgid "Caméra réseau"
-#~ msgstr ""
-
-#~ msgid "Capture d'écran"
-#~ msgstr ""
-
-#~ msgid "Adresse du flux de la caméra"
-#~ msgstr ""
-
-#~ msgid "Trames par seconde"
-#~ msgstr ""
-
-#~ msgid "Résolution"
-#~ msgstr ""
-
-#~ msgid "Caméra contrôlable (PTZ)"
-#~ msgstr ""
-
-#~ msgid "Type de contrôle"
-#~ msgstr ""
-
-#~ msgid "Vivotek"
-#~ msgstr ""
-
-#~ msgid "ONVIF (générique)"
-#~ msgstr ""
-
-#~ msgid "Adresse réseau"
-#~ msgstr ""
-
-#~ msgid "Port"
-#~ msgstr ""
-
-#~ msgid "Nom utilisateur"
-#~ msgstr ""
-
-#~ msgid "Mot de passe"
-#~ msgstr ""
-
-#~ msgid "Microphone"
-#~ msgstr ""
-
-#~ msgid "Caméra secondaire"
-#~ msgstr ""
-
-#~ msgid "Configuration générale"
-#~ msgstr ""
-
-#~ msgid "Affichage en plein écran en séance"
-#~ msgstr ""
-
-#~ msgid "Permettre l'accès via le web"
-#~ msgstr ""
-
-#~ msgid "Informations"
-#~ msgstr ""
-
-#~ msgid "ID Utilisateur"
-#~ msgstr ""
-
-#~ msgid "UUID Utilisateur"
-#~ msgstr ""
-
-#~ msgid "Code utilisateur"
-#~ msgstr ""
-
-#~ msgid "Activé"
-#~ msgstr ""
-
-#~ msgid "Prénom"
-#~ msgstr ""
-
-#~ msgid "Nom"
-#~ msgstr ""
-
-#~ msgid "Courriel"
-#~ msgstr ""
-
-#~ msgid "Groupe(s) utilisateur(s)"
-#~ msgstr ""
-
-#~ msgid "Super administrateur"
-#~ msgstr ""
-
-#~ msgid "Notes"
-#~ msgstr ""
-
-#~ msgid "Dernière connexion"
-#~ msgstr "FR:Dernière connexion"
+#: libtera/db/models/TeraUser.py:168
+msgid "Configuration audio-vidéo"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:172
+msgid "Caméra"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:173
+msgid "Type de caméra"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:174
+msgid "Caméra réseau"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:175
+msgid "Capture d'écran"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:179
+msgid "Adresse du flux de la caméra"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:183
+msgid "Trames par seconde"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:187
+msgid "Résolution"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:194
+msgid "Caméra contrôlable (PTZ)"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:195
+msgid "Type de contrôle"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:196
+msgid "Vivotek"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:196
+msgid "ONVIF (générique)"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:199
+msgid "Adresse réseau"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:202
+msgid "Port"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:205
+msgid "Nom utilisateur"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:208 libtera/db/models/TeraUser.py:240
+msgid "Mot de passe"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:212
+msgid "Microphone"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:213
+msgid "Caméra secondaire"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:215
+msgid "Configuration générale"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:217
+msgid "Affichage en plein écran en séance"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:219
+msgid "Permettre l'accès via le web"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:229
+msgid "Informations"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:233
+msgid "ID Utilisateur"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:234
+msgid "UUID Utilisateur"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:235
+msgid "Code utilisateur"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:236
+msgid "Activé"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:237
+msgid "Prénom"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:238
+msgid "Nom"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:239
+msgid "Courriel"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:241
+msgid "Groupe(s) utilisateur(s)"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:242
+msgid "Super administrateur"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:243
+msgid "Notes"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:244
+msgid "Dernière connexion"
+msgstr ""
 
