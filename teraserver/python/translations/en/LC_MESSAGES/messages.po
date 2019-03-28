@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-03-28 16:26-0400\n"
+"POT-Creation-Date: 2019-03-28 16:34-0400\n"
 "PO-Revision-Date: 2019-03-28 16:24-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -20,133 +20,133 @@ msgstr ""
 
 #: libtera/db/models/TeraUser.py:168
 msgid "Configuration audio-vidéo"
-msgstr ""
+msgstr "Audio/Video Configuration"
 
 #: libtera/db/models/TeraUser.py:172
 msgid "Caméra"
-msgstr ""
+msgstr "Camera"
 
 #: libtera/db/models/TeraUser.py:173
 msgid "Type de caméra"
-msgstr ""
+msgstr "Camera Type"
 
 #: libtera/db/models/TeraUser.py:174
 msgid "Caméra réseau"
-msgstr ""
+msgstr "Network Camera"
 
 #: libtera/db/models/TeraUser.py:175
 msgid "Capture d'écran"
-msgstr ""
+msgstr "Scren Capture"
 
 #: libtera/db/models/TeraUser.py:179
 msgid "Adresse du flux de la caméra"
-msgstr ""
+msgstr "Camera Stream Address"
 
 #: libtera/db/models/TeraUser.py:183
 msgid "Trames par seconde"
-msgstr ""
+msgstr "Frames per second"
 
 #: libtera/db/models/TeraUser.py:187
 msgid "Résolution"
-msgstr ""
+msgstr "Resolution"
 
 #: libtera/db/models/TeraUser.py:194
 msgid "Caméra contrôlable (PTZ)"
-msgstr ""
+msgstr "PTZ Camera"
 
 #: libtera/db/models/TeraUser.py:195
 msgid "Type de contrôle"
-msgstr ""
+msgstr "Control Type"
 
 #: libtera/db/models/TeraUser.py:196
 msgid "Vivotek"
-msgstr ""
+msgstr "Vivotek"
 
 #: libtera/db/models/TeraUser.py:196
 msgid "ONVIF (générique)"
-msgstr ""
+msgstr "ONVIF (generic)"
 
 #: libtera/db/models/TeraUser.py:199
 msgid "Adresse réseau"
-msgstr ""
+msgstr "Network Address"
 
 #: libtera/db/models/TeraUser.py:202
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 #: libtera/db/models/TeraUser.py:205
 msgid "Nom utilisateur"
-msgstr ""
+msgstr "Username"
 
 #: libtera/db/models/TeraUser.py:208 libtera/db/models/TeraUser.py:240
 msgid "Mot de passe"
-msgstr ""
+msgstr "Password"
 
 #: libtera/db/models/TeraUser.py:212
 msgid "Microphone"
-msgstr ""
+msgstr "Microphone"
 
 #: libtera/db/models/TeraUser.py:213
 msgid "Caméra secondaire"
-msgstr ""
+msgstr "Secondary Camera"
 
 #: libtera/db/models/TeraUser.py:215
 msgid "Configuration générale"
-msgstr ""
+msgstr "General Configuration"
 
 #: libtera/db/models/TeraUser.py:217
 msgid "Affichage en plein écran en séance"
-msgstr ""
+msgstr "Allow Fullscreen Session"
 
 #: libtera/db/models/TeraUser.py:219
 msgid "Permettre l'accès via le web"
-msgstr ""
+msgstr "Allow Web Access"
 
 #: libtera/db/models/TeraUser.py:229
 msgid "Informations"
-msgstr ""
+msgstr "Informations"
 
 #: libtera/db/models/TeraUser.py:233
 msgid "ID Utilisateur"
-msgstr ""
+msgstr "User ID"
 
 #: libtera/db/models/TeraUser.py:234
 msgid "UUID Utilisateur"
-msgstr ""
+msgstr "User UUID"
 
 #: libtera/db/models/TeraUser.py:235
 msgid "Code utilisateur"
-msgstr ""
+msgstr "User Code"
 
 #: libtera/db/models/TeraUser.py:236
 msgid "Activé"
-msgstr ""
+msgstr "Activated"
 
 #: libtera/db/models/TeraUser.py:237
 msgid "Prénom"
-msgstr ""
+msgstr "Surname"
 
 #: libtera/db/models/TeraUser.py:238
 msgid "Nom"
-msgstr ""
+msgstr "Name"
 
 #: libtera/db/models/TeraUser.py:239
 msgid "Courriel"
-msgstr ""
+msgstr "Email"
 
 #: libtera/db/models/TeraUser.py:241
 msgid "Groupe(s) utilisateur(s)"
-msgstr ""
+msgstr "User Group(s)"
 
 #: libtera/db/models/TeraUser.py:242
 msgid "Super administrateur"
-msgstr ""
+msgstr "Super Administrator"
 
 #: libtera/db/models/TeraUser.py:243
 msgid "Notes"
-msgstr ""
+msgstr "Notes"
 
 #: libtera/db/models/TeraUser.py:244
 msgid "Dernière connexion"
-msgstr ""
+msgstr "Last Connection"
 
