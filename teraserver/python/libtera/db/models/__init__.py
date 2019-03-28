@@ -6,8 +6,6 @@ __all__ = ['TeraDevice',
            'TeraParticipantGroup',
            'TeraProject',
            'TeraProjectAccess',
-           'TeraProjectGroup',
            'TeraSite',
            'TeraSiteAccess',
-           'TeraSiteGroup',
            'TeraUser']

@@ -1,8 +1,7 @@
 from libtera.db.Base import db, BaseModel
-from libtera.db.models.TeraSiteGroup import users_sitegroups_table, TeraSiteGroup
-from libtera.db.models.TeraProjectGroup import users_projectgroups_table, TeraProjectGroup
 from libtera.forms.TeraForm import TeraForm, TeraFormSection, TeraFormItem, TeraFormItemCondition, TeraFormValue
 from libtera.db.models.TeraProject import TeraProject
+from libtera.db.models.TeraSite import TeraSite
 
 from passlib.hash import bcrypt
 import uuid
@@ -24,11 +23,8 @@ class TeraUser(db.Model, BaseModel):
     user_lastonline = db.Column(db.TIMESTAMP, nullable=True)
     user_superadmin = db.Column(db.Boolean, nullable=False)
 
-    user_sitegroups = db.relationship("TeraSiteGroup", secondary=users_sitegroups_table,
-                                      back_populates="sitegroup_users", cascade="all,delete")
-
-    user_projectgroups = db.relationship("TeraProjectGroup", secondary=users_projectgroups_table,
-                                         back_populates="projectgroup_users", cascade="all,delete")
+    user_sites_access = db.relationship('TeraSiteAccess', cascade="all,delete")
+    user_projects_access = db.relationship("TeraProjectAccess", cascade="all,delete")
 
     authenticated = False
 
@@ -39,11 +35,11 @@ class TeraUser(db.Model, BaseModel):
         rval = super().to_json(ignore_fields=ignore_fields)
 
         # Add usergroups in json format, if needed
-        if 'user_sitegroups' in rval:
-            usersitegroups_list = []
-            for usersitegroup in self.user_usergroups:
-                usersitegroups_list.append(usersitegroup.to_json(ignore_fields=['sitegroup_users']))
-            rval['user_sitegroups'] = usersitegroups_list
+        # if 'user_sitegroups' in rval:
+        #     usersitegroups_list = []
+        #     for usersitegroup in self.user_usergroups:
+        #         usersitegroups_list.append(usersitegroup.to_json(ignore_fields=['sitegroup_users']))
+        #     rval['user_sitegroups'] = usersitegroups_list
 
         return rval
 
@@ -66,31 +62,53 @@ class TeraUser(db.Model, BaseModel):
     def __repr__(self):
         return self.__str__()
 
-    def get_accessible_sites(self):
+    def get_accessible_sites_ids(self):
         sites = []
-        for group in self.user_sitegroups:
-            sites.append(group.id_site)
+        for site in self.user_sites_access:
+            sites.append(site.id_site)
 
         return sites
 
-    def get_accessible_projects(self, create_access=False, read_access=False, update_access=False, delete_access=False):
+    def get_accessible_projects_ids(self):
         projects = []
 
-        for group in self.user_sitegroups:
-
-            valid = group.has_create_access('projects') & create_access or \
-                    group.has_read_access('projects') & read_access or \
-                    group.has_update_access('projects') & update_access or \
-                    group.has_delete_access('projects') & delete_access
-
-            if valid:
-                # Query all projects from this site
-                all_projects = TeraProject.query.filter_by(id_site=group.id_site).all()
-
-                for project in all_projects:
-                    projects.append(project.id_project)
+        for project in self.user_projects_access:
+            projects.append(project.id_project)
+            # valid = group.has_create_access('projects') & create_access or \
+            #         group.has_read_access('projects') & read_access or \
+            #         group.has_update_access('projects') & update_access or \
+            #         group.has_delete_access('projects') & delete_access
+            #
+            # if valid:
+            #     # Query all projects from this site
+            #     all_projects = TeraProject.query.filter_by(id_site=group.id_site).all()
+            #
+            #     for project in all_projects:
+            #         projects.append(project.id_project)
 
         return projects
+
+    def get_projects_roles(self):
+        projects_roles = {}
+        for project_access in self.user_projects_access:
+            projects_roles[project_access.project_access_project.project_name] = project_access.project_access_role
+        return projects_roles
+
+    def get_project_role(self, project: TeraProject):
+        for project_access in self.user_projects_access:
+            if project_access.id_project == project.id_project:
+                return project_access.project_access_role
+
+    def get_sites_roles(self):
+        sites_roles = {}
+        for site_access in self.user_sites_access:
+            sites_roles[site_access.site_access_site.site_name] = site_access.site_access_role
+        return sites_roles
+
+    def get_site_role(self, site: TeraSite):
+        for site_access in self.user_sites_access:
+            if site_access.id_site == site.id_site:
+                return site_access.site_access_role
 
     @staticmethod
     def is_anonymous():
@@ -127,8 +145,6 @@ class TeraUser(db.Model, BaseModel):
         admin.user_superadmin = False
         admin.user_username = "siteadmin"
         admin.user_uuid = str(uuid.uuid4())
-        admin.user_sitegroups.append(TeraSiteGroup.get_sitegroup_by_name('Admin - Default Site'))
-        admin.user_projectgroups.append(TeraProjectGroup.get_projectgroup_by_name('Admin - Default Project #1'))
         db.session.add(admin)
 
         # Site User
@@ -141,8 +157,6 @@ class TeraUser(db.Model, BaseModel):
         user.user_superadmin = False
         user.user_username = "user"
         user.user_uuid = str(uuid.uuid4())
-        user.user_sitegroups.append(TeraSiteGroup.get_sitegroup_by_name('User - Default Site'))
-        user.user_projectgroups.append(TeraProjectGroup.get_projectgroup_by_name('User - Default Project #1'))
         db.session.add(user)
 
         # Site User
@@ -155,9 +169,6 @@ class TeraUser(db.Model, BaseModel):
         user.user_superadmin = False
         user.user_username = "user2"
         user.user_uuid = str(uuid.uuid4())
-        user.user_sitegroups.append(TeraSiteGroup.get_sitegroup_by_name('User - Default Site'))
-        user.user_projectgroups.append(TeraProjectGroup.get_projectgroup_by_name('User - Default Project #1'))
-        user.user_projectgroups.append(TeraProjectGroup.get_projectgroup_by_name('User - Default Project #2'))
         db.session.add(user)
 
         db.session.commit()

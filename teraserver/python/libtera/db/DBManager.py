@@ -7,12 +7,11 @@ from libtera.db.Base import db
 from libtera.db.models import *
 
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSiteGroup import TeraSiteGroup
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
-from libtera.db.models.TeraProjectGroup import TeraProjectGroup
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
-
+from libtera.db.models.TeraProjectAccess import TeraProjectAccess
+from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 
 from modules.FlaskModule.FlaskModule import flask_app
 
@@ -36,17 +35,9 @@ class DBManager:
             print('No sites - creating defaults')
             TeraSite.create_defaults()
 
-        if TeraSiteGroup.get_count() == 0:
-            print("No sitegroups - creating defaults")
-            TeraSiteGroup.create_defaults()
-
         if TeraProject.get_count() == 0:
             print("No projects - creating defaults")
             TeraProject.create_defaults()
-
-        if TeraProjectGroup.get_count() == 0:
-            print("No project groups - creating defaults")
-            TeraProjectGroup.create_defaults()
 
         if TeraParticipantGroup.get_count() == 0:
             print("No participant groups - creating defaults")
@@ -55,6 +46,14 @@ class DBManager:
         if TeraUser.get_count() == 0:
             print('No users - creating defaults')
             TeraUser.create_defaults()
+
+        if TeraProjectAccess.get_count() == 0:
+            print("No project access - creating defaults")
+            TeraProjectAccess.create_defaults()
+
+        if TeraSiteAccess.get_count() == 0:
+            print("No site access - creating defaults")
+            TeraSiteAccess.create_defaults()
 
     @staticmethod
     def open(db_infos, echo=False):
@@ -97,7 +96,7 @@ class DBManager:
             return TeraSite.query.filter_by(**kwargs).all()
         else:
             # Only super user can create sites, by default we can list our sites only
-            return TeraSite.query.filter(TeraSite.id_site.in_(user.get_accessible_sites())).filter_by(**kwargs).all()
+            return TeraSite.query.filter(TeraSite.id_site.in_(user.get_accessible_sites_ids())).filter_by(**kwargs).all()
 
     @staticmethod
     def get_user_projects(user: TeraUser, **kwargs):
@@ -105,4 +104,4 @@ class DBManager:
             return TeraProject.query.filter_by(**kwargs).all()
         else:
             return TeraProject.query.filter(TeraProject.id_project.in_
-                                            (user.get_accessible_projects(read_access=True))).filter_by(**kwargs).all()
+                                            (user.get_accessible_projects_ids())).filter_by(**kwargs).all()
