@@ -3,8 +3,7 @@ from flask_restful import Resource, reqparse
 from modules.Globals import auth, db_man
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSite import TeraSite
-from libtera.db.models.TeraProject import TeraProject
+from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 
 
 class QueryProjects(Resource):
@@ -30,8 +29,12 @@ class QueryProjects(Resource):
         try:
             projects = db_man.get_user_projects(current_user, **my_args)
             projects_list = []
+            print("**********")
+            print(current_user.get_projects_roles())
             for project in projects:
-                projects_list.append(project.to_json())
+                project_json = project.to_json()
+                project_json['project_role'] = TeraProjectAccess.get_project_role_for_user(current_user, project)
+                projects_list.append(project_json)
             return jsonify(projects_list)
         except InvalidRequestError:
             return '', 500

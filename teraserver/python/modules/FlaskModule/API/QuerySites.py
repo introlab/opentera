@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 from modules.Globals import auth, db_man
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSite import TeraSite
+from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 
 
 class QuerySites(Resource):
@@ -30,10 +30,14 @@ class QuerySites(Resource):
         try:
 
             sites = db_man.get_user_sites(current_user, **my_args)
+            print("**********")
+            print(current_user.get_sites_roles())
 
             sites_list = []
             for site in sites:
-                sites_list.append(site.to_json())
+                site_json = site.to_json()
+                site_json['site_access'] = TeraSiteAccess.get_site_role_for_user(current_user, site)
+                sites_list.append(site_json)
             return jsonify(sites_list)
         except InvalidRequestError:
             return '', 500
