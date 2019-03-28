@@ -1,6 +1,6 @@
 import unittest
 from libtera.db.DBManager import DBManager
-from libtera.db.models.TeraUser import TeraUser, TeraUserTypes
+from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
@@ -30,6 +30,9 @@ class TeraUserTest(unittest.TestCase):
         self.db_man.create_defaults()
 
     def tearDown(self):
+        pass
+
+    def test_empty(self):
         pass
 
     def test_superadmin(self):
