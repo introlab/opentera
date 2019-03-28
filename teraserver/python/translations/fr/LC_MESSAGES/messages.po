@@ -1,0 +1,800 @@
+# French translations for PROJECT.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-03-28 10:31-0400\n"
+"PO-Revision-Date: 2019-03-28 10:09-0400\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: env/python-3.6/lib/python3.6/argparse.py:295
+msgid "usage: "
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:830
+msgid ".__call__() not defined"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1127
+#, python-format
+msgid "unknown parser %(parser_name)r (choices: %(choices)s)"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1181
+#, python-format
+msgid "argument \"-\" with mode %r"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1189
+#, python-format
+msgid "can't open '%s': %s"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1393
+#, python-format
+msgid "cannot merge actions - two groups are named %r"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1431
+msgid "'required' is an invalid argument for positionals"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1453
+#, python-format
+msgid ""
+"invalid option string %(option)r: must start with a character "
+"%(prefix_chars)r"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1473
+#, python-format
+msgid "dest= is required for options like %r"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1490
+#, python-format
+msgid "invalid conflict_resolution value: %r"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1510
+#, python-format
+msgid "conflicting option string: %s"
+msgid_plural "conflicting option strings: %s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1574
+msgid "mutually exclusive arguments must be optional"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1637
+msgid "positional arguments"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1638
+msgid "optional arguments"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1653
+#: env/python-3.6/lib/python3.6/optparse.py:1238
+msgid "show this help message and exit"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1684
+msgid "cannot have multiple subparser arguments"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1736
+#, python-format
+msgid "unrecognized arguments: %s"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1833
+#, python-format
+msgid "not allowed with argument %s"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:1879
+#: env/python-3.6/lib/python3.6/argparse.py:1893
+#, python-format
+msgid "ignored explicit argument %r"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2000
+#, python-format
+msgid "the following arguments are required: %s"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2015
+#, python-format
+msgid "one of the arguments %s is required"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2058
+msgid "expected one argument"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2059
+msgid "expected at most one argument"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2060
+msgid "expected at least one argument"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2062
+#, python-format
+msgid "expected %s argument"
+msgid_plural "expected %s arguments"
+msgstr[0] ""
+msgstr[1] ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2122
+#, python-format
+msgid "ambiguous option: %(option)s could match %(matches)s"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2185
+#, python-format
+msgid "unexpected option string: %s"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2289
+#, python-format
+msgid "%r is not callable"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2306
+#, python-format
+msgid "invalid %(type)s value: %(value)r"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2317
+#, python-format
+msgid "invalid choice: %(value)r (choose from %(choices)s)"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/argparse.py:2393
+#, python-format
+msgid "%(prog)s: error: %(message)s\n"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/getopt.py:161
+#, python-format
+msgid "option --%s requires argument"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/getopt.py:164
+#, python-format
+msgid "option --%s must not have an argument"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/getopt.py:174
+#, python-format
+msgid "option --%s not recognized"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/getopt.py:184
+#, python-format
+msgid "option --%s not a unique prefix"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/getopt.py:198
+#, python-format
+msgid "option -%s requires argument"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/getopt.py:211
+#, python-format
+msgid "option -%s not recognized"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:146
+#, python-format
+msgid "no such option: %s"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:157
+#, python-format
+msgid "ambiguous option: %s (%s?)"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:381
+#, python-format
+msgid "Usage: %s\n"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:400
+msgid "Usage"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:422
+#: env/python-3.6/lib/python3.6/optparse.py:423
+msgid "integer"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:424
+msgid "floating-point"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:425
+msgid "complex"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:433
+#, python-format
+msgid "option %s: invalid %s value: %r"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:441
+#, python-format
+msgid "option %s: invalid choice: %r (choose from %s)"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:1243
+msgid "show program's version number and exit"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:1266
+msgid "%prog [options]"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:1485
+#: env/python-3.6/lib/python3.6/optparse.py:1523
+#, python-format
+msgid "%(option)s option requires %(number)d argument"
+msgid_plural "%(option)s option requires %(number)d arguments"
+msgstr[0] ""
+msgstr[1] ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:1496
+#, python-format
+msgid "%s option does not take a value"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/optparse.py:1612
+msgid "Options"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:99
+msgid "Login Required"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:100
+msgid "Welcome"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:101
+msgid "Please confirm your email"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:102
+msgid "Login instructions"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:103
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/reset_notice.html:1
+msgid "Your password has been reset"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:104
+msgid "Your password has been changed"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:106
+msgid "Password reset instructions"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:132
+msgid "You do not have permission to view this resource."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:134
+#, python-format
+msgid "Thank you. Confirmation instructions have been sent to %(email)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:138
+msgid "Thank you. Your email has been confirmed."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:140
+msgid "Your email has already been confirmed."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:142
+msgid "Invalid confirmation token."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:144
+#, python-format
+msgid "%(email)s is already associated with an account."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:146
+msgid "Password does not match"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:148
+msgid "Passwords do not match"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:150
+msgid "Redirections outside the domain are forbidden"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:152
+#, python-format
+msgid "Instructions to reset your password have been sent to %(email)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:155
+#, python-format
+msgid ""
+"You did not reset your password within %(within)s. New instructions have "
+"been sent to %(email)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:158
+msgid "Invalid reset password token."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:160
+msgid "Email requires confirmation."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:162
+#, python-format
+msgid "Confirmation instructions have been sent to %(email)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:164
+#, python-format
+msgid ""
+"You did not confirm your email within %(within)s. New instructions to "
+"confirm your email have been sent to %(email)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:168
+#, python-format
+msgid ""
+"You did not login within %(within)s. New instructions to login have been "
+"sent to %(email)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:171
+#, python-format
+msgid "Instructions to login have been sent to %(email)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:173
+msgid "Invalid login token."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:175
+msgid "Account is disabled."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:177
+msgid "Email not provided"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:179
+msgid "Invalid email address"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:181
+msgid "Password not provided"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:183
+msgid "No password is set for this user"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:185
+msgid "Password must be at least 6 characters"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:187
+msgid "Specified user does not exist"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:189
+msgid "Invalid password"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:191
+msgid "You have successfully logged in."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:193
+msgid "Forgot password?"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:195
+msgid ""
+"You successfully reset your password and you have been logged in "
+"automatically."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:198
+msgid "Your new password must be different than your previous password."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:201
+msgid "You successfully changed your password."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:203
+msgid "Please log in to access this page."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/core.py:205
+msgid "Please reauthenticate to access this page."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:30
+msgid "Email Address"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:31
+msgid "Password"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:32
+msgid "Remember Me"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:33
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/_menu.html:4
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/login_user.html:3
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/send_login.html:3
+msgid "Login"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:34
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/_menu.html:6
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/register_user.html:3
+msgid "Register"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:35
+msgid "Resend Confirmation Instructions"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:36
+msgid "Recover Password"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:37
+msgid "Reset Password"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:38
+msgid "Retype Password"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:39
+msgid "New Password"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:40
+msgid "Change Password"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/forms.py:41
+msgid "Send Login Link"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/_menu.html:2
+msgid "Menu"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/_menu.html:9
+msgid "Forgot password"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/_menu.html:12
+msgid "Confirm account"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/change_password.html:3
+msgid "Change password"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/forgot_password.html:3
+msgid "Send password reset instructions"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/reset_password.html:3
+msgid "Reset password"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/send_confirmation.html:3
+msgid "Resend confirmation instructions"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/change_notice.html:1
+msgid "Your password has been changed."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/change_notice.html:3
+msgid "If you did not change your password,"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/change_notice.html:3
+msgid "click here to reset it"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/confirmation_instructions.html:1
+msgid "Please confirm your email through the link below:"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/confirmation_instructions.html:3
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/welcome.html:6
+msgid "Confirm my account"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/login_instructions.html:1
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/welcome.html:1
+#, python-format
+msgid "Welcome %(email)s!"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/login_instructions.html:3
+msgid "You can log into your account through the link below:"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/login_instructions.html:5
+msgid "Login now"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/reset_instructions.html:1
+msgid "Click here to reset your password"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_security/templates/security/email/welcome.html:4
+msgid "You can confirm your email through the link below:"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_wtf/file.py:51
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:205
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:245
+msgid "This field is required."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_wtf/file.py:85
+msgid "File does not have an approved extension: {extensions}"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/flask_wtf/file.py:90
+msgid "File does not have an approved extension."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/passlib/ext/django/utils.py:957
+msgid "algorithm"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:58
+#, python-format
+msgid "Invalid field name '%s'."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:66
+#, python-format
+msgid "Field must be equal to %(other_name)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:99
+#, python-format
+msgid "Field must be at least %(min)d character long."
+msgid_plural "Field must be at least %(min)d characters long."
+msgstr[0] ""
+msgstr[1] ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:102
+#, python-format
+msgid "Field cannot be longer than %(max)d character."
+msgid_plural "Field cannot be longer than %(max)d characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:105
+#, python-format
+msgid "Field must be between %(min)d and %(max)d characters long."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:141
+#, python-format
+msgid "Number must be at least %(min)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:143
+#, python-format
+msgid "Number must be at most %(max)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:145
+#, python-format
+msgid "Number must be between %(min)s and %(max)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:277
+msgid "Invalid input."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:311
+msgid "Invalid email address."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:352
+msgid "Invalid IP address."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:403
+msgid "Invalid Mac address."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:432
+msgid "Invalid URL."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:452
+msgid "Invalid UUID."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:482
+#, python-format
+msgid "Invalid value, must be one of: %(values)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/validators.py:514
+#, python-format
+msgid "Invalid value, can't be any of: %(values)s."
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/csrf/core.py:98
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/csrf/form.py:47
+msgid "Invalid CSRF Token"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/csrf/session.py:61
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/csrf/session.py:58
+msgid "CSRF token missing"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/csrf/session.py:69
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/csrf/session.py:66
+msgid "CSRF failed"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/csrf/session.py:74
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/csrf/session.py:71
+msgid "CSRF token expired"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/appengine/fields.py:87
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/appengine/fields.py:164
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/appengine/fields.py:166
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/django/fields.py:95
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/sqlalchemy/fields.py:125
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/sqlalchemy/fields.py:127
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/sqlalchemy/fields.py:180
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/sqlalchemy/fields.py:185
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/fields/core.py:475
+msgid "Not a valid choice"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/appengine/fields.py:185
+msgid "Not a valid list"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/appengine/fields.py:204
+msgid "Not a valid integer list"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/dateutil/fields.py:63
+msgid "Please input a date/time value"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/dateutil/fields.py:75
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/ext/dateutil/fields.py:83
+msgid "Invalid date/time input"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/fields/core.py:468
+msgid "Invalid Choice: could not coerce"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/fields/core.py:501
+msgid "Invalid choice(s): one or more data inputs could not be coerced"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/fields/core.py:508
+#, python-format
+msgid "'%(value)s' is not a valid choice for this field"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/fields/core.py:591
+msgid "Not a valid integer value"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/fields/core.py:657
+msgid "Not a valid decimal value"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/fields/core.py:684
+msgid "Not a valid float value"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/fields/core.py:745
+msgid "Not a valid datetime value"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/fields/core.py:762
+msgid "Not a valid date value"
+msgstr ""
+
+#: env/python-3.6/lib/python3.6/site-packages/wtforms/fields/core.py:779
+msgid "Not a valid time value"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:293
+msgid "ID Utilisateur"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:294
+msgid "UUID Utilisateur"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:295
+msgid "Code utilisateur"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:296
+msgid "Activé"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:297
+msgid "Prénom"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:298
+msgid "Nom"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:299
+msgid "Courriel"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:300
+msgid "Mot de passe"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:301
+msgid "Groupe(s) utilisateur(s)"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:302
+msgid "Super administrateur"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:303
+msgid "Notes"
+msgstr ""
+
+#: libtera/db/models/TeraUser.py:304
+msgid "Dernière connexion"
+msgstr ""
+

@@ -36,6 +36,7 @@ set (pip_packages
     flask-session
     flask-restful
     flask-security
+    flask-babel
     redis
     txredisapi
     eventlet
