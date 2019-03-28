@@ -4,6 +4,7 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
+from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.Base import db
 import uuid
 import os
@@ -51,10 +52,6 @@ class TeraUserTest(unittest.TestCase):
         projects = self.db_man.get_user_projects(admin)
         self.assertEqual(len(projects), TeraProject.get_count())
 
-        # Verify that we are not part of any groups
-        self.assertEqual(len(admin.user_projectgroups), 0)
-        self.assertEqual(len(admin.user_sitegroups), 0)
-
     def test_siteadmin(self):
         # Site admin should have access to the site
         siteadmin = TeraUser.get_user_by_username('siteadmin')
@@ -65,17 +62,13 @@ class TeraUserTest(unittest.TestCase):
                         'siteadmin user default password is admin')
 
         # Verify that site can access only its site
-        sites = self.db_man.get_user_sites(siteadmin)
+        sites = TeraSiteAccess.get_accessible_sites_for_user(siteadmin)
         self.assertEqual(len(sites), 1, 'siteadmin user can access 1 site')
         self.assertEqual(sites[0].site_name, 'Default Site')
 
         # Verify that siteadmin can access all sites project
-        projects = self.db_man.get_user_projects(siteadmin)
+        projects = TeraProjectAccess.get_accessible_projects_for_user(siteadmin)
         self.assertEqual(len(projects), 2)
-
-        # Verify that we are only part of one group
-        self.assertEqual(len(siteadmin.user_projectgroups), 1)
-        self.assertEqual(len(siteadmin.user_sitegroups), 1)
 
     def test_multisite_user(self):
         multi = TeraUser.get_user_by_username('user2')
@@ -86,14 +79,10 @@ class TeraUserTest(unittest.TestCase):
                         'user2 user default password is user2')
 
         # Verify that site can access only its site
-        sites = self.db_man.get_user_sites(multi)
+        sites = TeraSiteAccess.get_accessible_sites_for_user(multi)
         self.assertEqual(len(sites), 1, 'multi user can access 1 site')
         self.assertEqual(sites[0].site_name, 'Default Site')
 
         # Verify that multi can access 2 projects
-        projects = self.db_man.get_user_projects(multi)
+        projects = TeraProjectAccess.get_accessible_projects_for_user(multi)
         self.assertEqual(len(projects), 2)
-
-        # Verify that we are only part of one group
-        self.assertEqual(len(multi.user_projectgroups), len(projects))
-        self.assertEqual(len(multi.user_sitegroups), len(sites))
