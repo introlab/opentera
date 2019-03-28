@@ -285,7 +285,7 @@ class TeraUser(db.Model, BaseModel):
         form = TeraForm("user")
 
         # Sections
-        section = TeraFormSection("informations", "Informations")
+        section = TeraFormSection("informations", gettext("Informations"))
         form.add_section(section)
 
         # Items

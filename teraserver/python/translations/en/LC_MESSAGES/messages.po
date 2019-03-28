@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-03-28 11:59-0400\n"
+"POT-Creation-Date: 2019-03-28 12:05-0400\n"
 "PO-Revision-Date: 2019-03-28 10:09-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -750,6 +750,10 @@ msgstr ""
 msgid "Not a valid time value"
 msgstr ""
 
+#: libtera/db/models/TeraUser.py:288
+msgid "Informations"
+msgstr ""
+
 #: libtera/db/models/TeraUser.py:292
 msgid "ID Utilisateur"
 msgstr ""
@@ -780,7 +784,7 @@ msgstr ""
 
 #: libtera/db/models/TeraUser.py:299
 msgid "Mot de passe"
-msgstr ""
+msgstr "Password"
 
 #: libtera/db/models/TeraUser.py:300
 msgid "Groupe(s) utilisateur(s)"
@@ -788,7 +792,7 @@ msgstr ""
 
 #: libtera/db/models/TeraUser.py:301
 msgid "Super administrateur"
-msgstr ""
+msgstr "Super Administrator"
 
 #: libtera/db/models/TeraUser.py:302
 msgid "Notes"
@@ -796,5 +800,5 @@ msgstr ""
 
 #: libtera/db/models/TeraUser.py:303
 msgid "Dernière connexion"
-msgstr ""
+msgstr "Last Connexion"
 
