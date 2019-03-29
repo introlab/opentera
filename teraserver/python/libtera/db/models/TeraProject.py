@@ -1,5 +1,6 @@
 from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraSite import TeraSite
+from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 
 
 class TeraProject(db.Model, BaseModel):
@@ -24,6 +25,26 @@ class TeraProject(db.Model, BaseModel):
         #     rval['user_sitegroups'] = usersitegroups_list
 
         return rval
+
+    def get_users_ids_in_project(self):
+        # Get all users who has a role in the project
+        users = self.get_users_in_project()
+        users_ids = []
+
+        for user in users:
+            users_ids.append(user.id_user)
+
+        return users_ids
+
+    def get_users_in_project(self):
+        # Get all users who has a role in the project
+        project_access = TeraProjectAccess.query.filter(TeraProjectAccess.id_project == self.id_project).all()
+        users = []
+        for access in project_access:
+            if access.project_access_user not in users:
+                users.append(access.project_access_user)
+
+        return users
 
     @staticmethod
     def create_defaults():

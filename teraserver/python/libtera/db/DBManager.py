@@ -47,14 +47,6 @@ class DBManager:
             print('No users - creating defaults')
             TeraUser.create_defaults()
 
-        if TeraProjectAccess.get_count() == 0:
-            print("No project access - creating defaults")
-            TeraProjectAccess.create_defaults()
-
-        if TeraSiteAccess.get_count() == 0:
-            print("No site access - creating defaults")
-            TeraSiteAccess.create_defaults()
-
     @staticmethod
     def open(db_infos, echo=False):
         db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos

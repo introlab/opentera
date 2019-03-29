@@ -29,12 +29,12 @@ class QuerySites(Resource):
 
         try:
 
-            sites = TeraSiteAccess.get_accessible_sites_for_user(current_user)
+            sites = current_user.get_accessible_sites()
 
             sites_list = []
             for site in sites:
                 site_json = site.to_json()
-                site_json['site_access'] = TeraSiteAccess.get_site_role_for_user(current_user, site)
+                site_json['site_access'] = current_user.get_site_role(site)
                 sites_list.append(site_json)
             return jsonify(sites_list)
         except InvalidRequestError:

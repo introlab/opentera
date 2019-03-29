@@ -1,10 +1,14 @@
 from libtera.db.Base import db, BaseModel
 from libtera.forms.TeraForm import TeraForm, TeraFormSection, TeraFormItem, TeraFormItemCondition, TeraFormValue
+from libtera.db.models.TeraProjectAccess import TeraProjectAccess
+from libtera.db.models.TeraSiteAccess import TeraSiteAccess
+from libtera.db.models.TeraSite import TeraSite
+from libtera.db.models.TeraProject import TeraProject
 
 from passlib.hash import bcrypt
 import uuid
 import datetime
-from flask_babel import gettext, ngettext
+from flask_babel import gettext
 
 
 class TeraUser(db.Model, BaseModel):
@@ -54,6 +58,133 @@ class TeraUser(db.Model, BaseModel):
     def update_last_online(self):
         self.user_lastonline = datetime.datetime.now()
         db.session.commit()
+
+    def query_user_by_uuid(self, u_uuid):
+        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
+        accessibles = TeraUser.get_accessible_users_ids_for_user(self)
+        if user.id_user not in accessibles:
+            return None
+        return user
+
+    def get_accessible_users_ids(self):
+        users = self.get_accessible_users()
+        users_ids = []
+        for user in users:
+            if user.id_user not in users_ids:
+                users_ids.append(user.id_user)
+        return users_ids
+
+    def get_accessible_users(self):
+        projects = self.get_accessible_projects()
+        users = []
+        for project in projects:
+            project_users = project.get_users_in_project()
+            for user in project_users:
+                if user not in users:
+                    users.append(user)
+
+        # If superadmin, also add superadmin users
+        if self.user_superadmin:
+            superadmins = TeraUser.query.filter(TeraUser.user_superadmin).all()
+            for superadmin in superadmins:
+                if superadmin not in users:
+                    users.append(superadmin)
+
+        # TODO Sort by username
+        return users
+
+    def get_project_role(self, project: TeraProject):
+        if self.user_superadmin:
+            # SuperAdmin is always admin.
+            return 'admin'
+
+        role = TeraProjectAccess.query.filter_by(id_user=self.id_user, id_project=project.id_project).first()
+
+        if role is not None:
+            role_name = role.project_access_role
+        else:
+            # Site admins are always project admins
+            site_role = TeraSiteAccess.get_site_role_for_user(user, project.project_site)
+            if site_role == 'admin':
+                role_name = 'admin'
+
+        return role_name
+
+    def get_accessible_projects(self):
+        project_list = []
+        if self.user_superadmin:
+            # Is superadmin - admin on all projects
+            project_list = TeraProject.query.all()
+        else:
+            # Build project list - get sites
+            for site in self.get_accessible_sites():
+                if self.get_site_role_for_user(site) == 'admin':
+                    project_query = TeraProject.query.filter_by(id_site=site.id_site)
+                    if project_query:
+                        for project in project_query.all():
+                            project_list.append(project)
+
+            # Add specific projects
+            for project_access in self.user_projects_access:
+                project = project_access.project_access_project
+                if project not in project_list:
+                    project_list.append(project)
+        return project_list
+
+    def get_accessible_projects_ids(self):
+        projects = []
+
+        for project in self.get_accessible_projects():
+            projects.append(project.id_project)
+
+        return projects
+
+    def get_projects_roles(self):
+        projects_roles = {}
+        project_list = self.get_accessible_projects()
+
+        for project in project_list:
+            role = self.get_project_role(project)
+            projects_roles[project.project_name] = role
+        return projects_roles
+
+    def get_accessible_sites(self):
+        if self.user_superadmin:
+            site_list = TeraSite.query.all()
+        else:
+            site_list = []
+            for site_access in self.user_sites_access:
+                site_list.append(site_access.site_access_site)
+
+        return site_list
+
+    def get_accessible_sites_ids(self):
+        sites_ids = []
+
+        for site in self.get_accessible_sites():
+            sites_ids.append(site.id_site)
+
+        return sites_ids
+
+    def get_sites_roles(self):
+        sites_roles = {}
+
+        for site in self.get_accessible_sites():
+            sites_roles[site] = self.get_site_role(site)
+
+        return sites_roles
+
+    def get_site_role(self, site: TeraSite):
+        if self.user_superadmin:
+            # SuperAdmin is always admin.
+            return 'admin'
+
+        role = TeraSiteAccess.query.filter_by(id_user=self.id_user, id_site=site.id_site).first()
+        if role is not None:
+            role_name = role.site_access_role
+        else:
+            role_name = None
+        return role_name
 
     def __str__(self):
         return '<TeraUser ' + str(self.user_username) + ', ' + str(self.user_email) + ' >'
@@ -122,6 +253,50 @@ class TeraUser(db.Model, BaseModel):
         user.user_uuid = str(uuid.uuid4())
         db.session.add(user)
 
+        # Project Access
+        admin_access = TeraProjectAccess()
+        admin_access.id_user = TeraUser.get_user_by_username('siteadmin').id_user
+        admin_access.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
+        admin_access.project_access_role = 'admin'
+        db.session.add(admin_access)
+
+        user_access = TeraProjectAccess()
+        user_access.id_user = TeraUser.get_user_by_username('user').id_user
+        user_access.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
+        user_access.project_access_role = 'user'
+        db.session.add(user_access)
+
+        user2_access = TeraProjectAccess()
+        user2_access.id_user = TeraUser.get_user_by_username('user2').id_user
+        user2_access.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
+        user2_access.project_access_role = 'user'
+        db.session.add(user2_access)
+
+        user2_access_admin = TeraProjectAccess()
+        user2_access_admin.id_user = TeraUser.get_user_by_username('user2').id_user
+        user2_access_admin.id_project = TeraProject.get_project_by_projectname('Default Project #2').id_project
+        user2_access_admin.project_access_role = 'admin'
+        db.session.add(user2_access_admin)
+
+        # Site Access
+        admin_access = TeraSiteAccess()
+        admin_access.id_user = TeraUser.get_user_by_username('siteadmin').id_user
+        admin_access.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
+        admin_access.site_access_role = 'admin'
+        db.session.add(admin_access)
+
+        user_access = TeraSiteAccess()
+        user_access.id_user = TeraUser.get_user_by_username('user').id_user
+        user_access.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
+        user_access.site_access_role = 'user'
+        db.session.add(user_access)
+
+        user2_access = TeraSiteAccess()
+        user2_access.id_user = TeraUser.get_user_by_username('user2').id_user
+        user2_access.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
+        user2_access.site_access_role = 'user'
+        db.session.add(user2_access)
+
         db.session.commit()
 
     @staticmethod
@@ -150,15 +325,8 @@ class TeraUser(db.Model, BaseModel):
 
     @staticmethod
     def get_user_by_uuid(u_uuid):
-        return TeraUser.query.filter_by(user_uuid=u_uuid).first()
-
-    @staticmethod
-    def query_data(filter_args):
-        if isinstance(filter_args, tuple):
-            return TeraUser.query.filter_by(*filter_args).all()
-        if isinstance(filter_args, dict):
-            return TeraUser.query.filter_by(**filter_args).all()
-        return None
+        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
+        return user
 
     @staticmethod
     def get_profile_def():
