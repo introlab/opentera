@@ -1,11 +1,4 @@
 from libtera.db.Base import db, BaseModel
-from enum import Enum
-
-
-class TeraDeviceTypes(Enum):
-    VIDEOCONFERENCE = 1
-    ROBOT = 2
-    SENSOR = 3
 
 
 class TeraDevice(db.Model, BaseModel):
@@ -14,7 +7,7 @@ class TeraDevice(db.Model, BaseModel):
     id_kit = db.Column(db.Integer, db.ForeignKey("t_kits.id_kit"), nullable=True)
     device_uuid = db.Column(db.String(36), nullable=False, unique=True)
     device_name = db.Column(db.String, nullable=False)
-    device_type = db.Column(db.Integer, nullable=False)
+    device_type = db.Column(db.Integer, db.ForeignKey('t_devices_types.id_device_type'), nullable=False)
     device_token = db.Column(db.String(36), nullable=False)
     device_enabled = db.Column(db.Boolean, nullable=False)
     device_onlineable = db.Column(db.Boolean, nullable=False)

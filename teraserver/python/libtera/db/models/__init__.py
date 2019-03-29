@@ -8,4 +8,9 @@ __all__ = ['TeraDevice',
            'TeraProjectAccess',
            'TeraSite',
            'TeraSiteAccess',
-           'TeraUser']
+           'TeraUser',
+           'TeraDeviceType',
+           'TeraSessionType',
+           'TeraDeviceData',
+           'TeraTest',
+           'TeraTestType']

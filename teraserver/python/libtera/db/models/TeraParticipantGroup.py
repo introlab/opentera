@@ -9,6 +9,8 @@ class TeraParticipantGroup(db.Model, BaseModel):
     id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project'), nullable=False)
     participantgroup_name = db.Column(db.String, nullable=False, unique=False)
 
+    participantgroup_project = db.relationship('TeraProject')
+
     @staticmethod
     def create_defaults():
         base_pgroup = TeraParticipantGroup()

@@ -1,5 +1,6 @@
 from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraKit import kits_participants_table
+from libtera.db.models.TeraSession import sessions_participants_table
 
 
 class TeraParticipant(db.Model, BaseModel):
@@ -9,11 +10,16 @@ class TeraParticipant(db.Model, BaseModel):
     participant_name = db.Column(db.String, nullable=False)
     participant_token = db.Column(db.String(36), nullable=False)
     participant_lastonline = db.Column(db.TIMESTAMP, nullable=True)
-    participant_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group'),
-                                              nullable=False)
+    id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group'),
+                                     nullable=False)
 
     participant_kits = db.relationship("TeraKit", secondary=kits_participants_table, back_populates="kit_participants",
                                        cascade="all,delete")
+
+    participant_sessions = db.relationship("TeraSession", secondary=sessions_participants_table,
+                                           back_populates="session_participants", cascade="all,delete")
+
+    participant_participant_group = db.relationship('TeraParticipantGroup')
 
     # @staticmethod
     # def create_defaults():
