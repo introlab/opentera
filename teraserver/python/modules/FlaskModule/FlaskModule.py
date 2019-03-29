@@ -43,6 +43,9 @@ class FlaskModule(RedisClient):
         flask_app.secret_key = 'development'
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
+        # TODO set upload folder in config
+        flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
+
         # Not sure.
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
 
@@ -76,6 +79,7 @@ class FlaskModule(RedisClient):
 
     def init_views(self):
         from .Views.Index import Index
+        from .Views.Upload import Upload
 
         # Default arguments
         args = []
@@ -83,4 +87,4 @@ class FlaskModule(RedisClient):
 
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
-
+        flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
