@@ -39,20 +39,27 @@ public:
     bool isEditing();
     bool isWaiting();
     bool isLoading();
+    bool isWaitingOrLoading();
 
     void refreshData();
+
+    void queryDataRequest(const QString &path, const QString &query_args = QString());
+    virtual void processQueryReply(const QString &path, const QString &query_args, const QString &data)=0;
+    bool hasPendingDataRequests();
 
 private:
     virtual void updateControlsState()=0;
     virtual void updateFieldsValue()=0;
-    virtual void updateAccessibleControls()=0;
     virtual bool validateData()=0;
 
-protected:
-    EditorState     m_editState;
-    bool            m_undoing;
+    QString getQueryDataName(const QString &path, const QString &query_args);
 
+    QList<QString>  m_requests;
     ComManager*     m_comManager;
+
+    EditorState     m_editState;
+protected:
+    bool            m_undoing;    
 
 signals:
     void dataWasChanged();
@@ -70,7 +77,7 @@ public slots:
     void undoOrDeleteData();
 
 private slots:
-
+    void queryDataReply(const QString &path, const QString &query_args, const QString &data);
 };
 
 #endif // DATAEDITORWIDGET_H

@@ -8,6 +8,7 @@ MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
 {
     ui->setupUi(this);
     m_comManager = com_manager;
+    m_diag_editor = nullptr;
 
     // Initial UI state
     initUi();
@@ -82,7 +83,8 @@ void MainWindow::showNextMessage()
     }
     ui->frameMessages->setStyleSheet("background-color: " + background_color + ";");
     ui->lblMessage->setText(msg.getMessageText());
-    m_msgTimer.start();
+    if (msg.getMessageType() != Message::MESSAGE_ERROR)
+        m_msgTimer.start();
 
     QPropertyAnimation *animate = new QPropertyAnimation(ui->frameMessages,"windowOpacity",this);
     animate->setDuration(1000);
@@ -92,6 +94,12 @@ void MainWindow::showNextMessage()
     animate->setEndValue(0.0);
     animate->start(QAbstractAnimation::DeleteWhenStopped);
     ui->frameMessages->show();
+}
+
+void MainWindow::editorDialogFinished()
+{
+    m_diag_editor->deleteLater();
+    m_diag_editor = nullptr;
 }
 
 void MainWindow::updateCurrentUser()
@@ -148,12 +156,16 @@ void MainWindow::on_btnCloseMessage_clicked()
 
 void MainWindow::on_btnEditUser_clicked()
 {
-    QDialog diag(this);
-    UserWidget* user_editor = new UserWidget(m_comManager, m_comManager->getCurrentUser(), &diag);
+    if (m_diag_editor){
+        m_diag_editor->deleteLater();
+    }
+    m_diag_editor = new QDialog(this);
+    UserWidget* user_editor = new UserWidget(m_comManager, m_comManager->getCurrentUser(), m_diag_editor);
     user_editor->setLimited(true);
-    connect(user_editor, &UserWidget::closeRequest, &diag, &QDialog::close);
+    connect(user_editor, &UserWidget::closeRequest, m_diag_editor, &QDialog::close);
+    connect(m_diag_editor, &QDialog::finished, this, &MainWindow::editorDialogFinished);
 
-    diag.setWindowTitle(tr("Votre compte"));
+    m_diag_editor->setWindowTitle(tr("Votre compte"));
 
-    diag.exec();
+    m_diag_editor->open();
 }

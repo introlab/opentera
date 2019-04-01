@@ -58,6 +58,37 @@ void TeraForm::buildUiFromStructure(const QString &structure)
 
 }
 
+void TeraForm::fillFormFromData(const QJsonObject &data)
+{
+
+    QVariantMap fields = data.toVariantMap();
+    for (QString field:fields.keys()){
+        if (m_widgets.contains(field)){
+            setWidgetValue(m_widgets[field], fields[field]);
+        } else{
+           LOG_WARNING("No widget for field: " + field, "TeraForm::fillFormFromData");
+        }
+    }
+
+}
+
+void TeraForm::fillFormFromData(const QString &structure)
+{
+    if (structure.isEmpty())
+        return;
+
+    QJsonParseError json_error;
+
+    QJsonDocument struct_info = QJsonDocument::fromJson(structure.toUtf8(), &json_error);
+    if (json_error.error!= QJsonParseError::NoError){
+        LOG_ERROR("Unable to parse Ui structure: " + json_error.errorString(), "TeraForm::fillFormFromData");
+    }
+
+    QJsonObject struct_object = struct_info.object();
+    fillFormFromData(struct_object);
+
+}
+
 bool TeraForm::validateFormData(bool ignore_hidden)
 {
     bool rval = true;
@@ -422,6 +453,46 @@ void TeraForm::getWidgetValues(QWidget* widget, QVariant *id, QVariant *value)
     if (QSpinBox* spin = dynamic_cast<QSpinBox*>(widget)){
         *value = spin->value();
     }
+}
+
+void TeraForm::setWidgetValue(QWidget *widget, const QVariant &value)
+{
+    if (QComboBox* combo = dynamic_cast<QComboBox*>(widget)){
+        int index = combo->findText(value.toString());
+        if (index>=0){
+
+        }else{
+            LOG_WARNING("Item not found in ComboBox "+ combo->objectName() + " for item " + value.toString(), "TeraForm::setWidgetValue");
+        }
+        return;
+    }
+
+    if (QLineEdit* text = dynamic_cast<QLineEdit*>(widget)){
+        text->setText(value.toString());
+        return;
+    }
+
+    if (QTextEdit* text = dynamic_cast<QTextEdit*>(widget)){
+        text->setText(value.toString());
+        return;
+    }
+
+    if (QLabel* label = dynamic_cast<QLabel*>(widget)){
+        label->setText(value.toString());
+        return;
+    }
+
+    if (QCheckBox* check = dynamic_cast<QCheckBox*>(widget)){
+        check->setChecked(value.toBool());
+        return;
+    }
+
+    if (QSpinBox* spin = dynamic_cast<QSpinBox*>(widget)){
+        spin->setValue(value.toInt());
+        return;
+    }
+
+    LOG_WARNING("Unhandled widget: "+ QString(widget->metaObject()->className()) + " for item " + value.toString(), "TeraForm::setWidgetValue");
 }
 
 bool TeraForm::validateWidget(QWidget *widget, bool ignore_hidden)

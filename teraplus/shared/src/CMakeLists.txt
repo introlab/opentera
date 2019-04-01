@@ -15,7 +15,6 @@ set(sharedlib_headers
     Logger.h
     ConfigManager.h
     data/TeraUser.h
-    data/TeraUserGroup.h
     data/TeraData.h
     WebAPI.h
 )
@@ -24,7 +23,6 @@ set(sharedlib_srcs
     Logger.cpp
     ConfigManager.cpp
     data/TeraUser.cpp
-    data/TeraUserGroup.cpp
     data/TeraData.cpp
 )
 

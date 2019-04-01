@@ -13,28 +13,30 @@ class QuerySites(Resource):
         self.module = flaskModule
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('id_site', type=int, help='id_site', required=False)
-        # self.parser.add_argument('user_uuid', type=str, help='uuid')
+        self.parser.add_argument('user_uuid', type=str, help='uuid')
 
     @auth.login_required
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         args = self.parser.parse_args()
 
-        my_args = {}
+        sites = []
+        # If we have no arguments, return all accessible sites
+        queried_user = current_user
+        if not any(args.values()):
+            sites = queried_user.get_accessible_sites()
 
-        # Make sure we remove the None, safe?
-        for key in args:
-            if args[key] is not None:
-                my_args[key] = args[key]
+        # If we have a user_uuid, query for the site of that user
+        if args['user_uuid']:
+            queried_user = TeraUser.get_user_by_uuid(args['user_uuid'])
+            if queried_user is not None:
+                sites = queried_user.get_accessible_sites()
 
         try:
-
-            sites = current_user.get_accessible_sites()
-
             sites_list = []
             for site in sites:
                 site_json = site.to_json()
-                site_json['site_access'] = current_user.get_site_role(site)
+                site_json['site_role'] = queried_user.get_site_role(site)
                 sites_list.append(site_json)
             return jsonify(sites_list)
         except InvalidRequestError:

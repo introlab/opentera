@@ -81,9 +81,9 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
         handled = true;
     }
 
-    if (reply_path == WEB_DEFINITIONS_PATH){
-
-        emit objectDefinitionReceived(reply_data, reply_query);
+    if (!handled){
+        // General case
+        emit queryResultsReceived(reply_path, reply_query, reply_data);
         handled = true;
     }
 

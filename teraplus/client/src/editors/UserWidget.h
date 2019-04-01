@@ -3,6 +3,16 @@
 
 #include <QWidget>
 
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonArray>
+#include <QJsonObject>
+
+#include <QVariantList>
+#include <QVariantMap>
+
+#include <QComboBox>
+
 #include "DataEditorWidget.h"
 #include "data/TeraUser.h"
 
@@ -27,37 +37,39 @@ public:
 
     void deleteData();
 
-    void setWaiting();
     void setReady();
 
     void setLimited(bool limited);
 
     void connectSignals();
 
+    void processQueryReply(const QString &path, const QString &query_args, const QString &data);
+
 private:
     Ui::UserWidget* ui;
 
-    TeraUser*   m_data;
-    bool        m_limited; // Current user editing only
+    TeraUser*           m_data;
+    bool                m_limited; // Current user editing only
+    QMap<int, int>      m_tableSites_ids_rows;
+    QMap<int, int>      m_tableProjects_ids_rows;
+    QString             m_userprojects;
+    QString             m_usersites;
 
     void updateControlsState();
     void updateFieldsValue();
-    void updateAccessibleControls();
-    void hideValidationIcons();
 
     bool validateData();
 
-    void hideProfileValidationIcons();
-    bool validateProfile();
-    void buildProfileFromUI();
+    void fillSites(const QString& sites_json);
+    void fillSitesData();
+    void fillProjects(const QString& projects_json);
+    void fillProjectsData();
+    QComboBox *buildRolesComboBox();
 
 public slots:
 
 
 private slots:
-    // Profile editor items
-    void objectDefReceived(const QString &def, const QString &type);
-
     void btnEdit_clicked();
     void btnDelete_clicked();
     void btnSave_clicked();

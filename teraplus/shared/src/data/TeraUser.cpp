@@ -36,11 +36,6 @@ QString TeraUser::getEmail() const
     return m_email;
 }
 
-UserType TeraUser::getUserType() const
-{
-    return m_userType;
-}
-
 QUuid TeraUser::getUuid() const
 {
     return m_uuid;
@@ -75,7 +70,6 @@ QString TeraUser::getName() const
 {
     return m_firstName + " " + m_lastName;
 }
-
 
 QJsonObject TeraUser::toJson()
 {
@@ -120,15 +114,6 @@ void TeraUser::setEmail(const QString &email)
         return;
     m_email = email;
     emit emailChanged(m_email);
-}
-
-void TeraUser::setUserType(const UserType type)
-{
-    if (m_userType==type)
-        return;
-
-    m_userType = type;
-    emit userTypeChanged(m_userType);
 }
 
 void TeraUser::setUuid(const QUuid &uuid)

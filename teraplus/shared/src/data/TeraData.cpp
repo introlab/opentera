@@ -1,6 +1,9 @@
 #include "TeraData.h"
 #include <QDateTime>
+#include <Logger.h>
+
 #include <QDebug>
+
 
 TeraData::TeraData(QObject *parent) : QObject(parent)
 {
@@ -69,6 +72,9 @@ bool TeraData::fromJson(const QJsonValue &value)
 {
     for (int i=0; i<metaObject()->propertyCount(); i++){
         QString fieldName = QString(metaObject()->property(i).name());
+        // Skips internal fields
+        if (fieldName == "id" || fieldName == "name" || fieldName == "class_name" || fieldName == "objectName")
+            continue;
         if (!value[fieldName].isUndefined()){
             if (value[fieldName].isString()){
                 QDateTime date_tester = QDateTime::fromString(value[fieldName].toString(), Qt::ISODateWithMs);
@@ -76,9 +82,13 @@ bool TeraData::fromJson(const QJsonValue &value)
                     metaObject()->property(i).write(this, date_tester);
                     continue;
                 }
+                metaObject()->property(i).write(this, value[fieldName].toString());
+                continue;
             }
             metaObject()->property(i).write(this, value[fieldName].toVariant());
+            continue;
         }
+        LOG_WARNING("Field " + fieldName + " not found in JSON.", "TeraData::fromJson");
     }
 
     return true;
@@ -89,11 +99,19 @@ QJsonObject TeraData::toJson()
     QJsonObject object;
     for (int i=0; i<metaObject()->propertyCount(); i++){
         QString fieldName = QString(metaObject()->property(i).name());
-        if (fieldName != "objectName"){
-            if (metaObject()->property(i).read(this).canConvert(QMetaType::QDateTime)){
-                object[fieldName] = metaObject()->property(i).read(this).toDateTime().toString(Qt::ISODateWithMs);
-            }else{
+        if (fieldName != "objectName" && fieldName != "class_name"){
+            QVariant fieldData =  metaObject()->property(i).read(this);
+            if (fieldData.canConvert(QMetaType::QString)){
+                QDateTime date_tester = QDateTime::fromString(fieldData.toString(), Qt::ISODateWithMs);
+                if (date_tester.isValid()){
+                    object[fieldName] = fieldData.toDateTime().toString(Qt::ISODateWithMs);
+                }else{
+                    object[fieldName] = fieldData.toString();
+                }
+            }else if (fieldData.canConvert(QMetaType::QJsonValue)){
                 object[fieldName] = metaObject()->property(i).read(this).toJsonValue();
+            }else{
+                LOG_WARNING("Field " + fieldName + " can't be 'jsonized'", "TeraData::toJson");
             }
         }
     }

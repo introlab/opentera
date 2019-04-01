@@ -1,4 +1,5 @@
 #include "DataEditorWidget.h"
+#include <QApplication>
 
 DataEditorWidget::DataEditorWidget(ComManager *comMan, QWidget *parent) :
     QWidget(parent),
@@ -8,6 +9,8 @@ DataEditorWidget::DataEditorWidget(ComManager *comMan, QWidget *parent) :
 
     // Set ComManager pointer
     m_comManager = comMan;
+
+    connect(m_comManager, &ComManager::queryResultsReceived, this, &DataEditorWidget::queryDataReply);
 
 
 }
@@ -60,6 +63,7 @@ void DataEditorWidget::setReady(){
 
     m_editState = STATE_READY;
     setVisible(true);
+    QApplication::restoreOverrideCursor();
     updateControlsState();
     m_undoing=false;
     emit stateReady();
@@ -76,11 +80,12 @@ void DataEditorWidget::setEditing(){
 }
 
 void DataEditorWidget::setWaiting(){
-    if (isWaiting())
+    if (isWaiting() || isLoading())
         return;
 
     m_editState = STATE_WAITING;
     updateControlsState();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     emit stateWaiting();
 }
 
@@ -89,12 +94,34 @@ void DataEditorWidget::setLoading(){
         return;
 
     m_editState = STATE_LOADING;
+    QApplication::setOverrideCursor(Qt::BusyCursor);
     setVisible(false);
     emit stateLoading();
 }
 
 void DataEditorWidget::refreshData(){
     updateFieldsValue();
+}
+
+void DataEditorWidget::queryDataRequest(const QString &path, const QString &query_args)
+{
+    QString query_name = getQueryDataName(path, query_args);
+    m_requests.append(query_name);
+    m_comManager->doQuery(path, query_args);
+    setWaiting();
+}
+
+bool DataEditorWidget::hasPendingDataRequests()
+{
+    return !m_requests.isEmpty();
+}
+
+QString DataEditorWidget::getQueryDataName(const QString &path, const QString &query_args)
+{
+    QString query_name = path;
+    if (!query_args.isEmpty())
+        query_name += "?" + query_args;
+    return query_name;
 }
 
 bool DataEditorWidget::isReady(){
@@ -113,6 +140,11 @@ bool DataEditorWidget::isLoading(){
     return m_editState == STATE_LOADING;
 }
 
+bool DataEditorWidget::isWaitingOrLoading()
+{
+    return isLoading() || isWaiting();
+}
+
 void DataEditorWidget::undoOrDeleteData(){
     if (m_editState==STATE_EDITING){
         // If editing, undo the changes
@@ -126,6 +158,16 @@ void DataEditorWidget::undoOrDeleteData(){
         // Delete the data
         deleteData();
     }
+}
+
+void DataEditorWidget::queryDataReply(const QString &path, const QString &query_args, const QString &data)
+{
+    QString query_name = getQueryDataName(path, query_args);
+    m_requests.removeOne(query_name);
+    if (m_requests.isEmpty())
+        setReady();
+
+    processQueryReply(path, query_args, data);
 }
 
 void DataEditorWidget::undoData(){

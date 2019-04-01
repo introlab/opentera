@@ -63,7 +63,7 @@ class FlaskModule(RedisClient):
         from .API.Login import Login
         from .API.Logout import Logout
         from .API.QueryUsers import QueryUsers
-        from .API.Definitions import Definitions
+        from .API.QueryForms import QueryForms
         from .API.OnlineUsers import OnlineUsers
         from .API.QuerySites import QuerySites
         from .API.QueryProjects import QueryProjects
@@ -73,7 +73,7 @@ class FlaskModule(RedisClient):
         self.api.add_resource(QuerySites, '/api/sites', resource_class_args=[self])
         self.api.add_resource(Logout, '/api/logout', resource_class_args=[self])
         self.api.add_resource(QueryUsers, '/api/users', resource_class_args=[self])
-        self.api.add_resource(Definitions, '/api/definitions', resource_class_args=[self])
+        self.api.add_resource(QueryForms, '/api/forms', resource_class_args=[self])
         self.api.add_resource(OnlineUsers, '/api/online', resource_class_args=[self])
         self.api.add_resource(QueryProjects, '/api/projects', resource_class_args=[self])
 

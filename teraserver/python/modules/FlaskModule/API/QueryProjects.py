@@ -13,25 +13,30 @@ class QueryProjects(Resource):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('id_project', type=int, help='id_project')
         self.parser.add_argument('id_site', type=int, help='id_site')
+        self.parser.add_argument('user_uuid', type=str, help='user_uuid')
 
     @auth.login_required
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         args = self.parser.parse_args()
 
-        my_args = {}
+        projects = []
+        # If we have no arguments, return all accessible projects
+        queried_user = current_user
+        if not any(args.values()):
+            projects = queried_user.get_accessible_projects()
 
-        # Make sure we remove the None, safe?
-        for key in args:
-            if args[key] is not None:
-                my_args[key] = args[key]
+        # If we have a user_uuid, query for the site of that user
+        if args['user_uuid']:
+            queried_user = TeraUser.get_user_by_uuid(args['user_uuid'])
+            if queried_user is not None:
+                projects = queried_user.get_accessible_projects()
         try:
-            projects = current_user.get_accessible_projects()
             projects_list = []
 
             for project in projects:
                 project_json = project.to_json()
-                project_json['project_role'] = current_user.get_project_role(project)
+                project_json['project_role'] = queried_user.get_project_role(project)
                 projects_list.append(project_json)
             return jsonify(projects_list)
         except InvalidRequestError:

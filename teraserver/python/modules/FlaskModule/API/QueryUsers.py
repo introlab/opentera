@@ -29,12 +29,12 @@ class QueryUsers(Resource):
 
         users = []
         # If we have no arguments, return all accessible users
-        if not all(args.values()):
+        if not any(args.values()):
             users = current_user.get_accessible_users()
 
         # If we have a user_uuid, query for that user if accessible
         if args['user_uuid']:
-            return current_user.query_user_for_uuid(args['user_uuid'])
+            users.append(current_user.get_user_by_uuid(args['user_uuid']))
 
         # If we have a id_site, query for users of that site, if accessible
         # TODO
@@ -44,7 +44,8 @@ class QueryUsers(Resource):
         if users:
             users_list = []
             for user in users:
-                users_list.append(user.to_json())
+                if user is not None:
+                    users_list.append(user.to_json())
             return jsonify(users_list)
 
         return '', 500

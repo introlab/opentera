@@ -1,10 +1,10 @@
 from flask import jsonify
 from flask_restful import Resource, reqparse
 from modules.Globals import auth
-from libtera.db.models.TeraUser import TeraUser
+from libtera.forms.TeraUserForm import TeraUserForm
 
 
-class Definitions(Resource):
+class QueryForms(Resource):
 
     def __init__(self, flaskModule=None):
         self.module = flaskModule
@@ -16,10 +16,10 @@ class Definitions(Resource):
     def get(self):
         args = self.parser.parse_args(strict=True)
 
-        if args['type'] == 'profile':
-            return jsonify(TeraUser.get_profile_def())
+        if args['type'] == 'user_profile':
+            return jsonify(TeraUserForm.get_user_profile_definition())
 
         if args['type'] == 'user':
-            return jsonify(TeraUser.get_user_def())
+            return jsonify(TeraUserForm.get_user_definition())
 
         return 'Unknown definition type: ' + args['type'], 500

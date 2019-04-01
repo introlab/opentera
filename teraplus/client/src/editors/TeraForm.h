@@ -36,6 +36,8 @@ public:
     ~TeraForm();
 
     void buildUiFromStructure(const QString& structure);
+    void fillFormFromData(const QJsonObject& data);
+    void fillFormFromData(const QString& structure);
 
     bool validateFormData(bool ignore_hidden=false);
 
@@ -62,6 +64,7 @@ private:
     void checkConditionsForItem(QWidget* item);
     void setWidgetVisibility(QWidget* widget, QWidget *linked_widget, bool visible);
     void getWidgetValues(QWidget *widget, QVariant *id, QVariant* value);
+    void setWidgetValue(QWidget* widget, const QVariant& value);
 
     bool validateWidget(QWidget* widget, bool ignore_hidden=false);
 

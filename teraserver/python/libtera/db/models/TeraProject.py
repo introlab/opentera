@@ -17,12 +17,8 @@ class TeraProject(db.Model, BaseModel):
         ignore_fields.extend(['project_site'])
         rval = super().to_json(ignore_fields=ignore_fields)
 
-        # Add usergroups in json format, if needed
-        # if 'user_sitegroups' in rval:
-        #     usersitegroups_list = []
-        #     for usersitegroup in self.user_usergroups:
-        #         usersitegroups_list.append(usersitegroup.to_json(ignore_fields=['sitegroup_users']))
-        #     rval['user_sitegroups'] = usersitegroups_list
+        # Add sitename
+        rval['site_name'] = self.project_site.site_name
 
         return rval
 

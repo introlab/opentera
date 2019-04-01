@@ -40,6 +40,8 @@ private slots:
     void addMessage(const Message& msg);
     void showNextMessage();
 
+    void editorDialogFinished();
+
     void on_btnCloseMessage_clicked();
     void on_btnLogout_clicked();
 
@@ -52,7 +54,8 @@ private:
 
     Ui::MainWindow *ui;
 
-    ComManager* m_comManager;
+    ComManager*     m_comManager;
+    QDialog*        m_diag_editor;
 
     // Message system
     QList<Message>  m_messages;

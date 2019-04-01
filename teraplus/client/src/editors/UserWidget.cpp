@@ -14,7 +14,6 @@ UserWidget::UserWidget(ComManager *comMan, const TeraUser &data, QWidget *parent
     ui(new Ui::UserWidget),
     m_data(nullptr)
 {
-    setData(data);
 
     if (parent){
         ui->setupUi(parent);
@@ -25,58 +24,18 @@ UserWidget::UserWidget(ComManager *comMan, const TeraUser &data, QWidget *parent
     }
     setAttribute(Qt::WA_StyledBackground); //Required to set a background image
 
-    /*
-    if (is_kit){
-        m_data_type = TERADATA_KIT;
-        // Remove usergroup list
-        lblUserGroup->setVisible(false);
-        cmbUserGroup->setVisible(false);
-        // Remove enabled check
-        chkEnabled->setVisible(false);
-        chkAdmin->setVisible(false);
-        //lblEnabled->setVisible(false);
-        // Ensure kit is always enabled
-        chkEnabled->setChecked(true);
-        lblEmail->setVisible(false);
-        txtEmail->setVisible(false);
-        txtFirstName->setVisible(false);
-        lblFirstName->setVisible(false);
-        lblDesc->setVisible(true);
-        txtDesc->setVisible(true);
-    }else{
-        m_data_type = TERADATA_USER;
-        lblDesc->setVisible(false);
-        txtDesc->setVisible(false);
-        tabMain->removeTab(1); // Remove history tab
-    }*/
-
-    hideValidationIcons();
-    //ui->txtCPassword->setVisible(false);
-
-
     // Connect signals and slots
     connectSignals();
 
-    // UI signals
-    /*connect(chkCamControl1,SIGNAL(stateChanged(int)),this,SLOT(componentChecked(int)));
-    connect(chkONVIFAbsolute1,SIGNAL(stateChanged(int)),this,SLOT(componentChecked(int)));
-    connect(chkWebRTC,SIGNAL(stateChanged(int)),this,SLOT(componentChecked(int)));
-    connect(chkVirtualCam,SIGNAL(stateChanged(int)),this,SLOT(componentChecked(int)));
-    connect(chk2ndAudioSrc,SIGNAL(stateChanged(int)),this,SLOT(componentChecked(int)));
-    connect(chk2ndVideoSrc,SIGNAL(stateChanged(int)),this,SLOT(componentChecked(int)));
-    connect(chkTeraWeb, SIGNAL(stateChanged(int)),this,SLOT(componentChecked(int)));
-    connect(chkExternalPrograms, SIGNAL(stateChanged(int)),this,SLOT(componentChecked(int)));
+    // Query forms definition
+    queryDataRequest(WEB_DEFINITIONS_PATH, WEB_DEFINITIONS_PROFILE);
+    queryDataRequest(WEB_DEFINITIONS_PATH, WEB_DEFINITIONS_USER);
 
-    connect(btnControlPass1,SIGNAL(clicked(bool)),this,SLOT(showPassword(bool)));
+    // Query sites and projects
+    queryDataRequest(WEB_SITEINFO_PATH);
+    queryDataRequest(WEB_PROJECTINFO_PATH);
 
-    connect(cmbCam1Res,SIGNAL(currentIndexChanged(int)),this,SLOT(comboItemChanged()));
-    connect(cmbControl1,SIGNAL(currentIndexChanged(int)),this,SLOT(comboItemChanged()));
-    connect(cmbVirtualCam,SIGNAL(currentIndexChanged(int)),this,SLOT(comboItemChanged()));*/
-
-    // Update accessible controls
-    updateAccessibleControls();
-
-    updateFieldsValue();
+    setData(data);
 
 }
 
@@ -94,40 +53,11 @@ void UserWidget::setData(const TeraUser &data){
 
     m_data = new TeraUser(data);
 
-    // Query forms definition
-    m_comManager->doQuery(WEB_DEFINITIONS_PATH, WEB_DEFINITIONS_PROFILE);
-    m_comManager->doQuery(WEB_DEFINITIONS_PATH, WEB_DEFINITIONS_USER);
-
-    /*
-    if (m_data_type==TERADATA_KIT){
-        m_data->setUserType(UserInfo::USERTYPE_KIT);
-        // Query logs (if it is a kit)
-
-        QList<SearchCriteria> scl;
-        SearchCriteria sc;
-        sc.search_type = SearchCriteria::SearchUserID;
-        sc.criteria.append(m_data->id());
-        scl.append(sc);
-        emit dataLoadingRequest(TERADATA_KITLOG,scl);
-
-        setLoading();
-    }
-    if (m_data_type==TERADATA_USER)
-        m_data->setUserType(UserInfo::USERTYPE_USER);
-
-    //emit listRequest(TERADATA_USERGROUP);
-    tabMain->setVisible(true);
-
-    // Query global user list
-    if (m_users.isEmpty()){
-        QList<QVariant> args;
-        args.append(QString(""));
-        emit cloudRequest(CloudCom::CloudComDict::GET_USER_ACCOUNT,args);
-        setLoading();
-    }else{
-        updateFieldsValue();
-        setReady();
-    }*/
+    // Query sites and projects roles
+    m_usersites.clear();
+    m_userprojects.clear();
+    queryDataRequest(WEB_SITEINFO_PATH, WEB_QUERY_USERUUID + m_data->getUuid().toString(QUuid::WithoutBraces));
+    queryDataRequest(WEB_PROJECTINFO_PATH, WEB_QUERY_USERUUID + m_data->getUuid().toString(QUuid::WithoutBraces));
 
 }
 
@@ -172,115 +102,37 @@ void UserWidget::saveData(bool signal){
 
 
 void UserWidget::updateControlsState(){
-    // Controls editing set
-    bool edit = (m_editState==DataEditorWidget::STATE_EDITING);
-
-    //txtFirstName->setEnabled(false); // Always disabled, since managed globally
-    //txtLastName->setEnabled(false);
-    /*ui->txtFirstName->setEnabled(edit);
-    ui->txtLastName->setEnabled(edit);
-    ui->txtCPassword->setEnabled(edit);
-    ui->txtPassword->setEnabled(edit);
-    ui->txtEmail->setEnabled(edit);
-    ui->txtUserName->setEnabled(edit);
-    ui->txtDesc->setEnabled(edit);
-
-    if (m_data){
-        if (dataIsNew()){
-            ui->txtUserName->clear();
-        }
-    }
-
-    ui->chkEnabled->setEnabled(edit);
-    ui->chkAdmin->setEnabled(edit);*/
-
-    if (edit)
-        ui->tabMain->setVisible(true);
-
-   /* if (m_data_type == TERADATA_USER){
-        // Check if editing current user - disable user group change
-        if (m_data && m_loggedUser->id()==m_data->id())
-            cmbUserGroup->setEnabled(false);
-        else
-            cmbUserGroup->setEnabled(edit);
-    }*/
+    ui->wdgUser->setEnabled(!isWaitingOrLoading());
+    ui->wdgProfile->setEnabled(!isWaitingOrLoading());
+    ui->tableSites->setEnabled(!isWaitingOrLoading());
+    ui->tableProjects->setEnabled(!isWaitingOrLoading());
 
     // Buttons update
-    ui->btnEdit->setEnabled(isReady());
-    ui->btnDelete->setEnabled(isReady());
-    if (m_editState==STATE_EDITING){
-        ui->btnSave->setVisible(!isReady());
-        ui->btnUndo->setVisible(!isReady());
-    }else{
-        ui->btnSave->setVisible(false);
-        ui->btnUndo->setVisible(false);
+    ui->btnEdit->setEnabled(!isWaitingOrLoading());
+    ui->btnDelete->setEnabled(!isWaitingOrLoading());
+    ui->btnSave->setEnabled(!isWaitingOrLoading());
+    ui->btnUndo->setEnabled(!isWaitingOrLoading());
+    ui->btnSave->setVisible(isEditing());
+    ui->btnUndo->setVisible(isEditing());
+    // Always show save button if editing current user
+    if (m_limited){
+        ui->btnSave->setVisible(true);
+        ui->btnUndo->setVisible(true);
     }
-
-
 }
 
 void UserWidget::updateFieldsValue(){
-    if (m_data){
-        /*if (m_data_type==TERADATA_USER){
-            txtFirstName->setText(m_data->firstname());
-            txtLastName->setText(m_data->lastname());
-        }else{
-            txtLastName->setText(m_data->name());
-        }*/
-        /*ui->txtFirstName->setText(m_data->getFirstName());
-        ui->txtLastName->setText(m_data->getLastName());*/
-
-       /* chkEnabled->setChecked(m_data->enabled());
-        chkAdmin->setChecked(m_data->isSuperAdmin());
-        //txtUserName->setText(m_data->username()); // Updated when receiving profile
-        txtPassword->clear();
-        txtCPassword->clear();
-
-        if (!dataIsNew())
-            lblLastOnline->setText(m_data->lastOnline().toString());
-        else
-            lblLastOnline->setText("");
-
-        setTitle(m_data->name());
-        // Select usergroup
-        if (m_data_type == TERADATA_USER){
-            int index = cmbUserGroup->findData(m_data->id_usergroup());
-            cmbUserGroup->setCurrentIndex(index);
-        }
-
-        // Load profile from user
-        loadGlobalUser(m_data->uuid());
-
-        txtDesc->setPlainText(m_data->desc());*/
-
+    if (m_data && !hasPendingDataRequests()){
+        ui->wdgUser->fillFormFromData(m_data->toJson());
+        ui->wdgProfile->fillFormFromData(m_data->getProfile());
     }
-}
-
-void UserWidget::updateAccessibleControls(){
-    /*AccessInfo access = m_loggedUser->getAccess(TERA_ACCESS_USERS);
-    btnDelete->setVisible(access.canDelete());
-    btnEdit->setVisible(access.canEdit());
-
-    access = m_loggedUser->getAccess(TERA_ACCESS_TECH);
-    frmProfile->setVisible(access.canRead());
-    txtProfile->setEnabled(access.canEdit());
-
-    chkAdmin->setVisible(m_loggedUser->isSuperAdmin() && m_data_type==TERADATA_USER);*/
-
 }
 
 void UserWidget::deleteData(){
 
 }
 
-void UserWidget::setWaiting(){
-    ui->btnDelete->setEnabled(false);
-    ui->btnEdit->setEnabled(false);
-    DataEditorWidget::setWaiting();
-}
-
 void UserWidget::setReady(){
-    hideValidationIcons();
 /*    if (!_limited)
         btnDelete->setEnabled(true);
     else
@@ -352,33 +204,155 @@ bool UserWidget::validateData(){
     return false;
 }
 
-void UserWidget::hideValidationIcons(){
-
-}
-
-void UserWidget::objectDefReceived(const QString& def, const QString &type)
+void UserWidget::fillSites(const QString &sites_json)
 {
-    if (type == WEB_DEFINITIONS_PROFILE)
-        ui->wdgProfile->buildUiFromStructure(def);
+    QJsonParseError json_error;
 
-    if (type == WEB_DEFINITIONS_USER)
-        ui->wdgUser->buildUiFromStructure(def);
+    QJsonDocument info = QJsonDocument::fromJson(sites_json.toUtf8(), &json_error);
+    if (json_error.error!= QJsonParseError::NoError){
+        LOG_ERROR("Unable to parse sites: " + json_error.errorString(), "UserWidget::fillSites");
+        return;
+    }
+
+    ui->tableSites->clearContents();
+    m_tableSites_ids_rows.clear();
+
+    if (info.isArray()){
+        QVariantList sites = info.array().toVariantList();
+        for (QVariant site:sites){
+            ui->tableSites->setRowCount(ui->tableSites->rowCount()+1);
+            int current_row = ui->tableSites->rowCount()-1;
+            if (site.canConvert(QMetaType::QVariantMap)){
+                QVariantMap site_data = site.toMap();
+                QTableWidgetItem* item = new QTableWidgetItem(site_data["site_name"].toString());
+                ui->tableSites->setItem(current_row,0,item);
+                ui->tableSites->setCellWidget(current_row,1,buildRolesComboBox());
+                m_tableSites_ids_rows.insert(site_data["id_site"].toInt(), current_row);
+            }
+        }
+    }
+
+
 }
 
-void UserWidget::hideProfileValidationIcons(){
-    /*ui->valControlAdr1->setVisible(false);
-    ui->valControlPort1->setVisible(false);*/
+void UserWidget::fillSitesData()
+{
+    // Don't do anything if we don't have the table data first
+    if (m_tableSites_ids_rows.isEmpty() || m_usersites.isEmpty())
+        return;
+
+    QJsonParseError json_error;
+
+    QJsonDocument info = QJsonDocument::fromJson(m_usersites.toUtf8(), &json_error);
+    if (json_error.error!= QJsonParseError::NoError){
+        LOG_ERROR("Unable to parse sites: " + json_error.errorString(), "UserWidget::fillSites");
+        return;
+    }
+
+     if (info.isArray()){
+         QVariantList sites = info.array().toVariantList();
+         for (QVariant site:sites){
+             if (site.canConvert(QMetaType::QVariantMap)){
+                 QVariantMap site_data = site.toMap();
+                 int site_id = site_data["id_site"].toInt();
+                 if (m_tableSites_ids_rows.contains(site_id)){
+                     int row = m_tableSites_ids_rows[site_id];
+                     QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableSites->cellWidget(row,1));
+                     if (combo_roles){
+                         int index = combo_roles->findData(site_data["site_role"].toString());
+                         if (index >= 0){
+                             combo_roles->setCurrentIndex(index);
+                         }else{
+                             combo_roles->setCurrentIndex(0);
+                         }
+                     }
+                 }else{
+                     LOG_WARNING("Site ID " + site_data["id_site"].toString() + " not found in table.", "UserWidget::fillSitesData");
+                 }
+             }
+         }
+     }
 }
 
-bool UserWidget::validateProfile(){
-    // Check if profile in the "simplified" profile is valid
-    bool errors = false;
+void UserWidget::fillProjects(const QString &projects_json)
+{
+    QJsonParseError json_error;
 
-    return !errors;
+    QJsonDocument info = QJsonDocument::fromJson(projects_json.toUtf8(), &json_error);
+    if (json_error.error!= QJsonParseError::NoError){
+        LOG_ERROR("Unable to parse projects: " + json_error.errorString(), "UserWidget::fillProjects");
+        return;
+    }
+
+    ui->tableProjects->clearContents();
+    m_tableProjects_ids_rows.clear();
+
+    if (info.isArray()){
+        QVariantList projects = info.array().toVariantList();
+        for (QVariant project:projects){
+            ui->tableProjects->setRowCount(ui->tableProjects->rowCount()+1);
+            int current_row = ui->tableProjects->rowCount()-1;
+            if (project.canConvert(QMetaType::QVariantMap)){
+                QVariantMap proj_data = project.toMap();
+                QTableWidgetItem* item = new QTableWidgetItem(proj_data["site_name"].toString());
+                ui->tableProjects->setItem(current_row,0,item);
+                item = new QTableWidgetItem(proj_data["project_name"].toString());
+                ui->tableProjects->setItem(current_row,1,item);
+                ui->tableProjects->setCellWidget(current_row,2,buildRolesComboBox());
+                m_tableProjects_ids_rows.insert(proj_data["id_project"].toInt(), current_row);
+            }
+        }
+    }
 }
 
-void UserWidget::buildProfileFromUI(){
+void UserWidget::fillProjectsData()
+{
+    // Don't do anything if we don't have the table data first
+    if (m_tableProjects_ids_rows.isEmpty() || m_userprojects.isEmpty())
+        return;
 
+    QJsonParseError json_error;
+
+    QJsonDocument info = QJsonDocument::fromJson(m_userprojects.toUtf8(), &json_error);
+    if (json_error.error!= QJsonParseError::NoError){
+        LOG_ERROR("Unable to parse projects: " + json_error.errorString(), "UserWidget::fillProjectsData");
+        return;
+    }
+
+    if (info.isArray()){
+        QVariantList projects = info.array().toVariantList();
+        for (QVariant project:projects){
+            if (project.canConvert(QMetaType::QVariantMap)){
+                QVariantMap proj_data = project.toMap();
+                 int project_id = proj_data["id_project"].toInt();
+                 if (m_tableProjects_ids_rows.contains(project_id)){
+                     int row = m_tableProjects_ids_rows[project_id];
+                     QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableProjects->cellWidget(row,2));
+                     if (combo_roles){
+                         int index = combo_roles->findData(proj_data["project_role"].toString());
+                         if (index >= 0){
+                             combo_roles->setCurrentIndex(index);
+                         }else{
+                             combo_roles->setCurrentIndex(0);
+                         }
+                     }
+                 }else{
+                     LOG_WARNING("Project ID " + proj_data["id_site"].toString() + " not found in table.", "UserWidget::fillProjectsData");
+                 }
+             }
+         }
+     }
+}
+
+QComboBox *UserWidget::buildRolesComboBox()
+{
+    QComboBox* item_roles = new QComboBox();
+    item_roles->addItem(tr("Aucun rôle"), "");
+    item_roles->addItem(tr("Administrateur"), "admin");
+    item_roles->addItem(tr("Utilisateur"), "user");
+    item_roles->setCurrentIndex(0);
+
+    return item_roles;
 }
 
 void UserWidget::setLimited(bool limited){
@@ -396,8 +370,44 @@ void UserWidget::connectSignals()
     connect(ui->btnSave, &QPushButton::clicked, this, &UserWidget::btnSave_clicked);
     //connect(ui->txtPassword, &QLineEdit::textChanged, this, &UserWidget::txtPassword_textChanged);
 
-    connect(m_comManager, &ComManager::objectDefinitionReceived, this, &UserWidget::objectDefReceived);
+}
 
+void UserWidget::processQueryReply(const QString &path, const QString &query_args, const QString &data)
+{
+    if (path == WEB_DEFINITIONS_PATH){
+        if (query_args == WEB_DEFINITIONS_PROFILE)
+            ui->wdgProfile->buildUiFromStructure(data);
+
+        if (query_args == WEB_DEFINITIONS_USER)
+            ui->wdgUser->buildUiFromStructure(data);
+    }
+
+    if (path == WEB_SITEINFO_PATH){
+        if (query_args.startsWith(WEB_QUERY_USERUUID)){
+            // Specific roles for the sites
+            m_usersites = data;
+        }else{
+            // All sites accessibles by the current user, for base lists
+            fillSites(data);
+        }
+        fillSitesData();
+
+    }
+
+    if (path == WEB_PROJECTINFO_PATH){
+        if (query_args.startsWith(WEB_QUERY_USERUUID)){
+            // Specific roles for the projects
+            m_userprojects = data;
+        }else{
+            // All projects accessibles by the current user, for base lists
+            fillProjects(data);
+        }
+        fillProjectsData();
+
+    }
+
+    if (!hasPendingDataRequests())
+        updateFieldsValue();
 }
 void UserWidget::btnEdit_clicked()
 {
