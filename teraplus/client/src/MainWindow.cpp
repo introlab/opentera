@@ -105,6 +105,7 @@ void MainWindow::editorDialogFinished()
 void MainWindow::updateCurrentUser()
 {
     ui->lblUser->setText(m_comManager->getCurrentUser().getName());
+    ui->btnConfig->setVisible(m_comManager->getCurrentUser().getSuperAdmin());
 }
 
 void MainWindow::com_serverError(QAbstractSocket::SocketError error, QString error_msg)

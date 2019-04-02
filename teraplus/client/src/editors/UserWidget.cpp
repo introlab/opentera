@@ -119,6 +119,14 @@ void UserWidget::updateControlsState(){
         ui->btnSave->setVisible(true);
         ui->btnUndo->setVisible(true);
     }
+
+    // Enable access editing
+    bool allow_access_edit = m_limited;
+    if (m_data)
+        // Super admin can't be changed - they have access to everything!
+        allow_access_edit |= m_data->getSuperAdmin();
+    ui->tableSites->setEnabled(!allow_access_edit);
+    ui->tableProjects->setEnabled(!allow_access_edit);
 }
 
 void UserWidget::updateFieldsValue(){

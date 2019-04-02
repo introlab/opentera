@@ -1,5 +1,6 @@
 """
-Copyright 2019 IntRoLab / ESTRAD, Université de Sherbrooke
+Copyright 2019
+IntRoLab / ESTRAD, Université de Sherbrooke, Centre de Recherche sur le Vieillissement de Sherbrooke
 
 Simon Brière, ing., M.Sc.A.
 Dominic Létourneau, ing., M.Sc.A
