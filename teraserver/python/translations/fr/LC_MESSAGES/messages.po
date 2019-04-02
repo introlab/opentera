@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-03-29 07:44-0400\n"
+"POT-Creation-Date: 2019-04-01 16:03-0400\n"
 "PO-Revision-Date: 2019-03-28 16:24-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -18,135 +18,134 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: libtera/db/models/TeraUser.py:168
-msgid "Configuration audio-vidéo"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:172
-msgid "Caméra"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:173
-msgid "Type de caméra"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:174
-msgid "Caméra réseau"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:175
-msgid "Capture d'écran"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:179
-msgid "Adresse du flux de la caméra"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:183
-msgid "Trames par seconde"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:187
-msgid "Résolution"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:194
-msgid "Caméra contrôlable (PTZ)"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:195
-msgid "Type de contrôle"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:196
-msgid "Vivotek"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:196
-msgid "ONVIF (générique)"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:199
-msgid "Adresse réseau"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:202
-msgid "Port"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:205
-msgid "Nom utilisateur"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:208 libtera/db/models/TeraUser.py:240
-msgid "Mot de passe"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:212
-msgid "Microphone"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:213
-msgid "Caméra secondaire"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:215
-msgid "Configuration générale"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:217
-msgid "Affichage en plein écran en séance"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:219
-msgid "Permettre l'accès via le web"
-msgstr ""
-
-#: libtera/db/models/TeraUser.py:229
+#: libtera/forms/TeraUserForm.py:12
 msgid "Informations"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:233
+#: libtera/forms/TeraUserForm.py:16
 msgid "ID Utilisateur"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:234
+#: libtera/forms/TeraUserForm.py:17
 msgid "UUID Utilisateur"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:235
+#: libtera/forms/TeraUserForm.py:18
 msgid "Code utilisateur"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:236
+#: libtera/forms/TeraUserForm.py:19
 msgid "Activé"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:237
+#: libtera/forms/TeraUserForm.py:20
 msgid "Prénom"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:238
+#: libtera/forms/TeraUserForm.py:21
 msgid "Nom"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:239
+#: libtera/forms/TeraUserForm.py:22
 msgid "Courriel"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:241
-msgid "Groupe(s) utilisateur(s)"
+#: libtera/forms/TeraUserForm.py:24 libtera/forms/TeraUserForm.py:79
+msgid "Mot de passe"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:242
+#: libtera/forms/TeraUserForm.py:25
 msgid "Super administrateur"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:243
+#: libtera/forms/TeraUserForm.py:26
 msgid "Notes"
 msgstr ""
 
-#: libtera/db/models/TeraUser.py:244
+#: libtera/forms/TeraUserForm.py:27
 msgid "Dernière connexion"
 msgstr ""
+
+#: libtera/forms/TeraUserForm.py:37
+msgid "Configuration audio-vidéo"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:41
+msgid "Caméra"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:42
+msgid "Type de caméra"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:43
+msgid "Caméra réseau"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:44
+msgid "Capture d'écran"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:48
+msgid "Adresse du flux de la caméra"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:52
+msgid "Trames par seconde"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:57
+msgid "Résolution"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:65
+msgid "Caméra contrôlable (PTZ)"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:66
+msgid "Type de contrôle"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:67
+msgid "Vivotek"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:67
+msgid "ONVIF (générique)"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:70
+msgid "Adresse réseau"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:73
+msgid "Port"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:76
+msgid "Nom utilisateur"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:83
+msgid "Microphone"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:84
+msgid "Caméra secondaire"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:86
+msgid "Configuration générale"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:88
+msgid "Affichage en plein écran en séance"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:90
+msgid "Permettre l'accès via le web"
+msgstr ""
+
+#~ msgid "Groupe(s) utilisateur(s)"
+#~ msgstr ""
 
