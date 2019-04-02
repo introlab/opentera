@@ -6,6 +6,7 @@ class ConfigManager:
     server_config = {}  # name, port, ssl_path
     db_config = {}      # name, url, port, username, password
     redis_config = {}
+    webrtc_config = {}
 
     def __init__(self):
         pass
@@ -34,6 +35,9 @@ class ConfigManager:
 
         if self.validate_redis_config(config_json['Redis']):
             self.redis_config = config_json["Redis"]
+
+        if self.validate_webrtc_config(config_json['WebRTC']):
+            self.webrtc_config = config_json["WebRTC"]
 
     @staticmethod
     def validate_server_config(config):
@@ -66,5 +70,19 @@ class ConfigManager:
         for field in required_fields:
             if field not in config:
                 print('ERROR: Redis Config - missing database ' + field)
+                rval = False
+        return rval
+
+    @staticmethod
+    def validate_webrtc_config(config):
+        """
+        :param config:
+        :return:
+        """
+        rval = True
+        required_fields = ['enabled', 'hostname', 'min_port', 'max_port', 'executable', 'script', 'working_directory']
+        for field in required_fields:
+            if field not in config:
+                print('ERROR: WebRTC Config - missing field ' + field)
                 rval = False
         return rval

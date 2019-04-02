@@ -45,5 +45,5 @@ add_custom_target(
 
 # Will always be considered out of date...
 # Removed python-messages for now...
-add_custom_target(python-all DEPENDS  python-env python_translations)
+add_custom_target(python-all DEPENDS  python-env python_translations python-messages)
 

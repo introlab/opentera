@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package opentera.protobuf;
+
+message CreateSession {
+
+    string source = 1;
+    string command = 2;
+    string reply_to = 3;
+
+}

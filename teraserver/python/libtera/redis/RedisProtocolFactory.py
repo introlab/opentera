@@ -3,7 +3,7 @@ import txredisapi as txredis
 
 
 class redisProtocol(txredis.SubscriberProtocol):
-    def __init__(self, charset="utf-8", errors="strict", parent=None):
+    def __init__(self, charset='utf-8', errors="strict", parent=None):
         print('redisProtocol init with args', charset, errors, parent)
         super().__init__(charset, errors)
         self.parent = parent

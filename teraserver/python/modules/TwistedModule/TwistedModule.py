@@ -41,7 +41,7 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
         print('TeraWebSocketServerProtocol redisConnectionMade (redis)')
 
         # Subscribe to our own messages
-        self.subscribe('server.' + str(self.user.user_uuid) + '.answer')
+        self.subscribe('server.' + str(self.user.user_uuid) + '.*')
 
     def onMessage(self, msg, binary):
         print('TeraWebSocketProtocol onMessage', self, msg, binary)
@@ -157,8 +157,10 @@ class TwistedModule(RedisClient):
         # web_service.setServiceParent(application)
 
         reactor.listenSSL(self.config.server_config['port'], site,
-                          ssl.DefaultOpenSSLContextFactory(privateKeyFileName=self.config.server_config['ssl_path'] + '/key.pem',
-                                                           certificateFileName=self.config.server_config['ssl_path'] + '/cert.crt'))
+                          ssl.DefaultOpenSSLContextFactory(privateKeyFileName=
+                                                           self.config.server_config['ssl_path'] + '/key.pem',
+                                                           certificateFileName=
+                                                           self.config.server_config['ssl_path'] + '/cert.crt'))
         print('setup_twisted done')
 
     def run(self):
