@@ -103,7 +103,7 @@ void DataEditorWidget::refreshData(){
     updateFieldsValue();
 }
 
-void DataEditorWidget::queryDataRequest(const QString &path, const QString &query_args)
+void DataEditorWidget::queryDataRequest(const QString &path, const QUrlQuery &query_args)
 {
     QString query_name = getQueryDataName(path, query_args);
     m_requests.append(query_name);
@@ -116,11 +116,11 @@ bool DataEditorWidget::hasPendingDataRequests()
     return !m_requests.isEmpty();
 }
 
-QString DataEditorWidget::getQueryDataName(const QString &path, const QString &query_args)
+QString DataEditorWidget::getQueryDataName(const QString &path, const QUrlQuery &query_args)
 {
     QString query_name = path;
     if (!query_args.isEmpty())
-        query_name += "?" + query_args;
+        query_name += "?" + query_args.toString();
     return query_name;
 }
 
@@ -160,7 +160,7 @@ void DataEditorWidget::undoOrDeleteData(){
     }
 }
 
-void DataEditorWidget::queryDataReply(const QString &path, const QString &query_args, const QString &data)
+void DataEditorWidget::queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data)
 {
     QString query_name = getQueryDataName(path, query_args);
     m_requests.removeOne(query_name);

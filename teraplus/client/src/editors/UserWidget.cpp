@@ -28,8 +28,8 @@ UserWidget::UserWidget(ComManager *comMan, const TeraUser &data, QWidget *parent
     connectSignals();
 
     // Query forms definition
-    queryDataRequest(WEB_DEFINITIONS_PATH, WEB_DEFINITIONS_PROFILE);
-    queryDataRequest(WEB_DEFINITIONS_PATH, WEB_DEFINITIONS_USER);
+    queryDataRequest(WEB_DEFINITIONS_PATH, QUrlQuery(WEB_DEFINITIONS_PROFILE));
+    queryDataRequest(WEB_DEFINITIONS_PATH, QUrlQuery(WEB_DEFINITIONS_USER));
 
     // Query sites and projects
     queryDataRequest(WEB_SITEINFO_PATH);
@@ -56,8 +56,8 @@ void UserWidget::setData(const TeraUser &data){
     // Query sites and projects roles
     m_usersites.clear();
     m_userprojects.clear();
-    queryDataRequest(WEB_SITEINFO_PATH, WEB_QUERY_USERUUID + m_data->getUuid().toString(QUuid::WithoutBraces));
-    queryDataRequest(WEB_PROJECTINFO_PATH, WEB_QUERY_USERUUID + m_data->getUuid().toString(QUuid::WithoutBraces));
+    queryDataRequest(WEB_SITEINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + m_data->getUuid().toString(QUuid::WithoutBraces)));
+    queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + m_data->getUuid().toString(QUuid::WithoutBraces)));
 
 }
 
@@ -151,65 +151,12 @@ void UserWidget::setReady(){
 }
 
 bool UserWidget::validateData(){
-   /* QList<Data_Validation> errors;
+    bool valid = false;
 
-    hideValidationIcons();
+    valid = ui->wdgUser->validateFormData();
+    valid &= ui->wdgProfile->validateFormData();
 
-    if (!m_data)
-        return false;
-
-    // Create a local copy of the data, in case of a user undo
-    UserInfo* data = new UserInfo(*m_data);
-
-    saveData(false);
-    errors = m_data->validate();
-
-    if (txtPassword->text()!=""){
-        if (txtPassword->text()!=txtCPassword->text())
-            errors.append(VALIDATE_PASSWORD);
-    }
-
-    if (errors.contains(VALIDATE_ID)){
-        // Check if that error is OK, since that can happens if creating global user at the same time
-        if (dataIsNew())
-            errors.removeAll(VALIDATE_ID);
-    }
-
-    if (dataIsNew() && txtPassword->text()==""){
-        errors.append(VALIDATE_PASSWORD);
-    }
-    // Copy old data
-    *m_data = *data;
-
-    delete data;
-
-    if (errors.count()==0)
-        return true;
-
-    for (int i=0; i<errors.count(); i++){
-        switch (errors.at(i)){
-        case VALIDATE_FIRSTNAME:
-            icoFirstName->setVisible(true);
-            break;
-        case VALIDATE_LASTNAME:
-        case VALIDATE_NAME:
-            icoLastName->setVisible(true);
-            break;
-        case VALIDATE_USERGROUP:
-            icoUserGroup->setVisible(true);
-            break;
-        case VALIDATE_ID:
-            icoLinked->setVisible(true);
-            break;
-        case VALIDATE_PASSWORD:
-            icoPassword->setVisible(true);
-            break;
-        default:
-            break;
-        }
-    }*/
-
-    return false;
+    return valid;
 }
 
 void UserWidget::fillSites(const QString &sites_json)
@@ -380,18 +327,31 @@ void UserWidget::connectSignals()
 
 }
 
-void UserWidget::processQueryReply(const QString &path, const QString &query_args, const QString &data)
+void UserWidget::processQueryReply(const QString &path, const QUrlQuery &query_args, const QString &data)
 {
+    QString query_str=query_args.toString();
     if (path == WEB_DEFINITIONS_PATH){
-        if (query_args == WEB_DEFINITIONS_PROFILE)
+        if (query_str.contains(WEB_DEFINITIONS_PROFILE))
             ui->wdgProfile->buildUiFromStructure(data);
-
-        if (query_args == WEB_DEFINITIONS_USER)
-            ui->wdgUser->buildUiFromStructure(data);
+        else{
+            if (query_str.contains(WEB_DEFINITIONS_USER)){
+                ui->wdgUser->buildUiFromStructure(data);
+                // Disable some widgets if we are in limited mode (editing self profile)
+                if (m_limited){
+                    // Disable some widgets
+                    QWidget* item = ui->wdgUser->getWidgetForField("user_username");
+                    if (item) item->setEnabled(false);
+                    item = ui->wdgUser->getWidgetForField("user_enabled");
+                    if (item) item->setEnabled(false);
+                    item = ui->wdgUser->getWidgetForField("user_superadmin");
+                    if (item) item->setEnabled(false);
+                }
+            }
+        }
     }
 
     if (path == WEB_SITEINFO_PATH){
-        if (query_args.startsWith(WEB_QUERY_USERUUID)){
+        if (query_args.hasQueryItem(WEB_QUERY_USERUUID)){
             // Specific roles for the sites
             m_usersites = data;
         }else{
@@ -403,7 +363,7 @@ void UserWidget::processQueryReply(const QString &path, const QString &query_arg
     }
 
     if (path == WEB_PROJECTINFO_PATH){
-        if (query_args.startsWith(WEB_QUERY_USERUUID)){
+        if (query_args.hasQueryItem(WEB_QUERY_USERUUID)){
             // Specific roles for the projects
             m_userprojects = data;
         }else{
@@ -429,6 +389,19 @@ void UserWidget::btnDelete_clicked()
 
 void UserWidget::btnSave_clicked()
 {
+    if (!validateData()){
+        QStringList invalids = ui->wdgUser->getInvalidFormDataLabels();
+        invalids.append(ui->wdgProfile->getInvalidFormDataLabels());
+
+        QString msg = tr("Les champs suivants doivent être complétés:") +" <ul>";
+        for (QString field:invalids){
+            msg += "<li>" + field + "</li>";
+        }
+        msg += "</ul>";
+        GlobalMessageBox msgbox(this);
+        msgbox.showError(tr("Champs invalides"), msg);
+        return;
+    }
     /* if (!dataIsNew())//btnExisting->isChecked())
          m_data->setUuid(m_profile.getUUID());
 

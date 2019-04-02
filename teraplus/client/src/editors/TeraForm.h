@@ -39,7 +39,10 @@ public:
     void fillFormFromData(const QJsonObject& data);
     void fillFormFromData(const QString& structure);
 
-    bool validateFormData(bool ignore_hidden=false);
+    bool validateFormData(bool include_hidden=false);
+    QStringList getInvalidFormDataLabels(bool include_hidden=false);
+
+    QWidget* getWidgetForField(const QString& field);
 
 private:
     Ui::TeraForm*                                   ui;
@@ -66,7 +69,7 @@ private:
     void getWidgetValues(QWidget *widget, QVariant *id, QVariant* value);
     void setWidgetValue(QWidget* widget, const QVariant& value);
 
-    bool validateWidget(QWidget* widget, bool ignore_hidden=false);
+    bool validateWidget(QWidget* widget, bool include_hidden=false);
 
 private slots:
     void widgetValueChanged();

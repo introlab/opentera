@@ -20,6 +20,7 @@
 #include <QJsonValue>
 
 #include <QUrl>
+#include <QUrlQuery>
 #include <QTimer>
 #include <QUuid>
 
@@ -40,7 +41,7 @@ public:
     void disconnectFromServer();
 
     bool processNetworkReply(QNetworkReply* reply);
-    void doQuery(const QString &path, const QString &query_args = QString());
+    void doQuery(const QString &path, const QUrlQuery &query_args = QUrlQuery());
 
     TeraUser &getCurrentUser();
 
@@ -74,7 +75,7 @@ signals:
     void currentUserUpdated();
 
     void usersReceived(QList<TeraUser> user_list);
-    void queryResultsReceived(QString object, QString object_type, QString data);
+    void queryResultsReceived(QString object, QUrlQuery url_query, QString data);
 
 public slots:
 

@@ -89,13 +89,32 @@ void TeraForm::fillFormFromData(const QString &structure)
 
 }
 
-bool TeraForm::validateFormData(bool ignore_hidden)
+bool TeraForm::validateFormData(bool include_hidden)
 {
     bool rval = true;
     for (QWidget* item:m_widgets.values()){
-       rval &= validateWidget(item, ignore_hidden);
+       rval &= validateWidget(item, include_hidden);
     }
     return rval;
+}
+
+QStringList TeraForm::getInvalidFormDataLabels(bool include_hidden)
+{
+    QStringList rval;
+    for (QWidget* item:m_widgets.values()){
+        if (!validateWidget(item, include_hidden)){
+            rval.append(item->property("label").toString());
+        }
+    }
+    return rval;
+}
+
+QWidget *TeraForm::getWidgetForField(const QString &field)
+{
+    if (m_widgets.contains(field))
+        return m_widgets[field];
+
+    return nullptr;
 }
 
 void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structure)
@@ -154,6 +173,8 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
 
             if (item_widget){
                 // Set widget properties
+                if (item_data.contains("label"))
+                    item_widget->setProperty("label", item_data["label"].toString());
                 if (item_data.contains("id"))
                     item_widget->setProperty("id", item_data["id"]);
                 if (item_data.contains("required")){
@@ -495,12 +516,12 @@ void TeraForm::setWidgetValue(QWidget *widget, const QVariant &value)
     LOG_WARNING("Unhandled widget: "+ QString(widget->metaObject()->className()) + " for item " + value.toString(), "TeraForm::setWidgetValue");
 }
 
-bool TeraForm::validateWidget(QWidget *widget, bool ignore_hidden)
+bool TeraForm::validateWidget(QWidget *widget, bool include_hidden)
 {
 
     bool rval = true;
 
-    if (widget->isVisible() || ignore_hidden){
+    if (widget->isVisibleTo(widget->parentWidget()) || include_hidden){
         if (widget->property("required").isValid()){
             if (widget->property("required").toBool()){
                 QVariant id, value;

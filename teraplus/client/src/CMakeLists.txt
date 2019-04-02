@@ -11,6 +11,7 @@ set(headers
     MainWindow.h
     NotificationWindow.h
     Message.h
+    GlobalMessageBox.h
     editors/DataEditorWidget.h
     editors/UserWidget.h
     editors/TeraForm.h
@@ -25,6 +26,7 @@ set(srcs
     MainWindow.cpp
     NotificationWindow.cpp
     Message.cpp
+    GlobalMessageBox.cpp
     editors/DataEditorWidget.cpp
     editors/UserWidget.cpp
     editors/TeraForm.cpp
