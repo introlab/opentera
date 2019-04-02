@@ -1,0 +1,20 @@
+{
+  "name": "TeraWebRTC",
+  "version": "0.1.0",
+  "author": "Dominic Létourneau, Simon Brière",
+  "description": "EasyRTC Server for OpenTera",
+  "private": true,
+  "scripts": {
+    "start": "node server_ssl.js"
+  },
+  "dependencies": {
+    "easyrtc": "git+https://github.com/priologic/easyrtc.git",
+    "express": "^4.16.4",
+    "serve-static": "^1.8.0",
+    "socket.io": "^1.4.5"
+  },
+  "license": "BSD3",
+  "engines": {
+    "node": ">=0.8"
+  }
+}

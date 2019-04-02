@@ -33,6 +33,8 @@ from modules.Globals import db_man
 from modules.RedisModule.RedisModule import setup_redis
 from modules.RedisModule.RedisModule import get_redis
 from modules.UserManagerModule.UserManagerModule import UserManagerModule
+from modules.WebRTCModule.WebRTCModule import WebRTCModule
+
 import os
 
 from sqlalchemy.exc import OperationalError
@@ -100,6 +102,9 @@ if __name__ == '__main__':
     twisted_module = TwistedModule(config_man)
 
     user_manager_module = UserManagerModule(config_man)
+
+    # WebRTCModule
+    webrtc_module = WebRTCModule(config_man)
     
     # This is blocking, running event loop
     # reactor.addSystemEventTrigger('before', 'shutdown', reactor_is_shutting_down)
