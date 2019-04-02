@@ -2,7 +2,7 @@ from flask import jsonify
 from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
 from modules.FlaskModule.FlaskModule import flask_app
-
+from messages.python.CreateSession_pb2 import CreateSession
 
 class OnlineUserRegistry:
     def __init__(self):
@@ -58,6 +58,18 @@ class UserManagerModule(RedisClient):
             print('answering', 'server.' + str(uuid) + '.answer', online_users)
             self.publish('server.' + str(uuid) + '.answer', online_users)
             return True
+        if message == b'session' or message == 'session':
+            # Create message
+            protobuf_message = CreateSession(source='UserManagerModule',
+                                             command='create_session',
+                                             reply_to='server.' + uuid + '.create_session')
+
+            test =  protobuf_message.SerializeToString()
+
+            len_test = len(test)
+
+            # Send message to WebRTCModule
+            self.publish('webrtc.' + 'create_session', protobuf_message.SerializeToString())
 
         print('Error unhandled message ', uuid, message)
         return False

@@ -1,7 +1,13 @@
 # Protobuf files
-SET(protofiles
-    sample.proto
-)
+#SET(protofiles
+#    sample.proto
+#)
+
+FILE(GLOB_RECURSE protofiles RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/*.proto")
+
+
+# Include path
+set(GOOGLE_PROTO_PATH ${PYTHON_ENV_DIRECTORY}/include/google/protobuf/)
 
 # Output directory for python/protobuf files
 set(PROTOBUF_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/python)
@@ -18,7 +24,7 @@ foreach(file ${protofiles})
     list(APPEND protobuf_python_files ${output_target})
     #Add command to generate target
     add_custom_target(${output_target}
-        COMMAND ${PROTOC_EXECUTABLE} ${file} -I=${CMAKE_CURRENT_SOURCE_DIR} --python_out ${PROTOBUF_OUTPUT_PATH}
+        COMMAND ${PROTOC_EXECUTABLE} ${file} -I=${CMAKE_CURRENT_SOURCE_DIR} -I${GOOGLE_PROTO_PATH} --python_out ${PROTOBUF_OUTPUT_PATH}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         DEPENDS ${file} python-env)
 endforeach(file)

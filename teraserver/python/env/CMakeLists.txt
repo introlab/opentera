@@ -17,7 +17,7 @@ endif(WIN32)
 
 # Define packages to install
 set (conda_packages
-
+    protobuf
 )
 
 set (pip_packages
@@ -26,7 +26,6 @@ set (pip_packages
     sqlalchemy
     psycopg2-binary
     python-oauth2
-    protobuf
     flask
     flask-sqlalchemy
     flask-oauthlib
