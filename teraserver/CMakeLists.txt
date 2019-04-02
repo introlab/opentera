@@ -7,12 +7,11 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
 endif(NOT CMAKE_BUILD_TYPE)
 
-# add_subdirectory(cpp)
 
-#Disabled for now.
-#This is en experimental HTTP server
+# Main http server
 add_subdirectory(python)
 
-
+# Easyrtc process
+add_subdirectory(easyrtc)
 
 

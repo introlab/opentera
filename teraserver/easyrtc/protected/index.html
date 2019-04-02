@@ -1,0 +1,341 @@
+﻿    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>TeraPlus</title>
+		<link rel="stylesheet" href="css/jquery-ui.css">
+		<script src="external/jquery/jquery.js"></script>
+		<script src="js/jquery-ui.js"></script>
+		<!--<script src="js/jquery.layout.js"></script>-->
+		
+        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
+		<link rel="stylesheet" type="text/css" href="css/teraplus.css" /> 
+		<link rel="stylesheet" type="text/css" href="css/dialog-polyfill.css" />
+		
+		<!-- Assumes global locations for socket.io.js and easyrtc.js -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
+	<script type="text/javascript" src="js/teraplus.js"></script>
+        <script type="text/javascript" src="/easyrtc/labs/easyrtc_rates.js"></script>
+		  <script>
+		  $( function() {
+			
+		  
+			$( "#selfView" ).dialog({
+			dialogClass: "no-close noTitleStuff",
+			closeOnEscape: false,
+			position: { my: "left", at: "center", of: "mainContainer"}
+			});
+
+			$( "#remoteView1" ).dialog({
+			dialogClass: "no-close noTitleStuff",
+			closeOnEscape: false,
+			position: {my: "left top", at: "right top-42", of: "#selfView"}
+			//position: { my: "left", at: "center", of: "mainContainer"}
+			});
+			
+			$( "#remoteView2" ).dialog({
+			dialogClass: "no-close noTitleStuff",
+			closeOnEscape: false,
+			position: {my: "left top", at: "right top-42", of: "#remoteView1"}
+			//position: { my: "left", at: "center", of: "mainContainer"}
+			});
+			
+			$( "#remoteView3" ).dialog({
+			dialogClass: "no-close noTitleStuff",
+			closeOnEscape: false,
+			position: {my: "left top", at: "left-4 bottom+4", of: "#remoteView1"}
+			//position: { my: "left", at: "center", of: "mainContainer"}
+			});
+			
+			$( "#remoteView4" ).dialog({
+			dialogClass: "no-close",
+			closeOnEscape: false,
+			position: {my: "left top", at: "left-4 bottom+4", of: "#remoteView2"}
+			//position: { my: "left", at: "center", of: "mainContainer"}
+			});
+			
+			configDlg = $( "#configDialog" ).dialog({
+				autoOpen: false,
+				closeOnEscape: false,
+				height: 450,
+				width: 550,
+				modal: true,
+				buttons: {
+					"OK": function() {
+						configChanged();
+						$( this ).dialog( "close" );
+					}/*,
+					"Annuler": function() {
+						$( this ).dialog( "close" );
+					}*/
+				}
+			});
+			
+			$("#remoteView1").parent().hide();
+			$("#remoteView2").parent().hide();
+			$("#remoteView3").parent().hide();
+			$("#remoteView4").parent().hide();
+			
+		   } );
+		   
+		  </script>
+
+      </head>
+      <body onload='initSystem();' onresize='resetVideosPos(); /*setTitle(0,"Vidéo Locale");*/' style="background-color:black; overflow: hidden;">
+      
+			<!--<script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>-->
+			
+			<!-- Audio for browsers -->
+			<audio id="audioConnected" src="sounds/TeRA_CallConnected.mp3" type="audio/mpeg"></audio>
+			<audio id="audioDisconnected" src="sounds/TeRA_CallDisconnected.mp3" type="audio/mpeg"></audio>
+			<audio id="audioCalling" src="sounds/TeRA_Calling.mp3" type="audio/mpeg" loop="true"></audio>
+			
+			<div id="configDialog" title="Paramètres">
+				<p>Source vidéo principale: </p> <select id="videoSelect" onchange="" onclick="event.stopPropagation();"></select>
+				<p>Source audio principale: </p> <select id="audioSelect" onchange="" onclick="event.stopPropagation();"></select>
+				<p>Source vidéo secondaire: </p> <select id="videoSelect2" onchange="" onclick="event.stopPropagation();"></select>
+				<p>Source audio secondaire: </p> <select id="audioSelect2" onchange="" onclick="event.stopPropagation();"></select>
+			</div>
+	  
+		<div class="container-fluid" id="mainContainer">
+			<div id="deniedView" class="titre" style="display:none">
+				<label id="errorLabel" class="titre" style="color:white;background-color: rgba(140,0,0,0.5);">Accès refusé<br><small>Vous n'avez pas l'autorisation de joindre cette séance.</small></label>
+			</div>
+			
+		<!--<div class="ui-layout-center" >-->
+		<div id="selfView" title="Vidéo locale" onmousemove="resetInactiveTimer();openButtons('navButtons');openButtons('enlargeButton');" onmouseleave="closeButtons('navButtons');closeButtons('enlargeButton');return false;"  style="overflow: hidden;">
+				<div class="titre">
+					<label id="videoLabel" class="titre" style="color:white;background-color: rgba(0,140,0,0.5);">Vidéo locale</label>
+					<div id="statusAudio" class="overlay-top-left" >
+						<input id="config" type="image" alt="image" src="images/config.png" height=22 onclick="configDlg.dialog('open');closeButtons('navButtons');event.stopPropagation();" />
+						<input id="micStatus" type="image" alt="image" src="images/micro.png" height=22 onclick="muteMicro(0,0);closeButtons('navButtons');event.stopPropagation();" />
+						<input id="speakerStatus" type="image" alt="image" src="images/speaker.png" height=22 onclick="muteSpeaker(0);closeButtons('navButtons');event.stopPropagation();" style="display:none;"/>
+						<input id="videoStatus" type="image" alt="image" src="images/video_off.png" height=22 onclick="muteVideo();closeButtons('navButtons');event.stopPropagation();" style="display:none;"/>
+						<input id="sensorsStatus" type="image" alt="image" src="images/sensors_off.png" height=22 onclick="event.stopPropagation();" style="display:none;"/>
+					</div>
+					<div id="navButtons" class="overlay-top-right"  oncontextmenu="closeButtons('navButtons');return false;" onclick="if (!isButtonsClosed('navButtons')) selfVideo.onclick(event);" onwheel="if (!isButtonsClosed('navButtons')) manageMouseWheel(event,0);">
+						<div id="zoomButtons0" style="display:none;">
+							<input type="image" alt="image" src="images/Zoom-max.png" height=22 onclick="zoomMax(0);closeButtons('navButtons');event.stopPropagation();"/>
+							<input type="image" alt="image" src="images/Zoom-in1.png" height=22 onclick="zoomIn(0);event.stopPropagation();event.stopPropagation();"/>
+							<input type="image" alt="image" src="images/Zoom-out1.png" height=22 onclick="zoomOut(0);event.stopPropagation();"/>
+							<input type="image" alt="image" src="images/Zoom-min.png" height=22 onclick="zoomMin(0);closeButtons('navButtons');event.stopPropagation();"/>
+						</div>
+						<div id="presetButtons0" style="display:none;">
+							<button class="button1" onclick="gotoPreset(event,0,1);closeButtons('navButtons');event.stopPropagation();">1</button>
+							<button class="button1" onclick="gotoPreset(event,0,2);closeButtons('navButtons');event.stopPropagation();">2</button>
+							<button class="button1" onclick="gotoPreset(event,0,3);closeButtons('navButtons');event.stopPropagation();">3</button>
+						</div>
+						<div id="settingsButton0" style="display:none">
+							<input type="image" alt="image" src="images/settings.png" height=22 onclick="camSettings(0);closeButtons('navButtons');event.stopPropagation();"/>
+						</div>
+					</div>
+					
+				</div>
+				
+		
+				<div id="enlargeButton" onclick="if (!isButtonsClosed('enlargeButton')) selfVideo.onclick(event);event.stopPropagation();" class="overlay-bottom-right">
+					<div style="padding-left:20px;padding-top:20px;background-color:rgba(0,0,0,0);">
+						<input id="largeBtn" class="overlay-top-left" type="image" alt="image" src="images/pin.png" height=42 onclick="selectLargeView('#selfView');closeButtons('navButtons');event.stopPropagation();" style="display:none;"/>
+						<input id="swapBtn" class="overlay-top-left" type="image" alt="image" src="images/swap.png" height=36 onclick="swapLocalSources();event.stopPropagation();" style="display:none;"/>
+					</div>
+				</div>
+								
+				
+			<!--class="easyrtcMirror"-->
+			<video  id="selfVideo" playsinline="true" muted="muted" micEnabled="true" oncontextmenu="toggleButtons('navButtons');return false;" onclick="getVideoCoords(event,0);" onwheel="manageMouseWheel(event,0);" class="easyrtcMirror"></video>
+			<video class="minivideo easyrtcMirror" id="selfVideo2" playsinline="true" muted="muted" style="display: none;"></video>
+			
+			<div id="miniVideoControls" class="minicontrols">
+				<input id="miniMicStatus" type="image" alt="image" src="images/micro.png" height=22 onclick="muteMicro(0,1);closeButtons('navButtons');event.stopPropagation();" style="display: none;"/>
+				<!--<input type="image" alt="image" src="images/screen.png" height=22 onclick="updateVideoSource();event.stopPropagation();"/>-->
+				<input id="imgAddVid2" type="image" alt="image" src="images/plus.png" height=22 onclick="addLocalSource2(0);event.stopPropagation();"/>
+				<input id="imgRemoveVid2" type="image" alt="image" src="images/minus.png" style="display: none;" height=22 onclick="removeLocalSource2(0);event.stopPropagation();"/>
+			</div>
+			<image class="minispeaker" id="imgSpeaker" src="images/speaker.png" style="display: none;"></image>
+		  </div>
+		  
+		  <!-- -->
+		<div id="remoteView1" title="Vidéo #1" onmousemove="resetInactiveTimer();openButtons('navButtons1');openButtons('enlargeButton1');" onmouseleave="closeButtons('navButtons1');closeButtons('enlargeButton1');return false;" style="overflow: hidden;">
+			<div class="titre">
+				<label id="videoLabel1" class="titre" style="color:white;background-color: rgba(0,0,140,0.5);">Vidéo #1</label>
+				<div id="statusAudio1" class="overlay-top-left">
+					<input id="micStatus1" type="image" alt="image" src="images/micro.png" height=22 onclick="muteMicro(1,0);closeButtons('navButtons1');event.stopPropagation();"/>
+					<input id="speakerStatus1" type="image" alt="image" src="images/speaker.png" height=22 onclick="muteSpeaker(1);closeButtons('navButtons1');event.stopPropagation();" style="display:none;"/>
+					<input id="videoStatus1" type="image" alt="image" src="images/video_off.png" height=22 onclick="muteVideo();closeButtons('navButtons1');event.stopPropagation();" style="display:none;"/>
+					<input id="sensorsStatus1" type="image" alt="image" src="images/sensors_off.png" height=22 onclick="" style="display:none;"/>
+				</div>
+				<div id="navButtons1" class="overlay-top-right" oncontextmenu="closeButtons('navButtons1');return false;" onclick="if (!isButtonsClosed('navButtons1')) remoteVideo1.onclick(event);" onwheel="if (!isButtonsClosed('navButtons1')) manageMouseWheel(event,1);">					
+					<div id="zoomButtons1" style="display:none;">
+						<input type="image" alt="image" src="images/Zoom-max.png" height=22 onclick="zoomMax(1);closeButtons('navButtons1');event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-in1.png" height=22 onclick="zoomIn(1);event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-out1.png" height=22 onclick="zoomOut(1);event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-min.png" height=22 onclick="zoomMin(1);closeButtons('navButtons1');event.stopPropagation();"/>
+					</div>
+					<div id="presetButtons1" style="display:none;">
+						<button class="button1" onclick="gotoPreset(event,1,1);closeButtons('navButtons1');event.stopPropagation();">1</button>
+						<button class="button1" onclick="gotoPreset(event,1,2);closeButtons('navButtons1');event.stopPropagation();">2</button>
+						<button class="button1" onclick="gotoPreset(event,1,3);closeButtons('navButtons1');event.stopPropagation();">3</button>
+					</div>
+					<div id="settingsButton1" style="display:none">
+						<input type="image" alt="image" src="images/settings.png" height=22 onclick="camSettings(1);closeButtons('navButtons1');event.stopPropagation();"/>
+					</div>
+				</div>
+			</div>
+			
+			<div id="enlargeButton1" onclick="if (!isButtonsClosed('enlargeButton1')) remoteVideo1.onclick(event);event.stopPropagation();" class="overlay-bottom-right">
+				<div style="padding-left:20px;padding-top:20px;background-color:rgba(0,0,0,0);">
+					<input id="largeBtn1" class="overlay-top-left" type="image" alt="image" src="images/pin.png" height=42 onclick="selectLargeView('#remoteView1');closeButtons('navButtons1');event.stopPropagation();" style="display:none;"/>
+				</div>
+			</div>
+			
+			
+			<video id="remoteVideo1" playsinline="true" micEnabled="true" oncontextmenu="toggleButtons('navButtons1');return false;" onclick="getVideoCoords(event,1);"  onwheel="manageMouseWheel(event,1);"></video>
+			<div id="miniVideoControls1" class="minicontrols">
+				<input id="miniMicStatus1" type="image" alt="image" src="images/micro.png" height=22 onclick="muteMicro(1,1);closeButtons('navButtons');event.stopPropagation();" style="display: none;"/>
+				<!--<input type="image" alt="image" src="images/screen.png" height=22 onclick="updateVideoSource();event.stopPropagation();"/>-->
+				<input id="imgAddVid2_1" type="image" alt="image" src="images/plus.png" height=22 onclick="addLocalSource2(1);event.stopPropagation();" style="display: none;"/>
+				<input id="imgRemoveVid2_1" type="image" alt="image" src="images/minus.png" style="display: none;" height=22 onclick="removeLocalSource2(1);event.stopPropagation();"/>
+			</div>
+			<image class="minispeaker" id="imgSpeaker1" src="images/speaker.png" style="display: none;"></image>
+		  </div>
+		  <!-- -->
+		<div id="remoteView2" title="Vidéo #2" onmousemove="resetInactiveTimer();openButtons('navButtons2');openButtons('enlargeButton2');" onmouseleave="closeButtons('navButtons2');closeButtons('enlargeButton2');return false;" style="overflow: hidden;">
+			<div class="titre">
+				<label id="videoLabel2" class="titre" style="color:white;background-color: rgba(0,0,140,0.5);">Vidéo #2</label>
+				<div id="statusAudio2" class="overlay-top-left">
+					<input id="micStatus2" type="image" alt="image" src="images/micro.png" height=22 onclick="muteMicro(2,0);closeButtons('navButtons2');event.stopPropagation();"/>
+					<input id="speakerStatus2" type="image" alt="image" src="images/speaker.png" height=22 onclick="muteSpeaker(2);closeButtons('navButtons2');event.stopPropagation();" style="display:none;"/>
+					<input id="videoStatus2" type="image" alt="image" src="images/video_off.png" height=22 onclick="muteVideo();closeButtons('navButtons2');event.stopPropagation();" style="display:none;"/>
+					<input id="sensorsStatus2" type="image" alt="image" src="images/sensors_off.png" height=22 onclick="" style="display:none;"/>
+				</div>
+				<div id="navButtons2" class="overlay-top-right" oncontextmenu="closeButtons('navButtons2');return false;" onclick="if (!isButtonsClosed('navButtons2')) remoteVideo2.onclick(event);" onwheel="if (!isButtonsClosed('navButtons2')) manageMouseWheel(event,2);">					
+					<div id="zoomButtons2" style="display:none;">
+						<input type="image" alt="image" src="images/Zoom-max.png" height=22 onclick="zoomMax(2);closeButtons('navButtons2');event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-in1.png" height=22 onclick="zoomIn(2);event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-out1.png" height=22 onclick="zoomOut(2);event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-min.png" height=22 onclick="zoomMin(2);closeButtons('navButtons2');event.stopPropagation();"/>
+					</div>
+					<div id="presetButtons2" style="display:none;">
+						<button class="button1" onclick="gotoPreset(event,2,1);closeButtons('navButtons2');event.stopPropagation();">1</button>
+						<button class="button1" onclick="gotoPreset(event,2,2);closeButtons('navButtons2');event.stopPropagation();">2</button>
+						<button class="button1" onclick="gotoPreset(event,2,3);closeButtons('navButtons2');event.stopPropagation();">3</button>
+					</div>
+					<div id="settingsButton2" style="display:none">
+						<input type="image" alt="image" src="images/settings.png" height=22 onclick="camSettings(2);closeButtons('navButtons2');event.stopPropagation();"/>
+					</div>
+				</div>
+			</div>
+			
+			<div id="enlargeButton2" onclick="if (!isButtonsClosed('enlargeButton2')) remoteVideo2.onclick(event);event.stopPropagation();" class="overlay-bottom-right">
+				<div style="padding-left:20px;padding-top:20px;background-color:rgba(0,0,0,0);">
+					<input id="largeBtn2" class="overlay-top-left" type="image" alt="image" src="images/pin.png" height=42 onclick="selectLargeView('#remoteView2');closeButtons('navButtons2');event.stopPropagation();" style="display:none;"/>
+				</div>
+			</div>
+			
+			
+			<video id="remoteVideo2" playsinline="true" micEnabled="true" oncontextmenu="toggleButtons('navButtons2');return false;" onclick="getVideoCoords(event,2);"  onwheel="manageMouseWheel(event,2);"></video>
+			<div id="miniVideoControls2" class="minicontrols">
+				<input id="miniMicStatus2" type="image" alt="image" src="images/micro.png" height=22 onclick="muteMicro(2,1);closeButtons('navButtons');event.stopPropagation();" style="display: none;"/>
+				<!--<input type="image" alt="image" src="images/screen.png" height=22 onclick="updateVideoSource();event.stopPropagation();"/>-->
+				<input id="imgAddVid2_2" type="image" alt="image" src="images/plus.png" height=22 onclick="addLocalSource2(2);event.stopPropagation();" style="display: none;"/>
+				<input id="imgRemoveVid2_2" type="image" alt="image" src="images/minus.png" style="display: none;" height=22 onclick="removeLocalSource2(2);event.stopPropagation();"/>
+			</div>
+			<image class="minispeaker" id="imgSpeaker2" src="images/speaker.png" style="display: none;"></image>
+		  </div>
+			
+			
+		<!-- -->
+			
+		<div id="remoteView3" title="Vidéo #3" onmousemove="resetInactiveTimer();openButtons('navButtons3');openButtons('enlargeButton3');" onmouseleave="closeButtons('navButtons3');closeButtons('enlargeButton3');return false;" style="overflow: hidden;">
+			<div class="titre">
+				<label id="videoLabel3" class="titre" style="color:white;background-color: rgba(0,0,140,0.5);">Vidéo #3</label>
+				<div id="statusAudio3" class="overlay-top-left">
+					<input id="micStatus3" type="image" alt="image" src="images/micro.png" height=22 onclick="muteMicro(3,0);closeButtons('navButtons3');event.stopPropagation();"/>
+					<input id="speakerStatus3" type="image" alt="image" src="images/speaker.png" height=22 onclick="muteSpeaker(3);closeButtons('navButtons3');event.stopPropagation();" style="display:none;"/>
+					<input id="videoStatus3" type="image" alt="image" src="images/video_off.png" height=22 onclick="muteVideo();closeButtons('navButtons3');event.stopPropagation();" style="display:none;"/>
+					<input id="sensorsStatus3" type="image" alt="image" src="images/sensors_off.png" height=22 onclick="" style="display:none;"/>
+				</div>
+				<div id="navButtons3" class="overlay-top-right" oncontextmenu="closeButtons('navButtons3');return false;" onclick="if (!isButtonsClosed('navButtons3')) remoteVideo3.onclick(event);" onwheel="if (!isButtonsClosed('navButtons3')) manageMouseWheel(event,3);">					
+					<div id="zoomButtons3" style="display:none;">
+						<input type="image" alt="image" src="images/Zoom-max.png" height=22 onclick="zoomMax(3);closeButtons('navButtons3');event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-in1.png" height=22 onclick="zoomIn(3);event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-out1.png" height=22 onclick="zoomOut(3);event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-min.png" height=22 onclick="zoomMin(3);closeButtons('navButtons3');event.stopPropagation();"/>
+					</div>
+					<div id="presetButtons3" style="display:none;">
+						<button class="button1" onclick="gotoPreset(event,3,1);closeButtons('navButtons3');event.stopPropagation();">1</button>
+						<button class="button1" onclick="gotoPreset(event,3,2);closeButtons('navButtons3');event.stopPropagation();">2</button>
+						<button class="button1" onclick="gotoPreset(event,3,3);closeButtons('navButtons3');event.stopPropagation();">3</button>
+					</div>
+					<div id="settingsButton3" style="display:none">
+						<input type="image" alt="image" src="images/settings.png" height=22 onclick="camSettings(3);closeButtons('navButtons3');event.stopPropagation();"/>
+					</div>
+				</div>
+			</div>
+			
+			<div id="enlargeButton3" onclick="if (!isButtonsClosed('enlargeButton3')) remoteVideo3.onclick(event);event.stopPropagation();" class="overlay-bottom-right">
+				<div style="padding-left:20px;padding-top:20px;background-color:rgba(0,0,0,0);">
+					<input id="largeBtn3" class="overlay-top-left" type="image" alt="image" src="images/pin.png" height=42 onclick="selectLargeView('#remoteView3');closeButtons('navButtons3');event.stopPropagation();" style="display:none;"/>
+				</div>
+			</div>
+			
+			
+			<video id="remoteVideo3" playsinline="true" micEnabled="true" oncontextmenu="toggleButtons('navButtons3');return false;" onclick="getVideoCoords(event,3);"  onwheel="manageMouseWheel(event,3);"></video>
+			<div id="miniVideoControls3" class="minicontrols">
+				<input id="miniMicStatus3" type="image" alt="image" src="images/micro.png" height=22 onclick="muteMicro(3,1);closeButtons('navButtons');event.stopPropagation();" style="display: none;"/>
+				<!--<input type="image" alt="image" src="images/screen.png" height=22 onclick="updateVideoSource();event.stopPropagation();"/>-->
+				<input id="imgAddVid2_3" type="image" alt="image" src="images/plus.png" height=22 onclick="addLocalSource2(3);event.stopPropagation();" style="display: none;"/>
+				<input id="imgRemoveVid2_3" type="image" alt="image" src="images/minus.png" style="display: none;" height=22 onclick="removeLocalSource2(3);event.stopPropagation();"/>
+			</div>
+			<image class="minispeaker" id="imgSpeaker3" src="images/speaker.png" style="display: none;"></image>
+		  </div>
+		  <!-- -->
+			
+		<div id="remoteView4" title="Vidéo #4" onmousemove="resetInactiveTimer();openButtons('navButtons4');openButtons('enlargeButton4');" onmouseleave="closeButtons('navButtons4');closeButtons('enlargeButton4');return false;" style="overflow: hidden;">
+			<div class="titre">
+				<label id="videoLabel4" class="titre" style="color:white;background-color: rgba(0,0,140,0.5);">Vidéo #4</label>
+				<div id="statusAudio4" class="overlay-top-left">
+					<input id="micStatus4" type="image" alt="image" src="images/micro.png" height=22 onclick="muteMicro(4,0);closeButtons('navButtons4');event.stopPropagation();"/>
+					<input id="speakerStatus4" type="image" alt="image" src="images/speaker.png" height=22 onclick="muteSpeaker(4);closeButtons('navButtons4');event.stopPropagation();" style="display:none;"/>
+					<input id="videoStatus4" type="image" alt="image" src="images/video_off.png" height=22 onclick="muteVideo();closeButtons('navButtons4');event.stopPropagation();" style="display:none;"/>
+					<input id="sensorsStatus4" type="image" alt="image" src="images/sensors_off.png" height=22 onclick="" style="display:none;"/>
+				</div>
+				<div id="navButtons4" class="overlay-top-right" oncontextmenu="closeButtons('navButtons4');return false;" onclick="if (!isButtonsClosed('navButtons4')) remoteVideo4.onclick(event);" onwheel="if (!isButtonsClosed('navButtons4')) manageMouseWheel(event,4);">					
+					<div id="zoomButtons4" style="display:none;">
+						<input type="image" alt="image" src="images/Zoom-max.png" height=22 onclick="zoomMax(4);closeButtons('navButtons4');event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-in1.png" height=22 onclick="zoomIn(4);event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-out1.png" height=22 onclick="zoomOut(4);event.stopPropagation();"/>
+						<input type="image" alt="image" src="images/Zoom-min.png" height=22 onclick="zoomMin(4);closeButtons('navButtons4');event.stopPropagation();"/>
+					</div>
+					<div id="presetButtons4" style="display:none;">
+						<button class="button1" onclick="gotoPreset(event,4,1);closeButtons('navButtons4');event.stopPropagation();">1</button>
+						<button class="button1" onclick="gotoPreset(event,4,2);closeButtons('navButtons4');event.stopPropagation();">2</button>
+						<button class="button1" onclick="gotoPreset(event,4,3);closeButtons('navButtons4');event.stopPropagation();">3</button>
+					</div>
+					<div id="settingsButton4" style="display:none">
+						<input type="image" alt="image" src="images/settings.png" height=22 onclick="camSettings(4);closeButtons('navButtons4');event.stopPropagation();"/>
+					</div>
+				</div>
+			</div>
+			
+			<div id="enlargeButton4" onclick="if (!isButtonsClosed('enlargeButton4')) remoteVideo4.onclick(event);event.stopPropagation();" class="overlay-bottom-right">
+				<div style="padding-left:20px;padding-top:20px;background-color:rgba(0,0,0,0);">
+					<input id="largeBtn4" class="overlay-top-left" type="image" alt="image" src="images/pin.png" height=42 onclick="selectLargeView('#remoteView4');closeButtons('navButtons4');event.stopPropagation();" style="display:none;"/>
+				</div>
+			</div>
+						
+			<video id="remoteVideo4" playsinline="true" micEnabled="true" oncontextmenu="toggleButtons('navButtons4');return false;" onclick="getVideoCoords(event,4);"  onwheel="manageMouseWheel(event,4);"></video>
+			<div id="miniVideoControls4" class="minicontrols">
+				<input id="miniMicStatus4" type="image" alt="image" src="images/micro.png" height=22 onclick="muteMicro(4,1);closeButtons('navButtons');event.stopPropagation();" style="display: none;"/>
+				<!--<input type="image" alt="image" src="images/screen.png" height=22 onclick="updateVideoSource();event.stopPropagation();"/>-->
+				<input id="imgAddVid2_4" type="image" alt="image" src="images/plus.png" height=22 onclick="addLocalSource2(4);event.stopPropagation();" style="display: none;"/>
+				<input id="imgRemoveVid2_4" type="image" alt="image" src="images/minus.png" style="display: none;" height=22 onclick="removeLocalSource2(4);event.stopPropagation();"/>
+			</div>
+			<image class="minispeaker" id="imgSpeaker4" src="images/speaker.png" style="display: none;"></image>
+		  </div>
+			
+			
+		</div>
+      
+      </body>
+    </html>

@@ -49,7 +49,8 @@ class Upload(MethodView):
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             # file.save(os.path.join(flask_app.config['UPLOAD_FOLDER'], filename))
-            return 'TODO Server should save file: ' + str(file) + ' ' + filename + ' in folder: ' + flask_app.config['UPLOAD_FOLDER']
+            return 'TODO Server should save file: ' + str(file) + ' ' + filename + ' in folder: ' \
+                   + flask_app.config['UPLOAD_FOLDER']
 
         return 'File type not allowed: ' + secure_filename(file.filename) + ' allowed extensions : ' \
                + str(ALLOWED_EXTENSIONS), 401

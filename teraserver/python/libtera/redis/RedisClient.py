@@ -33,13 +33,6 @@ class RedisClient:
         # Redis client (async)
         reactor.connectTCP(config['hostname'], config['port'], RedisProtocolFactory(parent=self, protocol=redisProtocol))
 
-
-
-    # @defer.inlineCallbacks
-    # def getConnection(self):
-    #    connection = yield txredis.Connection()
-    #    defer.returnValue(connection)
-
     def redisConnectionMade(self):
         print('RedisClient connectionMade')
         pass
