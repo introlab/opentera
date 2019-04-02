@@ -43,16 +43,18 @@ public:
 
     void refreshData();
 
-    void queryDataRequest(const QString &path, const QString &query_args = QString());
-    virtual void processQueryReply(const QString &path, const QString &query_args, const QString &data)=0;
+    void queryDataRequest(const QString &path, const QUrlQuery &query_args = QUrlQuery());
+    virtual void processQueryReply(const QString &path, const QUrlQuery &query_args, const QString &data)=0;
     bool hasPendingDataRequests();
+
+    void setDataRequest(const QString &path, const QString &query_args);
 
 private:
     virtual void updateControlsState()=0;
     virtual void updateFieldsValue()=0;
     virtual bool validateData()=0;
 
-    QString getQueryDataName(const QString &path, const QString &query_args);
+    QString getQueryDataName(const QString &path, const QUrlQuery &query_args);
 
     QList<QString>  m_requests;
     ComManager*     m_comManager;
@@ -77,7 +79,7 @@ public slots:
     void undoOrDeleteData();
 
 private slots:
-    void queryDataReply(const QString &path, const QString &query_args, const QString &data);
+    void queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data);
 };
 
 #endif // DATAEDITORWIDGET_H

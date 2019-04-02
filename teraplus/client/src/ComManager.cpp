@@ -60,7 +60,7 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
 {
     QString reply_path = reply->url().path();
     QString reply_data = reply->readAll();
-    QString reply_query = reply->url().query();
+    QUrlQuery reply_query = QUrlQuery(reply->url().query());
     //qDebug() << reply_path << " ---> " << reply_data << ": " << reply_query;
 
     bool handled = false;
@@ -90,7 +90,7 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
     return handled;
 }
 
-void ComManager::doQuery(const QString &path, const QString &query_args)
+void ComManager::doQuery(const QString &path, const QUrlQuery &query_args)
 {
     QUrl query = m_serverUrl;
 
@@ -125,7 +125,7 @@ bool ComManager::handleLoginReply(const QString &reply_data)
     // Query connected user information
     QString user_uuid = login_info["user_uuid"].toString();
     m_currentUser.setUuid(QUuid(user_uuid));
-    doQuery(QString(WEB_USERINFO_PATH), "user_uuid=" + user_uuid);
+    doQuery(QString(WEB_USERINFO_PATH), QUrlQuery("user_uuid=" + user_uuid));
 
     return true;
 }

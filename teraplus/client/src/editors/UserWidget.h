@@ -14,6 +14,7 @@
 #include <QComboBox>
 
 #include "DataEditorWidget.h"
+#include "GlobalMessageBox.h"
 #include "data/TeraUser.h"
 
 namespace Ui {
@@ -43,7 +44,7 @@ public:
 
     void connectSignals();
 
-    void processQueryReply(const QString &path, const QString &query_args, const QString &data);
+    void processQueryReply(const QString &path, const QUrlQuery &query_args, const QString &data);
 
 private:
     Ui::UserWidget* ui;

@@ -12,5 +12,5 @@
 #define WEB_DEFINITIONS_PROFILE "type=user_profile"
 #define WEB_DEFINITIONS_USER    "type=user"
 
-#define WEB_QUERY_USERUUID      "user_uuid="
+#define WEB_QUERY_USERUUID      "user_uuid"
 #endif // WEBAPI_H
