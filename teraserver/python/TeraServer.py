@@ -1,9 +1,13 @@
 """
-Copyright 2019
+Project OpenTera (https://github.com/introlab/opentera)
+
+Copyright (C) 2019
 IntRoLab / ESTRAD, Université de Sherbrooke, Centre de Recherche sur le Vieillissement de Sherbrooke
 
-Simon Brière, ing., M.Sc.A.
-Dominic Létourneau, ing., M.Sc.A
+Authors:
+
+Simon Brière, ing., M.Sc.A. (simon.briere@usherbrooke.ca)
+Dominic Létourneau, ing., M.Sc.A (dominic.letourneau@usherbrooke.ca)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
