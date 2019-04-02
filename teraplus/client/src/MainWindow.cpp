@@ -15,6 +15,9 @@ MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
 
     // Connect signals
     connectSignals();
+
+    // Update user in case we already have it
+    updateCurrentUser();
 }
 
 MainWindow::~MainWindow()
