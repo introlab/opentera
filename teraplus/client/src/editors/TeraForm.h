@@ -43,12 +43,16 @@ public:
     QStringList getInvalidFormDataLabels(bool include_hidden=false);
 
     QWidget* getWidgetForField(const QString& field);
+    bool setFieldValue(const QString& field, const QVariant& value);
+
+    QString getFormData(bool include_unmodified_data=false);
 
 private:
     Ui::TeraForm*                                   ui;
     QMap<QString, QWidget*>                         m_widgets;
     QMap<QWidget*, QFormLayout::TakeRowResult>      m_hidden_rows;
     QString                                         m_objectType;
+    QVariantMap                                     m_initialValues;
 
     void buildFormFromStructure(QWidget* page, const QVariantList &structure);
     void setDefaultValues();

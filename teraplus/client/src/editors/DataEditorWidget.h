@@ -47,7 +47,8 @@ public:
     virtual void processQueryReply(const QString &path, const QUrlQuery &query_args, const QString &data)=0;
     bool hasPendingDataRequests();
 
-    void setDataRequest(const QString &path, const QString &query_args);
+    void postDataRequest(const QString &path, const QString &query_args);
+    virtual void processPostReply(const QString &path, const QString &data)=0;
 
 private:
     virtual void updateControlsState()=0;
@@ -80,6 +81,8 @@ public slots:
 
 private slots:
     void queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data);
+    void postDataReply(const QString &path, const QString &data);
+    void comDataError(QNetworkReply::NetworkError error, QString error_str);
 };
 
 #endif // DATAEDITORWIDGET_H

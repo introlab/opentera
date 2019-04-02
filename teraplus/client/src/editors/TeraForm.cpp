@@ -61,10 +61,18 @@ void TeraForm::buildUiFromStructure(const QString &structure)
 void TeraForm::fillFormFromData(const QJsonObject &data)
 {
 
-    QVariantMap fields = data.toVariantMap();
-    for (QString field:fields.keys()){
+    m_initialValues.clear();
+    // Check if the object we need is part of that object or not.
+    if (data.contains(m_objectType)){
+        // Found it - extract data from it.
+        m_initialValues = data[m_objectType].toObject().toVariantMap();
+    }else{
+        // If not, we suppose it is the object itself!
+        m_initialValues = data.toVariantMap();
+    }
+    for (QString field:m_initialValues.keys()){
         if (m_widgets.contains(field)){
-            setWidgetValue(m_widgets[field], fields[field]);
+            setWidgetValue(m_widgets[field], m_initialValues[field]);
         } else{
            LOG_WARNING("No widget for field: " + field, "TeraForm::fillFormFromData");
         }
@@ -115,6 +123,46 @@ QWidget *TeraForm::getWidgetForField(const QString &field)
         return m_widgets[field];
 
     return nullptr;
+}
+
+bool TeraForm::setFieldValue(const QString &field, const QVariant &value)
+{
+    bool rval = false;
+
+    if (m_widgets.contains(field)){
+        setWidgetValue(m_widgets[field], value);
+        rval = true;
+    }
+
+    return rval;
+}
+
+QString TeraForm::getFormData(bool include_unmodified_data)
+{
+    QString data;
+    QJsonDocument document;
+    QJsonObject data_obj;
+    QJsonObject base_obj;
+
+    for(QString field:m_widgets.keys()){
+        QVariant value, id;
+        getWidgetValues(m_widgets[field], &id, &value);
+        if (!id.isNull())
+            value = id;
+        // Include only modified fields or ids
+        if ((!include_unmodified_data && m_initialValues[field] != value)
+                || field.startsWith("id_") || include_unmodified_data){
+            QJsonValue json_value = QJsonValue::fromVariant(value);
+            data_obj.insert(field, json_value);
+        }
+    }
+
+    if (!data_obj.isEmpty()){
+        base_obj.insert(m_objectType, data_obj);
+        document.setObject(base_obj);
+        data = document.toJson();
+    }
+    return data;
 }
 
 void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structure)
@@ -241,7 +289,8 @@ QWidget *TeraForm::createVideoInputsWidget(const QVariantMap &structure)
     // Query webcams on the system
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
     for (QCameraInfo camera:cameras){
-        item_combo->addItem(camera.description(), camera.deviceName());
+        //item_combo->addItem(camera.description(), camera.deviceName());
+        item_combo->addItem(camera.description(), camera.description());
     }
 
     // Using old-style connect since SLOT has less parameter and not working with new-style connect
@@ -456,7 +505,8 @@ void TeraForm::setWidgetVisibility(QWidget *widget, QWidget *linked_widget, bool
 
 void TeraForm::getWidgetValues(QWidget* widget, QVariant *id, QVariant *value)
 {
-    *id = QVariant("");
+/*    if (id)
+        *id = QVariant();*/
 
     if (QComboBox* combo = dynamic_cast<QComboBox*>(widget)){
         *id = combo->currentData();
@@ -467,12 +517,40 @@ void TeraForm::getWidgetValues(QWidget* widget, QVariant *id, QVariant *value)
         *value = text->text();
     }
 
+    if (QTextEdit* text = dynamic_cast<QTextEdit*>(widget)){
+        *value = text->toPlainText();
+        return;
+    }
+
     if (QCheckBox* check = dynamic_cast<QCheckBox*>(widget)){
         *value = check->isChecked();
     }
 
     if (QSpinBox* spin = dynamic_cast<QSpinBox*>(widget)){
         *value = spin->value();
+    }
+
+    if (QLabel* label = dynamic_cast<QLabel*>(widget)){
+        *value = label->text();
+    }
+
+    if (value->canConvert(QMetaType::QString)){
+        bool ok;
+        QString string_val = value->toString();
+        string_val.toInt(&ok);
+        if (ok){
+            *value = string_val.toInt();
+        }
+
+        if (string_val.startsWith("{")){
+            // Maybe JSON, so try to keep that format if possible
+            QJsonParseError err;
+            QJsonDocument doc = QJsonDocument::fromJson(string_val.toUtf8(), &err);
+            if (err.error == QJsonParseError::NoError){
+                *value = doc;
+            }
+        }
+
     }
 }
 
@@ -481,8 +559,16 @@ void TeraForm::setWidgetValue(QWidget *widget, const QVariant &value)
     if (QComboBox* combo = dynamic_cast<QComboBox*>(widget)){
         int index = combo->findText(value.toString());
         if (index>=0){
-
+            combo->setCurrentIndex(index);
         }else{
+            // Check if we have a number, if so, suppose it is the index
+            if (value.canConvert(QMetaType::Int)){
+                index = value.toInt();
+                if (index>=0 && index+1<combo->count()){
+                    combo->setCurrentIndex(index+1);
+                    return;
+                }
+            }
             LOG_WARNING("Item not found in ComboBox "+ combo->objectName() + " for item " + value.toString(), "TeraForm::setWidgetValue");
         }
         return;
@@ -526,7 +612,7 @@ bool TeraForm::validateWidget(QWidget *widget, bool include_hidden)
             if (widget->property("required").toBool()){
                 QVariant id, value;
                 getWidgetValues(widget, &id, &value);
-                if (value.isNull() || id.isNull() || value.toInt()==-1 || value.toString().isEmpty()){
+                if (value.isNull() || value.toInt()==-1 || value.toString().isEmpty()){
                     rval = false;
                 }
             }

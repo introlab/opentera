@@ -7,6 +7,7 @@ from libtera.db.models.TeraProject import TeraProject
 from passlib.hash import bcrypt
 import uuid
 import datetime
+import json
 
 
 class TeraUser(db.Model, BaseModel):
@@ -102,7 +103,7 @@ class TeraUser(db.Model, BaseModel):
             role_name = role.project_access_role
         else:
             # Site admins are always project admins
-            site_role = TeraSiteAccess.get_site_role_for_user(user, project.project_site)
+            site_role = TeraSiteAccess.get_site_role(self, project.project_site)
             if site_role == 'admin':
                 role_name = 'admin'
 
@@ -191,13 +192,63 @@ class TeraUser(db.Model, BaseModel):
         return self.__str__()
 
     @staticmethod
+    def encrypt_password(password):
+        return bcrypt.hash(password)
+
+    @staticmethod
     def is_anonymous():
         return False
+
+    @staticmethod
+    def verify_password(username, password):
+        # Query User with that username
+        user = TeraUser.get_user_by_username(username)
+        if user is None:
+            print('TeraUser: verify_password - user ' + username + ' not found.')
+            return None
+
+        # Check if enabled
+        if not user.user_enabled:
+            print('TeraUser: verify_password - user ' + username + ' is disabled.')
+            return None
+
+        # Check password
+        if bcrypt.verify(password, user.user_password):
+            user.authenticated = True
+            return user
+
+        return None
 
     @staticmethod
     def get_count():
         user_count = db.session.query(db.func.count(TeraUser.id_user))
         return user_count.first()[0]
+
+    @staticmethod
+    def get_user_by_username(username):
+        return TeraUser.query.filter_by(user_username=username).first()
+
+    @staticmethod
+    def get_user_by_uuid(u_uuid):
+        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
+        return user
+
+    @staticmethod
+    def update_user(id_user, values={}):
+        # Remove the password field is present and if empty
+        if 'user_password' in values:
+            if values['user_password'] == '':
+                values.pop('user_password')
+            else:
+                values['user_password'] = TeraUser.encrypt_password(values['user_password'])
+
+        # Dumps the user profile if present
+        if 'user_profile' in values:
+            if isinstance(values['user_profile'], dict):
+                values['user_profile'] = json.dumps(values['user_profile'])
+
+        TeraUser.query.filter_by(id_user=id_user).update(values)
+        db.session.commit()
 
     @staticmethod
     def create_defaults():
@@ -208,7 +259,7 @@ class TeraUser(db.Model, BaseModel):
         admin.user_firstname = "Super"
         admin.user_lastname = "Admin"
         admin.user_profile = ""
-        admin.user_password = bcrypt.hash("admin")
+        admin.user_password = TeraUser.encrypt_password("admin")
         admin.user_superadmin = True
         admin.user_username = "admin"
         admin.user_uuid = str(uuid.uuid4())
@@ -221,7 +272,7 @@ class TeraUser(db.Model, BaseModel):
         admin.user_firstname = "Site"
         admin.user_lastname = "Admin"
         admin.user_profile = ""
-        admin.user_password = bcrypt.hash("siteadmin")
+        admin.user_password = TeraUser.encrypt_password("siteadmin")
         admin.user_superadmin = False
         admin.user_username = "siteadmin"
         admin.user_uuid = str(uuid.uuid4())
@@ -233,7 +284,7 @@ class TeraUser(db.Model, BaseModel):
         user.user_firstname = "Site"
         user.user_lastname = "User"
         user.user_profile = ""
-        user.user_password = bcrypt.hash("user")
+        user.user_password = TeraUser.encrypt_password("user")
         user.user_superadmin = False
         user.user_username = "user"
         user.user_uuid = str(uuid.uuid4())
@@ -245,7 +296,7 @@ class TeraUser(db.Model, BaseModel):
         user.user_firstname = "MultiSite"
         user.user_lastname = "User"
         user.user_profile = ""
-        user.user_password = bcrypt.hash("user2")
+        user.user_password = TeraUser.encrypt_password("user2")
         user.user_superadmin = False
         user.user_username = "user2"
         user.user_uuid = str(uuid.uuid4())
@@ -296,33 +347,3 @@ class TeraUser(db.Model, BaseModel):
         db.session.add(user2_access)
 
         db.session.commit()
-
-    @staticmethod
-    def verify_password(username, password):
-        # Query User with that username
-        user = TeraUser.get_user_by_username(username)
-        if user is None:
-            print('TeraUser: verify_password - user ' + username + ' not found.')
-            return None
-
-        # Check if enabled
-        if not user.user_enabled:
-            print('TeraUser: verify_password - user ' + username + ' is disabled.')
-            return None
-
-        # Check password
-        if bcrypt.verify(password, user.user_password):
-            user.authenticated = True
-            return user
-
-        return None
-
-    @staticmethod
-    def get_user_by_username(username):
-        return TeraUser.query.filter_by(user_username=username).first()
-
-    @staticmethod
-    def get_user_by_uuid(u_uuid):
-        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
-        return user
-

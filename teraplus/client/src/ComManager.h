@@ -42,6 +42,8 @@ public:
 
     bool processNetworkReply(QNetworkReply* reply);
     void doQuery(const QString &path, const QUrlQuery &query_args = QUrlQuery());
+    void doPost(const QString &path, const QString &post_data);
+    void doUpdateCurrentUser();
 
     TeraUser &getCurrentUser();
 
@@ -76,6 +78,7 @@ signals:
 
     void usersReceived(QList<TeraUser> user_list);
     void queryResultsReceived(QString object, QUrlQuery url_query, QString data);
+    void postResultsReceived(QString path, QString data);
 
 public slots:
 

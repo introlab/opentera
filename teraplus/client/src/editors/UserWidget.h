@@ -45,6 +45,7 @@ public:
     void connectSignals();
 
     void processQueryReply(const QString &path, const QUrlQuery &query_args, const QString &data);
+    void processPostReply(const QString &path, const QString &data);
 
 private:
     Ui::UserWidget* ui;

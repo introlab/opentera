@@ -24,6 +24,7 @@ class TeraUserForm:
             TeraFormItem("user_password", gettext("Mot de passe"), "password", item_options={"confirm": True}))
         section.add_item(TeraFormItem("user_superadmin", gettext("Super administrateur"), "boolean", True))
         section.add_item(TeraFormItem("user_notes", gettext("Notes"), "longtext"))
+        section.add_item(TeraFormItem("user_profile", gettext("Profil"), "hidden"))
         section.add_item(TeraFormItem("user_lastonline", gettext("Dernière connexion"), "label",
                                       item_options={"readonly": True}))
 

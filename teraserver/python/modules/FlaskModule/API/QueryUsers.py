@@ -1,8 +1,9 @@
-from flask import jsonify, session
+from flask import jsonify, session, request
 from flask_restful import Resource, reqparse
+from sqlalchemy import exc
 from modules.Globals import auth
-from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
+import json
 
 
 class QueryUsers(Resource):
@@ -10,22 +11,16 @@ class QueryUsers(Resource):
     def __init__(self, flaskModule=None):
         Resource.__init__(self)
         self.module = flaskModule
-        self.parser = reqparse.RequestParser()
-        self.parser.add_argument('user_uuid', type=str, help='uuid')
-        self.parser.add_argument('id_site', type=int, help='Users for a specific site')
-        self.parser.add_argument('id_project', type=int, help='Users for a specific project')
 
     @auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
-        args = self.parser.parse_args()
+        parser = reqparse.RequestParser()
+        parser.add_argument('user_uuid', type=str, help='uuid')
+        parser.add_argument('id_site', type=int, help='Users for a specific site')
+        parser.add_argument('id_project', type=int, help='Users for a specific project')
 
-        # my_args = {}
-        #
-        # # Make sure we remove the None
-        # for key in args:
-        #     if args[key] is not None:
-        #         my_args[key] = args[key]
+        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        args = parser.parse_args()
 
         users = []
         # If we have no arguments, return all accessible users
@@ -40,6 +35,7 @@ class QueryUsers(Resource):
         # TODO
 
         # If we have a id_project, query for users of that project, if accessible
+        # TODO
 
         if users:
             users_list = []
@@ -58,9 +54,32 @@ class QueryUsers(Resource):
         # except InvalidRequestError:
         #     return '', 500
 
+    @auth.login_required
     def post(self):
-        return '', 501
+        parser = reqparse.RequestParser()
+        parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
 
+        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        # Using request.json instead of parser, since parser messes up the json!
+        json_user = request.json['user']
+
+        # Check if current user can modify the posted user
+        if 'id_user' not in json_user or json_user['id_user'] not in current_user.get_accessible_users_ids():
+            return '', 403
+
+        # Do the update!
+        try:
+            TeraUser.update_user(json_user['id_user'], json_user)
+        except exc.SQLAlchemyError:
+            import sys
+            print(sys.exc_info())
+            return '', 500
+
+        # TODO: Publish update to everyone who is subscribed to users update...
+
+        return '', 200
+
+    @auth.login_required
     def delete(self):
         return '', 501
 

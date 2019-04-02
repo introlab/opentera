@@ -103,6 +103,9 @@ void MainWindow::editorDialogFinished()
 {
     m_diag_editor->deleteLater();
     m_diag_editor = nullptr;
+
+    // Update current user, since might be modified
+    m_comManager->doUpdateCurrentUser();
 }
 
 void MainWindow::updateCurrentUser()
@@ -166,7 +169,7 @@ void MainWindow::on_btnEditUser_clicked()
     m_diag_editor = new QDialog(this);
     UserWidget* user_editor = new UserWidget(m_comManager, m_comManager->getCurrentUser(), m_diag_editor);
     user_editor->setLimited(true);
-    connect(user_editor, &UserWidget::closeRequest, m_diag_editor, &QDialog::close);
+    connect(user_editor, &UserWidget::closeRequest, m_diag_editor, &QDialog::accept);
     connect(m_diag_editor, &QDialog::finished, this, &MainWindow::editorDialogFinished);
 
     m_diag_editor->setWindowTitle(tr("Votre compte"));

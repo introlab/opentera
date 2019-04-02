@@ -20,3 +20,11 @@ class BaseModel:
                     value = value.isoformat()
                 pr[name] = value
         return pr
+
+    def from_json(self, json):
+        for name in json:
+            if hasattr(self, name):
+                setattr(self, name, json[name])
+            else:
+                print('Attribute ' + name + ' not found.')
+

@@ -11,7 +11,8 @@ DataEditorWidget::DataEditorWidget(ComManager *comMan, QWidget *parent) :
     m_comManager = comMan;
 
     connect(m_comManager, &ComManager::queryResultsReceived, this, &DataEditorWidget::queryDataReply);
-
+    connect(m_comManager, &ComManager::postResultsReceived, this, &DataEditorWidget::postDataReply);
+    connect(m_comManager, &ComManager::networkError, this, &DataEditorWidget::comDataError);
 
 }
 
@@ -32,7 +33,7 @@ TeraData *DataEditorWidget::getData()
 
 
 void DataEditorWidget::setEditing(bool enabled){
-    if (m_editState==STATE_WAITING)
+    /*if (m_editState==STATE_WAITING)
         return; // Dont do anything if waiting
 
     if (m_editState==STATE_READY && enabled){
@@ -54,7 +55,7 @@ void DataEditorWidget::setEditing(bool enabled){
             setReady();
         }
         m_undoing = false;
-    }
+    }*/
 }
 
 void DataEditorWidget::setReady(){
@@ -62,6 +63,7 @@ void DataEditorWidget::setReady(){
         return;
 
     m_editState = STATE_READY;
+    setEnabled(true);
     setVisible(true);
     QApplication::restoreOverrideCursor();
     updateControlsState();
@@ -74,6 +76,7 @@ void DataEditorWidget::setEditing(){
         return;
     /*if (!isVisible())
         setVisible(true);*/
+    setEnabled(true);
     m_editState = STATE_EDITING;
     updateControlsState();
     emit stateEditing();
@@ -84,6 +87,7 @@ void DataEditorWidget::setWaiting(){
         return;
 
     m_editState = STATE_WAITING;
+    setEnabled(false);
     updateControlsState();
     QApplication::setOverrideCursor(Qt::WaitCursor);
     emit stateWaiting();
@@ -94,6 +98,7 @@ void DataEditorWidget::setLoading(){
         return;
 
     m_editState = STATE_LOADING;
+    setEnabled(false);
     QApplication::setOverrideCursor(Qt::BusyCursor);
     setVisible(false);
     emit stateLoading();
@@ -114,6 +119,14 @@ void DataEditorWidget::queryDataRequest(const QString &path, const QUrlQuery &qu
 bool DataEditorWidget::hasPendingDataRequests()
 {
     return !m_requests.isEmpty();
+}
+
+void DataEditorWidget::postDataRequest(const QString &path, const QString &json_data)
+{
+    QString query_name = getQueryDataName(path, QUrlQuery());
+    m_requests.append(query_name);
+    m_comManager->doPost(path, json_data);
+    setWaiting();
 }
 
 QString DataEditorWidget::getQueryDataName(const QString &path, const QUrlQuery &query_args)
@@ -168,6 +181,23 @@ void DataEditorWidget::queryDataReply(const QString &path, const QUrlQuery &quer
         setReady();
 
     processQueryReply(path, query_args, data);
+}
+
+void DataEditorWidget::postDataReply(const QString &path, const QString &data)
+{
+    QString query_name = getQueryDataName(path, QUrlQuery());
+    m_requests.removeOne(query_name);
+    if (m_requests.isEmpty())
+        setReady();
+
+    processPostReply(path, data);
+}
+
+void DataEditorWidget::comDataError(QNetworkReply::NetworkError error, QString error_str)
+{
+    Q_UNUSED(error)
+    Q_UNUSED(error_str)
+    setReady();
 }
 
 void DataEditorWidget::undoData(){

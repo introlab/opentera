@@ -65,26 +65,32 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
 
     bool handled = false;
 
-    if (reply_path == WEB_LOGIN_PATH){
-        // Initialize cookies
-        m_cookieJar.cookiesForUrl(reply->url());
+    if (reply->operation()==QNetworkAccessManager::GetOperation){
+        if (reply_path == WEB_LOGIN_PATH){
+            // Initialize cookies
+            m_cookieJar.cookiesForUrl(reply->url());
 
-        handled=handleLoginReply(reply_data);
+            handled=handleLoginReply(reply_data);
+        }
+
+        if (reply_path == WEB_USERINFO_PATH){
+            handled=handleUsersReply(reply_data);
+        }
+
+        if (reply_path == WEB_LOGOUT_PATH){
+            emit serverDisconnected();
+            handled = true;
+        }
+
+        if (!handled){
+            // General case
+            emit queryResultsReceived(reply_path, reply_query, reply_data);
+            handled = true;
+        }
     }
 
-    if (reply_path == WEB_USERINFO_PATH){
-        handled=handleUsersReply(reply_data);
-    }
-
-    if (reply_path == WEB_LOGOUT_PATH){
-        emit serverDisconnected();
-        handled = true;
-    }
-
-    if (!handled){
-        // General case
-        emit queryResultsReceived(reply_path, reply_query, reply_data);
-        handled = true;
+    if (reply->operation()==QNetworkAccessManager::PostOperation){
+        emit postResultsReceived(reply_path, reply_data);
     }
 
     return handled;
@@ -100,6 +106,22 @@ void ComManager::doQuery(const QString &path, const QUrlQuery &query_args)
     }
     m_netManager->get(QNetworkRequest(query));
     emit waitingForReply(true);
+}
+
+void ComManager::doPost(const QString &path, const QString &post_data)
+{
+    QUrl query = m_serverUrl;
+
+    query.setPath(path);
+    QNetworkRequest request(query);
+    request.setRawHeader("Content-Type", "application/json");
+    m_netManager->post(request, post_data.toUtf8());
+    emit waitingForReply(true);
+}
+
+void ComManager::doUpdateCurrentUser()
+{
+    doQuery(QString(WEB_USERINFO_PATH), QUrlQuery("user_uuid=" + m_currentUser.getUuid().toString(QUuid::WithoutBraces)));
 }
 
 TeraUser& ComManager::getCurrentUser()
@@ -125,7 +147,7 @@ bool ComManager::handleLoginReply(const QString &reply_data)
     // Query connected user information
     QString user_uuid = login_info["user_uuid"].toString();
     m_currentUser.setUuid(QUuid(user_uuid));
-    doQuery(QString(WEB_USERINFO_PATH), QUrlQuery("user_uuid=" + user_uuid));
+    doUpdateCurrentUser();
 
     return true;
 }

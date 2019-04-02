@@ -74,30 +74,24 @@ bool UserWidget::dataIsNew(){
 }
 
 void UserWidget::saveData(bool signal){
-    //m_data->setUser(txtUserName->text());
-/*
-    if (m_data_type==TERADATA_USER){
-        m_data->setUserGroup(cmbUserGroup->itemData(cmbUserGroup->currentIndex()).toUInt());
-        m_data->setUserType(UserInfo::USERTYPE_USER);
-        m_data->setEnabled(chkEnabled->checkState()==Qt::Checked);
-        m_data->setSuperAdmin(chkAdmin->checkState()==Qt::Checked);
-        m_data->setFirstName(txtFirstName->text());
-        m_data->setLastName(txtLastName->text());
-    }
-    else{
-        m_data->setUserType(UserInfo::USERTYPE_KIT);
-        m_data->setEnabled(true); // Kit always are enabled
-        m_data->setFirstName("");
-        m_data->setLastName(txtLastName->text());
-        m_data->setDesc(txtDesc->toPlainText());
+
+    QString user_profile = ui->wdgProfile->getFormData(true);
+
+    if (!ui->wdgUser->setFieldValue("user_profile", user_profile)){
+        LOG_ERROR(tr("Field user_profile can't be set."), "UserWidget::saveData");
     }
 
-    */
+    QString user_data = ui->wdgUser->getFormData();
+    postDataRequest(WEB_USERINFO_PATH, user_data);
+
+    //TODO: Site access
+    //TODO: Project access
+
     if (signal)
         emit dataWasChanged();
 
-    if (parent())
-        emit closeRequest(); // Ask to close that editor
+    /*if (parent())
+        emit closeRequest(); // Ask to close that editor*/
 }
 
 
@@ -313,7 +307,7 @@ QComboBox *UserWidget::buildRolesComboBox()
 void UserWidget::setLimited(bool limited){
     m_limited = limited;
 
-    setEditing();
+    //setEditing();
 
 }
 
@@ -377,6 +371,15 @@ void UserWidget::processQueryReply(const QString &path, const QUrlQuery &query_a
     if (!hasPendingDataRequests())
         updateFieldsValue();
 }
+
+void UserWidget::processPostReply(const QString &path, const QString &data)
+{
+    if (path == WEB_USERINFO_PATH){
+        // OK, data was saved!
+        if (parent())
+            emit closeRequest();
+    }
+}
 void UserWidget::btnEdit_clicked()
 {
     setEditing(true);
@@ -402,18 +405,8 @@ void UserWidget::btnSave_clicked()
         msgbox.showError(tr("Champs invalides"), msg);
         return;
     }
-    /* if (!dataIsNew())//btnExisting->isChecked())
-         m_data->setUuid(m_profile.getUUID());
 
-     if (!validateData())
-         return;
-
-
-     // If new account, wait until it is created before saving. Otherwise, save it now.
-     if (!dataIsNew())
-         setEditing(false); // This will save TeRA related stuff
-         */
-
+     saveData();
 }
 
 void UserWidget::txtPassword_textChanged(const QString &new_pass)
