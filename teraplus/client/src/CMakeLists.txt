@@ -12,9 +12,11 @@ set(headers
     NotificationWindow.h
     Message.h
     GlobalMessageBox.h
+    ConfigWidget.h
     editors/DataEditorWidget.h
     editors/UserWidget.h
     editors/TeraForm.h
+    editors/DataListWidget.h
 )
 
 set(srcs
@@ -27,17 +29,21 @@ set(srcs
     NotificationWindow.cpp
     Message.cpp
     GlobalMessageBox.cpp
+    ConfigWidget.cpp
     editors/DataEditorWidget.cpp
     editors/UserWidget.cpp
     editors/TeraForm.cpp
+    editors/DataListWidget.cpp
 )
 
 SET(uis
     LoginDialog.ui
     MainWindow.ui
     notification.ui
+    ConfigWidget.ui
     editors/UserWidget.ui
     editors/TeraForm.ui
+    editors/DataListWidget.ui
 )
 
 SET(qrcs

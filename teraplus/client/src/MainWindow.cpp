@@ -32,6 +32,7 @@ void MainWindow::connectSignals()
     connect(m_comManager, &ComManager::networkError, this, &MainWindow::com_networkError);
     connect(m_comManager, &ComManager::serverError, this, &MainWindow::com_serverError);
     connect(m_comManager, &ComManager::waitingForReply, this, &MainWindow::com_waitingForReply);
+    connect(m_comManager, &ComManager::postResultsOK, this, &MainWindow::com_postReplyOK);
     connect(&m_msgTimer, &QTimer::timeout, this, &MainWindow::showNextMessage);
 }
 
@@ -84,7 +85,7 @@ void MainWindow::showNextMessage()
         m_loadingIcon->start();
         break;
     }
-    ui->frameMessages->setStyleSheet("background-color: " + background_color + ";");
+    ui->frameMessages->setStyleSheet("QWidget#frameMessages{background-color: " + background_color + ";}");
     ui->lblMessage->setText(msg.getMessageText());
     if (msg.getMessageType() != Message::MESSAGE_ERROR)
         m_msgTimer.start();
@@ -103,9 +104,6 @@ void MainWindow::editorDialogFinished()
 {
     m_diag_editor->deleteLater();
     m_diag_editor = nullptr;
-
-    // Update current user, since might be modified
-    m_comManager->doUpdateCurrentUser();
 }
 
 void MainWindow::updateCurrentUser()
@@ -135,6 +133,11 @@ void MainWindow::com_waitingForReply(bool waiting)
     }
     ui->btnEditUser->setEnabled(!waiting);
     ui->btnConfig->setEnabled(!waiting);
+}
+
+void MainWindow::com_postReplyOK()
+{
+    addMessage(Message::MESSAGE_OK, tr("Données sauvegardées."));
 }
 
 void MainWindow::on_btnLogout_clicked()
@@ -173,6 +176,23 @@ void MainWindow::on_btnEditUser_clicked()
     connect(m_diag_editor, &QDialog::finished, this, &MainWindow::editorDialogFinished);
 
     m_diag_editor->setWindowTitle(tr("Votre compte"));
+
+    m_diag_editor->open();
+}
+
+void MainWindow::on_btnConfig_clicked()
+{
+    if (m_diag_editor){
+        m_diag_editor->deleteLater();
+    }
+    m_diag_editor = new QDialog(this);
+    ConfigWidget* config_editor = new ConfigWidget(m_comManager, m_diag_editor);
+    m_diag_editor->setFixedSize(size().width()-50, size().height()-150);
+    //m_diag_editor->move(25,75);
+
+    connect(m_diag_editor, &QDialog::finished, this, &MainWindow::editorDialogFinished);
+
+    m_diag_editor->setWindowTitle(tr("Configuration Globale"));
 
     m_diag_editor->open();
 }

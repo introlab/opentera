@@ -76,8 +76,9 @@ class QueryUsers(Resource):
             return '', 500
 
         # TODO: Publish update to everyone who is subscribed to users update...
+        update_user = TeraUser.get_user_by_id(json_user['id_user'])
 
-        return '', 200
+        return jsonify([update_user.to_json()])
 
     @auth.login_required
     def delete(self):

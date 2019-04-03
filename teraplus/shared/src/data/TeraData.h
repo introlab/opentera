@@ -8,6 +8,14 @@
 
 #include <QMetaProperty>
 
+enum TeraDataTypes {
+    TERADATA_USER,
+    TERADATA_SITE,
+    TERADATA_KIT,
+    TERADATA_SESSIONTYPE,
+    TERADATA_TESTDEF
+};
+
 class TeraData : public QObject
 {
     Q_OBJECT

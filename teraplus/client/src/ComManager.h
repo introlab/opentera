@@ -79,6 +79,7 @@ signals:
     void usersReceived(QList<TeraUser> user_list);
     void queryResultsReceived(QString object, QUrlQuery url_query, QString data);
     void postResultsReceived(QString path, QString data);
+    void postResultsOK();
 
 public slots:
 

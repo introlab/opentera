@@ -7,6 +7,7 @@
 #include <QDialog>
 
 #include "editors/UserWidget.h"
+#include "ConfigWidget.h"
 
 #include "data/TeraUser.h"
 #include "ComManager.h"
@@ -35,6 +36,7 @@ private slots:
     void com_serverError(QAbstractSocket::SocketError error, QString error_msg);
     void com_networkError(QNetworkReply::NetworkError error, QString error_msg);
     void com_waitingForReply(bool waiting);
+    void com_postReplyOK();
 
     void addMessage(Message::MessageType msg_type, QString msg);
     void addMessage(const Message& msg);
@@ -46,6 +48,8 @@ private slots:
     void on_btnLogout_clicked();
 
     void on_btnEditUser_clicked();
+
+    void on_btnConfig_clicked();
 
 private:
     void connectSignals();

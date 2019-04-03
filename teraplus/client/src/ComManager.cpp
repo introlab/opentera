@@ -90,6 +90,11 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
     }
 
     if (reply->operation()==QNetworkAccessManager::PostOperation){
+        if (reply_path == WEB_USERINFO_PATH){
+            handled=handleUsersReply(reply_data);
+        }
+
+        emit postResultsOK();
         emit postResultsReceived(reply_path, reply_data);
     }
 

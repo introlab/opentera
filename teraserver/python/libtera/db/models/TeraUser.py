@@ -234,6 +234,11 @@ class TeraUser(db.Model, BaseModel):
         return user
 
     @staticmethod
+    def get_user_by_id(id_user):
+        user = TeraUser.query.filter_by(id_user=id_user).first()
+        return user
+
+    @staticmethod
     def update_user(id_user, values={}):
         # Remove the password field is present and if empty
         if 'user_password' in values:
