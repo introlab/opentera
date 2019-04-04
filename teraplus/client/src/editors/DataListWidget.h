@@ -41,6 +41,9 @@ private:
     bool                    m_copying;
     bool                    m_searching;
 
+    void connectSignals();
+    void queryDataList();
+
     void updateDataInList(int index, TeraData* data, bool select_item=false);
 
     void setSearching(bool search);
@@ -49,6 +52,8 @@ public slots:
 
 
 private slots:
+    void com_Waiting(bool waiting);
+    void queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data);
 
 };
 

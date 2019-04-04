@@ -30,18 +30,13 @@ class TeraUser(db.Model, BaseModel):
 
     authenticated = False
 
-    def to_json(self, ignore_fields=None):
+    def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
         ignore_fields.extend(['authenticated', 'user_password', 'user_sites_access', 'user_projects_access'])
+        if minimal:
+            ignore_fields.extend(['user_email', 'user_profile', 'user_notes', 'user_lastonline', 'user_superadmin'])
         rval = super().to_json(ignore_fields=ignore_fields)
-
-        # Add usergroups in json format, if needed
-        # if 'user_sitegroups' in rval:
-        #     usersitegroups_list = []
-        #     for usersitegroup in self.user_usergroups:
-        #         usersitegroups_list.append(usersitegroup.to_json(ignore_fields=['sitegroup_users']))
-        #     rval['user_sitegroups'] = usersitegroups_list
 
         return rval
 

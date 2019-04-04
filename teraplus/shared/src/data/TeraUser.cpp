@@ -1,171 +1,101 @@
 #include "TeraUser.h"
 
 TeraUser::TeraUser(QObject *parent)
-    : TeraData(parent)
+    : TeraData(TERADATA_USER, parent)
 {
-    m_superadmin = false;
 }
 
-TeraUser::TeraUser(const TeraUser &copy, QObject *parent) : TeraData(parent)
+TeraUser::TeraUser(const TeraUser &copy, QObject *parent) : TeraData(TERADATA_USER, parent)
 {
     *this = copy;
 }
 
-TeraUser::TeraUser(const QJsonValue &json, QObject *parent) : TeraData(parent)
+TeraUser::TeraUser(const QJsonValue &json, QObject *parent) :
+    TeraData(TERADATA_USER, parent)
 {
     fromJson(json);
 }
 
 QString TeraUser::getUserPseudo() const
 {
-    return m_userPseudo;
+    if (hasFieldName("user_username"))
+        return getFieldValue("user_profile").toString();
+
+    return QString();
 }
 
 QString TeraUser::getFirstName() const
 {
-    return m_firstName;
+    if (hasFieldName("user_firstname"))
+        return getFieldValue("user_firstname").toString();
+
+    return QString();
 }
 
 QString TeraUser::getLastName() const
 {
-    return m_lastName;
+    if (hasFieldName("user_lastname"))
+        return getFieldValue("user_lastname").toString();
+
+    return QString();
 }
 
 QString TeraUser::getEmail() const
 {
-    return m_email;
+    if (hasFieldName("user_email"))
+        return getFieldValue("user_email").toString();
+
+    return QString();
 }
 
 QUuid TeraUser::getUuid() const
 {
-    return m_uuid;
+    if (hasFieldName("user_uuid"))
+        return getFieldValue("user_uuid").toUuid();
+
+    return QUuid();
 }
 
 bool TeraUser::getEnabled() const
 {
-    return m_enabled;
+    if (hasFieldName("user_enabled"))
+        return getFieldValue("user_enabled").toBool();
+
+    return false;
 }
 
 QString TeraUser::getNotes() const
 {
-    return m_notes;
+    if (hasFieldName("user_notes"))
+        return getFieldValue("user_notes").toString();
+
+    return QString();
 }
 
 QString TeraUser::getProfile() const
 {
-    return m_profile;
+    if (hasFieldName("user_profile"))
+        return getFieldValue("user_profile").toString();
+
+    return QString();
 }
 
 QDateTime TeraUser::getLastOnline() const
 {
-    return m_lastonline;
+    if (hasFieldName("user_lastonline"))
+        return getFieldValue("user_lastonline").toDateTime();
+
+    return QDateTime();
 }
 
 bool TeraUser::getSuperAdmin() const
 {
-    return m_superadmin;
+    if (hasFieldName("user_superadmin"))
+        return getFieldValue("user_superadmin").toBool();
+    return false;
 }
 
 QString TeraUser::getName() const
 {
-    return m_firstName + " " + m_lastName;
-}
-
-QJsonObject TeraUser::toJson()
-{
-    QJsonObject json = TeraData::toJson();
-
-    json.remove("id");
-    json["user_lastonline"] = m_lastonline.toString();
-
-    return json;
-}
-
-void TeraUser::setUserPseudo(const QString &pseudo)
-{
-    if (m_userPseudo==pseudo)
-        return;
-
-    m_userPseudo = pseudo;
-    emit userPseudoChanged(m_userPseudo);
-}
-
-void TeraUser::setFirstName(const QString &firstName)
-{
-    if (m_firstName==firstName)
-        return;
-
-    m_firstName = firstName;
-    emit firstNameChanged(m_firstName);
-}
-
-void TeraUser::setLastName(const QString &lastName)
-{
-    if (m_lastName==lastName)
-        return;
-
-    m_lastName = lastName;
-    emit lastNameChanged(m_lastName);
-}
-
-void TeraUser::setEmail(const QString &email)
-{
-    if (m_email==email)
-        return;
-    m_email = email;
-    emit emailChanged(m_email);
-}
-
-void TeraUser::setUuid(const QUuid &uuid)
-{
-    if (m_uuid == uuid)
-        return;
-
-    m_uuid = uuid;
-    emit uuidChanged(m_uuid);
-}
-
-void TeraUser::setEnabled(const bool &enabled)
-{
-    if (m_enabled == enabled)
-        return;
-
-    m_enabled = enabled;
-    emit enabledChanged(m_enabled);
-}
-
-void TeraUser::setNotes(const QString &notes)
-{
-    if (m_notes == notes)
-        return;
-
-    m_notes = notes;
-    emit notesChanged(m_notes);
-}
-
-void TeraUser::setProfile(const QString &profile)
-{
-    if (m_profile == profile)
-        return;
-
-    m_profile = profile;
-    emit profileChanged(m_profile);
-}
-
-void TeraUser::setLastOnline(const QDateTime &last_online)
-{
-    if (m_lastonline == last_online)
-        return;
-
-    m_lastonline = last_online;
-    emit lastOnlineChanged(last_online);
-}
-
-void TeraUser::setSuperAdmin(const bool &super)
-{
-    if (m_superadmin==super)
-        return;
-
-    m_superadmin = super;
-    emit superAdminChanged(super);
+    return getFirstName() + " " + getLastName();
 }

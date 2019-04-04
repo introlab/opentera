@@ -73,7 +73,7 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
             handled=handleLoginReply(reply_data);
         }
 
-        if (reply_path == WEB_USERINFO_PATH){
+        if (reply_path == WEB_USERINFO_PATH && !reply_query.hasQueryItem(WEB_QUERY_LIST)){
             handled=handleUsersReply(reply_data);
         }
 
@@ -151,7 +151,7 @@ bool ComManager::handleLoginReply(const QString &reply_data)
 
     // Query connected user information
     QString user_uuid = login_info["user_uuid"].toString();
-    m_currentUser.setUuid(QUuid(user_uuid));
+    m_currentUser.setFieldValue("user_uuid", QUuid(user_uuid));
     doUpdateCurrentUser();
 
     return true;

@@ -40,8 +40,7 @@ QListWidget:!enabled{border:0}
 
 QPushButton:hover{background-color:  rgba(255,255,255,50);}
 QPushButton#btnSearch:hover{background-color:  rgba(255,255,255,0%);}
-QPushButton#btnBack{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #2198c0, stop: 1 #0d5ca6);}
-QPushButton#btnBack:hover{background-color: rgba(0,188,255,50%);}
+QPushButton#btnSearch, QPushButton#btnClear,QPushButton#btnCopy,QPushButton#btnNew{border: 0px solid transparent;}
 
 QTreeWidget::branch:closed:has-children:has-siblings  {
             border-image: none;

@@ -115,6 +115,11 @@ DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWid
     }
 
     m_editor = nullptr;
+
+    connectSignals();
+
+    queryDataList();
+
 }
 
 DataListWidget::~DataListWidget()
@@ -247,6 +252,37 @@ void DataListWidget::selectItem(quint64 id){
     }*/
 
 }
+
+void DataListWidget::connectSignals()
+{
+    connect(m_comManager, &ComManager::waitingForReply, this, &DataListWidget::com_Waiting);
+}
+
+void DataListWidget::queryDataList()
+{
+    switch(m_dataType){
+    case TERADATA_USER:
+        // Query users
+        m_comManager->doQuery(WEB_USERINFO_PATH, QUrlQuery(WEB_QUERY_LIST));
+        break;
+    default:
+        break;
+
+    }
+}
+
+void DataListWidget::com_Waiting(bool waiting){
+    this->setDisabled(waiting);
+}
+
+void DataListWidget::queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data)
+{
+    // Build list of items from query reply
+    if (query_args.hasQueryItem(WEB_QUERY_LIST)){
+        m_datalist.clear();
+    }
+}
+
 /*
 void DataListWidget::searchChanged(QString new_search){
     Q_UNUSED(new_search)

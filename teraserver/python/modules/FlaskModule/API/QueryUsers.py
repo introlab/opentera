@@ -18,6 +18,7 @@ class QueryUsers(Resource):
         parser.add_argument('user_uuid', type=str, help='uuid')
         parser.add_argument('id_site', type=int, help='Users for a specific site')
         parser.add_argument('id_project', type=int, help='Users for a specific project')
+        parser.add_argument('list', type=bool, help='Request user list (ID, name, enabled)')
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         args = parser.parse_args()
@@ -41,7 +42,10 @@ class QueryUsers(Resource):
             users_list = []
             for user in users:
                 if user is not None:
-                    users_list.append(user.to_json())
+                    if args['list'] is None:
+                        users_list.append(user.to_json())
+                    else:
+                        users_list.append(user.to_json(minimal=True))
             return jsonify(users_list)
 
         return '', 500

@@ -16,18 +16,20 @@ enum TeraDataTypes {
     TERADATA_TESTDEF
 };
 
+Q_DECLARE_METATYPE(TeraDataTypes)
+
 class TeraData : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(int id READ getId WRITE setId NOTIFY idChanged)
-    Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QString class_name READ getClassName)
+    Q_PROPERTY(int id READ getId)
+    Q_PROPERTY(QString name READ getName)
+    Q_PROPERTY(TeraDataTypes data_type READ getDataType WRITE setDataType)
 
 public:
-    explicit TeraData(QObject *parent = nullptr);
+    explicit TeraData(TeraDataTypes obj_type, QObject *parent = nullptr);
     explicit TeraData(const TeraData& copy, QObject *parent=nullptr);
-    explicit TeraData(const QJsonValue& json, QObject *parent = nullptr);
+    explicit TeraData(TeraDataTypes obj_type, const QJsonValue& json, QObject *parent = nullptr);
 
     virtual bool        fromJson(const QJsonValue& value);
     virtual QJsonObject toJson();
@@ -38,19 +40,31 @@ public:
     virtual TeraData &operator = (const TeraData& other);
     virtual bool operator == (const TeraData& other) const;
 
-    QString getClassName() const;
+    TeraDataTypes getDataType() const;
+    bool hasFieldName(const QString& fieldName) const;
+    QVariant getFieldValue(const QString &fieldName) const;
+    void setFieldValue(const QString& fieldName, const QVariant& fieldValue);
+    QList<QString> getFieldList() const;
+
+    static QString getDataTypeName(const TeraDataTypes data_type);
 
 protected:
-    int         m_id;
-    QString     m_name;
+
+    TeraDataTypes   m_data_type;
+
+private:
+    QString m_objectName;
+    QString m_idField;
+    QString m_nameField;
+
+    bool hasMetaProperty(const QString& fieldName) const;
+
 signals:
 
-    void idChanged();
-    void nameChanged(QString name);
 
 public slots:
-    void setId(int id);
-    void setName(QString name);
+    void setDataType(TeraDataTypes data_type);
+
 };
 
 #endif // TERADATA_H
