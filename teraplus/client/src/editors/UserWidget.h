@@ -38,8 +38,6 @@ public:
 
     void deleteData();
 
-    void setReady();
-
     void setLimited(bool limited);
 
     void connectSignals();

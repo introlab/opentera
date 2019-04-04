@@ -13,5 +13,6 @@
 #define WEB_DEFINITIONS_USER    "type=user"
 
 #define WEB_QUERY_USERUUID      "user_uuid"
+#define WEB_QUERY_ID_USER       "id_user"
 #define WEB_QUERY_LIST          "list"
 #endif // WEBAPI_H

@@ -1,106 +1,5 @@
 #include "DataListWidget.h"
 
-/*DataListWidget::DataListWidget(UserInfo *currentUser, TeraDataTypes datatype, DataEditorWidget *parent) :
-    DataEditorWidget(currentUser, parent),
-    //parent_id(0),
-    m_editor(0),
-    //m_data(0),
-    last_item(0)
-{
-    m_isDataList=true;
-    //m_datalist=NULL;
-    copying=false;
-    searching=false;
-    pending_select=false;
-    pending_select_id=0;
-   // m_status=STATUS_READY;
-
-    setupUi(this);
-    setAttribute(Qt::WA_StyledBackground); //Required to set a background image
-
-    m_data_type = datatype;
-
-    // Signals & Slots
-    connect(lstData,SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),this,SLOT(selectedItemChanged(QListWidgetItem*,QListWidgetItem*)));
-    connect(lstData,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(itemClicked(QListWidgetItem*)));
-    connect(btnDelete,SIGNAL(clicked()),this,SLOT(deleteItemRequested()));
-    connect(btnNew,SIGNAL(clicked()),this,SLOT(addItemRequested()));
-    connect(btnCopy,SIGNAL(clicked()),this,SLOT(copyItemRequested()));
-    connect(btnBack,SIGNAL(clicked()),this,SIGNAL(backRequested()));
-
-    // Load default editor for the selected datatype
-    switch (datatype){
-     case TERADATA_USER:
-        m_editor = new UserWidget(m_loggedUser, false);
-        ((UserWidget*)m_editor)->setLimited(false);
-        break;
-    case TERADATA_KIT:
-       m_editor = new UserWidget(m_loggedUser, true);
-       ((UserWidget*)m_editor)->setLimited(false);
-       break;
-     case TERADATA_USERGROUP:
-        m_editor = new UserGroupWidget(m_loggedUser);
-        break;
-     case TERADATA_GROUP:
-        m_editor = new PatientGroupWidget(m_loggedUser);
-        break;
-    case TERADATA_SESSION:
-       m_editor = new SessionWidget(m_loggedUser);
-       connect((SessionWidget*)m_editor,SIGNAL(dataLoadingRequest(TeraDataTypes,quint64)),this,SIGNAL(dataLoadingRequest(TeraDataTypes,quint64)));
-       connect((SessionWidget*)m_editor,SIGNAL(requestLiveSession(SessionType*, SessionInfo*)),this,SIGNAL(requestLiveSession(SessionType*,SessionInfo*)));
-       connect(m_editor,SIGNAL(doingSession(SessionInfo*,bool,bool)),this,SIGNAL(doingSession(SessionInfo*,bool,bool)));
-
-       break;
-    case TERADATA_SESSIONTYPE:
-        m_editor = new SessionTypeWidget(m_loggedUser);
-        break;
-    case TERADATA_TESTDEF:
-        m_editor = new TestDefWidget(m_loggedUser);
-        break;
-     default:
-        //Not supported - do nothing
-        m_editor = new DefaultWidget(m_loggedUser);
-        return;
-        break;
-    }
-
-    connect(m_editor,SIGNAL(deleteRequest(TeraData*,TeraDataTypes)),this,SLOT(deleteItemRequested(TeraData*,TeraDataTypes)));
-    //connect(m_editor,SIGNAL(startEdit(bool)),this,SLOT(editorEditMode(bool))); //Edit signal propagation
-    connect(m_editor,SIGNAL(stateEditing()),this,SLOT(setEditing()));
-    connect(m_editor,SIGNAL(stateWaiting()),this,SLOT(setWaiting()));
-    connect(m_editor,SIGNAL(stateReady()),this,SLOT(setReady()));
-    connect(m_editor,SIGNAL(listRequest(TeraDataTypes)),this,SIGNAL(listRequest(TeraDataTypes)));
-    connect(m_editor,SIGNAL(limitedListRequest(TeraDataTypes)),this,SIGNAL(limitedListRequest(TeraDataTypes)));
-    connect(m_editor,SIGNAL(localPatientsListRequest()),this,SIGNAL(localPatientsListRequest()));
-    connect(m_editor,SIGNAL(dataLoadingRequest(TeraDataTypes,QList<SearchCriteria>)),this,SIGNAL(dataLoadingRequest(TeraDataTypes,QList<SearchCriteria>)));
-    connect(m_editor,SIGNAL(cloudRequest(unsigned int)),this,SIGNAL(cloudRequest(unsigned int)));
-    connect(m_editor,SIGNAL(cloudRequest(unsigned int,QList<QVariant>)),this,SIGNAL(cloudRequest(unsigned int,QList<QVariant>)));
-    connect(m_editor,SIGNAL(dataWasChanged()),this,SLOT(editorDataChanged()));
-    connect(m_editor,SIGNAL(setClientVariableRequest(QString,QVariant)),this,SIGNAL(setClientVariableRequest(QString,QVariant)));
-    connect(m_editor,SIGNAL(statusMessage(QString,bool)),this,SIGNAL(statusMessage(QString,bool)));
-    connect(m_editor,SIGNAL(dataFileRequest(DataInfo)),this,SIGNAL(dataFileRequest(DataInfo)));
-    connect(m_editor,SIGNAL(saveRequest(TeraData*,TeraDataTypes)),this,SIGNAL(saveRequest(TeraData*,TeraDataTypes)));
-
-    m_editor->setVisible(false); // Hide by default
-
-    connect(txtSearch,SIGNAL(textChanged(QString)),this,SLOT(searchChanged(QString)));
-    connect(btnClear,SIGNAL(clicked()),this,SLOT(clearSearch()));
-
-    //QHBoxLayout* layout = new QHBoxLayout;
-    //layout->addWidget(m_editor);
-    //dataZone->setLayout(layout);
-
-    //dataZone->layout()->addWidget(m_editor);
-    dataZone->addWidget(m_editor);
-    updateAccessibleControls();
-
-    btnCopy->setEnabled(false);
-    btnClear->setVisible(false);
-
-    enableBackButton(false);
-
-}*/
-
 DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWidget *parent):
     QWidget(parent),
     ui(new Ui::DataListWidget),
@@ -131,12 +30,19 @@ DataListWidget::~DataListWidget()
     clearDataList();
 }
 
-void DataListWidget::updateDataInList(TeraData* data, const bool select_item){
+void DataListWidget::updateDataInList(TeraData* data){
 
-    QListWidgetItem* item;
-    if (m_datalist.contains(data)){
-        item = m_datamap[data];
-    }else{
+    QListWidgetItem* item = nullptr;
+
+    // Check if we already have that item
+    for (TeraData* current_data:m_datalist){
+        if (*current_data == *data){
+            item = m_datamap[current_data];
+        }
+    }
+
+    // If we don't, create a new one.
+    if (!item){
         item = new QListWidgetItem(data->getName(),ui->lstData);
 
         m_datalist.append(data);
@@ -148,11 +54,39 @@ void DataListWidget::updateDataInList(TeraData* data, const bool select_item){
     item->setText(data->getName());
     item->setData(Qt::UserRole, data->getId());
 
-    //TODO: Different color if enabled or has color property
-
-    if (select_item){
-        ui->lstData->setCurrentItem(item);
+    //Customize color and icons, if needed, according to data_type
+    if (m_dataType==TERADATA_USER){
+        if (data->getFieldValue("user_enabled").toBool())
+            item->setTextColor(Qt::green);
+        else {
+            item->setTextColor(Qt::red);
+        }
     }
+
+    if (ui->lstData->selectedItems().contains(item)){
+        // Load editor
+        showEditor(data);
+    }
+}
+
+void DataListWidget::showEditor(TeraData *data)
+{
+    if (m_editor){
+        ui->wdgEditor->layout()->removeWidget(m_editor);
+        m_editor->deleteLater();
+        m_editor = nullptr;
+    }
+
+    switch(data->getDataType()){
+        case TERADATA_USER:{
+            m_editor = new UserWidget(m_comManager, *(dynamic_cast<TeraUser*>(data)));
+        }break;
+        default:
+            LOG_ERROR("Unhandled datatype for editor: " + TeraData::getDataTypeName(data->getDataType()), "DataListWidget::lstData_currentItemChanged");
+            return;
+    }
+
+     ui->wdgEditor->layout()->addWidget(m_editor);
 }
 
 /*void DataListWidget::itemClicked(QListWidgetItem *item){
@@ -163,34 +97,15 @@ void DataListWidget::updateDataInList(TeraData* data, const bool select_item){
     }
 }*/
 
-void DataListWidget::selectItem(quint64 id){
-   /*
-    if (m_datalist.isEmpty())
-        return;
-    if (isWaiting()){
-        // Already waiting for data to be loaded - delay the new selection until then
-        pending_select_id = id;
-        pending_select = true;
-        return;
-    }
-    // Find the requested id in the list
-    for (int i=0;i<m_datalist.count();i++){
-        if (m_datalist.at(i)->id()==id){
-            //Found
-            lstData->setCurrentRow(i);
-            break;
-        }
-    }*/
-
-}
-
 void DataListWidget::connectSignals()
 {
     connect(m_comManager, &ComManager::waitingForReply, this, &DataListWidget::com_Waiting);
     connect(m_comManager, &ComManager::queryResultsReceived, this, &DataListWidget::queryDataReply);
+    connect(m_comManager, &ComManager::postResultsReceived, this, &DataListWidget::postDataReply);
 
     connect(ui->txtSearch, &QLineEdit::textChanged, this, &DataListWidget::searchChanged);
     connect(ui->btnClear, &QPushButton::clicked, this, &DataListWidget::clearSearch);
+    connect(ui->lstData, &QListWidget::currentItemChanged, this, &DataListWidget::lstData_currentItemChanged);
 }
 
 void DataListWidget::queryDataList()
@@ -216,35 +131,63 @@ void DataListWidget::com_Waiting(bool waiting){
 void DataListWidget::queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data)
 {
     Q_UNUSED(path)
-    // Build list of items from query reply
-    if (query_args.hasQueryItem(WEB_QUERY_LIST)){
-        clearDataList();
 
+    QJsonParseError json_error;
+
+    // Process reply
+    QJsonDocument items = QJsonDocument::fromJson(data.toUtf8(), &json_error);
+    if (json_error.error!= QJsonParseError::NoError){
+        LOG_ERROR("Can't parse reply data.", "DataListWidget::queryDataReply");
+        return;
+    }
+
+    // Browse each data
+    bool first_item = true;
+    for (QJsonValue item:items.array()){
+
+        if (TeraData::getDataTypeFromPath(path) == m_dataType){
+            TeraData* item_data;
+            // Specific case for "user" since we have a dedicated class for it
+            if (m_dataType == TERADATA_USER){
+                item_data = new TeraUser(item);
+            }else{
+                item_data = new TeraData(m_dataType, item);
+            }
+            // Clear items from list if we have a first list item
+            if (query_args.hasQueryItem(WEB_QUERY_LIST) && first_item){
+                clearDataList();
+                first_item = false;
+            }
+            updateDataInList(item_data);
+        }
+    }
+
+}
+
+void DataListWidget::postDataReply(QString path, QString data)
+{
+    if (TeraData::getDataTypeFromPath(path) == m_dataType){
         QJsonParseError json_error;
 
         // Process reply
-        QJsonDocument list_items = QJsonDocument::fromJson(data.toUtf8(), &json_error);
+        QJsonDocument items = QJsonDocument::fromJson(data.toUtf8(), &json_error);
         if (json_error.error!= QJsonParseError::NoError){
             LOG_ERROR("Can't parse reply data.", "DataListWidget::queryDataReply");
             return;
         }
 
-        // Browse each data
-        for (QJsonValue item:list_items.array()){
+        for (QJsonValue item:items.array()){
             TeraData* item_data;
             // Specific case for "user" since we have a dedicated class for it
-            if (m_dataType != TERADATA_USER)
-                item_data = new TeraData(m_dataType, item);
-            else {
+            if (m_dataType == TERADATA_USER){
                 item_data = new TeraUser(item);
+            }else{
+                item_data = new TeraData(m_dataType, item);
             }
             updateDataInList(item_data);
         }
-
-    }else{
-        // We don't have a list, but an item update.
-        // TODO: Update item in list, if needed.
     }
+
 }
 
 void DataListWidget::searchChanged(QString new_search){
@@ -302,3 +245,29 @@ void DataListWidget::clearSearch(){
     ui->txtSearch->setText("");
 }
 
+
+void DataListWidget::lstData_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    Q_UNUSED(previous)
+    if (!current)
+        return;
+
+    TeraData* current_data = m_datamap.keys(current).first();
+
+
+    // Query full data for that data item
+    m_comManager->doQuery(TeraData::getPathForDataType(current_data->getDataType()),
+                          QUrlQuery(QString(WEB_QUERY_ID_USER) + "=" + QString::number(current_data->getId())));
+
+    /*switch(current_data->getDataType()){
+        case TERADATA_USER:
+            //m_editor = new UserWidget(m_comManager, const_cast<TeraData*>(current_data));
+
+        break;
+        default:
+            LOG_ERROR("Unhandled datatype for editor: " + TeraData::getDataTypeName(current_data->getDataType()), "DataListWidget::lstData_currentItemChanged");
+            return;
+    }*/
+
+    //ui->wdgEditor->layout()->addWidget(m_editor);
+}

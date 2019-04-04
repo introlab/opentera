@@ -80,7 +80,7 @@ QVariant TeraData::getFieldValue(const QString &fieldName) const
     if (hasFieldName(fieldName))
         return property(fieldName.toStdString().c_str());
 
-    LOG_WARNING("Field " + fieldName + " not found in " + objectName(), "TeraData::getFieldValue");
+    LOG_WARNING("Field " + fieldName + " not found in " + metaObject()->className(), "TeraData::getFieldValue");
     return QVariant();
 }
 

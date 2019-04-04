@@ -55,9 +55,19 @@ class TeraUser(db.Model, BaseModel):
 
     def query_user_by_uuid(self, u_uuid):
         user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
-        accessibles = TeraUser.get_accessible_users_ids_for_user(self)
-        if user.id_user not in accessibles:
-            return None
+        if user is not None:
+            accessibles = TeraUser.get_accessible_users_ids(self)
+            if user.id_user not in accessibles:
+                return None
+        return user
+
+    def query_user_by_id(self, id_user):
+        user = TeraUser.query.filter_by(id_user=id_user).first()
+        if user is not None:
+            accessibles = TeraUser.get_accessible_users_ids(self)
+            if user.id_user not in accessibles:
+                return None
+
         return user
 
     def get_accessible_users_ids(self):
@@ -98,7 +108,7 @@ class TeraUser(db.Model, BaseModel):
             role_name = role.project_access_role
         else:
             # Site admins are always project admins
-            site_role = TeraSiteAccess.get_site_role(self, project.project_site)
+            site_role = self.get_site_role(project.project_site)
             if site_role == 'admin':
                 role_name = 'admin'
 

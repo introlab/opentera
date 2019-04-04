@@ -74,7 +74,7 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
         }
 
         if (reply_path == WEB_USERINFO_PATH && !reply_query.hasQueryItem(WEB_QUERY_LIST)){
-            handled=handleUsersReply(reply_data);
+            handleUsersReply(reply_data);
         }
 
         if (reply_path == WEB_LOGOUT_PATH){

@@ -16,6 +16,7 @@ class QueryUsers(Resource):
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user_uuid', type=str, help='uuid')
+        parser.add_argument('id_user', type=int, help='User ID')
         parser.add_argument('id_site', type=int, help='Users for a specific site')
         parser.add_argument('id_project', type=int, help='Users for a specific project')
         parser.add_argument('list', type=bool, help='Request user list (ID, name, enabled)')
@@ -30,7 +31,9 @@ class QueryUsers(Resource):
 
         # If we have a user_uuid, query for that user if accessible
         if args['user_uuid']:
-            users.append(current_user.get_user_by_uuid(args['user_uuid']))
+            users.append(current_user.query_user_by_uuid(args['user_uuid']))
+        if args['id_user']:
+            users.append(current_user.query_user_by_id(args['id_user']))
 
         # If we have a id_site, query for users of that site, if accessible
         # TODO

@@ -17,12 +17,12 @@ UserWidget::UserWidget(ComManager *comMan, const TeraUser &data, QWidget *parent
 
     if (parent){
         ui->setupUi(parent);
-        ui->btnEdit->hide();
-        ui->btnDelete->hide();
     }else {
         ui->setupUi(this);
     }
     setAttribute(Qt::WA_StyledBackground); //Required to set a background image
+
+    setLimited(false);
 
     // Connect signals and slots
     connectSignals();
@@ -102,8 +102,6 @@ void UserWidget::updateControlsState(){
     ui->tableProjects->setEnabled(!isWaitingOrLoading());
 
     // Buttons update
-    ui->btnEdit->setEnabled(!isWaitingOrLoading());
-    ui->btnDelete->setEnabled(!isWaitingOrLoading());
     ui->btnSave->setEnabled(!isWaitingOrLoading());
     ui->btnUndo->setEnabled(!isWaitingOrLoading());
     ui->btnSave->setVisible(isEditing());
@@ -134,15 +132,6 @@ void UserWidget::deleteData(){
 
 }
 
-void UserWidget::setReady(){
-/*    if (!_limited)
-        btnDelete->setEnabled(true);
-    else
-        btnDelete->setEnabled(false);*/
-    ui->btnEdit->setEnabled(true);
-
-    DataEditorWidget::setReady();
-}
 
 bool UserWidget::validateData(){
     bool valid = false;
@@ -180,8 +169,6 @@ void UserWidget::fillSites(const QString &sites_json)
             }
         }
     }
-
-
 }
 
 void UserWidget::fillSitesData()
@@ -313,8 +300,6 @@ void UserWidget::setLimited(bool limited){
 
 void UserWidget::connectSignals()
 {
-    connect(ui->btnEdit, &QPushButton::clicked, this, &UserWidget::btnEdit_clicked);
-    connect(ui->btnDelete, &QPushButton::clicked, this, &UserWidget::btnDelete_clicked);
     connect(ui->btnUndo, &QPushButton::clicked, this, &UserWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &UserWidget::btnSave_clicked);
     //connect(ui->txtPassword, &QLineEdit::textChanged, this, &UserWidget::txtPassword_textChanged);
@@ -374,6 +359,7 @@ void UserWidget::processQueryReply(const QString &path, const QUrlQuery &query_a
 
 void UserWidget::processPostReply(const QString &path, const QString &data)
 {
+    Q_UNUSED(data);
     if (path == WEB_USERINFO_PATH){
         // OK, data was saved!
         if (parent())

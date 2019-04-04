@@ -11,6 +11,8 @@
 //#include "TeraMenu_gui.h"
 #include "ui_DataListWidget.h"
 
+#include "editors/UserWidget.h"
+
 //Data widgets
 //#include "UserWidget.h"
 
@@ -26,8 +28,6 @@ public:
     explicit DataListWidget(ComManager* comMan, TeraDataTypes data_type, QWidget *parent = nullptr);
     ~DataListWidget();
 
-    void selectItem(quint64 id);
-
 private:
     Ui::DataListWidget*                 ui;
     DataEditorWidget*                   m_editor;
@@ -42,7 +42,8 @@ private:
     void connectSignals();
     void queryDataList();
 
-    void updateDataInList(TeraData *data, const bool select_item=false);
+    void updateDataInList(TeraData *data);
+    void showEditor(TeraData *data);
 
     void setSearching(bool search);
 
@@ -54,9 +55,11 @@ public slots:
 private slots:
     void com_Waiting(bool waiting);
     void queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data);
+    void postDataReply(QString path, QString data);
 
     void searchChanged(QString new_search);
     void clearSearch();
+    void lstData_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
 };
 
 
