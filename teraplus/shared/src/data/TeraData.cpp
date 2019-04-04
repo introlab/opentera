@@ -99,9 +99,11 @@ QList<QString> TeraData::getFieldList() const
     return rval;
 }
 
-QString TeraData::getDataTypeName(const TeraDataTypes data_type)
+QString TeraData::getDataTypeName(const TeraDataTypes &data_type)
 {
     switch (data_type) {
+    case TERADATA_UNKNOWN:
+        return "unknown";
     case TERADATA_USER:
         return "user";
     case TERADATA_SITE:
@@ -115,6 +117,46 @@ QString TeraData::getDataTypeName(const TeraDataTypes data_type)
     }
 
     return "";
+}
+
+TeraDataTypes TeraData::getDataTypeFromPath(const QString &path)
+{
+    if (path==WEB_USERINFO_PATH) return TERADATA_USER;
+    if (path==WEB_SITEINFO_PATH) return TERADATA_SITE;
+    //if (path==WEB_PROJECTINFO_PATH) return TERADATA_PROJECT;
+
+    LOG_ERROR("Unknown data type for path: " + path, "TeraData::getDataTypeFromPath");
+
+    return TERADATA_UNKNOWN;
+}
+
+QString TeraData::getPathForDataType(const TeraDataTypes &data_type)
+{
+    if (data_type==TERADATA_USER) return WEB_USERINFO_PATH;
+    if (data_type==TERADATA_SITE) return WEB_SITEINFO_PATH;
+
+    LOG_ERROR("Unknown path for data_type: " + getDataTypeName(data_type), "TeraData::getPathForDataType");
+
+    return QString();
+}
+
+QString TeraData::getIconFilenameForDataType(const TeraDataTypes &data_type)
+{
+    switch(data_type){
+    case TERADATA_USER:
+        return "://icons/software_user.png";
+    case TERADATA_SITE:
+        return "://icons/site.png";
+    case TERADATA_KIT:
+        return "://icons/kit.png";
+    case TERADATA_SESSIONTYPE:
+        return "://icons/session.png";
+    case TERADATA_TESTDEF:
+        return "://icons/test.png";
+    default:
+        return "://icons/error.png";
+    }
+
 }
 
 bool TeraData::hasMetaProperty(const QString &fieldName) const
@@ -141,33 +183,11 @@ void TeraData::setDataType(TeraDataTypes data_type)
 
 bool TeraData::fromJson(const QJsonValue &value)
 {
-    /*for (int i=0; i<metaObject()->propertyCount(); i++){
-        QString fieldName = QString(metaObject()->property(i).name());
-        // Skips internal fields
-        if (fieldName == "id" || fieldName == "name" || fieldName == "class_name" || fieldName == "objectName")
-            continue;
-        if (!value[fieldName].isUndefined()){
-            if (value[fieldName].isString()){
-                QDateTime date_tester = QDateTime::fromString(value[fieldName].toString(), Qt::ISODateWithMs);
-                if (date_tester.isValid()){
-                    metaObject()->property(i).write(this, date_tester);
-                    continue;
-                }
-                metaObject()->property(i).write(this, value[fieldName].toString());
-                continue;
-            }
-            metaObject()->property(i).write(this, value[fieldName].toVariant());
-            continue;
-        }
-        LOG_WARNING("Field " + fieldName + " not found in JSON.", "TeraData::fromJson");
-    }*/
     if (value.isObject()){
         QJsonObject json_object = value.toObject();
         for (int i=0; i<json_object.keys().count(); i++){
             QString fieldName = json_object.keys().at(i);
-            //qDebug() << "TeraData::fromJson - setting " << fieldName <<  " to " << json_object[fieldName].toVariant();
             setFieldValue(fieldName, json_object[fieldName].toVariant());
-            //setProperty(fieldName.toStdString().c_str(), json_object[fieldName].toVariant());
         }
     }else{
         LOG_WARNING("Trying to load a JSON object which is not an object.", "TeraData::fromJson");

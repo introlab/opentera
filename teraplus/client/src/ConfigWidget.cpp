@@ -69,7 +69,14 @@ void ConfigWidget::currentSectionChanged(QListWidgetItem *current, QListWidgetIt
 
 }
 
+void ConfigWidget::com_Waiting(bool waiting)
+{
+    setDisabled(waiting);
+}
+
 void ConfigWidget::connectSignals()
 {
     connect(ui->lstSections, &QListWidget::currentItemChanged, this, &ConfigWidget::currentSectionChanged);
+    connect(m_comManager, &ComManager::waitingForReply, this, &ConfigWidget::com_Waiting);
+    connect(ui->btnClose, &QPushButton::clicked, this, &ConfigWidget::closeRequest);
 }

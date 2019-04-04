@@ -191,6 +191,7 @@ void MainWindow::on_btnConfig_clicked()
     //m_diag_editor->move(25,75);
 
     connect(m_diag_editor, &QDialog::finished, this, &MainWindow::editorDialogFinished);
+    connect(config_editor, &ConfigWidget::closeRequest, m_diag_editor, &QDialog::accept);
 
     m_diag_editor->setWindowTitle(tr("Configuration Globale"));
 

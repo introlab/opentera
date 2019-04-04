@@ -115,6 +115,7 @@ DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWid
     }
 
     m_editor = nullptr;
+    setSearching(false);
 
     connectSignals();
 
@@ -127,101 +128,31 @@ DataListWidget::~DataListWidget()
     if (m_editor)
         m_editor->deleteLater();
 
-    qDeleteAll(m_datalist);
-    m_datalist.clear();
+    clearDataList();
 }
 
-void DataListWidget::setData(QList<TeraData*> *data){
-    //m_datalist = data;
-    qDeleteAll(m_datalist);
-    m_datalist.clear();
+void DataListWidget::updateDataInList(TeraData* data, const bool select_item){
 
-    for (int i=0; i<data->count(); i++){
-        m_datalist.append(new TeraData(*(data->at(i))));
+    QListWidgetItem* item;
+    if (m_datalist.contains(data)){
+        item = m_datamap[data];
+    }else{
+        item = new QListWidgetItem(data->getName(),ui->lstData);
+
+        m_datalist.append(data);
+        m_datamap[data] = item;
+
     }
-}
 
-/*QIcon DataListWidget::getDataTypeIcon(TeraData *data){
-    switch (m_data_type){
-    case TERADATA_USER:
-        if (data->enabled())
-            return QIcon(":/pictures/icons/patient_online.png");
-        else
-            return QIcon(":/pictures/icons/patient_offline.png");
-        break;
-    case TERADATA_USERGROUP:
-        return QIcon(":/pictures/icons/usergroup.png");
-        break;
-    case TERADATA_GROUP:
-        return QIcon(":/pictures/icons/group.png");
-        break;
-    case TERADATA_SESSION:{
-        bool has_warning = false;
-        QString icon_path;
-        if (qobject_cast<SessionInfo*>(data)){
-            SessionInfo* session = qobject_cast<SessionInfo*>(data);
-            AccessInfo access = m_loggedUser->getAccess(TERA_ACCESS_TECH);
-            has_warning = access.canRead() && session->hasTechAlert();
-        }
-        if (data->enabled())
-            icon_path = ":/pictures/icons/session_online.png";
-        else
-            icon_path = ":/pictures/icons/session_offline.png";
+    item->setIcon(QIcon(TeraData::getIconFilenameForDataType(data->getDataType())));
+    item->setText(data->getName());
+    item->setData(Qt::UserRole, data->getId());
 
-        if (has_warning){
-            icon_path = icon_path.left(icon_path.length()-4) + "_warning" + icon_path.right(4);
-        }
-        return QIcon(icon_path);
-    }
-        break;
-    case TERADATA_KIT:
-        return QIcon(":/pictures/icons/kit.png");
-        break;
-    case TERADATA_SESSIONTYPE:
-        return QIcon(":/pictures/icons/session.png");
-        break;
-    case TERADATA_TESTDEF:
-        return QIcon(":/pictures/icons/test.png");
-        break;
-    default:
-        return QIcon(":/pictures/icons/delete.png");
-        break;
-    }
-}*/
-
-void DataListWidget::addDataInList(TeraData* data, bool select_item){
-    /*QListWidgetItem *tmp = new QListWidgetItem(ui->lstData);
-
-    //Icon
-    //tmp->setIcon(getDataTypeIcon(data));
-
-    tmp->setText(data->getName());
-    tmp->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    tmp->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    tmp->setData(Qt::UserRole,data->getId());
-    //tmp->setTextColor(QColor(data->color()));
+    //TODO: Different color if enabled or has color property
 
     if (select_item){
-        ui->lstData->setCurrentItem(tmp);
-    }*/
-}
-
-void DataListWidget::updateDataInList(int index, TeraData* data, bool select_item){
-    /*if (index<0 || index>=ui->lstData->count())
-        return; // Invalid index
-
-    QListWidgetItem *tmp = ui->lstData->item(index);
-
-    //Icon
-    tmp->setIcon(getDataTypeIcon(data));
-
-    tmp->setText(data->name());
-    tmp->setData(Qt::UserRole,data->id());
-    tmp->setTextColor(data->color());
-
-    if (select_item){
-        lstData->setCurrentItem(tmp);
-    }*/
+        ui->lstData->setCurrentItem(item);
+    }
 }
 
 /*void DataListWidget::itemClicked(QListWidgetItem *item){
@@ -256,19 +187,26 @@ void DataListWidget::selectItem(quint64 id){
 void DataListWidget::connectSignals()
 {
     connect(m_comManager, &ComManager::waitingForReply, this, &DataListWidget::com_Waiting);
+    connect(m_comManager, &ComManager::queryResultsReceived, this, &DataListWidget::queryDataReply);
+
+    connect(ui->txtSearch, &QLineEdit::textChanged, this, &DataListWidget::searchChanged);
+    connect(ui->btnClear, &QPushButton::clicked, this, &DataListWidget::clearSearch);
 }
 
 void DataListWidget::queryDataList()
 {
-    switch(m_dataType){
-    case TERADATA_USER:
-        // Query users
-        m_comManager->doQuery(WEB_USERINFO_PATH, QUrlQuery(WEB_QUERY_LIST));
-        break;
-    default:
-        break;
+    QString query_path = TeraData::getPathForDataType(m_dataType);
 
+    if (!query_path.isEmpty()){
+        m_comManager->doQuery(query_path, QUrlQuery(WEB_QUERY_LIST));
     }
+}
+
+void DataListWidget::clearDataList(){
+    ui->lstData->clear();
+    m_datamap.clear();
+    qDeleteAll(m_datalist);
+    m_datalist.clear();
 }
 
 void DataListWidget::com_Waiting(bool waiting){
@@ -277,47 +215,72 @@ void DataListWidget::com_Waiting(bool waiting){
 
 void DataListWidget::queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data)
 {
+    Q_UNUSED(path)
     // Build list of items from query reply
     if (query_args.hasQueryItem(WEB_QUERY_LIST)){
-        m_datalist.clear();
+        clearDataList();
+
+        QJsonParseError json_error;
+
+        // Process reply
+        QJsonDocument list_items = QJsonDocument::fromJson(data.toUtf8(), &json_error);
+        if (json_error.error!= QJsonParseError::NoError){
+            LOG_ERROR("Can't parse reply data.", "DataListWidget::queryDataReply");
+            return;
+        }
+
+        // Browse each data
+        for (QJsonValue item:list_items.array()){
+            TeraData* item_data;
+            // Specific case for "user" since we have a dedicated class for it
+            if (m_dataType != TERADATA_USER)
+                item_data = new TeraData(m_dataType, item);
+            else {
+                item_data = new TeraUser(item);
+            }
+            updateDataInList(item_data);
+        }
+
+    }else{
+        // We don't have a list, but an item update.
+        // TODO: Update item in list, if needed.
     }
 }
 
-/*
 void DataListWidget::searchChanged(QString new_search){
     Q_UNUSED(new_search)
     // Check if search field is empty
-    if (txtSearch->text().count()==0){
+    if (ui->txtSearch->text().count()==0){
         setSearching(false);
         // Display back all items
-        for (int i=0; i<lstData->count();i++){
-            lstData->item(i)->setHidden(false);
+        for (int i=0; i<ui->lstData->count();i++){
+            ui->lstData->item(i)->setHidden(false);
         }
-        if (m_editor && lstData->selectedItems().count()>0)
+        if (m_editor && ui->lstData->selectedItems().count()>0)
             m_editor->setVisible(true);
         return;
     }
 
-    if (!searching){
+    if (!m_searching){
         setSearching(true);
     }
 
     // Apply the search filter
-    QList<QListWidgetItem*> found = lstData->findItems(txtSearch->text(),Qt::MatchContains);
-    for (int i=0; i<lstData->count();i++){
-        if (found.contains(lstData->item(i))){
-            if (lstData->item(i)->isSelected()){
+    QList<QListWidgetItem*> found = ui->lstData->findItems(ui->txtSearch->text(),Qt::MatchContains);
+    for (int i=0; i<ui->lstData->count();i++){
+        if (found.contains(ui->lstData->item(i))){
+            if (ui->lstData->item(i)->isSelected()){
                 if (m_editor)
                     m_editor->setVisible(true);
             }
-            lstData->item(i)->setHidden(false);
+            ui->lstData->item(i)->setHidden(false);
 
         }else{
-            if (lstData->item(i)->isSelected()){
+            if (ui->lstData->item(i)->isSelected()){
                 if (m_editor)
                     m_editor->setVisible(false);
             }
-            lstData->item(i)->setHidden(true);
+            ui->lstData->item(i)->setHidden(true);
         }
     }
 
@@ -325,17 +288,17 @@ void DataListWidget::searchChanged(QString new_search){
 
 void DataListWidget::setSearching(bool search){
     if (search){
-        searching = true;
-        txtSearch->setStyleSheet("color:white;");
-        btnClear->setVisible(true);
+        m_searching = true;
+        ui->txtSearch->setStyleSheet("color:white;");
+        ui->btnClear->setVisible(true);
     }else{
-        searching=false;
-        txtSearch->setStyleSheet("color:rgba(255,255,255,50%);");
-        btnClear->setVisible(false);
+        m_searching=false;
+        ui->txtSearch->setStyleSheet("color:rgba(255,255,255,50%);");
+        ui->btnClear->setVisible(false);
     }
 }
 
 void DataListWidget::clearSearch(){
-    txtSearch->setText("");
+    ui->txtSearch->setText("");
 }
-*/
+

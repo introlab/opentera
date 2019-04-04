@@ -8,7 +8,10 @@
 
 #include <QMetaProperty>
 
+#include "webapi.h"
+
 enum TeraDataTypes {
+    TERADATA_UNKNOWN,
     TERADATA_USER,
     TERADATA_SITE,
     TERADATA_KIT,
@@ -46,7 +49,11 @@ public:
     void setFieldValue(const QString& fieldName, const QVariant& fieldValue);
     QList<QString> getFieldList() const;
 
-    static QString getDataTypeName(const TeraDataTypes data_type);
+    static QString getDataTypeName(const TeraDataTypes& data_type);
+    static TeraDataTypes getDataTypeFromPath(const QString& path);
+    static QString getPathForDataType(const TeraDataTypes& data_type);
+
+    static QString getIconFilenameForDataType(const TeraDataTypes& data_type);
 
 protected:
 

@@ -1,7 +1,9 @@
-#ifndef DATALISTWIDGET_H
+﻿#ifndef DATALISTWIDGET_H
 #define DATALISTWIDGET_H
 
 #include <QWidget>
+#include <QJsonDocument>
+
 #include "DataEditorWidget.h"
 
 #include "TeraData.h"
@@ -24,19 +26,15 @@ public:
     explicit DataListWidget(ComManager* comMan, TeraDataTypes data_type, QWidget *parent = nullptr);
     ~DataListWidget();
 
-    void setData(QList<TeraData*>* data);
-
-    void addDataInList(TeraData* data, bool select_item=false);
     void selectItem(quint64 id);
 
 private:
-    Ui::DataListWidget*     ui;
-    DataEditorWidget*       m_editor;
-    QList<TeraData*>        m_datalist;
-    ComManager*             m_comManager;
-    TeraDataTypes           m_dataType;
-
-    QListWidgetItem*        m_last_item;
+    Ui::DataListWidget*                 ui;
+    DataEditorWidget*                   m_editor;
+    QMap<TeraData*, QListWidgetItem*>   m_datamap;
+    QList<TeraData*>                    m_datalist;
+    ComManager*                         m_comManager;
+    TeraDataTypes                       m_dataType;
 
     bool                    m_copying;
     bool                    m_searching;
@@ -44,9 +42,11 @@ private:
     void connectSignals();
     void queryDataList();
 
-    void updateDataInList(int index, TeraData* data, bool select_item=false);
+    void updateDataInList(TeraData *data, const bool select_item=false);
 
     void setSearching(bool search);
+
+    void clearDataList();
 
 public slots:
 
@@ -55,6 +55,8 @@ private slots:
     void com_Waiting(bool waiting);
     void queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data);
 
+    void searchChanged(QString new_search);
+    void clearSearch();
 };
 
 

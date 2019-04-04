@@ -26,6 +26,7 @@ public:
 private slots:
 
     void currentSectionChanged(QListWidgetItem *current, QListWidgetItem *previous);
+    void com_Waiting(bool waiting);
 
 private:
 
@@ -38,6 +39,9 @@ private:
 
     void addSection(const QString& name, const QIcon& icon, const int& id);
     void setupSections();
+
+signals:
+    void closeRequest();
 };
 
 #endif // CONFIGWIDGET_H
