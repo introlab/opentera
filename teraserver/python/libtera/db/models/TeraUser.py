@@ -35,9 +35,9 @@ class TeraUser(db.Model, BaseModel):
             ignore_fields = []
         ignore_fields.extend(['authenticated', 'user_password', 'user_sites_access', 'user_projects_access'])
         if minimal:
-            ignore_fields.extend(['user_email', 'user_profile', 'user_notes', 'user_lastonline', 'user_superadmin'])
+            ignore_fields.extend(['user_username', 'user_email', 'user_profile', 'user_notes', 'user_lastonline', 'user_superadmin'])
         rval = super().to_json(ignore_fields=ignore_fields)
-
+        rval['user_name'] = self.user_firstname + ' ' + self.user_lastname
         return rval
 
     def is_authenticated(self):

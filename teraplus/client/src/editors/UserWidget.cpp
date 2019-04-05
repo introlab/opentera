@@ -9,10 +9,9 @@
 #include <QtMultimedia/QAudioDeviceInfo>
 
 
-UserWidget::UserWidget(ComManager *comMan, const TeraUser &data, QWidget *parent) :
-    DataEditorWidget(comMan, parent),
-    ui(new Ui::UserWidget),
-    m_data(nullptr)
+UserWidget::UserWidget(ComManager *comMan, const TeraData *data, QWidget *parent) :
+    DataEditorWidget(comMan, data, parent),
+    ui(new Ui::UserWidget)
 {
 
     if (parent){
@@ -41,29 +40,20 @@ UserWidget::UserWidget(ComManager *comMan, const TeraUser &data, QWidget *parent
 
 UserWidget::~UserWidget()
 {    
-    if (m_data)
-        m_data->deleteLater();
     if (ui)
         delete ui;
 }
 
-void UserWidget::setData(const TeraUser &data){
-    if (m_data)
-        m_data->deleteLater();
-
-    m_data = new TeraUser(data);
+void UserWidget::setData(const TeraData *data){
+   DataEditorWidget::setData(data);
 
     // Query sites and projects roles
     m_usersites.clear();
     m_userprojects.clear();
-    queryDataRequest(WEB_SITEINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + m_data->getUuid().toString(QUuid::WithoutBraces)));
-    queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + m_data->getUuid().toString(QUuid::WithoutBraces)));
+    QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
+    queryDataRequest(WEB_SITEINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
+    queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
 
-}
-
-TeraUser* UserWidget::getData()
-{
-    return m_data;
 }
 
 bool UserWidget::dataIsNew(){
@@ -116,7 +106,7 @@ void UserWidget::updateControlsState(){
     bool allow_access_edit = m_limited;
     if (m_data)
         // Super admin can't be changed - they have access to everything!
-        allow_access_edit |= m_data->getSuperAdmin();
+        allow_access_edit |= m_data->getFieldValue("user_superadmin").toBool();
     ui->tableSites->setEnabled(!allow_access_edit);
     ui->tableProjects->setEnabled(!allow_access_edit);
 }
@@ -124,7 +114,7 @@ void UserWidget::updateControlsState(){
 void UserWidget::updateFieldsValue(){
     if (m_data && !hasPendingDataRequests()){
         ui->wdgUser->fillFormFromData(m_data->toJson());
-        ui->wdgProfile->fillFormFromData(m_data->getProfile());
+        ui->wdgProfile->fillFormFromData(m_data->getFieldValue("user_profile").toString());
     }
 }
 
@@ -294,7 +284,7 @@ QComboBox *UserWidget::buildRolesComboBox()
 void UserWidget::setLimited(bool limited){
     m_limited = limited;
 
-    //setEditing();
+    updateControlsState();
 
 }
 
@@ -302,7 +292,6 @@ void UserWidget::connectSignals()
 {
     connect(ui->btnUndo, &QPushButton::clicked, this, &UserWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &UserWidget::btnSave_clicked);
-    //connect(ui->txtPassword, &QLineEdit::textChanged, this, &UserWidget::txtPassword_textChanged);
 
 }
 

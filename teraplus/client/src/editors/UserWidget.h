@@ -15,7 +15,6 @@
 
 #include "DataEditorWidget.h"
 #include "GlobalMessageBox.h"
-#include "data/TeraUser.h"
 
 namespace Ui {
 class UserWidget;
@@ -26,11 +25,10 @@ class UserWidget : public DataEditorWidget
     Q_OBJECT
 
 public:
-    explicit UserWidget(ComManager* comMan, const TeraUser& data = nullptr, QWidget *parent = nullptr);
+    explicit UserWidget(ComManager* comMan, const TeraData* data = nullptr, QWidget *parent = nullptr);
     ~UserWidget();
 
-    void setData(const TeraUser& data);
-    TeraUser* getData();
+    void setData(const TeraData* data);
 
     void saveData(bool signal=true);
 
@@ -48,7 +46,6 @@ public:
 private:
     Ui::UserWidget* ui;
 
-    TeraUser*           m_data;
     bool                m_limited; // Current user editing only
     QMap<int, int>      m_tableSites_ids_rows;
     QMap<int, int>      m_tableProjects_ids_rows;

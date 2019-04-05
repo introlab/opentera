@@ -4,7 +4,6 @@
 #include <QWidget>
 
 #include "data/TeraData.h"
-#include "data/TeraUser.h"
 
 #include "ComManager.h"
 
@@ -12,7 +11,7 @@ class DataEditorWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DataEditorWidget(ComManager* comMan, QWidget *parent = nullptr);
+    explicit DataEditorWidget(ComManager *comMan, const TeraData* data = nullptr, QWidget *parent = nullptr);
     ~DataEditorWidget();
 
     enum EditorState{
@@ -22,7 +21,7 @@ public:
         STATE_LOADING
     };
 
-    void setData(const TeraData& data);
+    virtual void setData(const TeraData *data);
     TeraData* getData();
 
     virtual void saveData(bool signal=true)=0;
@@ -62,7 +61,8 @@ private:
 
     EditorState     m_editState;
 protected:
-    bool            m_undoing;    
+    bool            m_undoing;
+    TeraData*       m_data;
 
 signals:
     void dataWasChanged();

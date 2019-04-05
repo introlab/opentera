@@ -1,7 +1,9 @@
 #include "ComManager.h"
 #include <sstream>
 
-ComManager::ComManager(QUrl serverUrl, QObject *parent) : QObject(parent)
+ComManager::ComManager(QUrl serverUrl, QObject *parent) :
+    QObject(parent),
+    m_currentUser(TERADATA_USER)
 {
     // Initialize communication objects
     m_webSocket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, parent);
@@ -126,10 +128,10 @@ void ComManager::doPost(const QString &path, const QString &post_data)
 
 void ComManager::doUpdateCurrentUser()
 {
-    doQuery(QString(WEB_USERINFO_PATH), QUrlQuery("user_uuid=" + m_currentUser.getUuid().toString(QUuid::WithoutBraces)));
+    doQuery(QString(WEB_USERINFO_PATH), QUrlQuery("user_uuid=" + m_currentUser.getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces)));
 }
 
-TeraUser& ComManager::getCurrentUser()
+TeraData &ComManager::getCurrentUser()
 {
     return m_currentUser;
 }
@@ -167,10 +169,10 @@ bool ComManager::handleUsersReply(const QString &reply_data)
         return false;
 
     // Browse each users
-    QList<TeraUser> users_data;
+    QList<TeraData> users_data;
     for (QJsonValue user:users.array()){
-        TeraUser user_data(user);
-        if (m_currentUser.getUuid()==user_data.getUuid()){
+        TeraData user_data(TERADATA_USER, user);
+        if (m_currentUser.getFieldValue("user_uuid").toUuid() == user_data.getFieldValue("user_uuid").toUuid()){
             m_currentUser = user_data;
             emit currentUserUpdated();
         }

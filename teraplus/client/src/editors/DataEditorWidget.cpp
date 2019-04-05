@@ -1,10 +1,12 @@
 #include "DataEditorWidget.h"
 #include <QApplication>
 
-DataEditorWidget::DataEditorWidget(ComManager *comMan, QWidget *parent) :
+DataEditorWidget::DataEditorWidget(ComManager *comMan, const TeraData *data, QWidget *parent) :
     QWidget(parent),
     m_undoing(false)
 {
+    m_data = nullptr;
+    setData(data);
     setLoading();
 
     // Set ComManager pointer
@@ -17,18 +19,25 @@ DataEditorWidget::DataEditorWidget(ComManager *comMan, QWidget *parent) :
 }
 
 DataEditorWidget::~DataEditorWidget(){
-
+    if (m_data)
+        m_data->deleteLater();
 }
 
 
-void DataEditorWidget::setData(const TeraData &data)
+void DataEditorWidget::setData(const TeraData* data)
 {
-    Q_UNUSED(data)
+    if (m_data){
+        m_data->deleteLater();
+    }
+
+    if (data != nullptr){
+        m_data = new TeraData(*data);
+    }
 }
 
 TeraData *DataEditorWidget::getData()
 {
-    return nullptr;
+    return m_data;
 }
 
 
@@ -77,6 +86,8 @@ void DataEditorWidget::setEditing(){
     /*if (!isVisible())
         setVisible(true);*/
     setEnabled(true);
+    setVisible(true);
+    QApplication::restoreOverrideCursor();
     m_editState = STATE_EDITING;
     updateControlsState();
     emit stateEditing();
@@ -178,7 +189,7 @@ void DataEditorWidget::queryDataReply(const QString &path, const QUrlQuery &quer
     QString query_name = getQueryDataName(path, query_args);
     m_requests.removeOne(query_name);
     if (m_requests.isEmpty())
-        setReady();
+        setEditing();
 
     processQueryReply(path, query_args, data);
 }

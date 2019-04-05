@@ -27,7 +27,7 @@
 #include "Logger.h"
 #include "webapi.h"
 
-#include "TeraUser.h"
+#include "TeraData.h"
 
 
 class ComManager : public QObject
@@ -45,7 +45,7 @@ public:
     void doPost(const QString &path, const QString &post_data);
     void doUpdateCurrentUser();
 
-    TeraUser &getCurrentUser();
+    TeraData &getCurrentUser();
 
 protected:
     bool handleLoginReply(const QString& reply_data);
@@ -64,7 +64,7 @@ protected:
 
     QTimer                  m_connectTimer;
 
-    TeraUser                m_currentUser;
+    TeraData                m_currentUser;
 
 signals:
     void serverDisconnected();
@@ -76,7 +76,7 @@ signals:
 
     void currentUserUpdated();
 
-    void usersReceived(QList<TeraUser> user_list);
+    void usersReceived(QList<TeraData> user_list);
     void queryResultsReceived(QString object, QUrlQuery url_query, QString data);
     void postResultsReceived(QString path, QString data);
     void postResultsOK();

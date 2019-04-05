@@ -9,7 +9,6 @@
 #include "editors/UserWidget.h"
 #include "ConfigWidget.h"
 
-#include "data/TeraUser.h"
 #include "ComManager.h"
 #include "Message.h"
 

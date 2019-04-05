@@ -79,7 +79,7 @@ void DataListWidget::showEditor(TeraData *data)
 
     switch(data->getDataType()){
         case TERADATA_USER:{
-            m_editor = new UserWidget(m_comManager, *(dynamic_cast<TeraUser*>(data)));
+            m_editor = new UserWidget(m_comManager, data);
         }break;
         default:
             LOG_ERROR("Unhandled datatype for editor: " + TeraData::getDataTypeName(data->getDataType()), "DataListWidget::lstData_currentItemChanged");
@@ -146,13 +146,7 @@ void DataListWidget::queryDataReply(const QString &path, const QUrlQuery &query_
     for (QJsonValue item:items.array()){
 
         if (TeraData::getDataTypeFromPath(path) == m_dataType){
-            TeraData* item_data;
-            // Specific case for "user" since we have a dedicated class for it
-            if (m_dataType == TERADATA_USER){
-                item_data = new TeraUser(item);
-            }else{
-                item_data = new TeraData(m_dataType, item);
-            }
+            TeraData* item_data = new TeraData(m_dataType, item);
             // Clear items from list if we have a first list item
             if (query_args.hasQueryItem(WEB_QUERY_LIST) && first_item){
                 clearDataList();
@@ -177,13 +171,7 @@ void DataListWidget::postDataReply(QString path, QString data)
         }
 
         for (QJsonValue item:items.array()){
-            TeraData* item_data;
-            // Specific case for "user" since we have a dedicated class for it
-            if (m_dataType == TERADATA_USER){
-                item_data = new TeraUser(item);
-            }else{
-                item_data = new TeraData(m_dataType, item);
-            }
+            TeraData* item_data = new TeraData(m_dataType, item);
             updateDataInList(item_data);
         }
     }
