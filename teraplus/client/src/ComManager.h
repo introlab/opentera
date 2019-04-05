@@ -46,10 +46,14 @@ public:
     void doUpdateCurrentUser();
 
     TeraData &getCurrentUser();
+    typedef void (ComManager::* signal_ptr)(QList<TeraData>);
+
+    static signal_ptr getSignalFunctionForDataType(const TeraDataTypes& data_type);
 
 protected:
     bool handleLoginReply(const QString& reply_data);
-    bool handleUsersReply(const QString& reply_data);
+    bool handleDataReply(const QString& reply_path, const QString& reply_data);
+    bool handleFormReply(const QUrlQuery& reply_query, const QString& reply_data);
 
 
     QUrl                    m_serverUrl;
@@ -76,10 +80,19 @@ signals:
 
     void currentUserUpdated();
 
+    void formReceived(QString form_type, QString data);
+
     void usersReceived(QList<TeraData> user_list);
-    void queryResultsReceived(QString object, QUrlQuery url_query, QString data);
-    void postResultsReceived(QString path, QString data);
-    void postResultsOK();
+    void sitesReceived(QList<TeraData> site_list);
+    void kitsReceived(QList<TeraData> kit_list);
+    void sessionTypesReceived(QList<TeraData> st_list);
+    void testDefsReceived(QList<TeraData> tests_list);
+    void projectsReceived(QList<TeraData> projects_list);
+
+    //void queryResultsReceived(QString object, QUrlQuery url_query, QString data);
+    //void postResultsReceived(QString path, QString data);
+    void queryResultsOK(QString path, QUrlQuery url_query);
+    void postResultsOK(QString path);
 
 public slots:
 

@@ -75,29 +75,26 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
             handled=handleLoginReply(reply_data);
         }
 
-        if (reply_path == WEB_USERINFO_PATH && !reply_query.hasQueryItem(WEB_QUERY_LIST)){
-            handleUsersReply(reply_data);
-        }
-
         if (reply_path == WEB_LOGOUT_PATH){
             emit serverDisconnected();
             handled = true;
         }
 
+        if (reply_path == WEB_FORMS_PATH){
+            handled = handleFormReply(reply_query, reply_data);
+            if (handled) emit queryResultsOK(reply_path, reply_query);
+        }
+
         if (!handled){
             // General case
-            emit queryResultsReceived(reply_path, reply_query, reply_data);
-            handled = true;
+            handled=handleDataReply(reply_path, reply_data);
+            if (handled) emit queryResultsOK(reply_path, reply_query);
         }
     }
 
     if (reply->operation()==QNetworkAccessManager::PostOperation){
-        if (reply_path == WEB_USERINFO_PATH){
-            handled=handleUsersReply(reply_data);
-        }
-
-        emit postResultsOK();
-        emit postResultsReceived(reply_path, reply_data);
+        handled=handleDataReply(reply_path, reply_data);
+        if (handled) emit postResultsOK(reply_path);
     }
 
     return handled;
@@ -136,6 +133,30 @@ TeraData &ComManager::getCurrentUser()
     return m_currentUser;
 }
 
+ComManager::signal_ptr ComManager::getSignalFunctionForDataType(const TeraDataTypes &data_type)
+{
+    switch(data_type){
+    case TERADATA_UNKNOWN:
+        LOG_ERROR("Unknown object - no signal associated.", "ComManager::getSignalFunctionForDataType");
+        return nullptr;
+    case TERADATA_USER:
+        return &ComManager::usersReceived;
+    case TERADATA_SITE:
+        return &ComManager::sitesReceived;
+    case TERADATA_KIT:
+        return &ComManager::kitsReceived;
+    case TERADATA_SESSIONTYPE:
+        return &ComManager::sessionTypesReceived;
+    case TERADATA_TESTDEF:
+        return &ComManager::testDefsReceived;
+    case TERADATA_PROJECT:
+        return &ComManager::projectsReceived;
+    }
+
+    return nullptr;
+}
+
+
 bool ComManager::handleLoginReply(const QString &reply_data)
 {
     QJsonParseError json_error;
@@ -159,32 +180,62 @@ bool ComManager::handleLoginReply(const QString &reply_data)
     return true;
 }
 
-bool ComManager::handleUsersReply(const QString &reply_data)
+bool ComManager::handleDataReply(const QString& reply_path, const QString &reply_data)
 {
     QJsonParseError json_error;
 
     // Process reply
-    QJsonDocument users = QJsonDocument::fromJson(reply_data.toUtf8(), &json_error);
+    QJsonDocument data_list = QJsonDocument::fromJson(reply_data.toUtf8(), &json_error);
     if (json_error.error!= QJsonParseError::NoError)
         return false;
 
-    // Browse each users
-    QList<TeraData> users_data;
-    for (QJsonValue user:users.array()){
-        TeraData user_data(TERADATA_USER, user);
-        if (m_currentUser.getFieldValue("user_uuid").toUuid() == user_data.getFieldValue("user_uuid").toUuid()){
-            m_currentUser = user_data;
-            emit currentUserUpdated();
+    // Browse each items received
+    QList<TeraData> items;
+    TeraDataTypes items_type = TeraData::getDataTypeFromPath(reply_path);
+    for (QJsonValue data:data_list.array()){
+        TeraData item_data(items_type, data);
+
+        // Check if the currently connected user was updated.
+        if (items_type == TERADATA_USER){
+            if (m_currentUser.getFieldValue("user_uuid").toUuid() == item_data.getFieldValue("user_uuid").toUuid()){
+                m_currentUser = item_data;
+                emit currentUserUpdated();
+            }
         }
-        users_data.append(user_data);
+        items.append(item_data);
     }
 
     // Emit signal
-    if (!users_data.isEmpty()){
-        emit usersReceived(users_data);
+    switch (items_type) {
+    case TERADATA_UNKNOWN:
+        LOG_ERROR("Unknown object - don't know what to do with it.", "ComManager::handleDataReply");
+        break;
+    case TERADATA_USER:
+        emit usersReceived(items);
+        break;
+    case TERADATA_SITE:
+        emit sitesReceived(items);
+        break;
+    case TERADATA_KIT:
+        emit kitsReceived(items);
+        break;
+    case TERADATA_SESSIONTYPE:
+        emit sessionTypesReceived(items);
+        break;
+    case TERADATA_TESTDEF:
+        emit testDefsReceived(items);
+        break;
+    case TERADATA_PROJECT:
+        emit projectsReceived(items);
+        break;
     }
 
+    return true;
+}
 
+bool ComManager::handleFormReply(const QUrlQuery &reply_query, const QString &reply_data)
+{
+    emit formReceived(reply_query.toString(), reply_data);
     return true;
 }
 

@@ -56,6 +56,7 @@ private slots:
     void com_Waiting(bool waiting);
     void queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data);
     void postDataReply(QString path, QString data);
+    void setDataList(QList<TeraData> list);
 
     void searchChanged(QString new_search);
     void clearSearch();

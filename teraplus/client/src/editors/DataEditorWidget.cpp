@@ -12,9 +12,9 @@ DataEditorWidget::DataEditorWidget(ComManager *comMan, const TeraData *data, QWi
     // Set ComManager pointer
     m_comManager = comMan;
 
-    connect(m_comManager, &ComManager::queryResultsReceived, this, &DataEditorWidget::queryDataReply);
-    connect(m_comManager, &ComManager::postResultsReceived, this, &DataEditorWidget::postDataReply);
     connect(m_comManager, &ComManager::networkError, this, &DataEditorWidget::comDataError);
+    connect(m_comManager, &ComManager::queryResultsOK, this, &DataEditorWidget::queryDataReplyOK);
+    connect(m_comManager, &ComManager::postResultsOK, this, & DataEditorWidget::postDataReplyOK);
 
 }
 
@@ -184,24 +184,29 @@ void DataEditorWidget::undoOrDeleteData(){
     }
 }
 
-void DataEditorWidget::queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data)
+void DataEditorWidget::queryDataReplyOK(const QString &path, const QUrlQuery &query_args)
 {
     QString query_name = getQueryDataName(path, query_args);
     m_requests.removeOne(query_name);
+    if (!hasPendingDataRequests())
+        updateFieldsValue();
+
     if (m_requests.isEmpty())
         setEditing();
 
-    processQueryReply(path, query_args, data);
+
 }
 
-void DataEditorWidget::postDataReply(const QString &path, const QString &data)
+void DataEditorWidget::postDataReplyOK(const QString &path)
 {
     QString query_name = getQueryDataName(path, QUrlQuery());
     m_requests.removeOne(query_name);
+    if (!hasPendingDataRequests())
+        updateFieldsValue();
+
     if (m_requests.isEmpty())
         setReady();
 
-    processPostReply(path, data);
 }
 
 void DataEditorWidget::comDataError(QNetworkReply::NetworkError error, QString error_str)

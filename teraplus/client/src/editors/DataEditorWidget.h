@@ -43,11 +43,8 @@ public:
     void refreshData();
 
     void queryDataRequest(const QString &path, const QUrlQuery &query_args = QUrlQuery());
-    virtual void processQueryReply(const QString &path, const QUrlQuery &query_args, const QString &data)=0;
     bool hasPendingDataRequests();
-
     void postDataRequest(const QString &path, const QString &query_args);
-    virtual void processPostReply(const QString &path, const QString &data)=0;
 
 private:
     virtual void updateControlsState()=0;
@@ -57,12 +54,12 @@ private:
     QString getQueryDataName(const QString &path, const QUrlQuery &query_args);
 
     QList<QString>  m_requests;
-    ComManager*     m_comManager;
 
     EditorState     m_editState;
 protected:
     bool            m_undoing;
     TeraData*       m_data;
+    ComManager*     m_comManager;
 
 signals:
     void dataWasChanged();
@@ -80,8 +77,8 @@ public slots:
     void undoOrDeleteData();
 
 private slots:
-    void queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data);
-    void postDataReply(const QString &path, const QString &data);
+    void queryDataReplyOK(const QString &path, const QUrlQuery &query_args);
+    void postDataReplyOK(const QString &path);
     void comDataError(QNetworkReply::NetworkError error, QString error_str);
 };
 

@@ -33,6 +33,7 @@ DataListWidget::~DataListWidget()
 void DataListWidget::updateDataInList(TeraData* data){
 
     QListWidgetItem* item = nullptr;
+    bool already_present = false;
 
     // Check if we already have that item
     for (TeraData* current_data:m_datalist){
@@ -48,6 +49,8 @@ void DataListWidget::updateDataInList(TeraData* data){
         m_datalist.append(data);
         m_datamap[data] = item;
 
+    }else{
+        already_present = true;
     }
 
     item->setIcon(QIcon(TeraData::getIconFilenameForDataType(data->getDataType())));
@@ -66,6 +69,11 @@ void DataListWidget::updateDataInList(TeraData* data){
     if (ui->lstData->selectedItems().contains(item)){
         // Load editor
         showEditor(data);
+    }
+
+    // Delete item if it was already there (we copied what we needed)
+    if (already_present){
+        delete data;
     }
 }
 
@@ -100,8 +108,11 @@ void DataListWidget::showEditor(TeraData *data)
 void DataListWidget::connectSignals()
 {
     connect(m_comManager, &ComManager::waitingForReply, this, &DataListWidget::com_Waiting);
-    connect(m_comManager, &ComManager::queryResultsReceived, this, &DataListWidget::queryDataReply);
-    connect(m_comManager, &ComManager::postResultsReceived, this, &DataListWidget::postDataReply);
+    /*connect(m_comManager, &ComManager::queryResultsReceived, this, &DataListWidget::queryDataReply);
+    connect(m_comManager, &ComManager::postResultsReceived, this, &DataListWidget::postDataReply);*/
+
+    // Connect correct signal according to the datatype
+    connect(m_comManager, ComManager::getSignalFunctionForDataType(m_dataType), this, &DataListWidget::setDataList);
 
     connect(ui->txtSearch, &QLineEdit::textChanged, this, &DataListWidget::searchChanged);
     connect(ui->btnClear, &QPushButton::clicked, this, &DataListWidget::clearSearch);
@@ -176,6 +187,16 @@ void DataListWidget::postDataReply(QString path, QString data)
         }
     }
 
+}
+
+void DataListWidget::setDataList(QList<TeraData> list)
+{
+    for (int i=0; i<list.count(); i++){
+        if (list.at(i).getDataType() == m_dataType){
+            TeraData* item_data = new TeraData(list.at(i));
+            updateDataInList(item_data);
+        }
+    }
 }
 
 void DataListWidget::searchChanged(QString new_search){

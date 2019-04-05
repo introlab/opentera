@@ -40,8 +40,8 @@ public:
 
     void connectSignals();
 
-    void processQueryReply(const QString &path, const QUrlQuery &query_args, const QString &data);
-    void processPostReply(const QString &path, const QString &data);
+    //void processQueryReply(const QString &path, const QUrlQuery &query_args, const QString &data);
+    //void processPostReply(const QString &path, const QString &data);
 
 private:
     Ui::UserWidget* ui;
@@ -49,24 +49,28 @@ private:
     bool                m_limited; // Current user editing only
     QMap<int, int>      m_tableSites_ids_rows;
     QMap<int, int>      m_tableProjects_ids_rows;
-    QString             m_userprojects;
-    QString             m_usersites;
 
     void updateControlsState();
     void updateFieldsValue();
 
     bool validateData();
 
-    void fillSites(const QString& sites_json);
-    void fillSitesData();
-    void fillProjects(const QString& projects_json);
-    void fillProjectsData();
+    void fillSites(const QList<TeraData>& sites);
+    void updateSites(const QList<TeraData>& sites);
+    void fillProjects(const QList<TeraData>& projects);
+    void updateProjects(const QList<TeraData>& projects);
     QComboBox *buildRolesComboBox();
 
 public slots:
 
 
 private slots:
+    void processUsersReply(QList<TeraData> users);
+    void processSitesReply(QList<TeraData> sites);
+    void processProjectsReply(QList<TeraData> projects);
+    void processFormsReply(QString form_type, QString data);
+    void postResultReply(QString path);
+
     void btnEdit_clicked();
     void btnDelete_clicked();
     void btnSave_clicked();

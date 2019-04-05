@@ -62,7 +62,7 @@ TeraData &TeraData::operator =(const TeraData &other)
 
 bool TeraData::operator ==(const TeraData &other) const
 {
-    return getId() == other.getId();
+    return getId() == other.getId() && getDataType() == other.getDataType();
 }
 
 TeraDataTypes TeraData::getDataType() const
@@ -114,6 +114,8 @@ QString TeraData::getDataTypeName(const TeraDataTypes &data_type)
         return "session_type";
     case TERADATA_TESTDEF:
         return "test_type";
+    case TERADATA_PROJECT:
+        return "project";
     }
 
     return "";
@@ -123,7 +125,7 @@ TeraDataTypes TeraData::getDataTypeFromPath(const QString &path)
 {
     if (path==WEB_USERINFO_PATH) return TERADATA_USER;
     if (path==WEB_SITEINFO_PATH) return TERADATA_SITE;
-    //if (path==WEB_PROJECTINFO_PATH) return TERADATA_PROJECT;
+    if (path==WEB_PROJECTINFO_PATH) return TERADATA_PROJECT;
 
     LOG_ERROR("Unknown data type for path: " + path, "TeraData::getDataTypeFromPath");
 
@@ -134,6 +136,7 @@ QString TeraData::getPathForDataType(const TeraDataTypes &data_type)
 {
     if (data_type==TERADATA_USER) return WEB_USERINFO_PATH;
     if (data_type==TERADATA_SITE) return WEB_SITEINFO_PATH;
+    if (data_type==TERADATA_PROJECT) return WEB_PROJECTINFO_PATH;
 
     LOG_ERROR("Unknown path for data_type: " + getDataTypeName(data_type), "TeraData::getPathForDataType");
 

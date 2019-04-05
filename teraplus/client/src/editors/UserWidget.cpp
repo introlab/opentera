@@ -27,8 +27,8 @@ UserWidget::UserWidget(ComManager *comMan, const TeraData *data, QWidget *parent
     connectSignals();
 
     // Query forms definition
-    queryDataRequest(WEB_DEFINITIONS_PATH, QUrlQuery(WEB_DEFINITIONS_PROFILE));
-    queryDataRequest(WEB_DEFINITIONS_PATH, QUrlQuery(WEB_DEFINITIONS_USER));
+    queryDataRequest(WEB_FORMS_PATH, QUrlQuery(WEB_FORMS_QUERY_USER_PROFILE));
+    queryDataRequest(WEB_FORMS_PATH, QUrlQuery(WEB_FORMS_QUERY_USER));
 
     // Query sites and projects
     queryDataRequest(WEB_SITEINFO_PATH);
@@ -48,8 +48,6 @@ void UserWidget::setData(const TeraData *data){
    DataEditorWidget::setData(data);
 
     // Query sites and projects roles
-    m_usersites.clear();
-    m_userprojects.clear();
     QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
     queryDataRequest(WEB_SITEINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
     queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
@@ -132,142 +130,86 @@ bool UserWidget::validateData(){
     return valid;
 }
 
-void UserWidget::fillSites(const QString &sites_json)
+void UserWidget::fillSites(const QList<TeraData> &sites)
 {
-    QJsonParseError json_error;
-
-    QJsonDocument info = QJsonDocument::fromJson(sites_json.toUtf8(), &json_error);
-    if (json_error.error!= QJsonParseError::NoError){
-        LOG_ERROR("Unable to parse sites: " + json_error.errorString(), "UserWidget::fillSites");
-        return;
-    }
-
     ui->tableSites->clearContents();
     m_tableSites_ids_rows.clear();
 
-    if (info.isArray()){
-        QVariantList sites = info.array().toVariantList();
-        for (QVariant site:sites){
-            ui->tableSites->setRowCount(ui->tableSites->rowCount()+1);
-            int current_row = ui->tableSites->rowCount()-1;
-            if (site.canConvert(QMetaType::QVariantMap)){
-                QVariantMap site_data = site.toMap();
-                QTableWidgetItem* item = new QTableWidgetItem(site_data["site_name"].toString());
-                ui->tableSites->setItem(current_row,0,item);
-                ui->tableSites->setCellWidget(current_row,1,buildRolesComboBox());
-                m_tableSites_ids_rows.insert(site_data["id_site"].toInt(), current_row);
+    for (int i=0; i<sites.count(); i++){
+        ui->tableSites->setRowCount(ui->tableSites->rowCount()+1);
+        int current_row = ui->tableSites->rowCount()-1;
+        QTableWidgetItem* item = new QTableWidgetItem(sites.at(i).getFieldValue("site_name").toString());
+        ui->tableSites->setItem(current_row,0,item);
+        ui->tableSites->setCellWidget(current_row,1,buildRolesComboBox());
+        m_tableSites_ids_rows.insert(sites.at(i).getFieldValue("id_site").toInt(), current_row);
+    }
+}
+
+void UserWidget::updateSites(const QList<TeraData>& sites)
+{
+    // Don't do anything if we don't have the table data first
+    if (m_tableSites_ids_rows.isEmpty())
+        return;
+
+    for (int i=0; i<sites.count(); i++){
+        int site_id = sites.at(i).getId();
+        if (m_tableSites_ids_rows.contains(site_id)){
+            int row = m_tableSites_ids_rows[site_id];
+            QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableSites->cellWidget(row,1));
+            if (combo_roles){
+                int index = combo_roles->findData(sites.at(i).getFieldValue("site_role").toString());
+                if (index >= 0){
+                    combo_roles->setCurrentIndex(index);
+                }else{
+                    combo_roles->setCurrentIndex(0);
+                }
             }
+        }else{
+            LOG_WARNING("Site ID " + QString::number(site_id) + " not found in table.", "UserWidget::fillSitesData");
         }
     }
 }
 
-void UserWidget::fillSitesData()
+void UserWidget::fillProjects(const QList<TeraData> &projects)
 {
-    // Don't do anything if we don't have the table data first
-    if (m_tableSites_ids_rows.isEmpty() || m_usersites.isEmpty())
-        return;
-
-    QJsonParseError json_error;
-
-    QJsonDocument info = QJsonDocument::fromJson(m_usersites.toUtf8(), &json_error);
-    if (json_error.error!= QJsonParseError::NoError){
-        LOG_ERROR("Unable to parse sites: " + json_error.errorString(), "UserWidget::fillSites");
-        return;
-    }
-
-     if (info.isArray()){
-         QVariantList sites = info.array().toVariantList();
-         for (QVariant site:sites){
-             if (site.canConvert(QMetaType::QVariantMap)){
-                 QVariantMap site_data = site.toMap();
-                 int site_id = site_data["id_site"].toInt();
-                 if (m_tableSites_ids_rows.contains(site_id)){
-                     int row = m_tableSites_ids_rows[site_id];
-                     QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableSites->cellWidget(row,1));
-                     if (combo_roles){
-                         int index = combo_roles->findData(site_data["site_role"].toString());
-                         if (index >= 0){
-                             combo_roles->setCurrentIndex(index);
-                         }else{
-                             combo_roles->setCurrentIndex(0);
-                         }
-                     }
-                 }else{
-                     LOG_WARNING("Site ID " + site_data["id_site"].toString() + " not found in table.", "UserWidget::fillSitesData");
-                 }
-             }
-         }
-     }
-}
-
-void UserWidget::fillProjects(const QString &projects_json)
-{
-    QJsonParseError json_error;
-
-    QJsonDocument info = QJsonDocument::fromJson(projects_json.toUtf8(), &json_error);
-    if (json_error.error!= QJsonParseError::NoError){
-        LOG_ERROR("Unable to parse projects: " + json_error.errorString(), "UserWidget::fillProjects");
-        return;
-    }
-
     ui->tableProjects->clearContents();
     m_tableProjects_ids_rows.clear();
 
-    if (info.isArray()){
-        QVariantList projects = info.array().toVariantList();
-        for (QVariant project:projects){
-            ui->tableProjects->setRowCount(ui->tableProjects->rowCount()+1);
-            int current_row = ui->tableProjects->rowCount()-1;
-            if (project.canConvert(QMetaType::QVariantMap)){
-                QVariantMap proj_data = project.toMap();
-                QTableWidgetItem* item = new QTableWidgetItem(proj_data["site_name"].toString());
-                ui->tableProjects->setItem(current_row,0,item);
-                item = new QTableWidgetItem(proj_data["project_name"].toString());
-                ui->tableProjects->setItem(current_row,1,item);
-                ui->tableProjects->setCellWidget(current_row,2,buildRolesComboBox());
-                m_tableProjects_ids_rows.insert(proj_data["id_project"].toInt(), current_row);
-            }
-        }
+    for (int i=0; i<projects.count(); i++){
+        ui->tableProjects->setRowCount(ui->tableProjects->rowCount()+1);
+        int current_row = ui->tableProjects->rowCount()-1;
+        QTableWidgetItem* item = new QTableWidgetItem(projects.at(i).getFieldValue("site_name").toString());
+        ui->tableProjects->setItem(current_row,0,item);
+        item = new QTableWidgetItem(projects.at(i).getFieldValue("project_name").toString());
+        ui->tableProjects->setItem(current_row,1,item);
+        ui->tableProjects->setCellWidget(current_row,2,buildRolesComboBox());
+        m_tableProjects_ids_rows.insert(projects.at(i).getFieldValue("id_project").toInt(), current_row);
     }
 }
 
-void UserWidget::fillProjectsData()
+void UserWidget::updateProjects(const QList<TeraData>& projects)
 {
     // Don't do anything if we don't have the table data first
-    if (m_tableProjects_ids_rows.isEmpty() || m_userprojects.isEmpty())
+    if (m_tableProjects_ids_rows.isEmpty())
         return;
 
-    QJsonParseError json_error;
-
-    QJsonDocument info = QJsonDocument::fromJson(m_userprojects.toUtf8(), &json_error);
-    if (json_error.error!= QJsonParseError::NoError){
-        LOG_ERROR("Unable to parse projects: " + json_error.errorString(), "UserWidget::fillProjectsData");
-        return;
+    for (int i=0; i<projects.count(); i++){
+        int project_id = projects.at(i).getId();
+        if (m_tableProjects_ids_rows.contains(project_id)){
+            int row = m_tableProjects_ids_rows[project_id];
+            QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableProjects->cellWidget(row,2));
+            if (combo_roles){
+                int index = combo_roles->findData(projects.at(i).getFieldValue("project_role").toString());
+                if (index >= 0){
+                    combo_roles->setCurrentIndex(index);
+                }else{
+                    combo_roles->setCurrentIndex(0);
+                }
+            }
+        }else{
+            LOG_WARNING("Project ID " + QString::number(project_id) + " not found in table.", "UserWidget::fillProjectsData");
+        }
     }
-
-    if (info.isArray()){
-        QVariantList projects = info.array().toVariantList();
-        for (QVariant project:projects){
-            if (project.canConvert(QMetaType::QVariantMap)){
-                QVariantMap proj_data = project.toMap();
-                 int project_id = proj_data["id_project"].toInt();
-                 if (m_tableProjects_ids_rows.contains(project_id)){
-                     int row = m_tableProjects_ids_rows[project_id];
-                     QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableProjects->cellWidget(row,2));
-                     if (combo_roles){
-                         int index = combo_roles->findData(proj_data["project_role"].toString());
-                         if (index >= 0){
-                             combo_roles->setCurrentIndex(index);
-                         }else{
-                             combo_roles->setCurrentIndex(0);
-                         }
-                     }
-                 }else{
-                     LOG_WARNING("Project ID " + proj_data["id_site"].toString() + " not found in table.", "UserWidget::fillProjectsData");
-                 }
-             }
-         }
-     }
 }
 
 QComboBox *UserWidget::buildRolesComboBox()
@@ -281,6 +223,74 @@ QComboBox *UserWidget::buildRolesComboBox()
     return item_roles;
 }
 
+void UserWidget::processUsersReply(QList<TeraData> users)
+{
+    for (int i=0; i<users.count(); i++){
+        if (users.at(i) == *m_data){
+            // We found "ourself" in the list - update data.
+            *m_data = users.at(i);
+            updateFieldsValue();
+            break;
+        }
+    }
+    if (!hasPendingDataRequests())
+        updateFieldsValue();
+}
+
+void UserWidget::processSitesReply(QList<TeraData> sites)
+{
+    if (m_tableSites_ids_rows.isEmpty()){
+        // We don't have any site list yet - fill it with what we got.
+        fillSites(sites);
+    }else{
+        // We want to update user roles for each site
+        updateSites(sites);
+    }
+}
+
+void UserWidget::processProjectsReply(QList<TeraData> projects)
+{
+    if (m_tableProjects_ids_rows.isEmpty()){
+        // We don't have any project list yet - fill it with what we got.
+        fillProjects(projects);
+    }else{
+        // We want to update user roles for each project
+        updateProjects(projects);
+    }
+}
+
+void UserWidget::processFormsReply(QString form_type, QString data)
+{
+    if (form_type == WEB_FORMS_QUERY_USER){
+        ui->wdgUser->buildUiFromStructure(data);
+        // Disable some widgets if we are in limited mode (editing self profile)
+        if (m_limited){
+            // Disable some widgets
+            QWidget* item = ui->wdgUser->getWidgetForField("user_username");
+            if (item) item->setEnabled(false);
+            item = ui->wdgUser->getWidgetForField("user_enabled");
+            if (item) item->setEnabled(false);
+            item = ui->wdgUser->getWidgetForField("user_superadmin");
+            if (item) item->setEnabled(false);
+        }
+        return;
+    }
+
+    if (form_type == WEB_FORMS_QUERY_USER_PROFILE){
+        ui->wdgProfile->buildUiFromStructure(data);
+        return;
+    }
+}
+
+void UserWidget::postResultReply(QString path)
+{
+    // OK, data was saved!
+    if (path==WEB_USERINFO_PATH){
+        if (parent())
+            emit closeRequest();
+    }
+}
+
 void UserWidget::setLimited(bool limited){
     m_limited = limited;
 
@@ -290,71 +300,17 @@ void UserWidget::setLimited(bool limited){
 
 void UserWidget::connectSignals()
 {
+    connect(m_comManager, &ComManager::usersReceived, this, &UserWidget::processUsersReply);
+    connect(m_comManager, &ComManager::sitesReceived, this, &UserWidget::processSitesReply);
+    connect(m_comManager, &ComManager::projectsReceived, this, &UserWidget::processProjectsReply);
+    connect(m_comManager, &ComManager::formReceived, this, &UserWidget::processFormsReply);
+    connect(m_comManager, &ComManager::postResultsOK, this, &UserWidget::postResultReply);
+
     connect(ui->btnUndo, &QPushButton::clicked, this, &UserWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &UserWidget::btnSave_clicked);
 
 }
 
-void UserWidget::processQueryReply(const QString &path, const QUrlQuery &query_args, const QString &data)
-{
-    QString query_str=query_args.toString();
-    if (path == WEB_DEFINITIONS_PATH){
-        if (query_str.contains(WEB_DEFINITIONS_PROFILE))
-            ui->wdgProfile->buildUiFromStructure(data);
-        else{
-            if (query_str.contains(WEB_DEFINITIONS_USER)){
-                ui->wdgUser->buildUiFromStructure(data);
-                // Disable some widgets if we are in limited mode (editing self profile)
-                if (m_limited){
-                    // Disable some widgets
-                    QWidget* item = ui->wdgUser->getWidgetForField("user_username");
-                    if (item) item->setEnabled(false);
-                    item = ui->wdgUser->getWidgetForField("user_enabled");
-                    if (item) item->setEnabled(false);
-                    item = ui->wdgUser->getWidgetForField("user_superadmin");
-                    if (item) item->setEnabled(false);
-                }
-            }
-        }
-    }
-
-    if (path == WEB_SITEINFO_PATH){
-        if (query_args.hasQueryItem(WEB_QUERY_USERUUID)){
-            // Specific roles for the sites
-            m_usersites = data;
-        }else{
-            // All sites accessibles by the current user, for base lists
-            fillSites(data);
-        }
-        fillSitesData();
-
-    }
-
-    if (path == WEB_PROJECTINFO_PATH){
-        if (query_args.hasQueryItem(WEB_QUERY_USERUUID)){
-            // Specific roles for the projects
-            m_userprojects = data;
-        }else{
-            // All projects accessibles by the current user, for base lists
-            fillProjects(data);
-        }
-        fillProjectsData();
-
-    }
-
-    if (!hasPendingDataRequests())
-        updateFieldsValue();
-}
-
-void UserWidget::processPostReply(const QString &path, const QString &data)
-{
-    Q_UNUSED(data);
-    if (path == WEB_USERINFO_PATH){
-        // OK, data was saved!
-        if (parent())
-            emit closeRequest();
-    }
-}
 void UserWidget::btnEdit_clicked()
 {
     setEditing(true);

@@ -8,9 +8,9 @@
 #define WEB_SITEINFO_PATH       "/api/sites"
 #define WEB_PROJECTINFO_PATH    "/api/projects"
 
-#define WEB_DEFINITIONS_PATH    "/api/forms"
-#define WEB_DEFINITIONS_PROFILE "type=user_profile"
-#define WEB_DEFINITIONS_USER    "type=user"
+#define WEB_FORMS_PATH                  "/api/forms"
+#define WEB_FORMS_QUERY_USER_PROFILE    "type=user_profile"
+#define WEB_FORMS_QUERY_USER            "type=user"
 
 #define WEB_QUERY_USERUUID      "user_uuid"
 #define WEB_QUERY_ID_USER       "id_user"
