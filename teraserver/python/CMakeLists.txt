@@ -37,7 +37,7 @@ add_custom_target(
     # COMMAND ${PYBABEL_EXECUTABLE} init -i ${translation_pot_file} -d translations -l en
     COMMAND ${PYBABEL_EXECUTABLE} update -i ${translation_pot_file} -d translations
     COMMAND ${PYBABEL_EXECUTABLE} compile -d translations
-    DEPENDS ${PYBABEL_EXECUTABLE} python-env
+    DEPENDS python-env ${PYBABEL_EXECUTABLE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     SOURCES babel.cfg
 )
