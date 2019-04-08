@@ -48,9 +48,9 @@ void UserWidget::setData(const TeraData *data){
    DataEditorWidget::setData(data);
 
     // Query sites and projects roles
-    QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
+   /* QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
     queryDataRequest(WEB_SITEINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
-    queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
+    queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));*/
 
 }
 
@@ -63,17 +63,39 @@ bool UserWidget::dataIsNew(){
 
 void UserWidget::saveData(bool signal){
 
+    // User Profile
     QString user_profile = ui->wdgProfile->getFormData(true);
 
     if (!ui->wdgUser->setFieldValue("user_profile", user_profile)){
         LOG_ERROR(tr("Field user_profile can't be set."), "UserWidget::saveData");
     }
 
-    QString user_data = ui->wdgUser->getFormData();
-    postDataRequest(WEB_USERINFO_PATH, user_data);
+    //QString user_data = ui->wdgUser->getFormData();
+    QJsonDocument user_data = ui->wdgUser->getFormDataJson();
 
-    //TODO: Site access
-    //TODO: Project access
+    // Site access
+
+    QJsonArray site_access = getSitesRoles();
+    if (!site_access.isEmpty()){
+        QJsonObject base_obj = user_data.object();
+        QJsonObject base_user = base_obj["user"].toObject();
+        base_user.insert("sites",site_access);
+        base_obj.insert("user", base_user);
+        user_data.setObject(base_obj);
+    }
+
+    // Project access
+    QJsonArray project_access = getProjectsRoles();
+    if (!project_access.isEmpty()){
+        QJsonObject base_obj = user_data.object();
+        QJsonObject base_user = base_obj["user"].toObject();
+        base_user.insert("projects",project_access);
+        base_obj.insert("user", base_user);
+        user_data.setObject(base_obj);
+    }
+
+    //qDebug() << user_data.toJson();
+    postDataRequest(WEB_USERINFO_PATH, user_data.toJson());
 
     if (signal)
         emit dataWasChanged();
@@ -151,6 +173,12 @@ void UserWidget::fillSites(const QList<TeraData> &sites)
         }
         m_tableSites_ids_rows.insert(sites.at(i).getId(), current_row);
     }
+
+    // Query sites roles
+    if (m_data){
+        QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
+        queryDataRequest(WEB_SITEINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
+    }
 }
 
 void UserWidget::updateSites(const QList<TeraData>& sites)
@@ -171,12 +199,35 @@ void UserWidget::updateSites(const QList<TeraData>& sites)
                 }else{
                     combo_roles->setCurrentIndex(0);
                 }
+                combo_roles->setProperty("original_index", index);
             }
 
         }else{
-            LOG_WARNING("Site ID " + QString::number(site_id) + " not found in table.", "UserWidget::fillSitesData");
+            LOG_WARNING("Site ID " + QString::number(site_id) + " not found in table.", "UserWidget::updateSites");
         }
     }
+}
+
+QJsonArray UserWidget::getSitesRoles()
+{
+    QJsonArray roles;
+
+    for (int i=0; i<m_tableSites_ids_rows.count(); i++){
+        int site_id = m_tableSites_ids_rows.keys().at(i);
+        int row = m_tableSites_ids_rows[site_id];
+        QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableSites->cellWidget(row,1));
+        //qDebug() << site_id << ": " << combo_roles->property("original_index").toInt() << " = " << combo_roles->currentIndex() << "?";
+        if (combo_roles->property("original_index").toInt() != combo_roles->currentIndex()){
+            QJsonObject data_obj;
+            // Ok, value was modified - must add!
+            QJsonValue role = combo_roles->currentData().toString();
+            data_obj.insert("id_site", site_id);
+            data_obj.insert("site_role", role);
+            roles.append(data_obj);
+        }
+    }
+
+    return roles;
 }
 
 void UserWidget::fillProjects(const QList<TeraData> &projects)
@@ -200,6 +251,11 @@ void UserWidget::fillProjects(const QList<TeraData> &projects)
         }
         m_tableProjects_ids_rows.insert(projects.at(i).getId(), current_row);
     }
+
+    if (m_data){
+        QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
+        queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
+    }
 }
 
 void UserWidget::updateProjects(const QList<TeraData>& projects)
@@ -220,11 +276,33 @@ void UserWidget::updateProjects(const QList<TeraData>& projects)
                 }else{
                     combo_roles->setCurrentIndex(0);
                 }
+                combo_roles->setProperty("original_index", index);
             }
         }else{
             LOG_WARNING("Project ID " + QString::number(project_id) + " not found in table.", "UserWidget::fillProjectsData");
         }
     }
+}
+
+QJsonArray UserWidget::getProjectsRoles()
+{
+    QJsonArray roles;
+
+    for (int i=0; i<m_tableProjects_ids_rows.count(); i++){
+        int proj_id = m_tableProjects_ids_rows.keys().at(i);
+        int row = m_tableProjects_ids_rows[proj_id];
+        QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableProjects->cellWidget(row,2));
+        if (combo_roles->property("original_index").toInt() != combo_roles->currentIndex()){
+            QJsonObject data_obj;
+            // Ok, value was modified - must add!
+            QJsonValue role = combo_roles->currentData().toString();
+            data_obj.insert("id_project", proj_id);
+            data_obj.insert("project_role", role);
+            roles.append(data_obj);
+        }
+    }
+
+    return roles;
 }
 
 QComboBox *UserWidget::buildRolesComboBox()

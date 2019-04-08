@@ -57,8 +57,12 @@ private:
 
     void fillSites(const QList<TeraData>& sites);
     void updateSites(const QList<TeraData>& sites);
+    QJsonArray getSitesRoles();
+
     void fillProjects(const QList<TeraData>& projects);
     void updateProjects(const QList<TeraData>& projects);
+    QJsonArray getProjectsRoles();
+
     QComboBox *buildRolesComboBox();
 
 public slots:

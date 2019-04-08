@@ -8,6 +8,7 @@ class Message
 
 public:
     typedef enum {
+        MESSAGE_NONE,
         MESSAGE_WORKING,
         MESSAGE_OK,
         MESSAGE_WARNING,
