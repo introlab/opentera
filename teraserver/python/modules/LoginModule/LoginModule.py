@@ -6,25 +6,20 @@ from modules.FlaskModule.FlaskModule import flask_app
 
 from libtera.redis.RedisClient import RedisClient
 from libtera.db.models.TeraUser import TeraUser
+from libtera.db.models.TeraParticipant import TeraParticipant
 
 from modules.Globals import auth
 from modules.RedisModule.RedisModule import get_redis
 from libtera.ConfigManager import ConfigManager
 import datetime
-from flask_jwt import JWT, jwt_required, current_identity
 
+from flask import current_app, request, jsonify, _request_ctx_stack
+from werkzeug.local import LocalProxy
+from flask_restful import Resource, reqparse
+from functools import wraps
 
-def authenticate(username, password):
-    print('authenticate JWT')
-    pass
-
-
-def identity(payload):
-    print('identity JWT')
-    pass
-
-
-jwt = JWT(flask_app, authenticate, identity)
+# Current identity, stacked
+current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant', None))
 
 
 class LoginModule(RedisClient):
@@ -52,10 +47,29 @@ class LoginModule(RedisClient):
                                  'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
                                  'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
 
-        # Token based authentication
-        flask_app.config.update({'JWT_VERIFY_EXPIRATION': False,
-                                 'JWT_AUTH_HEADER_PREFIX': 'OpenTeraToken',
-                                 'JWT_DEFAULT_REALM': 'OpenTera'})
+    @staticmethod
+    def token_required(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            # Parse args
+            parser = reqparse.RequestParser()
+            parser.add_argument('token', type=str, help='Token', required=True)
+
+            args = parser.parse_args(strict=False)
+
+            # Verify token.
+            if 'token' in args:
+                # Load participant from DB
+                _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(args['token'])
+
+                if current_participant:
+                    # Returns the function if authenticated with token
+                    return f(*args, **kwargs)
+
+            # Any other case, do not call function
+            return 'Forbidden', 403
+
+        return decorated
 
     @staticmethod
     @login_manager.user_loader

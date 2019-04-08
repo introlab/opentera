@@ -9,6 +9,7 @@ from libtera.db.models import *
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
+from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
@@ -42,6 +43,10 @@ class DBManager:
         if TeraParticipantGroup.get_count() == 0:
             print("No participant groups - creating defaults")
             TeraParticipantGroup.create_defaults()
+
+        if TeraParticipant.get_count() == 0:
+            print("No participant - creating defaults")
+            TeraParticipant.create_defaults()
 
         if TeraUser.get_count() == 0:
             print('No users - creating defaults')

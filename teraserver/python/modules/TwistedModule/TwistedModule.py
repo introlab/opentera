@@ -19,6 +19,7 @@ import sys
 
 # from modules.RedisModule import get_redis
 from libtera.db.models.TeraUser import TeraUser
+from libtera.db.models.TeraParticipant import TeraParticipant
 import uuid
 
 from libtera.redis.RedisProtocolFactory import RedisProtocolFactory, redisProtocol
@@ -36,17 +37,26 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
         WebSocketServerProtocol.__init__(self)
         RedisClient.__init__(self, config=config)
         self.user = None
+        self.participant = None
 
     def redisConnectionMade(self):
         print('TeraWebSocketServerProtocol redisConnectionMade (redis)')
 
-        # Subscribe to our own messages
-        self.subscribe('server.' + str(self.user.user_uuid) + '.*')
+        if self.user:
+            # Subscribe to our own messages
+            self.subscribe('server.' + str(self.user.user_uuid) + '.*')
+        if self.participant:
+            # Subscribe to our own messages
+            self.subscribe('server.' + str(self.participant.participant_uuid) + '.*')
 
     def onMessage(self, msg, binary):
         print('TeraWebSocketProtocol onMessage', self, msg, binary)
 
-        self.publish('websocket.' + str(self.user.user_uuid) + '.request', msg)
+        if self.user:
+            self.publish('websocket.' + str(self.user.user_uuid) + '.request', msg)
+
+        if self.participant:
+            self.publish('websocket.' + str(self.participant.participant_uuid) + '.request', msg)
 
         # Echo for debug
         self.sendMessage(msg, binary)
@@ -61,11 +71,11 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
         """
         print('onConnect', self, request)
 
-        # Look for id in
-        id = request.params['id']
-        print('testing id: ', id)
+        if request.params.__contains__('id'):
 
-        if len(id) > 0:
+            # Look for id in
+            id = request.params['id']
+            print('testing id: ', id)
 
             value = self.redisGet(id[0])
 
@@ -82,18 +92,40 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
                     self.redisDelete(id[0])
                     return
 
+        if request.params.__contains__('token'):
+
+            # Look for token
+            token = request.params['token']
+            print('testing token: ', token)
+
+            self.participant = TeraParticipant.get_participant_by_token(token[0])
+
+            if self.participant is not None:
+                print('Participant connected ', self.participant)
+                return
+
         # if we get here we need to close the websocket, auth failed.
         # To deny a connection, raise an Exception
         raise ConnectionDeny(ConnectionDeny.FORBIDDEN, "Websocket authentication failed (key, uuid).")
 
     def onOpen(self):
-        # Advertise that we have a new user
-        self.publish('websocket.' + str(self.user.user_uuid), 'connected')
-        # At this stage, we can send messages. initiating...
-        self.sendMessage(bytes('Hello ' + str(self.user), 'utf-8'), False)
+        if self.user:
+            # Advertise that we have a new user
+            self.publish('websocket.' + str(self.user.user_uuid), 'connected')
+            # At this stage, we can send messages. initiating...
+            self.sendMessage(bytes('Hello ' + str(self.user), 'utf-8'), False)
+        elif self.participant:
+            # Advertise that we have a new user
+            self.publish('websocket.' + str(self.participant.participant_uuid), 'connected')
+            # At this stage, we can send messages. initiating...
+            self.sendMessage(bytes('Hello ' + str(self.participant), 'utf-8'), False)
 
     def onClose(self, wasClean, code, reason):
-        self.publish('websocket.' + str(self.user.user_uuid), 'disconnected')
+        if self.user:
+            self.publish('websocket.' + str(self.user.user_uuid), 'disconnected')
+        elif self.participant:
+            self.publish('websocket.' + str(self.participant.participant_uuid), 'disconnected')
+
         print('onClose', self, wasClean, code, reason)
 
     def onOpenHandshakeTimeout(self):
