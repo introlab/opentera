@@ -9,7 +9,7 @@ OpenTera is licensed under[Apache License 2.0](https://www.apache.org/licenses/L
 OpenTera is based or uses the following Open Source Technologies :
 * [Python 3.6+, PSFL (BSD like)](https://www.python.org)
 * [Flask, BSD](http://flask.pocoo.org)
-* [Redis, BSD] (https://redislabs.com/why-redis/)
+* [Redis, BSD](https://redislabs.com/why-redis/)
  * [txredisapi, Apache License 2.0](https://github.com/fiorix/txredisapi) 
 * [SQLAlchemy, MIT](https://www.sqlalchemy.org)
 * [Twisted, MIT](https://twistedmatrix.com)
