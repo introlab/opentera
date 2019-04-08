@@ -49,13 +49,15 @@ TeraData &TeraData::operator =(const TeraData &other)
     // qDebug() << "Other: " << other.dynamicPropertyNames();
 
     // qDebug() << "This: " << dynamicPropertyNames();
-    for (int i=0; i<other.dynamicPropertyNames().count(); i++){
+    /*for (int i=0; i<other.dynamicPropertyNames().count(); i++){
         //metaObject()->property(i).write(this, other.metaObject()->property(i).read(&other));
         QString name = QString(other.dynamicPropertyNames().at(i));
         // qDebug() << "TeraData::operator= - setting " << name;
         setFieldValue(name, other.property(name.toStdString().c_str()));
-    }
+    }*/
     // qDebug() << "This final: " << dynamicPropertyNames();
+
+    m_fieldsValue = other.m_fieldsValue;
 
     return *this;
 }
@@ -72,13 +74,15 @@ TeraDataTypes TeraData::getDataType() const
 
 bool TeraData::hasFieldName(const QString &fieldName) const
 {
-    return dynamicPropertyNames().contains(fieldName.toUtf8());
+    //return dynamicPropertyNames().contains(fieldName.toUtf8());
+    return m_fieldsValue.contains(fieldName);
 }
 
 QVariant TeraData::getFieldValue(const QString &fieldName) const
 {
     if (hasFieldName(fieldName))
-        return property(fieldName.toStdString().c_str());
+        //return property(fieldName.toStdString().c_str());
+        return m_fieldsValue[fieldName];
 
     LOG_WARNING("Field " + fieldName + " not found in " + metaObject()->className(), "TeraData::getFieldValue");
     return QVariant();
@@ -86,14 +90,16 @@ QVariant TeraData::getFieldValue(const QString &fieldName) const
 
 void TeraData::setFieldValue(const QString &fieldName, const QVariant &fieldValue)
 {
-    setProperty(fieldName.toStdString().c_str(), fieldValue);
+    //setProperty(fieldName.toStdString().c_str(), fieldValue);
+    m_fieldsValue[fieldName] = fieldValue;
 }
 
 QList<QString> TeraData::getFieldList() const
 {
     QList<QString> rval;
-    for (QByteArray fieldname:dynamicPropertyNames()){
-        rval.append(QString(fieldname));
+    //for (QByteArray fieldname:dynamicPropertyNames()){
+    for (QString fieldname:m_fieldsValue.keys()){
+        rval.append(fieldname);
     }
 
     return rval;
@@ -161,7 +167,7 @@ QString TeraData::getIconFilenameForDataType(const TeraDataTypes &data_type)
     }
 
 }
-
+/*
 bool TeraData::hasMetaProperty(const QString &fieldName) const
 {
     for (int i=0; i<metaObject()->propertyCount(); i++){
@@ -170,7 +176,7 @@ bool TeraData::hasMetaProperty(const QString &fieldName) const
         }
     }
     return false;
-}
+}*/
 
 void TeraData::setDataType(TeraDataTypes data_type)
 {
@@ -219,7 +225,7 @@ QJsonObject TeraData::toJson()
                 LOG_WARNING("Field " + fieldName + " can't be 'jsonized'", "TeraData::toJson");
             }
         }
-    }*/
+    }*//*
     for (int i=0; i<dynamicPropertyNames().count(); i++){
         QString fieldName = QString(dynamicPropertyNames().at(i));
         // Ignore "metaObject" properties
@@ -238,7 +244,26 @@ QJsonObject TeraData::toJson()
                 LOG_WARNING("Field " + fieldName + " can't be 'jsonized'", "TeraData::toJson");
             }
         }
-    }
+    }*/
     //qDebug() << object;
+
+    for (int i=0; i<m_fieldsValue.count(); i++){
+        QString fieldName = m_fieldsValue.keys().at(i);
+        // Ignore "metaObject" properties
+        QVariant fieldData = getFieldValue(fieldName);
+        if (fieldData.canConvert(QMetaType::QString)){
+            QDateTime date_tester = QDateTime::fromString(fieldData.toString(), Qt::ISODateWithMs);
+            if (date_tester.isValid()){
+                object[fieldName] = fieldData.toDateTime().toString(Qt::ISODateWithMs);
+            }else{
+                object[fieldName] = fieldData.toString();
+            }
+        }else if (fieldData.canConvert(QMetaType::QJsonValue)){
+            object[fieldName] = fieldData.toJsonValue();
+        }else{
+            LOG_WARNING("Field " + fieldName + " can't be 'jsonized'", "TeraData::toJson");
+        }
+    }
+
     return object;
 }

@@ -30,7 +30,12 @@ class QuerySites(Resource):
         if args['user_uuid']:
             queried_user = TeraUser.get_user_by_uuid(args['user_uuid'])
             if queried_user is not None:
-                sites = queried_user.get_accessible_sites()
+                queried_sites = queried_user.get_accessible_sites()
+                # Match with accessible sites for the current user
+                current_sites = current_user.get_accessible_sites()
+                for site in queried_sites:
+                    if site in current_sites:
+                        sites.append(site)
 
         try:
             sites_list = []

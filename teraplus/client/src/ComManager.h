@@ -46,13 +46,16 @@ public:
     void doUpdateCurrentUser();
 
     TeraData &getCurrentUser();
+    QString getCurrentUserSiteRole(int site_id);
+    QString getCurrentUserProjectRole(int project_id);
+    bool isCurrentUserSuperAdmin();
     typedef void (ComManager::* signal_ptr)(QList<TeraData>);
 
     static signal_ptr getSignalFunctionForDataType(const TeraDataTypes& data_type);
 
 protected:
     bool handleLoginReply(const QString& reply_data);
-    bool handleDataReply(const QString& reply_path, const QString& reply_data);
+    bool handleDataReply(const QString& reply_path, const QString& reply_data, const QUrlQuery& reply_query);
     bool handleFormReply(const QUrlQuery& reply_query, const QString& reply_data);
 
 

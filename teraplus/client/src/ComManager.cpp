@@ -87,13 +87,13 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
 
         if (!handled){
             // General case
-            handled=handleDataReply(reply_path, reply_data);
+            handled=handleDataReply(reply_path, reply_data, reply_query);
             if (handled) emit queryResultsOK(reply_path, reply_query);
         }
     }
 
     if (reply->operation()==QNetworkAccessManager::PostOperation){
-        handled=handleDataReply(reply_path, reply_data);
+        handled=handleDataReply(reply_path, reply_data, reply_query);
         if (handled) emit postResultsOK(reply_path);
     }
 
@@ -131,6 +131,59 @@ void ComManager::doUpdateCurrentUser()
 TeraData &ComManager::getCurrentUser()
 {
     return m_currentUser;
+}
+
+QString ComManager::getCurrentUserSiteRole(int site_id)
+{
+    QString rval = "";
+
+    if (m_currentUser.hasFieldName("sites")){
+        QVariantList sites_list = m_currentUser.getFieldValue("sites").toList();
+        for (int i=0; i<sites_list.count(); i++){
+            QVariantMap site_info = sites_list.at(i).toMap();
+            if (site_info.contains("id_site")){
+                if (site_info["id_site"].toInt() == site_id){
+                    if (site_info.contains("site_role")){
+                        rval = site_info["site_role"].toString();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return rval;
+}
+
+QString ComManager::getCurrentUserProjectRole(int project_id)
+{
+    QString rval = "";
+
+    if (m_currentUser.hasFieldName("projects")){
+        QVariantList proj_list = m_currentUser.getFieldValue("projects").toList();
+        for (int i=0; i<proj_list.count(); i++){
+            QVariantMap proj_info = proj_list.at(i).toMap();
+            if (proj_info.contains("id_project")){
+                if (proj_info["id_project"].toInt() == project_id){
+                    if (proj_info.contains("project_role")){
+                        rval = proj_info["project_role"].toString();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return rval;
+}
+
+bool ComManager::isCurrentUserSuperAdmin()
+{
+    bool rval = false;
+    if (m_currentUser.hasFieldName("user_superadmin")){
+        rval = m_currentUser.getFieldValue("user_superadmin").toBool();
+    }
+    return rval;
 }
 
 ComManager::signal_ptr ComManager::getSignalFunctionForDataType(const TeraDataTypes &data_type)
@@ -180,7 +233,7 @@ bool ComManager::handleLoginReply(const QString &reply_data)
     return true;
 }
 
-bool ComManager::handleDataReply(const QString& reply_path, const QString &reply_data)
+bool ComManager::handleDataReply(const QString& reply_path, const QString &reply_data, const QUrlQuery &reply_query)
 {
     QJsonParseError json_error;
 
@@ -195,9 +248,10 @@ bool ComManager::handleDataReply(const QString& reply_path, const QString &reply
     for (QJsonValue data:data_list.array()){
         TeraData item_data(items_type, data);
 
-        // Check if the currently connected user was updated.
+        // Check if the currently connected user was updated and not requesting a list (limited information)
         if (items_type == TERADATA_USER){
-            if (m_currentUser.getFieldValue("user_uuid").toUuid() == item_data.getFieldValue("user_uuid").toUuid()){
+            if (m_currentUser.getFieldValue("user_uuid").toUuid() == item_data.getFieldValue("user_uuid").toUuid() &&
+                    !reply_query.hasQueryItem(WEB_QUERY_LIST)){
                 m_currentUser = item_data;
                 emit currentUserUpdated();
             }

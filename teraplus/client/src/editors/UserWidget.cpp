@@ -101,12 +101,14 @@ void UserWidget::updateControlsState(){
     }
 
     // Enable access editing
-    bool allow_access_edit = m_limited;
-    if (m_data)
+    bool allow_access_edit = !m_limited;
+    if (m_data){
+        bool user_is_superadmin = m_data->getFieldValue("user_superadmin").toBool();
         // Super admin can't be changed - they have access to everything!
-        allow_access_edit |= m_data->getFieldValue("user_superadmin").toBool();
-    ui->tableSites->setEnabled(!allow_access_edit);
-    ui->tableProjects->setEnabled(!allow_access_edit);
+        allow_access_edit &= !user_is_superadmin;
+    }
+    ui->tableSites->setEnabled(allow_access_edit);
+    ui->tableProjects->setEnabled(allow_access_edit);
 }
 
 void UserWidget::updateFieldsValue(){
@@ -140,8 +142,14 @@ void UserWidget::fillSites(const QList<TeraData> &sites)
         int current_row = ui->tableSites->rowCount()-1;
         QTableWidgetItem* item = new QTableWidgetItem(sites.at(i).getFieldValue("site_name").toString());
         ui->tableSites->setItem(current_row,0,item);
-        ui->tableSites->setCellWidget(current_row,1,buildRolesComboBox());
-        m_tableSites_ids_rows.insert(sites.at(i).getFieldValue("id_site").toInt(), current_row);
+        QComboBox* combo_roles = buildRolesComboBox();
+        ui->tableSites->setCellWidget(current_row,1,combo_roles);
+        if (!m_comManager->isCurrentUserSuperAdmin()){
+            // Disable role selection if current user isn't admin of that site
+            bool edit_enabled = m_comManager->getCurrentUserSiteRole(sites.at(i).getId()) == "admin";
+            combo_roles->setEnabled(edit_enabled);
+        }
+        m_tableSites_ids_rows.insert(sites.at(i).getId(), current_row);
     }
 }
 
@@ -164,6 +172,7 @@ void UserWidget::updateSites(const QList<TeraData>& sites)
                     combo_roles->setCurrentIndex(0);
                 }
             }
+
         }else{
             LOG_WARNING("Site ID " + QString::number(site_id) + " not found in table.", "UserWidget::fillSitesData");
         }
@@ -175,6 +184,7 @@ void UserWidget::fillProjects(const QList<TeraData> &projects)
     ui->tableProjects->clearContents();
     m_tableProjects_ids_rows.clear();
 
+
     for (int i=0; i<projects.count(); i++){
         ui->tableProjects->setRowCount(ui->tableProjects->rowCount()+1);
         int current_row = ui->tableProjects->rowCount()-1;
@@ -182,8 +192,13 @@ void UserWidget::fillProjects(const QList<TeraData> &projects)
         ui->tableProjects->setItem(current_row,0,item);
         item = new QTableWidgetItem(projects.at(i).getFieldValue("project_name").toString());
         ui->tableProjects->setItem(current_row,1,item);
-        ui->tableProjects->setCellWidget(current_row,2,buildRolesComboBox());
-        m_tableProjects_ids_rows.insert(projects.at(i).getFieldValue("id_project").toInt(), current_row);
+        QComboBox* combo_roles = buildRolesComboBox();
+        ui->tableProjects->setCellWidget(current_row,2,combo_roles);
+        if (!m_comManager->isCurrentUserSuperAdmin()){
+            // Disable role selection if current user isn't admin of that project
+            combo_roles->setEnabled(m_comManager->getCurrentUserProjectRole(projects.at(i).getId()) == "admin");
+        }
+        m_tableProjects_ids_rows.insert(projects.at(i).getId(), current_row);
     }
 }
 

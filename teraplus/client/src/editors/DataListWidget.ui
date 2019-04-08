@@ -37,6 +37,7 @@ QComboBox:!enabled{background-color: rgba(0,0,0,150);color:white;border:0}
 QListWidget,QWidget#searchZone{background-color:rgba(200,200,200,10%);color:white;border:1px solid rgba(255,255,255,20%);}
 QWidget#searchZone{border:1px solid rgba(255,255,255,50%);}
 QListWidget:!enabled{border:0}
+QListWidget::item:selected{background-color: rgba(128,128,128,50%); color:white;}
 
 QPushButton:hover{background-color:  rgba(255,255,255,50);}
 QPushButton#btnSearch:hover{background-color:  rgba(255,255,255,0%);}
