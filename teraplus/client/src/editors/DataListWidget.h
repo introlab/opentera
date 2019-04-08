@@ -42,7 +42,9 @@ private:
     void connectSignals();
     void queryDataList();
 
-    void updateDataInList(TeraData *data);
+    TeraData *getCurrentData();
+    void updateDataInList(TeraData *data, bool select_item=false);
+    void deleteDataFromList(TeraData* data);
     void showEditor(TeraData *data);
 
     void setSearching(bool search);
@@ -58,9 +60,13 @@ private slots:
     void postDataReply(QString path, QString data);
     void setDataList(QList<TeraData> list);
 
+    void editor_dataDeleted();
+
     void searchChanged(QString new_search);
     void clearSearch();
     void lstData_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
+
+    void newDataRequested();
 };
 
 

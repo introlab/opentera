@@ -38,12 +38,15 @@ public:
     void buildUiFromStructure(const QString& structure);
     void fillFormFromData(const QJsonObject& data);
     void fillFormFromData(const QString& structure);
+    bool formHasData();
+    void resetFormValues();
 
     bool validateFormData(bool include_hidden=false);
     QStringList getInvalidFormDataLabels(bool include_hidden=false);
 
     QWidget* getWidgetForField(const QString& field);
     bool setFieldValue(const QString& field, const QVariant& value);
+    QVariant getFieldValue(const QString& field);
 
     QString getFormData(bool include_unmodified_data=false);
     QJsonDocument getFormDataJson(bool include_unmodified_data=false);
@@ -64,7 +67,7 @@ private:
     QWidget* createTextWidget(const QVariantMap& structure, bool is_masked);
     QWidget* createBooleanWidget(const QVariantMap& structure);
     QWidget* createNumericWidget(const QVariantMap& structure);
-    QWidget* createLabelWidget(const QVariantMap& structure, bool is_hidden);
+    QWidget* createLabelWidget(const QVariantMap& structure);
     QWidget* createListWidget(const QVariantMap& structure);
     QWidget* createLongTextWidget(const QVariantMap& structure);
 

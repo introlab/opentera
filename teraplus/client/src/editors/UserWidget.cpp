@@ -54,13 +54,6 @@ void UserWidget::setData(const TeraData *data){
 
 }
 
-bool UserWidget::dataIsNew(){
-    if (m_data->getId()==0)
-        return true;
-    else
-        return false;
-}
-
 void UserWidget::saveData(bool signal){
 
     // User Profile
@@ -71,7 +64,8 @@ void UserWidget::saveData(bool signal){
     }
 
     //QString user_data = ui->wdgUser->getFormData();
-    QJsonDocument user_data = ui->wdgUser->getFormDataJson();
+    // If data is new, we request all the fields.
+    QJsonDocument user_data = ui->wdgUser->getFormDataJson(m_data->isNew());
 
     // Site access
 
@@ -114,8 +108,8 @@ void UserWidget::updateControlsState(){
     // Buttons update
     ui->btnSave->setEnabled(!isWaitingOrLoading());
     ui->btnUndo->setEnabled(!isWaitingOrLoading());
-    ui->btnSave->setVisible(isEditing());
-    ui->btnUndo->setVisible(isEditing());
+    //ui->btnSave->setVisible(isEditing());
+    //ui->btnUndo->setVisible(isEditing());
     // Always show save button if editing current user
     if (m_limited){
         ui->btnSave->setVisible(true);
@@ -135,21 +129,33 @@ void UserWidget::updateControlsState(){
 
 void UserWidget::updateFieldsValue(){
     if (m_data && !hasPendingDataRequests()){
-        ui->wdgUser->fillFormFromData(m_data->toJson());
-        ui->wdgProfile->fillFormFromData(m_data->getFieldValue("user_profile").toString());
+        if (!ui->wdgUser->formHasData())
+            ui->wdgUser->fillFormFromData(m_data->toJson());
+        else {
+            ui->wdgUser->resetFormValues();
+        }
+        if (!ui->wdgProfile->formHasData())
+            ui->wdgProfile->fillFormFromData(m_data->getFieldValue("user_profile").toString());
+        else{
+            ui->wdgProfile->resetFormValues();
+        }
+        resetSites();
+        resetProjects();
     }
 }
-
-void UserWidget::deleteData(){
-
-}
-
 
 bool UserWidget::validateData(){
     bool valid = false;
 
     valid = ui->wdgUser->validateFormData();
     valid &= ui->wdgProfile->validateFormData();
+
+    if (m_data->getId()==0){
+        // New user - must check that a password is set
+        if (ui->wdgUser->getFieldValue("user_password").toString().isEmpty()){
+            valid = false;
+        }
+    }
 
     return valid;
 }
@@ -176,8 +182,10 @@ void UserWidget::fillSites(const QList<TeraData> &sites)
 
     // Query sites roles
     if (m_data){
-        QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
-        queryDataRequest(WEB_SITEINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
+        if (!m_data->isNew()){
+            QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
+            queryDataRequest(WEB_SITEINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
+        }
     }
 }
 
@@ -230,6 +238,16 @@ QJsonArray UserWidget::getSitesRoles()
     return roles;
 }
 
+void UserWidget::resetSites()
+{
+    for (int i=0; i<m_tableSites_ids_rows.count(); i++){
+        int site_id = m_tableSites_ids_rows.keys().at(i);
+        int row = m_tableProjects_ids_rows[site_id];
+        QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableSites->cellWidget(row,1));
+        combo_roles->setCurrentIndex(combo_roles->property("original_index").toInt());
+    }
+}
+
 void UserWidget::fillProjects(const QList<TeraData> &projects)
 {
     ui->tableProjects->clearContents();
@@ -253,8 +271,10 @@ void UserWidget::fillProjects(const QList<TeraData> &projects)
     }
 
     if (m_data){
-        QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
-        queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
+        if (!m_data->isNew()){
+            QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
+            queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
+        }
     }
 }
 
@@ -303,6 +323,16 @@ QJsonArray UserWidget::getProjectsRoles()
     }
 
     return roles;
+}
+
+void UserWidget::resetProjects()
+{
+    for (int i=0; i<m_tableProjects_ids_rows.count(); i++){
+        int proj_id = m_tableProjects_ids_rows.keys().at(i);
+        int row = m_tableProjects_ids_rows[proj_id];
+        QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableProjects->cellWidget(row,2));
+        combo_roles->setCurrentIndex(combo_roles->property("original_index").toInt());
+    }
 }
 
 QComboBox *UserWidget::buildRolesComboBox()
@@ -419,6 +449,12 @@ void UserWidget::btnSave_clicked()
     if (!validateData()){
         QStringList invalids = ui->wdgUser->getInvalidFormDataLabels();
         invalids.append(ui->wdgProfile->getInvalidFormDataLabels());
+        if (m_data->getId()==0){
+            // New user - must check that a password is set
+            if (ui->wdgUser->getFieldValue("user_password").toString().isEmpty()){
+                invalids.append(tr("Mot de passe"));
+            }
+        }
 
         QString msg = tr("Les champs suivants doivent être complétés:") +" <ul>";
         for (QString field:invalids){

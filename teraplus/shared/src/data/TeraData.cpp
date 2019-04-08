@@ -33,6 +33,11 @@ int TeraData::getId() const
     return -1;
 }
 
+void TeraData::setId(const int &id)
+{
+    setFieldValue(m_idField, id);
+}
+
 QString TeraData::getName() const
 {
     QVariant raw_name = getFieldValue(m_nameField);
@@ -40,6 +45,11 @@ QString TeraData::getName() const
         return raw_name.toString();
 
     return tr("Inconnu");
+}
+
+bool TeraData::isNew()
+{
+    return getId()<=0;
 }
 
 TeraData &TeraData::operator =(const TeraData &other)

@@ -30,7 +30,7 @@ DataListWidget::~DataListWidget()
     clearDataList();
 }
 
-void DataListWidget::updateDataInList(TeraData* data){
+void DataListWidget::updateDataInList(TeraData* data, bool select_item){
 
     QListWidgetItem* item = nullptr;
     bool already_present = false;
@@ -66,7 +66,11 @@ void DataListWidget::updateDataInList(TeraData* data){
         }
     }
 
-    if (ui->lstData->selectedItems().contains(item)){
+    if (select_item){
+        ui->lstData->setCurrentItem(item);
+    }
+
+    if (ui->lstData->currentItem()==item){
         // Load editor
         showEditor(data);
     }
@@ -77,6 +81,21 @@ void DataListWidget::updateDataInList(TeraData* data){
     }
 }
 
+void DataListWidget::deleteDataFromList(TeraData *data)
+{
+    // Remove list item
+    QListWidgetItem* list_item = m_datamap[data];
+    if (list_item){
+        delete ui->lstData->takeItem(ui->lstData->row(list_item));
+        m_datamap.remove(data);
+    }else{
+        LOG_WARNING("Can't find ListWidgetItem for " + data->getName(), "DataListWidget::deleteDataFromList");
+    }
+
+    m_datalist.removeAll(data);
+    data->deleteLater();
+}
+
 void DataListWidget::showEditor(TeraData *data)
 {
     if (m_editor){
@@ -84,6 +103,10 @@ void DataListWidget::showEditor(TeraData *data)
         m_editor->deleteLater();
         m_editor = nullptr;
     }
+
+    // No data to display - return!
+    if (!data)
+        return;
 
     switch(data->getDataType()){
         case TERADATA_USER:{
@@ -94,6 +117,9 @@ void DataListWidget::showEditor(TeraData *data)
             return;
     }
 
+    if (m_editor){
+        connect(m_editor, &DataEditorWidget::dataWasDeleted, this, &DataListWidget::editor_dataDeleted);
+    }
      ui->wdgEditor->layout()->addWidget(m_editor);
 }
 
@@ -117,6 +143,7 @@ void DataListWidget::connectSignals()
     connect(ui->txtSearch, &QLineEdit::textChanged, this, &DataListWidget::searchChanged);
     connect(ui->btnClear, &QPushButton::clicked, this, &DataListWidget::clearSearch);
     connect(ui->lstData, &QListWidget::currentItemChanged, this, &DataListWidget::lstData_currentItemChanged);
+    connect(ui->btnNew, &QPushButton::clicked, this, &DataListWidget::newDataRequested);
 }
 
 void DataListWidget::queryDataList()
@@ -128,6 +155,14 @@ void DataListWidget::queryDataList()
     }
 }
 
+TeraData *DataListWidget::getCurrentData()
+{
+    if (m_datamap.key(ui->lstData->currentItem())){
+        return m_datamap.key(ui->lstData->currentItem());
+    }
+    return nullptr;
+}
+
 void DataListWidget::clearDataList(){
     ui->lstData->clear();
     m_datamap.clear();
@@ -136,7 +171,14 @@ void DataListWidget::clearDataList(){
 }
 
 void DataListWidget::com_Waiting(bool waiting){
-    this->setDisabled(waiting);
+    TeraData* current_item = getCurrentData();
+    if (current_item){
+        if (current_item->isNew()){
+            waiting = true;
+        }
+    }
+    //this->setDisabled(waiting);
+    ui->frameItems->setDisabled(waiting);
 }
 
 void DataListWidget::queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data)
@@ -197,6 +239,15 @@ void DataListWidget::setDataList(QList<TeraData> list)
             updateDataInList(item_data);
         }
     }
+}
+
+void DataListWidget::editor_dataDeleted()
+{
+    // Remove data from list
+    deleteDataFromList(getCurrentData());
+
+    ui->lstData->setCurrentRow(-1);
+    showEditor(nullptr);
 }
 
 void DataListWidget::searchChanged(QString new_search){
@@ -279,4 +330,12 @@ void DataListWidget::lstData_currentItemChanged(QListWidgetItem *current, QListW
     }*/
 
     //ui->wdgEditor->layout()->addWidget(m_editor);
+}
+
+void DataListWidget::newDataRequested()
+{
+    TeraData* new_data = new TeraData(m_dataType);
+    new_data->setId(0);
+    updateDataInList(new_data, true);
+
 }

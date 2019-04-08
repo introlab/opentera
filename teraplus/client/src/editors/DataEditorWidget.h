@@ -26,8 +26,8 @@ public:
 
     virtual void saveData(bool signal=true)=0;
     virtual void undoData();
-    virtual void deleteData()=0;
-    virtual bool dataIsNew()=0;
+    virtual void deleteData();
+    virtual bool dataIsNew();
 
     virtual void setReady();
     virtual void setEditing();
@@ -70,6 +70,8 @@ signals:
     void stateLoading();
 
     void closeRequest();
+
+    void dataWasDeleted();
 
 public slots:
 

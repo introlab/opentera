@@ -70,11 +70,15 @@ void TeraForm::fillFormFromData(const QJsonObject &data)
         // If not, we suppose it is the object itself!
         m_initialValues = data.toVariantMap();
     }
-    for (QString field:m_initialValues.keys()){
-        if (m_widgets.contains(field)){
-            setWidgetValue(m_widgets[field], m_initialValues[field]);
-        } else{
-           LOG_WARNING("No widget for field: " + field, "TeraForm::fillFormFromData");
+
+    resetFormValues();
+
+    // Set initial values for missing fields
+    for (QString field:m_widgets.keys()){
+        if (!m_initialValues.contains(field)){
+            QVariant value;
+            getWidgetValues(m_widgets[field],nullptr, &value);
+            m_initialValues.insert(field, value);
         }
     }
 
@@ -82,12 +86,14 @@ void TeraForm::fillFormFromData(const QJsonObject &data)
 
 void TeraForm::fillFormFromData(const QString &structure)
 {
-    if (structure.isEmpty())
-        return;
-
+    QJsonDocument struct_info;
     QJsonParseError json_error;
+    if (!structure.isEmpty()){
+        struct_info = QJsonDocument::fromJson(structure.toUtf8(), &json_error);
+    }else{
+        struct_info = QJsonDocument::fromJson("{}", &json_error);
+    }
 
-    QJsonDocument struct_info = QJsonDocument::fromJson(structure.toUtf8(), &json_error);
     if (json_error.error!= QJsonParseError::NoError){
         LOG_ERROR("Unable to parse Ui structure: " + json_error.errorString(), "TeraForm::fillFormFromData");
     }
@@ -137,6 +143,16 @@ bool TeraForm::setFieldValue(const QString &field, const QVariant &value)
     return rval;
 }
 
+QVariant TeraForm::getFieldValue(const QString &field)
+{
+    QVariant rval;
+
+    if (m_widgets.contains(field)){
+        getWidgetValues(m_widgets[field], nullptr, &rval);
+    }
+    return rval;
+}
+
 QString TeraForm::getFormData(bool include_unmodified_data)
 {
     QString data;
@@ -170,6 +186,23 @@ QJsonDocument TeraForm::getFormDataJson(bool include_unmodified_data)
     }
 
     return document;
+}
+
+bool TeraForm::formHasData()
+{
+    return !m_initialValues.isEmpty();
+}
+
+void TeraForm::resetFormValues()
+{
+    for (QString field:m_initialValues.keys()){
+        if (m_widgets.contains(field)){
+            setWidgetValue(m_widgets[field], m_initialValues[field]);
+        } else{
+           LOG_WARNING("No widget for field: " + field, "TeraForm::fillFormFromData");
+        }
+    }
+
 }
 
 void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structure)
@@ -213,7 +246,7 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
                 item_widget = createNumericWidget(item_data);
             }
             if (item_type == "hidden"){
-                item_widget = createLabelWidget(item_data, true);
+                item_widget = createLabelWidget(item_data);
             }
             if (item_type == "checklist"){
                 item_widget = createListWidget(item_data);
@@ -222,7 +255,7 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
                 item_widget = createLongTextWidget(item_data);
             }
             if (item_type == "label"){
-                item_widget = createLabelWidget(item_data, false);
+                item_widget = createLabelWidget(item_data);
             }
 
 
@@ -397,7 +430,7 @@ QWidget *TeraForm::createNumericWidget(const QVariantMap &structure)
     return item_spin;
 }
 
-QWidget *TeraForm::createLabelWidget(const QVariantMap &structure, bool is_hidden)
+QWidget *TeraForm::createLabelWidget(const QVariantMap &structure)
 {
     Q_UNUSED(structure)
     QLabel* item_label = new QLabel();
@@ -516,7 +549,8 @@ void TeraForm::getWidgetValues(QWidget* widget, QVariant *id, QVariant *value)
         *id = QVariant();*/
 
     if (QComboBox* combo = dynamic_cast<QComboBox*>(widget)){
-        *id = combo->currentData();
+        if (id)
+            *id = combo->currentData();
         *value = combo->currentText();
     }
 

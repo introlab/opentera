@@ -263,6 +263,25 @@ class TeraUser(db.Model, BaseModel):
         db.session.commit()
 
     @staticmethod
+    def insert_user(user):
+        user.id_user = None
+
+        # Encrypts password
+        user.user_password = TeraUser.encrypt_password(user.user_password)
+
+        # Generate UUID
+        user.user_uuid = str(uuid.uuid4())
+
+        # Clear last online field
+        user.user_lastonline = None
+
+        # Converts profile from dict, if needed
+        if isinstance(user.user_profile, dict):
+            user.user_profile = json.dumps(user.user_profile)
+        db.session.add(user)
+        db.session.commit()
+
+    @staticmethod
     def create_defaults():
 
         # Admin

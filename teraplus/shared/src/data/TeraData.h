@@ -39,7 +39,10 @@ public:
     virtual QJsonObject toJson();
 
     int getId() const;
+    void setId(const int& id);
     virtual QString getName() const;
+
+    bool isNew();
 
     virtual TeraData &operator = (const TeraData& other);
     virtual bool operator == (const TeraData& other) const;

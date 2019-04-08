@@ -5,7 +5,7 @@ from modules.Globals import auth
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
-
+from flask_babel import gettext
 
 class QueryUsers(Resource):
 
@@ -92,9 +92,13 @@ class QueryUsers(Resource):
         # Using request.json instead of parser, since parser messes up the json!
         json_user = request.json['user']
 
+        # Validate if we have an id_user
+        if 'id_user' not in json_user:
+            return '', 400
+
         # Check if current user can modify the posted user
-        if 'id_user' not in json_user or json_user['id_user'] not in \
-                current_user.get_accessible_users_ids(admin_only=True):
+        if json_user['id_user'] not in current_user.get_accessible_users_ids(admin_only=True) and \
+                json_user['id_user'] > 0:
             return '', 403
 
         # Check if we have site access to handle separately
@@ -108,12 +112,36 @@ class QueryUsers(Resource):
             json_projects = json_user.pop('projects')
 
         # Do the update!
-        try:
-            TeraUser.update_user(json_user['id_user'], json_user)
-        except exc.SQLAlchemyError:
-            import sys
-            print(sys.exc_info())
-            return '', 500
+        if json_user['id_user'] > 0:
+            # Already existing user
+            try:
+                TeraUser.update_user(json_user['id_user'], json_user)
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return '', 500
+        else:
+            # New user, check if password is set
+            if 'user_password' not in json_user:
+                return gettext('Password required'), 400
+            if json_user['user_password'] is None or json_user['user_password'] == '':
+                return gettext('Invalid password'), 400
+
+            # Check if username is already taken
+            if TeraUser.get_user_by_username(json_user['user_username']) is not None:
+                return gettext('Username unavailable.'), 409
+
+            # Ok so far, we can try to create the user!
+            try:
+                new_user = TeraUser()
+                new_user.from_json(json_user)
+                TeraUser.insert_user(new_user)
+                # Update ID User for further use
+                json_user['id_user'] = new_user.id_user;
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return '', 500
 
         if json_sites:
             for site in json_sites:

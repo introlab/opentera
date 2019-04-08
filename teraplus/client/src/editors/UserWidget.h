@@ -32,10 +32,6 @@ public:
 
     void saveData(bool signal=true);
 
-    bool dataIsNew();
-
-    void deleteData();
-
     void setLimited(bool limited);
 
     void connectSignals();
@@ -58,10 +54,12 @@ private:
     void fillSites(const QList<TeraData>& sites);
     void updateSites(const QList<TeraData>& sites);
     QJsonArray getSitesRoles();
+    void resetSites();
 
     void fillProjects(const QList<TeraData>& projects);
     void updateProjects(const QList<TeraData>& projects);
     QJsonArray getProjectsRoles();
+    void resetProjects();
 
     QComboBox *buildRolesComboBox();
 

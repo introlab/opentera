@@ -170,7 +170,7 @@ bool DataEditorWidget::isWaitingOrLoading()
 }
 
 void DataEditorWidget::undoOrDeleteData(){
-    if (m_editState==STATE_EDITING){
+    //if (m_editState==STATE_EDITING){
         // If editing, undo the changes
         if (dataIsNew())
             // If a new dataset, undo = remove it
@@ -178,10 +178,10 @@ void DataEditorWidget::undoOrDeleteData(){
         else
             undoData();
 
-    }else{
+    /*}else{
         // Delete the data
         deleteData();
-    }
+    }*/
 }
 
 void DataEditorWidget::queryDataReplyOK(const QString &path, const QUrlQuery &query_args)
@@ -220,4 +220,17 @@ void DataEditorWidget::undoData(){
     m_undoing=true;
     updateFieldsValue();
     setReady();
+}
+
+void DataEditorWidget::deleteData()
+{
+    emit dataWasDeleted();
+}
+
+bool DataEditorWidget::dataIsNew()
+{
+    if (m_data){
+        return m_data->isNew();
+    }
+    return true;
 }
