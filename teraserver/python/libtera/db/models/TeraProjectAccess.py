@@ -18,5 +18,44 @@ class TeraProjectAccess(db.Model, BaseModel):
         return count.first()[0]
 
     @staticmethod
+    def update_project_access(id_user: int, id_project: int, rolename: str):
+        # Check if access already exists
+        access = TeraProjectAccess.get_specific_project_access(id_user=id_user, id_project=id_project)
+        if access is None:
+            # No access already present for that user and site - create new one
+            return TeraProjectAccess.insert_project_access(id_user=id_user, id_project=id_project, rolename=rolename)
+        else:
+            # Update it
+            if rolename == '':
+                # No role anymore - delete it from the database
+                db.session.delete(access)
+            else:
+                access.project_access_role = rolename
+
+            db.session.commit()
+            return access
+
+    @staticmethod
+    def insert_project_access(id_user: int, id_project: int, rolename: str):
+        # No role - don't insert anything!
+        if rolename == '':
+            return
+
+        new_access = TeraProjectAccess()
+        new_access.project_access_role = rolename
+        new_access.id_project = id_project
+        new_access.id_user = id_user
+
+        db.session.add(new_access)
+        db.session.commit()
+
+        return new_access
+
+    @staticmethod
+    def get_specific_project_access(id_user: int, id_project: int):
+        access = TeraProjectAccess.query.filter_by(id_user=id_user, id_project=id_project).first()
+        return access
+
+    @staticmethod
     def create_defaults():
         pass

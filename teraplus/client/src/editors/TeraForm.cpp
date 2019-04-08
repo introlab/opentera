@@ -140,6 +140,13 @@ bool TeraForm::setFieldValue(const QString &field, const QVariant &value)
 QString TeraForm::getFormData(bool include_unmodified_data)
 {
     QString data;
+    QJsonDocument document = getFormDataJson(include_unmodified_data);
+    data = document.toJson();
+    return data;
+}
+
+QJsonDocument TeraForm::getFormDataJson(bool include_unmodified_data)
+{
     QJsonDocument document;
     QJsonObject data_obj;
     QJsonObject base_obj;
@@ -160,9 +167,9 @@ QString TeraForm::getFormData(bool include_unmodified_data)
     if (!data_obj.isEmpty()){
         base_obj.insert(m_objectType, data_obj);
         document.setObject(base_obj);
-        data = document.toJson();
     }
-    return data;
+
+    return document;
 }
 
 void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structure)
@@ -395,7 +402,7 @@ QWidget *TeraForm::createLabelWidget(const QVariantMap &structure, bool is_hidde
     Q_UNUSED(structure)
     QLabel* item_label = new QLabel();
 
-    item_label->setHidden(is_hidden);
+    //item_label->setHidden(is_hidden);
 
     return item_label;
 }

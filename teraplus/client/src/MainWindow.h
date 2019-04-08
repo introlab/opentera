@@ -39,6 +39,7 @@ private slots:
 
     void addMessage(Message::MessageType msg_type, QString msg);
     void addMessage(const Message& msg);
+    bool hasWaitingMessage();
     void showNextMessage();
 
     void editorDialogFinished();
@@ -62,6 +63,7 @@ private:
 
     // Message system
     QList<Message>  m_messages;
+    Message         m_currentMessage;
     QMovie*         m_loadingIcon;
     QTimer          m_msgTimer;
 

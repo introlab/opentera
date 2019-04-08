@@ -3,7 +3,8 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 from modules.Globals import auth
 from libtera.db.models.TeraUser import TeraUser
-import json
+from libtera.db.models.TeraSiteAccess import TeraSiteAccess
+from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 
 
 class QueryUsers(Resource):
@@ -96,6 +97,16 @@ class QueryUsers(Resource):
                 current_user.get_accessible_users_ids(admin_only=True):
             return '', 403
 
+        # Check if we have site access to handle separately
+        json_sites = None
+        if 'sites' in json_user:
+            json_sites = json_user.pop('sites')
+
+        # Check if we have project access to handle separately
+        json_projects = None
+        if 'projects' in json_user:
+            json_projects = json_user.pop('projects')
+
         # Do the update!
         try:
             TeraUser.update_user(json_user['id_user'], json_user)
@@ -103,6 +114,30 @@ class QueryUsers(Resource):
             import sys
             print(sys.exc_info())
             return '', 500
+
+        if json_sites:
+            for site in json_sites:
+                # Check if current user is admin of that site
+                if current_user.get_site_role(site=site) == 'admin':
+                    try:
+                        TeraSiteAccess.update_site_access(json_user['id_user'], site['id_site'], site['site_role'])
+                    except exc.SQLAlchemyError:
+                        import sys
+                        print(sys.exc_info())
+                        return '', 500
+
+        if json_projects:
+            for project in json_projects:
+                # Check if current user is admin of that site
+                if current_user.get_project_role(project=project) == 'admin':
+                    try:
+                        TeraProjectAccess.update_project_access(id_user=json_user['id_user'],
+                                                                id_project=project['id_project'],
+                                                                rolename=project['project_role'])
+                    except exc.SQLAlchemyError:
+                        import sys
+                        print(sys.exc_info())
+                        return '', 500
 
         # TODO: Publish update to everyone who is subscribed to users update...
         update_user = TeraUser.get_user_by_id(json_user['id_user'])

@@ -9,6 +9,7 @@ MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
     ui->setupUi(this);
     m_comManager = com_manager;
     m_diag_editor = nullptr;
+    m_currentMessage.setMessage(Message::MESSAGE_NONE,"");
 
     // Initial UI state
     initUi();
@@ -58,15 +59,16 @@ void MainWindow::showNextMessage()
     ui->frameMessages->hide();
     m_msgTimer.stop();
     if (m_messages.isEmpty()){
+        m_currentMessage.setMessage(Message::MESSAGE_NONE,"");
         return;
     }
 
-    Message msg = m_messages.takeFirst();
+    m_currentMessage = m_messages.takeFirst();
 
     QString background_color = "rgba(128,128,128,50%)";
     QString icon_path = "";
 
-    switch(msg.getMessageType()){
+    switch(m_currentMessage.getMessageType()){
     case Message::MESSAGE_OK:
         background_color = "rgba(0,255,0,50%)";
         ui->icoMessage->setPixmap(QPixmap("://icons/ok.png"));
@@ -84,10 +86,12 @@ void MainWindow::showNextMessage()
         ui->icoMessage->setMovie(m_loadingIcon);
         m_loadingIcon->start();
         break;
+    default:
+        break;
     }
     ui->frameMessages->setStyleSheet("QWidget#frameMessages{background-color: " + background_color + ";}");
-    ui->lblMessage->setText(msg.getMessageText());
-    if (msg.getMessageType() != Message::MESSAGE_ERROR)
+    ui->lblMessage->setText(m_currentMessage.getMessageText());
+    if (m_currentMessage.getMessageType() != Message::MESSAGE_ERROR && m_currentMessage.getMessageType()!=Message::MESSAGE_NONE)
         m_msgTimer.start();
 
     QPropertyAnimation *animate = new QPropertyAnimation(ui->frameMessages,"windowOpacity",this);
@@ -130,9 +134,11 @@ void MainWindow::com_networkError(QNetworkReply::NetworkError error, QString err
 void MainWindow::com_waitingForReply(bool waiting)
 {
     if (waiting){
-        addMessage(Message::MESSAGE_WORKING, "");
+        if (!hasWaitingMessage())
+            addMessage(Message::MESSAGE_WORKING, "");
     }else{
-        showNextMessage();
+        if (m_currentMessage.getMessageType()==Message::MESSAGE_WORKING)
+            showNextMessage();
     }
     ui->btnEditUser->setEnabled(!waiting);
     ui->btnConfig->setEnabled(!waiting);
@@ -160,6 +166,15 @@ void MainWindow::addMessage(const Message &msg)
 
     if (ui->frameMessages->isHidden())
         showNextMessage();
+}
+
+bool MainWindow::hasWaitingMessage()
+{
+    for (Message msg:m_messages){
+        if (msg.getMessageType()==Message::MESSAGE_WORKING)
+            return true;
+    }
+    return false;
 }
 
 void MainWindow::on_btnCloseMessage_clicked()
