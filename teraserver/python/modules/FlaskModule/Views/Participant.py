@@ -35,7 +35,7 @@ def token_required(f):
 
 class Participant(MethodView):
     # Decorators everywhere?
-    # decorators = [jwt_required]
+    # decorators = [token_required]
 
     def __init__(self, *args, **kwargs):
         print('Participant.__init__', args, kwargs)
