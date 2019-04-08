@@ -61,11 +61,13 @@ protected:
     TeraDataTypes   m_data_type;
 
 private:
-    QString m_objectName;
-    QString m_idField;
-    QString m_nameField;
+    QString     m_objectName;
+    QString     m_idField;
+    QString     m_nameField;
 
-    bool hasMetaProperty(const QString& fieldName) const;
+    QVariantMap m_fieldsValue;
+
+    //bool hasMetaProperty(const QString& fieldName) const;
 
 signals:
 

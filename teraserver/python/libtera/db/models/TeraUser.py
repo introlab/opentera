@@ -70,16 +70,16 @@ class TeraUser(db.Model, BaseModel):
 
         return user
 
-    def get_accessible_users_ids(self):
-        users = self.get_accessible_users()
+    def get_accessible_users_ids(self, admin_only=False):
+        users = self.get_accessible_users(admin_only=admin_only)
         users_ids = []
         for user in users:
             if user.id_user not in users_ids:
                 users_ids.append(user.id_user)
         return users_ids
 
-    def get_accessible_users(self):
-        projects = self.get_accessible_projects()
+    def get_accessible_users(self, admin_only=False):
+        projects = self.get_accessible_projects(admin_only=admin_only)
         users = []
         for project in projects:
             project_users = project.get_users_in_project()
@@ -114,13 +114,13 @@ class TeraUser(db.Model, BaseModel):
 
         return role_name
 
-    def get_accessible_projects(self):
+    def get_accessible_projects(self, admin_only=False):
         project_list = []
         if self.user_superadmin:
             # Is superadmin - admin on all projects
             project_list = TeraProject.query.all()
         else:
-            # Build project list - get sites
+            # Build project list - get sites where user is admin
             for site in self.get_accessible_sites():
                 if self.get_site_role(site) == 'admin':
                     project_query = TeraProject.query.filter_by(id_site=site.id_site)
@@ -132,13 +132,14 @@ class TeraUser(db.Model, BaseModel):
             for project_access in self.user_projects_access:
                 project = project_access.project_access_project
                 if project not in project_list:
-                    project_list.append(project)
+                    if not admin_only or (admin_only and self.get_project_role(project)=='admin'):
+                        project_list.append(project)
         return project_list
 
-    def get_accessible_projects_ids(self):
+    def get_accessible_projects_ids(self, admin_only=False):
         projects = []
 
-        for project in self.get_accessible_projects():
+        for project in self.get_accessible_projects(admin_only=admin_only):
             projects.append(project.id_project)
 
         return projects
@@ -152,20 +153,21 @@ class TeraUser(db.Model, BaseModel):
             projects_roles[project.project_name] = role
         return projects_roles
 
-    def get_accessible_sites(self):
+    def get_accessible_sites(self, admin_only=False):
         if self.user_superadmin:
             site_list = TeraSite.query.all()
         else:
             site_list = []
             for site_access in self.user_sites_access:
-                site_list.append(site_access.site_access_site)
+                if not admin_only or (admin_only and site_access.site_access_role == 'admin'):
+                    site_list.append(site_access.site_access_site)
 
         return site_list
 
-    def get_accessible_sites_ids(self):
+    def get_accessible_sites_ids(self, admin_only=False):
         sites_ids = []
 
-        for site in self.get_accessible_sites():
+        for site in self.get_accessible_sites(admin_only=admin_only):
             sites_ids.append(site.id_site)
 
         return sites_ids

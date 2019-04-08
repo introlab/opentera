@@ -46,7 +46,28 @@ class QueryUsers(Resource):
             for user in users:
                 if user is not None:
                     if args['list'] is None:
-                        users_list.append(user.to_json())
+                        # If user is "self", append projects and sites roles
+                        user_json = user.to_json()
+                        if user.id_user == current_user.id_user:
+                            # Sites
+                            sites = current_user.get_accessible_sites()
+                            sites_list = []
+                            for site in sites:
+                                site_json = site.to_json()
+                                site_json['site_role'] = current_user.get_site_role(site)
+                                sites_list.append(site_json)
+                            user_json['sites'] = sites_list
+
+                            # Projects
+                            projects = current_user.get_accessible_projects()
+                            proj_list = []
+                            for project in projects:
+                                proj_json = project.to_json()
+                                proj_json['project_role'] = current_user.get_project_role(project)
+                                proj_list.append(proj_json)
+                            user_json['projects'] = proj_list
+
+                        users_list.append(user_json)
                     else:
                         users_list.append(user.to_json(minimal=True))
             return jsonify(users_list)
@@ -71,7 +92,8 @@ class QueryUsers(Resource):
         json_user = request.json['user']
 
         # Check if current user can modify the posted user
-        if 'id_user' not in json_user or json_user['id_user'] not in current_user.get_accessible_users_ids():
+        if 'id_user' not in json_user or json_user['id_user'] not in \
+                current_user.get_accessible_users_ids(admin_only=True):
             return '', 403
 
         # Do the update!

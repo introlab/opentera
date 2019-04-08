@@ -206,7 +206,7 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
              <bool>false</bool>
             </property>
             <property name="selectionMode">
-             <enum>QAbstractItemView::SingleSelection</enum>
+             <enum>QAbstractItemView::NoSelection</enum>
             </property>
             <property name="selectionBehavior">
              <enum>QAbstractItemView::SelectRows</enum>
@@ -241,7 +241,7 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
           <item>
            <widget class="QTableWidget" name="tableProjects">
             <property name="selectionMode">
-             <enum>QAbstractItemView::SingleSelection</enum>
+             <enum>QAbstractItemView::NoSelection</enum>
             </property>
             <property name="selectionBehavior">
              <enum>QAbstractItemView::SelectRows</enum>

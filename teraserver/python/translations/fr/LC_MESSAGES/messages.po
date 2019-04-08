@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-04-03 11:40-0400\n"
+"POT-Creation-Date: 2019-04-08 09:20-0400\n"
 "PO-Revision-Date: 2019-03-28 16:24-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -31,122 +31,126 @@ msgid "UUID Utilisateur"
 msgstr ""
 
 #: libtera/forms/TeraUserForm.py:18
-msgid "Code utilisateur"
+msgid "Nom complet Utilisateur"
 msgstr ""
 
 #: libtera/forms/TeraUserForm.py:19
-msgid "Activé"
+msgid "Code utilisateur"
 msgstr ""
 
 #: libtera/forms/TeraUserForm.py:20
-msgid "Prénom"
+msgid "Activé"
 msgstr ""
 
 #: libtera/forms/TeraUserForm.py:21
-msgid "Nom"
+msgid "Prénom"
 msgstr ""
 
 #: libtera/forms/TeraUserForm.py:22
+msgid "Nom"
+msgstr ""
+
+#: libtera/forms/TeraUserForm.py:23
 msgid "Courriel"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:24 libtera/forms/TeraUserForm.py:80
+#: libtera/forms/TeraUserForm.py:25 libtera/forms/TeraUserForm.py:81
 msgid "Mot de passe"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:25
+#: libtera/forms/TeraUserForm.py:26
 msgid "Super administrateur"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:26
+#: libtera/forms/TeraUserForm.py:27
 msgid "Notes"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:27
+#: libtera/forms/TeraUserForm.py:28
 msgid "Profil"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:28
+#: libtera/forms/TeraUserForm.py:29
 msgid "Dernière connexion"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:38
+#: libtera/forms/TeraUserForm.py:39
 msgid "Configuration audio-vidéo"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:42
+#: libtera/forms/TeraUserForm.py:43
 msgid "Caméra"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:43
+#: libtera/forms/TeraUserForm.py:44
 msgid "Type de caméra"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:44
+#: libtera/forms/TeraUserForm.py:45
 msgid "Caméra réseau"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:45
+#: libtera/forms/TeraUserForm.py:46
 msgid "Capture d'écran"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:49
+#: libtera/forms/TeraUserForm.py:50
 msgid "Adresse du flux de la caméra"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:53
+#: libtera/forms/TeraUserForm.py:54
 msgid "Trames par seconde"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:58
+#: libtera/forms/TeraUserForm.py:59
 msgid "Résolution"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:66
+#: libtera/forms/TeraUserForm.py:67
 msgid "Caméra contrôlable (PTZ)"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:67
+#: libtera/forms/TeraUserForm.py:68
 msgid "Type de contrôle"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:68
+#: libtera/forms/TeraUserForm.py:69
 msgid "Vivotek"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:68
+#: libtera/forms/TeraUserForm.py:69
 msgid "ONVIF (générique)"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:71
+#: libtera/forms/TeraUserForm.py:72
 msgid "Adresse réseau"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:74
+#: libtera/forms/TeraUserForm.py:75
 msgid "Port"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:77
+#: libtera/forms/TeraUserForm.py:78
 msgid "Nom utilisateur"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:84
+#: libtera/forms/TeraUserForm.py:85
 msgid "Microphone"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:85
+#: libtera/forms/TeraUserForm.py:86
 msgid "Caméra secondaire"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:87
+#: libtera/forms/TeraUserForm.py:88
 msgid "Configuration générale"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:89
+#: libtera/forms/TeraUserForm.py:90
 msgid "Affichage en plein écran en séance"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:91
+#: libtera/forms/TeraUserForm.py:92
 msgid "Permettre l'accès via le web"
 msgstr ""
 
