@@ -27,6 +27,12 @@ class TeraParticipant(db.Model, BaseModel):
 
     participant_participant_group = db.relationship('TeraParticipantGroup')
 
+    def __str__(self):
+        return '<TeraParticipant ' + str(self.participant_name) + ' >'
+
+    def __repr__(self):
+        return self.__str__()
+
     def create_token(self):
         # Creating token with user info
         payload = {

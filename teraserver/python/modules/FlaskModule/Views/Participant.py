@@ -23,6 +23,7 @@ class Participant(MethodView):
     def get(self):
 
         print('current participant', current_participant)
-        return 'Participant GET ' + current_participant.participant_name
+        return render_template('participant.html', token=current_participant.participant_token)
+        # return 'Participant GET ' + current_participant.participant_name
 
 
