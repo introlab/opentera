@@ -12,6 +12,10 @@ class TeraParticipantGroup(db.Model, BaseModel):
     participantgroup_project = db.relationship('TeraProject')
 
     @staticmethod
+    def get_participant_group_by_group_name(name):
+        return TeraParticipantGroup.query.filter_by(participantgroup_name=name).first()
+
+    @staticmethod
     def create_defaults():
         base_pgroup = TeraParticipantGroup()
         base_pgroup.participantgroup_name = 'Default Participant Group'

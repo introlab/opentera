@@ -1,6 +1,8 @@
 from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraKit import kits_participants_table
 from libtera.db.models.TeraSession import sessions_participants_table
+from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
+import uuid
 import jwt
 import time
 
@@ -33,7 +35,7 @@ class TeraParticipant(db.Model, BaseModel):
         }
 
         # TODO key should be secret ?
-        self.participant_token = jwt.encode(payload, TeraParticipant.secret, 'HS256')
+        self.participant_token = jwt.encode(payload, TeraParticipant.secret, 'HS256').decode('utf-8')
 
         return self.participant_token
 
@@ -43,7 +45,7 @@ class TeraParticipant(db.Model, BaseModel):
 
         if participant:
             # Validate token
-            data = jwt.decode(token, TeraParticipant.secret, 'HS256')
+            data = jwt.decode(token.encode('utf-8'), TeraParticipant.secret, 'HS256')
 
             if data['participant_uuid'] == participant.participant_uuid \
                     and data['participant_name'] == participant.participant_name:
@@ -53,21 +55,31 @@ class TeraParticipant(db.Model, BaseModel):
 
         return None
 
+    @staticmethod
+    def create_defaults():
+        participant1 = TeraParticipant()
+        participant1.participant_name = 'Test Participant #1'
+        participant1.participant_uuid = str(uuid.uuid4())
+        participant1.participant_participant_group = \
+            TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group')
 
-    # @staticmethod
-    # def create_defaults():
-    #     base_pgroup = TeraParticipantGroup()
-    #     base_pgroup.participantgroup_name = 'Default Group'
-    #     base_pgroup.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
-    #     db.session.add(base_pgroup)
-    #
-    #     base_pgroup2 = TeraParticipantGroup()
-    #     base_pgroup2.participantgroup_name = 'Default Group'
-    #     base_pgroup2.id_project = TeraProject.get_project_by_projectname('Default Project #2').id_project
-    #     db.session.add(base_pgroup2)
-    #     db.session.commit()
-    #
-    # @staticmethod
-    # def get_count():
-    #     count = db.session.query(db.func.count(TeraParticipantGroup.id_participant_group))
-    #     return count.first()[0]
+        token1 = participant1.create_token()
+        print('token1 ', token1)
+        db.session.add(participant1)
+
+        participant2 = TeraParticipant()
+        participant2.participant_name = 'Test Participant #2'
+        participant2.participant_uuid = str(uuid.uuid4())
+        participant2.participant_participant_group = \
+            TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group')
+
+        token2 = participant2.create_token()
+        print('token2 ', token2)
+        db.session.add(participant2)
+
+        db.session.commit()
+
+    @staticmethod
+    def get_count():
+        count = db.session.query(db.func.count(TeraParticipant.id_participant))
+        return count.first()[0]
