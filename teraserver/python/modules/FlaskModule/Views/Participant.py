@@ -23,6 +23,6 @@ class Participant(MethodView):
     def get(self):
 
         print('current participant', current_participant)
-        return 'Participant GET'
+        return 'Participant GET ' + current_participant.participant_name
 
 

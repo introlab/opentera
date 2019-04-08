@@ -5,6 +5,7 @@ from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 import uuid
 import jwt
 import time
+import datetime
 
 
 class TeraParticipant(db.Model, BaseModel):
@@ -13,7 +14,7 @@ class TeraParticipant(db.Model, BaseModel):
     id_participant = db.Column(db.Integer, db.Sequence('id_participant_sequence'), primary_key=True, autoincrement=True)
     participant_uuid = db.Column(db.String(36), nullable=False, unique=True)
     participant_name = db.Column(db.String, nullable=False)
-    participant_token = db.Column(db.String, nullable=False)
+    participant_token = db.Column(db.String, nullable=False, unique=True)
     participant_lastonline = db.Column(db.TIMESTAMP, nullable=True)
     id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group'),
                                      nullable=False)
@@ -39,6 +40,10 @@ class TeraParticipant(db.Model, BaseModel):
 
         return self.participant_token
 
+    def update_last_online(self):
+        self.participant_lastonline = datetime.datetime.now()
+        db.session.commit()
+
     @staticmethod
     def get_participant_by_token(token):
         participant = TeraParticipant.query.filter_by(participant_token=token).first()
@@ -49,6 +54,10 @@ class TeraParticipant(db.Model, BaseModel):
 
             if data['participant_uuid'] == participant.participant_uuid \
                     and data['participant_name'] == participant.participant_name:
+
+                # Update last online
+                participant.update_last_online()
+
                 return participant
             else:
                 return None
