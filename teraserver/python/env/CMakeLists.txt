@@ -31,6 +31,7 @@ set (pip_packages
     flask-oauthlib
     flask-login
     flask-httpauth
+    flask-jwt
     flask-socketio
     flask-session
     flask-restful
@@ -49,6 +50,7 @@ set (pip_packages
     pyopenssl
     service_identity
     jsonrpcclient
+    jwt
 )
 
 # Create environment, will produce python executable

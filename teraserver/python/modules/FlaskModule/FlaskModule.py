@@ -69,7 +69,6 @@ class FlaskModule(RedisClient):
         from .API.QueryProjects import QueryProjects
 
         self.api.add_resource(Login, '/api/login', resource_class_args=[self])
-
         self.api.add_resource(QuerySites, '/api/sites', resource_class_args=[self])
         self.api.add_resource(Logout, '/api/logout', resource_class_args=[self])
         self.api.add_resource(QueryUsers, '/api/users', resource_class_args=[self])
@@ -80,6 +79,8 @@ class FlaskModule(RedisClient):
     def init_views(self):
         from .Views.Index import Index
         from .Views.Upload import Upload
+        from .Views.Auth import Auth
+        from .Views.Participant import Participant
 
         # Default arguments
         args = []
@@ -88,3 +89,5 @@ class FlaskModule(RedisClient):
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
         flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
+        flask_app.add_url_rule('/auth/', view_func=Participant.as_view('auth', *args, **kwargs))
+        flask_app.add_url_rule('/participant/', view_func=Participant.as_view('participant', *args, **kwargs))

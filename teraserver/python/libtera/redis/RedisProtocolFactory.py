@@ -3,7 +3,7 @@ import txredisapi as txredis
 
 
 class redisProtocol(txredis.SubscriberProtocol):
-    def __init__(self, charset='utf-8', errors="strict", parent=None):
+    def __init__(self, charset=None, errors="strict", parent=None):
         print('redisProtocol init with args', charset, errors, parent)
         super().__init__(charset, errors)
         self.parent = parent
@@ -54,8 +54,10 @@ class RedisProtocolFactory(txredis.SubscriberFactory):
         """
         print('build Protocol addr:', addr)
         if hasattr(self, 'charset'):
+            # p = self.protocol(parent=self.parent)
             p = self.protocol(self.charset, parent=self.parent)
         else:
+            # Forcing no encoding
             p = self.protocol(parent=self.parent)
         p.factory = self
         p.timeOut = self.replyTimeout

@@ -49,7 +49,6 @@ class WebRTCModule(RedisClient):
                 self.create_session(protobuf_message)
                 # self.publish(protobuf_message.reply_to, 'should send back webrtc server info')
 
-
     def launch_node(self, port=8080, key="test"):
         command = [self.config.webrtc_config['executable'],
                    self.config.webrtc_config['script'], str(port), str(key)]

@@ -11,6 +11,21 @@ from modules.Globals import auth
 from modules.RedisModule.RedisModule import get_redis
 from libtera.ConfigManager import ConfigManager
 import datetime
+from flask_jwt import JWT, jwt_required, current_identity
+
+
+def authenticate(username, password):
+    print('authenticate JWT')
+    pass
+
+
+def identity(payload):
+    print('identity JWT')
+    pass
+
+
+jwt = JWT(flask_app, authenticate, identity)
+
 
 class LoginModule(RedisClient):
 
@@ -30,11 +45,17 @@ class LoginModule(RedisClient):
         self.login_manager.session_protection = "strong"
         # self.login_manager.request_loader(self.load_user)
 
+        # Cookie based configuration
         flask_app.config.update({'REMEMBER_COOKIE_NAME': 'OpenTera',
                                  'REMEMBER_COOKIE_DURATION': 14,
                                  'REMEMBER_COOKIE_SECURE': True,
                                  'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
                                  'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
+
+        # Token based authentication
+        flask_app.config.update({'JWT_VERIFY_EXPIRATION': False,
+                                 'JWT_AUTH_HEADER_PREFIX': 'OpenTeraToken',
+                                 'JWT_DEFAULT_REALM': 'OpenTera'})
 
     @staticmethod
     @login_manager.user_loader

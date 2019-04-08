@@ -54,7 +54,7 @@ class RedisClient:
     def subscribe(self, topic):
         if self.protocol:
             print('RedisClient (', self, ') subscribing to: ',  topic)
-            self.protocol.psubscribe(topic)
+            ret = self.protocol.psubscribe(topic)
         else:
             print('Error, no protocol')
 
