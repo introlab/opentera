@@ -3,6 +3,7 @@ from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
+from libtera.db.models.TeraDevice import TeraDevice
 
 from passlib.hash import bcrypt
 import uuid
@@ -134,6 +135,14 @@ class TeraUser(db.Model, BaseModel):
                     if not admin_only or (admin_only and self.get_project_role(project)=='admin'):
                         project_list.append(project)
         return project_list
+
+    def get_accessible_devices(self, admin_only=False):
+        device_list = []
+        if self.user_superadmin:
+            device_list = TeraDevice.query.all()
+
+        # Return result
+        return device_list
 
     def get_accessible_projects_ids(self, admin_only=False):
         projects = []

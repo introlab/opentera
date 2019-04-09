@@ -67,6 +67,9 @@ class FlaskModule(RedisClient):
         from .API.OnlineUsers import OnlineUsers
         from .API.QuerySites import QuerySites
         from .API.QueryProjects import QueryProjects
+        from .API.QueryParticipants import QueryParticipants
+        from .API.QueryDevices import QueryDevices
+        from .API.QueryKits import QueryKits
 
         self.api.add_resource(Login, '/api/login', resource_class_args=[self])
         self.api.add_resource(QuerySites, '/api/sites', resource_class_args=[self])
@@ -75,6 +78,9 @@ class FlaskModule(RedisClient):
         self.api.add_resource(QueryForms, '/api/forms', resource_class_args=[self])
         self.api.add_resource(OnlineUsers, '/api/online', resource_class_args=[self])
         self.api.add_resource(QueryProjects, '/api/projects', resource_class_args=[self])
+        self.api.add_resource(QueryParticipants, '/api/participants', resource_class_args=[self])
+        self.api.add_resource(QueryDevices, '/api/devices', resource_class_args=[self])
+        self.api.add_resource(QueryKits, '/api/kits', resource_class_args=[self])
 
     def init_views(self):
         from .Views.Index import Index

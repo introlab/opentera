@@ -21,6 +21,15 @@ class TeraDevice(db.Model, BaseModel):
     device_notes = db.Column(db.String, nullable=True)
     device_lastonline = db.Column(db.TIMESTAMP, nullable=True)
 
+    def to_json(self, ignore_fields=[], minimal=False):
+
+        ignore_fields.extend(['device_token', 'secret'])
+
+        if minimal:
+            ignore_fields.extend([])
+
+        return super().to_json(ignore_fields=ignore_fields)
+
     def create_token(self):
         # Creating token with user info
         payload = {
