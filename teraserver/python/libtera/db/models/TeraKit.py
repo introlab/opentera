@@ -1,18 +1,6 @@
 from libtera.db.Base import db, BaseModel
 
 
-kits_devices_required_table = db.Table('t_kits_devices_required', db.Column('id_kit', db.Integer,
-                                                                            db.ForeignKey('t_kits.id_kit',
-                                                                                          ondelete='cascade')),
-                                       db.Column('id_device', db.Integer, db.ForeignKey('t_devices.id_device',
-                                                                                        ondelete='cascade')))
-
-kits_devices_optional_table = db.Table('t_kits_devices_optional', db.Column('id_kit', db.Integer,
-                                                                            db.ForeignKey('t_kits.id_kit',
-                                                                                          ondelete='cascade')),
-                                       db.Column('id_device', db.Integer, db.ForeignKey('t_devices.id_device',
-                                                                                        ondelete='cascade')))
-
 kits_participants_table = db.Table('t_kits_participants', db.Column('id_kit', db.Integer,
                                                                     db.ForeignKey('t_kits.id_kit', ondelete='cascade')),
                                    db.Column('id_participant', db.Integer,
@@ -27,8 +15,8 @@ class TeraKit(db.Model, BaseModel):
     kit_shareable = db.Column(db.Boolean, nullable=False)
     kit_lastonline = db.Column(db.TIMESTAMP, nullable=True)
 
-    kit_required_devices = db.relationship("TeraDevice", secondary=kits_devices_required_table, cascade="all,delete")
-    kit_optional_devices = db.relationship("TeraDevice", secondary=kits_devices_optional_table, cascade="all,delete")
+    kit_devices = db.relationship("TeraKitDevice")
+
     kit_participants = db.relationship("TeraParticipant", secondary=kits_participants_table,
                                        back_populates="participant_kits", cascade="all,delete")
 
