@@ -46,14 +46,16 @@ private slots:
 
     void on_btnCloseMessage_clicked();
     void on_btnLogout_clicked();
-
     void on_btnEditUser_clicked();
-
     void on_btnConfig_clicked();
+
+    void newItemRequested();
 
 private:
     void connectSignals();
     void initUi();
+
+    QAction* addNewItemAction(const TeraDataTypes &data_type, const QString& label);
 
 
     Ui::MainWindow *ui;
@@ -64,8 +66,12 @@ private:
     // Message system
     QList<Message>  m_messages;
     Message         m_currentMessage;
-    QMovie*         m_loadingIcon;
     QTimer          m_msgTimer;
+
+    // UI items
+    QMovie*         m_loadingIcon;
+    QMenu*          m_newItemMenu;
+    QList<QAction*> m_newItemActions;
 
 };
 

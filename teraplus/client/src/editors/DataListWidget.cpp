@@ -19,6 +19,9 @@ DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWid
     setSearching(false);
     m_newdata = false;
 
+    // No copy function for now
+    ui->btnCopy->hide();
+
     connectSignals();
 
     queryDataList();
@@ -370,4 +373,9 @@ void DataListWidget::deleteDataRequested()
         // We must delete!
         m_comManager->doDelete(TeraData::getPathForDataType(m_dataType), m_datamap.key(ui->lstData->currentItem())->getId());
     }
+}
+
+void DataListWidget::copyDataRequested()
+{
+
 }

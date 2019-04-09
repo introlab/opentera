@@ -104,6 +104,7 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
             id = reply_query.queryItemValue("id").toInt();
         }
         emit deleteResultsOK(reply_path, id);
+        handled=true;
     }
 
     return handled;

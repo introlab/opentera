@@ -43,11 +43,12 @@ void ConfigWidget::addSection(const QString &name, const QIcon &icon, const int 
 
 void ConfigWidget::setupSections()
 {
-    addSection(tr("Utilisateurs"), QIcon("://icons/software_user.png"), TERADATA_USER);
+    addSection(tr("Utilisateurs"), QIcon(TeraData::getIconFilenameForDataType(TERADATA_USER)), TERADATA_USER);
     addSection(tr("Sites"), QIcon("://icons/site.png"), TERADATA_SITE);
-    addSection(tr("Kits"), QIcon("://icons/kit.png"), TERADATA_KIT);
-    addSection(tr("Séances"), QIcon("://icons/session.png"), TERADATA_SESSIONTYPE);
-    addSection(tr("Évaluations"), QIcon("://icons/kit.png"), TERADATA_TESTDEF);
+    //addSection(tr("Appareils"), QIcon(TeraData::getIconFilenameForDataType(TERADATA_DEVICE)), TERADATA_DEVICE);
+    addSection(tr("Kits"), QIcon(TeraData::getIconFilenameForDataType(TERADATA_KIT)), TERADATA_KIT);
+    addSection(tr("Séances"), QIcon(TeraData::getIconFilenameForDataType(TERADATA_SESSIONTYPE)), TERADATA_SESSIONTYPE);
+    addSection(tr("Évaluations"), QIcon(TeraData::getIconFilenameForDataType(TERADATA_TESTDEF)), TERADATA_TESTDEF);
 
     ui->lstSections->setItemSelected(ui->lstSections->item(0),true);
 }
