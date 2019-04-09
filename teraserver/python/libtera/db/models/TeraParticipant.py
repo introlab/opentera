@@ -16,7 +16,8 @@ class TeraParticipant(db.Model, BaseModel):
     participant_name = db.Column(db.String, nullable=False)
     participant_token = db.Column(db.String, nullable=False, unique=True)
     participant_lastonline = db.Column(db.TIMESTAMP, nullable=True)
-    id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group'),
+    id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group',
+                                                               ondelete='cascade'),
                                      nullable=False)
 
     participant_kits = db.relationship("TeraKit", secondary=kits_participants_table, back_populates="kit_participants",

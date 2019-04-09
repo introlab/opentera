@@ -6,7 +6,7 @@ class TeraParticipantGroup(db.Model, BaseModel):
     __tablename__ = 't_participants_groups'
     id_participant_group = db.Column(db.Integer, db.Sequence('id_participantgroup_sequence'), primary_key=True,
                                      autoincrement=True)
-    id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project'), nullable=False)
+    id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
     participantgroup_name = db.Column(db.String, nullable=False, unique=False)
 
     participantgroup_project = db.relationship('TeraProject')

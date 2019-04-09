@@ -5,8 +5,8 @@ from libtera.db.models.TeraSite import TeraSite
 class TeraSiteAccess(db.Model, BaseModel):
     __tablename__ = 't_sites_access'
     id_site_access = db.Column(db.Integer, db.Sequence('id_site_access_sequence'), primary_key=True, autoincrement=True)
-    id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site'), nullable=False)
-    id_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user'), nullable=False)
+    id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
+    id_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user', ondelete='cascade'), nullable=False)
     site_access_role = db.Column(db.String(100), nullable=False, unique=False)
 
     site_access_site = db.relationship('TeraSite')

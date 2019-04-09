@@ -97,6 +97,15 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
         if (handled) emit postResultsOK(reply_path);
     }
 
+    if (reply->operation()==QNetworkAccessManager::DeleteOperation){
+        // Extract id from url
+        int id = 0;
+        if (reply_query.hasQueryItem("id")){
+            id = reply_query.queryItemValue("id").toInt();
+        }
+        emit deleteResultsOK(reply_path, id);
+    }
+
     return handled;
 }
 
@@ -120,6 +129,17 @@ void ComManager::doPost(const QString &path, const QString &post_data)
     QNetworkRequest request(query);
     request.setRawHeader("Content-Type", "application/json");
     m_netManager->post(request, post_data.toUtf8());
+    emit waitingForReply(true);
+}
+
+void ComManager::doDelete(const QString &path, const int &id)
+{
+    QUrl query = m_serverUrl;
+
+    query.setPath(path);
+    query.setQuery("id=" + QString::number(id));
+    QNetworkRequest request(query);
+    m_netManager->deleteResource(request);
     emit waitingForReply(true);
 }
 

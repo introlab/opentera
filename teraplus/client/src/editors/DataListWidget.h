@@ -32,7 +32,6 @@ private:
     Ui::DataListWidget*                 ui;
     DataEditorWidget*                   m_editor;
     QMap<TeraData*, QListWidgetItem*>   m_datamap;
-    QList<TeraData*>                    m_datalist;
     ComManager*                         m_comManager;
     TeraDataTypes                       m_dataType;
 
@@ -60,8 +59,7 @@ private slots:
     void com_Waiting(bool waiting);
     void com_NetworkError(QNetworkReply::NetworkError error, QString error_str);
 
-    void queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data);
-    void postDataReply(QString path, QString data);
+    void deleteDataReply(QString path, int id);
     void setDataList(QList<TeraData> list);
 
     void editor_dataDeleted();
@@ -72,6 +70,7 @@ private slots:
     void lstData_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
 
     void newDataRequested();
+    void deleteDataRequested();
 };
 
 

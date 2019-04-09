@@ -43,6 +43,7 @@ public:
     bool processNetworkReply(QNetworkReply* reply);
     void doQuery(const QString &path, const QUrlQuery &query_args = QUrlQuery());
     void doPost(const QString &path, const QString &post_data);
+    void doDelete(const QString &path, const int& id);
     void doUpdateCurrentUser();
 
     TeraData &getCurrentUser();
@@ -96,6 +97,7 @@ signals:
     //void postResultsReceived(QString path, QString data);
     void queryResultsOK(QString path, QUrlQuery url_query);
     void postResultsOK(QString path);
+    void deleteResultsOK(QString path, int id);
 
 public slots:
 
