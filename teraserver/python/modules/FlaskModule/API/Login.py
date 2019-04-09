@@ -13,7 +13,7 @@ class Login(Resource):
     @auth.login_required
     def get(self):
 
-        session.parmanent = True
+        session.permanent = True
 
         # print('Setting key with expiration in 60s', session['_id'], session['user_id'])
         # get_redis().set(session['_id'], session['user_id'], ex=60)

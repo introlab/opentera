@@ -7,6 +7,7 @@ from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from flask_babel import gettext
 
+
 class QueryUsers(Resource):
 
     def __init__(self, flaskModule=None):

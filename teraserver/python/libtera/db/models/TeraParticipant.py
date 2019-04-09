@@ -51,6 +51,15 @@ class TeraParticipant(db.Model, BaseModel):
         self.participant_lastonline = datetime.datetime.now()
         db.session.commit()
 
+    def to_json(self, ignore_fields=[], minimal=False):
+
+        ignore_fields.extend(['participant_kits', 'participant_participant_group',
+                              'participant_token', 'participant_sessions', 'secret'])
+        if minimal:
+            ignore_fields.extend([])
+
+        return super().to_json(ignore_fields=ignore_fields)
+
     @staticmethod
     def get_participant_by_token(token):
         participant = TeraParticipant.query.filter_by(participant_token=token).first()

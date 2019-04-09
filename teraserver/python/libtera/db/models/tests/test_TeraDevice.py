@@ -3,7 +3,7 @@ from libtera.db.Base import db
 from libtera.db.DBManager import DBManager
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraParticipant import TeraParticipant
+from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
@@ -37,4 +37,8 @@ class TeraDeviceTest(unittest.TestCase):
     def test_defaults(self):
         pass
 
-
+    def test_json(self):
+        device = TeraDevice.get_device_by_name('Apple Watch #W05P1')
+        json = device.to_json()
+        self.assertNotEqual(None, json)
+        print(json)
