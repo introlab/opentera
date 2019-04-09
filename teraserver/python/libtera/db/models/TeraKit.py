@@ -46,8 +46,8 @@ class TeraKit(db.Model, BaseModel):
         kit1.kit_shareable = False
 
         # Apple Watch #W05P1
-        device = TeraDevice.get_device_by_name('Apple Watch #W05P1')
-        kit1.kit_required_devices.append(device)
+        # device = TeraDevice.get_device_by_name('Apple Watch #W05P1')
+        # kit1.kit_required_devices.append(device)
 
         participant = TeraParticipant.get_participant_by_name('Test Participant #1')
         kit1.kit_participants.append(participant)
@@ -57,6 +57,10 @@ class TeraKit(db.Model, BaseModel):
 
         db.session.add(kit1)
         db.session.commit()
+
+    @staticmethod
+    def get_kit_by_name(name):
+        return TeraKit.query.filter_by(kit_name=name).first()
 
     @staticmethod
     def get_count():

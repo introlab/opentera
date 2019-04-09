@@ -60,13 +60,14 @@ class DBManager:
             print('No device types - creating defaults')
             TeraDeviceType.create_defaults()
 
+        if TeraKit.get_count() == 0:
+            print('No kit - creating defaults')
+            TeraKit.create_defaults()
+
         if TeraDevice.get_count() == 0:
             print('No device - creating defaults')
             TeraDevice.create_defaults()
 
-        if TeraKit.get_count() == 0:
-            print('No kit - creating defaults')
-            TeraKit.create_defaults()
 
     @staticmethod
     def open(db_infos, echo=False):

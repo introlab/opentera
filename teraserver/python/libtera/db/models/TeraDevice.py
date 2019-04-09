@@ -11,6 +11,7 @@ class TeraDevice(db.Model, BaseModel):
     secret = 'TeraDeviceSecret'
     id_device = db.Column(db.Integer, db.Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
     id_kit = db.Column(db.Integer, db.ForeignKey("t_kits.id_kit", ondelete='SET NULL'), nullable=True)
+    id_project = db.Column(db.Integer, db.ForeignKey("t_projects.id_project", ondelete='cascade'), nullable=False)
     device_uuid = db.Column(db.String(36), nullable=False, unique=True)
     device_name = db.Column(db.String, nullable=False)
     device_type = db.Column(db.Integer, db.ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
@@ -21,6 +22,9 @@ class TeraDevice(db.Model, BaseModel):
     device_profile = db.Column(db.String, nullable=True)
     device_notes = db.Column(db.String, nullable=True)
     device_lastonline = db.Column(db.TIMESTAMP, nullable=True)
+
+    device_kit = db.relationship("TeraKit")
+    device_project = db.relationship("TeraProject")
 
     def to_json(self, ignore_fields=[], minimal=False):
 
@@ -76,6 +80,8 @@ class TeraDevice(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults():
+        from libtera.db.models.TeraProject import TeraProject
+
         device = TeraDevice()
         device.device_name = 'Apple Watch #W05P1'
         device.device_uuid = str(uuid.uuid4())
@@ -83,6 +89,8 @@ class TeraDevice(db.Model, BaseModel):
         device.create_token()
         device.device_enabled = True
         device.device_onlineable = True
+        device.device_project = TeraProject.get_project_by_projectname('Default Project #1')
+
         db.session.add(device)
         db.session.commit()
 
