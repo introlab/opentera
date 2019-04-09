@@ -138,8 +138,15 @@ class TeraUser(db.Model, BaseModel):
 
     def get_accessible_devices(self, admin_only=False):
         device_list = []
+
+        # Superadmin can access everything
         if self.user_superadmin:
             device_list = TeraDevice.query.all()
+        else:
+            pass
+            #for project in self.get_accessible_projects():
+
+
 
         # Return result
         return device_list
