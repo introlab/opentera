@@ -175,5 +175,25 @@ class QueryUsers(Resource):
 
     @auth.login_required
     def delete(self):
-        return '', 501
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+
+        args = parser.parse_args()
+        id_todel = args['id']
+
+        # Check if current user can delete
+        # Only superadmin can delete users from here
+        if not current_user.user_superadmin:
+            return '', 403
+
+        # If we are here, we are allowed to delete that user. Do so.
+        try:
+            TeraUser.delete_user(id_user=id_todel)
+        except exc.SQLAlchemyError:
+            import sys
+            print(sys.exc_info())
+            return 'Database error', 500
+
+        return '', 200
 

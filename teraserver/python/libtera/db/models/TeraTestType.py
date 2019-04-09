@@ -2,8 +2,10 @@ from libtera.db.Base import db, BaseModel
 
 
 tests_types_projects_table = db.Table('t_tests_types_projects', db.Column('id_tests_types', db.Integer, db.ForeignKey(
-                                                                                  't_tests_types.id_test_type')),
-                                      db.Column('id_project', db.Integer, db.ForeignKey('t_projects.id_project')))
+                                                                                  't_tests_types.id_test_type',
+                                                                                  ondelete='cascade')),
+                                      db.Column('id_project', db.Integer, db.ForeignKey('t_projects.id_project',
+                                                                                        ondelete='cascade')))
 
 
 class TeraTestType(db.Model, BaseModel):

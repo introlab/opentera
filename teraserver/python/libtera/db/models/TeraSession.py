@@ -2,9 +2,10 @@ from libtera.db.Base import db, BaseModel
 from enum import Enum
 
 sessions_participants_table = db.Table('t_sessions_participants', db.Column('id_session', db.Integer,
-                                                                            db.ForeignKey('t_sessions.id_session')),
+                                                                            db.ForeignKey('t_sessions.id_session',
+                                                                                          ondelete='cascade')),
                                        db.Column('id_participant', db.Integer,
-                                                 db.ForeignKey('t_participants.id_participant')))
+                                                 db.ForeignKey('t_participants.id_participant', ondelete='cascade')))
 
 
 class TeraSessionStatus(Enum):

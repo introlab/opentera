@@ -6,7 +6,7 @@ from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 class TeraProject(db.Model, BaseModel):
     __tablename__ = 't_projects'
     id_project = db.Column(db.Integer, db.Sequence('id_project_sequence'), primary_key=True, autoincrement=True)
-    id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site'), nullable=False)
+    id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
     project_name = db.Column(db.String, nullable=False, unique=False)
 
     project_site = db.relationship("TeraSite")

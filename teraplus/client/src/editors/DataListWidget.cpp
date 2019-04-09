@@ -45,7 +45,6 @@ void DataListWidget::updateDataInList(TeraData* data, bool select_item){
     if (!item){
         // Check if we have a new item that we could match
         item = new QListWidgetItem(data->getName(),ui->lstData);
-        m_datalist.append(data);
         m_datamap[data] = item;
 
     }else{
@@ -93,7 +92,6 @@ void DataListWidget::deleteDataFromList(TeraData *data)
         LOG_WARNING("Can't find ListWidgetItem for " + data->getName(), "DataListWidget::deleteDataFromList");
     }
 
-    m_datalist.removeAll(data);
     data->deleteLater();
 }
 
@@ -137,8 +135,7 @@ void DataListWidget::connectSignals()
 {
     connect(m_comManager, &ComManager::waitingForReply, this, &DataListWidget::com_Waiting);
     connect(m_comManager, &ComManager::networkError, this, &DataListWidget::com_NetworkError);
-    /*connect(m_comManager, &ComManager::queryResultsReceived, this, &DataListWidget::queryDataReply);
-    connect(m_comManager, &ComManager::postResultsReceived, this, &DataListWidget::postDataReply);*/
+    connect(m_comManager, &ComManager::deleteResultsOK, this, &DataListWidget::deleteDataReply);
 
     // Connect correct signal according to the datatype
     connect(m_comManager, ComManager::getSignalFunctionForDataType(m_dataType), this, &DataListWidget::setDataList);
@@ -147,6 +144,7 @@ void DataListWidget::connectSignals()
     connect(ui->btnClear, &QPushButton::clicked, this, &DataListWidget::clearSearch);
     connect(ui->lstData, &QListWidget::currentItemChanged, this, &DataListWidget::lstData_currentItemChanged);
     connect(ui->btnNew, &QPushButton::clicked, this, &DataListWidget::newDataRequested);
+    connect(ui->btnDelete, &QPushButton::clicked, this, &DataListWidget::deleteDataRequested);
 }
 
 void DataListWidget::queryDataList()
@@ -174,14 +172,14 @@ QListWidgetItem *DataListWidget::getItemForData(TeraData *data)
 
     // Less simple case - the pointers are not the same, but we might be referencing an object already present.
     if (!data->isNew()){
-        for (TeraData* current_data:m_datalist){
+        for (TeraData* current_data:m_datamap.keys()){
             if (*current_data == *data){
                 return m_datamap[current_data];
             }
         }
 
         // Not found - try to find an item which is new but with the same name
-        for (TeraData* current_data:m_datalist){
+        for (TeraData* current_data:m_datamap.keys()){
             if (current_data->isNew() && current_data->getName() == data->getName()){
                 m_newdata=false;
                 return m_datamap[current_data];
@@ -189,7 +187,7 @@ QListWidgetItem *DataListWidget::getItemForData(TeraData *data)
         }
     }else{
         // We have a new item - try and match.
-        for (TeraData* current_data:m_datalist){
+        for (TeraData* current_data:m_datamap.keys()){
             if (current_data->isNew()){
                 return m_datamap[current_data];
             }
@@ -203,9 +201,11 @@ QListWidgetItem *DataListWidget::getItemForData(TeraData *data)
 
 void DataListWidget::clearDataList(){
     ui->lstData->clear();
+
+    for (TeraData* data:m_datamap.keys()){
+        delete data;
+    }
     m_datamap.clear();
-    qDeleteAll(m_datalist);
-    m_datalist.clear();
 }
 
 void DataListWidget::com_Waiting(bool waiting){
@@ -223,59 +223,29 @@ void DataListWidget::com_Waiting(bool waiting){
 
 void DataListWidget::com_NetworkError(QNetworkReply::NetworkError error, QString error_str)
 {
+    Q_UNUSED(error)
     GlobalMessageBox error_diag(this);
+    if (error_str.isEmpty())
+        error_str = tr("Erreur inconnue");
     error_diag.showError("Erreur", error_str);
 
 }
 
-void DataListWidget::queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data)
+void DataListWidget::deleteDataReply(QString path, int id)
 {
-    Q_UNUSED(path)
-
-    QJsonParseError json_error;
-
-    // Process reply
-    QJsonDocument items = QJsonDocument::fromJson(data.toUtf8(), &json_error);
-    if (json_error.error!= QJsonParseError::NoError){
-        LOG_ERROR("Can't parse reply data.", "DataListWidget::queryDataReply");
+    if (id==0)
         return;
-    }
 
-    // Browse each data
-    bool first_item = true;
-    for (QJsonValue item:items.array()){
-
-        if (TeraData::getDataTypeFromPath(path) == m_dataType){
-            TeraData* item_data = new TeraData(m_dataType, item);
-            // Clear items from list if we have a first list item
-            if (query_args.hasQueryItem(WEB_QUERY_LIST) && first_item){
-                clearDataList();
-                first_item = false;
+    if (path == TeraData::getPathForDataType(m_dataType)){
+        // An item that we are managing got deleted
+        for (TeraData* data:m_datamap.keys()){
+            if (data->getId() == id){
+                deleteDataFromList(data);
+                break;
             }
-            updateDataInList(item_data);
         }
+
     }
-
-}
-
-void DataListWidget::postDataReply(QString path, QString data)
-{
-    if (TeraData::getDataTypeFromPath(path) == m_dataType){
-        QJsonParseError json_error;
-
-        // Process reply
-        QJsonDocument items = QJsonDocument::fromJson(data.toUtf8(), &json_error);
-        if (json_error.error!= QJsonParseError::NoError){
-            LOG_ERROR("Can't parse reply data.", "DataListWidget::queryDataReply");
-            return;
-        }
-
-        for (QJsonValue item:items.array()){
-            TeraData* item_data = new TeraData(m_dataType, item);
-            updateDataInList(item_data);
-        }
-    }
-
 }
 
 void DataListWidget::setDataList(QList<TeraData> list)
@@ -386,4 +356,18 @@ void DataListWidget::newDataRequested()
     m_newdata = true;
     updateDataInList(new_data, true);
 
+}
+
+void DataListWidget::deleteDataRequested()
+{
+    if (!ui->lstData->currentItem())
+        return;
+
+    GlobalMessageBox diag;
+    QMessageBox::StandardButton answer = diag.showYesNo(tr("Suppression?"),
+                                                        tr("Êtes-vous sûrs de vouloir supprimer """) + ui->lstData->currentItem()->text() + """?");
+    if (answer == QMessageBox::Yes){
+        // We must delete!
+        m_comManager->doDelete(TeraData::getPathForDataType(m_dataType), m_datamap.key(ui->lstData->currentItem())->getId());
+    }
 }

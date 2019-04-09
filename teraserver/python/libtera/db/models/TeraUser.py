@@ -297,6 +297,11 @@ class TeraUser(db.Model, BaseModel):
         db.session.commit()
 
     @staticmethod
+    def delete_user(id_user):
+        TeraUser.query.filter_by(id_user=id_user).delete()
+        db.session.commit()
+
+    @staticmethod
     def create_defaults():
 
         # Admin
