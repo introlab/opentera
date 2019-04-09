@@ -1,4 +1,6 @@
 #include "DataListWidget.h"
+#include "GlobalMessageBox.h"
+
 
 DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWidget *parent):
     QWidget(parent),
@@ -15,6 +17,7 @@ DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWid
 
     m_editor = nullptr;
     setSearching(false);
+    m_newdata = false;
 
     connectSignals();
 
@@ -36,21 +39,19 @@ void DataListWidget::updateDataInList(TeraData* data, bool select_item){
     bool already_present = false;
 
     // Check if we already have that item
-    for (TeraData* current_data:m_datalist){
-        if (*current_data == *data){
-            item = m_datamap[current_data];
-        }
-    }
+    item = getItemForData(data);
 
     // If we don't, create a new one.
     if (!item){
+        // Check if we have a new item that we could match
         item = new QListWidgetItem(data->getName(),ui->lstData);
-
         m_datalist.append(data);
         m_datamap[data] = item;
 
     }else{
         already_present = true;
+        // Copy data to local object
+        *m_datamap.key(item) = *data;
     }
 
     item->setIcon(QIcon(TeraData::getIconFilenameForDataType(data->getDataType())));
@@ -119,6 +120,7 @@ void DataListWidget::showEditor(TeraData *data)
 
     if (m_editor){
         connect(m_editor, &DataEditorWidget::dataWasDeleted, this, &DataListWidget::editor_dataDeleted);
+        connect(m_editor, &DataEditorWidget::dataWasChanged, this, &DataListWidget::editor_dataChanged);
     }
      ui->wdgEditor->layout()->addWidget(m_editor);
 }
@@ -134,6 +136,7 @@ void DataListWidget::showEditor(TeraData *data)
 void DataListWidget::connectSignals()
 {
     connect(m_comManager, &ComManager::waitingForReply, this, &DataListWidget::com_Waiting);
+    connect(m_comManager, &ComManager::networkError, this, &DataListWidget::com_NetworkError);
     /*connect(m_comManager, &ComManager::queryResultsReceived, this, &DataListWidget::queryDataReply);
     connect(m_comManager, &ComManager::postResultsReceived, this, &DataListWidget::postDataReply);*/
 
@@ -163,6 +166,41 @@ TeraData *DataListWidget::getCurrentData()
     return nullptr;
 }
 
+QListWidgetItem *DataListWidget::getItemForData(TeraData *data)
+{
+    // Simple case - we have the data into direct mapping
+    if (m_datamap.contains(data))
+        return m_datamap[data];
+
+    // Less simple case - the pointers are not the same, but we might be referencing an object already present.
+    if (!data->isNew()){
+        for (TeraData* current_data:m_datalist){
+            if (*current_data == *data){
+                return m_datamap[current_data];
+            }
+        }
+
+        // Not found - try to find an item which is new but with the same name
+        for (TeraData* current_data:m_datalist){
+            if (current_data->isNew() && current_data->getName() == data->getName()){
+                m_newdata=false;
+                return m_datamap[current_data];
+            }
+        }
+    }else{
+        // We have a new item - try and match.
+        for (TeraData* current_data:m_datalist){
+            if (current_data->isNew()){
+                return m_datamap[current_data];
+            }
+        }
+    }
+
+    // No match.
+    return nullptr;
+
+}
+
 void DataListWidget::clearDataList(){
     ui->lstData->clear();
     m_datamap.clear();
@@ -171,14 +209,23 @@ void DataListWidget::clearDataList(){
 }
 
 void DataListWidget::com_Waiting(bool waiting){
-    TeraData* current_item = getCurrentData();
+    /*TeraData* current_item = getCurrentData();
     if (current_item){
         if (current_item->isNew()){
             waiting = true;
         }
-    }
+    }*/
     //this->setDisabled(waiting);
+    if (m_newdata)
+        waiting = true;
     ui->frameItems->setDisabled(waiting);
+}
+
+void DataListWidget::com_NetworkError(QNetworkReply::NetworkError error, QString error_str)
+{
+    GlobalMessageBox error_diag(this);
+    error_diag.showError("Erreur", error_str);
+
 }
 
 void DataListWidget::queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data)
@@ -246,8 +293,20 @@ void DataListWidget::editor_dataDeleted()
     // Remove data from list
     deleteDataFromList(getCurrentData());
 
+    m_newdata = false;
     ui->lstData->setCurrentRow(-1);
     showEditor(nullptr);
+}
+
+void DataListWidget::editor_dataChanged()
+{
+    QListWidgetItem* item = getItemForData(m_editor->getData());
+
+    if (item){
+        item->setText(m_editor->getData()->getName());
+        // Copy data to local object
+        *m_datamap.key(item) = *m_editor->getData();
+    }
 }
 
 void DataListWidget::searchChanged(QString new_search){
@@ -318,24 +377,13 @@ void DataListWidget::lstData_currentItemChanged(QListWidgetItem *current, QListW
     // Query full data for that data item
     m_comManager->doQuery(TeraData::getPathForDataType(current_data->getDataType()),
                           QUrlQuery(QString(WEB_QUERY_ID_USER) + "=" + QString::number(current_data->getId())));
-
-    /*switch(current_data->getDataType()){
-        case TERADATA_USER:
-            //m_editor = new UserWidget(m_comManager, const_cast<TeraData*>(current_data));
-
-        break;
-        default:
-            LOG_ERROR("Unhandled datatype for editor: " + TeraData::getDataTypeName(current_data->getDataType()), "DataListWidget::lstData_currentItemChanged");
-            return;
-    }*/
-
-    //ui->wdgEditor->layout()->addWidget(m_editor);
 }
 
 void DataListWidget::newDataRequested()
 {
     TeraData* new_data = new TeraData(m_dataType);
     new_data->setId(0);
+    m_newdata = true;
     updateDataInList(new_data, true);
 
 }

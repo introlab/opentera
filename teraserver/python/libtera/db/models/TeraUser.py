@@ -79,20 +79,19 @@ class TeraUser(db.Model, BaseModel):
         return users_ids
 
     def get_accessible_users(self, admin_only=False):
-        projects = self.get_accessible_projects(admin_only=admin_only)
-        users = []
-        for project in projects:
-            project_users = project.get_users_in_project()
-            for user in project_users:
-                if user not in users:
-                    users.append(user)
-
-        # If superadmin, also add superadmin users
         if self.user_superadmin:
-            superadmins = TeraUser.query.filter(TeraUser.user_superadmin).all()
-            for superadmin in superadmins:
-                if superadmin not in users:
-                    users.append(superadmin)
+            users = TeraUser.query.all()
+        else:
+            projects = self.get_accessible_projects(admin_only=admin_only)
+            users = []
+            for project in projects:
+                project_users = project.get_users_in_project()
+                for user in project_users:
+                    if user not in users:
+                        users.append(user)
+            # You are always available to yourself!
+            if self not in users:
+                users.append(self)
 
         # TODO Sort by username
         return users

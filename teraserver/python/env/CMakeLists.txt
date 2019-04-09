@@ -31,13 +31,13 @@ set (pip_packages
     flask-oauthlib
     flask-login
     flask-httpauth
-    flask-jwt
     flask-socketio
     flask-session
     flask-restful
     flask-security
     flask-babel
     flask-migrate
+    flask-jwt
     redis
     txredisapi
     eventlet

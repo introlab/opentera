@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include <QNetworkReply>
 
 #include "ui_MainWindow.h"
 
@@ -50,6 +51,8 @@ void MainWindow::initUi()
 
     // Setup loading icon animation
     m_loadingIcon = new QMovie("://status/loading.gif");
+    ui->icoLoading->setMovie(m_loadingIcon);
+    ui->icoLoading->hide();
 
 }
 
@@ -127,18 +130,23 @@ void MainWindow::com_serverError(QAbstractSocket::SocketError error, QString err
 
 void MainWindow::com_networkError(QNetworkReply::NetworkError error, QString error_msg)
 {
-    Q_UNUSED(error)
-    addMessage(Message::MESSAGE_ERROR, error_msg);
+    addMessage(Message::MESSAGE_ERROR, tr("Erreur ") + QString::number(error) + ": " + error_msg);
 }
 
 void MainWindow::com_waitingForReply(bool waiting)
 {
-    if (waiting){
+    /*if (waiting){
         if (!hasWaitingMessage())
             addMessage(Message::MESSAGE_WORKING, "");
-    }else{
+     }else{
         if (m_currentMessage.getMessageType()==Message::MESSAGE_WORKING)
             showNextMessage();
+    }*/
+    ui->icoLoading->setVisible(waiting);
+    if (waiting)
+        m_loadingIcon->start();
+    else {
+        m_loadingIcon->stop();
     }
     ui->btnEditUser->setEnabled(!waiting);
     ui->btnConfig->setEnabled(!waiting);

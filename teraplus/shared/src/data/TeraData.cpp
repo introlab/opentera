@@ -47,6 +47,11 @@ QString TeraData::getName() const
     return tr("Inconnu");
 }
 
+void TeraData::setName(const QString &name)
+{
+    setFieldValue(m_nameField, name);
+}
+
 bool TeraData::isNew()
 {
     return getId()<=0;

@@ -68,7 +68,6 @@ void UserWidget::saveData(bool signal){
     QJsonDocument user_data = ui->wdgUser->getFormDataJson(m_data->isNew());
 
     // Site access
-
     QJsonArray site_access = getSitesRoles();
     if (!site_access.isEmpty()){
         QJsonObject base_obj = user_data.object();
@@ -91,8 +90,13 @@ void UserWidget::saveData(bool signal){
     //qDebug() << user_data.toJson();
     postDataRequest(WEB_USERINFO_PATH, user_data.toJson());
 
-    if (signal)
+    if (signal){
+        TeraData* new_data = ui->wdgUser->getFormDataObject(TERADATA_USER);
+        new_data->setName(new_data->getFieldValue("user_firstname").toString() + " " + new_data->getFieldValue("user_lastname").toString());
+        *m_data = *new_data;
+        delete new_data;
         emit dataWasChanged();
+    }
 
     /*if (parent())
         emit closeRequest(); // Ask to close that editor*/
@@ -141,6 +145,11 @@ void UserWidget::updateFieldsValue(){
         }
         resetSites();
         resetProjects();
+
+        // Don't allow editing of username if not now data
+        if (!m_data->isNew()){
+            ui->wdgUser->getWidgetForField("user_username")->setEnabled(false);
+        }
     }
 }
 
@@ -182,7 +191,7 @@ void UserWidget::fillSites(const QList<TeraData> &sites)
 
     // Query sites roles
     if (m_data){
-        if (!m_data->isNew()){
+        if (!m_data->isNew() && sites.count()>0){
             QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
             queryDataRequest(WEB_SITEINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
         }
@@ -271,7 +280,7 @@ void UserWidget::fillProjects(const QList<TeraData> &projects)
     }
 
     if (m_data){
-        if (!m_data->isNew()){
+        if (!m_data->isNew() && projects.count()>0){
             QString user_uuid = m_data->getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces);
             queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery(QString(WEB_QUERY_USERUUID) + "=" + user_uuid));
         }
@@ -394,6 +403,8 @@ void UserWidget::processFormsReply(QString form_type, QString data)
             item = ui->wdgUser->getWidgetForField("user_enabled");
             if (item) item->setEnabled(false);
             item = ui->wdgUser->getWidgetForField("user_superadmin");
+            if (item) item->setEnabled(false);
+            item = ui->wdgUser->getWidgetForField("user_notes");
             if (item) item->setEnabled(false);
         }
         return;

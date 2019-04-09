@@ -23,6 +23,8 @@
 #include <QtMultimedia/QCameraInfo>
 #include <QtMultimedia/QAudioDeviceInfo>
 
+#include "TeraData.h"
+
 namespace Ui {
 class TeraForm;
 }
@@ -50,6 +52,7 @@ public:
 
     QString getFormData(bool include_unmodified_data=false);
     QJsonDocument getFormDataJson(bool include_unmodified_data=false);
+    TeraData *getFormDataObject(const TeraDataTypes data_type);
 
 private:
     Ui::TeraForm*                                   ui;

@@ -367,8 +367,11 @@ void ComManager::onNetworkFinished(QNetworkReply *reply)
         }
     }
     else {
-        qDebug() << "ComManager::onNetworkFinished - Reply error: " << reply->error();
-        emit networkError(reply->error(), reply->errorString());
+        QString reply_msg = QString(reply->readAll()).replace("""", "");
+        qDebug() << "ComManager::onNetworkFinished - Reply error: " << reply->error() << ", Reply message: " << reply_msg;
+        if (reply_msg.isEmpty())
+            reply_msg = reply->errorString();
+        emit networkError(reply->error(), reply_msg);
     }
     reply->deleteLater();
 }

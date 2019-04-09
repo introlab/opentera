@@ -36,13 +36,15 @@ private:
     ComManager*                         m_comManager;
     TeraDataTypes                       m_dataType;
 
-    bool                    m_copying;
-    bool                    m_searching;
+    bool                                m_copying;
+    bool                                m_searching;
+    bool                                m_newdata;
 
     void connectSignals();
     void queryDataList();
 
     TeraData *getCurrentData();
+    QListWidgetItem *getItemForData(TeraData *data);
     void updateDataInList(TeraData *data, bool select_item=false);
     void deleteDataFromList(TeraData* data);
     void showEditor(TeraData *data);
@@ -56,11 +58,14 @@ public slots:
 
 private slots:
     void com_Waiting(bool waiting);
+    void com_NetworkError(QNetworkReply::NetworkError error, QString error_str);
+
     void queryDataReply(const QString &path, const QUrlQuery &query_args, const QString &data);
     void postDataReply(QString path, QString data);
     void setDataList(QList<TeraData> list);
 
     void editor_dataDeleted();
+    void editor_dataChanged();
 
     void searchChanged(QString new_search);
     void clearSearch();

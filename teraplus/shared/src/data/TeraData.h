@@ -41,6 +41,7 @@ public:
     int getId() const;
     void setId(const int& id);
     virtual QString getName() const;
+    void setName(const QString& name);
 
     bool isNew();
 

@@ -188,6 +188,19 @@ QJsonDocument TeraForm::getFormDataJson(bool include_unmodified_data)
     return document;
 }
 
+TeraData* TeraForm::getFormDataObject(const TeraDataTypes data_type)
+{
+    TeraData* rval = new TeraData(data_type);
+    for(QString field:m_widgets.keys()){
+        QVariant value, id;
+        getWidgetValues(m_widgets[field], &id, &value);
+        if (!id.isNull())
+            value = id;
+        rval->setFieldValue(field, value);
+    }
+    return rval;
+}
+
 bool TeraForm::formHasData()
 {
     return !m_initialValues.isEmpty();
