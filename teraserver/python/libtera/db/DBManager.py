@@ -13,6 +13,7 @@ from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraDevice import TeraDevice
+from libtera.db.models.TeraKit import TeraKit
 
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
@@ -62,6 +63,10 @@ class DBManager:
         if TeraDevice.get_count() == 0:
             print('No device - creating defaults')
             TeraDevice.create_defaults()
+
+        if TeraKit.get_count() == 0:
+            print('No kit - creating defaults')
+            TeraKit.create_defaults()
 
     @staticmethod
     def open(db_infos, echo=False):

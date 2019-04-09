@@ -60,9 +60,13 @@ class TeraDevice(db.Model, BaseModel):
         return None
 
     @staticmethod
+    def get_device_by_name(name):
+        return TeraDevice.query.filter_by(device_name=name).first()
+
+    @staticmethod
     def create_defaults():
         device = TeraDevice()
-        device.device_name = 'Test Device #1'
+        device.device_name = 'Apple Watch #W05P1'
         device.device_uuid = str(uuid.uuid4())
         device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
         device.create_token()
