@@ -137,6 +137,12 @@ QString TeraData::getDataTypeName(const TeraDataTypes &data_type)
         return "test_type";
     case TERADATA_PROJECT:
         return "project";
+    case TERADATA_DEVICE:
+        return "device";
+    case TERADATA_PARTICIPANT:
+        return "participant";
+    case TERADATA_GROUP:
+        return "participantgroup";
     }
 
     return "";
@@ -177,6 +183,14 @@ QString TeraData::getIconFilenameForDataType(const TeraDataTypes &data_type)
         return "://icons/session.png";
     case TERADATA_TESTDEF:
         return "://icons/test.png";
+    case TERADATA_DEVICE:
+        return "://icons/device.png";
+    case TERADATA_PARTICIPANT:
+        return "://icons/patient.png";
+    case TERADATA_GROUP:
+        return "://icons/group.png";
+    case TERADATA_PROJECT:
+        return "://icons/project.png";
     default:
         return "://icons/error.png";
     }

@@ -71,6 +71,7 @@ private slots:
 
     void newDataRequested();
     void deleteDataRequested();
+    void copyDataRequested();
 };
 
 

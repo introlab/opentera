@@ -17,6 +17,7 @@ set(headers
     editors/UserWidget.h
     editors/TeraForm.h
     editors/DataListWidget.h
+    editors/SiteWidget.h
 )
 
 set(srcs
@@ -34,6 +35,7 @@ set(srcs
     editors/UserWidget.cpp
     editors/TeraForm.cpp
     editors/DataListWidget.cpp
+    editors/SiteWidget.cpp
 )
 
 SET(uis
@@ -44,6 +46,7 @@ SET(uis
     editors/UserWidget.ui
     editors/TeraForm.ui
     editors/DataListWidget.ui
+    editors/SiteWidget.ui
 )
 
 SET(qrcs

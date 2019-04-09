@@ -26,6 +26,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete m_loadingIcon;
+    delete m_newItemMenu;
+    qDeleteAll(m_newItemActions);
 }
 
 void MainWindow::connectSignals()
@@ -54,6 +56,25 @@ void MainWindow::initUi()
     ui->icoLoading->setMovie(m_loadingIcon);
     ui->icoLoading->hide();
 
+    // Setup new item menu
+    m_newItemMenu = new QMenu();
+    QAction* new_action = addNewItemAction(TERADATA_SITE, tr("Site"));
+    new_action = addNewItemAction(TERADATA_PROJECT, tr("Projet"));
+    new_action = addNewItemAction(TERADATA_GROUP, tr("Groupe"));
+    new_action = addNewItemAction(TERADATA_PARTICIPANT, tr("Participant"));
+    ui->btnNewItem->setMenu(m_newItemMenu);
+}
+
+QAction *MainWindow::addNewItemAction(const TeraDataTypes& data_type, const QString &label)
+{
+    QAction* new_action = new QAction(QIcon(TeraData::getIconFilenameForDataType(data_type)), label);
+    new_action->setData(data_type);
+    m_newItemActions.append(new_action);
+
+    connect(new_action, &QAction::triggered, this, &MainWindow::newItemRequested);
+    m_newItemMenu->addAction(new_action);
+
+    return new_action;
 }
 
 void MainWindow::showNextMessage()
@@ -222,4 +243,24 @@ void MainWindow::on_btnConfig_clicked()
     m_diag_editor->setWindowTitle(tr("Configuration Globale"));
 
     m_diag_editor->open();
+}
+
+void MainWindow::newItemRequested()
+{
+    QAction* action = dynamic_cast<QAction*>(QObject::sender());
+    if (action){
+        TeraDataTypes data_type = static_cast<TeraDataTypes>(action->data().toInt());
+        if (data_type == TERADATA_SITE){
+            qDebug() << "New site";
+        }
+        if (data_type == TERADATA_PROJECT){
+            qDebug() << "New project";
+        }
+        if (data_type == TERADATA_GROUP){
+            qDebug() << "New group";
+        }
+        if (data_type == TERADATA_PARTICIPANT){
+            qDebug() << "New participant";
+        }
+    }
 }

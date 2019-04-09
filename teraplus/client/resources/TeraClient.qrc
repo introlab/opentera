@@ -77,5 +77,7 @@
         <file>icons/error.png</file>
         <file>icons/ok.png</file>
         <file>icons/site.png</file>
+        <file>icons/device.png</file>
+        <file>icons/project.png</file>
     </qresource>
 </RCC>
