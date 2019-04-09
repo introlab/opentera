@@ -5,10 +5,10 @@ FROM ubuntu:18.04
 # Install build dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	postgresql redis-server build-essential cmake python3.6 git \
-	python3-pip sudo vim
+	python3-pip sudo vim libprotobuf-dev
 
 # Clone repository
-ARG CACHE_DATE=2019-03-28
+ARG CACHE_DATE=2019-04-09
 RUN git clone -b dev https://github.com/introlab/opentera.git
 
 # Install python packages
@@ -23,6 +23,7 @@ RUN pip3 install  twisted \
     flask-oauthlib \
     flask-login \
     flask-httpauth \
+    flask-jwt \
     flask-socketio \
     flask-session \
     flask-restful \
@@ -40,7 +41,8 @@ RUN pip3 install  twisted \
     PyInstaller \
     pyopenssl \
     service_identity \
-    jsonrpcclient
+    jsonrpcclient \
+    jwt
 
 #Create db and user
 RUN service postgresql start &&\

@@ -7,6 +7,7 @@ from modules.FlaskModule.FlaskModule import flask_app
 from libtera.redis.RedisClient import RedisClient
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraParticipant import TeraParticipant
+from libtera.db.models.TeraDevice import TeraDevice
 
 from modules.Globals import auth
 from modules.RedisModule.RedisModule import get_redis
@@ -18,8 +19,11 @@ from werkzeug.local import LocalProxy
 from flask_restful import Resource, reqparse
 from functools import wraps
 
-# Current identity, stacked
+# Current participant identity, stacked
 current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant', None))
+
+# Current device identity, stacked
+current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_device', None))
 
 
 class LoginModule(RedisClient):
@@ -63,6 +67,13 @@ class LoginModule(RedisClient):
                 _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(args['token'])
 
                 if current_participant:
+                    # Returns the function if authenticated with token
+                    return f(*args, **kwargs)
+
+                # Load device from DB
+                _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(args['token'])
+
+                if current_device:
                     # Returns the function if authenticated with token
                     return f(*args, **kwargs)
 

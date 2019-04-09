@@ -71,6 +71,10 @@ class TeraParticipant(db.Model, BaseModel):
         return None
 
     @staticmethod
+    def get_participant_by_name(name):
+        return TeraParticipant.query.filter_by(participant_name=name).first()
+
+    @staticmethod
     def create_defaults():
         participant1 = TeraParticipant()
         participant1.participant_name = 'Test Participant #1'
