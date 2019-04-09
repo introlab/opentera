@@ -48,7 +48,8 @@ class TeraDevice(db.Model, BaseModel):
             data = jwt.decode(token.encode('utf-8'), TeraDevice.secret, 'HS256')
 
             if data['device_uuid'] == device.device_uuid \
-                    and data['device_name'] == device.device_name:
+                    and data['device_name'] == device.device_name \
+                    and data['device_type'] == device.device_type:
 
                 # Update last online
                 device.update_last_online()
