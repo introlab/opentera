@@ -1,12 +1,8 @@
-from flask import jsonify, session, request
+from flask import jsonify, session
 from flask_restful import Resource, reqparse
-from sqlalchemy import exc
 from modules.Globals import auth
 from libtera.db.models.TeraUser import TeraUser
 from sqlalchemy.exc import InvalidRequestError
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
-from flask_babel import gettext
 
 
 class QueryDevices(Resource):
@@ -33,7 +29,6 @@ class QueryDevices(Resource):
             device_list = []
             for device in devices:
                 device_json = device.to_json()
-                # device_json['project_role'] = queried_user.get_project_role(project)
                 device_list.append(device_json)
             return jsonify(device_list)
 

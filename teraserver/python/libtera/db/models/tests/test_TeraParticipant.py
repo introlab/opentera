@@ -33,6 +33,9 @@ class TeraParticipantTest(unittest.TestCase):
         # Creating default users / tests.
         self.db_man.create_defaults()
 
+    def tearDown(self):
+        pass
+
     def test_token(self):
 
         participantGroup = TeraParticipantGroup()

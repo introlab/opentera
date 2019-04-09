@@ -1,8 +1,9 @@
 from libtera.db.Base import db, BaseModel
 
 
-kits_participants_table = db.Table('t_kits_participants', db.Column('id_kit', db.Integer,
-                                                                    db.ForeignKey('t_kits.id_kit', ondelete='cascade')),
+kits_participants_table = db.Table('t_kits_participants',
+                                   db.Column('id_kit', db.Integer,
+                                             db.ForeignKey('t_kits.id_kit', ondelete='cascade')),
                                    db.Column('id_participant', db.Integer,
                                              db.ForeignKey('t_participants.id_participant', ondelete='cascade')))
 
@@ -21,6 +22,15 @@ class TeraKit(db.Model, BaseModel):
                                        back_populates="participant_kits", cascade="all,delete")
 
     kit_project = db.relationship("TeraProject")
+
+    def to_json(self, ignore_fields=[], minimal=False):
+
+        ignore_fields.extend(['kit_devices', 'kit_participants', 'kit_project'])
+
+        if minimal:
+            ignore_fields.extend([])
+
+        return super().to_json(ignore_fields=ignore_fields)
 
     @staticmethod
     def create_defaults():

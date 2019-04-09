@@ -28,7 +28,7 @@ class TeraDevice(db.Model, BaseModel):
 
     def to_json(self, ignore_fields=[], minimal=False):
 
-        ignore_fields.extend(['device_token', 'secret'])
+        ignore_fields.extend(['device_kits', 'device_project', 'device_token', 'secret'])
 
         if minimal:
             ignore_fields.extend([])

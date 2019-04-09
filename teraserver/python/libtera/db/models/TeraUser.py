@@ -4,6 +4,9 @@ from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraDevice import TeraDevice
+from libtera.db.models.TeraKit import TeraKit
+from libtera.db.models.TeraParticipant import TeraParticipant
+from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 
 from passlib.hash import bcrypt
 import uuid
@@ -137,19 +140,24 @@ class TeraUser(db.Model, BaseModel):
         return project_list
 
     def get_accessible_devices(self, admin_only=False):
-        device_list = []
+        project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
+        return TeraDevice.query.filter(TeraDevice.id_project.in_(project_id_list)).all()
 
-        # Superadmin can access everything
-        if self.user_superadmin:
-            device_list = TeraDevice.query.all()
-        else:
-            pass
-            #for project in self.get_accessible_projects():
+    def get_accessible_kits(self, admin_only=False):
+        project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
+        return TeraKit.query.filter(TeraKit.id_project.in_(project_id_list)).all()
+
+    def get_accessible_participants(self, admin_only=False):
+        project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
+        groups = TeraParticipantGroup.query.filter(TeraParticipantGroup.id_project.in_(project_id_list)).all()
+        participant_list = []
+        for group in groups:
+            participant_list.extend(TeraParticipant.query.
+                                    filter_by(id_participant_group=group.id_participant_group).all())
+
+        return participant_list
 
 
-
-        # Return result
-        return device_list
 
     def get_accessible_projects_ids(self, admin_only=False):
         projects = []
