@@ -9,6 +9,7 @@ set(headers
     LoginDialog.h
     ComManager.h
     MainWindow.h
+    ProjectNavigator.h
     NotificationWindow.h
     Message.h
     GlobalMessageBox.h
@@ -27,6 +28,7 @@ set(srcs
     LoginDialog.cpp
     ComManager.cpp
     MainWindow.cpp
+    ProjectNavigator.cpp
     NotificationWindow.cpp
     Message.cpp
     GlobalMessageBox.cpp
@@ -41,6 +43,7 @@ set(srcs
 SET(uis
     LoginDialog.ui
     MainWindow.ui
+    ProjectNavigator.ui
     notification.ui
     ConfigWidget.ui
     editors/UserWidget.ui

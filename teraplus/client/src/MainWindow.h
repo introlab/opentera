@@ -49,14 +49,9 @@ private slots:
     void on_btnEditUser_clicked();
     void on_btnConfig_clicked();
 
-    void newItemRequested();
-
 private:
     void connectSignals();
     void initUi();
-
-    QAction* addNewItemAction(const TeraDataTypes &data_type, const QString& label);
-
 
     Ui::MainWindow *ui;
 
@@ -70,8 +65,6 @@ private:
 
     // UI items
     QMovie*         m_loadingIcon;
-    QMenu*          m_newItemMenu;
-    QList<QAction*> m_newItemActions;
 
 };
 
