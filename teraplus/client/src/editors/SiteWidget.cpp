@@ -12,6 +12,9 @@ SiteWidget::SiteWidget(ComManager *comMan, const TeraData *data, QWidget *parent
     }
     setAttribute(Qt::WA_StyledBackground); //Required to set a background image
 
+    // Limited by default
+    m_limited = true;
+
     // Connect signals and slots
     connectSignals();
 
@@ -71,6 +74,7 @@ void SiteWidget::connectSignals()
 
     connect(ui->btnUndo, &QPushButton::clicked, this, &SiteWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &SiteWidget::btnSave_clicked);
+    connect(ui->btnUpdateRoles, &QPushButton::clicked, this, &SiteWidget::btnUpdateAccess_clicked);
 
 }
 
@@ -141,7 +145,9 @@ void SiteWidget::updateKit(const TeraData *kit)
 
 void SiteWidget::updateControlsState()
 {
-
+    ui->btnKits->setVisible(!m_limited);
+    ui->btnUsers->setVisible(!m_limited);
+    ui->btnProjects->setVisible(!m_limited);
 
 }
 
@@ -249,5 +255,37 @@ void SiteWidget::btnUndo_clicked()
 
     if (parent())
         emit closeRequest();
+
+}
+
+void SiteWidget::btnUpdateAccess_clicked()
+{
+
+    QJsonDocument document;
+    QJsonObject base_obj;
+    QJsonArray roles;
+
+    for (int i=0; i<m_tableUsers_ids_rows.count(); i++){
+        int user_id = m_tableUsers_ids_rows.keys().at(i);
+        int row = m_tableUsers_ids_rows[user_id];
+        QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableUsers->cellWidget(row,1));
+        if (combo_roles->property("original_index").toInt() != combo_roles->currentIndex()){
+            QJsonObject data_obj;
+            // Ok, value was modified - must add!
+            QJsonValue role = combo_roles->currentData().toString();
+            data_obj.insert("id_site", m_data->getId());
+            data_obj.insert("id_user", user_id);
+            data_obj.insert("site_access_role", role);
+            roles.append(data_obj);
+        }
+    }
+
+    if (!roles.isEmpty()){
+        base_obj.insert("site_access", roles);
+        document.setObject(base_obj);
+        postDataRequest(WEB_SITEACCESS_PATH, document.toJson());
+    }
+
+
 
 }

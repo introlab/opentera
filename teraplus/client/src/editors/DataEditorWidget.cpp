@@ -35,6 +35,11 @@ void DataEditorWidget::setData(const TeraData* data)
     }
 }
 
+void DataEditorWidget::setLimited(bool limited){
+    m_limited = limited;
+    updateControlsState();
+}
+
 TeraData *DataEditorWidget::getData()
 {
     return m_data;

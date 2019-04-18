@@ -35,6 +35,8 @@ public:
     virtual void setWaiting();
     virtual void setLoading();
 
+    void setLimited(bool limited);
+
     bool isReady();
     bool isEditing();
     bool isWaiting();
@@ -60,6 +62,7 @@ private:
 
 protected:
     bool            m_undoing;
+    bool            m_limited;
     TeraData*       m_data;
     ComManager*     m_comManager;
 

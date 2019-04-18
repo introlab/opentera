@@ -414,13 +414,6 @@ void UserWidget::postResultReply(QString path)
     }
 }
 
-void UserWidget::setLimited(bool limited){
-    m_limited = limited;
-
-    updateControlsState();
-
-}
-
 void UserWidget::connectSignals()
 {
     connect(m_comManager, &ComManager::usersReceived, this, &UserWidget::processUsersReply);

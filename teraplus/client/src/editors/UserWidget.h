@@ -32,8 +32,6 @@ public:
 
     void saveData(bool signal=true);
 
-    void setLimited(bool limited);
-
     void connectSignals();
 
     //void processQueryReply(const QString &path, const QUrlQuery &query_args, const QString &data);
@@ -42,7 +40,6 @@ public:
 private:
     Ui::UserWidget* ui;
 
-    bool                m_limited; // Current user editing only
     QMap<int, int>      m_tableSites_ids_rows;
     QMap<int, int>      m_tableProjects_ids_rows;
 

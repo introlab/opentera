@@ -57,49 +57,40 @@ class QuerySiteAccess(Resource):
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         # Using request.json instead of parser, since parser messes up the json!
-        json_site = request.json['site_access']
+        json_sites = request.json['site_access']
 
-        # Validate if we have an id_user
-        if 'id_site_access' not in json_site:
-            return 'Missing id_site_access', 400
+        if not isinstance(json_sites, list):
+            json_sites = [json_sites]
 
-        # Check if current user can change the access for that site
-        if current_user.get_site_role(site=json_site) != 'admin':
-            return 'Forbidden', 403
+        # Validate if we have everything needed
+        json_rval = []
+        for json_site in json_sites:
+            if 'id_user' not in json_site:
+                return 'Missing id_user', 400
+            if 'id_site' not in json_site:
+                return 'Missing id_site', 400
 
-        # Do the update!
-        try:
-            access = TeraSiteAccess.update_access(json_site['id_user'], json_site['id_site'], json_site['site_role'])
-        except exc.SQLAlchemyError:
-            import sys
-            print(sys.exc_info())
-            return '', 500
+            # Check if current user can change the access for that site
+            if current_user.get_site_role(site=json_site) != 'admin':
+                return 'Forbidden', 403
 
-        # TODO: Publish update to everyone who is subscribed to site access update...
+            # Do the update!
+            try:
+                access = TeraSiteAccess.update_site_access(json_site['id_user'], json_site['id_site'],
+                                                           json_site['site_access_role'])
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return '', 500
 
-        return jsonify(access.to_json())
+            # TODO: Publish update to everyone who is subscribed to site access update...
+            if access:
+                json_rval.append(access.to_json())
+
+        return jsonify(json_rval)
 
     @auth.login_required
     def delete(self):
-        # parser = reqparse.RequestParser()
-        # parser.add_argument('id', type=int, help='ID to delete', required=True)
-        # current_user = TeraUser.get_user_by_uuid(session['user_id'])
-        #
-        # args = parser.parse_args()
-        # id_todel = args['id']
-        #
-        # # Check if current user can delete
-        # # Only superadmin can delete users from here
-        # if not current_user.user_superadmin:
-        #     return '', 403
-        #
-        # # If we are here, we are allowed to delete that user. Do so.
-        # try:
-        #     TeraUser.delete_user(id_user=id_todel)
-        # except exc.SQLAlchemyError:
-        #     import sys
-        #     print(sys.exc_info())
-        #     return 'Database error', 500
 
         return '', 501
 

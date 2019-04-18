@@ -33,8 +33,8 @@ private slots:
 
     void btnSave_clicked();
     void btnUndo_clicked();
+    void btnUpdateAccess_clicked();
 
-    // DataEditorWidget interface
 private:
     Ui::SiteWidget *ui;
 
