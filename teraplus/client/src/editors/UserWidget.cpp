@@ -146,7 +146,7 @@ void UserWidget::updateFieldsValue(){
         resetSites();
         resetProjects();
 
-        // Don't allow editing of username if not now data
+        // Don't allow editing of username if not new data
         if (!m_data->isNew()){
             ui->wdgUser->getWidgetForField("user_username")->setEnabled(false);
         }
@@ -344,17 +344,6 @@ void UserWidget::resetProjects()
     }
 }
 
-QComboBox *UserWidget::buildRolesComboBox()
-{
-    QComboBox* item_roles = new QComboBox();
-    item_roles->addItem(tr("Aucun rôle"), "");
-    item_roles->addItem(tr("Administrateur"), "admin");
-    item_roles->addItem(tr("Utilisateur"), "user");
-    item_roles->setCurrentIndex(0);
-
-    return item_roles;
-}
-
 void UserWidget::processUsersReply(QList<TeraData> users)
 {
     for (int i=0; i<users.count(); i++){
@@ -445,16 +434,6 @@ void UserWidget::connectSignals()
 
 }
 
-void UserWidget::btnEdit_clicked()
-{
-    setEditing(true);
-}
-
-void UserWidget::btnDelete_clicked()
-{
-    undoOrDeleteData();
-}
-
 void UserWidget::btnSave_clicked()
 {
     if (!validateData()){
@@ -480,23 +459,11 @@ void UserWidget::btnSave_clicked()
      saveData();
 }
 
-void UserWidget::txtPassword_textChanged(const QString &new_pass)
-{
-    Q_UNUSED(new_pass)
-    /*if (ui->txtPassword->text().isEmpty()){
-        ui->txtCPassword->setVisible(false);
-        ui->txtCPassword->clear();
-    }else{
-        ui->txtCPassword->setVisible(true);
-    }*/
-}
-
 void UserWidget::btnUndo_clicked()
 {
     undoOrDeleteData();
 
     if (parent())
         emit closeRequest();
-
 
 }

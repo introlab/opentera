@@ -41,8 +41,8 @@ TeraData *DataEditorWidget::getData()
 }
 
 
-void DataEditorWidget::setEditing(bool enabled){
-    /*if (m_editState==STATE_WAITING)
+/*void DataEditorWidget::setEditing(bool enabled){
+    if (m_editState==STATE_WAITING)
         return; // Dont do anything if waiting
 
     if (m_editState==STATE_READY && enabled){
@@ -64,8 +64,8 @@ void DataEditorWidget::setEditing(bool enabled){
             setReady();
         }
         m_undoing = false;
-    }*/
-}
+    }
+}*/
 
 void DataEditorWidget::setReady(){
     if (isReady())
@@ -83,8 +83,6 @@ void DataEditorWidget::setReady(){
 void DataEditorWidget::setEditing(){
     if (isEditing())
         return;
-    /*if (!isVisible())
-        setVisible(true);*/
     setEnabled(true);
     setVisible(true);
     QApplication::restoreOverrideCursor();
@@ -146,6 +144,19 @@ QString DataEditorWidget::getQueryDataName(const QString &path, const QUrlQuery 
     if (!query_args.isEmpty())
         query_name += "?" + query_args.toString();
     return query_name;
+}
+
+QComboBox *DataEditorWidget::buildRolesComboBox()
+{
+
+    QComboBox* item_roles = new QComboBox();
+    item_roles->addItem(tr("Aucun rôle"), "");
+    item_roles->addItem(tr("Administrateur"), "admin");
+    item_roles->addItem(tr("Utilisateur"), "user");
+    item_roles->setCurrentIndex(0);
+
+    return item_roles;
+
 }
 
 bool DataEditorWidget::isReady(){

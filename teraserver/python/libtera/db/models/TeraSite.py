@@ -27,9 +27,30 @@ class TeraSite(db.Model, BaseModel):
         return TeraSite.query.filter_by(site_name=sitename).first()
 
     @staticmethod
+    def get_site_by_id(site_id):
+        return TeraSite.query.filter_by(id_site=site_id).first()
+
+    @staticmethod
     def query_data(filter_args):
         if isinstance(filter_args, tuple):
             return TeraSite.query.filter_by(*filter_args).all()
         if isinstance(filter_args, dict):
             return TeraSite.query.filter_by(**filter_args).all()
         return None
+
+    @staticmethod
+    def update_site(id_site, values={}):
+        TeraSite.query.filter_by(id_site=id_site).update(values)
+        db.session.commit()
+
+    @staticmethod
+    def insert_site(site):
+        site.id_site = None
+
+        db.session.add(site)
+        db.session.commit()
+
+    @staticmethod
+    def delete_site(id_site):
+        TeraSite.query.filter_by(id_site=id_site).delete()
+        db.session.commit()

@@ -3,22 +3,25 @@ from flask_restful import Resource, reqparse
 from modules.Globals import auth, db_man
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
+from libtera.db.models.TeraProject import TeraProject
 
 
 class QueryProjects(Resource):
 
-    def __init__(self, flaskModule=None):
+    def __init__(self, flaskModule = None):
         Resource.__init__(self)
         self.module = flaskModule
-        self.parser = reqparse.RequestParser()
-        self.parser.add_argument('id_project', type=int, help='id_project')
-        self.parser.add_argument('id_site', type=int, help='id_site')
-        self.parser.add_argument('user_uuid', type=str, help='user_uuid')
 
     @auth.login_required
     def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('id_project', type=int, help='id_project')
+        parser.add_argument('id_site', type=int, help='id_site')
+        parser.add_argument('user_uuid', type=str, help='user_uuid')
+        parser.add_argument('list', type=bool, help='Request list')
+
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
-        args = self.parser.parse_args()
+        args = parser.parse_args()
 
         projects = []
         # If we have no arguments, return all accessible projects
@@ -31,13 +34,22 @@ class QueryProjects(Resource):
             queried_user = TeraUser.get_user_by_uuid(args['user_uuid'])
             if queried_user is not None:
                 projects = queried_user.get_accessible_projects()
+
+        # If we have a site id, query for projects of that site
+        if args['id_site']:
+            projects = TeraProject.query_projects_for_site(current_user=current_user, site_id=args['id_site'])
+
         try:
             projects_list = []
 
             for project in projects:
-                project_json = project.to_json()
-                project_json['project_role'] = queried_user.get_project_role(project)
-                projects_list.append(project_json)
+                if args['list'] is None:
+                    project_json = project.to_json()
+                    project_json['project_role'] = queried_user.get_project_role(project)
+                    projects_list.append(project_json)
+                else:
+                    projects_list.append(project.to_json(minimal=True))
+
             return jsonify(projects_list)
         except InvalidRequestError:
             return '', 500

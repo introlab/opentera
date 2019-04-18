@@ -61,8 +61,6 @@ private:
     QJsonArray getProjectsRoles();
     void resetProjects();
 
-    QComboBox *buildRolesComboBox();
-
 public slots:
 
 
@@ -73,10 +71,7 @@ private slots:
     void processFormsReply(QString form_type, QString data);
     void postResultReply(QString path);
 
-    void btnEdit_clicked();
-    void btnDelete_clicked();
     void btnSave_clicked();
-    void txtPassword_textChanged(const QString &new_pass);
     void btnUndo_clicked();
 };
 

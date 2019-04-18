@@ -1,6 +1,8 @@
 #include "DataListWidget.h"
 #include "GlobalMessageBox.h"
 
+#include "editors/UserWidget.h"
+#include "editors/SiteWidget.h"
 
 DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWidget *parent):
     QWidget(parent),
@@ -111,9 +113,12 @@ void DataListWidget::showEditor(TeraData *data)
         return;
 
     switch(data->getDataType()){
-        case TERADATA_USER:{
+        case TERADATA_USER:
             m_editor = new UserWidget(m_comManager, data);
-        }break;
+        break;
+        case TERADATA_SITE:
+            m_editor = new SiteWidget(m_comManager, data);
+        break;
         default:
             LOG_ERROR("Unhandled datatype for editor: " + TeraData::getDataTypeName(data->getDataType()), "DataListWidget::lstData_currentItemChanged");
             return;
@@ -137,7 +142,6 @@ void DataListWidget::showEditor(TeraData *data)
 void DataListWidget::connectSignals()
 {
     connect(m_comManager, &ComManager::waitingForReply, this, &DataListWidget::com_Waiting);
-    connect(m_comManager, &ComManager::networkError, this, &DataListWidget::com_NetworkError);
     connect(m_comManager, &ComManager::deleteResultsOK, this, &DataListWidget::deleteDataReply);
 
     // Connect correct signal according to the datatype
@@ -224,15 +228,6 @@ void DataListWidget::com_Waiting(bool waiting){
     ui->frameItems->setDisabled(waiting);
 }
 
-void DataListWidget::com_NetworkError(QNetworkReply::NetworkError error, QString error_str)
-{
-    Q_UNUSED(error)
-    GlobalMessageBox error_diag(this);
-    if (error_str.isEmpty())
-        error_str = tr("Erreur inconnue");
-    error_diag.showError("Erreur", error_str);
-
-}
 
 void DataListWidget::deleteDataReply(QString path, int id)
 {

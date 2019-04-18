@@ -75,9 +75,22 @@ void ConfigWidget::com_Waiting(bool waiting)
     setDisabled(waiting);
 }
 
+void ConfigWidget::com_NetworkError(QNetworkReply::NetworkError error, QString error_str)
+{
+    Q_UNUSED(error)
+    GlobalMessageBox error_diag(this);
+    if (error_str.isEmpty() || error_str.startsWith(""""""))
+        error_str = tr("Erreur inconnue");
+    error_diag.showError("Erreur", error_str);
+}
+
 void ConfigWidget::connectSignals()
 {
     connect(ui->lstSections, &QListWidget::currentItemChanged, this, &ConfigWidget::currentSectionChanged);
+
     connect(m_comManager, &ComManager::waitingForReply, this, &ConfigWidget::com_Waiting);
+    connect(m_comManager, &ComManager::networkError, this, &ConfigWidget::com_NetworkError);
+
     connect(ui->btnClose, &QPushButton::clicked, this, &ConfigWidget::closeRequest);
 }
+

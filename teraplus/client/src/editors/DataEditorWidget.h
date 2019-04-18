@@ -2,6 +2,7 @@
 #define DATAEDITORWIDGET_H
 
 #include <QWidget>
+#include <QComboBox>
 
 #include "data/TeraData.h"
 
@@ -56,10 +57,13 @@ private:
     QList<QString>  m_requests;
 
     EditorState     m_editState;
+
 protected:
     bool            m_undoing;
     TeraData*       m_data;
     ComManager*     m_comManager;
+
+    QComboBox*      buildRolesComboBox();
 
 signals:
     void dataWasChanged();
@@ -75,7 +79,7 @@ signals:
 
 public slots:
 
-    void setEditing(bool enabled);
+    //void setEditing(bool enabled);
     void undoOrDeleteData();
 
 private slots:

@@ -151,7 +151,17 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
         <property name="currentIndex">
          <number>0</number>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
         <widget class="QWidget" name="tabInfos">
+         <attribute name="icon">
+          <iconset resource="../../resources/TeraClient.qrc">
+           <normaloff>:/icons/software_user.png</normaloff>:/icons/software_user.png</iconset>
+         </attribute>
          <attribute name="title">
           <string>Informations</string>
          </attribute>
@@ -190,6 +200,10 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
          </layout>
         </widget>
         <widget class="QWidget" name="tabRoles">
+         <attribute name="icon">
+          <iconset resource="../../resources/TeraClient.qrc">
+           <normaloff>:/icons/site.png</normaloff>:/icons/site.png</iconset>
+         </attribute>
          <attribute name="title">
           <string>Rôles</string>
          </attribute>
@@ -278,6 +292,10 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
          </layout>
         </widget>
         <widget class="QWidget" name="tabProfile">
+         <attribute name="icon">
+          <iconset resource="../../resources/TeraClient.qrc">
+           <normaloff>:/icons/options.png</normaloff>:/icons/options.png</iconset>
+         </attribute>
          <attribute name="title">
           <string>Paramètres</string>
          </attribute>

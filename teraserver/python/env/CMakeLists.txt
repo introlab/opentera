@@ -37,7 +37,7 @@ set (pip_packages
     flask-security
     flask-babel
     flask-migrate
-    flask-jwt
+    # flask-jwt
     redis
     txredisapi
     eventlet
@@ -50,7 +50,8 @@ set (pip_packages
     pyopenssl
     service_identity
     jsonrpcclient
-    jwt
+    # jwt
+    PyJWT
 )
 
 # Create environment, will produce python executable

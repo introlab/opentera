@@ -11,7 +11,7 @@ class TeraProject(db.Model, BaseModel):
 
     project_site = db.relationship("TeraSite")
 
-    def to_json(self, ignore_fields=None):
+    def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
         ignore_fields.extend(['project_site'])
@@ -70,6 +70,12 @@ class TeraProject(db.Model, BaseModel):
     @staticmethod
     def get_project_by_projectname(projectname):
         return TeraProject.query.filter_by(project_name=projectname).first()
+
+    @staticmethod
+    def query_projects_for_site(current_user, site_id: int):
+        proj_ids = current_user.get_accessible_projects_ids()
+        projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids)).all()
+        return projects
 
     @staticmethod
     def query_data(filter_args):

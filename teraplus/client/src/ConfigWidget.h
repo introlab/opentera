@@ -9,6 +9,8 @@
 #include "ComManager.h"
 #include "TeraData.h"
 
+#include "GlobalMessageBox.h"
+
 #include "editors/DataListWidget.h"
 
 namespace Ui {
@@ -27,6 +29,7 @@ private slots:
 
     void currentSectionChanged(QListWidgetItem *current, QListWidgetItem *previous);
     void com_Waiting(bool waiting);
+    void com_NetworkError(QNetworkReply::NetworkError error, QString error_str);
 
 private:
 
@@ -34,6 +37,7 @@ private:
 
     ComManager*         m_comManager;
     DataListWidget*     m_dataListEditor;
+
 
     void connectSignals();
 

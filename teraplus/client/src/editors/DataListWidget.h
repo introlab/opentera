@@ -8,13 +8,7 @@
 
 #include "TeraData.h"
 
-//#include "TeraMenu_gui.h"
 #include "ui_DataListWidget.h"
-
-#include "editors/UserWidget.h"
-
-//Data widgets
-//#include "UserWidget.h"
 
 namespace Ui {
 class DataListWidget;
@@ -57,7 +51,6 @@ public slots:
 
 private slots:
     void com_Waiting(bool waiting);
-    void com_NetworkError(QNetworkReply::NetworkError error, QString error_str);
 
     void deleteDataReply(QString path, int id);
     void setDataList(QList<TeraData> list);

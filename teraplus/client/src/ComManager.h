@@ -92,6 +92,10 @@ signals:
     void sessionTypesReceived(QList<TeraData> st_list);
     void testDefsReceived(QList<TeraData> tests_list);
     void projectsReceived(QList<TeraData> projects_list);
+    void devicesReceived(QList<TeraData> projects_list);
+    void participantsReceived(QList<TeraData> projects_list);
+    void groupsReceived(QList<TeraData> projects_list);
+    void siteAccessReceived(QList<TeraData> access_list);
 
     //void queryResultsReceived(QString object, QUrlQuery url_query, QString data);
     //void postResultsReceived(QString path, QString data);

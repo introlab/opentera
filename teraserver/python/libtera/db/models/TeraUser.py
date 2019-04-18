@@ -41,8 +41,11 @@ class TeraUser(db.Model, BaseModel):
         if minimal:
             ignore_fields.extend(['user_username', 'user_email', 'user_profile', 'user_notes', 'user_lastonline', 'user_superadmin'])
         rval = super().to_json(ignore_fields=ignore_fields)
-        rval['user_name'] = self.user_firstname + ' ' + self.user_lastname
+        rval['user_name'] = self.get_fullname()
         return rval
+
+    def get_fullname(self):
+        return self.user_firstname + ' ' + self.user_lastname
 
     def is_authenticated(self):
         return self.authenticated
@@ -156,8 +159,6 @@ class TeraUser(db.Model, BaseModel):
                                     filter_by(id_participant_group=group.id_participant_group).all())
 
         return participant_list
-
-
 
     def get_accessible_projects_ids(self, admin_only=False):
         projects = []

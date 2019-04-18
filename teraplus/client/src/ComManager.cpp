@@ -120,6 +120,8 @@ void ComManager::doQuery(const QString &path, const QUrlQuery &query_args)
     }
     m_netManager->get(QNetworkRequest(query));
     emit waitingForReply(true);
+
+    LOG_DEBUG("GET: " + path + ", with " + query_args.toString(), "ComManager::doQuery");
 }
 
 void ComManager::doPost(const QString &path, const QString &post_data)
@@ -131,6 +133,8 @@ void ComManager::doPost(const QString &path, const QString &post_data)
     request.setRawHeader("Content-Type", "application/json");
     m_netManager->post(request, post_data.toUtf8());
     emit waitingForReply(true);
+
+    LOG_DEBUG("POST: " + path + ", with " + post_data, "ComManager::doPost");
 }
 
 void ComManager::doDelete(const QString &path, const int &id)
@@ -142,6 +146,7 @@ void ComManager::doDelete(const QString &path, const int &id)
     QNetworkRequest request(query);
     m_netManager->deleteResource(request);
     emit waitingForReply(true);
+    LOG_DEBUG("DELETE: " + path + ", with ID=" + QString::number(id), "ComManager::doDelete");
 }
 
 void ComManager::doUpdateCurrentUser()
@@ -303,6 +308,18 @@ bool ComManager::handleDataReply(const QString& reply_path, const QString &reply
     case TERADATA_PROJECT:
         emit projectsReceived(items);
         break;
+    case TERADATA_DEVICE:
+        emit devicesReceived(items);
+        break;
+    case TERADATA_PARTICIPANT:
+        emit participantsReceived(items);
+        break;
+    case TERADATA_GROUP:
+        emit groupsReceived(items);
+        break;
+    case TERADATA_SITEACCESS:
+        emit siteAccessReceived(items);
+        break;
     }
 
     return true;
@@ -389,6 +406,9 @@ void ComManager::onNetworkFinished(QNetworkReply *reply)
     }
     else {
         QString reply_msg = QString(reply->readAll()).replace("""", "");
+        if (reply_msg.isEmpty() || reply_msg.startsWith("""""")){
+            reply_msg = tr("Erreur non-détaillée.");
+        }
         qDebug() << "ComManager::onNetworkFinished - Reply error: " << reply->error() << ", Reply message: " << reply_msg;
         if (reply_msg.isEmpty())
             reply_msg = reply->errorString();
