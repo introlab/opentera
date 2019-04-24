@@ -20,6 +20,8 @@ from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 
 from modules.FlaskModule.FlaskModule import flask_app
 
+# User access with roles
+from .DBManagerTeraUserAccess import DBManagerTeraUserAccess
 
 class DBManager:
     """db_infos = {
@@ -33,6 +35,11 @@ class DBManager:
 
     def __init__(self):
         pass
+
+    @staticmethod
+    def userAccess(user: TeraUser):
+        access = DBManagerTeraUserAccess(user=user)
+        return access
 
     @staticmethod
     def create_defaults():
@@ -67,7 +74,6 @@ class DBManager:
         if TeraDevice.get_count() == 0:
             print('No device - creating defaults')
             TeraDevice.create_defaults()
-
 
     @staticmethod
     def open(db_infos, echo=False):
@@ -104,18 +110,18 @@ class DBManager:
         # Init tables
         db.create_all()
 
-    @staticmethod
-    def get_user_sites(user: TeraUser, **kwargs):
-        if user.user_superadmin:
-            return TeraSite.query.filter_by(**kwargs).all()
-        else:
-            # Only super user can create sites, by default we can list our sites only
-            return TeraSite.query.filter(TeraSite.id_site.in_(user.get_accessible_sites_ids())).filter_by(**kwargs).all()
-
-    @staticmethod
-    def get_user_projects(user: TeraUser, **kwargs):
-        if user.user_superadmin:
-            return TeraProject.query.filter_by(**kwargs).all()
-        else:
-            return TeraProject.query.filter(TeraProject.id_project.in_
-                                            (user.get_accessible_projects_ids())).filter_by(**kwargs).all()
+    # @staticmethod
+    # def get_user_sites(user: TeraUser, **kwargs):
+    #     if user.user_superadmin:
+    #         return TeraSite.query.filter_by(**kwargs).all()
+    #     else:
+    #         # Only super user can create sites, by default we can list our sites only
+    #         return TeraSite.query.filter(TeraSite.id_site.in_(user.get_accessible_sites_ids())).filter_by(**kwargs).all()
+    #
+    # @staticmethod
+    # def get_user_projects(user: TeraUser, **kwargs):
+    #     if user.user_superadmin:
+    #         return TeraProject.query.filter_by(**kwargs).all()
+    #     else:
+    #         return TeraProject.query.filter(TeraProject.id_project.in_
+    #                                         (user.get_accessible_projects_ids())).filter_by(**kwargs).all()

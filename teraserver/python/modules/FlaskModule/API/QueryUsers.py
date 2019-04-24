@@ -6,6 +6,8 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from flask_babel import gettext
+from libtera.db.DBManager import DBManager
+from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 
 
 class QueryUsers(Resource):
@@ -24,10 +26,12 @@ class QueryUsers(Resource):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         args = parser.parse_args()
 
+        userAccess = DBManager.userAccess(current_user)
+
         users = []
         # If we have no arguments, return all accessible users
         if not any(args.values()):
-            users = current_user.get_accessible_users()
+            users = userAccess.get_accessible_users()
 
         # If we have a user_uuid, query for that user if accessible
         if args['user_uuid']:
@@ -47,20 +51,20 @@ class QueryUsers(Resource):
                         user_json = user.to_json()
                         if user.id_user == current_user.id_user:
                             # Sites
-                            sites = current_user.get_accessible_sites()
+                            sites = userAccess.get_accessible_sites()
                             sites_list = []
                             for site in sites:
                                 site_json = site.to_json()
-                                site_json['site_role'] = current_user.get_site_role(site)
+                                site_json['site_role'] = userAccess.get_site_role(site)
                                 sites_list.append(site_json)
                             user_json['sites'] = sites_list
 
                             # Projects
-                            projects = current_user.get_accessible_projects()
+                            projects = userAccess.get_accessible_projects()
                             proj_list = []
                             for project in projects:
                                 proj_json = project.to_json()
-                                proj_json['project_role'] = current_user.get_project_role(project)
+                                proj_json['project_role'] = userAccess.get_project_role(project)
                                 proj_list.append(proj_json)
                             user_json['projects'] = proj_list
 
@@ -85,6 +89,9 @@ class QueryUsers(Resource):
         parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+
+        userAccess = DBManager.userAccess(current_user)
+
         # Using request.json instead of parser, since parser messes up the json!
         json_user = request.json['user']
 
@@ -93,7 +100,7 @@ class QueryUsers(Resource):
             return '', 400
 
         # Check if current user can modify the posted user
-        if json_user['id_user'] not in current_user.get_accessible_users_ids(admin_only=True) and \
+        if json_user['id_user'] not in userAccess.get_accessible_users_ids(admin_only=True) and \
                 json_user['id_user'] > 0:
             return '', 403
 
@@ -173,6 +180,7 @@ class QueryUsers(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        userAccess = DBManager.userAccess(current_user)
 
         args = parser.parse_args()
         id_todel = args['id']
