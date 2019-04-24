@@ -328,6 +328,9 @@ bool ComManager::handleDataReply(const QString& reply_path, const QString &reply
     case TERADATA_SITEACCESS:
         emit siteAccessReceived(items);
         break;
+    case TERADATA_KITDEVICE:
+        emit kitDevicesReceived(items);
+        break;
     }
 
     return true;

@@ -49,6 +49,7 @@ public:
     QWidget* getWidgetForField(const QString& field);
     bool setFieldValue(const QString& field, const QVariant& value);
     QVariant getFieldValue(const QString& field);
+    void hideField(const QString& field);
 
     QString getFormData(bool include_unmodified_data=false);
     QJsonDocument getFormDataJson(bool include_unmodified_data=false);

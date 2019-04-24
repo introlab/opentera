@@ -30,6 +30,7 @@ private:
 
 private slots:
     void processFormsReply(QString form_type, QString data);
+    void processKitDevicesReply(QList<TeraData> kit_devices);
 
     void btnSave_clicked();
     void btnUndo_clicked();

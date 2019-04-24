@@ -29,16 +29,16 @@ class QueryKitDevice(Resource):
             return 'Missing arguments.', 400
 
         if args['id_device']:
-            kit_device = [TeraKitDevice.query_kit_device_for_device(current_user=current_user,
-                                                                    device_id=args['id_device'])]
+            kit_device = TeraKitDevice.query_kit_device_for_device(current_user=current_user,
+                                                                    device_id=args['id_device'])
         else:
             if args['id_kit']:
-                kit_device = [TeraKitDevice.query_kit_device_for_kit(current_user=current_user, kit_id=args['id_kit'])]
-
-        if kit_device is None:
-            kit_device = []
+                kit_device = TeraKitDevice.query_kit_device_for_kit(current_user=current_user, kit_id=args['id_kit'])
         try:
-            return jsonify(kit_device.to_json())
+            if kit_device is not None:
+                return jsonify([kit_device.to_json()])
+            else:
+                return jsonify([])
 
         except InvalidRequestError:
             return '', 500

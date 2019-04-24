@@ -153,6 +153,18 @@ QVariant TeraForm::getFieldValue(const QString &field)
     return rval;
 }
 
+void TeraForm::hideField(const QString &field)
+{
+    QWidget* widget = getWidgetForField(field);
+    if (widget){
+        QFormLayout* form_layout = dynamic_cast<QFormLayout*>(widget->parentWidget()->layout());
+
+        m_hidden_rows[widget] = form_layout->takeRow(widget);
+        widget->hide();
+        m_hidden_rows[widget].labelItem->widget()->hide();
+    }
+}
+
 QString TeraForm::getFormData(bool include_unmodified_data)
 {
     QString data;
