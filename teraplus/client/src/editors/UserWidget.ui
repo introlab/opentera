@@ -372,7 +372,7 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
   <customwidget>
    <class>TeraForm</class>
    <extends>QWidget</extends>
-   <header>teraform.h</header>
+   <header>TeraForm.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

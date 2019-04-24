@@ -21,23 +21,36 @@ class QueryDevices(Resource):
 
         parser = reqparse.RequestParser()
         parser.add_argument('id_device', type=int, help='id_device')
+        parser.add_argument('list', type=bool)
+        parser.add_argument('available', type=bool)
+        parser.add_argument('unavailable', type=bool)
         # parser.add_argument('device_uuid', type=str, help='device_uuid')
 
         args = parser.parse_args()
 
         devices = []
         # If we have no arguments, return all accessible devices
-        if not any(args.values()):
+        if not args['id_device']:
             devices = user_access.get_accessible_devices()
+        else:
+            devices = [user_access.query_device_by_id(device_id=args['id_device'])]
 
-        if args['id_device']:
-            devices.append(user_access.query_device_by_id(device_id=args['id_device']))
+        if args['available'] is not None:
+            devices = TeraDevice.get_available_devices()
+        elif args['unavailable'] is not None:
+            devices = TeraDevice.get_unavailable_devices()
 
         try:
             device_list = []
             for device in devices:
                 if device is not None:
-                    device_json = device.to_json()
+                    if args['list'] is None:
+                        device_json = device.to_json()
+                    else:
+                        device_json = device.to_json(minimal=True)
+                    if args['unavailable'] is not None:
+                        device_json['id_kit'] = device.device_kits[0].id_kit
+                        device_json['kit_name'] = device.device_kits[0].kit_device_kit.kit_name
                     device_list.append(device_json)
             return jsonify(device_list)
 

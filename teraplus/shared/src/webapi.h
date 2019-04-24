@@ -26,5 +26,7 @@
 #define WEB_QUERY_ID_SITE       "id_site"
 #define WEB_QUERY_ID_KIT        "id_kit"
 #define WEB_QUERY_ID_DEVICE     "id_device"
+#define WEB_QUERY_UNAVAILABLE   "unavailable"
+#define WEB_QUERY_AVAILABLE     "available"
 
 #endif // WEBAPI_H

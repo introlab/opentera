@@ -31,7 +31,8 @@ class TeraDevice(db.Model, BaseModel):
         ignore_fields.extend(['device_kits', 'device_site', 'device_token', 'secret'])
 
         if minimal:
-            ignore_fields.extend([])
+            ignore_fields.extend(['device_type', 'device_uuid', 'device_onlineable', 'device_profile', 'device_notes',
+                                  'device_lastonline'])
 
         return super().to_json(ignore_fields=ignore_fields)
 
@@ -83,6 +84,21 @@ class TeraDevice(db.Model, BaseModel):
         return TeraDevice.query.filter_by(id_device=device_id).first()
 
     @staticmethod
+    def get_available_devices(ignore_disabled=True):
+        if ignore_disabled:
+            return TeraDevice.query.outerjoin(TeraDevice.device_kits).filter(TeraDevice.device_kits == None).all()
+        else:
+            return TeraDevice.query.filter_by(device_enabled=True).outerjoin(TeraDevice.device_kits).\
+                filter(TeraDevice.device_kits == None).all()
+
+    @staticmethod
+    def get_unavailable_devices(ignore_disabled=True):
+        if ignore_disabled:
+            return TeraDevice.query.join(TeraDevice.device_kits).all()
+        else:
+            return TeraDevice.query.filter_by(device_enabled=True).join(TeraDevice.device_kits).all()
+
+    @staticmethod
     def create_defaults():
         from libtera.db.models.TeraSite import TeraSite
         from libtera.db.models.TeraKitDevice import TeraKitDevice
@@ -97,14 +113,37 @@ class TeraDevice(db.Model, BaseModel):
         device.device_onlineable = True
         # device.device_project = TeraProject.get_project_by_projectname('Default Project #1')
         device.device_site = TeraSite.get_site_by_sitename('Default Site')
-        kit = TeraKit.get_kit_by_name('Kit #1')
 
+        kit = TeraKit.get_kit_by_name('Kit #1')
         kitDev = TeraKitDevice()
         kitDev.kit_device_kit = kit
         kitDev.kit_device_device = device
         kitDev.kit_device_optional = True
         device.device_kits.append(kitDev)
         db.session.add(device)
+
+        device2 = TeraDevice()
+        device2.device_name = 'Kit Télé #1'
+        device2.device_uuid = str(uuid.uuid4())
+        device2.device_type = TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value
+        device2.create_token()
+        device2.device_enabled = True
+        device2.device_onlineable = True
+        # device.device_project = TeraProject.get_project_by_projectname('Default Project #1')
+        device2.device_site = TeraSite.get_site_by_sitename('Default Site')
+        db.session.add(device2)
+
+        device3 = TeraDevice()
+        device3.device_name = 'Robot A'
+        device3.device_uuid = str(uuid.uuid4())
+        device3.device_type = TeraDeviceType.DeviceTypeEnum.ROBOT.value
+        device3.create_token()
+        device3.device_enabled = True
+        device3.device_onlineable = True
+        # device.device_project = TeraProject.get_project_by_projectname('Default Project #1')
+        device3.device_site = TeraSite.get_site_by_sitename('Default Site')
+        db.session.add(device3)
+
         db.session.commit()
 
     @staticmethod

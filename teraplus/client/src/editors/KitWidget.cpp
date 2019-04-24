@@ -3,6 +3,8 @@
 
 #include "GlobalMessageBox.h"
 
+#include <QDebug>
+
 KitWidget::KitWidget(ComManager *comMan, const TeraData *data, QWidget *parent) :
     DataEditorWidget(comMan, data, parent),
     ui(new Ui::KitWidget)
@@ -22,6 +24,12 @@ KitWidget::KitWidget(ComManager *comMan, const TeraData *data, QWidget *parent) 
 
     // Query project list (to ensure sites and projects sync)
     queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery());
+
+    // Query available devices
+    QUrlQuery query;
+    query.addQueryItem(WEB_QUERY_LIST,"");
+    query.addQueryItem(WEB_QUERY_AVAILABLE, "");
+    queryDataRequest(WEB_DEVICEINFO_PATH, query);
 
 }
 
@@ -49,10 +57,24 @@ void KitWidget::connectSignals()
 {
     connect(m_comManager, &ComManager::formReceived, this, &KitWidget::processFormsReply);
     connect(m_comManager, &ComManager::projectsReceived, this, &KitWidget::processProjectsReply);
+    connect(m_comManager, &ComManager::devicesReceived, this, &KitWidget::processDevicesReply);
 
     connect(ui->wdgKit, &TeraForm::widgetValueHasChanged, this, &KitWidget::wdgKitWidgetValueChanged);
     connect(ui->btnSave, &QPushButton::clicked, this, &KitWidget::btnSave_clicked);
     connect(ui->btnUndo, &QPushButton::clicked, this, &KitWidget::btnUndo_clicked);
+}
+
+void KitWidget::updateDevice(const TeraData *device)
+{
+    int id_device = device->getId();
+    if (m_listDevices_items.contains(id_device)){
+        QListWidgetItem* item = m_listDevices_items[id_device];
+        item->setText(device->getName());
+    }else{
+        QListWidgetItem* item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_DEVICE)), device->getName());
+        ui->lstDevices->addItem(item);
+        m_listDevices_items[id_device] = item;
+    }
 }
 
 void KitWidget::updateControlsState()
@@ -89,6 +111,14 @@ void KitWidget::processProjectsReply(QList<TeraData> projects)
     if (m_projects.isEmpty())
         m_projects = projects;
 
+}
+
+void KitWidget::processDevicesReply(QList<TeraData> devices)
+{
+    qDebug() << "processDevicesReply";
+    for (int i=0; i<devices.count(); i++){
+        updateDevice(&devices.at(i));
+    }
 }
 
 void KitWidget::wdgKitWidgetValueChanged(QWidget *widget, QVariant value)
