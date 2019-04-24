@@ -1,10 +1,9 @@
 from flask import jsonify, session, request
 from flask_restful import Resource, reqparse
 from sqlalchemy import exc
-from modules.Globals import auth, db_man
+from modules.Globals import auth
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraSite import TeraSite
 
 
@@ -40,16 +39,21 @@ class QuerySites(Resource):
                     if site in current_sites:
                         sites.append(site)
 
+        if args['id_site']:
+            sites.append(TeraSite.query_site_by_id(current_user=current_user, site_id=args['id_site']))
+
         try:
             sites_list = []
             for site in sites:
-                site_json = site.to_json()
-                site_json['site_role'] = queried_user.get_site_role(site)
-                sites_list.append(site_json)
+                if site is not None:
+                    site_json = site.to_json()
+                    site_json['site_role'] = queried_user.get_site_role(site)
+                    sites_list.append(site_json)
             return jsonify(sites_list)
         except InvalidRequestError:
             return '', 500
 
+    @auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('site', type=str, location='json', help='Site to create / update', required=True)
@@ -94,6 +98,7 @@ class QuerySites(Resource):
 
         return jsonify([update_site.to_json()])
 
+    @auth.login_required
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)

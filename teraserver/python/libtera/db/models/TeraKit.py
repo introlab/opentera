@@ -34,7 +34,6 @@ class TeraKit(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults():
-
         from libtera.db.models.TeraDevice import TeraDevice
         from libtera.db.models.TeraParticipant import TeraParticipant
         from libtera.db.models.TeraProject import TeraProject

@@ -230,6 +230,14 @@ ComManager::signal_ptr ComManager::getSignalFunctionForDataType(const TeraDataTy
         return &ComManager::testDefsReceived;
     case TERADATA_PROJECT:
         return &ComManager::projectsReceived;
+    case TERADATA_DEVICE:
+        return &ComManager::devicesReceived;
+    case TERADATA_GROUP:
+        return &ComManager::groupsReceived;
+    case TERADATA_PARTICIPANT:
+        return &ComManager::participantsReceived;
+    case TERADATA_SITEACCESS:
+        return &ComManager::siteAccessReceived;
     }
 
     return nullptr;

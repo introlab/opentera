@@ -33,6 +33,11 @@ int TeraData::getId() const
     return -1;
 }
 
+QString TeraData::getIdFieldName() const
+{
+    return m_idField;
+}
+
 void TeraData::setId(const int &id)
 {
     setFieldValue(m_idField, id);
@@ -157,6 +162,7 @@ TeraDataTypes TeraData::getDataTypeFromPath(const QString &path)
     if (path==WEB_PROJECTINFO_PATH) return TERADATA_PROJECT;
     if (path==WEB_SITEACCESS_PATH)  return TERADATA_SITEACCESS;
     if (path==WEB_KITINFO_PATH)     return TERADATA_KIT;
+    if (path==WEB_DEVICEINFO_PATH)  return TERADATA_DEVICE;
 
     LOG_ERROR("Unknown data type for path: " + path, "TeraData::getDataTypeFromPath");
 
@@ -168,6 +174,7 @@ QString TeraData::getPathForDataType(const TeraDataTypes &data_type)
     if (data_type==TERADATA_USER) return WEB_USERINFO_PATH;
     if (data_type==TERADATA_SITE) return WEB_SITEINFO_PATH;
     if (data_type==TERADATA_PROJECT) return WEB_PROJECTINFO_PATH;
+    if (data_type==TERADATA_DEVICE) return WEB_DEVICEINFO_PATH;
 
     LOG_ERROR("Unknown path for data_type: " + getDataTypeName(data_type), "TeraData::getPathForDataType");
 

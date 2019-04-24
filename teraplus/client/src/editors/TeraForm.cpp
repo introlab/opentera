@@ -176,6 +176,10 @@ QJsonDocument TeraForm::getFormDataJson(bool include_unmodified_data)
         if ((!include_unmodified_data && m_initialValues[field] != value)
                 || field.startsWith("id_") || include_unmodified_data){
             QJsonValue json_value = QJsonValue::fromVariant(value);
+            if (field.startsWith("id_")){
+                // Force value into int
+                json_value = QJsonValue::fromVariant(value.toInt());
+            }
             data_obj.insert(field, json_value);
         }
     }
@@ -384,7 +388,7 @@ QWidget *TeraForm::createArrayWidget(const QVariantMap &structure)
             for (QVariant value:structure["values"].toList()){
                 if (value.canConvert(QMetaType::QVariantMap)){
                     QVariantMap item_data = value.toMap();
-                    item_combo->addItem(item_data["value"].toString(), item_data["id"]);
+                    item_combo->addItem(item_data["value"].toString(), item_data["id"].toString());
                 }
             }
         }
@@ -615,15 +619,21 @@ void TeraForm::setWidgetValue(QWidget *widget, const QVariant &value)
         if (index>=0){
             combo->setCurrentIndex(index);
         }else{
-            // Check if we have a number, if so, suppose it is the index
-            if (value.canConvert(QMetaType::Int)){
-                index = value.toInt();
-                if (index>=0 && index+1<combo->count()){
-                    combo->setCurrentIndex(index+1);
-                    return;
+            // Check if the value matches a data field
+            index = combo->findData(value);
+            if (index>=0){
+                combo->setCurrentIndex(index);
+            }else{
+                // Check if we have a number, if so, suppose it is the index
+                if (value.canConvert(QMetaType::Int)){
+                    index = value.toInt();
+                    if (index>=0 && index+1<combo->count()){
+                        combo->setCurrentIndex(index+1);
+                        return;
+                    }
                 }
+                LOG_WARNING("Item not found in ComboBox "+ combo->objectName() + " for item " + value.toString(), "TeraForm::setWidgetValue");
             }
-            LOG_WARNING("Item not found in ComboBox "+ combo->objectName() + " for item " + value.toString(), "TeraForm::setWidgetValue");
         }
         return;
     }

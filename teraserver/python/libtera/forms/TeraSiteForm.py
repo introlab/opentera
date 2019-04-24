@@ -5,7 +5,7 @@ from flask_babel import gettext
 class TeraSiteForm:
 
     @staticmethod
-    def get_site_definition():
+    def get_site_form():
         form = TeraForm("site")
 
         # Sections

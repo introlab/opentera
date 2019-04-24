@@ -31,6 +31,16 @@ class TeraSite(db.Model, BaseModel):
         return TeraSite.query.filter_by(id_site=site_id).first()
 
     @staticmethod
+    def query_site_by_id(current_user, site_id: int):
+        sites_ids = current_user.get_accessible_sites_ids()
+        site = None
+
+        if site_id in sites_ids:
+            site = TeraSite.get_site_by_id(site_id)
+
+        return site
+
+    @staticmethod
     def query_data(filter_args):
         if isinstance(filter_args, tuple):
             return TeraSite.query.filter_by(*filter_args).all()

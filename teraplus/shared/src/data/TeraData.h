@@ -43,6 +43,7 @@ public:
     virtual QJsonObject toJson();
 
     int getId() const;
+    QString getIdFieldName() const;
     void setId(const int& id);
     virtual QString getName() const;
     void setName(const QString& name);

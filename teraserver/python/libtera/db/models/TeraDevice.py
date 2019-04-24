@@ -11,7 +11,7 @@ class TeraDevice(db.Model, BaseModel):
     __tablename__ = 't_devices'
     secret = 'TeraDeviceSecret'
     id_device = db.Column(db.Integer, db.Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
-    id_project = db.Column(db.Integer, db.ForeignKey("t_projects.id_project", ondelete='cascade'), nullable=False)
+    id_site = db.Column(db.Integer, db.ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=False)
     device_uuid = db.Column(db.String(36), nullable=False, unique=True)
     device_name = db.Column(db.String, nullable=False)
     device_type = db.Column(db.Integer, db.ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
@@ -24,11 +24,11 @@ class TeraDevice(db.Model, BaseModel):
     device_lastonline = db.Column(db.TIMESTAMP, nullable=True)
 
     device_kits = db.relationship("TeraKitDevice")
-    device_project = db.relationship("TeraProject")
+    device_site = db.relationship("TeraSite")
 
     def to_json(self, ignore_fields=[], minimal=False):
 
-        ignore_fields.extend(['device_kits', 'device_project', 'device_token', 'secret'])
+        ignore_fields.extend(['device_kits', 'device_site', 'device_token', 'secret'])
 
         if minimal:
             ignore_fields.extend([])
@@ -79,8 +79,18 @@ class TeraDevice(db.Model, BaseModel):
         return TeraDevice.query.filter_by(device_name=name).first()
 
     @staticmethod
+    def get_device_by_id(device_id):
+        return TeraDevice.query.filter_by(id_device=device_id).first()
+
+    @staticmethod
+    def query_device_by_id(current_user, device_id: int):
+        sites_ids = current_user.get_accessible_sites_ids()
+        device = TeraDevice.query.filter_by(id_device=device_id).filter(TeraDevice.id_site.in_(sites_ids)).first()
+        return device
+
+    @staticmethod
     def create_defaults():
-        from libtera.db.models.TeraProject import TeraProject
+        from libtera.db.models.TeraSite import TeraSite
         from libtera.db.models.TeraKitDevice import TeraKitDevice
         from libtera.db.models.TeraKit import TeraKit
 
@@ -91,7 +101,8 @@ class TeraDevice(db.Model, BaseModel):
         device.create_token()
         device.device_enabled = True
         device.device_onlineable = True
-        device.device_project = TeraProject.get_project_by_projectname('Default Project #1')
+        # device.device_project = TeraProject.get_project_by_projectname('Default Project #1')
+        device.device_site = TeraSite.get_site_by_sitename('Default Site')
         kit = TeraKit.get_kit_by_name('Kit #1')
 
         kitDev = TeraKitDevice()
@@ -106,3 +117,29 @@ class TeraDevice(db.Model, BaseModel):
     def get_count():
         count = db.session.query(db.func.count(TeraDevice.id_device))
         return count.first()[0]
+
+    @staticmethod
+    def update_device(id_device, values={}):
+        TeraDevice.query.filter_by(id_device=id_device).update(values)
+        db.session.commit()
+
+    @staticmethod
+    def insert_device(device):
+        device.id_device = None
+
+        # Generate UUID
+        device.device_uuid = str(uuid.uuid4())
+
+        # Clear last online field
+        device.device_lastonline = None
+
+        # Create token
+        device.create_token()
+
+        db.session.add(device)
+        db.session.commit()
+
+    @staticmethod
+    def delete_device(id_device):
+        TeraDevice.query.filter_by(id_device=id_device).delete()
+        db.session.commit()

@@ -5,7 +5,7 @@ from flask_babel import gettext
 class TeraUserForm:
 
     @staticmethod
-    def get_user_definition():
+    def get_user_form():
         form = TeraForm("user")
 
         # Sections
@@ -32,7 +32,7 @@ class TeraUserForm:
         return form.to_dict()
 
     @staticmethod
-    def get_user_profile_definition():
+    def get_user_profile_form():
         form = TeraForm("profile")
 
         # Sections

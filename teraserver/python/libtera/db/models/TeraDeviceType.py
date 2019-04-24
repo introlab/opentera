@@ -19,7 +19,6 @@ class TeraDeviceType(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults():
-
         for name, member in TeraDeviceType.DeviceTypeEnum.__members__.items():
             devType = TeraDeviceType()
             devType.device_type_name = name
@@ -31,3 +30,8 @@ class TeraDeviceType(db.Model, BaseModel):
     def get_count():
         count = db.session.query(db.func.count(TeraDeviceType.id_device_type))
         return count.first()[0]
+
+    @staticmethod
+    def get_devices_types():
+        return TeraDeviceType.query.all()
+

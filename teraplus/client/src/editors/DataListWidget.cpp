@@ -3,6 +3,7 @@
 
 #include "editors/UserWidget.h"
 #include "editors/SiteWidget.h"
+#include "editors/DeviceWidget.h"
 
 DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWidget *parent):
     QWidget(parent),
@@ -118,6 +119,9 @@ void DataListWidget::showEditor(TeraData *data)
         break;
         case TERADATA_SITE:
             m_editor = new SiteWidget(m_comManager, data);
+        break;
+        case TERADATA_DEVICE:
+            m_editor = new DeviceWidget(m_comManager, data);
         break;
         default:
             LOG_ERROR("Unhandled datatype for editor: " + TeraData::getDataTypeName(data->getDataType()), "DataListWidget::lstData_currentItemChanged");
@@ -344,7 +348,7 @@ void DataListWidget::lstData_currentItemChanged(QListWidgetItem *current, QListW
 
     // Query full data for that data item
     m_comManager->doQuery(TeraData::getPathForDataType(current_data->getDataType()),
-                          QUrlQuery(QString(WEB_QUERY_ID_USER) + "=" + QString::number(current_data->getId())));
+                          QUrlQuery(current_data->getIdFieldName() + "=" + QString::number(current_data->getId())));
 }
 
 void DataListWidget::newDataRequested()

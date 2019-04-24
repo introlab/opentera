@@ -143,12 +143,28 @@ class TeraUser(db.Model, BaseModel):
         return project_list
 
     def get_accessible_devices(self, admin_only=False):
-        project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
-        return TeraDevice.query.filter(TeraDevice.id_project.in_(project_id_list)).all()
+        site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
+        return TeraDevice.query.filter(TeraDevice.id_site.in_(site_id_list)).all()
+
+    def get_accessible_devices_ids(self, admin_only=False):
+        devices = []
+
+        for device in self.get_accessible_devices(admin_only=admin_only):
+            devices.append(device.id_project)
+
+        return devices
 
     def get_accessible_kits(self, admin_only=False):
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
         return TeraKit.query.filter(TeraKit.id_project.in_(project_id_list)).all()
+
+    def get_accessible_kits_ids(self, admin_only=False):
+        kits = []
+
+        for kit in self.get_accessible_kits(admin_only=admin_only):
+            kits.append(kit.id_project)
+
+        return kits
 
     def get_accessible_participants(self, admin_only=False):
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)

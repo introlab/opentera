@@ -9,11 +9,13 @@
 #define WEB_PROJECTINFO_PATH    "/api/projects"
 #define WEB_KITINFO_PATH        "/api/kits"
 #define WEB_SITEACCESS_PATH     "/api/siteaccess"
+#define WEB_DEVICEINFO_PATH     "/api/devices"
 
 #define WEB_FORMS_PATH                  "/api/forms"
 #define WEB_FORMS_QUERY_USER_PROFILE    "type=user_profile"
 #define WEB_FORMS_QUERY_USER            "type=user"
 #define WEB_FORMS_QUERY_SITE            "type=site"
+#define WEB_FORMS_QUERY_DEVICE          "type=device"
 
 #define WEB_QUERY_USERUUID      "user_uuid"
 #define WEB_QUERY_ID_USER       "id_user"
