@@ -5,6 +5,7 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDevice import TeraDevice
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
+from libtera.db.DBManager import DBManager
 
 
 class QueryDevices(Resource):
@@ -16,6 +17,7 @@ class QueryDevices(Resource):
     @auth.login_required
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
 
         parser = reqparse.RequestParser()
         parser.add_argument('id_device', type=int, help='id_device')
@@ -26,10 +28,10 @@ class QueryDevices(Resource):
         devices = []
         # If we have no arguments, return all accessible devices
         if not any(args.values()):
-            devices = current_user.get_accessible_devices()
+            devices = user_access.get_accessible_devices()
 
         if args['id_device']:
-            devices.append(TeraDevice.query_device_by_id(current_user=current_user, device_id=args['id_device']))
+            devices.append(user_access.query_device_by_id(device_id=args['id_device']))
 
         try:
             device_list = []
@@ -48,6 +50,7 @@ class QueryDevices(Resource):
         parser.add_argument('device', type=str, location='json', help='Device to create / update', required=True)
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_device = request.json['device']
 
@@ -56,7 +59,7 @@ class QueryDevices(Resource):
             return '', 400
 
         # Check if current user can modify the posted device
-        if json_device['id_site'] not in current_user.get_accessible_sites_ids(admin_only=True) and \
+        if json_device['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True) and \
                 json_device['id_site'] > 0:
             return '', 403
 
@@ -92,12 +95,13 @@ class QueryDevices(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete
-        if TeraDevice.query_device_by_id(current_user=current_user, device_id=id_todel) is None:
+        if user_access.query_device_by_id(device_id=id_todel) is None:
             return '', 403
 
         # If we are here, we are allowed to delete. Do so.

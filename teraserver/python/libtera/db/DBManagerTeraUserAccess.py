@@ -172,3 +172,8 @@ class DBManagerTeraUserAccess:
         else:
             role_name = None
         return role_name
+
+    def query_device_by_id(self, device_id: int):
+        sites_ids = self.get_accessible_sites_ids()
+        device = TeraDevice.query.filter_by(id_device=device_id).filter(TeraDevice.id_site.in_(sites_ids)).first()
+        return device

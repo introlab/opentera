@@ -83,12 +83,6 @@ class TeraDevice(db.Model, BaseModel):
         return TeraDevice.query.filter_by(id_device=device_id).first()
 
     @staticmethod
-    def query_device_by_id(current_user, device_id: int):
-        sites_ids = current_user.get_accessible_sites_ids()
-        device = TeraDevice.query.filter_by(id_device=device_id).filter(TeraDevice.id_site.in_(sites_ids)).first()
-        return device
-
-    @staticmethod
     def create_defaults():
         from libtera.db.models.TeraSite import TeraSite
         from libtera.db.models.TeraKitDevice import TeraKitDevice
