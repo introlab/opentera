@@ -26,18 +26,20 @@ class QueryUsers(Resource):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         args = parser.parse_args()
 
-        userAccess = DBManager.userAccess(current_user)
+        user_access = DBManager.userAccess(current_user)
 
         users = []
         # If we have no arguments, return all accessible users
         if not any(args.values()):
-            users = userAccess.get_accessible_users()
+            users = user_access.get_accessible_users()
 
         # If we have a user_uuid, query for that user if accessible
         if args['user_uuid']:
-            users.append(current_user.query_user_by_uuid(args['user_uuid']))
+            if args['user_uuid'] in user_access.get_accessible_users_uuids():
+                users.append(TeraUser.get_user_by_uuid(args['user_uuid']))
         if args['id_user']:
-            users.append(current_user.query_user_by_id(args['id_user']))
+            if args['id_user'] in user_access.get_accessible_users_ids():
+                users.append(current_user.get_user_by_id(args['id_user']))
 
         # If we have a id_project, query for users of that project, if accessible
         # TODO
@@ -51,20 +53,20 @@ class QueryUsers(Resource):
                         user_json = user.to_json()
                         if user.id_user == current_user.id_user:
                             # Sites
-                            sites = userAccess.get_accessible_sites()
+                            sites = user_access.get_accessible_sites()
                             sites_list = []
                             for site in sites:
                                 site_json = site.to_json()
-                                site_json['site_role'] = userAccess.get_site_role(site)
+                                site_json['site_role'] = user_access.get_site_role(site)
                                 sites_list.append(site_json)
                             user_json['sites'] = sites_list
 
                             # Projects
-                            projects = userAccess.get_accessible_projects()
+                            projects = user_access.get_accessible_projects()
                             proj_list = []
                             for project in projects:
                                 proj_json = project.to_json()
-                                proj_json['project_role'] = userAccess.get_project_role(project)
+                                proj_json['project_role'] = user_access.get_project_role(project)
                                 proj_list.append(proj_json)
                             user_json['projects'] = proj_list
 

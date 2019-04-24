@@ -42,6 +42,14 @@ class DBManagerTeraUserAccess:
         # TODO Sort by username
         return users
 
+    def get_accessible_users_uuids(self, admin_only=False):
+        users = self.get_accessible_users(admin_only=admin_only)
+        users_ids = []
+        for user in users:
+            if user.id_user not in users_ids:
+                users_ids.append(user.user_uuid)
+        return users_ids
+
     def get_project_role(self, project: TeraProject):
         if self.user.user_superadmin:
             # SuperAdmin is always admin.
@@ -182,3 +190,38 @@ class DBManagerTeraUserAccess:
         proj_ids = self.get_accessible_projects_ids()
         projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids)).all()
         return projects
+
+    def query_access_for_site(self, site_id: int):
+        users = self.get_accessible_users();
+        users_ids = []
+        super_admins = []
+        for user in users:
+            if user.id_user not in users_ids:
+                users_ids.append(user.id_user)
+            if user.user_superadmin:
+                # Super admin access = admin in all site
+                super_admin = TeraSiteAccess.build_superadmin_access_object(site_id=site_id, user_id=user.id_user)
+                super_admins.append(super_admin)
+
+        access = TeraSiteAccess.query.filter_by(id_site=site_id).filter(TeraSiteAccess.id_user.in_(users_ids)).all()
+
+        # Add super admins to list, if needed
+        for super_access in super_admins:
+            if not any(x.id_user == super_access.id_user for x in access):
+                access.append(super_access)
+
+        return access
+
+    def query_access_for_user(self, user_id: int):
+        from libtera.db.models.TeraUser import TeraUser
+        user = TeraUser.get_user_by_id(user_id)
+        if not user.user_superadmin:
+            access = TeraSiteAccess.query.filter_by(id_user=user_id).all()
+        else:
+            # User is super admin, set roles to admin for all accessible sites
+            sites = self.get_accessible_sites()
+            access = []
+            for site in sites:
+                access.append(TeraSiteAccess.build_superadmin_access_object(site_id=site.id_site, user_id=user_id))
+
+        return access

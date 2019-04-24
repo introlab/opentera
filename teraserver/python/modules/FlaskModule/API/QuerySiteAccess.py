@@ -4,8 +4,7 @@ from sqlalchemy import exc
 from modules.Globals import auth
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
-from flask_babel import gettext
+from libtera.db.DBManager import DBManager
 
 
 class QuerySiteAccess(Resource):
@@ -21,6 +20,7 @@ class QuerySiteAccess(Resource):
         parser.add_argument('id_site', type=int, help='Site ID')
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
         args = parser.parse_args()
 
         access = None
@@ -33,12 +33,12 @@ class QuerySiteAccess(Resource):
             user_id = args['id_user']
 
             if user_id in current_user.get_accessible_users_ids():
-                access = TeraSiteAccess.query_access_for_user(current_user=current_user, user_id=user_id)
+                access = user_access.query_access_for_user(user_id=user_id)
 
         # Query access for site id
         if args['id_site']:
             site_id = args['id_site']
-            access = TeraSiteAccess.query_access_for_site(current_user=current_user, site_id=site_id)
+            access = user_access.query_access_for_site(site_id=site_id)
 
         if access is not None:
             access_list = []

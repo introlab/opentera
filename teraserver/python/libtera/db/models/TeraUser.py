@@ -60,23 +60,6 @@ class TeraUser(db.Model, BaseModel):
         self.user_lastonline = datetime.datetime.now()
         db.session.commit()
 
-    def query_user_by_uuid(self, u_uuid):
-        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
-        if user is not None:
-            accessibles = TeraUser.get_accessible_users_ids(self)
-            if user.id_user not in accessibles:
-                return None
-        return user
-
-    def query_user_by_id(self, id_user):
-        user = TeraUser.query.filter_by(id_user=id_user).first()
-        if user is not None:
-            accessibles = TeraUser.get_accessible_users_ids(self)
-            if user.id_user not in accessibles:
-                return None
-
-        return user
-
     def __str__(self):
         return '<TeraUser ' + str(self.user_username) + ', ' + str(self.user_email) + ' >'
 
