@@ -31,23 +31,13 @@ class TeraKitDevice(db.Model, BaseModel):
         return TeraKitDevice.query.filter_by(id_kit_device=kit_device_id).first()
 
     @staticmethod
-    def query_kit_device_for_kit(current_user: TeraUser, kit_id: int):
-        # Check if current user can access kit
-        kit_device = None
-        if kit_id in current_user.get_accessible_kits_ids():
-            kit_device = TeraKitDevice.query.filter_by(id_kit=kit_id).first()
-
-        return kit_device
+    def query_kit_device_for_kit(kit_id: int):
+        return TeraKitDevice.query.filter_by(id_kit=kit_id).first()
 
     @staticmethod
-    def query_kit_device_for_device(current_user: TeraUser, device_id: int):
-        # Check if current user can access kit
-        kit_device = None
-        if device_id in current_user.get_accessible_devices_ids():
-            kit_device = TeraKitDevice.query.filter_by(id_device=device_id).first()
-
-        return kit_device
-
+    def query_kit_device_for_device(device_id: int):
+        return TeraKitDevice.query.filter_by(id_device=device_id).first()
+  
     @staticmethod
     def update_kit_device(id_kit_device, values={}):
         TeraKitDevice.query.filter_by(id_kit_device=id_kit_device).update(values)
