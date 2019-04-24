@@ -81,7 +81,8 @@ void DeviceWidget::processFormsReply(QString form_type, QString data)
         return;
     }
     if (form_type == WEB_FORMS_QUERY_KIT_DEVICE){
-
+        ui->wdgKitDevice->buildUiFromStructure(data);
+        return;
     }
 }
 
