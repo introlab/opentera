@@ -18,6 +18,7 @@
 #define WEB_FORMS_QUERY_SITE            "type=site"
 #define WEB_FORMS_QUERY_DEVICE          "type=device"
 #define WEB_FORMS_QUERY_KIT_DEVICE      "type=kit_device"
+#define WEB_FORMS_QUERY_KIT             "type=kit"
 
 #define WEB_QUERY_USERUUID      "user_uuid"
 #define WEB_QUERY_ID_USER       "id_user"

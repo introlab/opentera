@@ -30,7 +30,7 @@ class QueryKitDevice(Resource):
 
         if args['id_device']:
             kit_device = TeraKitDevice.query_kit_device_for_device(current_user=current_user,
-                                                                    device_id=args['id_device'])
+                                                                   device_id=args['id_device'])
         else:
             if args['id_kit']:
                 kit_device = TeraKitDevice.query_kit_device_for_kit(current_user=current_user, kit_id=args['id_kit'])

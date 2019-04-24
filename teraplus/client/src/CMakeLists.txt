@@ -20,6 +20,7 @@ set(headers
     editors/DataListWidget.h
     editors/SiteWidget.h
     editors/DeviceWidget.h
+    editors/KitWidget.h
 )
 
 set(srcs
@@ -40,6 +41,7 @@ set(srcs
     editors/DataListWidget.cpp
     editors/SiteWidget.cpp
     editors/DeviceWidget.cpp
+    editors/KitWidget.cpp
 )
 
 SET(uis
@@ -53,6 +55,7 @@ SET(uis
     editors/DataListWidget.ui
     editors/SiteWidget.ui
     editors/DeviceWidget.ui
+    editors/KitWidget.ui
 )
 
 SET(qrcs

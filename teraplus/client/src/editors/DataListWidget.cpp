@@ -4,6 +4,7 @@
 #include "editors/UserWidget.h"
 #include "editors/SiteWidget.h"
 #include "editors/DeviceWidget.h"
+#include "editors/KitWidget.h"
 
 DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWidget *parent):
     QWidget(parent),
@@ -122,6 +123,9 @@ void DataListWidget::showEditor(TeraData *data)
         break;
         case TERADATA_DEVICE:
             m_editor = new DeviceWidget(m_comManager, data);
+        break;
+        case TERADATA_KIT:
+            m_editor = new KitWidget(m_comManager, data);
         break;
         default:
             LOG_ERROR("Unhandled datatype for editor: " + TeraData::getDataTypeName(data->getDataType()), "DataListWidget::lstData_currentItemChanged");

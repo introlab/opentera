@@ -12,6 +12,7 @@ class TeraKit(db.Model, BaseModel):
     __tablename__ = 't_kits'
     id_kit = db.Column(db.Integer, db.Sequence('id_kit_sequence'), primary_key=True, autoincrement=True)
     id_project = db.Column(db.Integer,  db.ForeignKey('t_projects.id_project', ondelete='set null'), nullable=True)
+    id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
     kit_name = db.Column(db.String, nullable=False)
     kit_shareable = db.Column(db.Boolean, nullable=False)
     kit_lastonline = db.Column(db.TIMESTAMP, nullable=True)
@@ -22,10 +23,11 @@ class TeraKit(db.Model, BaseModel):
                                        back_populates="participant_kits", cascade="all,delete")
 
     kit_project = db.relationship("TeraProject")
+    kit_site = db.relationship("TeraSite")
 
     def to_json(self, ignore_fields=[], minimal=False):
 
-        ignore_fields.extend(['kit_devices', 'kit_participants', 'kit_project'])
+        ignore_fields.extend(['kit_devices', 'kit_participants', 'kit_project', 'kit_site'])
 
         if minimal:
             ignore_fields.extend([])
@@ -37,6 +39,9 @@ class TeraKit(db.Model, BaseModel):
         from libtera.db.models.TeraDevice import TeraDevice
         from libtera.db.models.TeraParticipant import TeraParticipant
         from libtera.db.models.TeraProject import TeraProject
+        from libtera.db.models.TeraSite import TeraSite
+
+        site = TeraSite.get_site_by_sitename('Default Site')
 
         kit1 = TeraKit()
         kit1.kit_name = 'Kit #1'
@@ -48,6 +53,8 @@ class TeraKit(db.Model, BaseModel):
 
         participant = TeraParticipant.get_participant_by_name('Test Participant #1')
         kit1.kit_participants.append(participant)
+
+        kit1.kit_site = site
 
         project = TeraProject.get_project_by_projectname('Default Project #1')
         kit1.kit_project = project
@@ -63,3 +70,15 @@ class TeraKit(db.Model, BaseModel):
     def get_count():
         count = db.session.query(db.func.count(TeraKit.id_kit))
         return count.first()[0]
+
+    @staticmethod
+    def get_kit_by_id(kit_id: int):
+        return TeraKit.query.filter_by(id_kit=kit_id).first()
+
+    @staticmethod
+    def get_kits_for_site(site_id: int):
+        return TeraKit.query.filter_by(id_site=site_id).all()
+
+    @staticmethod
+    def get_kits_for_project(project_id: int):
+        return TeraKit.query.filter_by(id_project=project_id).all()

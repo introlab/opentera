@@ -89,7 +89,7 @@ void ProjectNavigator::processSitesReply(QList<TeraData> sites)
 {
     for (int i=0; i<sites.count(); i++){
         int index = ui->cmbSites->findData(sites.at(i).getId());
-        if (index>0){
+        if (index>=0){
             // Site already present, update infos
             ui->cmbSites->itemText(index) = sites.at(i).getName();
         }else{

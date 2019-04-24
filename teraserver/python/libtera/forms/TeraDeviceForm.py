@@ -1,13 +1,14 @@
 from libtera.forms.TeraForm import *
 from libtera.db.models.TeraDeviceType import TeraDeviceType
-from libtera.db.models.TeraUser import TeraUser
+
+from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 from flask_babel import gettext
 
 
 class TeraDeviceForm:
 
     @staticmethod
-    def get_device_form(current_user: TeraUser):
+    def get_device_form(user_access: DBManagerTeraUserAccess):
         form = TeraForm("device")
 
         # Building lists
@@ -16,7 +17,7 @@ class TeraDeviceForm:
         for dev_type in device_types:
             device_types_list.append(TeraFormValue(value_id=dev_type.id_device_type, value=dev_type.device_type_name))
 
-        sites = current_user.get_accessible_sites()
+        sites = user_access.get_accessible_sites()
         sites_list = []
         for site in sites:
             sites_list.append(TeraFormValue(value_id=site.id_site, value=site.site_name))
