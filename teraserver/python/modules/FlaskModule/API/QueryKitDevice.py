@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse
 from modules.Globals import auth
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraKitDevice import TeraKitDevice
+from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 
@@ -16,6 +17,7 @@ class QueryKitDevice(Resource):
     @auth.login_required
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
 
         parser = reqparse.RequestParser()
         parser.add_argument('id_device', type=int, help='id_device')
@@ -23,17 +25,18 @@ class QueryKitDevice(Resource):
 
         args = parser.parse_args()
 
-        kit_device = []
+        kit_device = None
         # If we have no arguments, return error
         if not any(args.values()):
             return 'Missing arguments.', 400
 
         if args['id_device']:
-            kit_device = TeraKitDevice.query_kit_device_for_device(current_user=current_user,
-                                                                   device_id=args['id_device'])
+            if args['id_device'] in user_access.get_accessible_devices_ids():
+                kit_device = TeraKitDevice.query_kit_device_for_device(device_id=args['id_device'])
         else:
             if args['id_kit']:
-                kit_device = TeraKitDevice.query_kit_device_for_kit(current_user=current_user, kit_id=args['id_kit'])
+                if args['id_kit'] in user_access.get_accessible_kits_ids():
+                    kit_device = TeraKitDevice.query_kit_device_for_kit(kit_id=args['id_kit'])
         try:
             if kit_device is not None:
                 return jsonify([kit_device.to_json()])
