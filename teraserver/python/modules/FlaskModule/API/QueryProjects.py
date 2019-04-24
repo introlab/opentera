@@ -4,6 +4,7 @@ from modules.Globals import auth, db_man
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraProject import TeraProject
+from libtera.db.DBManager import DBManager
 
 
 class QueryProjects(Resource):
@@ -21,23 +22,25 @@ class QueryProjects(Resource):
         parser.add_argument('list', type=bool, help='Request list')
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
         args = parser.parse_args()
 
         projects = []
         # If we have no arguments, return all accessible projects
         queried_user = current_user
         if not any(args.values()):
-            projects = queried_user.get_accessible_projects()
+            projects = user_access.get_accessible_projects()
 
         # If we have a user_uuid, query for the site of that user
         if args['user_uuid']:
             queried_user = TeraUser.get_user_by_uuid(args['user_uuid'])
             if queried_user is not None:
-                projects = queried_user.get_accessible_projects()
+                user_access = DBManager.userAccess(queried_user)
+                projects = user_access.get_accessible_projects()
 
         # If we have a site id, query for projects of that site
         if args['id_site']:
-            projects = TeraProject.query_projects_for_site(current_user=current_user, site_id=args['id_site'])
+            projects = user_access.query_projects_for_site(site_id=args['id_site'])
 
         try:
             projects_list = []
@@ -45,7 +48,7 @@ class QueryProjects(Resource):
             for project in projects:
                 if args['list'] is None:
                     project_json = project.to_json()
-                    project_json['project_role'] = queried_user.get_project_role(project)
+                    project_json['project_role'] = user_access.get_project_role(project)
                     projects_list.append(project_json)
                 else:
                     projects_list.append(project.to_json(minimal=True))

@@ -177,3 +177,8 @@ class DBManagerTeraUserAccess:
         sites_ids = self.get_accessible_sites_ids()
         device = TeraDevice.query.filter_by(id_device=device_id).filter(TeraDevice.id_site.in_(sites_ids)).first()
         return device
+
+    def query_projects_for_site(self, site_id: int):
+        proj_ids = self.get_accessible_projects_ids()
+        projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids)).all()
+        return projects
