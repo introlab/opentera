@@ -238,6 +238,8 @@ ComManager::signal_ptr ComManager::getSignalFunctionForDataType(const TeraDataTy
         return &ComManager::participantsReceived;
     case TERADATA_SITEACCESS:
         return &ComManager::siteAccessReceived;
+    case TERADATA_KITDEVICE:
+        return &ComManager::kitDevicesReceived;
     }
 
     return nullptr;
@@ -418,11 +420,12 @@ void ComManager::onNetworkFinished(QNetworkReply *reply)
     else {
         QString reply_msg = QString(reply->readAll()).replace("""", "");
         if (reply_msg.isEmpty() || reply_msg.startsWith("""""")){
-            reply_msg = tr("Erreur non-détaillée.");
+            //reply_msg = tr("Erreur non-détaillée.");
+            reply_msg = reply->errorString();
         }
         qDebug() << "ComManager::onNetworkFinished - Reply error: " << reply->error() << ", Reply message: " << reply_msg;
-        if (reply_msg.isEmpty())
-            reply_msg = reply->errorString();
+        /*if (reply_msg.isEmpty())
+            reply_msg = reply->errorString();*/
         emit networkError(reply->error(), reply_msg);
     }
     reply->deleteLater();

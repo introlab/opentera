@@ -624,6 +624,20 @@ void TeraForm::getWidgetValues(QWidget* widget, QVariant *id, QVariant *value)
     }
 }
 
+QVariant TeraForm::getWidgetValue(QWidget *widget)
+{
+    QVariant value;
+    QVariant id;
+
+    getWidgetValues(widget, &id, &value);
+
+    if (!id.isNull())
+        value = id;
+
+    return value;
+
+}
+
 void TeraForm::setWidgetValue(QWidget *widget, const QVariant &value)
 {
     if (QComboBox* combo = dynamic_cast<QComboBox*>(widget)){
@@ -710,10 +724,14 @@ void TeraForm::widgetValueChanged()
     if (!sender)
         return;
 
-    if (QWidget* sender_widget = dynamic_cast<QWidget*>(sender)){
+    QWidget* sender_widget = dynamic_cast<QWidget*>(sender);
+    if (sender_widget){
         validateWidget(sender_widget);
+        emit widgetValueHasChanged(sender_widget, getWidgetValue(sender_widget));
     }
 
     checkConditions();
+
+
 
 }

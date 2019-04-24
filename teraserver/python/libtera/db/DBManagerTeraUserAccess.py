@@ -104,14 +104,14 @@ class DBManagerTeraUserAccess:
         return devices
 
     def get_accessible_kits(self, admin_only=False):
-        project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
-        return TeraKit.query.filter(TeraKit.id_project.in_(project_id_list)).all()
+        site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
+        return TeraKit.query.filter(TeraKit.id_site.in_(site_id_list)).all()
 
     def get_accessible_kits_ids(self, admin_only=False):
         kits = []
 
         for kit in self.get_accessible_kits(admin_only=admin_only):
-            kits.append(kit.id_project)
+            kits.append(kit.id_kit)
 
         return kits
 

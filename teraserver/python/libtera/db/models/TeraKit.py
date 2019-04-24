@@ -82,3 +82,29 @@ class TeraKit(db.Model, BaseModel):
     @staticmethod
     def get_kits_for_project(project_id: int):
         return TeraKit.query.filter_by(id_project=project_id).all()
+
+    @staticmethod
+    def update_kit(id_kit: int, values={}):
+        if 'id_project' in values:
+            if values['id_project'] == 0:
+                values['id_project'] = None
+
+        TeraKit.query.filter_by(id_kit=id_kit).update(values)
+        db.session.commit()
+
+    @staticmethod
+    def insert_kit(kit):
+        kit.id_kit = None
+        if kit.id_project == 0:
+            kit.id_project = None
+
+        # Clear last online field
+        kit.kit_lastonline = None
+
+        db.session.add(kit)
+        db.session.commit()
+
+    @staticmethod
+    def delete_kit(id_kit):
+        TeraKit.query.filter_by(id_kit=id_kit).delete()
+        db.session.commit()
