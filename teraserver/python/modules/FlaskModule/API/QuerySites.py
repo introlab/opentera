@@ -5,6 +5,7 @@ from modules.Globals import auth
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
+from libtera.db.DBManager import DBManager
 
 
 class QuerySites(Resource):
@@ -20,34 +21,36 @@ class QuerySites(Resource):
         parser.add_argument('user_uuid', type=str, help='uuid')
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
         args = parser.parse_args()
 
         sites = []
         # If we have no arguments, return all accessible sites
-        queried_user = current_user
         if not any(args.values()):
-            sites = queried_user.get_accessible_sites()
+            sites = user_access.get_accessible_sites()
 
         # If we have a user_uuid, query for the site of that user
         if args['user_uuid']:
             queried_user = TeraUser.get_user_by_uuid(args['user_uuid'])
             if queried_user is not None:
-                queried_sites = queried_user.get_accessible_sites()
+                current_sites = user_access.get_accessible_sites()
+                user_access = DBManager.userAccess(queried_user)
+                queried_sites = user_access.get_accessible_sites()
                 # Match with accessible sites for the current user
-                current_sites = current_user.get_accessible_sites()
                 for site in queried_sites:
                     if site in current_sites:
                         sites.append(site)
 
         if args['id_site']:
-            sites.append(TeraSite.query_site_by_id(current_user=current_user, site_id=args['id_site']))
+            if args['id_site'] in user_access.get_accessible_sites_ids():
+                sites.append(TeraSite.get_site_by_id(site_id=args['id_site']))
 
         try:
             sites_list = []
             for site in sites:
                 if site is not None:
                     site_json = site.to_json()
-                    site_json['site_role'] = queried_user.get_site_role(site)
+                    site_json['site_role'] = user_access.get_site_role(site)
                     sites_list.append(site_json)
             return jsonify(sites_list)
         except InvalidRequestError:
@@ -59,6 +62,7 @@ class QuerySites(Resource):
         parser.add_argument('site', type=str, location='json', help='Site to create / update', required=True)
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_site = request.json['site']
 
@@ -67,7 +71,7 @@ class QuerySites(Resource):
             return '', 400
 
         # Check if current user can modify the posted site
-        if json_site['id_site'] not in current_user.get_accessible_sites_ids(admin_only=True) and \
+        if json_site['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True) and \
                 json_site['id_site'] > 0:
             return '', 403
 

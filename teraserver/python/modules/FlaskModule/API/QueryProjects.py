@@ -27,7 +27,7 @@ class QueryProjects(Resource):
 
         projects = []
         # If we have no arguments, return all accessible projects
-        queried_user = current_user
+        # queried_user = current_user
         if not any(args.values()):
             projects = user_access.get_accessible_projects()
 
