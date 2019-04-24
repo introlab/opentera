@@ -46,7 +46,7 @@ void DeviceWidget::saveData(bool signal)
 
 void DeviceWidget::updateControlsState()
 {
-
+   ui->tabKits->setEnabled(!dataIsNew());
 }
 
 void DeviceWidget::updateFieldsValue()
@@ -62,13 +62,13 @@ void DeviceWidget::updateFieldsValue()
 
 bool DeviceWidget::validateData()
 {
-
-    return true;
+    return ui->wdgDevice->validateFormData();
 }
 
 void DeviceWidget::connectSignals()
 {
     connect(m_comManager, &ComManager::formReceived, this, &DeviceWidget::processFormsReply);
+    connect(m_comManager, &ComManager::kitDevicesReceived, this, &DeviceWidget::processKitDevicesReply);
 
     connect(ui->btnSave, &QPushButton::clicked, this, &DeviceWidget::btnSave_clicked);
     connect(ui->btnUndo, &QPushButton::clicked, this, &DeviceWidget::btnUndo_clicked);
@@ -82,7 +82,25 @@ void DeviceWidget::processFormsReply(QString form_type, QString data)
     }
     if (form_type == WEB_FORMS_QUERY_KIT_DEVICE){
         ui->wdgKitDevice->buildUiFromStructure(data);
+        // Hide device name, since we already have it displayed elsewhere...
+        ui->wdgKitDevice->hideField("id_device");
+
+        if (!dataIsNew()){
+            queryDataRequest(WEB_KITDEVICE_PATH, QUrlQuery(QString(WEB_QUERY_ID_DEVICE) + "=" + QString::number(m_data->getId())));
+        }
         return;
+    }
+}
+
+void DeviceWidget::processKitDevicesReply(QList<TeraData> kit_devices)
+{
+    for (int i=0; i<kit_devices.count(); i++){
+        if (kit_devices.at(i).hasFieldName("id_device")){
+            if (kit_devices.at(i).getFieldValue("id_device").toInt() == m_data->getId()){
+                ui->wdgKitDevice->fillFormFromData(kit_devices[i].toJson());
+                break;
+            }
+        }
     }
 }
 

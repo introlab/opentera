@@ -150,6 +150,8 @@ QString TeraData::getDataTypeName(const TeraDataTypes &data_type)
         return "participantgroup";
     case TERADATA_SITEACCESS:
         return "siteaccess";
+    case TERADATA_KITDEVICE:
+        return "kit_device";
     }
 
     return "";
@@ -163,6 +165,7 @@ TeraDataTypes TeraData::getDataTypeFromPath(const QString &path)
     if (path==WEB_SITEACCESS_PATH)  return TERADATA_SITEACCESS;
     if (path==WEB_KITINFO_PATH)     return TERADATA_KIT;
     if (path==WEB_DEVICEINFO_PATH)  return TERADATA_DEVICE;
+    if (path==WEB_KITDEVICE_PATH)   return TERADATA_KITDEVICE;
 
     LOG_ERROR("Unknown data type for path: " + path, "TeraData::getDataTypeFromPath");
 
@@ -175,6 +178,7 @@ QString TeraData::getPathForDataType(const TeraDataTypes &data_type)
     if (data_type==TERADATA_SITE) return WEB_SITEINFO_PATH;
     if (data_type==TERADATA_PROJECT) return WEB_PROJECTINFO_PATH;
     if (data_type==TERADATA_DEVICE) return WEB_DEVICEINFO_PATH;
+    if (data_type==TERADATA_KITDEVICE) return WEB_KITDEVICE_PATH;
 
     LOG_ERROR("Unknown path for data_type: " + getDataTypeName(data_type), "TeraData::getPathForDataType");
 

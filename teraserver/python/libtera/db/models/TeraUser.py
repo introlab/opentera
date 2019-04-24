@@ -150,7 +150,7 @@ class TeraUser(db.Model, BaseModel):
         devices = []
 
         for device in self.get_accessible_devices(admin_only=admin_only):
-            devices.append(device.id_project)
+            devices.append(device.id_device)
 
         return devices
 
