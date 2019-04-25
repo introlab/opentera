@@ -1,0 +1,31 @@
+twisted
+autobahn
+sqlalchemy
+psycopg2-binary
+python-oauth2
+flask
+flask-sqlalchemy
+flask-oauthlib
+flask-login
+flask-httpauth
+flask-socketio
+flask-session
+flask-restful
+flask-security
+flask-babel
+flask-migrate
+# flask-jwt
+redis
+txredisapi
+eventlet
+gevent
+gevent-websocket
+passlib
+bcrypt
+wtforms
+PyInstaller
+pyopenssl
+service_identity
+jsonrpcclient
+# jwt
+PyJWT
