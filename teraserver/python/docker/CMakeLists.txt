@@ -10,7 +10,7 @@ add_custom_target(docker-Dockerfile
 # RUN pybabel compile -d translations
 
 set(translation_pot_file translations.pot)
-set(MESSAGES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../messages/)
+set(MESSAGES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../messages)
 set(PYBABEL_EXECUTABLE pybabel)
 set(PROTOC_EXECUTABLE protoc)
 set(GOOGLE_PROTO_PATH /usr/include/google/protobuf/)
@@ -38,6 +38,7 @@ foreach(file ${protofiles})
     set(output_target docker_${name_without_extension}.proto.target)
     list(APPEND docker_protobuf_python_targets ${output_target})
     #Add command to generate target
+    # message(STATUS "Should run: ${PROTOC_EXECUTABLE} ${file} -I. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/python")
     add_custom_target(${output_target}
         COMMAND ${PROTOC_EXECUTABLE} ${file} -I. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/python
         WORKING_DIRECTORY ${MESSAGES_PATH}
