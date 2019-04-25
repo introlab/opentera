@@ -39,7 +39,7 @@ foreach(file ${protofiles})
     list(APPEND docker_protobuf_python_targets ${output_target})
     #Add command to generate target
     add_custom_target(${output_target}
-        COMMAND ${PROTOC_EXECUTABLE} ${file} -I=. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/python
+        COMMAND ${PROTOC_EXECUTABLE} ${file} -I. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/python
         WORKING_DIRECTORY ${MESSAGES_PATH}
         DEPENDS ${MESSAGES_PATH}/${file} )
 endforeach(file)
