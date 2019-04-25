@@ -5,6 +5,12 @@
 #include <QDebug>
 
 
+TeraData::TeraData(QObject *parent) :
+    QObject(parent)
+{
+    setDataType(TERADATA_UNKNOWN);
+}
+
 TeraData::TeraData(TeraDataTypes obj_type, QObject *parent) :
     QObject(parent)
 {
@@ -96,6 +102,13 @@ bool TeraData::hasFieldName(const QString &fieldName) const
 {
     //return dynamicPropertyNames().contains(fieldName.toUtf8());
     return m_fieldsValue.contains(fieldName);
+}
+
+void TeraData::removeFieldName(const QString &fieldName)
+{
+    if (m_fieldsValue.contains(fieldName)){
+        m_fieldsValue.remove(fieldName);
+    }
 }
 
 QVariant TeraData::getFieldValue(const QString &fieldName) const

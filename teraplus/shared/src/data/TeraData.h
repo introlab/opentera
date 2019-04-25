@@ -36,8 +36,9 @@ class TeraData : public QObject
     Q_PROPERTY(TeraDataTypes data_type READ getDataType WRITE setDataType)
 
 public:
+    explicit TeraData(QObject *parent = nullptr);
     explicit TeraData(TeraDataTypes obj_type, QObject *parent = nullptr);
-    explicit TeraData(const TeraData& copy, QObject *parent=nullptr);
+    TeraData(const TeraData& copy, QObject *parent=nullptr);
     explicit TeraData(TeraDataTypes obj_type, const QJsonValue& json, QObject *parent = nullptr);
 
     virtual bool        fromJson(const QJsonValue& value);
@@ -56,6 +57,7 @@ public:
 
     TeraDataTypes getDataType() const;
     bool hasFieldName(const QString& fieldName) const;
+    void removeFieldName(const QString& fieldName);
     QVariant getFieldValue(const QString &fieldName) const;
     void setFieldValue(const QString& fieldName, const QVariant& fieldValue);
     QList<QString> getFieldList() const;

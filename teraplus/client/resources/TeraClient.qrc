@@ -79,5 +79,8 @@
         <file>icons/site.png</file>
         <file>icons/device.png</file>
         <file>icons/project.png</file>
+        <file>icons/device_installed.png</file>
+        <file>icons/device_offline.png</file>
+        <file>icons/device_online.png</file>
     </qresource>
 </RCC>

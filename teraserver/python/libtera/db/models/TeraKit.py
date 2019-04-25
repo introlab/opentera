@@ -25,12 +25,11 @@ class TeraKit(db.Model, BaseModel):
     kit_project = db.relationship("TeraProject")
     kit_site = db.relationship("TeraSite")
 
-    def to_json(self, ignore_fields=[], minimal=False):
+    def to_json(self, ignore_fields=None, minimal=False):
+        if ignore_fields is None:
+            ignore_fields = []
 
-        ignore_fields.extend(['kit_devices', 'kit_participants', 'kit_project', 'kit_site'])
-
-        if minimal:
-            ignore_fields.extend([])
+        ignore_fields += ['kit_devices', 'kit_participants', 'kit_project', 'kit_site']
 
         return super().to_json(ignore_fields=ignore_fields)
 

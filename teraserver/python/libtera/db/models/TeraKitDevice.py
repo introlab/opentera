@@ -32,11 +32,15 @@ class TeraKitDevice(db.Model, BaseModel):
 
     @staticmethod
     def query_kit_device_for_kit(kit_id: int):
-        return TeraKitDevice.query.filter_by(id_kit=kit_id).first()
+        return TeraKitDevice.query.filter_by(id_kit=kit_id).all()
 
     @staticmethod
     def query_kit_device_for_device(device_id: int):
-        return TeraKitDevice.query.filter_by(id_device=device_id).first()
+        return TeraKitDevice.query.filter_by(id_device=device_id).all()
+
+    @staticmethod
+    def query_kit_device_for_kit_device(device_id: int, kit_id: int):
+        return TeraKitDevice.query.filter_by(id_device=device_id, id_kit=kit_id).first()
 
     @staticmethod
     def update_kit_device(id_kit_device, values={}):

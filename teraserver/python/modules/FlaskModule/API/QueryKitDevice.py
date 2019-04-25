@@ -25,7 +25,7 @@ class QueryKitDevice(Resource):
 
         args = parser.parse_args()
 
-        kit_device = None
+        kit_device = []
         # If we have no arguments, return error
         if not any(args.values()):
             return 'Missing arguments.', 400
@@ -38,10 +38,10 @@ class QueryKitDevice(Resource):
                 if args['id_kit'] in user_access.get_accessible_kits_ids():
                     kit_device = TeraKitDevice.query_kit_device_for_kit(kit_id=args['id_kit'])
         try:
-            if kit_device is not None:
-                return jsonify([kit_device.to_json()])
-            else:
-                return jsonify([])
+            kit_device_list = []
+            for kd in kit_device:
+                kit_device_list.append(kd.to_json())
+            return jsonify(kit_device_list)
 
         except InvalidRequestError:
             return '', 500
@@ -53,40 +53,51 @@ class QueryKitDevice(Resource):
                             required=True)
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
+
         # Using request.json instead of parser, since parser messes up the json!
-        json_kit_device = request.json['kit_device']
+        json_kit_devices = request.json['kit_device']
+        if not isinstance(json_kit_devices, list):
+            json_kit_devices = [json_kit_devices]
 
         # Validate if we have an id
-        if 'id_device' not in json_kit_device and 'id_kit' not in json_kit_device and 'id_kit_device' not \
-                in json_kit_device:
-            return '', 400
+        for json_kit_device in json_kit_devices:
+            if 'id_device' not in json_kit_device and 'id_kit' not in json_kit_device:
+                return '', 400
 
-        # Check if current user can modify the posted device
-        if json_kit_device['id_kit'] not in current_user.get_accessible_devices_ids(admin_only=True) and \
-                json_kit_device['id_kit'] > 0:
-            return '', 403
+            # Check if current user can modify the posted device
+            if json_kit_device['id_kit'] not in user_access.get_accessible_kits_ids(admin_only=True) or \
+                    json_kit_device['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
+                return 'Accès refusé', 403
 
-        # Do the update!
-        if json_kit_device['id_kit_device'] > 0:
-            # Already existing
-            try:
-                TeraKitDevice.update_kit_device(json_kit_device['id_kit_device'], json_kit_device)
-            except exc.SQLAlchemyError:
-                import sys
-                print(sys.exc_info())
-                return '', 500
-        else:
-            # New
-            try:
-                new_kit_device = TeraKitDevice()
-                new_kit_device.from_json(json_kit_device)
-                TeraKitDevice.insert_device(new_kit_device)
-                # Update ID for further use
-                json_kit_device['id_kit_device'] = new_kit_device.id_kit_device
-            except exc.SQLAlchemyError:
-                import sys
-                print(sys.exc_info())
-                return '', 500
+            # Check if already exists
+            kit_device = TeraKitDevice.query_kit_device_for_kit_device(device_id=json_kit_device['id_device'],
+                                                                       kit_id=json_kit_device['id_kit'])
+            if kit_device:
+                json_kit_device['id_kit_device'] = kit_device.id_kit_device
+            else:
+                json_kit_device['id_kit_device'] = 0
+
+            # Do the update!
+            if json_kit_device['id_kit_device'] > 0:
+                # Already existing
+                try:
+                    TeraKitDevice.update_kit_device(json_kit_device['id_kit_device'], json_kit_device)
+                except exc.SQLAlchemyError:
+                    import sys
+                    print(sys.exc_info())
+                    return '', 500
+            else:
+                try:
+                    new_kit_device = TeraKitDevice()
+                    new_kit_device.from_json(json_kit_device)
+                    TeraKitDevice.insert_kit_device(new_kit_device)
+                    # Update ID for further use
+                    json_kit_device['id_kit_device'] = new_kit_device.id_kit_device
+                except exc.SQLAlchemyError:
+                    import sys
+                    print(sys.exc_info())
+                    return '', 500
 
         # TODO: Publish update to everyone who is subscribed to devices update...
         update_kit_device = TeraKitDevice.get_kit_device_by_id(json_kit_device['id_kit_device'])
@@ -98,13 +109,19 @@ class QueryKitDevice(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete
-        if id_todel not in current_user.get_accessible_devices_ids(admin_only=True) is None:
-            return '', 403
+        kit_device = TeraKitDevice.get_kit_device_by_id(id_todel)
+        if not kit_device:
+            return 'Not found.', 500
+
+        if kit_device.id_kit not in user_access.get_accessible_kits_ids(admin_only=True) or kit_device.id_device not in \
+                user_access.get_accessible_devices_ids(admin_only=True):
+            return 'Access denied', 403
 
         # If we are here, we are allowed to delete. Do so.
         try:

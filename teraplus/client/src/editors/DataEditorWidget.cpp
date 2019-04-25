@@ -15,6 +15,7 @@ DataEditorWidget::DataEditorWidget(ComManager *comMan, const TeraData *data, QWi
     connect(m_comManager, &ComManager::networkError, this, &DataEditorWidget::comDataError);
     connect(m_comManager, &ComManager::queryResultsOK, this, &DataEditorWidget::queryDataReplyOK);
     connect(m_comManager, &ComManager::postResultsOK, this, & DataEditorWidget::postDataReplyOK);
+    connect(m_comManager, &ComManager::deleteResultsOK, this, &DataEditorWidget::deleteDataReplyOK);
 
 }
 
@@ -143,6 +144,14 @@ void DataEditorWidget::postDataRequest(const QString &path, const QString &json_
     setWaiting();
 }
 
+void DataEditorWidget::deleteDataRequest(const QString &path, const int &id)
+{
+    QString query_name = getQueryDataName(path, QUrlQuery("del_id=" + QString::number(id)));
+    m_requests.append(query_name);
+    m_comManager->doDelete(path, id);
+    setWaiting();
+}
+
 QString DataEditorWidget::getQueryDataName(const QString &path, const QUrlQuery &query_args)
 {
     QString query_name = path;
@@ -223,6 +232,17 @@ void DataEditorWidget::postDataReplyOK(const QString &path)
     if (m_requests.isEmpty())
         setReady();
 
+}
+
+void DataEditorWidget::deleteDataReplyOK(const QString &path, const int &id)
+{
+    QString query_name = getQueryDataName(path, QUrlQuery("del_id=" + QString::number(id)));
+    m_requests.removeOne(query_name);
+    if (!hasPendingDataRequests())
+        updateFieldsValue();
+
+    if (m_requests.isEmpty())
+        setReady();
 }
 
 void DataEditorWidget::comDataError(QNetworkReply::NetworkError error, QString error_str)

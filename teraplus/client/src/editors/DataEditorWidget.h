@@ -48,6 +48,7 @@ public:
     void queryDataRequest(const QString &path, const QUrlQuery &query_args = QUrlQuery());
     bool hasPendingDataRequests();
     void postDataRequest(const QString &path, const QString &query_args);
+    void deleteDataRequest(const QString &path, const int &id);
 
 private:
     virtual void updateControlsState()=0;
@@ -88,6 +89,7 @@ public slots:
 private slots:
     void queryDataReplyOK(const QString &path, const QUrlQuery &query_args);
     void postDataReplyOK(const QString &path);
+    void deleteDataReplyOK(const QString &path, const int &id);
     void comDataError(QNetworkReply::NetworkError error, QString error_str);
 };
 

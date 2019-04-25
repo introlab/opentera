@@ -26,13 +26,15 @@ class TeraDevice(db.Model, BaseModel):
     device_kits = db.relationship("TeraKitDevice")
     device_site = db.relationship("TeraSite")
 
-    def to_json(self, ignore_fields=[], minimal=False):
+    def to_json(self, ignore_fields=None, minimal=False):
+        if ignore_fields is None:
+            ignore_fields = []
 
-        ignore_fields.extend(['device_kits', 'device_site', 'device_token', 'secret'])
+        ignore_fields += ['device_kits', 'device_site', 'device_token', 'secret']
 
         if minimal:
-            ignore_fields.extend(['device_type', 'device_uuid', 'device_onlineable', 'device_profile', 'device_notes',
-                                  'device_lastonline'])
+            ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_profile', 'device_notes',
+                              'device_lastonline']
 
         return super().to_json(ignore_fields=ignore_fields)
 

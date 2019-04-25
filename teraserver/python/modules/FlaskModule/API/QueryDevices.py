@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restful import Resource, reqparse
+from flask_restful import Resource, reqparse, inputs
 from modules.Globals import auth
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDevice import TeraDevice
@@ -22,8 +22,7 @@ class QueryDevices(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id_device', type=int, help='id_device')
         parser.add_argument('list', type=bool)
-        parser.add_argument('available', type=bool)
-        parser.add_argument('unavailable', type=bool)
+        parser.add_argument('available', type=inputs.boolean)
         # parser.add_argument('device_uuid', type=str, help='device_uuid')
 
         args = parser.parse_args()
@@ -36,9 +35,10 @@ class QueryDevices(Resource):
             devices = [user_access.query_device_by_id(device_id=args['id_device'])]
 
         if args['available'] is not None:
-            devices = TeraDevice.get_available_devices()
-        elif args['unavailable'] is not None:
-            devices = TeraDevice.get_unavailable_devices()
+            if args['available']:
+                devices = TeraDevice.get_available_devices()
+            else:
+                devices = TeraDevice.get_unavailable_devices()
 
         try:
             device_list = []
@@ -48,9 +48,11 @@ class QueryDevices(Resource):
                         device_json = device.to_json()
                     else:
                         device_json = device.to_json(minimal=True)
-                    if args['unavailable'] is not None:
-                        device_json['id_kit'] = device.device_kits[0].id_kit
-                        device_json['kit_name'] = device.device_kits[0].kit_device_kit.kit_name
+                    # if args['available'] is not None:
+                    #     if not args['available']:
+                    #         device_json['id_kit'] = device.device_kits[0].id_kit
+                    #         device_json['kit_name'] = device.device_kits[0].kit_device_kit.kit_name
+                    #         device_json['kit_device_optional'] = device.device_kits[0].kit_device_optional
                     device_list.append(device_json)
             return jsonify(device_list)
 
