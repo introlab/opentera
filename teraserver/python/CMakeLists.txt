@@ -47,3 +47,5 @@ add_custom_target(
 # Removed python-messages for now...
 add_custom_target(python-all DEPENDS  python-env python_translations python-messages)
 
+# Docker
+add_subdirectory(docker)
