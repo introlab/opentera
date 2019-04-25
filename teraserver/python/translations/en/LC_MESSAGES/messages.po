@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-04-24 08:41-0400\n"
+"POT-Creation-Date: 2019-04-25 09:08-0400\n"
 "PO-Revision-Date: 2019-03-28 16:24-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,69 +18,91 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: libtera/forms/TeraDeviceForm.py:25 libtera/forms/TeraKitDeviceForm.py:24
-#: libtera/forms/TeraSiteForm.py:12 libtera/forms/TeraUserForm.py:12
+#: libtera/forms/TeraDeviceForm.py:26 libtera/forms/TeraKitDeviceForm.py:25
+#: libtera/forms/TeraKitForm.py:24 libtera/forms/TeraSiteForm.py:12
+#: libtera/forms/TeraUserForm.py:12
 msgid "Informations"
 msgstr "Informations"
 
-#: libtera/forms/TeraDeviceForm.py:29
+#: libtera/forms/TeraDeviceForm.py:30
 msgid "ID Appareil"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:30
+#: libtera/forms/TeraDeviceForm.py:31
 msgid "UUID Appareil"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:31
+#: libtera/forms/TeraDeviceForm.py:32
 msgid "Nom appareil"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:32
+#: libtera/forms/TeraDeviceForm.py:33
 msgid "Type appareil"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:34
+#: libtera/forms/TeraDeviceForm.py:35
 msgid "Jeton d'accès"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:36
+#: libtera/forms/TeraDeviceForm.py:37
 msgid "Site d'appartenance"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:38
+#: libtera/forms/TeraDeviceForm.py:39
 msgid "Activé?"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:39
+#: libtera/forms/TeraDeviceForm.py:40
 msgid "Peut se connecter?"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:41 libtera/forms/TeraUserForm.py:27
+#: libtera/forms/TeraDeviceForm.py:42 libtera/forms/TeraUserForm.py:27
 msgid "Notes"
 msgstr "Notes"
 
-#: libtera/forms/TeraDeviceForm.py:42 libtera/forms/TeraUserForm.py:29
+#: libtera/forms/TeraDeviceForm.py:43 libtera/forms/TeraKitForm.py:33
+#: libtera/forms/TeraUserForm.py:29
 msgid "Dernière connexion"
 msgstr "Last Connection"
 
-#: libtera/forms/TeraDeviceForm.py:45 libtera/forms/TeraDeviceForm.py:47
+#: libtera/forms/TeraDeviceForm.py:46 libtera/forms/TeraDeviceForm.py:48
 msgid "Paramètres"
 msgstr ""
 
-#: libtera/forms/TeraKitDeviceForm.py:28
+#: libtera/forms/TeraKitDeviceForm.py:29
 msgid "ID Lien Kit-Appareil"
 msgstr ""
 
-#: libtera/forms/TeraKitDeviceForm.py:29
+#: libtera/forms/TeraKitDeviceForm.py:30
 msgid "Kit"
 msgstr ""
 
-#: libtera/forms/TeraKitDeviceForm.py:30
+#: libtera/forms/TeraKitDeviceForm.py:31
 msgid "Appareil"
 msgstr ""
 
-#: libtera/forms/TeraKitDeviceForm.py:31
+#: libtera/forms/TeraKitDeviceForm.py:32
 msgid "Optionnel?"
+msgstr ""
+
+#: libtera/forms/TeraKitForm.py:28
+msgid "ID Kit"
+msgstr ""
+
+#: libtera/forms/TeraKitForm.py:29
+msgid "Nom du kit"
+msgstr ""
+
+#: libtera/forms/TeraKitForm.py:30
+msgid "Site"
+msgstr ""
+
+#: libtera/forms/TeraKitForm.py:31
+msgid "Projet"
+msgstr ""
+
+#: libtera/forms/TeraKitForm.py:32
+msgid "Kit partageable?"
 msgstr ""
 
 #: libtera/forms/TeraSiteForm.py:16
@@ -219,15 +241,15 @@ msgstr "Allow Fullscreen Session"
 msgid "Permettre l'accès via le web"
 msgstr "Allow Web Access"
 
-#: modules/FlaskModule/API/QueryUsers.py:122
+#: modules/FlaskModule/API/QueryUsers.py:131
 msgid "Password required"
 msgstr ""
 
-#: modules/FlaskModule/API/QueryUsers.py:124
+#: modules/FlaskModule/API/QueryUsers.py:133
 msgid "Invalid password"
 msgstr ""
 
-#: modules/FlaskModule/API/QueryUsers.py:128
+#: modules/FlaskModule/API/QueryUsers.py:137
 msgid "Username unavailable."
 msgstr ""
 

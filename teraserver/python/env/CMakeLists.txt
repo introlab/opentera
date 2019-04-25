@@ -20,38 +20,10 @@ set (conda_packages
     protobuf
 )
 
-set (pip_packages
-    twisted
-    autobahn
-    sqlalchemy
-    psycopg2-binary
-    python-oauth2
-    flask
-    flask-sqlalchemy
-    flask-oauthlib
-    flask-login
-    flask-httpauth
-    flask-socketio
-    flask-session
-    flask-restful
-    flask-security
-    flask-babel
-    flask-migrate
-    # flask-jwt
-    redis
-    txredisapi
-    eventlet
-    gevent
-    gevent-websocket
-    passlib
-    bcrypt
-    wtforms
-    PyInstaller
-    pyopenssl
-    service_identity
-    jsonrpcclient
-    # jwt
-    PyJWT
+# Use the requirements file instead of listing all packages in CMake.
+add_custom_target(
+    python-requirements
+    SOURCES requirements.txt
 )
 
 # Create environment, will produce python executable
@@ -61,14 +33,17 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+
+# TODO - INSTALL WITH CONDA ?
+
+
 # Will always be considered out of date...
 # Always proceed...
-# TODO - INSTALL WITH CONDA ?
 add_custom_target(
   python-env
-  COMMAND ${PYTHON_PATH} -m pip install ${pip_packages}
+  COMMAND ${PYTHON_PATH} -m pip install -r ${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt
   WORKING_DIRECTORY ${ENV_PATH}
-  DEPENDS ${PYTHON_PATH}
+  DEPENDS ${PYTHON_PATH} python-requirements
 )
 
 
