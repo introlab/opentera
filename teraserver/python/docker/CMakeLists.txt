@@ -21,9 +21,7 @@ add_custom_target(
     COMMAND ${PYBABEL_EXECUTABLE} extract -F babel.cfg -o ${translation_pot_file} .
     COMMAND ${PYBABEL_EXECUTABLE} update -i ${translation_pot_file} -d translations
     COMMAND ${PYBABEL_EXECUTABLE} compile -d translations
-    DEPENDS ${PYBABEL_EXECUTABLE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../
-
 )
 
 FILE(GLOB_RECURSE protofiles RELATIVE "${MESSAGES_PATH}" "${MESSAGES_PATH}/*.proto")
@@ -47,7 +45,7 @@ endforeach(file)
 
 add_custom_target(
     docker-messages
-    DEPENDS ${PROTOC_EXECUTABLE} ${docker_protobuf_python_targets}
+    DEPENDS ${docker_protobuf_python_targets}
     WORKING_DIRECTORY ${MESSAGES_PATH}
 )
 

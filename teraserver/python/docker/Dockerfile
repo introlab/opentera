@@ -27,7 +27,7 @@ RUN service postgresql start &&\
 WORKDIR /opentera/teraserver
 
 # Everything is automated with cmake
-RUN cmake
+RUN cmake .
 RUN make docker-all
 
 
