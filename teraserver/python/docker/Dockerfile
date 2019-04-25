@@ -8,7 +8,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
         python3-pip sudo vim libprotobuf-dev cmake protobuf-compiler
 
 # Clone repository
-# ARG CACHE_DATE=2019-04-25
+ARG CACHE_DATE=2019-04-26
 RUN git clone -b dev https://github.com/introlab/opentera.git
 
 #Create db and user
