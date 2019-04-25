@@ -5,14 +5,11 @@ FROM ubuntu:18.04
 # Install build dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	postgresql redis-server build-essential cmake python3.6 git \
-        python3-pip sudo vim libprotobuf-dev cmake
+        python3-pip sudo vim libprotobuf-dev cmake protobuf-compiler
 
 # Clone repository
 # ARG CACHE_DATE=2019-04-25
 RUN git clone -b dev https://github.com/introlab/opentera.git
-
-# Install python packages
-RUN pip3 install protobuf
 
 #Create db and user
 RUN service postgresql start &&\
@@ -24,18 +21,21 @@ RUN service postgresql start &&\
 	sudo -u postgres psql -c "\l"
 
 
-WORKDIR /opentera/teraserver
+# Install python dependencies, must be installed before we run cmake
+WORKDIR /opentera/teraserver/python/env
 
-# Everything is automated with cmake
+# protobuf is the only one not in the requirements file
+RUN pip3 install protobuf
+RUN pip3 install -r requirements.txt
+
+
+# Everything else is automated with cmake
+WORKDIR /opentera/teraserver
 RUN cmake .
 RUN make docker-all
 
-
-# WORKDIR /opentera/teraserver/python
-# Generate translations
-# RUN pybabel extract -F babel.cfg -o translations.pot .
-# RUN pybabel update -i translations.pot -d translations
-# RUN pybabel compile -d translations
+# Final working directory
+WORKDIR /opentera/teraserver/python
 
 # Private and public mapping
 EXPOSE 4040:4040

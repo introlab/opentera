@@ -13,7 +13,7 @@ set(translation_pot_file translations.pot)
 set(MESSAGES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../messages)
 set(PYBABEL_EXECUTABLE pybabel)
 set(PROTOC_EXECUTABLE protoc)
-set(GOOGLE_PROTO_PATH /usr/python/Library/include/google/protobuf/)
+set(GOOGLE_PROTO_PATH /usr/include/google/protobuf/)
 
 # Will always be considered out of date...
 add_custom_target(
