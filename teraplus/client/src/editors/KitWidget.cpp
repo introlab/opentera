@@ -27,6 +27,13 @@ KitWidget::KitWidget(ComManager *comMan, const TeraData *data, QWidget *parent) 
     // Query project list (to ensure sites and projects sync)
     queryDataRequest(WEB_PROJECTINFO_PATH, QUrlQuery());
 
+    // Query participants for that kit
+    if (!dataIsNew()){
+        QUrlQuery query;
+        query.addQueryItem(WEB_QUERY_ID_KIT, QString::number(m_data->getId()));
+        queryDataRequest(WEB_PARTICIPANTINFO_PATH, query);
+    }
+
     QUrlQuery query;
     // Query available devices
     query.addQueryItem(WEB_QUERY_LIST,"");
@@ -60,6 +67,7 @@ void KitWidget::connectSignals()
     connect(m_comManager, &ComManager::devicesReceived, this, &KitWidget::processDevicesReply);
     connect(m_comManager, &ComManager::kitDevicesReceived, this, &KitWidget::processKitDevicesReply);
     connect(m_comManager, &ComManager::deleteResultsOK, this, &KitWidget::processDeleteDataReply);
+    connect(m_comManager, &ComManager::participantsReceived, this, &KitWidget::processParticipantsReply);
 
     connect(ui->wdgKit, &TeraForm::widgetValueHasChanged, this, &KitWidget::wdgKitWidgetValueChanged);
     connect(ui->btnSave, &QPushButton::clicked, this, &KitWidget::btnSave_clicked);
@@ -122,6 +130,19 @@ void KitWidget::updateDevice(const TeraData *device)
         item_src->takeItem(item_row);
         item_row = item_dst->row(item);
         item_dst->addItem(item);
+    }
+}
+
+void KitWidget::updateParticipant(const TeraData *participant)
+{
+    int id_participant = participant->getId();
+    if (m_listParticipants_items.contains(id_participant)){
+        QListWidgetItem* item = m_listParticipants_items[id_participant];
+        item->setText(participant->getName());
+    }else{
+        QListWidgetItem* item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_PARTICIPANT)), participant->getName());
+        ui->lstParticipants->addItem(item);
+        m_listParticipants_items[id_participant] = item;
     }
 }
 
@@ -193,6 +214,18 @@ void KitWidget::processKitDevicesReply(QList<TeraData> kit_devices)
         updateDevice(device);
     }
 
+}
+
+void KitWidget::processParticipantsReply(QList<TeraData> participants)
+{
+    for (int i=0; i<participants.count(); i++){
+        if (participants.at(i).hasFieldName("id_kit")){
+            if (participants.at(i).getFieldValue("id_kit").toInt() == m_data->getId()){
+                // OK, this participant is for us!
+                updateParticipant(&participants.at(i));
+            }
+        }
+    }
 }
 
 void KitWidget::processDeleteDataReply(QString path, int id)

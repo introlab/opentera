@@ -401,6 +401,25 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
       <attribute name="title">
        <string>Participants</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QLabel" name="lblParticipants">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Participant(s) utilisant ce kit</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="lstParticipants"/>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>

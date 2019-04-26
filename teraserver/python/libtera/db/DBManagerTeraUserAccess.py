@@ -125,6 +125,14 @@ class DBManagerTeraUserAccess:
 
         return participant_list
 
+    def get_accessible_participants_ids(self, admin_only=False):
+        parts = []
+
+        for part in self.get_accessible_participants(admin_only=admin_only):
+            parts.append(part.id_participant)
+
+        return parts
+
     def get_accessible_projects_ids(self, admin_only=False):
         projects = []
 
@@ -225,3 +233,11 @@ class DBManagerTeraUserAccess:
                 access.append(TeraSiteAccess.build_superadmin_access_object(site_id=site.id_site, user_id=user_id))
 
         return access
+
+    def query_participants_for_kit(self, kit_id: int):
+        from libtera.db.models.TeraParticipant import TeraParticipant
+
+        parts = TeraParticipant.query.join(TeraParticipant.participant_kits).filter_by(id_kit=kit_id)\
+            .filter(TeraKit.id_kit.in_(self.get_accessible_kits_ids()),
+                    TeraParticipant.id_participant.in_(self.get_accessible_participants_ids())).all()
+        return parts

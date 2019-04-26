@@ -2,15 +2,16 @@
 #define WEBAPI_H
 
 // TERASERVER URL Definitions
-#define WEB_LOGIN_PATH          "/api/login"
-#define WEB_LOGOUT_PATH         "/api/logout"
-#define WEB_USERINFO_PATH       "/api/users"
-#define WEB_SITEINFO_PATH       "/api/sites"
-#define WEB_PROJECTINFO_PATH    "/api/projects"
-#define WEB_KITINFO_PATH        "/api/kits"
-#define WEB_SITEACCESS_PATH     "/api/siteaccess"
-#define WEB_DEVICEINFO_PATH     "/api/devices"
-#define WEB_KITDEVICE_PATH      "/api/kitdevices"
+#define WEB_LOGIN_PATH              "/api/login"
+#define WEB_LOGOUT_PATH             "/api/logout"
+#define WEB_USERINFO_PATH           "/api/users"
+#define WEB_SITEINFO_PATH           "/api/sites"
+#define WEB_PROJECTINFO_PATH        "/api/projects"
+#define WEB_KITINFO_PATH            "/api/kits"
+#define WEB_SITEACCESS_PATH         "/api/siteaccess"
+#define WEB_DEVICEINFO_PATH         "/api/devices"
+#define WEB_KITDEVICE_PATH          "/api/kitdevices"
+#define WEB_PARTICIPANTINFO_PATH    "/api/participants"
 
 #define WEB_FORMS_PATH                  "/api/forms"
 #define WEB_FORMS_QUERY_USER_PROFILE    "type=user_profile"
