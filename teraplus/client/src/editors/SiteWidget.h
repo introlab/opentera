@@ -34,6 +34,9 @@ private slots:
     void btnSave_clicked();
     void btnUndo_clicked();
     void btnUpdateAccess_clicked();
+    void btnProjects_clicked();
+    void btnKits_clicked();
+    void btnUsers_clicked();
 
 private:
     Ui::SiteWidget *ui;
@@ -41,6 +44,8 @@ private:
     QMap<int, int>               m_tableUsers_ids_rows;
     QMap<int, QListWidgetItem*>  m_listProjects_items;
     QMap<int, QTableWidgetItem*> m_listKits_items;
+
+    QDialog*                    m_diag_editor;
 
     void connectSignals();
 

@@ -1,10 +1,14 @@
 #include "SiteWidget.h"
 #include "ui_SiteWidget.h"
 
+#include "editors/DataListWidget.h"
+
 SiteWidget::SiteWidget(ComManager *comMan, const TeraData *data, QWidget *parent) :
     DataEditorWidget(comMan, data, parent),
     ui(new Ui::SiteWidget)
 {
+    m_diag_editor = nullptr;
+
     if (parent){
         ui->setupUi(parent);
     }else {
@@ -75,6 +79,9 @@ void SiteWidget::connectSignals()
     connect(ui->btnUndo, &QPushButton::clicked, this, &SiteWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &SiteWidget::btnSave_clicked);
     connect(ui->btnUpdateRoles, &QPushButton::clicked, this, &SiteWidget::btnUpdateAccess_clicked);
+    connect(ui->btnProjects, &QPushButton::clicked, this, &SiteWidget::btnProjects_clicked);
+    connect(ui->btnKits, &QPushButton::clicked, this, &SiteWidget::btnKits_clicked);
+    connect(ui->btnUsers, &QPushButton::clicked, this, &SiteWidget::btnUsers_clicked);
 
 }
 
@@ -123,7 +130,7 @@ void SiteWidget::updateProject(const TeraData *project)
 void SiteWidget::updateKit(const TeraData *kit)
 {
     int id_kit = kit->getId();
-    QString project_name = tr("Inconnu");
+    QString project_name = tr("Aucun");
     if (m_listProjects_items.contains(kit->getFieldValue("id_project").toInt()))
         project_name = m_listProjects_items[kit->getFieldValue("id_project").toInt()]->text();
 
@@ -210,11 +217,13 @@ void SiteWidget::processProjectsReply(QList<TeraData> projects)
         }
     }
 
-    // Query kits for that site (depending on projects first to have names)
-    QUrlQuery args;
-    args.addQueryItem(WEB_QUERY_ID_SITE, QString::number(m_data->getId()));
-    args.addQueryItem(WEB_QUERY_LIST, "");
-    queryDataRequest(WEB_KITINFO_PATH, args);
+    if (isLoading()){
+        // Query kits for that site (depending on projects first to have names)
+        QUrlQuery args;
+        args.addQueryItem(WEB_QUERY_ID_SITE, QString::number(m_data->getId()));
+        args.addQueryItem(WEB_QUERY_LIST, "");
+        queryDataRequest(WEB_KITINFO_PATH, args);
+    }
 
 }
 
@@ -224,7 +233,7 @@ void SiteWidget::processKitsReply(QList<TeraData> kits)
         return;
 
     for (int i=0; i<kits.count(); i++){
-        if (m_listProjects_items.contains(kits.at(i).getFieldValue("id_project").toInt())){
+        if (kits.at(i).getFieldValue("id_site").toInt() == m_data->getId()/*m_listProjects_items.contains(kits.at(i).getFieldValue("id_project").toInt())*/){
             updateKit(&kits.at(i));
         }
     }
@@ -288,4 +297,46 @@ void SiteWidget::btnUpdateAccess_clicked()
 
 
 
+}
+
+void SiteWidget::btnProjects_clicked()
+{
+    if (m_diag_editor){
+        m_diag_editor->deleteLater();
+    }
+   /* m_diag_editor = new QDialog(this);
+    UserWidget* user_editor = new UserWidget(m_comManager, &(m_comManager->getCurrentUser()), m_diag_editor);
+    user_editor->setLimited(true);
+    connect(user_editor, &UserWidget::closeRequest, m_diag_editor, &QDialog::accept);
+    connect(m_diag_editor, &QDialog::finished, this, &MainWindow::editorDialogFinished);
+
+    m_diag_editor->setWindowTitle(tr("Votre compte"));
+
+    m_diag_editor->open();*/
+}
+
+void SiteWidget::btnKits_clicked()
+{
+    if (m_diag_editor){
+        m_diag_editor->deleteLater();
+    }
+    m_diag_editor = new QDialog(this);
+    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_KIT, m_diag_editor);
+
+    m_diag_editor->setWindowTitle(tr("Kits"));
+
+    m_diag_editor->open();
+}
+
+void SiteWidget::btnUsers_clicked()
+{
+    if (m_diag_editor){
+        m_diag_editor->deleteLater();
+    }
+    m_diag_editor = new QDialog(this);
+    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_USER, m_diag_editor);
+
+    m_diag_editor->setWindowTitle(tr("Utilisateurs"));
+
+    m_diag_editor->open();
 }

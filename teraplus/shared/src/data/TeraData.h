@@ -11,7 +11,7 @@
 #include "webapi.h"
 
 enum TeraDataTypes {
-    TERADATA_UNKNOWN,
+    TERADATA_NONE,
     TERADATA_USER,
     TERADATA_SITE,
     TERADATA_KIT,
@@ -36,7 +36,7 @@ class TeraData : public QObject
     Q_PROPERTY(TeraDataTypes data_type READ getDataType WRITE setDataType)
 
 public:
-    explicit TeraData(QObject *parent = nullptr);
+    //explicit TeraData(QObject *parent = nullptr);
     explicit TeraData(TeraDataTypes obj_type, QObject *parent = nullptr);
     TeraData(const TeraData& copy, QObject *parent=nullptr);
     explicit TeraData(TeraDataTypes obj_type, const QJsonValue& json, QObject *parent = nullptr);

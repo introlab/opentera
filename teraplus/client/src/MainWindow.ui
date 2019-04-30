@@ -66,7 +66,7 @@ QComboBox:!enabled{background-color: rgba(0,0,0,150);color:white;border:0}</stri
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QWidget" name="widgetMainTop" native="true">
+      <widget class="QWidget" name="wdgMainTop" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -74,31 +74,6 @@ QComboBox:!enabled{background-color: rgba(0,0,0,150);color:white;border:0}</stri
         </sizepolicy>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_10">
-        <property name="spacing">
-         <number>5</number>
-        </property>
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="widgetMainBottom" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_11">
         <property name="spacing">
          <number>5</number>
         </property>
@@ -509,7 +484,7 @@ QComboBox:!enabled{background-color: rgba(0,0,0,150);color:white;border:0}</stri
              </widget>
             </item>
             <item>
-             <widget class="ProjectNavigator" name="widgetMainMenu" native="true">
+             <widget class="ProjectNavigator" name="wdgMainMenu" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                 <horstretch>0</horstretch>

@@ -9,6 +9,7 @@ ProjectNavigator::ProjectNavigator(QWidget *parent) :
 
     m_comManager = nullptr;
     m_newItemMenu = nullptr;
+    m_currentSiteId = -1;
 }
 
 ProjectNavigator::~ProjectNavigator()
@@ -51,6 +52,10 @@ void ProjectNavigator::initUi()
 void ProjectNavigator::connectSignals()
 {
     connect(m_comManager, &ComManager::sitesReceived, this, &ProjectNavigator::processSitesReply);
+
+    void (QComboBox::* comboIndexChangedSignal)(int) = &QComboBox::currentIndexChanged;
+    connect(ui->cmbSites, comboIndexChangedSignal, this, &ProjectNavigator::currentSiteChanged);
+    connect(ui->btnEditSite, &QPushButton::clicked, this, &ProjectNavigator::btnEditSite_clicked);
 }
 
 QAction *ProjectNavigator::addNewItemAction(const TeraDataTypes &data_type, const QString &label)
@@ -102,4 +107,20 @@ void ProjectNavigator::processSitesReply(QList<TeraData> sites)
         // Select the only site in the list
         ui->cmbSites->setCurrentIndex(0);
     }
+}
+
+void ProjectNavigator::currentSiteChanged()
+{
+    m_currentSiteId = ui->cmbSites->currentData().toInt();
+
+    // Check if user is admin of that site. If so, enable the edit button.
+    ui->btnEditSite->setVisible(m_comManager->getCurrentUserSiteRole(m_currentSiteId)=="admin");
+
+    // Clear main display
+    emit dataDisplayRequest(TERADATA_NONE, 0);
+}
+
+void ProjectNavigator::btnEditSite_clicked()
+{
+    emit dataDisplayRequest(TERADATA_SITE, m_currentSiteId);
 }

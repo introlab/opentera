@@ -3,6 +3,8 @@
 
 #include "ui_MainWindow.h"
 
+#include "editors/SiteWidget.h"
+
 MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -10,6 +12,8 @@ MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
     ui->setupUi(this);
     m_comManager = com_manager;
     m_diag_editor = nullptr;
+    m_data_editor = nullptr;
+    m_waiting_for_data_type = TERADATA_NONE;
     m_currentMessage.setMessage(Message::MESSAGE_NONE,"");
 
     // Initial UI state
@@ -26,6 +30,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete m_loadingIcon;
+    if (m_data_editor)
+        m_data_editor->deleteLater();
 
 }
 
@@ -36,7 +42,11 @@ void MainWindow::connectSignals()
     connect(m_comManager, &ComManager::serverError, this, &MainWindow::com_serverError);
     connect(m_comManager, &ComManager::waitingForReply, this, &MainWindow::com_waitingForReply);
     connect(m_comManager, &ComManager::postResultsOK, this, &MainWindow::com_postReplyOK);
+    connect(m_comManager, &ComManager::sitesReceived, this, &MainWindow::processSitesReply);
+
     connect(&m_msgTimer, &QTimer::timeout, this, &MainWindow::showNextMessage);
+
+    connect(ui->wdgMainMenu, &ProjectNavigator::dataDisplayRequest, this, &MainWindow::dataDisplayRequested);
 }
 
 void MainWindow::initUi()
@@ -56,8 +66,29 @@ void MainWindow::initUi()
     ui->icoLoading->hide();
 
     // Setup main menu
-    ui->widgetMainMenu->setComManager(m_comManager);
+    ui->wdgMainMenu->setComManager(m_comManager);
 
+}
+
+void MainWindow::showDataEditor(const TeraDataTypes &data_type, const TeraData*data)
+{
+    if (m_data_editor){
+        m_data_editor->deleteLater();
+        m_data_editor = nullptr;
+    }
+
+    if (data_type == TERADATA_NONE || data == nullptr){
+        return;
+    }
+
+    if (data_type == TERADATA_SITE){
+        m_data_editor = new SiteWidget(m_comManager, data);
+        m_data_editor->setLimited(false);
+    }
+
+    if (m_data_editor){
+        ui->wdgMainTop->layout()->addWidget(m_data_editor);
+    }
 }
 
 void MainWindow::showNextMessage()
@@ -117,6 +148,26 @@ void MainWindow::editorDialogFinished()
     m_diag_editor = nullptr;
 }
 
+void MainWindow::dataDisplayRequested(TeraDataTypes data_type, int data_id)
+{
+    if (data_type == TERADATA_NONE){
+        // Clear data display
+        showDataEditor(TERADATA_NONE, nullptr);
+        return;
+    }
+
+
+    // Set flag to wait for that specific data type
+    if (m_waiting_for_data_type != TERADATA_NONE)
+        LOG_WARNING("Request for new data for editor, but still waiting on previous one!", "MainWindow::dataDisplayRequested");
+    m_waiting_for_data_type = data_type;
+
+    QUrlQuery query;
+    query.addQueryItem(WEB_QUERY_ID, QString::number(data_id));
+    m_comManager->doQuery(TeraData::getPathForDataType(data_type), query);
+
+}
+
 void MainWindow::updateCurrentUser()
 {
     if (m_comManager->getCurrentUser().hasFieldName("user_name")){
@@ -124,6 +175,20 @@ void MainWindow::updateCurrentUser()
         ui->lblUser->setText(m_comManager->getCurrentUser().getName());
         ui->btnConfig->setVisible(m_comManager->getCurrentUser().getFieldValue("user_superadmin").toBool());
     }
+}
+
+void MainWindow::processSitesReply(QList<TeraData> sites)
+{
+    if (m_waiting_for_data_type != TERADATA_SITE)
+        return;
+
+    m_waiting_for_data_type = TERADATA_NONE;
+
+    // Show editor
+    if (sites.count()>0){
+        showDataEditor(TERADATA_SITE, &sites.first());
+    }
+
 }
 
 void MainWindow::com_serverError(QAbstractSocket::SocketError error, QString error_msg)

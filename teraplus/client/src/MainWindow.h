@@ -31,6 +31,7 @@ signals:
 
 private slots:
     void updateCurrentUser();
+    void processSitesReply(QList<TeraData> sites);
 
     void com_serverError(QAbstractSocket::SocketError error, QString error_msg);
     void com_networkError(QNetworkReply::NetworkError error, QString error_msg);
@@ -43,6 +44,7 @@ private slots:
     void showNextMessage();
 
     void editorDialogFinished();
+    void dataDisplayRequested(TeraDataTypes data_type, int data_id);
 
     void on_btnCloseMessage_clicked();
     void on_btnLogout_clicked();
@@ -52,11 +54,14 @@ private slots:
 private:
     void connectSignals();
     void initUi();
+    void showDataEditor(const TeraDataTypes &data_type, const TeraData *data);
 
     Ui::MainWindow *ui;
 
-    ComManager*     m_comManager;
-    QDialog*        m_diag_editor;
+    ComManager*         m_comManager;
+    QDialog*            m_diag_editor;
+    DataEditorWidget*   m_data_editor;
+    TeraDataTypes       m_waiting_for_data_type;
 
     // Message system
     QList<Message>  m_messages;

@@ -36,7 +36,7 @@ class DBManagerTeraUserAccess:
                     if user not in users:
                         users.append(user)
             # You are always available to yourself!
-            if self not in users:
+            if self.user not in users:
                 users.append(self)
 
         # TODO Sort by username

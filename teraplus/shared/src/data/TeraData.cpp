@@ -4,12 +4,12 @@
 
 #include <QDebug>
 
-
+/*
 TeraData::TeraData(QObject *parent) :
     QObject(parent)
 {
-    setDataType(TERADATA_UNKNOWN);
-}
+    setDataType(TERADATA_NONE);
+}*/
 
 TeraData::TeraData(TeraDataTypes obj_type, QObject *parent) :
     QObject(parent)
@@ -141,8 +141,8 @@ QList<QString> TeraData::getFieldList() const
 QString TeraData::getDataTypeName(const TeraDataTypes &data_type)
 {
     switch (data_type) {
-    case TERADATA_UNKNOWN:
-        return "unknown";
+    case TERADATA_NONE:
+        return "";
     case TERADATA_USER:
         return "user";
     case TERADATA_SITE:
@@ -183,7 +183,7 @@ TeraDataTypes TeraData::getDataTypeFromPath(const QString &path)
 
     LOG_ERROR("Unknown data type for path: " + path, "TeraData::getDataTypeFromPath");
 
-    return TERADATA_UNKNOWN;
+    return TERADATA_NONE;
 }
 
 QString TeraData::getPathForDataType(const TeraDataTypes &data_type)

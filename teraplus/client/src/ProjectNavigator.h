@@ -26,19 +26,25 @@ public:
 
 private:
     Ui::ProjectNavigator *ui;
-
-    QAction* addNewItemAction(const TeraDataTypes &data_type, const QString& label);
-
     ComManager* m_comManager;
+    int m_currentSiteId;
 
     // Ui items
     QList<QAction*> m_newItemActions;
     QMenu*          m_newItemMenu;
 
+    QAction* addNewItemAction(const TeraDataTypes &data_type, const QString& label);
+
 private slots:
      void newItemRequested();
 
      void processSitesReply(QList<TeraData> sites);
+
+     void currentSiteChanged();
+     void btnEditSite_clicked();
+
+signals:
+     void dataDisplayRequest(TeraDataTypes data_type, int data_id);
 };
 
 #endif // PROJECTNAVIGATOR_H

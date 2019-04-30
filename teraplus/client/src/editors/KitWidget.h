@@ -25,7 +25,7 @@ private:
     QList<TeraData>                 m_projects;
     QMap<int, QListWidgetItem*>     m_listDevices_items;
     QMap<int, QListWidgetItem*>     m_listParticipants_items;
-    QMap<int, TeraData>             m_ids_devices;
+    QMap<int, TeraData*>            m_ids_devices;
 
     void connectSignals();
 

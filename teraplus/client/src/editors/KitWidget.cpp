@@ -43,6 +43,7 @@ KitWidget::KitWidget(ComManager *comMan, const TeraData *data, QWidget *parent) 
 KitWidget::~KitWidget()
 {
     delete ui;
+    qDeleteAll(m_ids_devices);
 }
 
 void KitWidget::saveData(bool signal)
@@ -89,7 +90,7 @@ void KitWidget::updateDevice(const TeraData *device)
         item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_DEVICE)), device->getName());
         ui->lstDevices->addItem(item);
         m_listDevices_items[id_device] = item;
-        m_ids_devices[id_device] = TeraData(*device);
+        m_ids_devices[id_device] = new TeraData(*device);
     }
 
     // Update visual according to status
@@ -185,15 +186,16 @@ void KitWidget::processProjectsReply(QList<TeraData> projects)
 
 void KitWidget::processDevicesReply(QList<TeraData> devices)
 {
-    bool first_list = ui->lstDevices->count()==0;
+    //static bool first_list = true;
     for (int i=0; i<devices.count(); i++){
         updateDevice(&devices.at(i));
     }
-    if (first_list){
+    if (isLoading() && m_data->getId()>0){
         // Query unavailable devices
         QUrlQuery query;
         query.addQueryItem(WEB_QUERY_ID_KIT, QString::number(m_data->getId()));
         queryDataRequest(WEB_KITDEVICE_PATH, query);
+        //first_list = false;
     }
 }
 
@@ -203,15 +205,15 @@ void KitWidget::processKitDevicesReply(QList<TeraData> kit_devices)
     for (int i=0; i<kit_devices.count(); i++){
         // Get device
         int id_device = kit_devices.at(i).getFieldValue("id_device").toInt();
-        TeraData* device = &m_ids_devices[id_device];
+        TeraData* device = m_ids_devices[id_device];
 
         if (device){
             // Found it - update values
             device->setFieldValue("id_kit", kit_devices.at(i).getFieldValue("id_kit"));
             device->setFieldValue("kit_device_optional", kit_devices.at(i).getFieldValue("kit_device_optional"));
             device->setFieldValue("id_kit_device", kit_devices.at(i).getId());
+            updateDevice(device);
         }
-        updateDevice(device);
     }
 
 }
@@ -233,7 +235,7 @@ void KitWidget::processDeleteDataReply(QString path, int id)
     if (path == WEB_KITDEVICE_PATH){
         // Kit-Device was deleted
         for (int i=0; i<m_ids_devices.count(); i++){
-            TeraData* device = &m_ids_devices[m_ids_devices.keys().at(i)];
+            TeraData* device = m_ids_devices[m_ids_devices.keys().at(i)];
             if (device->hasFieldName("id_kit_device")){
                 if (device->getFieldValue("id_kit_device").toInt()==id){
                     // We must update...
@@ -285,9 +287,9 @@ void KitWidget::lstDeviceCurrentChanged(QListWidgetItem *current, QListWidgetIte
         int id = m_listDevices_items.key(current, -1);
         if (id>=0){
             if (m_ids_devices.contains(id)){
-                if (!m_ids_devices.value(id).hasFieldName("id_kit") ||
-                        (m_ids_devices.value(id).hasFieldName("id_kit") &&
-                         m_ids_devices.value(id).getFieldValue("id_kit").toInt()==m_data->getId()))
+                if (!m_ids_devices.value(id)->hasFieldName("id_kit") ||
+                        (m_ids_devices.value(id)->hasFieldName("id_kit") &&
+                         m_ids_devices.value(id)->getFieldValue("id_kit").toInt()==m_data->getId()))
                     available = true;
             }
 
@@ -333,7 +335,7 @@ void KitWidget::btnAddDevice_clicked()
 {
     for (QListWidgetItem* item:ui->lstDevices->selectedItems()){
         int item_id = m_listDevices_items.key(item);
-        TeraData* item_data = &m_ids_devices[item_id];
+        TeraData* item_data = m_ids_devices[item_id];
 
         if (item_data){
 
@@ -364,7 +366,7 @@ void KitWidget::btnDelDevice_clicked()
 {
     for (QListWidgetItem* item:ui->lstKitDevices->selectedItems()){
         int item_id = m_listDevices_items.key(item);
-        TeraData* item_data = &m_ids_devices[item_id];
+        TeraData* item_data = m_ids_devices[item_id];
 
         if (item_data){
             int kit_device_id = item_data->getFieldValue("id_kit_device").toInt();

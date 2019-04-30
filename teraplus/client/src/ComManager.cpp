@@ -215,7 +215,7 @@ bool ComManager::isCurrentUserSuperAdmin()
 ComManager::signal_ptr ComManager::getSignalFunctionForDataType(const TeraDataTypes &data_type)
 {
     switch(data_type){
-    case TERADATA_UNKNOWN:
+    case TERADATA_NONE:
         LOG_ERROR("Unknown object - no signal associated.", "ComManager::getSignalFunctionForDataType");
         return nullptr;
     case TERADATA_USER:
@@ -297,7 +297,7 @@ bool ComManager::handleDataReply(const QString& reply_path, const QString &reply
 
     // Emit signal
     switch (items_type) {
-    case TERADATA_UNKNOWN:
+    case TERADATA_NONE:
         LOG_ERROR("Unknown object - don't know what to do with it.", "ComManager::handleDataReply");
         break;
     case TERADATA_USER:

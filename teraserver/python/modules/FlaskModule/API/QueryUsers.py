@@ -92,7 +92,7 @@ class QueryUsers(Resource):
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
 
-        userAccess = DBManager.userAccess(current_user)
+        user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
         json_user = request.json['user']
@@ -102,9 +102,14 @@ class QueryUsers(Resource):
             return '', 400
 
         # Check if current user can modify the posted user
-        if json_user['id_user'] not in userAccess.get_accessible_users_ids(admin_only=True) and \
+        if json_user['id_user'] not in user_access.get_accessible_users_ids(admin_only=True) and \
                 json_user['id_user'] > 0:
             return '', 403
+
+        # Only superadmin can modify superadmin status
+        if not current_user.user_superadmin and json_user['user_superadmin']:
+            # Remove field
+            json_user.pop('user_superadmin')
 
         # Check if we have site access to handle separately
         json_sites = None
@@ -151,7 +156,7 @@ class QueryUsers(Resource):
         if json_sites:
             for site in json_sites:
                 # Check if current user is admin of that site
-                if current_user.get_site_role(site=site) == 'admin':
+                if user_access.get_site_role(site=site) == 'admin':
                     try:
                         TeraSiteAccess.update_site_access(json_user['id_user'], site['id_site'], site['site_role'])
                     except exc.SQLAlchemyError:
@@ -162,7 +167,7 @@ class QueryUsers(Resource):
         if json_projects:
             for project in json_projects:
                 # Check if current user is admin of that site
-                if current_user.get_project_role(project=project) == 'admin':
+                if user_access.get_project_role(project=project) == 'admin':
                     try:
                         TeraProjectAccess.update_project_access(id_user=json_user['id_user'],
                                                                 id_project=project['id_project'],

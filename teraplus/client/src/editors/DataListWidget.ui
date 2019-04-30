@@ -41,7 +41,7 @@ QListWidget::item:selected{background-color: rgba(128,128,128,50%); color:white;
 
 QPushButton:hover{background-color:  rgba(255,255,255,50);}
 QPushButton#btnSearch:hover{background-color:  rgba(255,255,255,0%);}
-QPushButton#btnSearch, QPushButton#btnClear,QPushButton#btnCopy,QPushButton#btnNew{border: 0px solid transparent;}
+QPushButton#btnSearch, QPushButton#btnClear,QPushButton#btnCopy,QPushButton#btnNew, QPushButton#btnDelete{border: 0px solid transparent;}
 
 QTreeWidget::branch:closed:has-children:has-siblings  {
             border-image: none;

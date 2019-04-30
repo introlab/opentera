@@ -18,6 +18,7 @@ class QuerySites(Resource):
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id_site', type=int, help='id_site', required=False)
+        parser.add_argument('id', type=int, help='id_site', required=False)
         parser.add_argument('user_uuid', type=str, help='uuid')
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
@@ -40,6 +41,9 @@ class QuerySites(Resource):
                 for site in queried_sites:
                     if site in current_sites:
                         sites.append(site)
+
+        if args['id']:
+            args['id_site'] = args['id']
 
         if args['id_site']:
             if args['id_site'] in user_access.get_accessible_sites_ids():

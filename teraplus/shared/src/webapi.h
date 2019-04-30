@@ -24,6 +24,7 @@
 #define WEB_QUERY_USERUUID      "user_uuid"
 #define WEB_QUERY_ID_USER       "id_user"
 #define WEB_QUERY_LIST          "list"
+#define WEB_QUERY_ID            "id"
 #define WEB_QUERY_ID_SITE       "id_site"
 #define WEB_QUERY_ID_KIT        "id_kit"
 #define WEB_QUERY_ID_DEVICE     "id_device"
