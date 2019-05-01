@@ -4,6 +4,7 @@
 #include "ui_MainWindow.h"
 
 #include "editors/SiteWidget.h"
+#include "editors/ProjectWidget.h"
 
 MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
     QMainWindow(parent),
@@ -42,7 +43,7 @@ void MainWindow::connectSignals()
     connect(m_comManager, &ComManager::serverError, this, &MainWindow::com_serverError);
     connect(m_comManager, &ComManager::waitingForReply, this, &MainWindow::com_waitingForReply);
     connect(m_comManager, &ComManager::postResultsOK, this, &MainWindow::com_postReplyOK);
-    connect(m_comManager, &ComManager::sitesReceived, this, &MainWindow::processSitesReply);
+    connect(m_comManager, &ComManager::dataReceived, this, &MainWindow::processGenericDataReply);
 
     connect(&m_msgTimer, &QTimer::timeout, this, &MainWindow::showNextMessage);
 
@@ -86,8 +87,15 @@ void MainWindow::showDataEditor(const TeraDataTypes &data_type, const TeraData*d
         m_data_editor->setLimited(false);
     }
 
+    if (data_type == TERADATA_PROJECT){
+        m_data_editor = new ProjectWidget(m_comManager, data);
+        m_data_editor->setLimited(false);
+    }
+
     if (m_data_editor){
         ui->wdgMainTop->layout()->addWidget(m_data_editor);
+    }else{
+        LOG_ERROR("Unhandled data editor: " + TeraData::getPathForDataType(data_type), "MainWindow::showDataEditor");
     }
 }
 
@@ -177,19 +185,23 @@ void MainWindow::updateCurrentUser()
     }
 }
 
-void MainWindow::processSitesReply(QList<TeraData> sites)
+void MainWindow::processGenericDataReply(QList<TeraData> datas)
 {
-    if (m_waiting_for_data_type != TERADATA_SITE)
+    if (datas.isEmpty())
+        return;
+
+    TeraDataTypes item_data_type = datas.first().getDataType();
+
+    if (m_waiting_for_data_type != item_data_type)
         return;
 
     m_waiting_for_data_type = TERADATA_NONE;
 
     // Show editor
-    if (sites.count()>0){
-        showDataEditor(TERADATA_SITE, &sites.first());
-    }
+    showDataEditor(item_data_type, &datas.first());
 
 }
+
 
 void MainWindow::com_serverError(QAbstractSocket::SocketError error, QString error_msg)
 {

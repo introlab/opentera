@@ -1,11 +1,11 @@
-#include "SiteWidget.h"
-#include "ui_SiteWidget.h"
+#include "ProjectWidget.h"
+#include "ui_ProjectWidget.h"
 
 #include "editors/DataListWidget.h"
 
-SiteWidget::SiteWidget(ComManager *comMan, const TeraData *data, QWidget *parent) :
+ProjectWidget::ProjectWidget(ComManager *comMan, const TeraData *data, QWidget *parent) :
     DataEditorWidget(comMan, data, parent),
-    ui(new Ui::SiteWidget)
+    ui(new Ui::ProjectWidget)
 {
     m_diag_editor = nullptr;
 
@@ -23,7 +23,7 @@ SiteWidget::SiteWidget(ComManager *comMan, const TeraData *data, QWidget *parent
     connectSignals();
 
     // Query forms definition
-    queryDataRequest(WEB_FORMS_PATH, QUrlQuery(WEB_FORMS_QUERY_SITE));
+    queryDataRequest(WEB_FORMS_PATH, QUrlQuery(WEB_FORMS_QUERY_PROJECT));
 
     // Query accessible users list
     queryDataRequest(WEB_USERINFO_PATH, QUrlQuery(WEB_QUERY_LIST));
@@ -31,61 +31,62 @@ SiteWidget::SiteWidget(ComManager *comMan, const TeraData *data, QWidget *parent
     setData(data);
 }
 
-SiteWidget::~SiteWidget()
+ProjectWidget::~ProjectWidget()
 {
     delete ui;
 
 }
 
-void SiteWidget::saveData(bool signal)
+void ProjectWidget::saveData(bool signal)
 {
-    // Site data
-    QJsonDocument site_data = ui->wdgSite->getFormDataJson(m_data->isNew());
+    // Project data
+    QJsonDocument site_data = ui->wdgProject->getFormDataJson(m_data->isNew());
 
     //qDebug() << user_data.toJson();
-    postDataRequest(WEB_SITEINFO_PATH, site_data.toJson());
+    postDataRequest(WEB_PROJECTINFO_PATH, site_data.toJson());
 
     if (signal){
-        TeraData* new_data = ui->wdgSite->getFormDataObject(TERADATA_SITE);
+        TeraData* new_data = ui->wdgProject->getFormDataObject(TERADATA_PROJECT);
         *m_data = *new_data;
         delete new_data;
         emit dataWasChanged();
     }
 }
 
-void SiteWidget::setData(const TeraData *data)
+void ProjectWidget::setData(const TeraData *data)
 {
     DataEditorWidget::setData(data);
 
-    // Query projects
+    // Query groups & kits
     if (!dataIsNew()){
         QUrlQuery args;
-        args.addQueryItem(WEB_QUERY_ID_SITE, QString::number(data->getFieldValue("id_site").toInt()));
+        args.addQueryItem(WEB_QUERY_ID_PROJECT, QString::number(data->getFieldValue("id_project").toInt()));
         args.addQueryItem(WEB_QUERY_LIST, "");
-        queryDataRequest(WEB_PROJECTINFO_PATH, args);
+        queryDataRequest(WEB_GROUPINFO_PATH, args);
+        queryDataRequest(WEB_KITINFO_PATH, args);
+
     }else{
-        ui->tabSiteInfos->setEnabled(false);
+        ui->tabProjectInfos->setEnabled(false);
     }
 }
 
-void SiteWidget::connectSignals()
+void ProjectWidget::connectSignals()
 {
-    connect(m_comManager, &ComManager::formReceived, this, &SiteWidget::processFormsReply);
-    connect(m_comManager, &ComManager::siteAccessReceived, this, &SiteWidget::processSiteAccessReply);
-    connect(m_comManager, &ComManager::usersReceived, this, &SiteWidget::processUsersReply);
-    connect(m_comManager, &ComManager::projectsReceived, this, &SiteWidget::processProjectsReply);
-    connect(m_comManager, &ComManager::kitsReceived, this, &SiteWidget::processKitsReply);
+    connect(m_comManager, &ComManager::formReceived, this, &ProjectWidget::processFormsReply);
+    connect(m_comManager, &ComManager::projectAccessReceived, this, &ProjectWidget::processProjectAccessReply);
+    connect(m_comManager, &ComManager::usersReceived, this, &ProjectWidget::processUsersReply);
+    connect(m_comManager, &ComManager::groupsReceived, this, &ProjectWidget::processGroupsReply);
+    connect(m_comManager, &ComManager::kitsReceived, this, &ProjectWidget::processKitsReply);
 
-    connect(ui->btnUndo, &QPushButton::clicked, this, &SiteWidget::btnUndo_clicked);
-    connect(ui->btnSave, &QPushButton::clicked, this, &SiteWidget::btnSave_clicked);
-    connect(ui->btnUpdateRoles, &QPushButton::clicked, this, &SiteWidget::btnUpdateAccess_clicked);
-    connect(ui->btnProjects, &QPushButton::clicked, this, &SiteWidget::btnProjects_clicked);
-    connect(ui->btnKits, &QPushButton::clicked, this, &SiteWidget::btnKits_clicked);
-    connect(ui->btnUsers, &QPushButton::clicked, this, &SiteWidget::btnUsers_clicked);
+    connect(ui->btnUndo, &QPushButton::clicked, this, &ProjectWidget::btnUndo_clicked);
+    connect(ui->btnSave, &QPushButton::clicked, this, &ProjectWidget::btnSave_clicked);
+    connect(ui->btnUpdateRoles, &QPushButton::clicked, this, &ProjectWidget::btnUpdateAccess_clicked);
+    connect(ui->btnKits, &QPushButton::clicked, this, &ProjectWidget::btnKits_clicked);
+    connect(ui->btnUsers, &QPushButton::clicked, this, &ProjectWidget::btnUsers_clicked);
 
 }
 
-void SiteWidget::updateSiteAccess(const TeraData *access)
+void ProjectWidget::updateProjectAccess(const TeraData *access)
 {
     if (m_tableUsers_ids_rows.contains(access->getFieldValue("id_user").toInt())){
         // Already there - update the user access
@@ -93,8 +94,8 @@ void SiteWidget::updateSiteAccess(const TeraData *access)
         QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableUsers->cellWidget(row,1));
         if (combo_roles){
             int index = -1;
-            if (access->hasFieldName("site_access_role"))
-                index = combo_roles->findData(access->getFieldValue("site_access_role").toString());
+            if (access->hasFieldName("project_access_role"))
+                index = combo_roles->findData(access->getFieldValue("project_access_role").toString());
             if (index >= 0){
                 combo_roles->setCurrentIndex(index);
             }else{
@@ -102,8 +103,8 @@ void SiteWidget::updateSiteAccess(const TeraData *access)
             }
             combo_roles->setProperty("original_index", index);
 
-            if (access->hasFieldName("site_access_inherited")){
-                if (access->getFieldValue("site_access_inherited").toBool()){
+            if (access->hasFieldName("project_access_inherited")){
+                if (access->getFieldValue("project_access_inherited").toBool()){
                     // Inherited access - disable combobox
                     combo_roles->setDisabled(true);
                 }
@@ -121,136 +122,142 @@ void SiteWidget::updateSiteAccess(const TeraData *access)
     }
 }
 
-void SiteWidget::updateProject(const TeraData *project)
+void ProjectWidget::updateGroup(const TeraData *group)
 {
-    int id_project = project->getId();
-    if (m_listProjects_items.contains(id_project)){
-        QListWidgetItem* item = m_listProjects_items[id_project];
-        item->setText(project->getName());
+    int id_group = group->getId();
+    if (m_listGroups_items.contains(id_group)){
+        QListWidgetItem* item = m_listGroups_items[id_group];
+        item->setText(group->getName());
     }else{
-        QListWidgetItem* item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_PROJECT)), project->getName());
-        ui->lstProjects->addItem(item);
-        m_listProjects_items[id_project] = item;
+        QListWidgetItem* item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_GROUP)), group->getName());
+        ui->lstGroups->addItem(item);
+        m_listGroups_items[id_group] = item;
     }
 }
 
-void SiteWidget::updateKit(const TeraData *kit)
+void ProjectWidget::updateKit(const TeraData *kit)
 {
     int id_kit = kit->getId();
-    QString project_name = tr("Aucun");
-    if (m_listProjects_items.contains(kit->getFieldValue("id_project").toInt()))
-        project_name = m_listProjects_items[kit->getFieldValue("id_project").toInt()]->text();
+    QString participants_string = tr("Aucun");
+
+    // Build participant string if availables
+    if (kit->hasFieldName("kit_participants")){
+        QVariantList participants = kit->getFieldValue("kit_participants").toList();
+        participants_string = "";
+        for (int i=0; i<participants.count(); i++){
+            QVariantMap part_info = participants.at(i).toMap();
+            participants_string += part_info["participant_name"].toString();
+            if (i<participants.count()-1)
+                participants_string += ", ";
+        }
+    }
 
     if (m_listKits_items.contains(id_kit)){
        QTableWidgetItem* item = m_listKits_items[id_kit];
        item->setText(kit->getName());
-
-        ui->lstKits->item(item->row(), 1)->setText(project_name);
+        ui->lstKits->item(item->row(), 1)->setText(participants_string);
     }else{
         ui->lstKits->setRowCount(ui->lstKits->rowCount()+1);
         QTableWidgetItem* item = new QTableWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_KIT)), kit->getName());
         ui->lstKits->setItem(ui->lstKits->rowCount()-1, 0, item);
         m_listKits_items[id_kit] = item;
 
-        item = new QTableWidgetItem(project_name);
+        item = new QTableWidgetItem(participants_string);
         ui->lstKits->setItem(ui->lstKits->rowCount()-1, 1, item);
     }
 }
 
-void SiteWidget::updateControlsState()
+void ProjectWidget::updateControlsState()
 {
     ui->btnKits->setVisible(!m_limited);
     ui->btnUsers->setVisible(!m_limited);
-    ui->btnProjects->setVisible(!m_limited);
 
 }
 
-void SiteWidget::updateFieldsValue()
+void ProjectWidget::updateFieldsValue()
 {
     if (m_data){
-        ui->wdgSite->fillFormFromData(m_data->toJson());
+        ui->wdgProject->fillFormFromData(m_data->toJson());
     }
 }
 
-bool SiteWidget::validateData()
+bool ProjectWidget::validateData()
 {
-    return ui->wdgSite->validateFormData();
+    return ui->wdgProject->validateFormData();
 }
 
-void SiteWidget::processFormsReply(QString form_type, QString data)
+void ProjectWidget::processFormsReply(QString form_type, QString data)
 {
-    if (form_type == WEB_FORMS_QUERY_SITE){
-        ui->wdgSite->buildUiFromStructure(data);
+    if (form_type == WEB_FORMS_QUERY_PROJECT){
+        ui->wdgProject->buildUiFromStructure(data);
         return;
     }
 }
 
-void SiteWidget::processSiteAccessReply(QList<TeraData> access)
+void ProjectWidget::processProjectAccessReply(QList<TeraData> access)
 {
     if (!m_data)
         return;
 
     for (int i=0; i<access.count(); i++){
-        if (access.at(i).getFieldValue("id_site").toInt() == m_data->getFieldValue("id_site").toInt()){
+        if (access.at(i).getFieldValue("id_project").toInt() == m_data->getId()){
             // Ok, we need to update information in the table
-            updateSiteAccess(&access.at(i));
+            updateProjectAccess(&access.at(i));
         }
-
     }
 }
 
-void SiteWidget::processUsersReply(QList<TeraData> users)
+void ProjectWidget::processUsersReply(QList<TeraData> users)
 {
     for (int i=0; i<users.count(); i++){
-        updateSiteAccess(&users.at(i));
+        updateProjectAccess(&users.at(i));
     }
 
     // Query access for those users
     if (m_data && !dataIsNew()){
         QUrlQuery args;
-        args.addQueryItem(WEB_QUERY_ID_SITE, QString::number(m_data->getFieldValue("id_site").toInt()));
-        queryDataRequest(WEB_SITEACCESS_PATH, args);
+        args.addQueryItem(WEB_QUERY_ID_PROJECT, QString::number(m_data->getId()));
+        queryDataRequest(WEB_PROJECTACCESS_PATH, args);
     }
 }
 
-void SiteWidget::processProjectsReply(QList<TeraData> projects)
+void ProjectWidget::processGroupsReply(QList<TeraData> groups)
 {
     if (!m_data)
         return;
 
-    for (int i=0; i<projects.count(); i++){
-        if (projects.at(i).getFieldValue("id_site") == m_data->getFieldValue("id_site")){
-            updateProject(&projects.at(i));
+    for (int i=0; i<groups.count(); i++){
+        if (groups.at(i).getFieldValue("id_project") == m_data->getId()){
+            updateGroup(&groups.at(i));
         }
     }
 
-    if (isLoading()){
+    /*if (isLoading()){
         // Query kits for that site (depending on projects first to have names)
         QUrlQuery args;
         args.addQueryItem(WEB_QUERY_ID_SITE, QString::number(m_data->getId()));
         args.addQueryItem(WEB_QUERY_LIST, "");
         queryDataRequest(WEB_KITINFO_PATH, args);
-    }
-
+    }*/
 }
 
-void SiteWidget::processKitsReply(QList<TeraData> kits)
+void ProjectWidget::processKitsReply(QList<TeraData> kits)
 {
     if (!m_data)
         return;
 
     for (int i=0; i<kits.count(); i++){
-        if (kits.at(i).getFieldValue("id_site").toInt() == m_data->getId()/*m_listProjects_items.contains(kits.at(i).getFieldValue("id_project").toInt())*/){
+        if (kits.at(i).getFieldValue("id_project").toInt() == m_data->getId()/*m_listProjects_items.contains(kits.at(i).getFieldValue("id_project").toInt())*/){
             updateKit(&kits.at(i));
         }
     }
 
 }
 
-void SiteWidget::btnSave_clicked()
+void ProjectWidget::btnSave_clicked()
 {
     if (!validateData()){
-        QStringList invalids = ui->wdgSite->getInvalidFormDataLabels();
+        QStringList invalids = ui->wdgProject->getInvalidFormDataLabels();
 
         QString msg = tr("Les champs suivants doivent être complétés:") +" <ul>";
         for (QString field:invalids){
@@ -265,7 +272,7 @@ void SiteWidget::btnSave_clicked()
      saveData();
 }
 
-void SiteWidget::btnUndo_clicked()
+void ProjectWidget::btnUndo_clicked()
 {
     undoOrDeleteData();
 
@@ -274,7 +281,7 @@ void SiteWidget::btnUndo_clicked()
 
 }
 
-void SiteWidget::btnUpdateAccess_clicked()
+void ProjectWidget::btnUpdateAccess_clicked()
 {
 
     QJsonDocument document;
@@ -289,40 +296,24 @@ void SiteWidget::btnUpdateAccess_clicked()
             QJsonObject data_obj;
             // Ok, value was modified - must add!
             QJsonValue role = combo_roles->currentData().toString();
-            data_obj.insert("id_site", m_data->getId());
+            data_obj.insert("id_project", m_data->getId());
             data_obj.insert("id_user", user_id);
-            data_obj.insert("site_access_role", role);
+            data_obj.insert("project_access_role", role);
             roles.append(data_obj);
         }
     }
 
     if (!roles.isEmpty()){
-        base_obj.insert("site_access", roles);
+        base_obj.insert("project_access", roles);
         document.setObject(base_obj);
-        postDataRequest(WEB_SITEACCESS_PATH, document.toJson());
+        postDataRequest(WEB_PROJECTACCESS_PATH, document.toJson());
     }
 
 
 
 }
 
-void SiteWidget::btnProjects_clicked()
-{
-    if (m_diag_editor){
-        m_diag_editor->deleteLater();
-    }
-   /* m_diag_editor = new QDialog(this);
-    UserWidget* user_editor = new UserWidget(m_comManager, &(m_comManager->getCurrentUser()), m_diag_editor);
-    user_editor->setLimited(true);
-    connect(user_editor, &UserWidget::closeRequest, m_diag_editor, &QDialog::accept);
-    connect(m_diag_editor, &QDialog::finished, this, &MainWindow::editorDialogFinished);
-
-    m_diag_editor->setWindowTitle(tr("Votre compte"));
-
-    m_diag_editor->open();*/
-}
-
-void SiteWidget::btnKits_clicked()
+void ProjectWidget::btnKits_clicked()
 {
     if (m_diag_editor){
         m_diag_editor->deleteLater();
@@ -336,7 +327,7 @@ void SiteWidget::btnKits_clicked()
     m_diag_editor->open();
 }
 
-void SiteWidget::btnUsers_clicked()
+void ProjectWidget::btnUsers_clicked()
 {
     if (m_diag_editor){
         m_diag_editor->deleteLater();

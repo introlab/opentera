@@ -21,6 +21,8 @@ class QueryParticipants(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id_participant', type=int, help='id_participant')
         parser.add_argument('id_kit', type=int)
+        parser.add_argument('id_site', type=int, help='id site')
+        parser.add_argument('id_group', type=int)
         # parser.add_argument('participant_uuid', type=str, help='participant_uuid')
         # parser.add_argument('participant_name', type=str, help='participant_name')
 
@@ -35,6 +37,10 @@ class QueryParticipants(Resource):
                 participants = TeraParticipant.get_participant_by_id(args['id_participant'])
         elif args['id_kit']:
             participants = user_access.query_participants_for_kit(args['id_kit'])
+        elif args['id_site']:
+            participants = user_access.query_participants_for_site(args['id_site'])
+        elif args['id_group']:
+            participants = user_access.query_participants_for_group(args['id_group'])
 
         try:
             participant_list = []

@@ -58,3 +58,8 @@ python-3.6
 
 # Node modules
 node_modules/
+/teraplus/CMakeLists.txt.user.4.9-pre1
+/teraserver/CMakeLists.txt.user.4.9-pre1
+/teraserver/python/config/TeraServerConfig.ini~0b30c4625222f7c8696ca353a9e47d17d15d6cb5
+/teraserver/python/messages/python/CreateSession_pb2.py
+/teraserver/python/messages/python/TeraMessage_pb2.py

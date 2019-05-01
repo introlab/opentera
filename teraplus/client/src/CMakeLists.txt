@@ -21,6 +21,7 @@ set(headers
     editors/SiteWidget.h
     editors/DeviceWidget.h
     editors/KitWidget.h
+    editors/ProjectWidget.h
 )
 
 set(srcs
@@ -42,6 +43,7 @@ set(srcs
     editors/SiteWidget.cpp
     editors/DeviceWidget.cpp
     editors/KitWidget.cpp
+    editors/ProjectWidget.cpp
 )
 
 SET(uis
@@ -56,6 +58,7 @@ SET(uis
     editors/SiteWidget.ui
     editors/DeviceWidget.ui
     editors/KitWidget.ui
+    editors/ProjectWidget.ui
 )
 
 SET(qrcs

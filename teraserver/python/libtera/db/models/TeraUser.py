@@ -204,11 +204,11 @@ class TeraUser(db.Model, BaseModel):
         db.session.add(user)
 
         # Project Access
-        admin_access = TeraProjectAccess()
-        admin_access.id_user = TeraUser.get_user_by_username('siteadmin').id_user
-        admin_access.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
-        admin_access.project_access_role = 'admin'
-        db.session.add(admin_access)
+        # admin_access = TeraProjectAccess()
+        # admin_access.id_user = TeraUser.get_user_by_username('siteadmin').id_user
+        # admin_access.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
+        # admin_access.project_access_role = 'admin'
+        # db.session.add(admin_access)
 
         user_access = TeraProjectAccess()
         user_access.id_user = TeraUser.get_user_by_username('user').id_user

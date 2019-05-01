@@ -50,6 +50,13 @@ class QueryKits(Resource):
             kit_list = []
             for kit in kits:
                 kit_json = kit.to_json()
+                if args['id_project']:
+                    # Append participant(s) using that kit if querying for a specific project
+                    part_list = []
+                    for part in kit.kit_participants:
+                        part_json = {'id_participant': part.id_participant, 'participant_name': part.participant_name}
+                        part_list.append(part_json)
+                    kit_json['kit_participants'] = part_list
                 kit_list.append(kit_json)
             return jsonify(kit_list)
 

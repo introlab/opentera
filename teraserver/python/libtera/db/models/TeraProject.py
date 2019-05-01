@@ -72,7 +72,9 @@ class TeraProject(db.Model, BaseModel):
     def get_project_by_projectname(projectname):
         return TeraProject.query.filter_by(project_name=projectname).first()
 
-
+    @staticmethod
+    def get_project_by_id(project_id):
+        return TeraProject.query.filter_by(id_project=project_id).first()
 
     @staticmethod
     def query_data(filter_args):
@@ -81,3 +83,20 @@ class TeraProject(db.Model, BaseModel):
         if isinstance(filter_args, dict):
             return TeraProject.query.filter_by(**filter_args).all()
         return None
+
+    @staticmethod
+    def update_project(id_project: int, values={}):
+        TeraProject.query.filter_by(id_project=id_project).update(values)
+        db.session.commit()
+
+    @staticmethod
+    def insert_project(project):
+        project.id_project = None
+
+        db.session.add(project)
+        db.session.commit()
+
+    @staticmethod
+    def delete_project(id_project: int):
+        TeraProject.query.filter_by(id_project=id_project).delete()
+        db.session.commit()

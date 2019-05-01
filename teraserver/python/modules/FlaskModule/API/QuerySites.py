@@ -54,7 +54,7 @@ class QuerySites(Resource):
             for site in sites:
                 if site is not None:
                     site_json = site.to_json()
-                    site_json['site_role'] = user_access.get_site_role(site)
+                    site_json['site_role'] = user_access.get_site_role(site_json['id_site'])
                     sites_list.append(site_json)
             return jsonify(sites_list)
         except InvalidRequestError:

@@ -11,6 +11,9 @@ class TeraSiteAccess(db.Model, BaseModel):
     site_access_site = db.relationship('TeraSite')
     site_access_user = db.relationship('TeraUser')
 
+    def __init__(self):
+        self.site_access_inherited = False
+
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
@@ -29,6 +32,7 @@ class TeraSiteAccess(db.Model, BaseModel):
         super_admin.id_user = user_id
         super_admin.id_site = site_id
         super_admin.site_access_role = 'admin'
+        super_admin.site_access_inherited = True
         super_admin.site_access_user = TeraUser.get_user_by_id(user_id)
         super_admin.site_access_site = TeraSite.get_site_by_id(site_id)
 

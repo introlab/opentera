@@ -5,6 +5,8 @@
 #include <QAction>
 #include <QMenu>
 
+#include <QTreeWidgetItem>
+
 #include "ComManager.h"
 
 namespace Ui {
@@ -25,9 +27,15 @@ public:
     void connectSignals();
 
 private:
-    Ui::ProjectNavigator *ui;
-    ComManager* m_comManager;
-    int m_currentSiteId;
+    Ui::ProjectNavigator        *ui;
+    ComManager*                 m_comManager;
+    int                         m_currentSiteId;
+    int                         m_currentProjectId;
+
+    QMap<int, QTreeWidgetItem*> m_projects_items;
+
+    void updateSite(const TeraData* site);
+    void updateProject(const TeraData* project);
 
     // Ui items
     QList<QAction*> m_newItemActions;
@@ -39,8 +47,10 @@ private slots:
      void newItemRequested();
 
      void processSitesReply(QList<TeraData> sites);
+     void processProjectsReply(QList<TeraData> projects);
 
      void currentSiteChanged();
+     void currentNavItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
      void btnEditSite_clicked();
 
 signals:

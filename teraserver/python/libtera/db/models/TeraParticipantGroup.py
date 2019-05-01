@@ -11,9 +11,22 @@ class TeraParticipantGroup(db.Model, BaseModel):
 
     participantgroup_project = db.relationship('TeraProject')
 
+    def to_json(self, ignore_fields=None, minimal=False):
+        if ignore_fields is None:
+            ignore_fields = []
+        ignore_fields.extend(['participantgroup_project'])
+        rval = super().to_json(ignore_fields=ignore_fields)
+
+        rval['project_name'] = self.participantgroup_project.project_name
+        return rval
+
     @staticmethod
     def get_participant_group_by_group_name(name):
         return TeraParticipantGroup.query.filter_by(participantgroup_name=name).first()
+
+    @staticmethod
+    def get_participant_group_by_id(group_id):
+        return TeraParticipantGroup.query.filter_by(id_participant_group=group_id).first()
 
     @staticmethod
     def create_defaults():

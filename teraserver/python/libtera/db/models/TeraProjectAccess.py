@@ -12,10 +12,36 @@ class TeraProjectAccess(db.Model, BaseModel):
     project_access_project = db.relationship('TeraProject')
     project_access_user = db.relationship('TeraUser')
 
+    def __init__(self):
+        self.project_access_inherited = False
+
+    def to_json(self, ignore_fields=None, minimal=False):
+        if ignore_fields is None:
+            ignore_fields = []
+        ignore_fields.extend(['id_project_access', 'project_access_project', 'project_access_user'])
+        rval = super().to_json(ignore_fields=ignore_fields)
+
+        rval['project_name'] = self.project_access_project.project_name
+        rval['user_name'] = self.project_access_user.get_fullname()
+        return rval
+
     @staticmethod
     def get_count():
         count = db.session.query(db.func.count(TeraProjectAccess.id_project_access))
         return count.first()[0]
+
+    @staticmethod
+    def build_superadmin_access_object(project_id: int, user_id: int):
+        from libtera.db.models.TeraProject import TeraProject
+        from libtera.db.models.TeraUser import TeraUser
+        super_admin = TeraProjectAccess()
+        super_admin.id_user = user_id
+        super_admin.id_project = project_id
+        super_admin.project_access_role = 'admin'
+        super_admin.project_access_inherited = True
+        super_admin.project_access_user = TeraUser.get_user_by_id(user_id)
+        super_admin.project_access_project = TeraProject.get_project_by_id(project_id)
+        return super_admin
 
     @staticmethod
     def update_project_access(id_user: int, id_project: int, rolename: str):
