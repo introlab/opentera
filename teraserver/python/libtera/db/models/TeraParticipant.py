@@ -94,7 +94,7 @@ class TeraParticipant(db.Model, BaseModel):
         participant1.participant_name = 'Test Participant #1'
         participant1.participant_uuid = str(uuid.uuid4())
         participant1.participant_participant_group = \
-            TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group')
+            TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
 
         token1 = participant1.create_token()
         print('token1 ', token1)
@@ -104,7 +104,7 @@ class TeraParticipant(db.Model, BaseModel):
         participant2.participant_name = 'Test Participant #2'
         participant2.participant_uuid = str(uuid.uuid4())
         participant2.participant_participant_group = \
-            TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group')
+            TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group B')
 
         token2 = participant2.create_token()
         print('token2 ', token2)

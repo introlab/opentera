@@ -24,7 +24,10 @@ public:
     void setComManager(ComManager* comMan);
 
     void initUi();
-    void connectSignals();
+
+    int getCurrentSiteId() const;
+
+    void selectItem(const TeraDataTypes& data_type, const int& id);
 
 private:
     Ui::ProjectNavigator        *ui;
@@ -33,21 +36,27 @@ private:
     int                         m_currentProjectId;
 
     QMap<int, QTreeWidgetItem*> m_projects_items;
+    QMap<int, QTreeWidgetItem*> m_groups_items;
 
     void updateSite(const TeraData* site);
     void updateProject(const TeraData* project);
+    void updateGroup(const TeraData* group);
+
+    void connectSignals();
 
     // Ui items
     QList<QAction*> m_newItemActions;
     QMenu*          m_newItemMenu;
 
     QAction* addNewItemAction(const TeraDataTypes &data_type, const QString& label);
+    QAction* getActionForDataType(const TeraDataTypes &data_type);
 
 private slots:
      void newItemRequested();
 
      void processSitesReply(QList<TeraData> sites);
      void processProjectsReply(QList<TeraData> projects);
+     void processGroupsReply(QList<TeraData> groups);
 
      void currentSiteChanged();
      void currentNavItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);

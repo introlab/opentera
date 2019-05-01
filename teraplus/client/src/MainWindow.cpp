@@ -94,6 +94,7 @@ void MainWindow::showDataEditor(const TeraDataTypes &data_type, const TeraData*d
 
     if (m_data_editor){
         ui->wdgMainTop->layout()->addWidget(m_data_editor);
+        connect(m_data_editor, &DataEditorWidget::dataWasDeleted, this, &MainWindow::dataEditorCancelled);
     }else{
         LOG_ERROR("Unhandled data editor: " + TeraData::getPathForDataType(data_type), "MainWindow::showDataEditor");
     }
@@ -164,6 +165,15 @@ void MainWindow::dataDisplayRequested(TeraDataTypes data_type, int data_id)
         return;
     }
 
+    if (data_id == 0){
+        ui->wdgMainMenu->setEnabled(false);
+        TeraData* new_data = new TeraData(data_type);
+        new_data->setId(0);
+        if (data_type == TERADATA_PROJECT)
+            new_data->setFieldValue("id_site", ui->wdgMainMenu->getCurrentSiteId());
+        showDataEditor(data_type, new_data);
+        return;
+    }
 
     // Set flag to wait for that specific data type
     if (m_waiting_for_data_type != TERADATA_NONE)
@@ -174,6 +184,12 @@ void MainWindow::dataDisplayRequested(TeraDataTypes data_type, int data_id)
     query.addQueryItem(WEB_QUERY_ID, QString::number(data_id));
     m_comManager->doQuery(TeraData::getPathForDataType(data_type), query);
 
+}
+
+void MainWindow::dataEditorCancelled()
+{
+    showDataEditor(TERADATA_NONE, nullptr);
+    ui->wdgMainMenu->setEnabled(true);
 }
 
 void MainWindow::updateCurrentUser()
@@ -191,6 +207,17 @@ void MainWindow::processGenericDataReply(QList<TeraData> datas)
         return;
 
     TeraDataTypes item_data_type = datas.first().getDataType();
+
+    if (m_data_editor){
+        if (m_data_editor->getData()->getDataType() == item_data_type && m_data_editor->getData()->getId()==0){
+            // New item that was saved?
+            if (m_data_editor->getData()->getName() == datas.first().getName()){
+                // Yes, it is - close data editor
+                showDataEditor(TERADATA_NONE, nullptr);
+                ui->wdgMainMenu->setEnabled(true);
+            }
+        }
+    }
 
     if (m_waiting_for_data_type != item_data_type)
         return;

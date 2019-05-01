@@ -51,7 +51,18 @@ QLineEdit{background-color: rgba(0,0,0,0);color:rgba(255,255,255,50%);}
 QLineEdit:!enabled{background-color: rgba(0,0,0,0);color:rgba(255,255,255,25%);}
 
 QPlainTextEdit,QLineEdit,QListWidget,QComboBox,QTextEdit,QSpinBox{background-color: rgba(255,255,255,50%); color: black;}
-QComboBox:!enabled{background-color: rgba(0,0,0,150);color:white;border:0}</string>
+QComboBox:!enabled{background-color: rgba(0,0,0,150);color:white;border:0}
+
+QTreeWidget::branch:closed:has-children  {
+            border-image: none;
+            image: url(://controls/branch_closed.png);
+    }
+     
+    QTreeWidget::branch:open:has-children:!has-siblings,
+    QTreeWidget::branch:open:has-children:has-siblings   {
+            border-image: none;
+            image:url(://controls/branch_opened.png);
+    }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_3">

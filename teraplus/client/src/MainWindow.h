@@ -45,6 +45,7 @@ private slots:
 
     void editorDialogFinished();
     void dataDisplayRequested(TeraDataTypes data_type, int data_id);
+    void dataEditorCancelled();
 
     void on_btnCloseMessage_clicked();
     void on_btnLogout_clicked();

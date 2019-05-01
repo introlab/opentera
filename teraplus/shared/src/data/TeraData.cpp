@@ -160,7 +160,7 @@ QString TeraData::getDataTypeName(const TeraDataTypes &data_type)
     case TERADATA_PARTICIPANT:
         return "participant";
     case TERADATA_GROUP:
-        return "participantgroup";
+        return "participant_group";
     case TERADATA_SITEACCESS:
         return "siteaccess";
     case TERADATA_PROJECTACCESS:

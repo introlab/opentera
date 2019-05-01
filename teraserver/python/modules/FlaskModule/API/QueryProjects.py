@@ -65,6 +65,7 @@ class QueryProjects(Resource):
         except InvalidRequestError:
             return '', 500
 
+    @auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('project', type=str, location='json', help='Project to create / update', required=True)
@@ -103,9 +104,9 @@ class QueryProjects(Resource):
             try:
                 new_project = TeraProject()
                 new_project.from_json(json_project)
-                TeraProject.insert_kit(new_project)
+                TeraProject.insert_project(new_project)
                 # Update ID for further use
-                new_project['id_project'] = new_project.id_project
+                json_project['id_project'] = new_project.id_project
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -116,6 +117,7 @@ class QueryProjects(Resource):
 
         return jsonify([update_project.to_json()])
 
+    @auth.login_required
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)

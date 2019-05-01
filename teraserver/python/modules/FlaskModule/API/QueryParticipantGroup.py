@@ -20,6 +20,7 @@ class QueryParticipantGroup(Resource):
 
         parser = reqparse.RequestParser()
         parser.add_argument('id_group', type=int)
+        parser.add_argument('id_project', type=int)
 
         args = parser.parse_args()
 
@@ -30,6 +31,9 @@ class QueryParticipantGroup(Resource):
         elif args['id_group']:
             if args['id_group'] in user_access.get_accessible_groups_ids():
                 groups = TeraParticipantGroup.get_participant_group_by_id(args['id_group'])
+        elif args['id_project']:
+            if args['id_project'] in user_access.get_accessible_projects_ids():
+                groups = TeraParticipantGroup.get_participant_group_for_project(args['id_project'])
 
         try:
             group_list = []

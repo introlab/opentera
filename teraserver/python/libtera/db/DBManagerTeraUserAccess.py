@@ -257,7 +257,7 @@ class DBManagerTeraUserAccess:
             if user.id_user not in users_ids:
                 users_ids.append(user.id_user)
             user_access = DBManagerTeraUserAccess(user=user)
-            if user.user_superadmin or user_access.get_site_role(site_id=site_id):
+            if user.user_superadmin or user_access.get_site_role(site_id=site_id) == 'admin':
                 # Super admin access or site admin = admin in this site
                 super_admin = TeraProjectAccess.build_superadmin_access_object(project_id=project_id,
                                                                                user_id=user.id_user)

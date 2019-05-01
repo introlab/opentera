@@ -23,5 +23,7 @@ class TeraProjectForm:
         section.add_item(TeraFormItem("id_project", gettext("ID Projet"), "hidden", True))
         section.add_item(TeraFormItem("project_name", gettext("Nom du projet"), "text", True))
         section.add_item(TeraFormItem("id_site", gettext("Site"), "array", True, item_values=sites_list))
+        section.add_item(TeraFormItem("project_role", gettext("Rôle"), "hidden"))
+        section.add_item(TeraFormItem("site_name", gettext("Nom du site initial"), "hidden"))
 
         return form.to_dict()

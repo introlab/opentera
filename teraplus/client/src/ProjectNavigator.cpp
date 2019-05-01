@@ -50,10 +50,29 @@ void ProjectNavigator::initUi()
 
 }
 
+int ProjectNavigator::getCurrentSiteId() const
+{
+    return m_currentSiteId;
+}
+
+void ProjectNavigator::selectItem(const TeraDataTypes &data_type, const int &id)
+{
+    if (data_type == TERADATA_PROJECT){
+        if (m_projects_items.contains(id)){
+            ui->treeNavigator->setCurrentItem(m_projects_items[id]);
+        }else{
+            // New item that was just added... save id for later!
+            m_currentProjectId = id;
+        }
+        return;
+    }
+}
+
 void ProjectNavigator::connectSignals()
 {
     connect(m_comManager, &ComManager::sitesReceived, this, &ProjectNavigator::processSitesReply);
     connect(m_comManager, &ComManager::projectsReceived, this, &ProjectNavigator::processProjectsReply);
+    connect(m_comManager, &ComManager::groupsReceived, this, &ProjectNavigator::processGroupsReply);
 
     void (QComboBox::* comboIndexChangedSignal)(int) = &QComboBox::currentIndexChanged;
     connect(ui->cmbSites, comboIndexChangedSignal, this, &ProjectNavigator::currentSiteChanged);
@@ -103,6 +122,50 @@ void ProjectNavigator::updateProject(const TeraData *project)
 
     item->setText(0, project->getName());
     item->setIcon(0, QIcon(TeraData::getIconFilenameForDataType(TERADATA_PROJECT)));
+
+    if (m_currentProjectId != id_project && m_currentProjectId >0){
+        // Ensure correct project is selected
+        ui->treeNavigator->setCurrentItem(item);
+    }
+}
+
+void ProjectNavigator::updateGroup(const TeraData *group)
+{
+    int id_group = group->getId();
+    int id_project = group->getFieldValue("id_project").toInt();
+
+    // Check if current project exists
+    if (!m_projects_items.contains(id_project)){
+        LOG_WARNING("Project ID " + QString::number(id_project) + " not found for group " + group->getName(), "ProjectNavigator::updateGroup");
+        return;
+    }
+
+    // Check if group is for the current project
+    if (id_project != m_currentProjectId){
+        // Maybe that group changed project...
+        if (m_groups_items.contains(id_group)){
+            // It did - remove it from list.
+            delete m_groups_items[id_group];
+            m_groups_items.remove(id_group);
+        }
+        return;
+    }
+
+    QTreeWidgetItem* item;
+    if (m_groups_items.contains(id_group)){
+        // group already there
+        item = m_groups_items[id_group];
+    }else{
+        // New group - add it.
+        item = new QTreeWidgetItem();
+        QTreeWidgetItem* project_item = m_projects_items[id_project];
+        project_item->addChild(item);
+        m_groups_items[id_group] = item;
+        project_item->setExpanded(true);
+    }
+
+    item->setText(0, group->getName());
+    item->setIcon(0, QIcon(TeraData::getIconFilenameForDataType(TERADATA_GROUP)));
 }
 
 QAction *ProjectNavigator::addNewItemAction(const TeraDataTypes &data_type, const QString &label)
@@ -117,6 +180,20 @@ QAction *ProjectNavigator::addNewItemAction(const TeraDataTypes &data_type, cons
     return new_action;
 }
 
+QAction *ProjectNavigator::getActionForDataType(const TeraDataTypes &data_type)
+{
+    QAction* action = nullptr;
+
+    for (int i=0; i<m_newItemActions.count(); i++){
+        if (static_cast<TeraDataTypes>(m_newItemActions.at(i)->data().toInt()) == data_type){
+            action = m_newItemActions.at(i);
+            break;
+        }
+    }
+
+    return action;
+}
+
 void ProjectNavigator::newItemRequested()
 {
     QAction* action = dynamic_cast<QAction*>(QObject::sender());
@@ -125,15 +202,16 @@ void ProjectNavigator::newItemRequested()
         /*if (data_type == TERADATA_SITE){
             qDebug() << "New site";
         }*/
-        if (data_type == TERADATA_PROJECT){
-            qDebug() << "New project";
+        /*if (data_type == TERADATA_PROJECT){
+
         }
         if (data_type == TERADATA_GROUP){
             qDebug() << "New group";
         }
         if (data_type == TERADATA_PARTICIPANT){
             qDebug() << "New participant";
-        }
+        }*/
+        emit dataDisplayRequest(data_type, 0);
     }
 }
 
@@ -156,20 +234,33 @@ void ProjectNavigator::processProjectsReply(QList<TeraData> projects)
     }
 }
 
+void ProjectNavigator::processGroupsReply(QList<TeraData> groups)
+{
+    for (int i=0; i<groups.count(); i++){
+        updateGroup(&groups.at(i));
+    }
+}
+
 void ProjectNavigator::currentSiteChanged()
 {
     m_currentSiteId = ui->cmbSites->currentData().toInt();
-
-    // Check if user is admin of that site. If so, enable the edit button.
-    ui->btnEditSite->setVisible(m_comManager->getCurrentUserSiteRole(m_currentSiteId)=="admin");
 
     // Clear main display
     emit dataDisplayRequest(TERADATA_NONE, 0);
 
     // Clear all data
     m_projects_items.clear();
+    m_groups_items.clear();
     m_currentProjectId = -1;
     ui->treeNavigator->clear();
+
+    // Update UI according to actions availables
+    bool is_site_admin = m_comManager->getCurrentUserSiteRole(m_currentSiteId)=="admin";
+    ui->btnEditSite->setVisible(is_site_admin);
+    QAction* new_project = getActionForDataType(TERADATA_PROJECT);
+    if (new_project){
+        new_project->setEnabled(is_site_admin);
+    }
 
     // Query projects for that site
     QUrlQuery query;
@@ -188,6 +279,11 @@ void ProjectNavigator::currentNavItemChanged(QTreeWidgetItem *current, QTreeWidg
         emit dataDisplayRequest(TERADATA_PROJECT, id);
         m_currentProjectId = id;
 
+        // Request groups for that project
+        QUrlQuery query;
+        query.addQueryItem(WEB_QUERY_ID_PROJECT, QString::number(m_currentProjectId));
+        query.addQueryItem(WEB_QUERY_LIST, "");
+        m_comManager->doQuery(WEB_GROUPINFO_PATH, query);
     }
 }
 
