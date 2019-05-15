@@ -54,13 +54,6 @@ if __name__ == '__main__':
     config_file = application_path + os.sep + 'config' + os.sep + 'TeraServerConfig.ini'
     config_man.load_config(config_file)
 
-    # We should remove that soon...
-    # setup_redis(config_man)
-
-    # print('Rdis started:', get_redis())
-    # if get_redis() is None:
-        # print('error...')
-
     # DATABASE CONFIG AND OPENING
     #############################
     POSTGRES = {
