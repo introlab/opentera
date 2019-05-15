@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-04-25 09:08-0400\n"
+"POT-Creation-Date: 2019-05-15 10:06-0400\n"
 "PO-Revision-Date: 2019-03-28 16:24-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -19,8 +19,8 @@ msgstr ""
 "Generated-By: Babel 2.6.0\n"
 
 #: libtera/forms/TeraDeviceForm.py:26 libtera/forms/TeraKitDeviceForm.py:25
-#: libtera/forms/TeraKitForm.py:24 libtera/forms/TeraSiteForm.py:12
-#: libtera/forms/TeraUserForm.py:12
+#: libtera/forms/TeraKitForm.py:24 libtera/forms/TeraProjectForm.py:19
+#: libtera/forms/TeraSiteForm.py:12 libtera/forms/TeraUserForm.py:12
 msgid "Informations"
 msgstr ""
 
@@ -93,7 +93,7 @@ msgstr ""
 msgid "Nom du kit"
 msgstr ""
 
-#: libtera/forms/TeraKitForm.py:30
+#: libtera/forms/TeraKitForm.py:30 libtera/forms/TeraProjectForm.py:25
 msgid "Site"
 msgstr ""
 
@@ -103,6 +103,22 @@ msgstr ""
 
 #: libtera/forms/TeraKitForm.py:32
 msgid "Kit partageable?"
+msgstr ""
+
+#: libtera/forms/TeraProjectForm.py:23
+msgid "ID Projet"
+msgstr ""
+
+#: libtera/forms/TeraProjectForm.py:24
+msgid "Nom du projet"
+msgstr ""
+
+#: libtera/forms/TeraProjectForm.py:26
+msgid "Rôle"
+msgstr ""
+
+#: libtera/forms/TeraProjectForm.py:27
+msgid "Nom du site initial"
 msgstr ""
 
 #: libtera/forms/TeraSiteForm.py:16
@@ -241,15 +257,15 @@ msgstr ""
 msgid "Permettre l'accès via le web"
 msgstr ""
 
-#: modules/FlaskModule/API/QueryUsers.py:131
+#: modules/FlaskModule/API/QueryUsers.py:136
 msgid "Password required"
 msgstr ""
 
-#: modules/FlaskModule/API/QueryUsers.py:133
+#: modules/FlaskModule/API/QueryUsers.py:138
 msgid "Invalid password"
 msgstr ""
 
-#: modules/FlaskModule/API/QueryUsers.py:137
+#: modules/FlaskModule/API/QueryUsers.py:142
 msgid "Username unavailable."
 msgstr ""
 

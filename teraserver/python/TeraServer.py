@@ -37,15 +37,6 @@ import os
 
 from sqlalchemy.exc import OperationalError
 
-reactor_running = True
-
-
-def reactor_is_shutting_down():
-    print('before_shutdown')
-    global reactor_running
-    reactor_running = False
-
-
 if __name__ == '__main__':
 
     config_man = ConfigManager()
@@ -105,6 +96,5 @@ if __name__ == '__main__':
     webrtc_module = WebRTCModule(config_man)
     
     # This is blocking, running event loop
-    # reactor.addSystemEventTrigger('before', 'shutdown', reactor_is_shutting_down)
     twisted_module.run()
 
