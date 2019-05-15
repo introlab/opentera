@@ -10,7 +10,7 @@ from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraDevice import TeraDevice
 
 from modules.Globals import auth
-from modules.RedisModule.RedisModule import get_redis
+
 from libtera.ConfigManager import ConfigManager
 import datetime
 
@@ -28,10 +28,10 @@ current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_dev
 
 class LoginModule(RedisClient):
 
-    login_manager = LoginManager()
-
     def __init__(self, config: ConfigManager):
         self.config = config
+
+        self.login_manager = LoginManager()
 
         # Init RedisClient
         RedisClient.__init__(self, config=self.config.redis_config)
@@ -50,6 +50,31 @@ class LoginModule(RedisClient):
                                  'REMEMBER_COOKIE_SECURE': True,
                                  'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
                                  'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
+
+        # Setup user loader function
+        self.login_manager.user_loader(self.load_user)
+
+        # Setup verify password function
+        auth.verify_password(self.verify_password)
+
+    def load_user(self, user_id):
+        print('LoginModule - load_user', user_id)
+        return TeraUser.get_user_by_uuid(user_id)
+
+    def verify_password(self, username, password):
+        print('LoginModule - Verifying password for ', username)
+
+        if TeraUser.verify_password(username=username, password=password):
+            registered_user = TeraUser.get_user_by_username(username)
+            print('Found user: ', registered_user)
+            registered_user.update_last_online()
+
+            login_user(registered_user, remember=True)
+            print('Setting key with expiration in 60s', session['_id'], session['user_id'])
+
+            self.redisSet(session['_id'], session['user_id'], ex=60)
+            return True
+        return False
 
     @staticmethod
     def token_required(f):
@@ -81,30 +106,3 @@ class LoginModule(RedisClient):
             return 'Forbidden', 403
 
         return decorated
-
-    @staticmethod
-    @login_manager.user_loader
-    def load_user(user_id):
-        print('LoginModule - load_user', user_id)
-        return TeraUser.get_user_by_uuid(user_id)
-
-    @staticmethod
-    @auth.verify_password
-    def verify_password(username, password):
-        print('LoginModule - Verifying password for ', username)
-
-        if TeraUser.verify_password(username=username, password=password):
-            registered_user = TeraUser.get_user_by_username(username)
-            print('Found user: ', registered_user)
-            registered_user.update_last_online()
-
-            login_user(registered_user, remember=True)
-            print('Setting key with expiration in 60s', session['_id'], session['user_id'])
-
-            get_redis().set(session['_id'], session['user_id'], ex=60)
-            return True
-        return False
-
-
-
-

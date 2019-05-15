@@ -30,8 +30,6 @@ from modules.TwistedModule.TwistedModule import TwistedModule
 
 from libtera.ConfigManager import ConfigManager
 from modules.Globals import db_man
-from modules.RedisModule.RedisModule import setup_redis
-from modules.RedisModule.RedisModule import get_redis
 from modules.UserManagerModule.UserManagerModule import UserManagerModule
 from modules.WebRTCModule.WebRTCModule import WebRTCModule
 
@@ -66,11 +64,11 @@ if __name__ == '__main__':
     config_man.load_config(config_file)
 
     # We should remove that soon...
-    setup_redis(config_man)
+    # setup_redis(config_man)
 
-    print('Rdis started:', get_redis())
-    if get_redis() is None:
-        print('error...')
+    # print('Rdis started:', get_redis())
+    # if get_redis() is None:
+        # print('error...')
 
     # DATABASE CONFIG AND OPENING
     #############################

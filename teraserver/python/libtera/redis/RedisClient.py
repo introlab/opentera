@@ -4,14 +4,11 @@ from libtera.redis.RedisProtocolFactory import RedisProtocolFactory, redisProtoc
 from twisted.application import internet, service
 from twisted.internet import reactor, ssl, defer
 
-
 # Event based, twisted redis
 import txredisapi as txredis
 
 # Blocking redis
 import redis
-
-from modules.RedisModule.RedisModule import get_redis
 
 
 class RedisClient:
