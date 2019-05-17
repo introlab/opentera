@@ -9,7 +9,7 @@ import subprocess
 class WebRTCModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
-        BaseModule.__init__(self, ModuleNames.WEBRTC_MODULE_NAME, config)
+        BaseModule.__init__(self, ModuleNames.WEBRTC_MODULE_NAME.value, config)
         self.processList = []
 
     def __del__(self):

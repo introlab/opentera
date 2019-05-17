@@ -26,7 +26,7 @@ class TwistedModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
 
-        BaseModule.__init__(self, ModuleNames.TWISTED_MODULE_NAME, config)
+        BaseModule.__init__(self, ModuleNames.TWISTED_MODULE_NAME.value, config)
 
         print('setup_twisted')
 

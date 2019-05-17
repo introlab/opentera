@@ -30,7 +30,7 @@ class LoginModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
 
-        BaseModule.__init__(self, ModuleNames.LOGIN_MODULE_NAME, config)
+        BaseModule.__init__(self, ModuleNames.LOGIN_MODULE_NAME.value, config)
 
         self.login_manager = LoginManager()
 

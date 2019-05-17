@@ -1,5 +1,7 @@
 from libtera.ConfigManager import ConfigManager
+from messages.python.TeraMessage_pb2 import TeraMessage
 from messages.python.CreateSession_pb2 import CreateSession
+from messages.python.UserConnected_pb2 import UserConnected
 from modules.BaseModule import BaseModule, ModuleNames
 
 
@@ -24,7 +26,7 @@ class OnlineUserRegistry:
 class UserManagerModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
-        BaseModule.__init__(self, ModuleNames.USER_MANAGER_MODULE_NAME, config)
+        BaseModule.__init__(self, ModuleNames.USER_MANAGER_MODULE_NAME.value, config)
 
         # Create user registry
         self.registry = OnlineUserRegistry()
@@ -59,7 +61,17 @@ class UserManagerModule(BaseModule):
         We have received a published message from redis
         """
         print('UserManagerModule - Received message ', pattern, channel, message)
-        pass
+
+        tera_message = TeraMessage()
+        tera_message.ParseFromString(message)
+
+        # We have a repeated Any field look for message type
+        for any_msg in tera_message.data:
+            print('any_msg', any_msg)
+            # Test for UserConnected
+            user_connected = UserConnected()
+            if any_msg.Unpack(user_connected):
+                print('Working unpack!')
 
     def handle_api_messages(self, module, uuid, message):
         print('handle_api_messages', module, uuid, message)

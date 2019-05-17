@@ -35,7 +35,7 @@ class FlaskModule(BaseModule):
 
     def __init__(self,  config: ConfigManager):
 
-        BaseModule.__init__(self, ModuleNames.FLASK_MODULE_NAME, config)
+        BaseModule.__init__(self, ModuleNames.FLASK_MODULE_NAME.value, config)
 
         flask_app.debug = True
         flask_app.secret_key = 'development'

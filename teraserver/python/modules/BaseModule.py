@@ -12,6 +12,10 @@ class ModuleNames(Enum):
     USER_MANAGER_MODULE_NAME = str("UserManagerModule")
 
 
+def create_module_topic_from_name(name: ModuleNames):
+    return 'module.' + name.value + '.messages'
+
+
 class BaseModule(RedisClient):
     """
         BaseModule will handle basic registration of topics and events.
@@ -53,3 +57,5 @@ class BaseModule(RedisClient):
         """
         print('BaseModule - Received message ', pattern, channel, message)
         pass
+
+

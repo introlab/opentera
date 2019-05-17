@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package opentera.protobuf;
+
+message UserConnected {
+
+    string user_uuid = 1;
+    string reply_to = 2;
+
+}
