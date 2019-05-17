@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package opentera.protobuf;
 
-message UserConnected {
+message UserDisconnected {
 
     string user_uuid = 1;
 }

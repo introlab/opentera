@@ -12,8 +12,10 @@ from modules.BaseModule import ModuleNames, create_module_topic_from_name
 # Messages
 from messages.python.TeraMessage_pb2 import TeraMessage
 from messages.python.UserConnected_pb2 import UserConnected
+from messages.python.UserDisconnected_pb2 import UserDisconnected
 from google.protobuf.any_pb2 import Any
 import datetime
+
 
 class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
 
@@ -98,35 +100,13 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
     def onOpen(self):
         if self.user:
             # Advertise that we have a new user
-            self.publish('websocket.' + str(self.user.user_uuid), 'connected')
-            tera_message = TeraMessage()
-            protobuf_message = UserConnected()
-            protobuf_message.user_uuid = str(self.user.user_uuid)
-            protobuf_message.reply_to = self.answer_topic()
+            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            user_connected = UserConnected()
+            user_connected.user_uuid = str(self.user.user_uuid)
 
-            """
-                message Header {
-                    uint32 version = 1;
-                    int64 time = 2;
-                    uint32 seq = 3;
-                    string source = 4;
-                    string dest = 5;
-                }
-            
-                Header head = 1;
-            
-                repeated google.protobuf.Any data = 2;
-            """
-
-            # TODO too complicated....
-            tera_message.head.version = 1
-            # tera_message.head.time = datetime.datetime.now().timestamp()
-            # tera_message.head.seq = 0
-            tera_message.head.source = self.answer_topic()
-            tera_message.head.dest = create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
-
+            # Need to use Any container
             any_message = Any()
-            any_message.Pack(protobuf_message)
+            any_message.Pack(user_connected)
             tera_message.data.extend([any_message])
 
             # Publish to login module (bytes)
@@ -134,7 +114,7 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
                          tera_message.SerializeToString())
 
             # At this stage, we can send messages. initiating...
-            self.sendMessage(bytes('Hello ' + str(self.user), 'utf-8'), False)
+            self.sendMessage(bytes('Hello ' + str(self.user.user_username), 'utf-8'), False)
         elif self.participant:
             # Advertise that we have a new user
             self.publish('websocket.' + str(self.participant.participant_uuid), 'connected')
@@ -143,9 +123,22 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
 
     def onClose(self, wasClean, code, reason):
         if self.user:
-            self.publish('websocket.' + str(self.user.user_uuid), 'disconnected')
+            # Advertise that we have a new user
+            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            user_disconnected = UserDisconnected()
+            user_disconnected.user_uuid = str(self.user.user_uuid)
+
+            # Need to use Any container
+            any_message = Any()
+            any_message.Pack(user_disconnected)
+            tera_message.data.extend([any_message])
+
+            # Publish to login module (bytes)
+            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+                         tera_message.SerializeToString())
+
         elif self.participant:
-            self.publish('websocket.' + str(self.participant.participant_uuid), 'disconnected')
+            pass
 
         print('onClose', self, wasClean, code, reason)
 
@@ -157,3 +150,13 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
             return 'websocket.user.' + self.user.user_uuid
         if self.participant:
             return 'websocket.participant.' + self.participant.participant_uuid
+
+    def create_tera_message(self, dest=''):
+
+        tera_message = TeraMessage()
+        tera_message.head.version = 1
+        # tera_message.head.time = datetime.datetime.now().timestamp()
+        tera_message.head.seq = 0
+        tera_message.head.source = self.answer_topic()
+        tera_message.head.dest = dest
+        return tera_message

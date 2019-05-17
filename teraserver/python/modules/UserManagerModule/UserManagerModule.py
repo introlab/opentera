@@ -2,6 +2,7 @@ from libtera.ConfigManager import ConfigManager
 from messages.python.TeraMessage_pb2 import TeraMessage
 from messages.python.CreateSession_pb2 import CreateSession
 from messages.python.UserConnected_pb2 import UserConnected
+from messages.python.UserDisconnected_pb2 import UserDisconnected
 from modules.BaseModule import BaseModule, ModuleNames
 
 
@@ -63,15 +64,25 @@ class UserManagerModule(BaseModule):
         print('UserManagerModule - Received message ', pattern, channel, message)
 
         tera_message = TeraMessage()
-        tera_message.ParseFromString(message)
+        tera_message.ParseFromString(message.encode('utf-8'))
 
         # We have a repeated Any field look for message type
         for any_msg in tera_message.data:
-            print('any_msg', any_msg)
             # Test for UserConnected
             user_connected = UserConnected()
             if any_msg.Unpack(user_connected):
-                print('Working unpack!')
+                self.handle_user_connected(tera_message.head, user_connected)
+
+            # Test for UserDisconnected
+            user_disconnected = UserDisconnected()
+            if any_msg.Unpack(user_disconnected):
+                self.handle_user_disconnected(tera_message.head, user_disconnected)
+
+    def handle_user_connected(self, header, user_connected):
+        self.registry.user_online(user_connected.user_uuid)
+
+    def handle_user_disconnected(self, header, user_disconnected):
+        self.registry.user_offline(user_disconnected.user_uuid)
 
     def handle_api_messages(self, module, uuid, message):
         print('handle_api_messages', module, uuid, message)
@@ -84,12 +95,6 @@ class UserManagerModule(BaseModule):
 
     def handle_websocket_messages(self, uuid, message):
         print('handle_websocket_messages', uuid, message)
-        if message == b'connected' or message == 'connected':
-            self.registry.user_online(uuid)
-            return True
-        if message == b'disconnected' or message == 'disconnected':
-            self.registry.user_offline(uuid)
-            return True
         if message == b'list' or message == 'list':
             online_users = str(self.registry.online_users())
             # Answer
