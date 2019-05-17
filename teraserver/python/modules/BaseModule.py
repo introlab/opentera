@@ -1,5 +1,15 @@
 from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
+from enum import Enum, unique
+
+
+@unique
+class ModuleNames(Enum):
+    FLASK_MODULE_NAME = str("FlaskModule")
+    WEBRTC_MODULE_NAME = str("WebRTCModule")
+    TWISTED_MODULE_NAME = str("TwistedModule")
+    LOGIN_MODULE_NAME = str("LoginModule")
+    USER_MANAGER_MODULE_NAME = str("UserManagerModule")
 
 
 class BaseModule(RedisClient):

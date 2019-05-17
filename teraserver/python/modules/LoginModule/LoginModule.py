@@ -3,7 +3,7 @@ from flask_login import LoginManager, login_user, logout_user
 from flask import session, jsonify
 
 from modules.FlaskModule.FlaskModule import flask_app
-from modules.BaseModule import BaseModule
+from modules.BaseModule import BaseModule, ModuleNames
 
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraParticipant import TeraParticipant
@@ -30,7 +30,7 @@ class LoginModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
 
-        BaseModule.__init__(self, "LoginModule", config)
+        BaseModule.__init__(self, ModuleNames.LOGIN_MODULE_NAME, config)
 
         self.login_manager = LoginManager()
 

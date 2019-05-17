@@ -1,6 +1,7 @@
 from modules.FlaskModule.FlaskModule import flask_app
-from modules.BaseModule import BaseModule
+from modules.BaseModule import BaseModule, ModuleNames
 from libtera.ConfigManager import ConfigManager
+
 
 # Same directory
 from .TwistedModuleWebSocketServerFactory import TwistedModuleWebSocketServerFactory
@@ -25,7 +26,7 @@ class TwistedModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
 
-        BaseModule.__init__(self, "TwistedModule", config)
+        BaseModule.__init__(self, ModuleNames.TWISTED_MODULE_NAME, config)
 
         print('setup_twisted')
 

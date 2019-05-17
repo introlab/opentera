@@ -1,7 +1,7 @@
-from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
 from messages.python.CreateSession_pb2 import CreateSession
-from modules.BaseModule import BaseModule
+from modules.BaseModule import BaseModule, ModuleNames
+
 import os
 import subprocess
 
@@ -9,7 +9,7 @@ import subprocess
 class WebRTCModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
-        BaseModule.__init__(self, "WebRTCModule", config)
+        BaseModule.__init__(self, ModuleNames.WEBRTC_MODULE_NAME, config)
         self.processList = []
 
     def __del__(self):

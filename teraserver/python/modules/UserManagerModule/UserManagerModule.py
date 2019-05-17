@@ -1,6 +1,6 @@
 from libtera.ConfigManager import ConfigManager
 from messages.python.CreateSession_pb2 import CreateSession
-from modules.BaseModule import BaseModule
+from modules.BaseModule import BaseModule, ModuleNames
 
 
 class OnlineUserRegistry:
@@ -24,7 +24,7 @@ class OnlineUserRegistry:
 class UserManagerModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
-        BaseModule.__init__(self, "UserManagerModule", config)
+        BaseModule.__init__(self, ModuleNames.USER_MANAGER_MODULE_NAME, config)
 
         # Create user registry
         self.registry = OnlineUserRegistry()

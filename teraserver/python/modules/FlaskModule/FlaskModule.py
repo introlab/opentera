@@ -4,7 +4,7 @@ from flask_restful import Api
 from libtera.ConfigManager import ConfigManager
 from flask_babel import Babel
 
-from modules.BaseModule import BaseModule
+from modules.BaseModule import BaseModule, ModuleNames
 
 flask_app = Flask("OpenTera")
 
@@ -35,7 +35,7 @@ class FlaskModule(BaseModule):
 
     def __init__(self,  config: ConfigManager):
 
-        BaseModule.__init__(self, "FlaskModule", config)
+        BaseModule.__init__(self, ModuleNames.FLASK_MODULE_NAME, config)
 
         flask_app.debug = True
         flask_app.secret_key = 'development'
