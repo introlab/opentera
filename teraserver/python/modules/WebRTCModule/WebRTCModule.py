@@ -1,22 +1,31 @@
 from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
 from messages.python.CreateSession_pb2 import CreateSession
+from modules.BaseModule import BaseModule
 import os
 import subprocess
 
 
-# Will use twisted Async Redis client
-class WebRTCModule(RedisClient):
+class WebRTCModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
-        self.config = config
+        BaseModule.__init__(self, "WebRTCModule", config)
         self.processList = []
-        RedisClient.__init__(self, config=self.config.redis_config)
-        # self.launch_node()
 
-    def redisConnectionMade(self):
-        print('WebRTCModule.redisConnectionMade')
-        self.subscribe('webrtc.*')
+    def __del__(self):
+        self.unsubscribe_pattern_with_callback("webrtc.*", self.webrtc_message_callback_deprecated)
+
+    def setup_module_pubsub(self):
+        # Additional subscribe
+        # TODO change those messages to use complete protobuf messaging system
+        self.subscribe_pattern_with_callback("webrtc.*", self.webrtc_message_callback_deprecated)
+
+    def notify_module_messages(self, pattern, channel, message):
+        """
+        We have received a published message from redis
+        """
+        print('WebRTCModule - Received message ', pattern, channel, message)
+        pass
 
     def create_session(self, message: CreateSession):
 
@@ -26,11 +35,11 @@ class WebRTCModule(RedisClient):
         port = 8080
         key = "test"
 
-        url = 'https://'+self.config.webrtc_config['hostname'] + ':' + str(port) + '?key=' + key
+        url = 'https://'+self.config.webrtc_config['hostname'] + ':' + str(port) + '/teraplus?key=' + key
         self.launch_node(port=port, key=key)
         self.publish(message.reply_to, url)
 
-    def redisMessageReceived(self, pattern, channel, message):
+    def webrtc_message_callback_deprecated(self, pattern, channel, message):
         print('WebRTCModule message received', pattern, channel, message)
         parts = channel.split('.')
         if len(parts) == 2 and 'webrtc' in parts[0]:

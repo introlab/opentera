@@ -1,5 +1,10 @@
 from modules.FlaskModule.FlaskModule import flask_app
 from modules.BaseModule import BaseModule
+from libtera.ConfigManager import ConfigManager
+
+# Same directory
+from .TwistedModuleWebSocketServerFactory import TwistedModuleWebSocketServerFactory
+from .TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
 
 # WebSockets
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
@@ -13,16 +18,7 @@ from twisted.web.static import File
 from twisted.web.wsgi import WSGIResource
 from twisted.python import log
 
-
 import sys
-
-from libtera.redis.RedisClient import RedisClient
-from libtera.ConfigManager import ConfigManager
-
-
-# Same directory
-from .TwistedModuleWebSocketServerFactory import TwistedModuleWebSocketServerFactory
-from .TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
 
 
 class TwistedModule(BaseModule):
@@ -67,18 +63,18 @@ class TwistedModule(BaseModule):
                                                            self.config.server_config['ssl_path'] + '/cert.crt'))
         print('setup_twisted done')
 
-    def notify_module_messages(self, pattern, channel, message):
-        """
-        We have received a published message from redis
-        """
-        print('TwistedModule - Received message ', pattern, channel, message)
-        pass
-
     def __del__(self):
         pass
 
     def setup_module_pubsub(self):
         # Additional subscribe
+        pass
+
+    def notify_module_messages(self, pattern, channel, message):
+        """
+        We have received a published message from redis
+        """
+        print('TwistedModule - Received message ', pattern, channel, message)
         pass
 
     def run(self):

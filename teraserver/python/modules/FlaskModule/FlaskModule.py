@@ -1,9 +1,10 @@
 from flask import Flask, request, g
 from flask_session import Session
 from flask_restful import Api
-from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
 from flask_babel import Babel
+
+from modules.BaseModule import BaseModule
 
 flask_app = Flask("OpenTera")
 
@@ -30,14 +31,11 @@ def get_timezone():
         return user.timezone
 
 
-class FlaskModule(RedisClient):
+class FlaskModule(BaseModule):
 
     def __init__(self,  config: ConfigManager):
 
-        self.config = config
-
-        # Init RedisClient
-        RedisClient.__init__(self, config=self.config.redis_config)
+        BaseModule.__init__(self, "FlaskModule", config)
 
         flask_app.debug = True
         flask_app.secret_key = 'development'
@@ -57,6 +55,17 @@ class FlaskModule(RedisClient):
 
         # Init Views
         self.init_views()
+
+    def setup_module_pubsub(self):
+        # Additional subscribe
+        pass
+
+    def notify_module_messages(self, pattern, channel, message):
+        """
+        We have received a published message from redis
+        """
+        print('FlaskModule - Received message ', pattern, channel, message)
+        pass
 
     def init_api(self):
         # from .API.Index import Index

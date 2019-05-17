@@ -3,8 +3,8 @@ from flask_login import LoginManager, login_user, logout_user
 from flask import session, jsonify
 
 from modules.FlaskModule.FlaskModule import flask_app
+from modules.BaseModule import BaseModule
 
-from libtera.redis.RedisClient import RedisClient
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraDevice import TeraDevice
@@ -26,18 +26,27 @@ current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'curren
 current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_device', None))
 
 
-class LoginModule(RedisClient):
+class LoginModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
-        self.config = config
+
+        BaseModule.__init__(self, "LoginModule", config)
 
         self.login_manager = LoginManager()
 
-        # Init RedisClient
-        RedisClient.__init__(self, config=self.config.redis_config)
-
         # Setup login manager
         self.setup_login_manager()
+
+    def setup_module_pubsub(self):
+        # Additional subscribe
+        pass
+
+    def notify_module_messages(self, pattern, channel, message):
+        """
+        We have received a published message from redis
+        """
+        print('LoginModule - Received message ', pattern, channel, message)
+        pass
 
     def setup_login_manager(self):
         self.login_manager.init_app(flask_app)
