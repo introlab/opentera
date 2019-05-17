@@ -1,8 +1,7 @@
-from flask import jsonify
-from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
-from modules.FlaskModule.FlaskModule import flask_app
 from messages.python.CreateSession_pb2 import CreateSession
+from modules.BaseModule import BaseModule
+
 
 class OnlineUserRegistry:
     def __init__(self):
@@ -22,18 +21,45 @@ class OnlineUserRegistry:
         return self.user_list
 
 
-# Will use twisted Async Redis client
-class UserManagerModule(RedisClient):
+class UserManagerModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
-        self.redis_config = config.redis_config
-        super().__init__(config=self.redis_config)
+        BaseModule.__init__(self, "UserManagerModule", config)
+
+        # Create user registry
         self.registry = OnlineUserRegistry()
 
-    def redisConnectionMade(self):
-        print('UserManagerModule.connectionMade')
-        self.subscribe('websocket.*')
-        self.subscribe('api.*')
+    def __del__(self):
+        self.unsubscribe_pattern_with_callback("websocket.*", self.notify_websocket_messages_deprecated)
+        self.unsubscribe_pattern_with_callback("api.*", self.notify_api_messages_deprecated)
+
+    def setup_module_pubsub(self):
+        # Additional subscribe (old stuff to be removed)
+        self.subscribe_pattern_with_callback("websocket.*", self.notify_websocket_messages_deprecated)
+        self.subscribe_pattern_with_callback("api.*", self.notify_api_messages_deprecated)
+
+    def notify_websocket_messages_deprecated(self, pattern, channel, message):
+        """
+        Deprecated, should be replaced with protobuf messages
+        """
+        parts = channel.split('.')
+        if 'websocket' in parts[0]:
+            self.handle_websocket_messages(parts[1], message)
+
+    def notify_api_messages_deprecated(self, pattern, channel, message):
+        """
+            Deprecated, should be replaced with protobuf messages
+        """
+        parts = channel.split('.')
+        if 'api' in parts[0]:
+            self.handle_api_messages(parts[1], parts[2], message)
+
+    def notify_module_messages(self, pattern, channel, message):
+        """
+        We have received a published message from redis
+        """
+        print('UserManagerModule - Received message ', pattern, channel, message)
+        pass
 
     def handle_api_messages(self, module, uuid, message):
         print('handle_api_messages', module, uuid, message)
@@ -64,22 +90,10 @@ class UserManagerModule(RedisClient):
                                              command='create_session',
                                              reply_to='server.' + uuid + '.create_session')
 
-            test =  protobuf_message.SerializeToString()
-
-            len_test = len(test)
-
             # Send message to WebRTCModule
             self.publish('webrtc.' + 'create_session', protobuf_message.SerializeToString())
 
         print('Error unhandled message ', uuid, message)
         return False
-
-    def redisMessageReceived(self, pattern, channel, message):
-        print('UserManagerModule message received', pattern, channel, message)
-        parts = channel.split('.')
-        if 'websocket' in parts[0]:
-            self.handle_websocket_messages(parts[1], message)
-        elif 'api' in parts[0]:
-            self.handle_api_messages(parts[1], parts[2], message)
 
 
