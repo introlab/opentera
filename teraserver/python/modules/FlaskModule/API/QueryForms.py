@@ -11,6 +11,7 @@ from libtera.forms.TeraDeviceForm import TeraDeviceForm
 from libtera.forms.TeraKitDeviceForm import TeraKitDeviceForm
 from libtera.forms.TeraKitForm import TeraKitForm
 from libtera.forms.TeraProjectForm import TeraProjectForm
+from libtera.forms.TeraParticipantGroupForm import TeraParticipantGroupForm
 
 
 class QueryForms(Resource):
@@ -47,5 +48,8 @@ class QueryForms(Resource):
 
         if args['type'] == 'project':
             return jsonify(TeraProjectForm.get_project_form(user_access=user_access))
+
+        if args['type'] == 'group':
+            return jsonify(TeraParticipantGroupForm.get_participant_group_form(user_access=user_access))
 
         return 'Unknown definition type: ' + args['type'], 500

@@ -119,6 +119,7 @@ void ProjectWidget::updateProjectAccess(const TeraData *access)
         QComboBox* combo_roles = buildRolesComboBox();
         ui->tableUsers->setCellWidget(current_row,1,combo_roles);
         m_tableUsers_ids_rows.insert(access->getFieldValue("id_user").toInt(), current_row);
+        combo_roles->setEnabled(!m_limited);
     }
 }
 
@@ -171,6 +172,9 @@ void ProjectWidget::updateControlsState()
 {
     ui->btnKits->setVisible(!m_limited);
     ui->btnUsers->setVisible(!m_limited);
+    ui->frameButtons->setVisible(!m_limited);
+    ui->btnUpdateRoles->setVisible(!m_limited);
+    ui->wdgProject->setEnabled(!m_limited);
 
 }
 

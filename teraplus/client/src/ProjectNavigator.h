@@ -26,14 +26,20 @@ public:
     void initUi();
 
     int getCurrentSiteId() const;
+    int getCurrentProjectId() const;
 
     void selectItem(const TeraDataTypes& data_type, const int& id);
+
+    void setOnHold(const bool& hold);
 
 private:
     Ui::ProjectNavigator        *ui;
     ComManager*                 m_comManager;
     int                         m_currentSiteId;
     int                         m_currentProjectId;
+    int                         m_currentGroupId;
+
+    bool                        m_selectionHold;
 
     QMap<int, QTreeWidgetItem*> m_projects_items;
     QMap<int, QTreeWidgetItem*> m_groups_items;
@@ -41,6 +47,8 @@ private:
     void updateSite(const TeraData* site);
     void updateProject(const TeraData* project);
     void updateGroup(const TeraData* group);
+
+    void updateAvailableActions();
 
     void connectSignals();
 
@@ -60,6 +68,7 @@ private slots:
 
      void currentSiteChanged();
      void currentNavItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+     void navItemExpanded(QTreeWidgetItem* item);
      void btnEditSite_clicked();
 
 signals:

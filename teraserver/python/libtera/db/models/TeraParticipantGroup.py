@@ -17,7 +17,8 @@ class TeraParticipantGroup(db.Model, BaseModel):
         ignore_fields.extend(['participant_group_project'])
         rval = super().to_json(ignore_fields=ignore_fields)
 
-        rval['project_name'] = self.participant_group_project.project_name
+        if not minimal:
+            rval['project_name'] = self.participant_group_project.project_name
         # rval['id_site'] = self.participant_group_project.id_site
         return rval
 
@@ -50,3 +51,19 @@ class TeraParticipantGroup(db.Model, BaseModel):
     def get_count():
         count = db.session.query(db.func.count(TeraParticipantGroup.id_participant_group))
         return count.first()[0]
+
+    @staticmethod
+    def update_participant_group(id_participant_group: int, values={}):
+        TeraParticipantGroup.query.filter_by(id_participant_group=id_participant_group).update(values)
+        db.session.commit()
+
+    @staticmethod
+    def insert_participant_group(group):
+        group.id_participant_group = None
+        db.session.add(group)
+        db.session.commit()
+
+    @staticmethod
+    def delete_participant_group(id_participant_group: int):
+        TeraParticipantGroup.query.filter_by(id_participant_group=id_participant_group).delete()
+        db.session.commit()

@@ -57,7 +57,7 @@ class QueryUsers(Resource):
                             sites_list = []
                             for site in sites:
                                 site_json = site.to_json()
-                                site_json['site_role'] = user_access.get_site_role(site)
+                                site_json['site_role'] = user_access.get_site_role(site.id_site)
                                 sites_list.append(site_json)
                             user_json['sites'] = sites_list
 
@@ -66,7 +66,7 @@ class QueryUsers(Resource):
                             proj_list = []
                             for project in projects:
                                 proj_json = project.to_json()
-                                proj_json['project_role'] = user_access.get_project_role(project)
+                                proj_json['project_role'] = user_access.get_project_role(project.id_project)
                                 proj_list.append(proj_json)
                             user_json['projects'] = proj_list
 

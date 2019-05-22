@@ -23,6 +23,7 @@ class QueryParticipants(Resource):
         parser.add_argument('id_kit', type=int)
         parser.add_argument('id_site', type=int, help='id site')
         parser.add_argument('id_group', type=int)
+        parser.add_argument('list', type=bool)
         # parser.add_argument('participant_uuid', type=str, help='participant_uuid')
         # parser.add_argument('participant_name', type=str, help='participant_name')
 
@@ -45,11 +46,16 @@ class QueryParticipants(Resource):
         try:
             participant_list = []
             for participant in participants:
-                participant_json = participant.to_json()
-                if args['id_kit']:
-                    # Adds kit information to participant
-                    participant_json['id_kit'] = args['id_kit']
-                participant_list.append(participant_json)
+                if args['list'] is None:
+                    participant_json = participant.to_json()
+                    if args['id_kit']:
+                        # Adds kit information to participant
+                        participant_json['id_kit'] = args['id_kit']
+                    participant_list.append(participant_json)
+                else:
+                    participant_json = participant.to_json(minimal=True)
+                    participant_list.append(participant_json)
+
             return jsonify(participant_list)
 
         except InvalidRequestError:

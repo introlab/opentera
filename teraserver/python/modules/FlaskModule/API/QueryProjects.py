@@ -5,6 +5,7 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraProject import TeraProject
+from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.DBManager import DBManager
 
 
@@ -59,7 +60,10 @@ class QueryProjects(Resource):
                     project_json['project_role'] = user_access.get_project_role(project.id_project)
                     projects_list.append(project_json)
                 else:
-                    projects_list.append(project.to_json(minimal=True))
+                    project_json = project.to_json(minimal=True)
+                    project_json['project_participant_group_count'] = \
+                        len(TeraParticipantGroup.get_participant_group_for_project(project.id_project))
+                    projects_list.append(project_json)
 
             return jsonify(projects_list)
         except InvalidRequestError:

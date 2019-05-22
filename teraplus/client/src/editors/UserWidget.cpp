@@ -253,7 +253,8 @@ void UserWidget::resetSites()
         int site_id = m_tableSites_ids_rows.keys().at(i);
         int row = m_tableProjects_ids_rows[site_id];
         QComboBox* combo_roles = dynamic_cast<QComboBox*>(ui->tableSites->cellWidget(row,1));
-        combo_roles->setCurrentIndex(combo_roles->property("original_index").toInt());
+        if (combo_roles)
+            combo_roles->setCurrentIndex(combo_roles->property("original_index").toInt());
     }
 }
 

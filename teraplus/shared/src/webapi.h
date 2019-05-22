@@ -23,6 +23,7 @@
 #define WEB_FORMS_QUERY_KIT_DEVICE      "type=kit_device"
 #define WEB_FORMS_QUERY_KIT             "type=kit"
 #define WEB_FORMS_QUERY_PROJECT         "type=project"
+#define WEB_FORMS_QUERY_GROUP           "type=group"
 
 #define WEB_QUERY_USERUUID          "user_uuid"
 #define WEB_QUERY_ID_USER           "id_user"
@@ -33,6 +34,7 @@
 #define WEB_QUERY_ID_PARTICIPANT    "id_participant"
 #define WEB_QUERY_ID_PROJECT        "id_project"
 #define WEB_QUERY_ID_DEVICE         "id_device"
+#define WEB_QUERY_ID_GROUP          "id_group"
 #define WEB_QUERY_UNAVAILABLE       "unavailable"
 #define WEB_QUERY_AVAILABLE         "available"
 

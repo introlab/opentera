@@ -5,6 +5,7 @@
 
 #include "editors/SiteWidget.h"
 #include "editors/ProjectWidget.h"
+#include "editors/GroupWidget.h"
 
 MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
     QMainWindow(parent),
@@ -84,12 +85,21 @@ void MainWindow::showDataEditor(const TeraDataTypes &data_type, const TeraData*d
 
     if (data_type == TERADATA_SITE){
         m_data_editor = new SiteWidget(m_comManager, data);
-        m_data_editor->setLimited(false);
+        m_data_editor->setLimited(m_comManager->getCurrentUserSiteRole(data->getId()) != "admin" && data->getId()>0);
     }
 
     if (data_type == TERADATA_PROJECT){
         m_data_editor = new ProjectWidget(m_comManager, data);
-        m_data_editor->setLimited(false);
+        m_data_editor->setLimited(m_comManager->getCurrentUserProjectRole(data->getId()) != "admin" && data->getId()>0);
+    }
+
+    if (data_type == TERADATA_GROUP){
+        m_data_editor = new GroupWidget(m_comManager, data);
+        bool limited = false;
+        if (data->hasFieldName("id_project")){
+            limited = m_comManager->getCurrentUserProjectRole(data->getFieldValue("id_project").toInt()) != "admin" && data->getId()>0;
+        }
+        m_data_editor->setLimited(limited);
     }
 
     if (m_data_editor){
@@ -155,6 +165,9 @@ void MainWindow::editorDialogFinished()
 {
     m_diag_editor->deleteLater();
     m_diag_editor = nullptr;
+
+    // Enable selection in the project manager
+    ui->wdgMainMenu->setOnHold(false);
 }
 
 void MainWindow::dataDisplayRequested(TeraDataTypes data_type, int data_id)
@@ -169,8 +182,15 @@ void MainWindow::dataDisplayRequested(TeraDataTypes data_type, int data_id)
         ui->wdgMainMenu->setEnabled(false);
         TeraData* new_data = new TeraData(data_type);
         new_data->setId(0);
+
+        // Set default values for new data
         if (data_type == TERADATA_PROJECT)
             new_data->setFieldValue("id_site", ui->wdgMainMenu->getCurrentSiteId());
+
+        if (data_type == TERADATA_GROUP){
+            new_data->setFieldValue("id_project", ui->wdgMainMenu->getCurrentProjectId());
+        }
+
         showDataEditor(data_type, new_data);
         return;
     }
@@ -303,6 +323,10 @@ void MainWindow::on_btnEditUser_clicked()
     if (m_diag_editor){
         m_diag_editor->deleteLater();
     }
+
+    // Hold all selection from happening in the project manager
+    ui->wdgMainMenu->setOnHold(true);
+
     m_diag_editor = new QDialog(this);
     UserWidget* user_editor = new UserWidget(m_comManager, &(m_comManager->getCurrentUser()), m_diag_editor);
     user_editor->setLimited(true);
@@ -319,6 +343,10 @@ void MainWindow::on_btnConfig_clicked()
     if (m_diag_editor){
         m_diag_editor->deleteLater();
     }
+
+    // Hold all selection from happening in the project manager
+    ui->wdgMainMenu->setOnHold(true);
+
     m_diag_editor = new QDialog(this);
     ConfigWidget* config_editor = new ConfigWidget(m_comManager, m_diag_editor);
     m_diag_editor->setFixedSize(size().width()-50, size().height()-150);
@@ -330,4 +358,5 @@ void MainWindow::on_btnConfig_clicked()
     m_diag_editor->setWindowTitle(tr("Configuration Globale"));
 
     m_diag_editor->open();
+
 }
