@@ -7,7 +7,7 @@ package opentera.protobuf;
 message TeraMessage {
     message Header {
         uint32 version = 1;
-        int64 time = 2;
+        double time = 2;
         uint32 seq = 3;
         string source = 4;
         string dest = 5;

@@ -3,7 +3,8 @@ from messages.python.TeraMessage_pb2 import TeraMessage
 from messages.python.CreateSession_pb2 import CreateSession
 from messages.python.UserConnected_pb2 import UserConnected
 from messages.python.UserDisconnected_pb2 import UserDisconnected
-from modules.BaseModule import BaseModule, ModuleNames
+from modules.BaseModule import BaseModule, ModuleNames, create_module_topic_from_name
+from google.protobuf.any_pb2 import Any
 
 
 class OnlineUserRegistry:
@@ -33,13 +34,15 @@ class UserManagerModule(BaseModule):
         self.registry = OnlineUserRegistry()
 
     def __del__(self):
-        self.unsubscribe_pattern_with_callback("websocket.*", self.notify_websocket_messages_deprecated)
-        self.unsubscribe_pattern_with_callback("api.*", self.notify_api_messages_deprecated)
+        pass
+        # self.unsubscribe_pattern_with_callback("websocket.*", self.notify_websocket_messages_deprecated)
+        # self.unsubscribe_pattern_with_callback("api.*", self.notify_api_messages_deprecated)
 
     def setup_module_pubsub(self):
+        pass
         # Additional subscribe (old stuff to be removed)
-        self.subscribe_pattern_with_callback("websocket.*", self.notify_websocket_messages_deprecated)
-        self.subscribe_pattern_with_callback("api.*", self.notify_api_messages_deprecated)
+        # self.subscribe_pattern_with_callback("websocket.*", self.notify_websocket_messages_deprecated)
+        # self.subscribe_pattern_with_callback("api.*", self.notify_api_messages_deprecated)
 
     def notify_websocket_messages_deprecated(self, pattern, channel, message):
         """
@@ -64,7 +67,8 @@ class UserManagerModule(BaseModule):
         print('UserManagerModule - Received message ', pattern, channel, message)
 
         tera_message = TeraMessage()
-        tera_message.ParseFromString(message.encode('utf-8'))
+        tera_message.ParseFromString(message)
+        # tera_message.ParseFromString(message.encode('utf-8'))
 
         # We have a repeated Any field look for message type
         for any_msg in tera_message.data:
@@ -78,10 +82,23 @@ class UserManagerModule(BaseModule):
             if any_msg.Unpack(user_disconnected):
                 self.handle_user_disconnected(tera_message.head, user_disconnected)
 
-    def handle_user_connected(self, header, user_connected):
+    def handle_user_connected(self, header, user_connected: UserConnected):
         self.registry.user_online(user_connected.user_uuid)
 
-    def handle_user_disconnected(self, header, user_disconnected):
+        for user_uuid in self.registry.online_users():
+            # TODO Check for permissions...
+            # Send to everyone?
+            tera_message = TeraMessage()
+            tera_message.head.source = create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
+            tera_message.head.dest = 'websocket.user.' + user_uuid
+
+            any_message = Any()
+            any_message.Pack(user_connected)
+            tera_message.data.extend([any_message])
+
+            self.publish(tera_message.head.dest, tera_message.SerializeToString())
+
+    def handle_user_disconnected(self, header, user_disconnected: UserDisconnected):
         self.registry.user_offline(user_disconnected.user_uuid)
 
     def handle_api_messages(self, module, uuid, message):

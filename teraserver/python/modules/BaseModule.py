@@ -1,7 +1,8 @@
 from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
 from enum import Enum, unique
-
+from messages.python.TeraMessage_pb2 import TeraMessage
+import datetime
 
 @unique
 class ModuleNames(Enum):
@@ -58,4 +59,15 @@ class BaseModule(RedisClient):
         print('BaseModule - Received message ', pattern, channel, message)
         pass
 
+    def create_tera_message(self, dest='', seq=0):
 
+        tera_message = TeraMessage()
+        tera_message.head.version = 1
+        tera_message.head.time = datetime.datetime.now().timestamp()
+        tera_message.head.seq = seq
+        tera_message.head.source = 'module.' + self.module_name
+        tera_message.head.dest = dest
+        return tera_message
+
+    def source_name(self):
+        return "module." + self.module_name + ".messages"

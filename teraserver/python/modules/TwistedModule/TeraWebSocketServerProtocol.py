@@ -13,8 +13,12 @@ from modules.BaseModule import ModuleNames, create_module_topic_from_name
 from messages.python.TeraMessage_pb2 import TeraMessage
 from messages.python.UserConnected_pb2 import UserConnected
 from messages.python.UserDisconnected_pb2 import UserDisconnected
+from messages.python.Result_pb2 import Result
 from google.protobuf.any_pb2 import Any
 import datetime
+from google.protobuf.json_format import MessageToJson
+from google.protobuf.json_format import Parse, ParseError
+from google.protobuf.message import DecodeError
 
 
 class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
@@ -28,31 +32,49 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
     def redisConnectionMade(self):
         print('TeraWebSocketServerProtocol redisConnectionMade (redis)')
 
-        if self.user:
-            # Subscribe to our own messages
-            self.subscribe('server.' + str(self.user.user_uuid) + '.*')
-        if self.participant:
-            # Subscribe to our own messages
-            self.subscribe('server.' + str(self.participant.participant_uuid) + '.*')
+        self.subscribe(self.answer_topic() + '.*')
 
     def onMessage(self, msg, binary):
         # Handle websocket communication
         # TODO use protobuf ?
         print('TeraWebSocketProtocol onMessage', self, msg, binary)
 
-        if self.user:
-            self.publish('websocket.' + str(self.user.user_uuid) + '.request', msg)
+        # Parse JSON (protobuf content)
+        try:
+            message = Parse(msg, TeraMessage)
+            self.publish(message.head.dest, message)
+        except ParseError:
+            print('TeraMessage parse error...')
+            # TODO remove this code...
+            if self.user:
+                self.publish('websocket.' + str(self.user.user_uuid) + '.request', msg)
 
-        if self.participant:
-            self.publish('websocket.' + str(self.participant.participant_uuid) + '.request', msg)
+            if self.participant:
+                self.publish('websocket.' + str(self.participant.participant_uuid) + '.request', msg)
 
         # Echo for debug
         self.sendMessage(msg, binary)
 
     def redisMessageReceived(self, pattern, channel, message):
         print('TeraWebSocketServerProtocol redis message received', pattern, channel, message)
-        # TODO use protobuf ?
-        self.sendMessage(message.encode('utf-8'), False)
+
+        # Forward as JSON to websocket
+        try:
+            tera_message = TeraMessage()
+            if isinstance(message, str):
+                tera_message.ParseFromString(message.encode('utf-8'))
+            elif isinstance(message, bytes):
+                tera_message.ParseFromString(message)
+
+            # Test message to JSON
+            json = MessageToJson(tera_message, including_default_value_fields=True)
+
+            # Send to websocket (in binary form)
+            self.sendMessage(json.encode('utf-8'), False)
+
+        except DecodeError:
+            print('DecodeError ', pattern, channel, message)
+            self.sendMessage(message.encode('utf-8'), False)
 
     def onConnect(self, request):
         """
@@ -113,13 +135,17 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
             self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
 
-            # At this stage, we can send messages. initiating...
-            self.sendMessage(bytes('Hello ' + str(self.user.user_username), 'utf-8'), False)
+            # Send message back
+            # json = MessageToJson(tera_message, including_default_value_fields=True)
+            # self.sendMessage(json.encode('utf-8'), False)
         elif self.participant:
+            # TODO send participant message
+            pass
+
             # Advertise that we have a new user
-            self.publish('websocket.' + str(self.participant.participant_uuid), 'connected')
+            # self.publish('websocket.' + str(self.participant.participant_uuid), 'connected')
             # At this stage, we can send messages. initiating...
-            self.sendMessage(bytes('Hello ' + str(self.participant), 'utf-8'), False)
+            # self.sendMessage(bytes('Hello ' + str(self.participant), 'utf-8'), False)
 
     def onClose(self, wasClean, code, reason):
         if self.user:
@@ -151,12 +177,12 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
         if self.participant:
             return 'websocket.participant.' + self.participant.participant_uuid
 
-    def create_tera_message(self, dest=''):
+    def create_tera_message(self, dest='', seq=0):
 
         tera_message = TeraMessage()
         tera_message.head.version = 1
-        # tera_message.head.time = datetime.datetime.now().timestamp()
-        tera_message.head.seq = 0
+        tera_message.head.time = datetime.datetime.now().timestamp()
+        tera_message.head.seq = seq
         tera_message.head.source = self.answer_topic()
         tera_message.head.dest = dest
         return tera_message

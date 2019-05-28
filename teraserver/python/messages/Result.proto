@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package opentera.protobuf;
+
+message Result {
+
+    int64 code = 1;
+    string message = 2;
+}

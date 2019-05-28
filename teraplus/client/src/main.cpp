@@ -12,7 +12,13 @@ int main(int argc, char* argv[])
     QApplication::setAttribute(Qt::AA_UseOpenGLES, true);
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
 
-    ClientApp* app = new ClientApp(argc, argv);  
+    ClientApp* app = new ClientApp(argc, argv);
+
+    //Set application style
+    #ifndef WIN32 // Don't set style on Windows - it creates some issues with combobox look.
+    app->setStyle("windows");
+    #endif
+
 
     //WebEngine default Settings
     /*QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
