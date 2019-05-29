@@ -116,3 +116,19 @@ class TeraParticipant(db.Model, BaseModel):
     def get_count():
         count = db.session.query(db.func.count(TeraParticipant.id_participant))
         return count.first()[0]
+
+    @staticmethod
+    def update_participant(id_participant: int, values={}):
+        TeraParticipant.query.filter_by(id_participant=id_participant).update(values)
+        db.session.commit()
+
+    @staticmethod
+    def insert_participant(participant):
+        participant.id_participant = None
+        db.session.add(participant)
+        db.session.commit()
+
+    @staticmethod
+    def delete_participant(id_participant: int):
+        TeraParticipant.query.filter_by(id_participant=id_participant).delete()
+        db.session.commit()

@@ -85,6 +85,7 @@ void ProjectNavigator::connectSignals()
     connect(m_comManager, &ComManager::sitesReceived, this, &ProjectNavigator::processSitesReply);
     connect(m_comManager, &ComManager::projectsReceived, this, &ProjectNavigator::processProjectsReply);
     connect(m_comManager, &ComManager::groupsReceived, this, &ProjectNavigator::processGroupsReply);
+    connect(m_comManager, &ComManager::participantsReceived, this, &ProjectNavigator::processParticipantsReply);
 
     void (QComboBox::* comboIndexChangedSignal)(int) = &QComboBox::currentIndexChanged;
     connect(ui->cmbSites, comboIndexChangedSignal, this, &ProjectNavigator::currentSiteChanged);
@@ -148,7 +149,6 @@ void ProjectNavigator::updateProject(const TeraData *project)
 
 void ProjectNavigator::updateGroup(const TeraData *group)
 {
-    //qDebug() << "Update group id: " << group->getId() << group->getName();
     int id_group = group->getId();
     int id_project = group->getFieldValue("id_project").toInt();
 
@@ -203,6 +203,52 @@ void ProjectNavigator::updateGroup(const TeraData *group)
         // Ensure correct project is selected
         ui->treeNavigator->setCurrentItem(item);
     }*/
+}
+
+void ProjectNavigator::updateParticipant(const TeraData *participant)
+{
+    int id_participant = participant->getId();
+    int id_group = participant->getFieldValue("id_participant_group").toInt();
+
+    QTreeWidgetItem* item;
+    if (m_participants_items.contains(id_participant)){
+        // Participant already there
+        item = m_participants_items[id_participant];
+
+        // Check if we need to change its group
+        int id_part_group = m_groups_items.key(item->parent());
+        if (id_part_group != id_group){
+            // Participant is not in the correct group, change it
+            QTreeWidgetItem* old_group = m_groups_items[id_part_group];
+            old_group->removeChild(item);
+            if (m_groups_items.contains(id_group)){
+                m_groups_items[id_group]->addChild(item);
+            }else{
+                // Not in a displayed group, delete it
+                delete item;
+                return;
+            }
+        }
+    }else{
+        // New participant - add it.
+        item = new QTreeWidgetItem();
+        QTreeWidgetItem* group_item = m_groups_items[id_group];
+        if (group_item){
+            // In a group currently displayed
+            group_item->addChild(item);
+            m_participants_items[id_participant] = item;
+        }
+        //project_item->setExpanded(true);
+    }
+    /*if (group->hasFieldName("group_participant_count")){
+        if (group->getFieldValue("group_participant_count").toInt() > 0){
+            item->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
+        }
+    }*/
+
+    item->setText(0, participant->getName());
+    item->setIcon(0, QIcon(TeraData::getIconFilenameForDataType(TERADATA_PARTICIPANT)));
+
 }
 
 void ProjectNavigator::updateAvailableActions()
@@ -262,18 +308,6 @@ void ProjectNavigator::newItemRequested()
     QAction* action = dynamic_cast<QAction*>(QObject::sender());
     if (action){
         TeraDataTypes data_type = static_cast<TeraDataTypes>(action->data().toInt());
-        /*if (data_type == TERADATA_SITE){
-            qDebug() << "New site";
-        }*/
-        /*if (data_type == TERADATA_PROJECT){
-
-        }
-        if (data_type == TERADATA_GROUP){
-            qDebug() << "New group";
-        }
-        if (data_type == TERADATA_PARTICIPANT){
-            qDebug() << "New participant";
-        }*/
         emit dataDisplayRequest(data_type, 0);
     }
 }
@@ -304,6 +338,13 @@ void ProjectNavigator::processGroupsReply(QList<TeraData> groups)
     }
 }
 
+void ProjectNavigator::processParticipantsReply(QList<TeraData> participants)
+{
+    for (int i=0; i<participants.count(); i++){
+        updateParticipant(&participants.at(i));
+    }
+}
+
 void ProjectNavigator::currentSiteChanged()
 {
     m_currentSiteId = ui->cmbSites->currentData().toInt();
@@ -314,6 +355,7 @@ void ProjectNavigator::currentSiteChanged()
     // Clear all data
     m_projects_items.clear();
     m_groups_items.clear();
+    m_participants_items.clear();
     m_currentProjectId = -1;
     m_currentGroupId = -1;
     ui->treeNavigator->clear();
@@ -359,6 +401,12 @@ void ProjectNavigator::currentNavItemChanged(QTreeWidgetItem *current, QTreeWidg
         emit dataDisplayRequest(TERADATA_GROUP, m_currentGroupId);
     }
 
+    // PARTICIPANT
+    if (m_participants_items.values().contains(current)){
+        int id = m_participants_items.key(current);
+        emit dataDisplayRequest(TERADATA_PARTICIPANT, id);
+    }
+
     // Update available actions (new items)
     updateAvailableActions();
 }
@@ -382,10 +430,10 @@ void ProjectNavigator::navItemExpanded(QTreeWidgetItem *item)
         int id = m_groups_items.key(item);
 
         // Request participants for that group
-        /*QUrlQuery query;
-        query.addQueryItem(WEB_QUERY_ID_GROUP, QString::number(m_currentGroupId));
+        QUrlQuery query;
+        query.addQueryItem(WEB_QUERY_ID_GROUP, QString::number(id));
         query.addQueryItem(WEB_QUERY_LIST, "");
-        m_comManager->doQuery(WEB_PARTICIPANTINFO_PATH, query);*/
+        m_comManager->doQuery(WEB_PARTICIPANTINFO_PATH, query);
 
     }
 }

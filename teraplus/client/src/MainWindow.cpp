@@ -6,6 +6,7 @@
 #include "editors/SiteWidget.h"
 #include "editors/ProjectWidget.h"
 #include "editors/GroupWidget.h"
+#include "editors/ParticipantWidget.h"
 
 MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
     QMainWindow(parent),
@@ -100,6 +101,12 @@ void MainWindow::showDataEditor(const TeraDataTypes &data_type, const TeraData*d
             limited = m_comManager->getCurrentUserProjectRole(data->getFieldValue("id_project").toInt()) != "admin" && data->getId()>0;
         }
         m_data_editor->setLimited(limited);
+    }
+
+    if (data_type == TERADATA_PARTICIPANT){
+        m_data_editor = new ParticipantWidget(m_comManager, data);
+        // TODO: Check if we allow editing or not!
+
     }
 
     if (m_data_editor){
@@ -278,6 +285,7 @@ void MainWindow::com_waitingForReply(bool waiting)
     }
     ui->btnEditUser->setEnabled(!waiting);
     ui->btnConfig->setEnabled(!waiting);
+    ui->wdgMainMenu->setEnabled(!waiting);
 }
 
 void MainWindow::com_postReplyOK()

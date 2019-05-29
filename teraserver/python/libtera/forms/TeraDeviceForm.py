@@ -32,7 +32,7 @@ class TeraDeviceForm:
         section.add_item(TeraFormItem("device_name", gettext("Nom appareil"), "text", item_required=True))
         section.add_item(TeraFormItem("device_type", gettext("Type appareil"), "array", item_required=True,
                                       item_values=device_types_list))
-        section.add_item(TeraFormItem("device_token", gettext("Jeton d'accès"), "hidden",
+        section.add_item(TeraFormItem("device_token", gettext("Jeton d'accès"), "label",
                                       item_options={"readonly": True}))
         section.add_item(TeraFormItem("id_site", gettext("Site d'appartenance"), "array", item_required=True,
                                       item_values=sites_list))

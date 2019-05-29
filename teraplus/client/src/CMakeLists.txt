@@ -14,6 +14,7 @@ set(headers
     Message.h
     GlobalMessageBox.h
     ConfigWidget.h
+    HistoryCalendarWidget.h
     editors/DataEditorWidget.h
     editors/UserWidget.h
     editors/TeraForm.h
@@ -23,6 +24,7 @@ set(headers
     editors/KitWidget.h
     editors/ProjectWidget.h
     editors/GroupWidget.h
+    editors/ParticipantWidget.h
 )
 
 set(srcs
@@ -37,6 +39,7 @@ set(srcs
     Message.cpp
     GlobalMessageBox.cpp
     ConfigWidget.cpp
+    HistoryCalendarWidget.cpp
     editors/DataEditorWidget.cpp
     editors/UserWidget.cpp
     editors/TeraForm.cpp
@@ -46,6 +49,7 @@ set(srcs
     editors/KitWidget.cpp
     editors/ProjectWidget.cpp
     editors/GroupWidget.cpp
+    editors/ParticipantWidget.cpp
 )
 
 SET(uis
@@ -62,6 +66,7 @@ SET(uis
     editors/KitWidget.ui
     editors/ProjectWidget.ui
     editors/GroupWidget.ui
+    editors/ParticipantWidget.ui
 )
 
 SET(qrcs

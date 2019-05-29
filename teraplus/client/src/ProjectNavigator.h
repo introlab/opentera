@@ -43,10 +43,12 @@ private:
 
     QMap<int, QTreeWidgetItem*> m_projects_items;
     QMap<int, QTreeWidgetItem*> m_groups_items;
+    QMap<int, QTreeWidgetItem*> m_participants_items;
 
     void updateSite(const TeraData* site);
     void updateProject(const TeraData* project);
     void updateGroup(const TeraData* group);
+    void updateParticipant(const TeraData* participant);
 
     void updateAvailableActions();
 
@@ -65,6 +67,7 @@ private slots:
      void processSitesReply(QList<TeraData> sites);
      void processProjectsReply(QList<TeraData> projects);
      void processGroupsReply(QList<TeraData> groups);
+     void processParticipantsReply(QList<TeraData> participants);
 
      void currentSiteChanged();
      void currentNavItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);

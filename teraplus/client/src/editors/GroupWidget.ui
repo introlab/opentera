@@ -122,7 +122,7 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
    <item>
     <widget class="TeraForm" name="wdgGroup" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -185,6 +185,36 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableDashboard">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <column>
+      <property name="text">
+       <string>Participant</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>État</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Dernière connexion</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Dernière séance</string>
+      </property>
+     </column>
     </widget>
    </item>
   </layout>

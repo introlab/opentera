@@ -24,6 +24,7 @@
 #define WEB_FORMS_QUERY_KIT             "type=kit"
 #define WEB_FORMS_QUERY_PROJECT         "type=project"
 #define WEB_FORMS_QUERY_GROUP           "type=group"
+#define WEB_FORMS_QUERY_PARTICIPANT     "type=participant"
 
 #define WEB_QUERY_USERUUID          "user_uuid"
 #define WEB_QUERY_ID_USER           "id_user"
