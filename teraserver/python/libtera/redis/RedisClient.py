@@ -51,13 +51,17 @@ class RedisClient:
     def subscribe(self, topic):
         if self.protocol:
             print('RedisClient (', self, ') subscribing to: ',  topic)
-            ret = self.protocol.psubscribe(topic)
+            return self.protocol.psubscribe(topic)
         else:
             print('Error, no protocol')
+            return defer.Deferred()
 
     def unsubscribe(self, topic):
         if self.protocol:
-            self.protocol.punsubscribe(topic)
+            return self.protocol.punsubscribe(topic)
+        else:
+            print('Error, no protocol')
+            return defer.Deferred()
 
     def publish(self, topic, message):
         self.redis.publish(topic, message)

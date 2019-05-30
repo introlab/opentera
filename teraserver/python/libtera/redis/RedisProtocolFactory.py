@@ -31,6 +31,9 @@ class redisProtocol(txredis.SubscriberProtocol):
         else:
             print("redisProtocol lost connection", reason)
 
+    def replyReceived(self, reply):
+        super().replyReceived(reply)
+
 
 class RedisProtocolFactory(txredis.SubscriberFactory):
 

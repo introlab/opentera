@@ -20,19 +20,44 @@ from google.protobuf.json_format import MessageToJson
 from google.protobuf.json_format import Parse, ParseError
 from google.protobuf.message import DecodeError
 
+# Twisted
+from twisted.internet import defer
 
-class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
+
+class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
 
     def __init__(self, config):
-        WebSocketServerProtocol.__init__(self)
         RedisClient.__init__(self, config=config)
+        WebSocketServerProtocol.__init__(self)
         self.user = None
         self.participant = None
 
+    @defer.inlineCallbacks
     def redisConnectionMade(self):
         print('TeraWebSocketServerProtocol redisConnectionMade (redis)')
+        ret = yield self.subscribe(self.answer_topic())
 
-        self.subscribe(self.answer_topic() + '.*')
+        if self.user:
+            # Advertise that we have a new user
+            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            user_connected = UserConnected()
+            user_connected.user_uuid = str(self.user.user_uuid)
+
+            # Need to use Any container
+            any_message = Any()
+            any_message.Pack(user_connected)
+            tera_message.data.extend([any_message])
+
+            # Publish to login module (bytes)
+            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+                         tera_message.SerializeToString())
+
+            # Send message back
+            # json = MessageToJson(tera_message, including_default_value_fields=True)
+            # self.sendMessage(json.encode('utf-8'), False)
+        elif self.participant:
+            # TODO Advertise that we have a new participant
+            pass
 
     def onMessage(self, msg, binary):
         # Handle websocket communication
@@ -45,12 +70,6 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
             self.publish(message.head.dest, message)
         except ParseError:
             print('TeraMessage parse error...')
-            # TODO remove this code...
-            if self.user:
-                self.publish('websocket.' + str(self.user.user_uuid) + '.request', msg)
-
-            if self.participant:
-                self.publish('websocket.' + str(self.participant.participant_uuid) + '.request', msg)
 
         # Echo for debug
         self.sendMessage(msg, binary)
@@ -75,12 +94,14 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
         except DecodeError:
             print('DecodeError ', pattern, channel, message)
             self.sendMessage(message.encode('utf-8'), False)
+        except:
+            print('Failure in redisMessageReceived')
 
     def onConnect(self, request):
         """
         Cannot send message at this stage, needs to verify connection here.
         """
-        print('onConnect', self, request)
+        print('onConnect')
 
         if request.params.__contains__('id'):
 
@@ -120,36 +141,13 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
         raise ConnectionDeny(ConnectionDeny.FORBIDDEN, "Websocket authentication failed (key, uuid).")
 
     def onOpen(self):
-        if self.user:
-            # Advertise that we have a new user
-            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            user_connected = UserConnected()
-            user_connected.user_uuid = str(self.user.user_uuid)
-
-            # Need to use Any container
-            any_message = Any()
-            any_message.Pack(user_connected)
-            tera_message.data.extend([any_message])
-
-            # Publish to login module (bytes)
-            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
-                         tera_message.SerializeToString())
-
-            # Send message back
-            # json = MessageToJson(tera_message, including_default_value_fields=True)
-            # self.sendMessage(json.encode('utf-8'), False)
-        elif self.participant:
-            # TODO send participant message
-            pass
-
-            # Advertise that we have a new user
-            # self.publish('websocket.' + str(self.participant.participant_uuid), 'connected')
-            # At this stage, we can send messages. initiating...
-            # self.sendMessage(bytes('Hello ' + str(self.participant), 'utf-8'), False)
+        print(type(self).__name__, 'onOpen')
+        # Moved handling code in redisConnectionMade...
+        # because it always occurs after onOpen...
 
     def onClose(self, wasClean, code, reason):
         if self.user:
-            # Advertise that we have a new user
+            # Advertise that user disconnected
             tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
             user_disconnected = UserDisconnected()
             user_disconnected.user_uuid = str(self.user.user_uuid)
@@ -164,6 +162,7 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
                          tera_message.SerializeToString())
 
         elif self.participant:
+            # TODO advertise that participant leaved
             pass
 
         print('onClose', self, wasClean, code, reason)
