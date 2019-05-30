@@ -35,6 +35,8 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
     @defer.inlineCallbacks
     def redisConnectionMade(self):
         print('TeraWebSocketServerProtocol redisConnectionMade (redis)')
+
+        # This will wait until subscribe result is available...
         ret = yield self.subscribe(self.answer_topic())
 
         if self.user:
@@ -51,10 +53,6 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
             # Publish to login module (bytes)
             self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
-
-            # Send message back
-            # json = MessageToJson(tera_message, including_default_value_fields=True)
-            # self.sendMessage(json.encode('utf-8'), False)
         elif self.participant:
             # TODO Advertise that we have a new participant
             pass

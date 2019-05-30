@@ -12,12 +12,12 @@ class Index(MethodView):
         self.flaskModule = kwargs.get('flaskModule', None)
         print(self.flaskModule)
 
-    # @auth.login_required
+    @auth.login_required
     def get(self):
         print('get')
         return render_template('index.html')
 
-    # @auth.login_required
+    @auth.login_required
     def post(self):
         print('post')
         pass

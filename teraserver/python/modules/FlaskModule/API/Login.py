@@ -15,9 +15,12 @@ class Login(Resource):
 
         session.permanent = True
 
-        # print('Setting key with expiration in 60s', session['_id'], session['user_id'])
-        # get_redis().set(session['_id'], session['user_id'], ex=60)
-        reply = {"websocket_url": "wss://localhost:4040/wss?id=" + session['_id'],
+        # Redis key is handled in LoginModule
+        servername = self.module.config.server_config['hostname']
+        port = self.module.config.server_config['port']
+
+        # Return reply as json object
+        reply = {"websocket_url": "wss://" + servername + ":" + str(port) + "/wss?id=" + session['_id'],
                  "user_uuid": session['user_id']}
         json_reply = jsonify(reply)
 

@@ -28,7 +28,9 @@ class RedisClient:
         self.redis = redis.Redis(host=config['hostname'], port=config['port'], db=config['db'])
 
         # Redis client (async)
-        reactor.connectTCP(config['hostname'], config['port'], RedisProtocolFactory(parent=self, protocol=redisProtocol))
+        conn = reactor.connectTCP(config['hostname'], config['port'],
+                                  RedisProtocolFactory(parent=self, protocol=redisProtocol))
+        print(conn)
 
     def redisConnectionMade(self):
         print('RedisClient connectionMade')
