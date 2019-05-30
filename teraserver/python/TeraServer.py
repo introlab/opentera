@@ -51,7 +51,19 @@ if __name__ == '__main__':
     else:
         application_path = os.path.dirname(os.path.abspath(__file__))
 
-    config_file = application_path + os.sep + 'config' + os.sep + 'TeraServerConfig.ini'
+
+    config_file = None
+
+    # Set environment variable for reading configuration file
+    # Will be helpful for docker containers
+    if os.environ.__contains__('OPENTERA_CONFIG_PATH'):
+        config_file = str(os.environ('OPENTERA_CONFIG_PATH'))
+    else:
+        config_file = application_path + os.sep + 'config' + os.sep + 'TeraServerConfig.ini'
+
+    print("Opening config file: ", config_file)
+
+    # Load configuration file.
     config_man.load_config(config_file)
 
     # DATABASE CONFIG AND OPENING

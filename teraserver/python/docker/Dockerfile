@@ -40,6 +40,9 @@ WORKDIR /opentera/teraserver/python
 # Private and public mapping
 EXPOSE 4040:4040
 
+# a default value (from WORKDIR)
+ENV OPENTERA_CONFIG_PATH config/TeraServerConfig.ini
+
 # Run the required services and python script
 CMD ls -l && ./start.sh
 
