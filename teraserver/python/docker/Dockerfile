@@ -1,5 +1,8 @@
 # Image: introlab3it/openteraserver
 
+LABEL version="0.1"
+LABEL description="OpenTera Test Server from IntRoLab."
+
 FROM ubuntu:18.04
 
 # Install build dependencies
@@ -8,7 +11,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
         python3-pip sudo vim libprotobuf-dev cmake protobuf-compiler
 
 # Clone repository
-ARG CACHE_DATE=2019-04-26
+ARG CACHE_DATE=2019-05-31
 RUN git clone -b dev https://github.com/introlab/opentera.git
 
 #Create db and user
@@ -20,6 +23,9 @@ RUN service postgresql start &&\
 	sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"&&\
 	sudo -u postgres psql -c "\l"
 
+#VOLUME
+RUN mkdir /config
+VOLUME /config
 
 # Install python dependencies, must be installed before we run cmake
 WORKDIR /opentera/teraserver/python/env
@@ -38,7 +44,9 @@ RUN make docker-all
 WORKDIR /opentera/teraserver/python
 
 # Private and public mapping
-EXPOSE 4040:4040
+EXPOSE 4040/tcp
+
+
 
 # env with a default value
 ENV OPENTERA_CONFIG_PATH /opentera/teraserver/config/TeraServerConfig.ini
