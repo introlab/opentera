@@ -4,6 +4,7 @@ from enum import Enum, unique
 from messages.python.TeraMessage_pb2 import TeraMessage
 import datetime
 
+
 @unique
 class ModuleNames(Enum):
     FLASK_MODULE_NAME = str("FlaskModule")
@@ -50,13 +51,21 @@ class BaseModule(RedisClient):
         pass
 
     def build_interface(self):
+        # TeraMessage Interface
         self.subscribe_pattern_with_callback("module." + self.module_name + ".messages", self.notify_module_messages)
+
+        # RPC messages
+        self.subscribe_pattern_with_callback("module." + self.module_name + ".rpc", self.notify_module_rpc)
 
     def notify_module_messages(self, pattern, channel, message):
         """
         We have received a published message from redis
         """
-        print('BaseModule - Received message ', pattern, channel, message)
+        print('BaseModule - Received message', self, pattern, channel, message)
+        pass
+
+    def notify_module_rpc(self, pattern, channel, message):
+        print('BaseModule - Received rpc', self, pattern, channel, message)
         pass
 
     def create_tera_message(self, dest='', seq=0):
