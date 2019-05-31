@@ -57,7 +57,7 @@ if __name__ == '__main__':
     # Set environment variable for reading configuration file
     # Will be helpful for docker containers
     if os.environ.__contains__('OPENTERA_CONFIG_PATH'):
-        config_file = str(os.environ('OPENTERA_CONFIG_PATH'))
+        config_file = str(os.environ['OPENTERA_CONFIG_PATH'])
     else:
         config_file = application_path + os.sep + 'config' + os.sep + 'TeraServerConfig.ini'
 
