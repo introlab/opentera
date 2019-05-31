@@ -1,7 +1,7 @@
 # Image: introlab3it/openteraserver
 
-LABEL version="0.1"
-LABEL description="OpenTera Test Server from IntRoLab."
+# LABEL version="0.1"
+# LABEL description="OpenTera Test Server from IntRoLab."
 
 FROM ubuntu:18.04
 
