@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package opentera.protobuf;
+
+message RPCMessage {
+    string method = 1;
+    string reply_to = 2;
+    double timestamp = 3;
+    repeated google.protobuf.Any args = 4;
+}

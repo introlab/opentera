@@ -4,6 +4,9 @@ from modules.Globals import auth
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
 from libtera.redis.AsyncRedisSubscribeWait import AsyncRedisSubscribeWait
+from modules.BaseModule import ModuleNames
+from messages.python.RPCMessage_pb2 import RPCMessage
+import datetime
 
 
 class OnlineUsers(Resource):
@@ -21,11 +24,20 @@ class OnlineUsers(Resource):
 
         try:
 
-            req = AsyncRedisSubscribeWait('server.OnlineUsers.' + session['user_id'] + '.*', self.flaskModule)
+            # This needs to be an unique name
+            my_name = 'module.' + self.flaskModule.module_name + '.OnlineUsers.' + session['user_id']
+
+            req = AsyncRedisSubscribeWait(my_name, self.flaskModule)
             req.listen()
 
             # Publish request
-            self.flaskModule.publish('api.OnlineUsers.' + session['user_id'] + '.request', b'list')
+            message = RPCMessage()
+            message.method = 'online_users'
+            message.timestamp = datetime.datetime.now().timestamp()
+            message.reply_to = my_name
+
+            self.flaskModule.publish('module.' + ModuleNames.USER_MANAGER_MODULE_NAME.value + '.rpc',
+                                     message.SerializeToString())
 
             # Wait for answer, no timeout
             (pattern, channel, data) = req.wait()

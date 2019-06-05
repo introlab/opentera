@@ -11,9 +11,7 @@ from modules.BaseModule import ModuleNames, create_module_topic_from_name
 
 # Messages
 from messages.python.TeraMessage_pb2 import TeraMessage
-from messages.python.UserConnected_pb2 import UserConnected
-from messages.python.UserDisconnected_pb2 import UserDisconnected
-from messages.python.Result_pb2 import Result
+from messages.python.UserEvent_pb2 import UserEvent
 from google.protobuf.any_pb2 import Any
 import datetime
 from google.protobuf.json_format import MessageToJson
@@ -42,9 +40,9 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
         if self.user:
             # Advertise that we have a new user
             tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            user_connected = UserConnected()
+            user_connected = UserEvent()
             user_connected.user_uuid = str(self.user.user_uuid)
-
+            user_connected.type = UserEvent.USER_CONNECTED
             # Need to use Any container
             any_message = Any()
             any_message.Pack(user_connected)
@@ -147,8 +145,9 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
         if self.user:
             # Advertise that user disconnected
             tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            user_disconnected = UserDisconnected()
+            user_disconnected = UserEvent()
             user_disconnected.user_uuid = str(self.user.user_uuid)
+            user_disconnected.type = UserEvent.USER_DISCONNECTED
 
             # Need to use Any container
             any_message = Any()

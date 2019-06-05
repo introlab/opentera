@@ -1,10 +1,11 @@
 from libtera.ConfigManager import ConfigManager
 from messages.python.TeraMessage_pb2 import TeraMessage
+from messages.python.RPCMessage_pb2 import RPCMessage
 from messages.python.CreateSession_pb2 import CreateSession
-from messages.python.UserConnected_pb2 import UserConnected
-from messages.python.UserDisconnected_pb2 import UserDisconnected
+from messages.python.UserEvent_pb2 import UserEvent
 from modules.BaseModule import BaseModule, ModuleNames, create_module_topic_from_name
 from google.protobuf.any_pb2 import Any
+import datetime
 
 
 class OnlineUserRegistry:
@@ -73,33 +74,50 @@ class UserManagerModule(BaseModule):
         # We have a repeated Any field look for message type
         for any_msg in tera_message.data:
             # Test for UserConnected
-            user_connected = UserConnected()
-            if any_msg.Unpack(user_connected):
-                self.handle_user_connected(tera_message.head, user_connected)
+            user_event = UserEvent()
+            if any_msg.Unpack(user_event):
+                if user_event.type == user_event.USER_CONNECTED:
+                    self.handle_user_connected(tera_message.head, user_event)
+                elif user_event.type == user_event.USER_DISCONNECTED:
+                    self.handle_user_disconnected(tera_message.head, user_event)
 
-            # Test for UserDisconnected
-            user_disconnected = UserDisconnected()
-            if any_msg.Unpack(user_disconnected):
-                self.handle_user_disconnected(tera_message.head, user_disconnected)
+    def notify_module_rpc(self, pattern, channel, message):
+        print('Received rpc', self, pattern, channel, message)
 
-    def handle_user_connected(self, header, user_connected: UserConnected):
-        self.registry.user_online(user_connected.user_uuid)
+        rpc_message = RPCMessage()
+        rpc_message.ParseFromString(message)
+
+        if rpc_message.method == 'online_users':
+            online_users = str(self.registry.online_users())
+            self.publish(rpc_message.reply_to, online_users)
+
+    def handle_user_connected(self, header, user_event: UserEvent):
+        self.registry.user_online(user_event.user_uuid)
 
         for user_uuid in self.registry.online_users():
             # TODO Check for permissions...
             # Send to everyone?
-            tera_message = TeraMessage()
-            tera_message.head.source = create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
-            tera_message.head.dest = 'websocket.user.' + user_uuid
+            tera_message = self.create_tera_message(dest='websocket.user.' + user_uuid)
 
             any_message = Any()
-            any_message.Pack(user_connected)
+            any_message.Pack(user_event)
             tera_message.data.extend([any_message])
 
             self.publish(tera_message.head.dest, tera_message.SerializeToString())
 
-    def handle_user_disconnected(self, header, user_disconnected: UserDisconnected):
-        self.registry.user_offline(user_disconnected.user_uuid)
+    def handle_user_disconnected(self, header, user_event: UserEvent):
+        self.registry.user_offline(user_event.user_uuid)
+
+        for user_uuid in self.registry.online_users():
+            # TODO Check for permissions...
+            # Send to everyone?
+            tera_message = self.create_tera_message(dest='websocket.user.' + user_uuid)
+
+            any_message = Any()
+            any_message.Pack(user_event)
+            tera_message.data.extend([any_message])
+
+            self.publish(tera_message.head.dest, tera_message.SerializeToString())
 
     def handle_api_messages(self, module, uuid, message):
         print('handle_api_messages', module, uuid, message)

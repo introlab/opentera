@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package opentera.protobuf;
-
-message UserDisconnected {
-
-    string user_uuid = 1;
-}
