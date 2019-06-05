@@ -1,5 +1,4 @@
 from libtera.db.Base import db, BaseModel
-from libtera.db.models.TeraParticipant import TeraParticipant
 from enum import Enum
 
 sessions_participants_table = db.Table('t_sessions_participants', db.Column('id_session', db.Integer,
@@ -42,23 +41,24 @@ class TeraSession(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults():
-        base_session = TeraSession()
-        base_project.project_name = 'Default Project #1'
-        base_project.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        db.session.add(base_project)
-
-        base_project2 = TeraProject()
-        base_project2.project_name = 'Default Project #2'
-        base_project2.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        db.session.add(base_project2)
-
-        secret_project = TeraProject()
-        secret_project.project_name = "Secret Project #1"
-        secret_project.id_site = TeraSite.get_site_by_sitename('Top Secret Site').id_site
-        db.session.add(secret_project)
-
-        # Commit
-        db.session.commit()
+        # base_session = TeraSession()
+        # base_project.project_name = 'Default Project #1'
+        # base_project.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
+        # db.session.add(base_project)
+        #
+        # base_project2 = TeraProject()
+        # base_project2.project_name = 'Default Project #2'
+        # base_project2.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
+        # db.session.add(base_project2)
+        #
+        # secret_project = TeraProject()
+        # secret_project.project_name = "Secret Project #1"
+        # secret_project.id_site = TeraSite.get_site_by_sitename('Top Secret Site').id_site
+        # db.session.add(secret_project)
+        #
+        # # Commit
+        # db.session.commit()
+        pass
 
     @staticmethod
     def get_count():
