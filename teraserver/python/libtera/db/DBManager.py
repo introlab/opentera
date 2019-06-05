@@ -14,9 +14,10 @@ from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraKit import TeraKit
+from libtera.db.models.TeraSession import TeraSession
 
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
+# from libtera.db.models.TeraProjectAccess import TeraProjectAccess
+# from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 
 from modules.FlaskModule.FlaskModule import flask_app
 
@@ -75,6 +76,10 @@ class DBManager:
             print('No device - creating defaults')
             TeraDevice.create_defaults()
 
+        if TeraSession.get_count() == 0:
+            print('No session - creating defaults')
+            TeraSession.create_defaults()
+
     @staticmethod
     def open(db_infos, echo=False):
         db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
@@ -109,19 +114,3 @@ class DBManager:
 
         # Init tables
         db.create_all()
-
-    # @staticmethod
-    # def get_user_sites(user: TeraUser, **kwargs):
-    #     if user.user_superadmin:
-    #         return TeraSite.query.filter_by(**kwargs).all()
-    #     else:
-    #         # Only super user can create sites, by default we can list our sites only
-    #         return TeraSite.query.filter(TeraSite.id_site.in_(user.get_accessible_sites_ids())).filter_by(**kwargs).all()
-    #
-    # @staticmethod
-    # def get_user_projects(user: TeraUser, **kwargs):
-    #     if user.user_superadmin:
-    #         return TeraProject.query.filter_by(**kwargs).all()
-    #     else:
-    #         return TeraProject.query.filter(TeraProject.id_project.in_
-    #                                         (user.get_accessible_projects_ids())).filter_by(**kwargs).all()

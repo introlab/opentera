@@ -19,8 +19,14 @@ ParticipantWidget::ParticipantWidget(ComManager *comMan, const TeraData *data, Q
 
     // Query form definition
     queryDataRequest(WEB_FORMS_PATH, QUrlQuery(WEB_FORMS_QUERY_PARTICIPANT));
-
     setData(data);
+
+    // Query sessions for that participant
+    if (!m_data->isNew()){
+        QUrlQuery query;
+        query.addQueryItem(WEB_QUERY_ID_PARTICIPANT, QString::number(m_data->getId()));
+        //queryDataRequest(WEB_SESSIONINFO_PATH, query);
+    }
 }
 
 ParticipantWidget::~ParticipantWidget()

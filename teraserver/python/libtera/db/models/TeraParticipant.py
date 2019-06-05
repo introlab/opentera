@@ -72,6 +72,7 @@ class TeraParticipant(db.Model, BaseModel):
                     and data['participant_name'] == participant.participant_name:
 
                 # Update last online
+                # TOCHECK: Should it be really here???
                 participant.update_last_online()
 
                 return participant

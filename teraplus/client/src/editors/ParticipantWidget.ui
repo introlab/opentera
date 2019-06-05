@@ -333,6 +333,55 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
       <attribute name="title">
        <string>Séances</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <item>
+        <widget class="QTableWidget" name="tableSessions">
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>50</number>
+         </attribute>
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>100</number>
+         </attribute>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Séance</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Date</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Durée</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Responsable</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabCalendar">
+      <attribute name="icon">
+       <iconset resource="../../resources/TeraClient.qrc">
+        <normaloff>:/icons/sensors.png</normaloff>:/icons/sensors.png</iconset>
+      </attribute>
+      <attribute name="title">
+       <string>Calendrier</string>
+      </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QScrollArea" name="calArea">

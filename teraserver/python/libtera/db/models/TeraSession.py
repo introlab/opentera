@@ -1,4 +1,5 @@
 from libtera.db.Base import db, BaseModel
+from libtera.db.models.TeraParticipant import TeraParticipant
 from enum import Enum
 
 sessions_participants_table = db.Table('t_sessions_participants', db.Column('id_session', db.Integer,
@@ -30,4 +31,47 @@ class TeraSession(db.Model, BaseModel):
 
     session_user = db.relationship('TeraUser')
     session_session_type = db.relationship('TeraSessionType')
+
+    def to_json(self, ignore_fields=[], minimal=False):
+        ignore_fields.extend(['session_participants', 'session_user',
+                              'session_session_type'])
+        if minimal:
+            ignore_fields.extend([])
+
+        return super().to_json(ignore_fields=ignore_fields)
+
+    @staticmethod
+    def create_defaults():
+        base_session = TeraSession()
+        base_project.project_name = 'Default Project #1'
+        base_project.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
+        db.session.add(base_project)
+
+        base_project2 = TeraProject()
+        base_project2.project_name = 'Default Project #2'
+        base_project2.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
+        db.session.add(base_project2)
+
+        secret_project = TeraProject()
+        secret_project.project_name = "Secret Project #1"
+        secret_project.id_site = TeraSite.get_site_by_sitename('Top Secret Site').id_site
+        db.session.add(secret_project)
+
+        # Commit
+        db.session.commit()
+
+    @staticmethod
+    def get_count():
+        count = db.session.query(db.func.count(TeraSession.id_session))
+        return count.first()[0]
+
+    @staticmethod
+    def get_session_by_id(ses_id: int):
+        return TeraSession.query.filter_by(id_session=ses_id).first()
+
+    @staticmethod
+    def get_sessions_for_participant(part_id: int):
+        return TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
+                                                                               part_id).all()
+
 

@@ -309,3 +309,12 @@ class DBManagerTeraUserAccess:
             .filter(TeraKit.id_kit.in_(self.get_accessible_kits_ids()),
                     TeraParticipant.id_participant.in_(self.get_accessible_participants_ids())).all()
         return parts
+
+    def query_session(self, session_id: int):
+        from libtera.db.models.TeraParticipant import TeraParticipant
+        from libtera.db.models.TeraSession import TeraSession
+
+        session = TeraSession.query.join(TeraSession.session_participants).filter_by(id_session=session_id)\
+            .filter(TeraParticipant.id_participant_group.in_(self.get_accessible_participants_ids())).first()
+
+        return session
