@@ -9,7 +9,7 @@ from messages.python.RPCMessage_pb2 import RPCMessage
 import datetime
 
 
-class OnlineUsers(Resource):
+class QueryOnlineUsers(Resource):
     def __init__(self, flaskModule):
         Resource.__init__(self)
         self.flaskModule = flaskModule
