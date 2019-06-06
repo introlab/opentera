@@ -39,6 +39,14 @@ class UserManagerModule(BaseModule):
         # self.unsubscribe_pattern_with_callback("websocket.*", self.notify_websocket_messages_deprecated)
         # self.unsubscribe_pattern_with_callback("api.*", self.notify_api_messages_deprecated)
 
+    def setup_rpc_interface(self):
+        self.rpc_api['online_users'] = {'args': [], 'returns': 'list', 'callback': self.online_users_rpc_callback}
+
+    def online_users_rpc_callback(self, *args, **kwargs):
+        print('online_users_rpc_callback', args, kwargs)
+        online_users = str(self.registry.online_users())
+        return online_users
+
     def setup_module_pubsub(self):
         pass
         # Additional subscribe (old stuff to be removed)
@@ -81,15 +89,15 @@ class UserManagerModule(BaseModule):
                 elif user_event.type == user_event.USER_DISCONNECTED:
                     self.handle_user_disconnected(tera_message.head, user_event)
 
-    def notify_module_rpc(self, pattern, channel, message):
-        print('Received rpc', self, pattern, channel, message)
-
-        rpc_message = RPCMessage()
-        rpc_message.ParseFromString(message)
-
-        if rpc_message.method == 'online_users':
-            online_users = str(self.registry.online_users())
-            self.publish(rpc_message.reply_to, online_users)
+    # def notify_module_rpc(self, pattern, channel, message):
+    #     print('Received rpc', self, pattern, channel, message)
+    #
+    #     rpc_message = RPCMessage()
+    #     rpc_message.ParseFromString(message)
+    #
+    #     if rpc_message.method == 'online_users':
+    #         online_users = str(self.registry.online_users())
+    #         self.publish(rpc_message.reply_to, online_users)
 
     def handle_user_connected(self, header, user_event: UserEvent):
         self.registry.user_online(user_event.user_uuid)
