@@ -1,5 +1,7 @@
 from libtera.db.Base import db, BaseModel
 from enum import Enum
+import random
+from datetime import datetime, timedelta
 
 sessions_participants_table = db.Table('t_sessions_participants', db.Column('id_session', db.Integer,
                                                                             db.ForeignKey('t_sessions.id_session',
@@ -41,24 +43,25 @@ class TeraSession(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults():
-        # base_session = TeraSession()
-        # base_project.project_name = 'Default Project #1'
-        # base_project.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        # db.session.add(base_project)
-        #
-        # base_project2 = TeraProject()
-        # base_project2.project_name = 'Default Project #2'
-        # base_project2.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        # db.session.add(base_project2)
-        #
-        # secret_project = TeraProject()
-        # secret_project.project_name = "Secret Project #1"
-        # secret_project.id_site = TeraSite.get_site_by_sitename('Top Secret Site').id_site
-        # db.session.add(secret_project)
-        #
-        # # Commit
-        # db.session.commit()
-        pass
+        from libtera.db.models.TeraUser import TeraUser
+        from libtera.db.models.TeraSessionType import TeraSessionType
+        from libtera.db.models.TeraParticipant import TeraParticipant
+
+        session_user = TeraUser.get_user_by_id(1)
+        session_part = TeraParticipant.get_participant_by_name('Test Participant #1')
+        for i in range(8):
+            base_session = TeraSession()
+            base_session.session_user = session_user
+            ses_type = random.randint(1, 4)
+            base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
+            base_session.session_name = "Séance #" + str(i+1)
+            base_session.session_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
+            ses_status = random.randint(0, 4)
+            base_session.session_status = ses_status
+            base_session.session_participants = [session_part]
+            db.session.add(base_session)
+
+        db.session.commit()
 
     @staticmethod
     def get_count():
