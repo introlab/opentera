@@ -36,8 +36,6 @@ class UserManagerModule(BaseModule):
 
     def __del__(self):
         pass
-        # self.unsubscribe_pattern_with_callback("websocket.*", self.notify_websocket_messages_deprecated)
-        # self.unsubscribe_pattern_with_callback("api.*", self.notify_api_messages_deprecated)
 
     def setup_rpc_interface(self):
         self.rpc_api['online_users'] = {'args': [], 'returns': 'list', 'callback': self.online_users_rpc_callback}
@@ -49,25 +47,6 @@ class UserManagerModule(BaseModule):
 
     def setup_module_pubsub(self):
         pass
-        # Additional subscribe (old stuff to be removed)
-        # self.subscribe_pattern_with_callback("websocket.*", self.notify_websocket_messages_deprecated)
-        # self.subscribe_pattern_with_callback("api.*", self.notify_api_messages_deprecated)
-
-    def notify_websocket_messages_deprecated(self, pattern, channel, message):
-        """
-        Deprecated, should be replaced with protobuf messages
-        """
-        parts = channel.split('.')
-        if 'websocket' in parts[0]:
-            self.handle_websocket_messages(parts[1], message)
-
-    def notify_api_messages_deprecated(self, pattern, channel, message):
-        """
-            Deprecated, should be replaced with protobuf messages
-        """
-        parts = channel.split('.')
-        if 'api' in parts[0]:
-            self.handle_api_messages(parts[1], parts[2], message)
 
     def notify_module_messages(self, pattern, channel, message):
         """
@@ -88,16 +67,6 @@ class UserManagerModule(BaseModule):
                     self.handle_user_connected(tera_message.head, user_event)
                 elif user_event.type == user_event.USER_DISCONNECTED:
                     self.handle_user_disconnected(tera_message.head, user_event)
-
-    # def notify_module_rpc(self, pattern, channel, message):
-    #     print('Received rpc', self, pattern, channel, message)
-    #
-    #     rpc_message = RPCMessage()
-    #     rpc_message.ParseFromString(message)
-    #
-    #     if rpc_message.method == 'online_users':
-    #         online_users = str(self.registry.online_users())
-    #         self.publish(rpc_message.reply_to, online_users)
 
     def handle_user_connected(self, header, user_event: UserEvent):
         self.registry.user_online(user_event.user_uuid)
@@ -127,33 +96,7 @@ class UserManagerModule(BaseModule):
 
             self.publish(tera_message.head.dest, tera_message.SerializeToString())
 
-    def handle_api_messages(self, module, uuid, message):
-        print('handle_api_messages', module, uuid, message)
-        if message == b'list' or message == 'list':
-            online_users = str(self.registry.online_users())
-            # Answer
-            print('answering', 'server.' + module + '.' + str(uuid) + '.answer', online_users)
-            self.publish('server.' + module + '.' + str(uuid) + '.answer', online_users)
-            return True
 
-    def handle_websocket_messages(self, uuid, message):
-        print('handle_websocket_messages', uuid, message)
-        if message == b'list' or message == 'list':
-            online_users = str(self.registry.online_users())
-            # Answer
-            print('answering', 'server.' + str(uuid) + '.answer', online_users)
-            self.publish('server.' + str(uuid) + '.answer', online_users)
-            return True
-        if message == b'session' or message == 'session':
-            # Create message
-            protobuf_message = CreateSession(source='UserManagerModule',
-                                             command='create_session',
-                                             reply_to='server.' + uuid + '.create_session')
 
-            # Send message to WebRTCModule
-            self.publish('webrtc.' + 'create_session', protobuf_message.SerializeToString())
-
-        print('Error unhandled message ', uuid, message)
-        return False
 
 
