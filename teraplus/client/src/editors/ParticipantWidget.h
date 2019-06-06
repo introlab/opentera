@@ -2,6 +2,8 @@
 #define PARTICIPANTWIDGET_H
 
 #include <QWidget>
+#include <QTableWidgetItem>
+
 #include "DataEditorWidget.h"
 #include "GlobalMessageBox.h"
 
@@ -24,13 +26,20 @@ public:
 private:
     Ui::ParticipantWidget *ui;
 
+    QMap<int, QTableWidgetItem*>    m_listSessions_items;
+    QMap<int, TeraData*>            m_ids_session_types;
+
     void updateControlsState();
     void updateFieldsValue();
 
     bool validateData();
 
+    void updateSession(const TeraData* session);
+
 private slots:
     void processFormsReply(QString form_type, QString data);
+    void processSessionsReply(QList<TeraData> sessions);
+    void processSessionTypesReply(QList<TeraData> session_types);
 
     void btnSave_clicked();
     void btnUndo_clicked();

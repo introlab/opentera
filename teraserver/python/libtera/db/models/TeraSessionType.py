@@ -33,6 +33,16 @@ class TeraSessionType(db.Model, BaseModel):
     session_type_uses_devices_types = db.relationship("TeraDeviceType", secondary=sessions_types_devices_table,
                                                       cascade="all,delete")
 
+    def to_json(self, ignore_fields=None, minimal=False):
+        if ignore_fields is None:
+            ignore_fields = []
+        ignore_fields.extend(['session_type_projects', 'session_type_uses_devices_types'])
+        if minimal:
+            ignore_fields.extend(['session_type_prefix', 'session_type_online', 'session_type_multiusers',
+                                  'session_type_profile'])
+        rval = super().to_json(ignore_fields=ignore_fields)
+        return rval
+
     @staticmethod
     def create_defaults():
         from libtera.db.models.TeraProject import TeraProject

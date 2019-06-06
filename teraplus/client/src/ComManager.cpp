@@ -242,6 +242,8 @@ ComManager::signal_ptr ComManager::getSignalFunctionForDataType(const TeraDataTy
         return &ComManager::kitDevicesReceived;
     case TERADATA_PROJECTACCESS:
         return &ComManager::projectAccessReceived;
+    case TERADATA_SESSION:
+        return &ComManager::sessionsReceived;
     }
 
     return nullptr;
@@ -338,6 +340,12 @@ bool ComManager::handleDataReply(const QString& reply_path, const QString &reply
     case TERADATA_PROJECTACCESS:
         emit projectAccessReceived(items);
         break;
+    case TERADATA_SESSION:
+        emit sessionsReceived(items);
+        break;
+/*    default:
+        emit getSignalFunctionForDataType(items_type);*/
+
     }
 
     // Always emit generic signal

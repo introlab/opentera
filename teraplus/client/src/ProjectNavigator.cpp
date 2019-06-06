@@ -178,11 +178,12 @@ void ProjectNavigator::updateGroup(const TeraData *group)
         }
     }
 
-    QTreeWidgetItem* item;
+    QTreeWidgetItem* item = nullptr;
     if (m_groups_items.contains(id_group)){
         // group already there
         item = m_groups_items[id_group];
-    }else{
+    }
+    if (!item){
         // New group - add it.
         item = new QTreeWidgetItem();
         QTreeWidgetItem* project_item = m_projects_items[id_project];

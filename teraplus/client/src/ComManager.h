@@ -102,6 +102,7 @@ signals:
     void siteAccessReceived(QList<TeraData> access_list);
     void projectAccessReceived(QList<TeraData> access_list);
     void kitDevicesReceived(QList<TeraData> kits_devices_list);
+    void sessionsReceived(QList<TeraData> sessions_list);
 
     //void queryResultsReceived(QString object, QUrlQuery url_query, QString data);
     //void postResultsReceived(QString path, QString data);

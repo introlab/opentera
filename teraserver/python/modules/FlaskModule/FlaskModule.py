@@ -84,6 +84,7 @@ class FlaskModule(BaseModule):
         from .API.QueryProjectAccess import QueryProjectAccess
         from .API.QueryParticipantGroup import QueryParticipantGroup
         from .API.QuerySessions import QuerySessions
+        from .API.QuerySessionTypes import QuerySessionTypes
 
         self.api.add_resource(Login, '/api/login', resource_class_args=[self])
         self.api.add_resource(QuerySites, '/api/sites', resource_class_args=[self])
@@ -100,6 +101,7 @@ class FlaskModule(BaseModule):
         self.api.add_resource(QueryKitDevice, '/api/kitdevices', resource_class_args=[self])
         self.api.add_resource(QueryParticipantGroup, '/api/groups', resource_class_args=[self])
         self.api.add_resource(QuerySessions, '/api/sessions', resource_class_args=[self])
+        self.api.add_resource(QuerySessionTypes, '/api/sessiontypes', resource_class_args=[self])
 
     def init_views(self):
         from .Views.Index import Index

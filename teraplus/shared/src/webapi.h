@@ -15,6 +15,7 @@
 #define WEB_PARTICIPANTINFO_PATH    "/api/participants"
 #define WEB_GROUPINFO_PATH          "/api/groups"
 #define WEB_SESSIONINFO_PATH        "/api/sessions"
+#define WEB_SESSIONTYPES_PATH       "/api/sessiontypes"
 
 #define WEB_FORMS_PATH                  "/api/forms"
 #define WEB_FORMS_QUERY_USER_PROFILE    "type=user_profile"

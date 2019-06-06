@@ -1,4 +1,5 @@
 from libtera.db.Base import db, BaseModel
+
 from enum import Enum
 import random
 from datetime import datetime, timedelta
@@ -24,7 +25,8 @@ class TeraSession(db.Model, BaseModel):
     id_session_type = db.Column(db.Integer, db.ForeignKey('t_sessions_types.id_session_type'), nullable=False)
     id_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user'), nullable=False)
     session_name = db.Column(db.String, nullable=False)
-    session_datetime = db.Column(db.TIMESTAMP, nullable=False)
+    session_start_datetime = db.Column(db.TIMESTAMP, nullable=False)
+    session_duration = db.Column(db.Integer, nullable=False, default=0)
     session_status = db.Column(db.Integer, nullable=False)
     session_comments = db.Column(db.String, nullable=True)
     session_participants = db.relationship("TeraParticipant", secondary=sessions_participants_table,
@@ -39,7 +41,22 @@ class TeraSession(db.Model, BaseModel):
         if minimal:
             ignore_fields.extend([])
 
-        return super().to_json(ignore_fields=ignore_fields)
+        rval = super().to_json(ignore_fields=ignore_fields)
+
+        if not minimal:
+            # Append list of participants ids
+            session_part = []
+            for part in self.session_participants:
+                session_part.append(part.id_participant)
+            rval["session_participants_ids"] = session_part
+
+            # Append user name
+            rval["session_user"] = self.session_user.get_fullname()
+
+            # Append session type infos
+            # rval["session_session_type"] = self.session_session_type.to_json(ignore_fields=['id_session_type',
+            #                                                                                'session_type_profile'])
+        return rval
 
     @staticmethod
     def create_defaults():
@@ -55,7 +72,8 @@ class TeraSession(db.Model, BaseModel):
             ses_type = random.randint(1, 4)
             base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
             base_session.session_name = "Séance #" + str(i+1)
-            base_session.session_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
+            base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
+            base_session.session_duration = random.randint(60, 4800)
             ses_status = random.randint(0, 4)
             base_session.session_status = ses_status
             base_session.session_participants = [session_part]
@@ -74,6 +92,7 @@ class TeraSession(db.Model, BaseModel):
 
     @staticmethod
     def get_sessions_for_participant(part_id: int):
+        from libtera.db.models.TeraParticipant import TeraParticipant
         return TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
                                                                                part_id).all()
 

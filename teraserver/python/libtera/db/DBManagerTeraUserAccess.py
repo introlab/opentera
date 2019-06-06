@@ -5,6 +5,7 @@ from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraDeviceType import TeraDeviceType
+from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraKit import TeraKit
 
@@ -154,15 +155,6 @@ class DBManagerTeraUserAccess:
 
         return projects
 
-    def get_projects_roles(self):
-        projects_roles = {}
-        project_list = self.get_accessible_projects()
-
-        for project in project_list:
-            role = self.get_project_role(project)
-            projects_roles[project.project_name] = role
-        return projects_roles
-
     def get_accessible_sites(self, admin_only=False):
         if self.user.user_superadmin:
             site_list = TeraSite.query.all()
@@ -181,6 +173,19 @@ class DBManagerTeraUserAccess:
             sites_ids.append(site.id_site)
 
         return sites_ids
+
+    def get_accessible_session_types(self, admin_only=False):
+        project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
+        return TeraSessionType.query.filter(TeraProject.id_project.in_(project_id_list)).all()
+
+    def get_projects_roles(self):
+        projects_roles = {}
+        project_list = self.get_accessible_projects()
+
+        for project in project_list:
+            role = self.get_project_role(project)
+            projects_roles[project.project_name] = role
+        return projects_roles
 
     def get_sites_roles(self):
         sites_roles = {}
@@ -206,6 +211,12 @@ class DBManagerTeraUserAccess:
         sites_ids = self.get_accessible_sites_ids()
         device = TeraDevice.query.filter_by(id_device=device_id).filter(TeraDevice.id_site.in_(sites_ids)).first()
         return device
+
+    def query_session_type_by_id(self, session_type_id:int):
+        proj_ids = self.get_accessible_projects_ids()
+        session_type = TeraSessionType.query.filter_by(id_session_type=session_type_id).filter(TeraProject.id_project.
+                                                                                               in_(proj_ids)).first()
+        return session_type
 
     def query_projects_for_site(self, site_id: int):
         proj_ids = self.get_accessible_projects_ids()
