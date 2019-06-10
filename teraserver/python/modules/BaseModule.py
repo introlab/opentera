@@ -2,6 +2,7 @@ from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
 from enum import Enum, unique
 from messages.python.TeraMessage_pb2 import TeraMessage
+from messages.python.RPCMessage_pb2 import RPCMessage
 import datetime
 
 
@@ -26,11 +27,14 @@ class BaseModule(RedisClient):
     def __init__(self, module_name, config: ConfigManager):
 
         # Set module name
-        # TODO verify module name
+        # TODO verify module name to be unique
         self.module_name = module_name
 
         # Store config
         self.config = config
+
+        # Store RPC API
+        self.rpc_api = dict()
 
         # Init redis with configuration
         RedisClient.__init__(self, config=config.redis_config)
@@ -40,6 +44,9 @@ class BaseModule(RedisClient):
 
     def redisConnectionMade(self):
         print('BaseModule.connectionMade')
+
+        # Build RPC interface
+        self.setup_rpc_interface()
 
         # Build standard interface
         self.build_interface()
@@ -57,6 +64,9 @@ class BaseModule(RedisClient):
         # RPC messages
         self.subscribe_pattern_with_callback("module." + self.module_name + ".rpc", self.notify_module_rpc)
 
+    def setup_rpc_interface(self):
+        pass
+
     def notify_module_messages(self, pattern, channel, message):
         """
         We have received a published message from redis
@@ -66,7 +76,28 @@ class BaseModule(RedisClient):
 
     def notify_module_rpc(self, pattern, channel, message):
         print('BaseModule - Received rpc', self, pattern, channel, message)
-        pass
+
+        try:
+            # Look for a RPCMessage
+            rpc_message = RPCMessage()
+            rpc_message.ParseFromString(message)
+
+            if self.rpc_api.__contains__(rpc_message.method):
+
+                # RPC method found, call it with the args
+
+                # TODO process args and types
+                args = list()
+                kwargs = dict()
+
+                # Call callback function
+                retval = self.rpc_api[rpc_message.method]['callback'](*args, **kwargs)
+
+                # Return result (a json string)
+                self.publish(rpc_message.reply_to, retval)
+
+        except:
+            print('Error calling rpc method', message)
 
     def create_tera_message(self, dest='', seq=0):
 

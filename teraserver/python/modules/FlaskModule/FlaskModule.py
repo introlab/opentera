@@ -73,7 +73,7 @@ class FlaskModule(BaseModule):
         from .API.Logout import Logout
         from .API.QueryUsers import QueryUsers
         from .API.QueryForms import QueryForms
-        from .API.OnlineUsers import OnlineUsers
+        from .API.QueryOnlineUsers import QueryOnlineUsers
         from .API.QuerySites import QuerySites
         from .API.QueryProjects import QueryProjects
         from .API.QueryParticipants import QueryParticipants
@@ -87,11 +87,11 @@ class FlaskModule(BaseModule):
         from .API.QuerySessionTypes import QuerySessionTypes
 
         self.api.add_resource(Login, '/api/login', resource_class_args=[self])
-        self.api.add_resource(QuerySites, '/api/sites', resource_class_args=[self])
         self.api.add_resource(Logout, '/api/logout', resource_class_args=[self])
+        self.api.add_resource(QuerySites, '/api/sites', resource_class_args=[self])
         self.api.add_resource(QueryUsers, '/api/users', resource_class_args=[self])
         self.api.add_resource(QueryForms, '/api/forms', resource_class_args=[self])
-        self.api.add_resource(OnlineUsers, '/api/online', resource_class_args=[self])
+        self.api.add_resource(QueryOnlineUsers, '/api/online', resource_class_args=[self])
         self.api.add_resource(QueryProjects, '/api/projects', resource_class_args=[self])
         self.api.add_resource(QueryParticipants, '/api/participants', resource_class_args=[self])
         self.api.add_resource(QueryDevices, '/api/devices', resource_class_args=[self])
