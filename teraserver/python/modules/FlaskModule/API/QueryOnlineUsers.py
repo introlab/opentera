@@ -37,11 +37,6 @@ class QueryOnlineUsers(Resource):
             message.id = 1
             message.reply_to = my_name
 
-            # Testing args
-            test_double = Value()
-            test_double.double_value = 2.0
-            message.args.extend([test_double])
-
             self.flaskModule.publish('module.' + ModuleNames.USER_MANAGER_MODULE_NAME.value + '.rpc',
                                      message.SerializeToString())
 

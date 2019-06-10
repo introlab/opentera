@@ -90,19 +90,20 @@ class BaseModule(RedisClient):
                 args = list()
                 kwargs = dict()
 
-                # TODO type checking with declared rpc interface
+                # TODO type checking with declared rpc interface ?
                 for value in rpc_message.args:
-                    pass
+                    # Append the oneof value to args
+                    args.append(getattr(value, value.WhichOneof('arg_value')))
 
                 # Call callback function
-                value = self.rpc_api[rpc_message.method]['callback'](*args, **kwargs)
+                ret_value = self.rpc_api[rpc_message.method]['callback'](*args, **kwargs)
 
                 # More than we need?
                 my_dict = {'method': rpc_message.method,
                            'id': rpc_message.id,
                            'pattern': pattern,
                            'status': 'OK',
-                           'return_value': value}
+                           'return_value': ret_value}
 
                 json_data = json.dumps(my_dict)
 

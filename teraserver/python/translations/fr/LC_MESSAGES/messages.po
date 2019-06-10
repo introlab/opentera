@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-06-06 16:29-0400\n"
+"POT-Creation-Date: 2019-06-10 09:40-0400\n"
 "PO-Revision-Date: 2019-03-28 16:24-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -21,8 +21,8 @@ msgstr ""
 #: libtera/forms/TeraDeviceForm.py:26 libtera/forms/TeraKitDeviceForm.py:25
 #: libtera/forms/TeraKitForm.py:24 libtera/forms/TeraParticipantForm.py:19
 #: libtera/forms/TeraParticipantGroupForm.py:20
-#: libtera/forms/TeraProjectForm.py:19 libtera/forms/TeraSiteForm.py:12
-#: libtera/forms/TeraUserForm.py:12
+#: libtera/forms/TeraProjectForm.py:19 libtera/forms/TeraSessionTypeForm.py:20
+#: libtera/forms/TeraSiteForm.py:12 libtera/forms/TeraUserForm.py:12
 msgid "Informations"
 msgstr ""
 
@@ -150,6 +150,34 @@ msgstr ""
 
 #: libtera/forms/TeraProjectForm.py:27
 msgid "Nom du site initial"
+msgstr ""
+
+#: libtera/forms/TeraSessionTypeForm.py:24
+msgid "ID Type Séance"
+msgstr ""
+
+#: libtera/forms/TeraSessionTypeForm.py:25
+msgid "Nom du type de séance"
+msgstr ""
+
+#: libtera/forms/TeraSessionTypeForm.py:26
+msgid "Code du type de séance"
+msgstr ""
+
+#: libtera/forms/TeraSessionTypeForm.py:28
+msgid "Séance assistée?"
+msgstr ""
+
+#: libtera/forms/TeraSessionTypeForm.py:29
+msgid "Séance de groupe?"
+msgstr ""
+
+#: libtera/forms/TeraSessionTypeForm.py:30
+msgid "Couleur d'affichage"
+msgstr ""
+
+#: libtera/forms/TeraSessionTypeForm.py:31
+msgid "Paramètres spécifiques"
 msgstr ""
 
 #: libtera/forms/TeraSiteForm.py:16
@@ -286,6 +314,16 @@ msgstr ""
 
 #: libtera/forms/TeraUserForm.py:92
 msgid "Permettre l'accès via le web"
+msgstr ""
+
+#: modules/FlaskModule/API/QuerySessionTypes.py:119
+msgid ""
+"Impossible de supprimer - pas administrateur dans tous les projets de ce "
+"type."
+msgstr ""
+
+#: modules/FlaskModule/API/QuerySessionTypes.py:123
+msgid "Impossible de supprimer - des seances de ce type existent."
 msgstr ""
 
 #: modules/FlaskModule/API/QueryUsers.py:136
