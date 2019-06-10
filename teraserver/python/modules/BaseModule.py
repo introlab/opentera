@@ -3,6 +3,8 @@ from libtera.ConfigManager import ConfigManager
 from enum import Enum, unique
 from messages.python.TeraMessage_pb2 import TeraMessage
 from messages.python.RPCMessage_pb2 import RPCMessage
+
+import json
 import datetime
 
 
@@ -85,19 +87,40 @@ class BaseModule(RedisClient):
             if self.rpc_api.__contains__(rpc_message.method):
 
                 # RPC method found, call it with the args
-
-                # TODO process args and types
                 args = list()
                 kwargs = dict()
 
+                # TODO type checking with declared rpc interface
+                for value in rpc_message.args:
+                    pass
+
                 # Call callback function
-                retval = self.rpc_api[rpc_message.method]['callback'](*args, **kwargs)
+                value = self.rpc_api[rpc_message.method]['callback'](*args, **kwargs)
+
+                # More than we need?
+                my_dict = {'method': rpc_message.method,
+                           'id': rpc_message.id,
+                           'pattern': pattern,
+                           'status': 'OK',
+                           'return_value': value}
+
+                json_data = json.dumps(my_dict)
 
                 # Return result (a json string)
-                self.publish(rpc_message.reply_to, retval)
+                self.publish(rpc_message.reply_to, json_data)
 
         except:
             print('Error calling rpc method', message)
+            my_dict = {'method': rpc_message.method,
+                       'id': rpc_message.id,
+                       'pattern': pattern,
+                       'status': 'Error',
+                       'return_value': None}
+
+            json_data = json.dumps(my_dict)
+
+            # Return result (a json string)
+            self.publish(rpc_message.reply_to, json_data)
 
     def create_tera_message(self, dest='', seq=0):
 

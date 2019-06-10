@@ -5,7 +5,7 @@ from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
 from libtera.redis.AsyncRedisSubscribeWait import AsyncRedisSubscribeWait
 from modules.BaseModule import ModuleNames
-from messages.python.RPCMessage_pb2 import RPCMessage
+from messages.python.RPCMessage_pb2 import RPCMessage, Value
 import datetime
 
 
@@ -34,7 +34,13 @@ class QueryOnlineUsers(Resource):
             message = RPCMessage()
             message.method = 'online_users'
             message.timestamp = datetime.datetime.now().timestamp()
+            message.id = 1
             message.reply_to = my_name
+
+            # Testing args
+            test_double = Value()
+            test_double.double_value = 2.0
+            message.args.extend([test_double])
 
             self.flaskModule.publish('module.' + ModuleNames.USER_MANAGER_MODULE_NAME.value + '.rpc',
                                      message.SerializeToString())

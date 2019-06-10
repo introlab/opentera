@@ -42,8 +42,7 @@ class UserManagerModule(BaseModule):
 
     def online_users_rpc_callback(self, *args, **kwargs):
         print('online_users_rpc_callback', args, kwargs)
-        online_users = str(self.registry.online_users())
-        return online_users
+        return self.registry.online_users()
 
     def setup_module_pubsub(self):
         pass
