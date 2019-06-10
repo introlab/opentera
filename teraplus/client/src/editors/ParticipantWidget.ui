@@ -351,6 +351,9 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
            <height>20</height>
           </size>
          </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
          <attribute name="horizontalHeaderMinimumSectionSize">
           <number>75</number>
          </attribute>

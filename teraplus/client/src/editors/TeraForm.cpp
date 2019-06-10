@@ -286,6 +286,9 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
             if (item_type == "label"){
                 item_widget = createLabelWidget(item_data);
             }
+            if (item_type == "color"){
+                item_widget = createColorWidget(item_data);
+            }
 
 
             if (item_widget){
@@ -421,6 +424,10 @@ QWidget *TeraForm::createTextWidget(const QVariantMap &structure, bool is_masked
     if (is_masked)
         item_text->setEchoMode(QLineEdit::Password);
 
+    if (structure.contains("max_length")){
+        item_text->setMaxLength(structure["max_length"].toInt());
+    }
+
     connect(item_text, &QLineEdit::textChanged, this, &TeraForm::widgetValueChanged);
 
     return item_text;
@@ -484,7 +491,25 @@ QWidget *TeraForm::createLongTextWidget(const QVariantMap &structure)
 {
     Q_UNUSED(structure)
     QTextEdit* item_text = new QTextEdit();
+
     return item_text;
+}
+
+QWidget *TeraForm::createColorWidget(const QVariantMap &structure)
+{
+    Q_UNUSED(structure)
+    QPushButton* item_btn = new QPushButton();
+
+    item_btn->setFlat(true);
+    item_btn->setProperty("color", "#FFFFFF");
+    item_btn->setStyleSheet("background-color: #FFFFFF");
+    item_btn->setCursor(Qt::PointingHandCursor);
+    item_btn->setMaximumWidth(100);
+
+    // Connect signal
+    connect(item_btn, &QPushButton::clicked, this, &TeraForm::colorWidgetClicked);
+
+    return item_btn;
 }
 
 void TeraForm::checkConditions()
@@ -604,6 +629,12 @@ void TeraForm::getWidgetValues(QWidget* widget, QVariant *id, QVariant *value)
         *value = label->text();
     }
 
+    if (QPushButton* btn = dynamic_cast<QPushButton*>(widget)){
+        if (btn->property("color").isValid()){
+            *value = btn->property("color").toString();
+        }
+    }
+
     if (value->canConvert(QMetaType::QString)){
         bool ok;
         QString string_val = value->toString();
@@ -689,6 +720,15 @@ void TeraForm::setWidgetValue(QWidget *widget, const QVariant &value)
         return;
     }
 
+    if (QPushButton* btn = dynamic_cast<QPushButton*>(widget)){
+        if (value.toString().startsWith("#")){
+            btn->setProperty("color", value.toString());
+            btn->setStyleSheet(QString("background-color: " + value.toString() + ";"));
+            return;
+        }
+
+    }
+
     LOG_WARNING("Unhandled widget: "+ QString(widget->metaObject()->className()) + " for item " + value.toString(), "TeraForm::setWidgetValue");
 }
 
@@ -734,4 +774,24 @@ void TeraForm::widgetValueChanged()
 
 
 
+}
+
+void TeraForm::colorWidgetClicked()
+{
+    QObject* sender = QObject::sender();
+    if (!sender)
+        return;
+
+    QPushButton* sender_widget = dynamic_cast<QPushButton*>(sender);
+
+    QColorDialog diag;
+    QColor color;
+
+    color = diag.getColor(QColor(sender_widget->property("color").toString()),nullptr,tr("Choisir la couleur"));
+
+    if (color.isValid()){
+        sender_widget->setProperty("color", color.name());
+        // Display current color
+        sender_widget->setStyleSheet(QString("background-color: " + color.name() + ";"));
+    }
 }

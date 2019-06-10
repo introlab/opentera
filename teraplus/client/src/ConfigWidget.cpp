@@ -79,7 +79,7 @@ void ConfigWidget::com_NetworkError(QNetworkReply::NetworkError error, QString e
 {
     Q_UNUSED(error)
     GlobalMessageBox error_diag(this);
-    if (error_str.isEmpty() || error_str.startsWith(""""""))
+    if (error_str.isEmpty() || error_str.startsWith("\"\""))
         error_str = tr("Erreur inconnue");
     error_diag.showError("Erreur", error_str);
 }

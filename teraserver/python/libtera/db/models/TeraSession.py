@@ -96,4 +96,6 @@ class TeraSession(db.Model, BaseModel):
         return TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
                                                                                part_id).all()
 
-
+    @staticmethod
+    def get_sessions_for_type(session_type_id: int):
+        return TeraSession.query.filter_by(id_session_type=session_type_id).all()

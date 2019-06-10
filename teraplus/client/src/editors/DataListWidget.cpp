@@ -5,6 +5,7 @@
 #include "editors/SiteWidget.h"
 #include "editors/DeviceWidget.h"
 #include "editors/KitWidget.h"
+#include "editors/SessionTypeWidget.h"
 
 DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWidget *parent):
     QWidget(parent),
@@ -73,6 +74,11 @@ void DataListWidget::updateDataInList(TeraData* data, bool select_item){
         }
     }
 
+    QString color_field = TeraData::getDataTypeName(m_dataType) + "_color";
+    if (data->hasFieldName(color_field)){
+        item->setTextColor(QColor(data->getFieldValue(color_field).toString()));
+    }
+
     if (select_item){
         ui->lstData->setCurrentItem(item);
     }
@@ -126,6 +132,9 @@ void DataListWidget::showEditor(TeraData *data)
         break;
         case TERADATA_KIT:
             m_editor = new KitWidget(m_comManager, data);
+        break;
+        case TERADATA_SESSIONTYPE:
+            m_editor = new SessionTypeWidget(m_comManager, data);
         break;
         default:
             LOG_ERROR("Unhandled datatype for editor: " + TeraData::getDataTypeName(data->getDataType()), "DataListWidget::lstData_currentItemChanged");

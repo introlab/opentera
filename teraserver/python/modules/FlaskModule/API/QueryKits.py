@@ -124,7 +124,7 @@ class QueryKits(Resource):
         # Only site admins can delete
         kit = TeraKit.get_kit_by_id(id_todel)
 
-        if user_access.get_site_role(kit.kit_site) != 'admin':
+        if user_access.get_site_role(kit.id_site) != 'admin':
             return '', 403
 
         # If we are here, we are allowed to delete. Do so.

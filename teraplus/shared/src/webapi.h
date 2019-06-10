@@ -15,7 +15,7 @@
 #define WEB_PARTICIPANTINFO_PATH    "/api/participants"
 #define WEB_GROUPINFO_PATH          "/api/groups"
 #define WEB_SESSIONINFO_PATH        "/api/sessions"
-#define WEB_SESSIONTYPES_PATH       "/api/sessiontypes"
+#define WEB_SESSIONTYPE_PATH       "/api/sessiontypes"
 
 #define WEB_FORMS_PATH                  "/api/forms"
 #define WEB_FORMS_QUERY_USER_PROFILE    "type=user_profile"
@@ -27,6 +27,7 @@
 #define WEB_FORMS_QUERY_PROJECT         "type=project"
 #define WEB_FORMS_QUERY_GROUP           "type=group"
 #define WEB_FORMS_QUERY_PARTICIPANT     "type=participant"
+#define WEB_FORMS_QUERY_SESSION_TYPE    "type=session_type"
 
 #define WEB_QUERY_USERUUID          "user_uuid"
 #define WEB_QUERY_ID_USER           "id_user"

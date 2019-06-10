@@ -2,10 +2,12 @@ from flask import jsonify, session, request
 from flask_restful import Resource, reqparse
 from modules.Globals import auth
 from libtera.db.models.TeraUser import TeraUser
+from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
+from flask_babel import gettext
 
 
 class QuerySessionTypes(Resource):
@@ -49,55 +51,83 @@ class QuerySessionTypes(Resource):
 
     @auth.login_required
     def post(self):
-        # parser = reqparse.RequestParser()
-        # parser.add_argument('participant', type=str, location='json', help='Partiicpant to create / update',
-        #                     required=True)
-        #
-        # current_user = TeraUser.get_user_by_uuid(session['user_id'])
-        # user_access = DBManager.userAccess(current_user)
-        # # Using request.json instead of parser, since parser messes up the json!
-        # if 'participant' not in request.json:
-        #     return '', 400
-        #
-        # json_participant = request.json['participant']
-        #
-        # # Validate if we have an id
-        # if 'id_participant' not in json_participant or 'id_participant_group' not in json_participant:
-        #     return '', 400
-        #
-        # # Check if current user can modify the posted group
-        # # User can modify or add a group if it has admin access to that project
-        # if json_participant['id_participant_group'] not in user_access.get_accessible_groups_ids(admin_only=True):
-        #     return '', 403
-        #
-        # # Do the update!
-        # if json_participant['id_participant'] > 0:
-        #     # Already existing
-        #     try:
-        #         TeraParticipant.update_participant(json_participant['id_participant'], json_participant)
-        #     except exc.SQLAlchemyError:
-        #         import sys
-        #         print(sys.exc_info())
-        #         return '', 500
-        # else:
-        #     # New
-        #     try:
-        #         new_part = TeraParticipant()
-        #         new_part.from_json(json_participant)
-        #         TeraParticipant.insert_participant(new_part)
-        #         # Update ID for further use
-        #         json_participant['id_participant'] = new_part.id_participant
-        #     except exc.SQLAlchemyError:
-        #         import sys
-        #         print(sys.exc_info())
-        #         return '', 500
-        #
-        # # TODO: Publish update to everyone who is subscribed to sites update...
-        # update_participant = TeraParticipant.get_participant_by_id(json_participant['id_participant'])
-        #
-        # return jsonify([update_participant.to_json()])
-        return '', 501
+        parser = reqparse.RequestParser()
+        parser.add_argument('session_type', type=str, location='json', help='Session type to create / update',
+                            required=True)
+
+        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
+        # Using request.json instead of parser, since parser messes up the json!
+        if 'session_type' not in request.json:
+            return '', 400
+
+        json_session_type = request.json['session_type']
+
+        # Validate if we have an id
+        if 'id_session_type' not in json_session_type:
+            return '', 400
+
+        # Check if current user can modify the posted group
+        # User can modify or add a group if it has admin access to that project
+        if json_session_type['id_session_type'] not in user_access.get_accessible_session_types_ids(admin_only=True) \
+                and json_session_type['id_session_type'] > 0:
+            return '', 403
+
+        # Do the update!
+        if json_session_type['id_session_type'] > 0:
+            # Already existing
+            try:
+                TeraSessionType.update_session_type(json_session_type['id_session_type'], json_session_type)
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return '', 500
+        else:
+            # New
+            try:
+                new_st = TeraSessionType()
+                new_st.from_json(json_session_type)
+                TeraSessionType.insert_session_type(new_st)
+                # Update ID for further use
+                json_session_type['id_session_type'] = new_st.id_session_type
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return '', 500
+
+        # TODO: Publish update to everyone who is subscribed to update...
+        update_session_type = TeraSessionType.get_session_type_by_id(json_session_type['id_session_type'])
+
+        return jsonify([update_session_type.to_json()])
 
     @auth.login_required
     def delete(self):
-        return '', 501
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
+
+        args = parser.parse_args()
+        id_todel = args['id']
+
+        # Check if current user can delete
+        session_type = TeraSessionType.get_session_type_by_id(id_todel)
+
+        # Check if we are admin of all projects of that session_type
+        for proj in session_type.session_type_projects:
+            if user_access.get_project_role(proj.id_project) != "admin":
+                return gettext('Impossible de supprimer - pas administrateur dans tous les projets de ce type.'), 403
+
+        # Check if there's some sessions that are using that session type. If so, we must not delete!
+        if len(TeraSession.get_sessions_for_type(id_todel)) > 0:
+            return gettext('Impossible de supprimer - des seances de ce type existent.'), 403
+
+        # If we are here, we are allowed to delete. Do so.
+        try:
+            TeraSessionType.delete_session_type(id_session_type=id_todel)
+        except exc.SQLAlchemyError:
+            import sys
+            print(sys.exc_info())
+            return 'Database error', 500
+
+        return '', 200

@@ -19,6 +19,8 @@
 #include <QFrame>
 #include <QListWidget>
 #include <QTextEdit>
+#include <QPushButton>
+#include <QColorDialog>
 
 #include <QtMultimedia/QCameraInfo>
 #include <QtMultimedia/QAudioDeviceInfo>
@@ -74,6 +76,7 @@ private:
     QWidget* createLabelWidget(const QVariantMap& structure);
     QWidget* createListWidget(const QVariantMap& structure);
     QWidget* createLongTextWidget(const QVariantMap& structure);
+    QWidget* createColorWidget(const QVariantMap& structure);
 
     void checkConditions();
     void checkConditionsForItem(QWidget* item);
@@ -86,6 +89,7 @@ private:
 
 private slots:
     void widgetValueChanged();
+    void colorWidgetClicked();
 
 signals:
     void widgetValueHasChanged(QWidget* widget, QVariant value);

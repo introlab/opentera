@@ -178,6 +178,14 @@ class DBManagerTeraUserAccess:
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
         return TeraSessionType.query.filter(TeraProject.id_project.in_(project_id_list)).all()
 
+    def get_accessible_session_types_ids(self, admin_only=False):
+        st_ids = []
+
+        for st in self.get_accessible_session_types(admin_only=admin_only):
+            st_ids.append(st.id_session_type)
+
+        return st_ids
+
     def get_projects_roles(self):
         projects_roles = {}
         project_list = self.get_accessible_projects()

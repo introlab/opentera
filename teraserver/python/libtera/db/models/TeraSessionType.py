@@ -113,3 +113,18 @@ class TeraSessionType(db.Model, BaseModel):
     def get_session_type_by_prefix(prefix: str):
         return TeraSessionType.query.filter_by(session_type_prefix=prefix).first()
 
+    @staticmethod
+    def update_session_type(id_session_type: int, values={}):
+        TeraSessionType.query.filter_by(id_session_type=id_session_type).update(values)
+        db.session.commit()
+
+    @staticmethod
+    def insert_session_type(session_type):
+        session_type.id_session_type = None
+        db.session.add(session_type)
+        db.session.commit()
+
+    @staticmethod
+    def delete_session_type(id_session_type: int):
+        TeraSessionType.query.filter_by(id_session_type=id_session_type).delete()
+        db.session.commit()

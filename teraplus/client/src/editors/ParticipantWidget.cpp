@@ -22,7 +22,7 @@ ParticipantWidget::ParticipantWidget(ComManager *comMan, const TeraData *data, Q
     setData(data);
 
     // Query sessions types
-    queryDataRequest(WEB_SESSIONTYPES_PATH);
+    queryDataRequest(WEB_SESSIONTYPE_PATH);
 }
 
 ParticipantWidget::~ParticipantWidget()
