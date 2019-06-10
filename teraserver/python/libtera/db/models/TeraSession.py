@@ -94,8 +94,25 @@ class TeraSession(db.Model, BaseModel):
     def get_sessions_for_participant(part_id: int):
         from libtera.db.models.TeraParticipant import TeraParticipant
         return TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
-                                                                               part_id).all()
+                                                                               part_id)\
+            .order_by(TeraSession.session_start_datetime.asc()).all()
 
     @staticmethod
     def get_sessions_for_type(session_type_id: int):
         return TeraSession.query.filter_by(id_session_type=session_type_id).all()
+
+    @staticmethod
+    def update_session(id_session: int, values={}):
+        TeraSession.query.filter_by(id_session=id_session).update(values)
+        db.session.commit()
+
+    @staticmethod
+    def insert_session(session):
+        session.id_session = None
+        db.session.add(session)
+        db.session.commit()
+
+    @staticmethod
+    def delete_session(id_session: int):
+        TeraSession.query.filter_by(id_session=id_session).delete()
+        db.session.commit()

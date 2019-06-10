@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTableWidgetItem>
+#include <QListWidgetItem>
 
 #include "DataEditorWidget.h"
 #include "GlobalMessageBox.h"
@@ -28,21 +29,31 @@ private:
 
     QMap<int, QTableWidgetItem*>    m_listSessions_items;
     QMap<int, TeraData*>            m_ids_session_types;
+    QMap<int, TeraData*>            m_ids_sessions;
 
     void updateControlsState();
     void updateFieldsValue();
 
     bool validateData();
 
-    void updateSession(const TeraData* session);
+    void updateSession(TeraData *session);
 
+    void updateCalendars(QDate left_date);
+    QDate getMinimumSessionDate();
 private slots:
     void processFormsReply(QString form_type, QString data);
     void processSessionsReply(QList<TeraData> sessions);
     void processSessionTypesReply(QList<TeraData> session_types);
+    void deleteDataReply(QString path, int id);
 
     void btnSave_clicked();
     void btnUndo_clicked();
+    void btnDeleteSession_clicked();
+
+    void currentSelectedSessionChanged(QTableWidgetItem* current, QTableWidgetItem* previous);
+    void currentTypeFiltersChanged(QListWidgetItem* changed);
+    void displayNextMonth();
+    void displayPreviousMonth();
 };
 
 #endif // PARTICIPANTWIDGET_H

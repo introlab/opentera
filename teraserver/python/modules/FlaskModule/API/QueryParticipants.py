@@ -21,6 +21,7 @@ class QueryParticipants(Resource):
 
         parser = reqparse.RequestParser()
         parser.add_argument('id_participant', type=int, help='id_participant')
+        parser.add_argument('id', type=int)
         parser.add_argument('id_kit', type=int)
         parser.add_argument('id_site', type=int, help='id site')
         parser.add_argument('id_group', type=int)
@@ -31,12 +32,15 @@ class QueryParticipants(Resource):
         args = parser.parse_args()
 
         participants = []
+        if args['id']:
+            args['id_participant'] = args['id']
+
         # If we have no arguments, return all accessible participants
         if not any(args.values()):
             participants = user_access.get_accessible_participants()
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
-                participants = TeraParticipant.get_participant_by_id(args['id_participant'])
+                participants = [TeraParticipant.get_participant_by_id(args['id_participant'])]
         elif args['id_kit']:
             participants = user_access.query_participants_for_kit(args['id_kit'])
         elif args['id_site']:

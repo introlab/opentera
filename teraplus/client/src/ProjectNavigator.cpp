@@ -162,17 +162,19 @@ void ProjectNavigator::updateGroup(const TeraData *group)
     if (id_project != m_currentProjectId){
         // Maybe that group changed project...
         if (m_groups_items.contains(id_group)){
-            int current_group_project = m_projects_items.key(m_groups_items[id_group]->parent());
-            if (current_group_project != id_project){
-                // It has - change group if available
-                if (m_projects_items.contains(id_project)){
-                    m_groups_items[id_group]->parent()->removeChild(m_groups_items[id_group]);
-                    m_projects_items[id_project]->addChild(m_groups_items[id_group]);
-                }else{
-                    // Changed site also! Remove it completely from display
-                    delete m_groups_items[id_group];
-                    m_groups_items.remove(id_group);
-                    return;
+            if (m_groups_items[id_group] != nullptr){
+                int current_group_project = m_projects_items.key(m_groups_items[id_group]->parent());
+                if (current_group_project != id_project){
+                    // It has - change group if available
+                    if (m_projects_items.contains(id_project)){
+                        m_groups_items[id_group]->parent()->removeChild(m_groups_items[id_group]);
+                        m_projects_items[id_project]->addChild(m_groups_items[id_group]);
+                    }else{
+                        // Changed site also! Remove it completely from display
+                        delete m_groups_items[id_group];
+                        m_groups_items.remove(id_group);
+                        return;
+                    }
                 }
             }
         }

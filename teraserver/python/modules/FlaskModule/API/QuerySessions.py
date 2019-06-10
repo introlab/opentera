@@ -6,6 +6,7 @@ from libtera.db.models.TeraSession import TeraSession
 from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
+from flask_babel import gettext
 
 
 class QuerySessions(Resource):
@@ -104,4 +105,32 @@ class QuerySessions(Resource):
 
     @auth.login_required
     def delete(self):
-        return '', 501
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
+
+        args = parser.parse_args()
+        id_todel = args['id']
+
+        # Check if current user can delete
+        # User can delete a session if it has access to one of its participant
+        todel_session = TeraSession.get_session_by_id(id_todel)
+        can_delete = False
+        for ses_part in todel_session.session_participants:
+            if ses_part in user_access.get_accessible_participants():
+                can_delete = True
+                break
+
+        if not can_delete:
+            return gettext('Vous n\'avez pas acces a au moins un participant de la seance.'), 403
+
+        # If we are here, we are allowed to delete. Do so.
+        try:
+            TeraSession.delete_session(id_session=id_todel)
+        except exc.SQLAlchemyError:
+            import sys
+            print(sys.exc_info())
+            return 'Database error', 500
+
+        return '', 200

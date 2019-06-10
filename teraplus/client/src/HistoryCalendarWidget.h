@@ -20,15 +20,16 @@ public:
     //void setEvents1(QList<QDate>* events);
     //void setEvents2(QList<QDate>* events);
 
-    void setData(const QList<TeraData>& sessions, const QList<quint64>& filters, bool warning);
+    void setData(const QList<TeraData* > &sessions);
+    void setSessionTypes(const QList<TeraData *> &session_types);
+    void setFilters(const QList<int> &session_types_ids);
 
 private:
     QDate m_currentDate;
 
-    QList<TeraData>* m_sessions;
-    QList<quint64>*      m_displayTypes;
-
-    QHash<QDate,int>     m_dates;
+    QMultiMap<QDate, TeraData*>     m_sessions;
+    QList<int>                      m_displayTypes;
+    QMap<int, TeraData*>            m_ids_session_types;
 
     //QTableView *getView();
 

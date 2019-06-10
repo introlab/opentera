@@ -29,6 +29,7 @@ ParticipantWidget::~ParticipantWidget()
 {
     delete ui;
     qDeleteAll(m_ids_session_types);
+    qDeleteAll(m_ids_sessions);
 }
 
 void ParticipantWidget::saveData(bool signal)
@@ -51,9 +52,15 @@ void ParticipantWidget::connectSignals()
     connect(m_comManager, &ComManager::formReceived, this, &ParticipantWidget::processFormsReply);
     connect(m_comManager, &ComManager::sessionsReceived, this, &ParticipantWidget::processSessionsReply);
     connect(m_comManager, &ComManager::sessionTypesReceived, this, &ParticipantWidget::processSessionTypesReply);
+    connect(m_comManager, &ComManager::deleteResultsOK, this, &ParticipantWidget::deleteDataReply);
 
     connect(ui->btnUndo, &QPushButton::clicked, this, &ParticipantWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &ParticipantWidget::btnSave_clicked);
+    connect(ui->btnDelSession, &QPushButton::clicked, this, &ParticipantWidget::btnDeleteSession_clicked);
+    connect(ui->tableSessions, &QTableWidget::currentItemChanged, this, &ParticipantWidget::currentSelectedSessionChanged);
+    connect(ui->lstFilters, &QListWidget::itemChanged, this, &ParticipantWidget::currentTypeFiltersChanged);
+    connect(ui->btnNextCal, &QPushButton::clicked, this, &ParticipantWidget::displayNextMonth);
+    connect(ui->btnPrevCal, &QPushButton::clicked, this, &ParticipantWidget::displayPreviousMonth);
 }
 
 void ParticipantWidget::updateControlsState()
@@ -83,7 +90,7 @@ bool ParticipantWidget::validateData()
     return valid;
 }
 
-void ParticipantWidget::updateSession(const TeraData *session)
+void ParticipantWidget::updateSession(TeraData *session)
 {
     int id_session = session->getId();
 
@@ -114,6 +121,7 @@ void ParticipantWidget::updateSession(const TeraData *session)
         ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 4, user_item);
 
         m_listSessions_items[id_session] = name_item;
+        m_ids_sessions[id_session] = new TeraData(*session);
     }
 
     // Update values
@@ -122,6 +130,7 @@ void ParticipantWidget::updateSession(const TeraData *session)
     int session_type = session->getFieldValue("id_session_type").toInt();
     if (m_ids_session_types.contains(session_type)){
         type_item->setText(m_ids_session_types[session_type]->getFieldValue("session_type_name").toString());
+        type_item->setTextColor(QColor(m_ids_session_types[session_type]->getFieldValue("session_type_color").toString()));
     }else{
         type_item->setText("Inconnu");
     }
@@ -153,10 +162,19 @@ void ParticipantWidget::processSessionsReply(QList<TeraData> sessions)
             continue;
         }
     }
+
+    // Update calendar view
+    currentTypeFiltersChanged(nullptr);
+    updateCalendars(getMinimumSessionDate());
+    ui->calMonth1->setData(m_ids_sessions.values());
+    ui->calMonth2->setData(m_ids_sessions.values());
+    ui->calMonth2->setData(m_ids_sessions.values());
 }
 
 void ParticipantWidget::processSessionTypesReply(QList<TeraData> session_types)
 {
+    ui->cmbSessionType->clear();
+
     for (TeraData st:session_types){
         if (!m_ids_session_types.contains(st.getId())){
             m_ids_session_types[st.getId()] = new TeraData(st);
@@ -173,16 +191,39 @@ void ParticipantWidget::processSessionTypesReply(QList<TeraData> session_types)
             QIcon* icon = new QIcon(*pxmap);
             s->setIcon(*icon);
             ui->lstFilters->addItem(s);
+
+            // New session ComboBox
+            ui->cmbSessionType->addItem(st.getName(), st.getId());
         }else{
             *m_ids_session_types[st.getId()] = st;
         }
     }
+
+    ui->calMonth1->setSessionTypes(m_ids_session_types.values());
+    ui->calMonth2->setSessionTypes(m_ids_session_types.values());
+    ui->calMonth3->setSessionTypes(m_ids_session_types.values());
 
     // Query sessions for that participant
     if (!m_data->isNew() && m_listSessions_items.isEmpty()){
         QUrlQuery query;
         query.addQueryItem(WEB_QUERY_ID_PARTICIPANT, QString::number(m_data->getId()));
         queryDataRequest(WEB_SESSIONINFO_PATH, query);
+    }
+}
+
+void ParticipantWidget::deleteDataReply(QString path, int id)
+{
+    if (id==0)
+        return;
+
+    if (path == TeraData::getPathForDataType(TERADATA_SESSION)){
+        // A session got deleted - check if it affects the current display
+        if (m_listSessions_items.contains(id)){
+            ui->tableSessions->removeRow(m_listSessions_items[id]->row());
+            delete m_ids_sessions[id];
+            m_ids_sessions.remove(id);
+            m_listSessions_items.remove(id);
+        }
     }
 }
 
@@ -209,5 +250,94 @@ void ParticipantWidget::btnUndo_clicked()
 
     if (parent())
         emit closeRequest();
+}
+
+void ParticipantWidget::btnDeleteSession_clicked()
+{
+    if (!ui->tableSessions->currentItem())
+        return;
+
+    GlobalMessageBox diag;
+    QTableWidgetItem* base_item = ui->tableSessions->item(ui->tableSessions->currentRow(),0);
+    QMessageBox::StandardButton answer = diag.showYesNo(tr("Suppression?"),
+                                                        tr("Êtes-vous sûrs de vouloir supprimer """) + base_item->text() + """?");
+    if (answer == QMessageBox::Yes){
+        // We must delete!
+        m_comManager->doDelete(TeraData::getPathForDataType(TERADATA_SESSION), m_listSessions_items.key(base_item));
+    }
+}
+
+void ParticipantWidget::currentSelectedSessionChanged(QTableWidgetItem *current, QTableWidgetItem *previous)
+{
+    Q_UNUSED(previous)
+    ui->btnDelSession->setEnabled(current);
+}
+
+void ParticipantWidget::currentTypeFiltersChanged(QListWidgetItem *changed)
+{
+    Q_UNUSED(changed)
+    QList<int> ids;
+
+    for (int i=0; i<ui->lstFilters->count(); i++){
+        if (ui->lstFilters->item(i)->checkState() == Qt::Checked){
+            ids.append(ui->lstFilters->item(i)->data(Qt::UserRole).toInt());
+        }
+    }
+
+    ui->calMonth1->setFilters(ids);
+    ui->calMonth2->setFilters(ids);
+    ui->calMonth3->setFilters(ids);
+
+    // TODO: Update session tables
+}
+
+void ParticipantWidget::updateCalendars(QDate left_date){
+    ui->calMonth1->setCurrentPage(left_date.year(),left_date.month());
+    ui->lblMonth1->setText(QDate::longMonthName(left_date.month()) + " " + QString::number(left_date.year()));
+
+    left_date = left_date.addMonths(1);
+    ui->calMonth2->setCurrentPage(left_date.year(),left_date.month());
+    ui->lblMonth2->setText(QDate::longMonthName(left_date.month()) + " " + QString::number(left_date.year()));
+
+    left_date = left_date.addMonths(1);
+    ui->calMonth3->setCurrentPage(left_date.year(),left_date.month());
+    ui->lblMonth3->setText(QDate::longMonthName(left_date.month()) + " " + QString::number(left_date.year()));
+
+    // Check if we must enable the previous month button
+    QDate min_date = getMinimumSessionDate();
+
+    if (ui->calMonth1->yearShown()==min_date.year() && ui->calMonth1->monthShown()==min_date.month())
+        ui->btnPrevCal->setEnabled(false);
+    else
+        ui->btnPrevCal->setEnabled(true);
+
+}
+
+QDate ParticipantWidget::getMinimumSessionDate()
+{
+    QDate min_date = QDate::currentDate();
+    for (TeraData* session:m_ids_sessions.values()){
+        QDate session_date = session->getFieldValue("session_start_datetime").toDateTime().date();
+        if (session_date < min_date)
+            min_date = session_date;
+    }
+
+    return min_date;
+}
+
+void ParticipantWidget::displayNextMonth(){
+    QDate new_date;
+    new_date.setDate(ui->calMonth1->yearShown(), ui->calMonth1->monthShown(), 1);
+    new_date = new_date.addMonths(1);
+
+    updateCalendars(new_date);
+}
+
+void ParticipantWidget::displayPreviousMonth(){
+    QDate new_date;
+    new_date.setDate(ui->calMonth1->yearShown(), ui->calMonth1->monthShown(), 1);
+    new_date = new_date.addMonths(-1);
+
+    updateCalendars(new_date);
 }
 

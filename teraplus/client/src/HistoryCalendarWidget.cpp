@@ -1,4 +1,5 @@
 #include "HistoryCalendarWidget.h"
+#include "Logger.h"
 #include <QTextCharFormat>
 
 HistoryCalendarWidget::HistoryCalendarWidget(QWidget *parent) :
@@ -11,7 +12,7 @@ HistoryCalendarWidget::HistoryCalendarWidget(QWidget *parent) :
 }
 
 HistoryCalendarWidget::~HistoryCalendarWidget(){
-
+    qDeleteAll(m_ids_session_types);
 }
 
 void HistoryCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const{
@@ -44,7 +45,7 @@ void HistoryCalendarWidget::paintCell(QPainter *painter, const QRect &rect, cons
     }
 
     // Check for sessions on that date
-    if (!m_dates.contains(date) || date.month() != monthShown()){
+    if (!m_sessions.keys().contains(date) || date.month() != monthShown()){
         // Paint with default format
         QCalendarWidget::paintCell (painter, rect, date);
         return;
@@ -53,23 +54,23 @@ void HistoryCalendarWidget::paintCell(QPainter *painter, const QRect &rect, cons
     painter->save(); // save standard settings
 
     // TODO: Adjust!
-   /* QList<SessionInfo*>* sessions = m_sessions->at(m_dates.value(date))->getSessions();
-    bool has_alert_today = false;
+    QList<TeraData*> sessions = m_sessions.values(date);
+    /*bool has_alert_today = false;
     for (int i=0; i<sessions->count(); i++){
         if (sessions->at(i)->hasTechAlert()){
             has_alert_today=true;
             break;
         }
-    }
+    }*/
 
     if (date<=QDate::currentDate()){
-         if (!has_alert_today){
+         //if (!has_alert_today){
             brush.setColor(QColor::fromRgb(255,255,255,198));
             pen.setColor(QColor::fromRgb(255,255,255,128));
-         }else{
+         /*}else{
              brush.setColor(QColor::fromRgb(255,100,100,198));
              pen.setColor(QColor::fromRgb(255,100,100,128));
-         }
+         }*/
     }else{
         brush.setColor(QColor::fromRgb(255,255,255,128));
         pen.setColor(QColor::fromRgb(255,255,255,64));
@@ -79,29 +80,27 @@ void HistoryCalendarWidget::paintCell(QPainter *painter, const QRect &rect, cons
     painter->setBrush(brush);
     painter->drawRect(rect.adjusted(2,2,-2,-2));
 
-    QHash<quint64,QString> to_display;
+    QHash<int,QString> display_colors;
 
-    for (int i=0; i<sessions->count();i++){
-        quint64 ses_type = sessions->at(i)->sessionType();
-        if (m_displayTypes)
-            if (!m_displayTypes->contains(ses_type))
-                continue;
-        if (to_display.contains(ses_type))
+    for (int i=0; i<sessions.count();i++){
+        int ses_type = sessions.at(i)->getFieldValue("id_session_type").toInt();
+        if (!m_displayTypes.contains(ses_type))
+            continue;
+        if (display_colors.contains(ses_type))
             continue;
         // We have a session that we need to display, find color for the correct session type
-        for (int j=0; j<m_sessionsTypes->count(); j++){
-            if (m_sessionsTypes->at(j)->id()==ses_type){
-                to_display.insert(ses_type,m_sessionsTypes->at(j)->color());
-                break;
-            }
+        if (m_ids_session_types.contains(ses_type)){
+            display_colors[ses_type] = m_ids_session_types.value(ses_type)->getFieldValue("session_type_color").toString();
+        }else{
+            LOG_WARNING("No session type match - ignoring.", "HistoryCalendarWidget::paintCell");
         }
     }
-    quint8 count = 0;
-    quint8 total = to_display.count(); //m_sessions->at(m_dates.value(date))->sessionsTypesCount(*m_displayTypes);
+    int count = 0;
+    int total = display_colors.count(); //m_sessions->at(m_dates.value(date))->sessionsTypesCount(*m_displayTypes);
     //qDebug() << date.toString() << ": Count = " << QString::number(count) << ", Total = " << QString::number(total);
 
-    for (int i=0; i<to_display.count(); i++){
-        QColor color(to_display.values().at(i));
+    for (int i=0; i<display_colors.count(); i++){
+        QColor color(display_colors.values().at(i));
         //qDebug() << date.toString() << ": Count = " << QString::number(count) << ", Total = " << QString::number(total) << ", Color = " << to_display.values().at(i);
         pen.setColor(color);
         brush.setColor(color);
@@ -109,11 +108,13 @@ void HistoryCalendarWidget::paintCell(QPainter *painter, const QRect &rect, cons
         painter->setBrush(brush);
 
         //Draw the indicator
-        float ratio = (float)count/(float)total;
-        painter->drawRect(rect.adjusted(2,ratio*rect.height()+2,-2*(float)rect.width()/3-2,rect.height()/(float)total-2));
-
+        float ratio = static_cast<float>(count)/total;
+        painter->drawRect(rect.adjusted(2,
+                                        static_cast<int>(ratio*rect.height()+2),
+                                        static_cast<int>(-2*static_cast<float>(rect.width())/3-2),
+                                        static_cast<int>(rect.height()/static_cast<float>(total)-2)));
         count++;
-    }*/
+    }
 
     // Check if we need to display any indicator warning for that session
     /*for (int i=0; i<sessions->count(); i++){
@@ -128,25 +129,32 @@ void HistoryCalendarWidget::paintCell(QPainter *painter, const QRect &rect, cons
     painter->restore(); // restore previous settings
 }
 
-void HistoryCalendarWidget::setData(const QList<TeraData>& sessions, const QList<quint64>& filters, bool warning){
-    /*m_sessions = sessions;
-    m_displayTypes = filters;
-
-    // Create dates mapping for fast search
-    m_dates.clear();
-    for (int i=0; i<m_sessions->count(); i++){
-        if (m_displayTypes==NULL || m_sessions->at(i)->hasSessionTypes(*m_displayTypes)){
-            m_dates.insert(m_sessions->at(i)->date(),i);
-
-            // Remove alerts from display if not tech access
-            if (!tech){
-                for (int j=0; j<m_sessions->at(i)->sessionsCount(); j++){
-                    m_sessions->at(i)->getSessions()->at(j)->setTechAlert(false);
-                }
-            }
-        }
+void HistoryCalendarWidget::setData(const QList<TeraData *> &sessions){
+    qDeleteAll(m_sessions);
+    m_sessions.clear();
+    for (TeraData* ses:sessions){
+        QDate session_date = ses->getFieldValue("session_start_datetime").toDateTime().date();
+        if (session_date.isValid())
+            m_sessions.insertMulti(session_date, new TeraData(*ses));
+        else
+            LOG_WARNING("Invalid session date", "HistoryCalendarWidget::setData");
     }
 
-    updateCells();*/
+    updateCells();
+}
+
+void HistoryCalendarWidget::setSessionTypes(const QList<TeraData *> &session_types)
+{
+    qDeleteAll(m_ids_session_types);
+    m_ids_session_types.clear();
+    for (TeraData* st:session_types){
+        m_ids_session_types[st->getId()] = new TeraData(*st);
+    }
+}
+
+void HistoryCalendarWidget::setFilters(const QList<int> &session_types_ids)
+{
+    m_displayTypes = session_types_ids;
+    updateCells();
 }
 

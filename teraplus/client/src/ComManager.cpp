@@ -435,7 +435,7 @@ void ComManager::onNetworkFinished(QNetworkReply *reply)
     }
     else {
         QString reply_msg = QString::fromUtf8(reply->readAll()).replace("\"", "");
-        if (reply_msg.isEmpty() || reply_msg.startsWith("\"\"")){
+        if (reply_msg.isEmpty() || reply_msg.startsWith("\"\"") || reply_msg == "\n"){
             //reply_msg = tr("Erreur non-détaillée.");
             reply_msg = reply->errorString();
         }
