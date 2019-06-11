@@ -18,7 +18,7 @@ from twisted.web.server import Site
 from twisted.web.static import File
 from twisted.web.wsgi import WSGIResource
 from twisted.python import log
-
+from OpenSSL import SSL
 import sys
 
 
@@ -57,15 +57,40 @@ class TwistedModule(BaseModule):
         # application = service.Application(__name__)
         # web_service.setServiceParent(application)
 
-        reactor.listenSSL(self.config.server_config['port'], site,
-                          ssl.DefaultOpenSSLContextFactory(privateKeyFileName=
-                                                           self.config.server_config['ssl_path'] + '/key.pem',
-                                                           certificateFileName=
-                                                           self.config.server_config['ssl_path'] + '/cert.crt'))
+        # ssl_factory = ssl.DefaultOpenSSLContextFactory(
+        #     privateKeyFileName=self.config.server_config['ssl_path'] + '/key.pem',
+        #     certificateFileName=self.config.server_config['ssl_path'] + '/cert.crt')
+
+        # List of available certificates to verify
+        caCerts=[]
+        # Use verify = True to verify certificates
+        ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
+                                             requireCertificate=False,
+                                             enableSessions=False)
+
+        ctx = ssl_factory.getContext()
+        ctx.use_privatekey_file(self.config.server_config['ssl_path'] + '/key.pem')
+        ctx.use_certificate_file(self.config.server_config['ssl_path'] + '/cert.crt')
+
+        # Certificate verification callback
+        # ctx.set_verify(SSL.VERIFY_PEER, self.verifyCallback)
+
+        # With self-signed certs we have to explicitely tell the server to trust them
+        # ctx.load_verify_locations('path to ca.pem file')
+
+        reactor.listenSSL(self.config.server_config['port'], site, ssl_factory)
         print('setup_twisted done')
 
     def __del__(self):
         pass
+
+    def verifyCallback(self, connection, x509, errnum, errdepth, ok):
+        if not ok:
+            print('invalid cert from subject:', x509.get_subject())
+            return False
+        else:
+            print("Certs are fine")
+        return True
 
     def setup_module_pubsub(self):
         # Additional subscribe
