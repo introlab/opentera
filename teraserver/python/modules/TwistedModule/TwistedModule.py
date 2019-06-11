@@ -62,18 +62,21 @@ class TwistedModule(BaseModule):
         #     certificateFileName=self.config.server_config['ssl_path'] + '/cert.crt')
 
         # List of available certificates to verify
-        caCerts=[]
+        cert = ssl.Certificate.loadPEM(open(self.config.server_config['ssl_path'] + '/devices/client_certificate.pem',
+                                            'rb').read())
+        caCerts=[cert.original]
+
         # Use verify = True to verify certificates
-        ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
+        ssl_factory = ssl.CertificateOptions(verify=True, caCerts=caCerts,
                                              requireCertificate=False,
                                              enableSessions=False)
 
         ctx = ssl_factory.getContext()
         ctx.use_privatekey_file(self.config.server_config['ssl_path'] + '/key.pem')
-        ctx.use_certificate_file(self.config.server_config['ssl_path'] + '/cert.crt')
+        ctx.use_certificate_file(self.config.server_config['ssl_path'] + '/ca.pem')
 
         # Certificate verification callback
-        # ctx.set_verify(SSL.VERIFY_PEER, self.verifyCallback)
+        ctx.set_verify(SSL.VERIFY_PEER, self.verifyCallback)
 
         # With self-signed certs we have to explicitely tell the server to trust them
         # ctx.load_verify_locations('path to ca.pem file')

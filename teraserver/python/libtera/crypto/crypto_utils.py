@@ -80,6 +80,24 @@ def write_private_key_and_ca_certificate(info: dict, path=''):
 
     return True
 
+def write_private_key_and_client_certificate(info: dict, path=''):
+    try:
+        # Will write private key in PEM (base64) format
+        with open(path + '/client_key.pem', 'wb') as f:
+            f.write(info['private_key'].private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=NoEncryption()
+            ))
+
+        # Will write certificate
+        with open(path + '/client_certificate.pem', 'wb') as f:
+            f.write(info['certificate'].public_bytes(serialization.Encoding.PEM))
+    except:
+        return False
+
+    return True
+
 
 def load_private_key_and_ca_certificate(path=''):
     result = {}
@@ -156,6 +174,8 @@ if __name__ == '__main__':
 
     client_info = create_certificate_signing_request()
 
-    cert = generate_user_certificate(client_info['csr'], ca_info)
+    client_info['certificate'] = generate_user_certificate(client_info['csr'], ca_info)
+
+    write_private_key_and_client_certificate(client_info, path=os.getcwd())
 
     print(ca_info)
