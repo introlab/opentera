@@ -58,16 +58,17 @@ class TwistedModule(BaseModule):
         # web_service.setServiceParent(application)
 
         # ssl_factory = ssl.DefaultOpenSSLContextFactory(
-        #     privateKeyFileName=self.config.server_config['ssl_path'] + '/key.pem',
-        #     certificateFileName=self.config.server_config['ssl_path'] + '/cert.crt')
+        #      privateKeyFileName=self.config.server_config['ssl_path'] + '/key.pem',
+        #      certificateFileName=self.config.server_config['ssl_path'] + '/ca.pem')
 
-        # List of available certificates to verify
-        cert = ssl.Certificate.loadPEM(open(self.config.server_config['ssl_path'] + '/devices/client_certificate.pem',
-                                            'rb').read())
+        # List of available CA clients certificates
+        cert = ssl.Certificate.loadPEM(open(self.config.server_config['ssl_path'] +
+                                            '/devices/client_certificate.pem', 'rb').read())
+
         caCerts=[cert.original]
 
         # Use verify = True to verify certificates
-        ssl_factory = ssl.CertificateOptions(verify=True, caCerts=caCerts,
+        ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
                                              requireCertificate=False,
                                              enableSessions=False)
 
@@ -78,8 +79,8 @@ class TwistedModule(BaseModule):
         # Certificate verification callback
         ctx.set_verify(SSL.VERIFY_PEER, self.verifyCallback)
 
-        # With self-signed certs we have to explicitely tell the server to trust them
-        # ctx.load_verify_locations('path to ca.pem file')
+        # With self-signed certs we have to explicitely tell the server to trust certificates
+        ctx.load_verify_locations(self.config.server_config['ssl_path'] + '/ca.pem')
 
         reactor.listenSSL(self.config.server_config['port'], site, ssl_factory)
         print('setup_twisted done')
@@ -88,8 +89,11 @@ class TwistedModule(BaseModule):
         pass
 
     def verifyCallback(self, connection, x509, errnum, errdepth, ok):
+        # errnum 24=invalid CA certificate...
+
         if not ok:
-            print('invalid cert from subject:', x509.get_subject())
+            print('invalid cert from subject:', connection, x509.get_subject(),
+                  errnum, SSL.errorcode[errnum], errdepth, ok)
             return False
         else:
             print("Certs are fine")

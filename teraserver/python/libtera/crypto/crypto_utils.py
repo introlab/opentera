@@ -7,9 +7,10 @@ from cryptography.hazmat.primitives.serialization import (Encoding, PrivateForma
 import datetime
 import os
 import uuid
+import socket
 
 # info at https://cryptography.io
-def generate_ca_certificate(common_name=u'OpenTeraServer', country_name=u'CA',
+def generate_ca_certificate(common_name=socket.gethostname(), country_name=u'CA',
                             state_or_province=u'Québec', locality_name=u'Sherbrooke',
                             organization_name=u'Université de Sherbrooke'):
 
@@ -73,7 +74,7 @@ def write_private_key_and_ca_certificate(info: dict, path=''):
             ))
 
         # Will write certificate
-        with open(path + '/certificate.pem', 'wb') as f:
+        with open(path + '/ca.pem', 'wb') as f:
             f.write(info['certificate'].public_bytes(serialization.Encoding.PEM))
     except:
         return False
@@ -107,7 +108,7 @@ def load_private_key_and_ca_certificate(path=''):
     result['private_key'] = private_key
 
     # Load certificate
-    cert_bytes = open(path + '/certificate.pem', 'rb').read()
+    cert_bytes = open(path + '/ca.pem', 'rb').read()
     certificate = x509.load_pem_x509_certificate(cert_bytes, default_backend())
     result['certificate'] = certificate
 
@@ -165,17 +166,12 @@ def generate_user_certificate(csr, ca_info):
 
 # For testing...
 if __name__ == '__main__':
-
+    print(socket.gethostname())
     ca_info = generate_ca_certificate()
-
-    write_private_key_and_ca_certificate(ca_info, path=os.getcwd())
-
-    test = load_private_key_and_ca_certificate(path=os.getcwd())
-
+    write_private_key_and_ca_certificate(ca_info, path=os.getcwd() + '/../../certificates')
+    test = load_private_key_and_ca_certificate(path=os.getcwd() + '/../../certificates')
     client_info = create_certificate_signing_request()
-
     client_info['certificate'] = generate_user_certificate(client_info['csr'], ca_info)
-
-    write_private_key_and_client_certificate(client_info, path=os.getcwd())
+    write_private_key_and_client_certificate(client_info, path=os.getcwd() + '/../../certificates/devices')
 
     print(ca_info)
