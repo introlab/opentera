@@ -27,11 +27,9 @@ class TeraSessionType(db.Model, BaseModel):
     session_type_profile = db.Column(db.String, nullable=True)
     session_type_color = db.Column(db.String(7), nullable=False)
 
-    session_type_projects = db.relationship("TeraProject", secondary=sessions_types_projects_table,
-                                            cascade="all,delete")
+    session_type_projects = db.relationship("TeraProject", secondary=sessions_types_projects_table)
 
-    session_type_uses_devices_types = db.relationship("TeraDeviceType", secondary=sessions_types_devices_table,
-                                                      cascade="all,delete")
+    session_type_uses_devices_types = db.relationship("TeraDeviceType", secondary=sessions_types_devices_table)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:

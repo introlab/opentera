@@ -1,7 +1,9 @@
 from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraKit import kits_participants_table
-from libtera.db.models.TeraSession import sessions_participants_table
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
+
+from flask_sqlalchemy import event
+
 import uuid
 import jwt
 import time
@@ -20,11 +22,10 @@ class TeraParticipant(db.Model, BaseModel):
                                                                ondelete='cascade'),
                                      nullable=False)
 
-    participant_kits = db.relationship("TeraKit", secondary=kits_participants_table, back_populates="kit_participants",
-                                       cascade="all,delete")
+    participant_kits = db.relationship("TeraKit", secondary=kits_participants_table, back_populates="kit_participants")
 
-    participant_sessions = db.relationship("TeraSession", secondary=sessions_participants_table,
-                                           back_populates="session_participants", cascade="all,delete")
+    participant_sessions = db.relationship("TeraSession", secondary="t_sessions_participants",
+                                           back_populates="session_participants")
 
     participant_participant_group = db.relationship('TeraParticipantGroup')
 
@@ -131,5 +132,27 @@ class TeraParticipant(db.Model, BaseModel):
 
     @staticmethod
     def delete_participant(id_participant: int):
-        TeraParticipant.query.filter_by(id_participant=id_participant).delete()
+        part = TeraParticipant.query.filter_by(id_participant=id_participant).first()
+        db.session.delete(part)
+        # Check if we need to delete orphan sessions (sessions that have no more participants left
+        from libtera.db.models.TeraSession import TeraSession
+        orphans = TeraSession.query.outerjoin(TeraSession.session_participants).filter(
+            TeraSession.session_participants == None).all()
+
+        if orphans:
+            for orphan in orphans:
+                db.session.delete(orphan)
         db.session.commit()
+
+# @event.listens_for(TeraParticipant, 'after_delete')
+# def after_delete_trigger(mapper, connection, target):
+#     # Check if we need to delete orphan sessions (sessions that have no more participants left
+#     from libtera.db.models.TeraSession import TeraSession
+#     orphans = TeraSession.query.outerjoin(TeraSession.session_participants).filter(
+#         TeraSession.session_participants == None).all()
+#
+#     if orphans:
+#         for orphan in orphans:
+#             db.session.delete(orphan)
+#         db.session.commit()
+

@@ -29,6 +29,7 @@ public:
     int getCurrentProjectId() const;
 
     void selectItem(const TeraDataTypes& data_type, const int& id);
+    void removeItem(const TeraDataTypes& data_type, const int& id);
 
     void setOnHold(const bool& hold);
 
@@ -50,7 +51,8 @@ private:
     void updateGroup(const TeraData* group);
     void updateParticipant(const TeraData* participant);
 
-    void updateAvailableActions();
+    void updateAvailableActions(QTreeWidgetItem *current_item);
+    TeraDataTypes getItemType(QTreeWidgetItem* item);
 
     void connectSignals();
 
@@ -63,6 +65,7 @@ private:
 
 private slots:
      void newItemRequested();
+     void deleteItemRequested();
 
      void processSitesReply(QList<TeraData> sites);
      void processProjectsReply(QList<TeraData> projects);
@@ -76,6 +79,7 @@ private slots:
 
 signals:
      void dataDisplayRequest(TeraDataTypes data_type, int data_id);
+     void dataDeleteRequest(TeraDataTypes data_type, int data_id);
 };
 
 #endif // PROJECTNAVIGATOR_H

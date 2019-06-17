@@ -1,4 +1,5 @@
 #include "ProjectNavigator.h"
+#include "GlobalMessageBox.h"
 #include "ui_ProjectNavigator.h"
 
 ProjectNavigator::ProjectNavigator(QWidget *parent) :
@@ -75,6 +76,56 @@ void ProjectNavigator::selectItem(const TeraDataTypes &data_type, const int &id)
     }
 }
 
+void ProjectNavigator::removeItem(const TeraDataTypes &data_type, const int &id)
+{
+    switch(data_type){
+    case TERADATA_SITE:
+        //TODO
+        break;
+    case TERADATA_PROJECT:
+        if (m_projects_items.contains(id)){
+            for (int i=0; i<ui->treeNavigator->topLevelItemCount(); i++){
+                if (ui->treeNavigator->topLevelItem(i) == m_projects_items[id]){
+                    delete ui->treeNavigator->takeTopLevelItem(i);
+                    m_projects_items.remove(id);
+                    break;
+                }
+            }
+        }
+        break;
+    case TERADATA_GROUP:
+    case TERADATA_PARTICIPANT:
+    {
+        QTreeWidgetItem* item = nullptr;
+        if (data_type==TERADATA_GROUP){
+            if (m_groups_items.contains(id))
+                item = m_groups_items[id];
+        }
+        if (data_type==TERADATA_PARTICIPANT){
+            if (m_participants_items.contains(id))
+                item = m_participants_items[id];
+        }
+        if (item){
+            if (item->parent()){
+                for (int i=0; i<item->parent()->childCount(); i++){
+                    if (item->parent()->child(i) == item){
+                        delete item->parent()->takeChild(i);
+                        if (data_type==TERADATA_GROUP)
+                            m_groups_items.remove(id);
+                        if (data_type==TERADATA_PARTICIPANT)
+                            m_participants_items.remove(id);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+        break;
+    default: ;
+        // Don't do anything!
+    }
+}
+
 void ProjectNavigator::setOnHold(const bool &hold)
 {
     m_selectionHold = hold;
@@ -92,6 +143,7 @@ void ProjectNavigator::connectSignals()
     connect(ui->btnEditSite, &QPushButton::clicked, this, &ProjectNavigator::btnEditSite_clicked);
     connect(ui->treeNavigator, &QTreeWidget::currentItemChanged, this, &ProjectNavigator::currentNavItemChanged);
     connect(ui->treeNavigator, &QTreeWidget::itemExpanded, this, &ProjectNavigator::navItemExpanded);
+    connect(ui->btnDeleteItem, &QPushButton::clicked, this, &ProjectNavigator::deleteItemRequested);
 }
 
 void ProjectNavigator::updateSite(const TeraData *site)
@@ -129,6 +181,7 @@ void ProjectNavigator::updateProject(const TeraData *project)
     }else{
         // New project - add it.
         item = new QTreeWidgetItem();
+        item->setData(0, Qt::UserRole, id_project);
         ui->treeNavigator->addTopLevelItem(item);
         if (project->hasFieldName("project_participant_group_count")){
             if (project->getFieldValue("project_participant_group_count").toInt() > 0){
@@ -188,6 +241,7 @@ void ProjectNavigator::updateGroup(const TeraData *group)
     if (!item){
         // New group - add it.
         item = new QTreeWidgetItem();
+        item->setData(0, Qt::UserRole, id_group);
         QTreeWidgetItem* project_item = m_projects_items[id_project];
         project_item->addChild(item);
         m_groups_items[id_group] = item;
@@ -235,6 +289,7 @@ void ProjectNavigator::updateParticipant(const TeraData *participant)
     }else{
         // New participant - add it.
         item = new QTreeWidgetItem();
+        item->setData(0, Qt::UserRole, id_participant);
         QTreeWidgetItem* group_item = m_groups_items[id_group];
         if (group_item){
             // In a group currently displayed
@@ -254,11 +309,12 @@ void ProjectNavigator::updateParticipant(const TeraData *participant)
 
 }
 
-void ProjectNavigator::updateAvailableActions()
+void ProjectNavigator::updateAvailableActions(QTreeWidgetItem* current_item)
 {
     // Get user access for current site and project
     bool is_site_admin = m_comManager->getCurrentUserSiteRole(m_currentSiteId)=="admin";
     bool is_project_admin = m_comManager->getCurrentUserProjectRole(m_currentProjectId)=="admin";
+    TeraDataTypes item_type = getItemType(current_item);
 
     // New project
     ui->btnEditSite->setVisible(is_site_admin);
@@ -278,6 +334,37 @@ void ProjectNavigator::updateAvailableActions()
     if (new_part){
         new_part->setEnabled(is_project_admin);
     }
+
+    // Delete button
+    ui->btnDeleteItem->setEnabled(false);
+
+    if (item_type==TERADATA_PROJECT && is_site_admin){
+        ui->btnDeleteItem->setEnabled(true);
+    }
+    if (item_type==TERADATA_GROUP && is_project_admin){
+        ui->btnDeleteItem->setEnabled(true);
+    }
+    if (item_type==TERADATA_PARTICIPANT && is_project_admin){
+        ui->btnDeleteItem->setEnabled(true);
+    }
+
+}
+
+TeraDataTypes ProjectNavigator::getItemType(QTreeWidgetItem *item)
+{
+    if (m_projects_items.values().contains(item)){
+        return TERADATA_PROJECT;
+    }
+
+    if (m_groups_items.values().contains(item)){
+        return TERADATA_GROUP;
+    }
+
+    if (m_participants_items.values().contains(item)){
+        return TERADATA_PARTICIPANT;
+    }
+
+    return TERADATA_NONE;
 }
 
 QAction *ProjectNavigator::addNewItemAction(const TeraDataTypes &data_type, const QString &label)
@@ -312,6 +399,22 @@ void ProjectNavigator::newItemRequested()
     if (action){
         TeraDataTypes data_type = static_cast<TeraDataTypes>(action->data().toInt());
         emit dataDisplayRequest(data_type, 0);
+    }
+}
+
+void ProjectNavigator::deleteItemRequested()
+{
+    if (!ui->treeNavigator->currentItem())
+        return;
+
+    GlobalMessageBox diag;
+    QMessageBox::StandardButton answer = diag.showYesNo(tr("Suppression?"),
+                                                        tr("Êtes-vous sûrs de vouloir supprimer """) + ui->treeNavigator->currentItem()->text(0) + """?");
+    if (answer == QMessageBox::Yes){
+        // We must delete!
+        TeraDataTypes item_type = getItemType(ui->treeNavigator->currentItem());
+        int id_todel = ui->treeNavigator->currentItem()->data(0, Qt::UserRole).toInt();
+        emit dataDeleteRequest(item_type, id_todel);
     }
 }
 
@@ -364,7 +467,7 @@ void ProjectNavigator::currentSiteChanged()
     ui->treeNavigator->clear();
 
     // Update UI according to actions availables
-    updateAvailableActions();
+    updateAvailableActions(nullptr);
 
     // Query projects for that site
     QUrlQuery query;
@@ -381,9 +484,10 @@ void ProjectNavigator::currentNavItemChanged(QTreeWidgetItem *current, QTreeWidg
         return;
 
     current->setExpanded(true); // Will call "navItemExpanded" and expands the item
+    TeraDataTypes item_type = getItemType(current);
 
     // PROJECT
-    if (m_projects_items.values().contains(current)){
+    if (item_type==TERADATA_PROJECT){
         // We have a project
         //navItemExpanded(current);
         int id = m_projects_items.key(current);
@@ -393,7 +497,9 @@ void ProjectNavigator::currentNavItemChanged(QTreeWidgetItem *current, QTreeWidg
     }
 
     // PARTICIPANT GROUP
-    if (m_groups_items.values().contains(current)){
+    if (item_type==TERADATA_GROUP){
+        // Ensure project id is correctly set
+        m_currentProjectId = m_participants_items.key(current->parent());
         // We have a participants group
         //navItemExpanded(current);
         int id = m_groups_items.key(current);
@@ -405,13 +511,16 @@ void ProjectNavigator::currentNavItemChanged(QTreeWidgetItem *current, QTreeWidg
     }
 
     // PARTICIPANT
-    if (m_participants_items.values().contains(current)){
+    if (item_type==TERADATA_PARTICIPANT){
+        // Ensure that group and project ids are correctly set
+        m_currentGroupId = m_groups_items.key(current->parent());
+        m_currentProjectId = m_projects_items.key(current->parent()->parent());
         int id = m_participants_items.key(current);
         emit dataDisplayRequest(TERADATA_PARTICIPANT, id);
     }
 
     // Update available actions (new items)
-    updateAvailableActions();
+    updateAvailableActions(current);
 }
 
 void ProjectNavigator::navItemExpanded(QTreeWidgetItem *item)

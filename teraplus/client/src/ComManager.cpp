@@ -146,7 +146,7 @@ void ComManager::doDelete(const QString &path, const int &id)
     QNetworkRequest request(query);
     m_netManager->deleteResource(request);
     emit waitingForReply(true);
-    LOG_DEBUG("DELETE: " + path + ", with ID=" + QString::number(id), "ComManager::doDelete");
+    LOG_DEBUG("DELETE: " + path + ", with id=" + QString::number(id), "ComManager::doDelete");
 }
 
 void ComManager::doUpdateCurrentUser()

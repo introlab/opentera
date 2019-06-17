@@ -46,10 +46,12 @@ void MainWindow::connectSignals()
     connect(m_comManager, &ComManager::waitingForReply, this, &MainWindow::com_waitingForReply);
     connect(m_comManager, &ComManager::postResultsOK, this, &MainWindow::com_postReplyOK);
     connect(m_comManager, &ComManager::dataReceived, this, &MainWindow::processGenericDataReply);
+    connect(m_comManager, &ComManager::deleteResultsOK, this, &MainWindow::com_deleteResultsOK);
 
     connect(&m_msgTimer, &QTimer::timeout, this, &MainWindow::showNextMessage);
 
     connect(ui->wdgMainMenu, &ProjectNavigator::dataDisplayRequest, this, &MainWindow::dataDisplayRequested);
+    connect(ui->wdgMainMenu, &ProjectNavigator::dataDeleteRequest, this, &MainWindow::dataDeleteRequested);
 }
 
 void MainWindow::initUi()
@@ -213,6 +215,15 @@ void MainWindow::dataDisplayRequested(TeraDataTypes data_type, int data_id)
 
 }
 
+void MainWindow::dataDeleteRequested(TeraDataTypes data_type, int data_id)
+{
+    /*if (m_waiting_for_data_type != TERADATA_NONE)
+        LOG_WARNING("Request to delete, but still waiting on previous result!", "MainWindow::dataDeleteRequested");
+    m_waiting_for_data_type = data_type;*/
+
+    m_comManager->doDelete(TeraData::getPathForDataType(data_type), data_id);
+}
+
 void MainWindow::dataEditorCancelled()
 {
     showDataEditor(TERADATA_NONE, nullptr);
@@ -291,6 +302,11 @@ void MainWindow::com_waitingForReply(bool waiting)
 void MainWindow::com_postReplyOK()
 {
     addMessage(Message::MESSAGE_OK, tr("Données sauvegardées."));
+}
+
+void MainWindow::com_deleteResultsOK(QString path, int id)
+{
+    ui->wdgMainMenu->removeItem(TeraData::getDataTypeFromPath(path), id);
 }
 
 void MainWindow::on_btnLogout_clicked()

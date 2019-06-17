@@ -118,4 +118,28 @@ class QueryParticipants(Resource):
 
     @auth.login_required
     def delete(self):
-        return '', 501
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
+
+        args = parser.parse_args()
+        id_todel = args['id']
+
+        # Check if current user can delete
+        # Only project admins can delete a participant
+        part = TeraParticipant.get_participant_by_id(id_todel)
+
+        if user_access.get_project_role(part.participant_participant_group.id_project) != 'admin':
+            return '', 403
+
+        # If we are here, we are allowed to delete. Do so.
+        try:
+            TeraParticipant.delete_participant(id_participant=id_todel)
+        except exc.SQLAlchemyError:
+            import sys
+            print(sys.exc_info())
+            return 'Database error', 500
+
+        return '', 200
+
