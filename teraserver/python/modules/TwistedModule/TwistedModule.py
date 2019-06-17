@@ -68,7 +68,7 @@ class TwistedModule(BaseModule):
         caCerts=[cert.original]
 
         # Use verify = True to verify certificates
-        ssl_factory = ssl.CertificateOptions(verify=True, caCerts=caCerts,
+        ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
                                              requireCertificate=False,
                                              enableSessions=False)
 
@@ -89,14 +89,22 @@ class TwistedModule(BaseModule):
         pass
 
     def verifyCallback(self, connection, x509, errnum, errdepth, ok):
+        # 'b707e0b2-e649-47e7-a938-2b949c423f73'
         # errnum 24=invalid CA certificate...
 
         if not ok:
-            print('invalid cert from subject:', connection, x509.get_subject(),
-                  errnum, SSL.errorcode[errnum], errdepth, ok)
+            print('invalid cert from subject:', connection, x509.get_subject(), errnum, errdepth, ok)
             return False
         else:
-            print("Certs are fine")
+            print("Certs are fine", connection, x509.get_subject(), errnum, errdepth, ok)
+            subject = x509.get_subject()
+            # Get UID if possible
+            if 'Device' in subject.CN and hasattr(subject, 'UID'):
+                print('Device UID IS', subject.UID)
+            elif 'Participant' in subject.CN and hasattr(subject, 'UID'):
+                print('Participant UID IS', subject.UID)
+
+
         return True
 
     def setup_module_pubsub(self):

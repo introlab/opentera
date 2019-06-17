@@ -108,7 +108,8 @@ class TeraDevice(db.Model, BaseModel):
 
         device = TeraDevice()
         device.device_name = 'Apple Watch #W05P1'
-        device.device_uuid = str(uuid.uuid4())
+        # Forcing uuid for tests
+        device.device_uuid = 'b707e0b2-e649-47e7-a938-2b949c423f73'  # str(uuid.uuid4())
         device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
         device.create_token()
         device.device_enabled = True

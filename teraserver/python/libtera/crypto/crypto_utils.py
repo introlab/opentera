@@ -95,10 +95,10 @@ def generate_local_certificate(common_name=socket.gethostname(), country_name=u'
         ).serial_number(
             x509.random_serial_number()
         ).not_valid_before(
-            datetime.datetime.utcnow() - datetime.timedelta(days=1)
+            datetime.datetime.utcnow() - datetime.timedelta(hours=1)
         ).not_valid_after(
             # Our certificate will be valid for 10 years
-            datetime.datetime.utcnow() + datetime.timedelta(days=3650)
+            datetime.datetime.utcnow() + datetime.timedelta(days=365)
         ).add_extension(
             x509.SubjectAlternativeName([x509.DNSName(u"localhost")]),
             critical=False
@@ -136,7 +136,8 @@ def write_private_key_and_certificate(info: dict, keyfile='key.pem', certfile='c
     return True
 
 
-def create_certificate_signing_request(user_uuid=uuid.uuid4()):
+# Default apple watch, for testing...
+def create_certificate_signing_request(user_uuid='b707e0b2-e649-47e7-a938-2b949c423f73'):
 
     result = {}
 
@@ -148,7 +149,7 @@ def create_certificate_signing_request(user_uuid=uuid.uuid4()):
     # 2. You create a request for a certificate, which is signed by your key (to prove that you own the key)
     csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
         # Provide various details about who we are.
-        x509.NameAttribute(NameOID.COMMON_NAME, u'Client'),
+        x509.NameAttribute(NameOID.COMMON_NAME, u'Device'),
         x509.NameAttribute(NameOID.USER_ID, str(user_uuid))
         ])).sign(private_key, hashes.SHA256(), default_backend())
 
@@ -170,7 +171,7 @@ def generate_user_certificate(csr, ca_info):
     builder = builder.subject_name(csr.subject)
 
     builder = builder.issuer_name(ca.subject)
-    builder = builder.not_valid_before(datetime.datetime.now() - datetime.timedelta(days=1))
+    builder = builder.not_valid_before(datetime.datetime.now() - datetime.timedelta(hours=1))
     builder = builder.not_valid_after(datetime.datetime.now() + datetime.timedelta(days=3650))
     builder = builder.public_key(csr.public_key())
     builder = builder.serial_number(x509.random_serial_number())
