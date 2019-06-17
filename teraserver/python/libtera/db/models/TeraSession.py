@@ -3,12 +3,18 @@ from libtera.db.Base import db, BaseModel
 from enum import Enum
 import random
 from datetime import datetime, timedelta
+from sqlalchemy import event
 
-sessions_participants_table = db.Table('t_sessions_participants', db.Column('id_session', db.Integer,
-                                                                            db.ForeignKey('t_sessions.id_session',
-                                                                                          ondelete='cascade')),
-                                       db.Column('id_participant', db.Integer,
-                                                 db.ForeignKey('t_participants.id_participant', ondelete='cascade')))
+
+class TeraSessionParticipants(db.Model, BaseModel):
+    __tablename__ = 't_sessions_participants'
+    id_session_participant = db.Column(db.Integer, db.Sequence('id_session_participant'), primary_key=True,
+                                       autoincrement=True)
+    id_session = db.Column(db.Integer, db.ForeignKey('t_sessions.id_session', ondelete='cascade'))
+    id_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant', ondelete='cascade'))
+
+    session_participant_session = db.relationship('TeraSession')
+    session_participant_participant = db.relationship('TeraParticipant')
 
 
 class TeraSessionStatus(Enum):
@@ -29,8 +35,8 @@ class TeraSession(db.Model, BaseModel):
     session_duration = db.Column(db.Integer, nullable=False, default=0)
     session_status = db.Column(db.Integer, nullable=False)
     session_comments = db.Column(db.String, nullable=True)
-    session_participants = db.relationship("TeraParticipant", secondary=sessions_participants_table,
-                                           back_populates="participant_sessions", cascade="all,delete")
+    session_participants = db.relationship("TeraParticipant", secondary="t_sessions_participants",
+                                           back_populates="participant_sessions")
 
     session_user = db.relationship('TeraUser')
     session_session_type = db.relationship('TeraSessionType')
@@ -66,6 +72,7 @@ class TeraSession(db.Model, BaseModel):
 
         session_user = TeraUser.get_user_by_id(1)
         session_part = TeraParticipant.get_participant_by_name('Test Participant #1')
+        session_part2 = TeraParticipant.get_participant_by_name('Test Participant #2')
         for i in range(8):
             base_session = TeraSession()
             base_session.session_user = session_user
@@ -76,7 +83,10 @@ class TeraSession(db.Model, BaseModel):
             base_session.session_duration = random.randint(60, 4800)
             ses_status = random.randint(0, 4)
             base_session.session_status = ses_status
-            base_session.session_participants = [session_part]
+            if i < 7:
+                base_session.session_participants = [session_part]
+            else:
+                base_session.session_participants = [session_part, session_part2]
             db.session.add(base_session)
 
         db.session.commit()
@@ -114,5 +124,6 @@ class TeraSession(db.Model, BaseModel):
 
     @staticmethod
     def delete_session(id_session: int):
-        TeraSession.query.filter_by(id_session=id_session).delete()
+        db.session.delete(TeraSession.query.filter_by(id_session=id_session).first())
         db.session.commit()
+

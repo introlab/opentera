@@ -20,7 +20,7 @@ class TeraKit(db.Model, BaseModel):
     kit_devices = db.relationship("TeraKitDevice")
 
     kit_participants = db.relationship("TeraParticipant", secondary=kits_participants_table,
-                                       back_populates="participant_kits", cascade="all,delete")
+                                       back_populates="participant_kits")
 
     kit_project = db.relationship("TeraProject")
     kit_site = db.relationship("TeraSite")

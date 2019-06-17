@@ -15,4 +15,4 @@ class TeraTestType(db.Model, BaseModel):
     test_type_prefix = db.Column(db.String(10), nullable=False, unique=False)
     test_type_definition = db.Column(db.String, nullable=False)
 
-    test_type_projects = db.relationship("TeraProject", secondary=tests_types_projects_table, cascade="all,delete")
+    test_type_projects = db.relationship("TeraProject", secondary=tests_types_projects_table)

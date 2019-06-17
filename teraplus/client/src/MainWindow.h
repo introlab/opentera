@@ -37,6 +37,7 @@ private slots:
     void com_networkError(QNetworkReply::NetworkError error, QString error_msg);
     void com_waitingForReply(bool waiting);
     void com_postReplyOK();
+    void com_deleteResultsOK(QString path, int id);
 
     void addMessage(Message::MessageType msg_type, QString msg);
     void addMessage(const Message& msg);
@@ -45,6 +46,7 @@ private slots:
 
     void editorDialogFinished();
     void dataDisplayRequested(TeraDataTypes data_type, int data_id);
+    void dataDeleteRequested(TeraDataTypes data_type, int data_id);
     void dataEditorCancelled();
 
     void on_btnCloseMessage_clicked();
