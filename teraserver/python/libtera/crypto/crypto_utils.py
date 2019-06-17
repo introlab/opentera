@@ -29,7 +29,8 @@ def generate_ca_certificate(common_name=socket.gethostname(), country_name=u'CA'
         x509.NameAttribute(NameOID.COUNTRY_NAME, country_name),
         x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, state_or_province),
         x509.NameAttribute(NameOID.LOCALITY_NAME, locality_name),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, organization_name)
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, organization_name),
+        x509.NameAttribute(NameOID.EMAIL_ADDRESS, u'test@noemail.com')
     ])
 
     builder = x509.CertificateSigningRequestBuilder()
@@ -44,13 +45,13 @@ def generate_ca_certificate(common_name=socket.gethostname(), country_name=u'CA'
         ).serial_number(
             x509.random_serial_number()
         ).not_valid_before(
-            datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+            datetime.datetime.utcnow() - datetime.timedelta(days=1)
         ).not_valid_after(
             # Our certificate will be valid for 10 years
             datetime.datetime.utcnow() + datetime.timedelta(days=3650)
         ).add_extension(
-            x509.SubjectAlternativeName([x509.DNSName(u"localhost")]),
-            critical=False,
+            x509.BasicConstraints(ca=True, path_length=None),
+            critical=True
             # Sign our certificate with our private key
         ).sign(private_key, hashes.SHA256(), default_backend())
 
@@ -59,14 +60,67 @@ def generate_ca_certificate(common_name=socket.gethostname(), country_name=u'CA'
     return result
 
 
-def write_private_key_and_ca_certificate(info: dict, path=''):
+def generate_local_certificate(common_name=socket.gethostname(), country_name=u'CA',
+                            state_or_province=u'Québec', locality_name=u'Sherbrooke',
+                            organization_name=u'Université de Sherbrooke'):
+
+    result = {}
+
+    # Generate the private key
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+        backend=default_backend())
+
+    result['private_key'] = private_key
+
+    subject = issuer = x509.Name([
+        x509.NameAttribute(NameOID.COMMON_NAME, common_name),
+        x509.NameAttribute(NameOID.COUNTRY_NAME, country_name),
+        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, state_or_province),
+        x509.NameAttribute(NameOID.LOCALITY_NAME, locality_name),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, organization_name),
+        x509.NameAttribute(NameOID.EMAIL_ADDRESS, u'test@noemail.com')
+    ])
+
+    builder = x509.CertificateSigningRequestBuilder()
+
+    # Create Certificate
+    cert = x509.CertificateBuilder().subject_name(
+            subject
+        ).issuer_name(
+            issuer
+        ).public_key(
+            private_key.public_key()
+        ).serial_number(
+            x509.random_serial_number()
+        ).not_valid_before(
+            datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        ).not_valid_after(
+            # Our certificate will be valid for 10 years
+            datetime.datetime.utcnow() + datetime.timedelta(days=3650)
+        ).add_extension(
+            x509.SubjectAlternativeName([x509.DNSName(u"localhost")]),
+            critical=False
+            # Sign our certificate with our private key
+        ).add_extension(
+            x509.BasicConstraints(ca=False, path_length=None),
+            critical=True
+        ).sign(private_key, hashes.SHA256(), default_backend())
+
+    result['certificate'] = cert
+
+    return result
+
+
+def write_private_key_and_certificate(info: dict, keyfile='key.pem', certfile='cert.pem'):
     """
         Use def generate_ca_certificate(...) to generate the private key and certificate before.
 
     """
     try:
         # Will write private key in PEM (base64) format
-        with open(path + '/key.pem', 'wb') as f:
+        with open(keyfile, 'wb') as f:
             f.write(info['private_key'].private_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PrivateFormat.TraditionalOpenSSL,
@@ -74,45 +128,12 @@ def write_private_key_and_ca_certificate(info: dict, path=''):
             ))
 
         # Will write certificate
-        with open(path + '/ca.pem', 'wb') as f:
+        with open(certfile, 'wb') as f:
             f.write(info['certificate'].public_bytes(serialization.Encoding.PEM))
     except:
         return False
 
     return True
-
-def write_private_key_and_client_certificate(info: dict, path=''):
-    try:
-        # Will write private key in PEM (base64) format
-        with open(path + '/client_key.pem', 'wb') as f:
-            f.write(info['private_key'].private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.TraditionalOpenSSL,
-                encryption_algorithm=NoEncryption()
-            ))
-
-        # Will write certificate
-        with open(path + '/client_certificate.pem', 'wb') as f:
-            f.write(info['certificate'].public_bytes(serialization.Encoding.PEM))
-    except:
-        return False
-
-    return True
-
-
-def load_private_key_and_ca_certificate(path=''):
-    result = {}
-    # Load key
-    key_bytes = open(path + '/key.pem', 'rb').read()
-    private_key = serialization.load_pem_private_key(key_bytes, password=None, backend=default_backend())
-    result['private_key'] = private_key
-
-    # Load certificate
-    cert_bytes = open(path + '/ca.pem', 'rb').read()
-    certificate = x509.load_pem_x509_certificate(cert_bytes, default_backend())
-    result['certificate'] = certificate
-
-    return result
 
 
 def create_certificate_signing_request(user_uuid=uuid.uuid4()):
@@ -127,6 +148,7 @@ def create_certificate_signing_request(user_uuid=uuid.uuid4()):
     # 2. You create a request for a certificate, which is signed by your key (to prove that you own the key)
     csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
         # Provide various details about who we are.
+        x509.NameAttribute(NameOID.COMMON_NAME, u'Client'),
         x509.NameAttribute(NameOID.USER_ID, str(user_uuid))
         ])).sign(private_key, hashes.SHA256(), default_backend())
 
@@ -146,8 +168,9 @@ def generate_user_certificate(csr, ca_info):
     ca_key = ca_info['private_key']
     # WARNING, subject needs to be verified
     builder = builder.subject_name(csr.subject)
+
     builder = builder.issuer_name(ca.subject)
-    builder = builder.not_valid_before(datetime.datetime.now() - datetime.timedelta(hours=1))
+    builder = builder.not_valid_before(datetime.datetime.now() - datetime.timedelta(days=1))
     builder = builder.not_valid_after(datetime.datetime.now() + datetime.timedelta(days=3650))
     builder = builder.public_key(csr.public_key())
     builder = builder.serial_number(x509.random_serial_number())
@@ -167,11 +190,27 @@ def generate_user_certificate(csr, ca_info):
 # For testing...
 if __name__ == '__main__':
     print(socket.gethostname())
-    ca_info = generate_ca_certificate()
-    write_private_key_and_ca_certificate(ca_info, path=os.getcwd() + '/../../certificates')
-    test = load_private_key_and_ca_certificate(path=os.getcwd() + '/../../certificates')
+
+    current_path = os.getcwd()
+
+    # Generate CA certificate
+    ca_info = generate_ca_certificate(common_name='IntRoLab_CA')
+    write_private_key_and_certificate(ca_info, keyfile=current_path + '/../../certificates/ca_key.pem',
+                                      certfile=current_path + '/../../certificates/ca_cert.pem')
+
+    # Generate signing request
     client_info = create_certificate_signing_request()
     client_info['certificate'] = generate_user_certificate(client_info['csr'], ca_info)
-    write_private_key_and_client_certificate(client_info, path=os.getcwd() + '/../../certificates/devices')
+
+    # Client test key + certificate
+    write_private_key_and_certificate(client_info,
+                                      keyfile=current_path + '/../../certificates/devices/client_key.pem',
+                                      certfile=current_path + '/../../certificates/devices/client_certificate.pem')
+
+    site_info = generate_local_certificate()
+    write_private_key_and_certificate(site_info, keyfile=current_path + '/../../certificates/site_key.pem',
+                                      certfile=current_path + '/../../certificates/site_cert.pem')
 
     print(ca_info)
+    print(site_info)
+    print(client_info)

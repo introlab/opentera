@@ -68,19 +68,19 @@ class TwistedModule(BaseModule):
         caCerts=[cert.original]
 
         # Use verify = True to verify certificates
-        ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
+        ssl_factory = ssl.CertificateOptions(verify=True, caCerts=caCerts,
                                              requireCertificate=False,
                                              enableSessions=False)
 
         ctx = ssl_factory.getContext()
-        ctx.use_privatekey_file(self.config.server_config['ssl_path'] + '/key.pem')
-        ctx.use_certificate_file(self.config.server_config['ssl_path'] + '/ca.pem')
+        ctx.use_privatekey_file(self.config.server_config['ssl_path'] + '/site_key.pem')
+        ctx.use_certificate_file(self.config.server_config['ssl_path'] + '/site_cert.pem')
 
         # Certificate verification callback
         ctx.set_verify(SSL.VERIFY_PEER, self.verifyCallback)
 
         # With self-signed certs we have to explicitely tell the server to trust certificates
-        ctx.load_verify_locations(self.config.server_config['ssl_path'] + '/ca.pem')
+        ctx.load_verify_locations(self.config.server_config['ssl_path'] + '/ca_cert.pem')
 
         reactor.listenSSL(self.config.server_config['port'], site, ssl_factory)
         print('setup_twisted done')
