@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-06-18 11:17-0400\n"
+"POT-Creation-Date: 2019-06-18 13:35-0400\n"
 "PO-Revision-Date: 2019-03-28 16:24-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -21,8 +21,9 @@ msgstr ""
 #: libtera/forms/TeraDeviceForm.py:26 libtera/forms/TeraKitDeviceForm.py:25
 #: libtera/forms/TeraKitForm.py:24 libtera/forms/TeraParticipantForm.py:19
 #: libtera/forms/TeraParticipantGroupForm.py:20
-#: libtera/forms/TeraProjectForm.py:19 libtera/forms/TeraSessionTypeForm.py:20
-#: libtera/forms/TeraSiteForm.py:12 libtera/forms/TeraUserForm.py:12
+#: libtera/forms/TeraProjectForm.py:19 libtera/forms/TeraSessionForm.py:32
+#: libtera/forms/TeraSessionTypeForm.py:20 libtera/forms/TeraSiteForm.py:12
+#: libtera/forms/TeraUserForm.py:12
 msgid "Informations"
 msgstr ""
 
@@ -154,6 +155,38 @@ msgstr ""
 
 #: libtera/forms/TeraProjectForm.py:27
 msgid "Nom du site initial"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:36
+msgid "ID séance"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:37
+msgid "Nom de la séance"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:38
+msgid "Type de séance"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:39
+msgid "Créateur"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:40
+msgid "Date de début"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:41
+msgid "Durée"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:44
+msgid "État"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:45
+msgid "Commentaires"
 msgstr ""
 
 #: libtera/forms/TeraSessionTypeForm.py:24
@@ -330,7 +363,12 @@ msgstr ""
 msgid "Impossible de supprimer - des seances de ce type existent."
 msgstr ""
 
-#: modules/FlaskModule/API/QuerySessions.py:126
+#: modules/FlaskModule/API/QuerySessions.py:82
+msgid "Participants absents"
+msgstr ""
+
+#: modules/FlaskModule/API/QuerySessions.py:97
+#: modules/FlaskModule/API/QuerySessions.py:146
 msgid "Vous n'avez pas acces a au moins un participant de la seance."
 msgstr ""
 
