@@ -137,6 +137,7 @@ class TeraParticipant(db.Model, BaseModel):
     @staticmethod
     def insert_participant(participant):
         participant.id_participant = None
+        participant.participant_lastonline = None
         db.session.add(participant)
         db.session.commit()
 

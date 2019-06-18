@@ -107,7 +107,13 @@ void MainWindow::showDataEditor(const TeraDataTypes &data_type, const TeraData*d
 
     if (data_type == TERADATA_PARTICIPANT){
         m_data_editor = new ParticipantWidget(m_comManager, data);
-        // TODO: Check if we allow editing or not!
+        bool limited = true;
+        if (data->hasFieldName("id_project")){
+            limited = m_comManager->getCurrentUserProjectRole(data->getFieldValue("id_project").toInt()) != "admin";
+        }
+        if (data->getId()==0)
+            limited = false;
+        m_data_editor->setLimited(limited);
 
     }
 
@@ -198,6 +204,10 @@ void MainWindow::dataDisplayRequested(TeraDataTypes data_type, int data_id)
 
         if (data_type == TERADATA_GROUP){
             new_data->setFieldValue("id_project", ui->wdgMainMenu->getCurrentProjectId());
+        }
+
+        if (data_type == TERADATA_PARTICIPANT){
+            new_data->setFieldValue("id_participant_group", ui->wdgMainMenu->getCurrentGroupId());
         }
 
         showDataEditor(data_type, new_data);

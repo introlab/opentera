@@ -62,3 +62,10 @@ node_modules/
 /teraserver/CMakeLists.txt.user.4.9-pre1
 /teraserver/python/config/TeraServerConfig.ini~0b30c4625222f7c8696ca353a9e47d17d15d6cb5
 /teraserver/python/messages/python/*
+/teraserver/python/certificates/ca_cert.pem
+/teraserver/python/certificates/ca_key.pem
+/teraserver/python/certificates/devices/client_certificate.pem
+/teraserver/python/certificates/devices/client_key.pem
+/teraserver/python/certificates/site_cert.pem
+/teraserver/python/certificates/site_key.pem
+/teraplus/client/resources/icons/device.psd

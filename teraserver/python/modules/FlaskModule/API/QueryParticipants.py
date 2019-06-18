@@ -65,6 +65,9 @@ class QueryParticipants(Resource):
                     if args['id_kit']:
                         # Adds kit information to participant
                         participant_json['id_kit'] = args['id_kit']
+                    if args['id_participant']:
+                        # Adds project information to participant
+                        participant_json['id_project'] = participant.participant_participant_group.id_project
                     participant_list.append(participant_json)
                 else:
                     participant_json = participant.to_json(minimal=True)
