@@ -51,6 +51,11 @@ class QueryParticipants(Resource):
             participants = user_access.query_participants_for_group(args['id_group'])
         elif args['id_session']:
             part_session = TeraSession.get_session_by_id(args['id_session'])
+            participants = []
+            accessibles_parts = user_access.get_accessible_participants_ids()
+            for part in part_session.session_participants:
+                if part.id_participant in accessibles_parts:
+                    participants.append(part)
 
         try:
             participant_list = []

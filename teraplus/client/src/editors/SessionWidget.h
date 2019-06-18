@@ -31,12 +31,15 @@ private:
 
     bool validateData();
 
+    void updateParticipant(TeraData* participant);
+
 private slots:
     void btnSave_clicked();
     void btnUndo_clicked();
 
 
     void processFormsReply(QString form_type, QString data);
+    void processParticipantsReply(QList<TeraData> participants);
     void postResultReply(QString path);
 };
 

@@ -20,6 +20,11 @@ SessionWidget::SessionWidget(ComManager *comMan, const TeraData *data, QWidget *
     // Query form definition
     queryDataRequest(WEB_FORMS_PATH, QUrlQuery(WEB_FORMS_QUERY_SESSION));
 
+    // Query session participants
+    QUrlQuery query;
+    query.addQueryItem(WEB_QUERY_ID_SESSION, QString::number(m_data->getId()));
+    queryDataRequest(WEB_PARTICIPANTINFO_PATH, query);
+
     setData(data);
 
 }
@@ -75,12 +80,54 @@ bool SessionWidget::validateData(){
     return valid;
 }
 
+void SessionWidget::updateParticipant(TeraData *participant)
+{
+    QListWidgetItem* item = nullptr;
+    for(int i=0; i<ui->lstParticipants->count(); i++){
+        int part_id = ui->lstParticipants->item(i)->data(Qt::UserRole).toInt();
+        if (part_id == participant->getId()){
+            // Participant already present
+            item = ui->lstParticipants->item(i);
+            break;
+        }
+    }
+
+    // New participant
+    if (!item){
+        item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_PARTICIPANT)), participant->getName());
+        item->setData(Qt::UserRole, participant->getId());
+        ui->lstParticipants->addItem(item);
+    }
+
+    // Update participant name
+    item->setText(participant->getName());
+}
+
 void SessionWidget::processFormsReply(QString form_type, QString data)
 {
     if (form_type == WEB_FORMS_QUERY_SESSION){
         ui->wdgSession->buildUiFromStructure(data);
         return;
     }
+}
+
+void SessionWidget::processParticipantsReply(QList<TeraData> participants)
+{
+    if (!m_data)
+        return;
+
+    QList<QVariant> part_ids;
+    if (m_data->hasFieldName("session_participants_ids")){
+        part_ids = m_data->getFieldValue("session_participants_ids").toList();
+    }
+
+    for (TeraData part:participants){
+        // Participant is part of the current session
+        if (part_ids.contains(part.getId())){
+            updateParticipant(&part);
+        }
+    }
+
 }
 
 void SessionWidget::postResultReply(QString path)
@@ -96,6 +143,7 @@ void SessionWidget::connectSignals()
 {
     connect(m_comManager, &ComManager::formReceived, this, &SessionWidget::processFormsReply);
     connect(m_comManager, &ComManager::postResultsOK, this, &SessionWidget::postResultReply);
+    connect(m_comManager, &ComManager::participantsReceived, this, &SessionWidget::processParticipantsReply);
 
     connect(ui->btnUndo, &QPushButton::clicked, this, &SessionWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &SessionWidget::btnSave_clicked);
