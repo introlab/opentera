@@ -95,6 +95,9 @@ class DBManagerTeraUserAccess:
         return project_list
 
     def get_accessible_devices(self, admin_only=False):
+        if self.user.user_superadmin:
+            return TeraDevice.query.all()
+
         site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
         return TeraDevice.query.filter(TeraDevice.id_site.in_(site_id_list)).all()
 
@@ -217,8 +220,11 @@ class DBManagerTeraUserAccess:
         return role_name
 
     def query_device_by_id(self, device_id: int):
-        sites_ids = self.get_accessible_sites_ids()
-        device = TeraDevice.query.filter_by(id_device=device_id).filter(TeraDevice.id_site.in_(sites_ids)).first()
+        if self.user.user_superadmin:
+            device = TeraDevice.get_device_by_id(device_id)
+        else:
+            sites_ids = self.get_accessible_sites_ids()
+            device = TeraDevice.query.filter_by(id_device=device_id).filter(TeraDevice.id_site.in_(sites_ids)).first()
         return device
 
     def query_session_type_by_id(self, session_type_id:int):
