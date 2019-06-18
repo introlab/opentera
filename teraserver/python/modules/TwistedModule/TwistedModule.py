@@ -21,6 +21,17 @@ from twisted.python import log
 from OpenSSL import SSL
 import sys
 
+# TeraDevice
+from libtera.db.models.TeraDevice import TeraDevice
+
+
+# Current device identity, stacked
+from flask import _request_ctx_stack
+from werkzeug.local import LocalProxy
+
+# On stack current device
+# current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_device', None))
+
 
 class TwistedModule(BaseModule):
 
@@ -101,9 +112,12 @@ class TwistedModule(BaseModule):
             # Get UID if possible
             if 'Device' in subject.CN and hasattr(subject, 'UID'):
                 print('Device UID IS', subject.UID)
+                # Load device information on stack
+                # current_device = TeraDevice.get_device_by_uuid(subject.UID)
+                # print(current_device)
+
             elif 'Participant' in subject.CN and hasattr(subject, 'UID'):
                 print('Participant UID IS', subject.UID)
-
 
         return True
 

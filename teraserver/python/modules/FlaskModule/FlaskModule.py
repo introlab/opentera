@@ -85,6 +85,7 @@ class FlaskModule(BaseModule):
         from .API.QueryParticipantGroup import QueryParticipantGroup
         from .API.QuerySessions import QuerySessions
         from .API.QuerySessionTypes import QuerySessionTypes
+        from .API.DeviceUpload import DeviceUpload
 
         self.api.add_resource(Login, '/api/login', resource_class_args=[self])
         self.api.add_resource(Logout, '/api/logout', resource_class_args=[self])
@@ -102,6 +103,7 @@ class FlaskModule(BaseModule):
         self.api.add_resource(QueryParticipantGroup, '/api/groups', resource_class_args=[self])
         self.api.add_resource(QuerySessions, '/api/sessions', resource_class_args=[self])
         self.api.add_resource(QuerySessionTypes, '/api/sessiontypes', resource_class_args=[self])
+        self.api.add_resource(DeviceUpload, '/api/device_upload', resource_class_args=[self])
 
     def init_views(self):
         from .Views.Index import Index

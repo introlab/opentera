@@ -115,3 +115,18 @@ class LoginModule(BaseModule):
             return 'Forbidden', 403
 
         return decorated
+
+    @staticmethod
+    def certificate_required(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            # Current device is set in Twisted Module while negociating SSL certificates
+            # if hasattr(_request_ctx_stack.top, 'current_device'):
+                # if _request_ctx_stack.top.current_device is not None:
+
+            return f(*args, **kwargs)
+
+            # Any other case, do not call function
+            # return 'Forbidden', 403
+
+        return decorated
