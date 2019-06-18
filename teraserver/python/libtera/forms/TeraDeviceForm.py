@@ -34,7 +34,9 @@ class TeraDeviceForm:
                                       item_values=device_types_list))
         section.add_item(TeraFormItem("device_token", gettext("Jeton d'accès"), "label",
                                       item_options={"readonly": True}))
-        section.add_item(TeraFormItem("id_site", gettext("Site d'appartenance"), "array", item_required=True,
+        section.add_item(TeraFormItem("device_certificate", gettext("Certificat"), "label",
+                                      item_options={"readonly": True}))
+        section.add_item(TeraFormItem("id_site", gettext("Site d'appartenance"), "array", item_required=False,
                                       item_values=sites_list))
         section.add_item(TeraFormItem("device_enabled", gettext("Activé?"), "boolean", item_required=True))
         section.add_item(TeraFormItem("device_onlineable", gettext("Peut se connecter?"), "boolean",

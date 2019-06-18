@@ -11,12 +11,13 @@ class TeraDevice(db.Model, BaseModel):
     __tablename__ = 't_devices'
     secret = 'TeraDeviceSecret'
     id_device = db.Column(db.Integer, db.Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
-    id_site = db.Column(db.Integer, db.ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=False)
+    id_site = db.Column(db.Integer, db.ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=True)
     device_uuid = db.Column(db.String(36), nullable=False, unique=True)
     device_name = db.Column(db.String, nullable=False)
     device_type = db.Column(db.Integer, db.ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
                             nullable=False)
     device_token = db.Column(db.String, nullable=False, unique=True)
+    device_certificate = db.Column(db.String, nullable=True)
     device_enabled = db.Column(db.Boolean, nullable=False)
     device_onlineable = db.Column(db.Boolean, nullable=False)
     device_profile = db.Column(db.String, nullable=True)
