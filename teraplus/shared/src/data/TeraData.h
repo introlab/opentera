@@ -27,6 +27,7 @@ enum TeraDataTypes {
     TERADATA_SESSION
 };
 
+
 Q_DECLARE_METATYPE(TeraDataTypes)
 
 class TeraData : public QObject

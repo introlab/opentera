@@ -289,6 +289,12 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
             if (item_type == "color"){
                 item_widget = createColorWidget(item_data);
             }
+            if (item_type == "datetime"){
+                item_widget = createDateTimeWidget(item_data);
+            }
+            if (item_type == "duration"){
+                item_widget = createDurationWidget(item_data);
+            }
 
 
             if (item_widget){
@@ -307,8 +313,9 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
                 }
                 if (item_data.contains("readonly")){
                     item_widget->setProperty("readonly", item_data["readonly"].toBool());
-                    item_widget->setEnabled(item_data["readonly"].toBool());
+                    item_widget->setDisabled(item_data["readonly"].toBool());
                 }
+                item_widget->setProperty("item_type", item_type);
 
                 item_widget->setMinimumHeight(30);
 
@@ -512,6 +519,26 @@ QWidget *TeraForm::createColorWidget(const QVariantMap &structure)
     return item_btn;
 }
 
+QWidget *TeraForm::createDateTimeWidget(const QVariantMap &structure)
+{
+    Q_UNUSED(structure)
+    QDateTimeEdit* item_dt = new QDateTimeEdit();
+    item_dt->setDisplayFormat("dd MMMM yyyy - hh:mm");
+    item_dt->setCalendarPopup(true);
+
+    return item_dt;
+
+}
+
+QWidget *TeraForm::createDurationWidget(const QVariantMap &structure)
+{
+    Q_UNUSED(structure)
+    QTimeEdit* item_t = new QTimeEdit();
+    item_t->setDisplayFormat("hh:mm:ss");
+
+    return item_t;
+}
+
 void TeraForm::checkConditions()
 {
     for (QWidget* item:m_widgets.values()){
@@ -635,6 +662,18 @@ void TeraForm::getWidgetValues(QWidget* widget, QVariant *id, QVariant *value)
         }
     }
 
+    if (QDateTimeEdit* dt = dynamic_cast<QDateTimeEdit*>(widget)){
+        *value = dt->dateTime();
+    }
+
+    if (QTimeEdit* te = dynamic_cast<QTimeEdit*>(widget)){
+        if (te->property("item_type") == "duration"){
+            *value = QTime(0,0).secsTo(te->time());
+        }else{
+            *value = te->time();
+        }
+    }
+
     if (value->canConvert(QMetaType::QString)){
         bool ok;
         QString string_val = value->toString();
@@ -728,6 +767,32 @@ void TeraForm::setWidgetValue(QWidget *widget, const QVariant &value)
         }
 
     }
+
+    if (QTimeEdit* te = dynamic_cast<QTimeEdit*>(widget)){
+        QTime time_value = value.toTime();
+
+        if (!time_value.isValid()){
+            int time_s = value.toInt();
+            time_value = QTime(0,0).addSecs(time_s);
+        }
+        te->setTime(time_value);
+        return;
+    }
+
+    if (QDateTimeEdit* dt = dynamic_cast<QDateTimeEdit*>(widget)){
+        QDateTime time_value = value.toDateTime();
+
+        if (!time_value.isValid()){
+            unsigned int time_s = value.toUInt();
+            // Consider we have a UNIX timestamp
+            time_value = QDateTime::fromSecsSinceEpoch(time_s);
+        }
+
+        dt->setDateTime(value.toDateTime());
+        return;
+    }
+
+
 
     LOG_WARNING("Unhandled widget: "+ QString(widget->metaObject()->className()) + " for item " + value.toString(), "TeraForm::setWidgetValue");
 }

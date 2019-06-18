@@ -15,7 +15,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget{background-color: rgba(0,0,0,0);color:white;border-radius:5px}
-QPlainTextEdit,QLineEdit,QListWidget,QComboBox,QTextEdit,QSpinBox{background-color: rgba(255,255,255,50%); color: black;}
+QPlainTextEdit,QLineEdit,QListWidget,QComboBox,QTextEdit,QSpinBox,QDateTimeEdit, QTimeEdit{background-color: rgba(255,255,255,50%); color: black;}
 
 QTableWidget{
 background-color: rgba(0,0,0,50%);
@@ -23,8 +23,7 @@ color: white;
 border: 1px solid rgba(255,255,255,50%);
 }
 
-QLineEdit:!enabled, QListWidget:!enabled,QComboBox:!enabled,QTextEdit:!enabled,QPlainTextEdit:!enabled{background-color: rgba(0,0,0,30%);color:white;border:0}
-QDateEdit::down-arrow:!enabled,QTimeEdit::down-arrow:!enabled,QDateEdit::up-arrow:!enabled,QTimeEdit::up-arrow:!enabled,QComboBox::drop-down:!enabled{background-color:rgba(0,0,0,0%);}
+QLineEdit:!enabled, QListWidget:!enabled,QComboBox:!enabled,QTextEdit:!enabled,QPlainTextEdit:!enabled, QDateTimeEdit:!enabled, QTimeEdit:!enabled{background-color: rgba(0,0,0,30%);color:white;border:0}QDateEdit::down-arrow:!enabled,QDateTimeEdit::down-arrow:!enabled,QTimeEdit::down-arrow:!enabled,QDateEdit::up-arrow:!enabled,QTimeEdit::up-arrow:!enabled,QComboBox::drop-down:!enabled,QDateTimeEdit::up-arrow:!enabled{background-color:rgba(0,0,0,0%);}
 
 QCheckBox::indicator:unchecked:!enabled { background-color:rgba(128,0,0,100%);}
 QCheckBox::indicator:checked:!enabled { background-color:green;}

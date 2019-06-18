@@ -21,6 +21,8 @@
 #include <QTextEdit>
 #include <QPushButton>
 #include <QColorDialog>
+#include <QDateTimeEdit>
+#include <QTimeEdit>
 
 #include <QtMultimedia/QCameraInfo>
 #include <QtMultimedia/QAudioDeviceInfo>
@@ -77,6 +79,8 @@ private:
     QWidget* createListWidget(const QVariantMap& structure);
     QWidget* createLongTextWidget(const QVariantMap& structure);
     QWidget* createColorWidget(const QVariantMap& structure);
+    QWidget* createDateTimeWidget(const QVariantMap& structure);
+    QWidget* createDurationWidget(const QVariantMap& structure);
 
     void checkConditions();
     void checkConditionsForItem(QWidget* item);

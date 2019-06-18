@@ -26,7 +26,7 @@ class TeraUserForm:
         section.add_item(TeraFormItem("user_superadmin", gettext("Super administrateur"), "boolean", True))
         section.add_item(TeraFormItem("user_notes", gettext("Notes"), "longtext"))
         section.add_item(TeraFormItem("user_profile", gettext("Profil"), "hidden"))
-        section.add_item(TeraFormItem("user_lastonline", gettext("Dernière connexion"), "label",
+        section.add_item(TeraFormItem("user_lastonline", gettext("Dernière connexion"), "datetime",
                                       item_options={"readonly": True}))
 
         return form.to_dict()

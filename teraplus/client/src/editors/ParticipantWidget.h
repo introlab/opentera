@@ -8,6 +8,8 @@
 #include "DataEditorWidget.h"
 #include "GlobalMessageBox.h"
 
+#include "TeraSessionStatus.h"
+
 namespace Ui {
 class ParticipantWidget;
 }
@@ -31,12 +33,15 @@ private:
     QMap<int, TeraData*>            m_ids_session_types;
     QMap<int, TeraData*>            m_ids_sessions;
 
+    QDialog*                     m_diag_editor;
+
     void updateControlsState();
     void updateFieldsValue();
 
     bool validateData();
 
     void updateSession(TeraData *session);
+    void updateKit(TeraData* kit);
 
     void updateCalendars(QDate left_date);
     QDate getMinimumSessionDate();
@@ -44,13 +49,16 @@ private slots:
     void processFormsReply(QString form_type, QString data);
     void processSessionsReply(QList<TeraData> sessions);
     void processSessionTypesReply(QList<TeraData> session_types);
+    void processKitsReply(QList<TeraData> kits);
     void deleteDataReply(QString path, int id);
 
     void btnSave_clicked();
     void btnUndo_clicked();
+    void btnKits_clicked();
     void btnDeleteSession_clicked();
 
     void currentSelectedSessionChanged(QTableWidgetItem* current, QTableWidgetItem* previous);
+    void displaySessionDetails(QTableWidgetItem* session_item);
     void currentTypeFiltersChanged(QListWidgetItem* changed);
     void displayNextMonth();
     void displayPreviousMonth();

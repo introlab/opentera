@@ -697,6 +697,14 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
          </column>
          <column>
           <property name="text">
+           <string>État</string>
+          </property>
+          <property name="textAlignment">
+           <set>AlignCenter</set>
+          </property>
+         </column>
+         <column>
+          <property name="text">
            <string>Durée</string>
           </property>
           <property name="textAlignment">
@@ -827,7 +835,7 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
         <normaloff>:/icons/kit.png</normaloff>:/icons/kit.png</iconset>
       </attribute>
       <attribute name="title">
-       <string>Kits</string>
+       <string>Kit(s)</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>

@@ -54,54 +54,74 @@ class QuerySessions(Resource):
 
     @auth.login_required
     def post(self):
-        # parser = reqparse.RequestParser()
-        # parser.add_argument('participant', type=str, location='json', help='Partiicpant to create / update',
-        #                     required=True)
-        #
-        # current_user = TeraUser.get_user_by_uuid(session['user_id'])
-        # user_access = DBManager.userAccess(current_user)
-        # # Using request.json instead of parser, since parser messes up the json!
-        # if 'participant' not in request.json:
-        #     return '', 400
-        #
-        # json_participant = request.json['participant']
-        #
-        # # Validate if we have an id
-        # if 'id_participant' not in json_participant or 'id_participant_group' not in json_participant:
-        #     return '', 400
-        #
-        # # Check if current user can modify the posted group
-        # # User can modify or add a group if it has admin access to that project
-        # if json_participant['id_participant_group'] not in user_access.get_accessible_groups_ids(admin_only=True):
-        #     return '', 403
-        #
-        # # Do the update!
-        # if json_participant['id_participant'] > 0:
-        #     # Already existing
-        #     try:
-        #         TeraParticipant.update_participant(json_participant['id_participant'], json_participant)
-        #     except exc.SQLAlchemyError:
-        #         import sys
-        #         print(sys.exc_info())
-        #         return '', 500
-        # else:
-        #     # New
-        #     try:
-        #         new_part = TeraParticipant()
-        #         new_part.from_json(json_participant)
-        #         TeraParticipant.insert_participant(new_part)
-        #         # Update ID for further use
-        #         json_participant['id_participant'] = new_part.id_participant
-        #     except exc.SQLAlchemyError:
-        #         import sys
-        #         print(sys.exc_info())
-        #         return '', 500
-        #
-        # # TODO: Publish update to everyone who is subscribed to sites update...
-        # update_participant = TeraParticipant.get_participant_by_id(json_participant['id_participant'])
-        #
-        # return jsonify([update_participant.to_json()])
-        return '', 501
+        parser = reqparse.RequestParser()
+        parser.add_argument('session', type=str, location='json', help='Partiicpant to create / update',
+                            required=True)
+
+        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
+        # Using request.json instead of parser, since parser messes up the json!
+        if 'session' not in request.json:
+            return '', 400
+
+        json_session = request.json['session']
+
+        # Validate if we have an id
+        if 'id_session' not in json_session:
+            return '', 400
+
+        # Check if current user can modify the posted group
+        # User can modify or add a session if they have access (not necessary admin) to at least a participant in the
+        # session
+
+        can_update = False
+        session_parts_ids = []
+        if json_session['id_session'] == 0:
+            # New session - check if we have a participant list
+            if 'session_participants_ids' not in json_session:
+                return gettext('Participants absents'), 400
+            session_parts_ids = json_session['session_participants_ids']
+        else:
+            # Query the session
+            ses_to_update = TeraSession.get_session_by_id(json_session['id_session'])
+            for part in ses_to_update.session_participants:
+                session_parts_ids.append(part.id_participant)
+
+        accessibles_ids = user_access.get_accessible_participants_ids()
+        for part_id in session_parts_ids:
+            if part_id in accessibles_ids:
+                can_update = True
+                break
+
+        if not can_update:
+            return gettext('Vous n\'avez pas acces a au moins un participant de la seance.'), 403
+
+        # Do the update!
+        if json_session['id_session'] > 0:
+            # Already existing
+            try:
+                TeraSession.update_session(json_session['id_session'], json_session)
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return '', 500
+        else:
+            # New
+            try:
+                new_ses = TeraSession()
+                new_ses.from_json(json_session)
+                TeraSession.insert_session(new_ses)
+                # Update ID for further use
+                json_session['id_session'] = new_ses.id_session
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return '', 500
+
+        # TODO: Publish update to everyone who is subscribed to sites update...
+        update_session = TeraSession.get_session_by_id(json_session['id_session'])
+
+        return jsonify([update_session.to_json()])
 
     @auth.login_required
     def delete(self):

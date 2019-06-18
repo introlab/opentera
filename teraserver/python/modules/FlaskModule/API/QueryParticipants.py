@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse
 from modules.Globals import auth
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraParticipant import TeraParticipant
+from libtera.db.models.TeraSession import TeraSession
 from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -25,6 +26,7 @@ class QueryParticipants(Resource):
         parser.add_argument('id_kit', type=int)
         parser.add_argument('id_site', type=int, help='id site')
         parser.add_argument('id_group', type=int)
+        parser.add_argument('id_session', type=int)
         parser.add_argument('list', type=bool)
         # parser.add_argument('participant_uuid', type=str, help='participant_uuid')
         # parser.add_argument('participant_name', type=str, help='participant_name')
@@ -35,9 +37,9 @@ class QueryParticipants(Resource):
         if args['id']:
             args['id_participant'] = args['id']
 
-        # If we have no arguments, return all accessible participants
+        # If we have no arguments, return nothing
         if not any(args.values()):
-            participants = user_access.get_accessible_participants()
+            return '', 400
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
                 participants = [TeraParticipant.get_participant_by_id(args['id_participant'])]
@@ -47,6 +49,8 @@ class QueryParticipants(Resource):
             participants = user_access.query_participants_for_site(args['id_site'])
         elif args['id_group']:
             participants = user_access.query_participants_for_group(args['id_group'])
+        elif args['id_session']:
+            part_session = TeraSession.get_session_by_id(args['id_session'])
 
         try:
             participant_list = []

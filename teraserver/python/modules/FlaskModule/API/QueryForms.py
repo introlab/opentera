@@ -14,6 +14,7 @@ from libtera.forms.TeraProjectForm import TeraProjectForm
 from libtera.forms.TeraParticipantGroupForm import TeraParticipantGroupForm
 from libtera.forms.TeraParticipantForm import TeraParticipantForm
 from libtera.forms.TeraSessionTypeForm import TeraSessionTypeForm
+from libtera.forms.TeraSessionForm import TeraSessionForm
 
 
 class QueryForms(Resource):
@@ -59,5 +60,8 @@ class QueryForms(Resource):
 
         if args['type'] == 'session_type':
             return jsonify(TeraSessionTypeForm.get_session_type_form(user_access=user_access))
+
+        if args['type'] == 'session':
+            return jsonify(TeraSessionForm.get_session_form(user_access=user_access))
 
         return 'Unknown definition type: ' + args['type'], 500

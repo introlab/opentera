@@ -26,6 +26,7 @@ set(headers
     editors/GroupWidget.h
     editors/ParticipantWidget.h
     editors/SessionTypeWidget.h
+    editors/SessionWidget.h
 )
 
 set(srcs
@@ -52,6 +53,7 @@ set(srcs
     editors/GroupWidget.cpp
     editors/ParticipantWidget.cpp
     editors/SessionTypeWidget.cpp
+    editors/SessionWidget.cpp
 )
 
 SET(uis
@@ -70,6 +72,7 @@ SET(uis
     editors/GroupWidget.ui
     editors/ParticipantWidget.ui
     editors/SessionTypeWidget.ui
+    editors/SessionWidget.ui
 )
 
 SET(qrcs

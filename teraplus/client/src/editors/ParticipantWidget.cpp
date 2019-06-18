@@ -1,10 +1,16 @@
 #include "ParticipantWidget.h"
 #include "ui_ParticipantWidget.h"
 
+#include "editors/DataListWidget.h"
+#include "editors/SessionWidget.h"
+
 ParticipantWidget::ParticipantWidget(ComManager *comMan, const TeraData *data, QWidget *parent) :
     DataEditorWidget(comMan, data, parent),
     ui(new Ui::ParticipantWidget)
 {
+
+    m_diag_editor = nullptr;
+
     if (parent){
        ui->setupUi(parent);
     }else {
@@ -23,6 +29,12 @@ ParticipantWidget::ParticipantWidget(ComManager *comMan, const TeraData *data, Q
 
     // Query sessions types
     queryDataRequest(WEB_SESSIONTYPE_PATH);
+
+    // Query kits for that participant
+    QUrlQuery query;
+    query.addQueryItem(WEB_QUERY_ID_PARTICIPANT, QString::number(m_data->getId()));
+    query.addQueryItem(WEB_QUERY_LIST,"");
+    queryDataRequest(WEB_KITINFO_PATH, query);
 }
 
 ParticipantWidget::~ParticipantWidget()
@@ -52,12 +64,15 @@ void ParticipantWidget::connectSignals()
     connect(m_comManager, &ComManager::formReceived, this, &ParticipantWidget::processFormsReply);
     connect(m_comManager, &ComManager::sessionsReceived, this, &ParticipantWidget::processSessionsReply);
     connect(m_comManager, &ComManager::sessionTypesReceived, this, &ParticipantWidget::processSessionTypesReply);
+    connect(m_comManager, &ComManager::kitsReceived, this, &ParticipantWidget::processKitsReply);
     connect(m_comManager, &ComManager::deleteResultsOK, this, &ParticipantWidget::deleteDataReply);
 
     connect(ui->btnUndo, &QPushButton::clicked, this, &ParticipantWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &ParticipantWidget::btnSave_clicked);
+    connect(ui->btnKits, &QPushButton::clicked, this, &ParticipantWidget::btnKits_clicked);
     connect(ui->btnDelSession, &QPushButton::clicked, this, &ParticipantWidget::btnDeleteSession_clicked);
     connect(ui->tableSessions, &QTableWidget::currentItemChanged, this, &ParticipantWidget::currentSelectedSessionChanged);
+    connect(ui->tableSessions, &QTableWidget::itemDoubleClicked, this, &ParticipantWidget::displaySessionDetails);
     connect(ui->lstFilters, &QListWidget::itemChanged, this, &ParticipantWidget::currentTypeFiltersChanged);
     connect(ui->btnNextCal, &QPushButton::clicked, this, &ParticipantWidget::displayNextMonth);
     connect(ui->btnPrevCal, &QPushButton::clicked, this, &ParticipantWidget::displayPreviousMonth);
@@ -99,14 +114,17 @@ void ParticipantWidget::updateSession(TeraData *session)
     QTableWidgetItem* type_item;
     QTableWidgetItem* duration_item;
     QTableWidgetItem* user_item;
+    QTableWidgetItem* status_item;
 
     if (m_listSessions_items.contains(id_session)){
         // Already there, get items
        name_item = m_listSessions_items[id_session];
        date_item = ui->tableSessions->item(name_item->row(), 1);
        type_item = ui->tableSessions->item(name_item->row(), 2);
-       duration_item = ui->tableSessions->item(name_item->row(), 3);
-       user_item = ui->tableSessions->item(name_item->row(), 4);
+       status_item = ui->tableSessions->item(name_item->row(), 3);
+       duration_item = ui->tableSessions->item(name_item->row(), 4);
+       user_item = ui->tableSessions->item(name_item->row(), 5);
+       delete m_ids_sessions[id_session];
     }else{
         ui->tableSessions->setRowCount(ui->tableSessions->rowCount()+1);
         name_item = new QTableWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_SESSION)),"");
@@ -115,14 +133,16 @@ void ParticipantWidget::updateSession(TeraData *session)
         ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 1, date_item);
         type_item = new QTableWidgetItem("");
         ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 2, type_item);
+        status_item = new QTableWidgetItem("");
+        ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 3, status_item);
         duration_item = new QTableWidgetItem("");
-        ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 3, duration_item);
+        ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 4, duration_item);
         user_item = new QTableWidgetItem("");
-        ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 4, user_item);
+        ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 5, user_item);
 
         m_listSessions_items[id_session] = name_item;
-        m_ids_sessions[id_session] = new TeraData(*session);
     }
+    m_ids_sessions[id_session] = new TeraData(*session);
 
     // Update values
     name_item->setText(session->getName());
@@ -136,8 +156,37 @@ void ParticipantWidget::updateSession(TeraData *session)
     }
     duration_item->setText(QTime(0,0).addSecs(session->getFieldValue("session_duration").toInt()).toString("hh:mm:ss"));
     user_item->setText(session->getFieldValue("session_user").toString());
+    TeraSessionStatus::SessionStatus session_status = static_cast<TeraSessionStatus::SessionStatus>(session->getFieldValue("session_status").toInt());
+    status_item->setText(TeraSessionStatus::getStatusName(session_status));
+    // Set color depending on status_item
+    //status_item->setTextColor(QColor(TeraSessionStatus::getStatusColor(session_status)));
+    status_item->setTextColor(Qt::black);
+    status_item->setBackgroundColor(QColor(TeraSessionStatus::getStatusColor(session_status)));
 
     ui->tableSessions->resizeColumnsToContents();
+}
+
+void ParticipantWidget::updateKit(TeraData *kit)
+{
+    QListWidgetItem* item = nullptr;
+    for(int i=0; i<ui->lstKits->count(); i++){
+        int kit_id = ui->lstKits->item(i)->data(Qt::UserRole).toInt();
+        if (kit_id == kit->getId()){
+            // Kit already present
+            item = ui->lstKits->item(i);
+            break;
+        }
+    }
+
+    // New kit
+    if (!item){
+        item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_KIT)), kit->getName());
+        item->setData(Qt::UserRole, kit->getId());
+        ui->lstKits->addItem(item);
+    }
+
+    // Update kit name
+    item->setText(kit->getName());
 }
 
 void ParticipantWidget::processFormsReply(QString form_type, QString data)
@@ -211,6 +260,24 @@ void ParticipantWidget::processSessionTypesReply(QList<TeraData> session_types)
     }
 }
 
+void ParticipantWidget::processKitsReply(QList<TeraData> kits)
+{
+    for(TeraData kit:kits){
+        if (kit.hasFieldName("kit_participants")){
+            QVariantList kit_parts = kit.getFieldValue("kit_participants").toList();
+
+            for (int i=0; i<kit_parts.count(); i++){
+                QVariantMap part_info = kit_parts.at(i).toMap();
+                if (part_info["id_participant"].toInt() == m_data->getId()){
+                    // Kit is for the current participant
+                    updateKit(&kit);
+                    break;
+                }
+            }
+        }
+    }
+}
+
 void ParticipantWidget::deleteDataReply(QString path, int id)
 {
     if (id==0)
@@ -252,6 +319,20 @@ void ParticipantWidget::btnUndo_clicked()
         emit closeRequest();
 }
 
+void ParticipantWidget::btnKits_clicked()
+{
+    if (m_diag_editor){
+        m_diag_editor->deleteLater();
+    }
+    m_diag_editor = new QDialog(this);
+    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_KIT, m_diag_editor);
+    Q_UNUSED(list_widget)
+
+    m_diag_editor->setWindowTitle(tr("Kits"));
+
+    m_diag_editor->open();
+}
+
 void ParticipantWidget::btnDeleteSession_clicked()
 {
     if (!ui->tableSessions->currentItem())
@@ -271,6 +352,26 @@ void ParticipantWidget::currentSelectedSessionChanged(QTableWidgetItem *current,
 {
     Q_UNUSED(previous)
     ui->btnDelSession->setEnabled(current);
+}
+
+void ParticipantWidget::displaySessionDetails(QTableWidgetItem *session_item)
+{
+    if (m_diag_editor){
+        m_diag_editor->deleteLater();
+    }
+    m_diag_editor = new QDialog(this);
+    int id_session = m_listSessions_items.key(ui->tableSessions->item(session_item->row(),0));
+    TeraData* ses_data = m_ids_sessions[id_session];
+    if (ses_data){
+        SessionWidget* ses_widget = new SessionWidget(m_comManager, ses_data, m_diag_editor);
+
+        m_diag_editor->setWindowTitle(tr("Séance"));
+        m_diag_editor->setMinimumSize(this->width(), this->height());
+
+        connect(ses_widget, &SessionWidget::closeRequest, m_diag_editor, &QDialog::accept);
+
+        m_diag_editor->open();
+    }
 }
 
 void ParticipantWidget::currentTypeFiltersChanged(QListWidgetItem *changed)

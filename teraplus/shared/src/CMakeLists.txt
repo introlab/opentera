@@ -15,6 +15,7 @@ set(sharedlib_headers
     Logger.h
     ConfigManager.h
     data/TeraData.h
+    data/TeraSessionStatus.h
     WebAPI.h
 )
 
@@ -22,6 +23,7 @@ set(sharedlib_srcs
     Logger.cpp
     ConfigManager.cpp
     data/TeraData.cpp
+    data/TeraSessionStatus.cpp
 )
 
 include_directories(

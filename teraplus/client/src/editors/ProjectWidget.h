@@ -44,7 +44,7 @@ private:
     QMap<int, QListWidgetItem*>  m_listGroups_items;
     QMap<int, QTableWidgetItem*> m_listKits_items;
 
-    QDialog*                    m_diag_editor;
+    QDialog*                     m_diag_editor;
 
     void connectSignals();
 
