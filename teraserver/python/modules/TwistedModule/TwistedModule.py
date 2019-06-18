@@ -14,6 +14,7 @@ from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 from twisted.application import internet, service
 from twisted.internet import reactor, ssl
 from twisted.python.threadpool import ThreadPool
+from twisted.web.http import HTTPChannel
 from twisted.web.server import Site
 from twisted.web.static import File
 from twisted.web.wsgi import WSGIResource
@@ -21,16 +22,33 @@ from twisted.python import log
 from OpenSSL import SSL
 import sys
 
-# TeraDevice
-from libtera.db.models.TeraDevice import TeraDevice
+
+class MyHTTPChannel(HTTPChannel):
+    def allHeadersReceived(self):
+        # Verify if we have a client with a certificate...
+        cert = self.transport.getPeerCertificate()
+
+        if cert is not None:
+            # Certificate found, add information in header
+            subject = cert.get_subject()
+            # Get UID if possible
+            if 'Device' in subject.CN and hasattr(subject, 'UID'):
+                user_id = subject.UID
+                req = self.requests[-1]
+                req.requestHeaders.addRawHeader('X-Device-UUID', user_id)
+            if 'Participant' in subject.CN and hasattr(subject, 'UID'):
+                user_id = subject.UID
+                req = self.requests[-1]
+                req.requestHeaders.addRawHeader('X-Participant-UUID', user_id)
+
+        HTTPChannel.allHeadersReceived(self)
 
 
-# Current device identity, stacked
-from flask import _request_ctx_stack
-from werkzeug.local import LocalProxy
+class MySite(Site):
+    protocol = MyHTTPChannel
 
-# On stack current device
-# current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_device', None))
+    def __init__(self, resource, requestFactory=None, *args, **kwargs):
+        super().__init__(resource, requestFactory, *args, **kwargs)
 
 
 class TwistedModule(BaseModule):
@@ -61,7 +79,7 @@ class TwistedModule(BaseModule):
         root_resource = WSGIRootResource(wsgi_resource, {b'wss': wss_resource})
 
         # Create a Twisted Web Site
-        site = Site(root_resource)
+        site = MySite(root_resource)
 
         # setup an application for serving the site
         # web_service = internet.TCPServer(settings.PORT, site, interface=settings.INTERFACE)
@@ -104,20 +122,10 @@ class TwistedModule(BaseModule):
         # errnum 24=invalid CA certificate...
 
         if not ok:
-            print('invalid cert from subject:', connection, x509.get_subject(), errnum, errdepth, ok)
+            print('Invalid cert from subject:', connection, x509.get_subject(), errnum, errdepth, ok)
             return False
         else:
             print("Certs are fine", connection, x509.get_subject(), errnum, errdepth, ok)
-            subject = x509.get_subject()
-            # Get UID if possible
-            if 'Device' in subject.CN and hasattr(subject, 'UID'):
-                print('Device UID IS', subject.UID)
-                # Load device information on stack
-                # current_device = TeraDevice.get_device_by_uuid(subject.UID)
-                # print(current_device)
-
-            elif 'Participant' in subject.CN and hasattr(subject, 'UID'):
-                print('Participant UID IS', subject.UID)
 
         return True
 

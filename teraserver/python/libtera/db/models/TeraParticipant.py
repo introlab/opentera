@@ -83,6 +83,16 @@ class TeraParticipant(db.Model, BaseModel):
         return None
 
     @staticmethod
+    def get_participant_by_uuid(uuid):
+        participant = TeraParticipant.query.filter_by(participant_uuid=uuid).first()
+
+        if participant:
+            participant.update_last_online()
+            return participant
+
+        return None
+
+    @staticmethod
     def get_participant_by_name(name):
         return TeraParticipant.query.filter_by(participant_name=name).first()
 

@@ -120,13 +120,25 @@ class LoginModule(BaseModule):
     def certificate_required(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            # Current device is set in Twisted Module while negociating SSL certificates
-            # if hasattr(_request_ctx_stack.top, 'current_device'):
-                # if _request_ctx_stack.top.current_device is not None:
 
-            return f(*args, **kwargs)
+            # Headers are modified in TwistedModule to add certificate information if available.
+            # We are interested in the content of two fields : X-Device-Uuid, X-Participant-Uuid
+
+            if request.headers.__contains__('X-Device-Uuid'):
+                # Load device from DB
+                _request_ctx_stack.top.current_device = TeraDevice.get_device_by_uuid(
+                    request.headers['X-Device-Uuid'])
+                if current_device:
+                    return f(*args, **kwargs)
+
+            elif request.headers.__contains__('X-Participant-Uuid'):
+                # Load participant from DB
+                _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_uuid(
+                    request.headers['X-Participant-Uuid'])
+                if current_participant:
+                    return f(*args, **kwargs)
 
             # Any other case, do not call function
-            # return 'Forbidden', 403
+            return 'Forbidden', 403
 
         return decorated
