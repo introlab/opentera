@@ -36,6 +36,36 @@ from modules.WebRTCModule.WebRTCModule import WebRTCModule
 import os
 
 from sqlalchemy.exc import OperationalError
+import libtera.crypto.crypto_utils as crypto
+
+
+def generate_certificates(config: ConfigManager):
+    """
+        Will generate certificates and keys if they do not exist
+    """
+    site_certificate_path = config.server_config['ssl_path'] + '/' + config.server_config['site_certificate']
+    site_key_path = config.server_config['ssl_path'] + '/' + config.server_config['site_private_key']
+    ca_certificate_path = config.server_config['ssl_path'] + '/' + config.server_config['ca_certificate']
+    ca_key_path = config.server_config['ssl_path'] + '/' + config.server_config['ca_private_key']
+    device_certificate_path = config.server_config['ssl_path'] + '/devices/client_certificate.pem'
+    device_key_path = config.server_config['ssl_path'] + '/devices/client_key.pem'
+
+    if not os.path.exists(site_certificate_path) or not os.path.exists(site_key_path):
+        print('Generating Site certificate and key')
+        site_info = crypto.generate_local_certificate()
+        # Safe files
+        crypto.write_private_key_and_certificate(site_info, keyfile=site_key_path, certfile=site_certificate_path)
+
+    if not os.path.exists(ca_certificate_path) or not os.path.exists(ca_key_path):
+        print('Generating Site certificate and key')
+        ca_info = crypto.generate_ca_certificate(common_name='Local CA')
+        # Safe files
+        crypto.write_private_key_and_certificate(ca_info, keyfile=ca_key_path, certfile=ca_certificate_path)
+        print('Generating test device certificate')
+        client_info = crypto.create_certificate_signing_request()
+        client_info['certificate'] = crypto.generate_user_certificate(client_info['csr'], ca_info)
+        crypto.write_private_key_and_certificate(client_info, keyfile=device_key_path, certfile=device_certificate_path)
+
 
 if __name__ == '__main__':
 
@@ -65,6 +95,9 @@ if __name__ == '__main__':
 
     # Load configuration file.
     config_man.load_config(config_file)
+
+    # Generate certificate (if required)
+    generate_certificates(config_man)
 
     # DATABASE CONFIG AND OPENING
     #############################

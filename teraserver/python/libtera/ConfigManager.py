@@ -42,7 +42,9 @@ class ConfigManager:
     @staticmethod
     def validate_server_config(config):
         rval = True
-        required_fields = ['name', 'port', 'ssl_path', 'hostname']
+
+        required_fields = ['name', 'port', 'ssl_path', 'hostname',
+                           'site_certificate', 'site_private_key', 'ca_certificate', 'ca_private_key']
         for field in required_fields:
             if field not in config:
                 print('ERROR: Server Config - missing server ' + field)
