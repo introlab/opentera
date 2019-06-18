@@ -27,6 +27,7 @@ public:
 
     int getCurrentSiteId() const;
     int getCurrentProjectId() const;
+    int getCurrentGroupId() const;
 
     void selectItem(const TeraDataTypes& data_type, const int& id);
     void removeItem(const TeraDataTypes& data_type, const int& id);

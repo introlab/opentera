@@ -63,6 +63,11 @@ int ProjectNavigator::getCurrentProjectId() const
     return m_currentProjectId;
 }
 
+int ProjectNavigator::getCurrentGroupId() const
+{
+    return m_currentGroupId;
+}
+
 void ProjectNavigator::selectItem(const TeraDataTypes &data_type, const int &id)
 {
     if (data_type == TERADATA_PROJECT){
@@ -314,6 +319,7 @@ void ProjectNavigator::updateAvailableActions(QTreeWidgetItem* current_item)
     // Get user access for current site and project
     bool is_site_admin = m_comManager->getCurrentUserSiteRole(m_currentSiteId)=="admin";
     bool is_project_admin = m_comManager->getCurrentUserProjectRole(m_currentProjectId)=="admin";
+    bool at_least_one_enabled = false;
     TeraDataTypes item_type = getItemType(current_item);
 
     // New project
@@ -321,19 +327,24 @@ void ProjectNavigator::updateAvailableActions(QTreeWidgetItem* current_item)
     QAction* new_project = getActionForDataType(TERADATA_PROJECT);
     if (new_project){
         new_project->setEnabled(is_site_admin);
+        if (new_project->isEnabled()) at_least_one_enabled = true;
     }
 
     // New group
     QAction* new_group = getActionForDataType(TERADATA_GROUP);
     if (new_group){
         new_group->setEnabled(is_project_admin);
+        if (new_group->isEnabled()) at_least_one_enabled = true;
     }
 
     // New participant
     QAction* new_part = getActionForDataType(TERADATA_PARTICIPANT);
     if (new_part){
         new_part->setEnabled(is_project_admin);
+        if (new_part->isEnabled()) at_least_one_enabled = true;
     }
+
+    ui->btnNewItem->setEnabled(at_least_one_enabled);
 
     // Delete button
     ui->btnDeleteItem->setEnabled(false);
