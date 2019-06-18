@@ -78,6 +78,12 @@ class QueryDevices(Resource):
                 json_device['id_site'] > 0:
             return '', 403
 
+        # Devices without a site can only be modified by super admins
+        if json_device['id_site'] == 0:
+            if not current_user.user_superadmin:
+                return '', 403
+            json_device['id_site'] = None
+
         # Do the update!
         if json_device['id_device'] > 0:
             # Already existing
