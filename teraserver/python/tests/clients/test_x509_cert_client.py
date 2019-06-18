@@ -12,10 +12,12 @@ from zope.interface import implementer
 import OpenSSL.crypto
 
 import os
-
+import libtera.crypto.crypto_utils as crypto
+from cryptography.hazmat.primitives import hashes, serialization
+import base64
 
 @implementer(IPolicyForHTTPS)
-class MyPolicy(client.BrowserLikePolicyForHTTPS):
+class WithCertificatePolicy(client.BrowserLikePolicyForHTTPS):
     def creatorForNetloc(self, hostname, port):
 
         # val = super().creatorForNetloc(hostname, port)
@@ -34,6 +36,15 @@ class MyPolicy(client.BrowserLikePolicyForHTTPS):
         options = ssl.CertificateOptions(privateKey=key,
                                          certificate=cert,
                                          verify=False)
+
+        return options
+
+
+@implementer(IPolicyForHTTPS)
+class NoCertificatePolicy(client.BrowserLikePolicyForHTTPS):
+    def creatorForNetloc(self, hostname, port):
+        # Do not verify certificates
+        options = ssl.CertificateOptions(verify=False)
 
         return options
 
@@ -63,7 +74,7 @@ class x509ClientTest(unittest.TestCase):
             reactor.stop()
 
         # Agent with SSL Policy
-        agent = Agent(reactor, MyPolicy())
+        agent = Agent(reactor, WithCertificatePolicy())
 
         # body = FileBodyProducer(BytesIO(b"hello, world"))
         d = agent.request(
@@ -72,6 +83,45 @@ class x509ClientTest(unittest.TestCase):
             Headers({'User-Agent': ['Twisted Web Client Example'],
                      'Content-Type': ['text/x-greeting']}),
             None)
+
+        d.addCallbacks(gotResponse, noResponse)
+
+        reactor.run()
+
+    def test_https_device_registration(self):
+
+        # This will generate private key and signing request for the CA
+        client_info = crypto.create_certificate_signing_request(user_uuid='rien')
+
+        csr = client_info['csr']
+        print(client_info['csr'])
+
+        # Encode in base64
+        # encoded_cert = base64.b64encode(client_info['csr'].tbs_certrequest_bytes)
+
+        # Encode in PEM format
+        encoded_csr = client_info['csr'].public_bytes(serialization.Encoding.PEM)
+
+        def gotResponse(response):
+            print(response.code)
+            reactor.stop()
+
+        def noResponse(failure):
+            failure.trap(ResponseFailed)
+            print(failure.value.reasons[0].getTraceback())
+            reactor.stop()
+
+        # Agent with NO SSL policy
+        agent = Agent(reactor, NoCertificatePolicy())
+
+        body = FileBodyProducer(BytesIO(encoded_csr))
+        d = agent.request(
+            b'POST',
+            b'https://localhost:4040/api/device_register',
+            Headers({'User-Agent': ['Twisted Web Client Example'],
+                     'Content-Type': ['application/octet-stream'],
+                     'Content-Transfer-Encoding': ['Base64']}),
+            body)
 
         d.addCallbacks(gotResponse, noResponse)
 

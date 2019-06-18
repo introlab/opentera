@@ -9,6 +9,23 @@ import os
 import uuid
 import socket
 
+
+def load_private_pem_key(filename):
+    with open(filename, 'rb') as key:
+        private_key = serialization.load_pem_private_key(key.read(), None, default_backend())
+        return private_key
+
+    return None
+
+
+def load_pem_certificate(filename):
+    with open(filename, 'rb') as f:
+        cert = x509.load_pem_x509_certificate(f.read(), default_backend())
+        return cert
+
+    return None
+
+
 # info at https://cryptography.io
 def generate_ca_certificate(common_name=socket.gethostname(), country_name=u'CA',
                             state_or_province=u'Québec', locality_name=u'Sherbrooke',
