@@ -90,14 +90,15 @@ class TwistedModule(BaseModule):
                                             '/devices/client_certificate.pem', 'rb').read())
 
         # TODO READ OTHER CERTIFICATES FROM DB...
-        caCerts=[cert.original]
+        # caCerts=[cert.original]
+        caCerts = []
 
         # Use verify = True to verify certificates
-        ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
+        self.ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
                                              requireCertificate=False,
                                              enableSessions=False)
 
-        ctx = ssl_factory.getContext()
+        ctx = self.ssl_factory.getContext()
         ctx.use_privatekey_file(self.config.server_config['ssl_path'] + '/'
                                 + self.config.server_config['site_private_key'])
 
@@ -111,7 +112,7 @@ class TwistedModule(BaseModule):
         ctx.load_verify_locations(self.config.server_config['ssl_path'] + '/'
                                   + self.config.server_config['ca_certificate'])
 
-        reactor.listenSSL(self.config.server_config['port'], site, ssl_factory)
+        reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
 
     def __del__(self):
         pass

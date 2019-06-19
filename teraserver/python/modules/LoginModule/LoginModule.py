@@ -128,7 +128,7 @@ class LoginModule(BaseModule):
                 # Load device from DB
                 _request_ctx_stack.top.current_device = TeraDevice.get_device_by_uuid(
                     request.headers['X-Device-Uuid'])
-                if current_device:
+                if current_device and current_device.device_enabled:
                     return f(*args, **kwargs)
 
             elif request.headers.__contains__('X-Participant-Uuid'):

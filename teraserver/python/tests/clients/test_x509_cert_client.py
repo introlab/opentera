@@ -18,89 +18,37 @@ from cryptography.hazmat.primitives import hashes, serialization
 import base64
 import json
 
-@implementer(IPolicyForHTTPS)
-class WithCertificatePolicy(client.BrowserLikePolicyForHTTPS):
-    def creatorForNetloc(self, hostname, port):
-
-        # val = super().creatorForNetloc(hostname, port)
-
-        # Read certificate
-        f = open('../../certificates/devices/client_certificate.pem')
-        cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, f.read())
-        f.close()
-
-        # Read private key
-        f = open('../../certificates/devices/client_key.pem')
-        key = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, f.read())
-        f.close()
-
-        # Do not verify certificates
-        options = ssl.CertificateOptions(privateKey=key,
-                                         certificate=cert,
-                                         verify=False)
-
-        return options
-
-
-@implementer(IPolicyForHTTPS)
-class NoCertificatePolicy(client.BrowserLikePolicyForHTTPS):
-    def creatorForNetloc(self, hostname, port):
-        # Do not verify certificates
-        options = ssl.CertificateOptions(verify=False)
-
-        return options
-
 
 class x509ClientTest(unittest.TestCase):
+    # File information
+    KEY_FILE = os.getcwd() + '/device.key.pem'
+    CERT_FILE = os.getcwd() + '/device.cert.pem'
+
     def setUp(self):
         pass
 
     def tearDown(self):
         pass
 
-    def test_certificate_files(self):
-        # Verify if certificate file exist
-        basepath = os.getcwd()
-        self.assertTrue(os.path.exists('../../certificates/devices/client_certificate.pem'))
-        self.assertTrue(os.path.exists('../../certificates/devices/client_key.pem'))
-
-    def test_https_device_certificate(self):
-
-        def gotResponse(response):
-            print(response.code)
-            print(response)
-            # reactor.stop()
-
-        def noResponse(failure):
-            failure.trap(ResponseFailed)
-            print(failure.value.reasons[0].getTraceback())
-            reactor.stop()
-
-        # Agent with SSL Policy
-        agent = Agent(reactor, WithCertificatePolicy())
-
-        # body = FileBodyProducer(BytesIO(b"hello, world"))
-        d = agent.request(
-            b'GET',
-            b'https://localhost:4040/api/device_upload',
-            Headers({'User-Agent': ['Twisted Web Client Example'],
-                     'Content-Type': ['text/x-greeting']}),
-            None)
-
-        d.addCallbacks(gotResponse, noResponse)
-
-        reactor.run()
-
+    # STEP 1 : REGISTER DEVICE AND GET A CERTIFICATE
     def test_https_device_registration(self):
+
+        @implementer(IPolicyForHTTPS)
+        class NoCertificatePolicy(client.BrowserLikePolicyForHTTPS):
+            def creatorForNetloc(self, hostname, port):
+                # Do not verify certificates
+                options = ssl.CertificateOptions(verify=False)
+
+                return options
 
         # This will generate private key and signing request for the CA
         client_info = crypto.create_certificate_signing_request('Test AppleWatch to be registered')
 
-        csr = client_info['csr']
-        print(client_info['csr'])
-
-        # Encode in base64
-        # encoded_cert = base64.b64encode(client_info['csr'].tbs_certrequest_bytes)
+        # Write private key
+        with open(x509ClientTest.KEY_FILE, 'wb') as f:
+            f.write(client_info['private_key'].private_bytes(serialization.Encoding.PEM,
+                                                             serialization.PrivateFormat.TraditionalOpenSSL,
+                                                             serialization.NoEncryption()))
 
         # Encode in PEM format
         encoded_csr = client_info['csr'].public_bytes(serialization.Encoding.PEM)
@@ -114,9 +62,7 @@ class x509ClientTest(unittest.TestCase):
                 result = json.loads(bytes.decode('utf-8'))
 
                 # Write the certificate
-                filename = os.getcwd() + '/device.cert.pem'
-
-                with open(filename, 'wb') as f:
+                with open(x509ClientTest.CERT_FILE, 'wb') as f:
                     f.write(result['certificate'].encode('utf-8'))
 
                 print(result)
@@ -154,3 +100,60 @@ class x509ClientTest(unittest.TestCase):
 
         reactor.run()
 
+    # STEP 2, verify if certificate and key files exist
+    def test_certificate_files(self):
+        # Verify if certificate file exist
+        basepath = os.getcwd()
+        self.assertTrue(os.path.exists(x509ClientTest.CERT_FILE))
+        self.assertTrue(os.path.exists(x509ClientTest.KEY_FILE))
+
+    # STEP 3: connect to server to upload a file...
+    def test_https_device_certificate(self):
+        @implementer(IPolicyForHTTPS)
+        class WithCertificatePolicy(client.BrowserLikePolicyForHTTPS):
+            def creatorForNetloc(self, hostname, port):
+                # val = super().creatorForNetloc(hostname, port)
+
+                # Read certificate
+                f = open(x509ClientTest.CERT_FILE)
+                cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, f.read())
+                f.close()
+
+                # Read private key
+                f = open(x509ClientTest.KEY_FILE)
+                key = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, f.read())
+                f.close()
+
+                # Do not verify certificates
+                options = ssl.CertificateOptions(privateKey=key,
+                                                 certificate=cert,
+                                                 verify=False)
+
+                return options
+
+        def gotResponse(response):
+            print('gotResponse, SSL OK')
+            print(response.code)
+            print(response)
+            reactor.stop()
+
+        def noResponse(failure):
+            print('noResponse, SSL Failed')
+            failure.trap(ResponseFailed)
+            print(failure.value.reasons[0].getTraceback())
+            reactor.stop()
+
+        # Agent with SSL Policy
+        agent = Agent(reactor, WithCertificatePolicy())
+
+        # body = FileBodyProducer(BytesIO(b"hello, world"))
+        d = agent.request(
+            b'GET',
+            b'https://localhost:4040/api/device_upload',
+            Headers({'User-Agent': ['Twisted Web Client Example'],
+                     'Content-Type': ['text/x-greeting']}),
+            None)
+
+        d.addCallbacks(gotResponse, noResponse)
+
+        reactor.run()
