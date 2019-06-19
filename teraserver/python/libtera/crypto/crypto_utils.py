@@ -25,7 +25,6 @@ def load_pem_certificate(filename):
 
     return None
 
-
 # info at https://cryptography.io
 def generate_ca_certificate(common_name=socket.gethostname(), country_name=u'CA',
                             state_or_province=u'Québec', locality_name=u'Sherbrooke',
@@ -154,7 +153,7 @@ def write_private_key_and_certificate(info: dict, keyfile='key.pem', certfile='c
 
 
 # Default apple watch, for testing...
-def create_certificate_signing_request(user_uuid='b707e0b2-e649-47e7-a938-2b949c423f73'):
+def create_certificate_signing_request(device_name):
 
     result = {}
 
@@ -166,8 +165,7 @@ def create_certificate_signing_request(user_uuid='b707e0b2-e649-47e7-a938-2b949c
     # 2. You create a request for a certificate, which is signed by your key (to prove that you own the key)
     csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
         # Provide various details about who we are.
-        x509.NameAttribute(NameOID.COMMON_NAME, u'Device'),
-        x509.NameAttribute(NameOID.USER_ID, str(user_uuid))
+        x509.NameAttribute(NameOID.COMMON_NAME, str(device_name))
         ])).sign(private_key, hashes.SHA256(), default_backend())
 
     result['csr'] = csr
@@ -175,7 +173,7 @@ def create_certificate_signing_request(user_uuid='b707e0b2-e649-47e7-a938-2b949c
     return result
 
 
-def generate_user_certificate(csr, ca_info):
+def generate_device_certificate(csr, ca_info, device_uuid):
     # 3 You give your csr to a CA (but not the private key!)
     # 4 The CA validates that you own the resource (verify uuid?)
     # 5 The CA gives you a certificate, signed by them, which identifies your public key, and the resource you are
@@ -184,9 +182,13 @@ def generate_user_certificate(csr, ca_info):
 
     ca = ca_info['certificate']
     ca_key = ca_info['private_key']
-    # WARNING, subject needs to be verified
-    builder = builder.subject_name(csr.subject)
-
+    # WARNING, subject needs to be verified by CA, do not use csr subject
+    builder = builder.subject_name(
+        x509.Name([
+            x509.NameAttribute(NameOID.COMMON_NAME, u'Device'),
+            x509.NameAttribute(NameOID.USER_ID, str(device_uuid))
+        ])
+    )
     builder = builder.issuer_name(ca.subject)
     builder = builder.not_valid_before(datetime.datetime.now() - datetime.timedelta(hours=1))
     builder = builder.not_valid_after(datetime.datetime.now() + datetime.timedelta(days=3650))
@@ -217,14 +219,16 @@ if __name__ == '__main__':
                                       certfile=current_path + '/../../certificates/ca_cert.pem')
 
     # Generate signing request
-    client_info = create_certificate_signing_request()
-    client_info['certificate'] = generate_user_certificate(client_info['csr'], ca_info)
+    client_info = create_certificate_signing_request(device_name='Test Device')
+    client_info['certificate'] = generate_device_certificate(client_info['csr'], ca_info,
+                                                             'b707e0b2-e649-47e7-a938-2b949c423f73')
 
     # Client test key + certificate
     write_private_key_and_certificate(client_info,
                                       keyfile=current_path + '/../../certificates/devices/client_key.pem',
                                       certfile=current_path + '/../../certificates/devices/client_certificate.pem')
 
+    # Will use hostname as common name by default
     site_info = generate_local_certificate()
     write_private_key_and_certificate(site_info, keyfile=current_path + '/../../certificates/site_key.pem',
                                       certfile=current_path + '/../../certificates/site_cert.pem')

@@ -1,14 +1,17 @@
 from flask_restful import Resource, reqparse
-from modules.LoginModule.LoginModule import LoginModule, current_device
+from flask import jsonify
 from flask import request
 import base64
+from libtera.crypto.crypto_utils import generate_device_certificate, load_private_pem_key, load_pem_certificate
 from cryptography import x509
+from cryptography.x509.oid import NameOID
 from cryptography.hazmat.backends import default_backend
-import OpenSSL.crypto as crypto
-from libtera.crypto.crypto_utils import generate_user_certificate, load_private_pem_key, load_pem_certificate
-from cryptography import x509
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import hashes, serialization
+
+from libtera.db.Base import db
+from libtera.db.models.TeraDevice import TeraDevice
+from libtera.db.models.TeraDeviceType import TeraDeviceType
+import uuid
 
 class DeviceRegister(Resource):
     """
@@ -41,17 +44,39 @@ class DeviceRegister(Resource):
 
         # We should receive a certificate signing request (base64)
         if request.content_type == 'application/octet-stream':
-            # Read certificate request
-            # req = crypto.load_certificate_request(crypto.FILETYPE_PEM, request.data)
+            try:
+                # Read certificate request
+                req = x509.load_pem_x509_csr(request.data, default_backend())
 
-            req = x509.load_pem_x509_csr(request.data, default_backend())
+                # Create TeraDevice
+                device = TeraDevice()
 
-            # Must sign request with CA/key
-            cert = generate_user_certificate(req, self.ca_info)
+                # Required field(s)
+                # Name should be taken from CSR
+                device.device_name = str(req.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value)
+                device.device_onlineable = False
+                device.device_enabled = False
+                device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
+                device.device_uuid = str(uuid.uuid4())
+                device.create_token()
+                device.update_last_online()
 
+                # Must sign request with CA/key and generate certificate
+                cert = generate_device_certificate(req, self.ca_info, device.device_uuid)
 
+                # Update certificate
+                device.device_certificate = cert.public_bytes(serialization.Encoding.PEM).decode('utf-8')
 
-            print(req)
-            print(cert)
+                # Store
+                db.session.add(device)
+                db.session.commit()
 
-        return '', 200
+                result = dict()
+                result['certificate'] = device.device_certificate
+
+                # Return certificate...
+                return jsonify(result)
+            except:
+                return 'Error processing request', 400
+        else:
+            return 'Invalid content type', 400

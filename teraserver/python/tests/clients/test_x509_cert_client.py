@@ -2,6 +2,7 @@ import unittest
 
 from OpenSSL import SSL
 from twisted.internet import ssl, reactor
+from twisted.internet.defer import Deferred
 from twisted.internet.protocol import ClientFactory, Protocol
 from twisted.web.client import Agent, FileBodyProducer, ResponseFailed
 from twisted.web import client
@@ -15,6 +16,7 @@ import os
 import libtera.crypto.crypto_utils as crypto
 from cryptography.hazmat.primitives import hashes, serialization
 import base64
+import json
 
 @implementer(IPolicyForHTTPS)
 class WithCertificatePolicy(client.BrowserLikePolicyForHTTPS):
@@ -66,7 +68,8 @@ class x509ClientTest(unittest.TestCase):
 
         def gotResponse(response):
             print(response.code)
-            reactor.stop()
+            print(response)
+            # reactor.stop()
 
         def noResponse(failure):
             failure.trap(ResponseFailed)
@@ -91,7 +94,7 @@ class x509ClientTest(unittest.TestCase):
     def test_https_device_registration(self):
 
         # This will generate private key and signing request for the CA
-        client_info = crypto.create_certificate_signing_request(user_uuid='rien')
+        client_info = crypto.create_certificate_signing_request('Test AppleWatch to be registered')
 
         csr = client_info['csr']
         print(client_info['csr'])
@@ -102,9 +105,33 @@ class x509ClientTest(unittest.TestCase):
         # Encode in PEM format
         encoded_csr = client_info['csr'].public_bytes(serialization.Encoding.PEM)
 
+        class CertificateReader(Protocol):
+            def __init__(self, finished):
+                self.finished = finished
+
+            def dataReceived(self, bytes):
+                # We should have our new certificate, json format
+                result = json.loads(bytes.decode('utf-8'))
+
+                # Write the certificate
+                filename = os.getcwd() + '/device.cert.pem'
+
+                with open(filename, 'wb') as f:
+                    f.write(result['certificate'].encode('utf-8'))
+
+                print(result)
+
+            def connectionLost(self, reason):
+                # print('Finished receiving body:', reason)
+                self.finished.callback(None)
+                reactor.stop()
+
         def gotResponse(response):
             print(response.code)
-            reactor.stop()
+            # Reading response
+            finished = Deferred()
+            response.deliverBody(CertificateReader(finished))
+            return finished
 
         def noResponse(failure):
             failure.trap(ResponseFailed)

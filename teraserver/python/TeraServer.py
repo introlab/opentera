@@ -62,8 +62,9 @@ def generate_certificates(config: ConfigManager):
         # Safe files
         crypto.write_private_key_and_certificate(ca_info, keyfile=ca_key_path, certfile=ca_certificate_path)
         print('Generating test device certificate')
-        client_info = crypto.create_certificate_signing_request()
-        client_info['certificate'] = crypto.generate_user_certificate(client_info['csr'], ca_info)
+        client_info = crypto.create_certificate_signing_request('Test Device')
+        client_info['certificate'] = crypto.generate_device_certificate(client_info['csr'], ca_info,
+                                                                        'b707e0b2-e649-47e7-a938-2b949c423f73')
         crypto.write_private_key_and_certificate(client_info, keyfile=device_key_path, certfile=device_certificate_path)
 
 
