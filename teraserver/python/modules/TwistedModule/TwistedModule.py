@@ -33,11 +33,11 @@ class MyHTTPChannel(HTTPChannel):
 
         # SAFETY X-Device-UUID, X-Participant-UUID must not be set in header before testing certificate
         if req.requestHeaders.hasHeader('X-Device-UUID'):
-            req.requestHeaders.removeHEader('X-Device-UUID')
+            req.requestHeaders.removeHeader('X-Device-UUID')
             # TODO raise error?
 
         if req.requestHeaders.hasHeader('X-Participant-UUID'):
-            req.requestHeaders.removeHEader('X-Participant-UUID')
+            req.requestHeaders.removeHeader('X-Participant-UUID')
             # TODO raise error ?
 
         if cert is not None:
