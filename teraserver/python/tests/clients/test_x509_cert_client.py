@@ -108,6 +108,7 @@ class x509ClientTest(unittest.TestCase):
         self.assertTrue(os.path.exists(x509ClientTest.KEY_FILE))
 
     # STEP 3: connect to server to upload a file...
+    # Device must be manually enabled first...
     def test_https_device_certificate(self):
         @implementer(IPolicyForHTTPS)
         class WithCertificatePolicy(client.BrowserLikePolicyForHTTPS):

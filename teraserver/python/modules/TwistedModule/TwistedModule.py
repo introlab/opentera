@@ -28,17 +28,27 @@ class MyHTTPChannel(HTTPChannel):
         # Verify if we have a client with a certificate...
         cert = self.transport.getPeerCertificate()
 
+        # Current request
+        req = self.requests[-1]
+
+        # SAFETY X-Device-UUID, X-Participant-UUID must not be set in header before testing certificate
+        if req.requestHeaders.hasHeader('X-Device-UUID'):
+            req.requestHeaders.removeHEader('X-Device-UUID')
+            # TODO raise error?
+
+        if req.requestHeaders.hasHeader('X-Participant-UUID'):
+            req.requestHeaders.removeHEader('X-Participant-UUID')
+            # TODO raise error ?
+
         if cert is not None:
             # Certificate found, add information in header
             subject = cert.get_subject()
             # Get UID if possible
             if 'Device' in subject.CN and hasattr(subject, 'UID'):
                 user_id = subject.UID
-                req = self.requests[-1]
                 req.requestHeaders.addRawHeader('X-Device-UUID', user_id)
             if 'Participant' in subject.CN and hasattr(subject, 'UID'):
                 user_id = subject.UID
-                req = self.requests[-1]
                 req.requestHeaders.addRawHeader('X-Participant-UUID', user_id)
 
         HTTPChannel.allHeadersReceived(self)
