@@ -340,7 +340,15 @@ class DBManagerTeraUserAccess:
         from libtera.db.models.TeraParticipant import TeraParticipant
         from libtera.db.models.TeraSession import TeraSession
 
-        session = TeraSession.query.join(TeraSession.session_participants).filter_by(id_session=session_id)\
+        session = TeraSession.query.join(TeraSession.session_participants).filter(TeraSession.id_session == session_id)\
             .filter(TeraParticipant.id_participant.in_(self.get_accessible_participants_ids())).first()
 
         return session
+
+    def query_session_events(self, session_id: int):
+        from libtera.db.models.TeraSessionEvent import TeraSessionEvent
+
+        if self.query_session(session_id=session_id):
+            return TeraSessionEvent.get_events_for_session(id_session=session_id)
+
+        return []

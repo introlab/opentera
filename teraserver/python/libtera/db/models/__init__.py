@@ -14,4 +14,5 @@ __all__ = ['TeraDevice',
            'TeraDeviceData',
            'TeraTest',
            'TeraTestType',
-           'TeraKitDevice']
+           'TeraKitDevice',
+           'TeraSessionEvent']

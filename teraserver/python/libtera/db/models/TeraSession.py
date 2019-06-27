@@ -40,6 +40,7 @@ class TeraSession(db.Model, BaseModel):
 
     session_user = db.relationship('TeraUser')
     session_session_type = db.relationship('TeraSessionType')
+    session_events = db.relationship('TeraSessionEvent')
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['session_participants', 'session_user',
