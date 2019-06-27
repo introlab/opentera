@@ -24,6 +24,36 @@ class x509ClientTest(unittest.TestCase):
     KEY_FILE = os.getcwd() + '/device.key.pem'
     CERT_FILE = os.getcwd() + '/device.cert.pem'
 
+    @implementer(IPolicyForHTTPS)
+    class NoCertificatePolicy(client.BrowserLikePolicyForHTTPS):
+        def creatorForNetloc(self, hostname, port):
+            # Do not verify certificates
+            options = ssl.CertificateOptions(verify=False)
+
+            return options
+
+    @implementer(IPolicyForHTTPS)
+    class WithCertificatePolicy(client.BrowserLikePolicyForHTTPS):
+        def creatorForNetloc(self, hostname, port):
+            # val = super().creatorForNetloc(hostname, port)
+
+            # Read certificate
+            f = open(x509ClientTest.CERT_FILE)
+            cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, f.read())
+            f.close()
+
+            # Read private key
+            f = open(x509ClientTest.KEY_FILE)
+            key = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, f.read())
+            f.close()
+
+            # Do not verify certificates
+            options = ssl.CertificateOptions(privateKey=key,
+                                             certificate=cert,
+                                             verify=False)
+
+            return options
+
     def setUp(self):
         pass
 
@@ -32,14 +62,6 @@ class x509ClientTest(unittest.TestCase):
 
     # STEP 1 : REGISTER DEVICE AND GET A CERTIFICATE
     def test_https_device_registration(self):
-
-        @implementer(IPolicyForHTTPS)
-        class NoCertificatePolicy(client.BrowserLikePolicyForHTTPS):
-            def creatorForNetloc(self, hostname, port):
-                # Do not verify certificates
-                options = ssl.CertificateOptions(verify=False)
-
-                return options
 
         # This will generate private key and signing request for the CA
         client_info = crypto.create_certificate_signing_request('Test AppleWatch to be registered')
@@ -85,7 +107,7 @@ class x509ClientTest(unittest.TestCase):
             reactor.stop()
 
         # Agent with NO SSL policy
-        agent = Agent(reactor, NoCertificatePolicy())
+        agent = Agent(reactor, x509ClientTest.NoCertificatePolicy())
 
         body = FileBodyProducer(BytesIO(encoded_csr))
         d = agent.request(
@@ -107,30 +129,49 @@ class x509ClientTest(unittest.TestCase):
         self.assertTrue(os.path.exists(x509ClientTest.CERT_FILE))
         self.assertTrue(os.path.exists(x509ClientTest.KEY_FILE))
 
+    # STEP 3. Test Login device
+    def test_https_device_login(self):
+
+        class LoginResponseReader(Protocol):
+            def __init__(self, finished):
+                self.finished = finished
+
+            def dataReceived(self, bytes):
+                # We should have our new certificate, json format
+                result = json.loads(bytes.decode('utf-8'))
+                print(result)
+
+            def connectionLost(self, reason):
+                # print('Finished receiving body:', reason)
+                self.finished.callback(None)
+                reactor.stop()
+
+        def gotResponse(response):
+            # Reading response
+            finished = Deferred()
+            response.deliverBody(LoginResponseReader(finished))
+            return finished
+
+        def noResponse(failure):
+            failure.trap(ResponseFailed)
+            print(failure.value.reasons[0].getTraceback())
+            reactor.stop()
+
+        agent = Agent(reactor, x509ClientTest.WithCertificatePolicy())
+
+        d = agent.request(
+            b'GET',
+            b'https://localhost:4040/api/device/device_login',
+            Headers({'User-Agent': ['Twisted Web Client Example']}),
+            None)
+
+        d.addCallbacks(gotResponse, noResponse)
+
+        reactor.run()
+
     # STEP 3: connect to server to upload a file...
     # Device must be manually enabled first...
     def test_https_device_certificate(self):
-        @implementer(IPolicyForHTTPS)
-        class WithCertificatePolicy(client.BrowserLikePolicyForHTTPS):
-            def creatorForNetloc(self, hostname, port):
-                # val = super().creatorForNetloc(hostname, port)
-
-                # Read certificate
-                f = open(x509ClientTest.CERT_FILE)
-                cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, f.read())
-                f.close()
-
-                # Read private key
-                f = open(x509ClientTest.KEY_FILE)
-                key = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, f.read())
-                f.close()
-
-                # Do not verify certificates
-                options = ssl.CertificateOptions(privateKey=key,
-                                                 certificate=cert,
-                                                 verify=False)
-
-                return options
 
         def gotResponse(response):
             print('gotResponse, SSL OK')
@@ -145,7 +186,7 @@ class x509ClientTest(unittest.TestCase):
             reactor.stop()
 
         # Agent with SSL Policy
-        agent = Agent(reactor, WithCertificatePolicy())
+        agent = Agent(reactor, x509ClientTest.WithCertificatePolicy())
 
         # body = FileBodyProducer(BytesIO(b"hello, world"))
         d = agent.request(

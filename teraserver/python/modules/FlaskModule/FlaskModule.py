@@ -103,8 +103,10 @@ class FlaskModule(BaseModule):
         self.api.add_resource(QuerySessionTypes, '/api/user/sessiontypes', resource_class_args=[self])
 
         # Devices
+        from .API.device.DeviceLogin import DeviceLogin
         from .API.device.DeviceUpload import DeviceUpload
         from .API.device.DeviceRegister import DeviceRegister
+        self.api.add_resource(DeviceLogin, '/api/device/device_login', resource_class_args=[self])
         self.api.add_resource(DeviceUpload, '/api/device/device_upload', resource_class_args=[self])
         self.api.add_resource(DeviceRegister, '/api/device/device_register', resource_class_args=[self])
 

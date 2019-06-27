@@ -54,8 +54,9 @@ class DeviceRegister(Resource):
                 # Required field(s)
                 # Name should be taken from CSR
                 device.device_name = str(req.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value)
+                # TODO set flags properly
                 device.device_onlineable = False
-                device.device_enabled = False
+                device.device_enabled = True
                 device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
                 device.device_uuid = str(uuid.uuid4())
                 device.create_token()
