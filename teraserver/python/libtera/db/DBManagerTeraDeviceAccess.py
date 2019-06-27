@@ -30,9 +30,9 @@ class DBManagerTeraDeviceAccess:
 
     def get_accessible_participants(self, admin_only=False):
         participant_list = []
-        for kit in self.device.device_kits:
-            for part in kit.kit_participants:
-                participant_list.extend(part)
+        for kit_device in self.device.device_kits:
+            for part in kit_device.kit_device_kit.kit_participants:
+                participant_list.append(part)
         return participant_list
 
     def get_accessible_participants_ids(self, admin_only=False):

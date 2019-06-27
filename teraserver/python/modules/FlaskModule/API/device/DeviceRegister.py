@@ -10,6 +10,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 
 from libtera.db.Base import db
 from libtera.db.models.TeraDevice import TeraDevice
+from libtera.db.models.TeraKit import TeraKit
+from libtera.db.models.TeraKitDevice import TeraKitDevice
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 import uuid
 
@@ -56,11 +58,20 @@ class DeviceRegister(Resource):
                 device.device_name = str(req.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value)
                 # TODO set flags properly
                 device.device_onlineable = False
+                # TODO WARNING - Should be disabled when created...
                 device.device_enabled = True
                 device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
                 device.device_uuid = str(uuid.uuid4())
                 device.create_token()
                 device.update_last_online()
+
+                # TODO remove kits
+                kit = TeraKit.get_kit_by_name('Kit #1')
+                kitDev = TeraKitDevice()
+                kitDev.kit_device_kit = kit
+                kitDev.kit_device_device = device
+                kitDev.kit_device_optional = True
+                device.device_kits.append(kitDev)
 
                 # Must sign request with CA/key and generate certificate
                 cert = generate_device_certificate(req, self.ca_info, device.device_uuid)

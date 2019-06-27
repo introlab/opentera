@@ -1,6 +1,7 @@
 from flask import jsonify, session
 from flask_restful import Resource, reqparse
 from modules.LoginModule.LoginModule import LoginModule, current_device
+from modules.Globals import db_man
 
 
 class DeviceLogin(Resource):
@@ -17,24 +18,23 @@ class DeviceLogin(Resource):
         servername = self.module.config.server_config['hostname']
         port = self.module.config.server_config['port']
 
+        # Reply device information
+        reply = {'device_info': current_device.to_json()}
+
+        # Reply participant information
+        participants = db_man.deviceAccess(current_device).get_accessible_participants()
+        reply['participants_info'] = list()
+
+        for participant in participants:
+            reply['participants_info'].append(participant.to_json())
+
         # TODO Handle sessions
         if current_device.device_onlineable:
             # Permanent ?
             session.permanent = True
 
-            # Return reply as json object
-            reply = {"websocket_url": "wss://" + servername + ":" + str(port) + "/wss?id=" + session['_id'],
-                     "device_info": current_device.to_json()}
+            # Add websocket URL
+            reply['websocket_url'] = "wss://" + servername + ":" + str(port) + "/wss?id=" + session['_id']
 
-            json_reply = jsonify(reply)
-
-            return json_reply
-
-        else:
-
-            # Return reply as json object
-            reply = {"device_info": current_device.to_json()}
-
-            json_reply = jsonify(reply)
-
-            return json_reply
+        # Return reply as json object
+        return jsonify(reply)

@@ -31,7 +31,7 @@ class TeraDevice(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields += ['device_kits', 'device_site', 'device_token', 'secret']
+        ignore_fields += ['device_kits', 'device_site', 'device_token', 'device_certificate', 'secret']
 
         if minimal:
             ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_config', 'device_notes',
