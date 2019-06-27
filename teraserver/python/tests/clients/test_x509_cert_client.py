@@ -90,7 +90,7 @@ class x509ClientTest(unittest.TestCase):
         body = FileBodyProducer(BytesIO(encoded_csr))
         d = agent.request(
             b'POST',
-            b'https://localhost:4040/api/device_register',
+            b'https://localhost:4040/api/device/device_register',
             Headers({'User-Agent': ['Twisted Web Client Example'],
                      'Content-Type': ['application/octet-stream'],
                      'Content-Transfer-Encoding': ['Base64']}),
@@ -150,7 +150,7 @@ class x509ClientTest(unittest.TestCase):
         # body = FileBodyProducer(BytesIO(b"hello, world"))
         d = agent.request(
             b'GET',
-            b'https://localhost:4040/api/device_upload',
+            b'https://localhost:4040/api/device/device_upload',
             Headers({'User-Agent': ['Twisted Web Client Example'],
                      'Content-Type': ['text/x-greeting']}),
             None)

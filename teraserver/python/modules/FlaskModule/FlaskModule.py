@@ -68,44 +68,45 @@ class FlaskModule(BaseModule):
         pass
 
     def init_api(self):
-        # from .API.Index import Index
-        from .API.Login import Login
-        from .API.Logout import Logout
-        from .API.QueryUsers import QueryUsers
-        from .API.QueryForms import QueryForms
-        from .API.QueryOnlineUsers import QueryOnlineUsers
-        from .API.QuerySites import QuerySites
-        from .API.QueryProjects import QueryProjects
-        from .API.QueryParticipants import QueryParticipants
-        from .API.QueryDevices import QueryDevices
-        from .API.QueryKits import QueryKits
-        from .API.QuerySiteAccess import QuerySiteAccess
-        from .API.QueryKitDevice import QueryKitDevice
-        from .API.QueryProjectAccess import QueryProjectAccess
-        from .API.QueryParticipantGroup import QueryParticipantGroup
-        from .API.QuerySessions import QuerySessions
-        from .API.QuerySessionTypes import QuerySessionTypes
-        from .API.DeviceUpload import DeviceUpload
-        from .API.DeviceRegister import DeviceRegister
+        # Users...
+        from .API.user.Login import Login
+        from .API.user.Logout import Logout
+        from .API.user.QueryUsers import QueryUsers
+        from .API.user.QueryForms import QueryForms
+        from .API.user.QueryOnlineUsers import QueryOnlineUsers
+        from .API.user.QuerySites import QuerySites
+        from .API.user.QueryProjects import QueryProjects
+        from .API.user.QueryParticipants import QueryParticipants
+        from .API.user.QueryDevices import QueryDevices
+        from .API.user.QueryKits import QueryKits
+        from .API.user.QuerySiteAccess import QuerySiteAccess
+        from .API.user.QueryKitDevice import QueryKitDevice
+        from .API.user.QueryProjectAccess import QueryProjectAccess
+        from .API.user.QueryParticipantGroup import QueryParticipantGroup
+        from .API.user.QuerySessions import QuerySessions
+        from .API.user.QuerySessionTypes import QuerySessionTypes
+        self.api.add_resource(Login, '/api/user/login', resource_class_args=[self])
+        self.api.add_resource(Logout, '/api/user/logout', resource_class_args=[self])
+        self.api.add_resource(QuerySites, '/api/user/sites', resource_class_args=[self])
+        self.api.add_resource(QueryUsers, '/api/user/users', resource_class_args=[self])
+        self.api.add_resource(QueryForms, '/api/user/forms', resource_class_args=[self])
+        self.api.add_resource(QueryOnlineUsers, '/api/user/online', resource_class_args=[self])
+        self.api.add_resource(QueryProjects, '/api/user/projects', resource_class_args=[self])
+        self.api.add_resource(QueryParticipants, '/api/user/participants', resource_class_args=[self])
+        self.api.add_resource(QueryDevices, '/api/user/devices', resource_class_args=[self])
+        self.api.add_resource(QueryKits, '/api/user/kits', resource_class_args=[self])
+        self.api.add_resource(QuerySiteAccess, '/api/user/siteaccess', resource_class_args=[self])
+        self.api.add_resource(QueryProjectAccess, '/api/user/projectaccess', resource_class_args=[self])
+        self.api.add_resource(QueryKitDevice, '/api/user/kitdevices', resource_class_args=[self])
+        self.api.add_resource(QueryParticipantGroup, '/api/user/groups', resource_class_args=[self])
+        self.api.add_resource(QuerySessions, '/api/user/sessions', resource_class_args=[self])
+        self.api.add_resource(QuerySessionTypes, '/api/user/sessiontypes', resource_class_args=[self])
 
-        self.api.add_resource(Login, '/api/login', resource_class_args=[self])
-        self.api.add_resource(Logout, '/api/logout', resource_class_args=[self])
-        self.api.add_resource(QuerySites, '/api/sites', resource_class_args=[self])
-        self.api.add_resource(QueryUsers, '/api/users', resource_class_args=[self])
-        self.api.add_resource(QueryForms, '/api/forms', resource_class_args=[self])
-        self.api.add_resource(QueryOnlineUsers, '/api/online', resource_class_args=[self])
-        self.api.add_resource(QueryProjects, '/api/projects', resource_class_args=[self])
-        self.api.add_resource(QueryParticipants, '/api/participants', resource_class_args=[self])
-        self.api.add_resource(QueryDevices, '/api/devices', resource_class_args=[self])
-        self.api.add_resource(QueryKits, '/api/kits', resource_class_args=[self])
-        self.api.add_resource(QuerySiteAccess, '/api/siteaccess', resource_class_args=[self])
-        self.api.add_resource(QueryProjectAccess, '/api/projectaccess', resource_class_args=[self])
-        self.api.add_resource(QueryKitDevice, '/api/kitdevices', resource_class_args=[self])
-        self.api.add_resource(QueryParticipantGroup, '/api/groups', resource_class_args=[self])
-        self.api.add_resource(QuerySessions, '/api/sessions', resource_class_args=[self])
-        self.api.add_resource(QuerySessionTypes, '/api/sessiontypes', resource_class_args=[self])
-        self.api.add_resource(DeviceUpload, '/api/device_upload', resource_class_args=[self])
-        self.api.add_resource(DeviceRegister, '/api/device_register', resource_class_args=[self])
+        # Devices
+        from .API.device.DeviceUpload import DeviceUpload
+        from .API.device.DeviceRegister import DeviceRegister
+        self.api.add_resource(DeviceUpload, '/api/device/device_upload', resource_class_args=[self])
+        self.api.add_resource(DeviceRegister, '/api/device/device_register', resource_class_args=[self])
 
     def init_views(self):
         from .Views.Index import Index
@@ -120,5 +121,5 @@ class FlaskModule(BaseModule):
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
         flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
-        flask_app.add_url_rule('/auth/', view_func=Participant.as_view('auth', *args, **kwargs))
+        flask_app.add_url_rule('/auth/', view_func=Auth.as_view('auth', *args, **kwargs))
         flask_app.add_url_rule('/participant/', view_func=Participant.as_view('participant', *args, **kwargs))
