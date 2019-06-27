@@ -132,7 +132,7 @@ if __name__ == '__main__':
         quit()
 
     # Create default values, if required
-    db_man.create_defaults()
+    db_man.create_defaults(config=config_man)
 
     # Main Flask module
     flask_module = FlaskModule(config_man)

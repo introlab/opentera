@@ -102,6 +102,10 @@ class TeraSession(db.Model, BaseModel):
         return TeraSession.query.filter_by(id_session=ses_id).first()
 
     @staticmethod
+    def get_session_by_name(name: str):
+        return TeraSession.query.filter_by(session_name=name).first()
+
+    @staticmethod
     def get_sessions_for_participant(part_id: int):
         from libtera.db.models.TeraParticipant import TeraParticipant
         return TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==

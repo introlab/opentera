@@ -16,9 +16,9 @@ from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraKit import TeraKit
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraSessionType import TeraSessionType
+from libtera.db.models.TeraDeviceData import TeraDeviceData
 
-# from libtera.db.models.TeraProjectAccess import TeraProjectAccess
-# from libtera.db.models.TeraSiteAccess import TeraSiteAccess
+from libtera.ConfigManager import ConfigManager
 
 from modules.FlaskModule.FlaskModule import flask_app
 
@@ -51,7 +51,7 @@ class DBManager:
         return access
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(config: ConfigManager):
         if TeraSite.get_count() == 0:
             print('No sites - creating defaults')
             TeraSite.create_defaults()
@@ -91,6 +91,7 @@ class DBManager:
         if TeraSession.get_count() == 0:
             print('No session - creating defaults')
             TeraSession.create_defaults()
+            TeraDeviceData.create_defaults(config.server_config['upload_path'])
 
     @staticmethod
     def open(db_infos, echo=False):

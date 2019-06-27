@@ -2,8 +2,6 @@ from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraKit import kits_participants_table
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 
-from flask_sqlalchemy import event
-
 import uuid
 import jwt
 import time
