@@ -109,11 +109,13 @@ class FlaskModule(BaseModule):
         from .API.device.DeviceUpload import DeviceUpload
         from .API.device.DeviceRegister import DeviceRegister
         from .API.device.DeviceQuerySessions import DeviceQuerySessions
+        from .API.device.DeviceQuerySessionEvents import DeviceQuerySessionEvents
 
         self.api.add_resource(DeviceLogin, '/api/device/device_login', resource_class_args=[self])
         self.api.add_resource(DeviceUpload, '/api/device/device_upload', resource_class_args=[self])
         self.api.add_resource(DeviceRegister, '/api/device/device_register', resource_class_args=[self])
         self.api.add_resource(DeviceQuerySessions, '/api/device/sessions', resource_class_args=[self])
+        self.api.add_resource(DeviceQuerySessionEvents, '/api/device/sessionevents', resource_class_args=[self])
 
     def init_views(self):
         from .Views.Index import Index
