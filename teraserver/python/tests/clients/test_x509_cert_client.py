@@ -2,7 +2,7 @@ import unittest
 
 from OpenSSL import SSL
 from twisted.internet import ssl, reactor
-from twisted.internet.defer import Deferred
+from twisted.internet.defer import Deferred, inlineCallbacks, setDebugging
 from twisted.internet.protocol import ClientFactory, Protocol
 from twisted.web.client import Agent, FileBodyProducer, ResponseFailed
 from twisted.web import client
@@ -55,13 +55,19 @@ class x509ClientTest(unittest.TestCase):
             return options
 
     def setUp(self):
-        pass
+        # Defer set debugging
+        setDebugging(True)
+
+        # No agent
+        self.agent = None
 
     def tearDown(self):
         pass
 
-    # STEP 1 : REGISTER DEVICE AND GET A CERTIFICATE
-    def test_https_device_registration(self):
+    @inlineCallbacks
+    def _handle_device_registration(self):
+
+        certificate = None
 
         # This will generate private key and signing request for the CA
         client_info = crypto.create_certificate_signing_request('Test AppleWatch to be registered')
@@ -87,6 +93,8 @@ class x509ClientTest(unittest.TestCase):
                 with open(x509ClientTest.CERT_FILE, 'wb') as f:
                     f.write(result['certificate'].encode('utf-8'))
 
+                global certificate
+                certificate = result
                 print(result)
 
             def connectionLost(self, reason):
@@ -110,6 +118,7 @@ class x509ClientTest(unittest.TestCase):
         agent = Agent(reactor, x509ClientTest.NoCertificatePolicy())
 
         body = FileBodyProducer(BytesIO(encoded_csr))
+
         d = agent.request(
             b'POST',
             b'https://localhost:4040/api/device/device_register',
@@ -117,20 +126,13 @@ class x509ClientTest(unittest.TestCase):
                      'Content-Type': ['application/octet-stream'],
                      'Content-Transfer-Encoding': ['Base64']}),
             body)
-
         d.addCallbacks(gotResponse, noResponse)
+        yield d
+        print('_handle_device_registration')
+        return certificate
 
-        reactor.run()
-
-    # STEP 2, verify if certificate and key files exist
-    def test_certificate_files(self):
-        # Verify if certificate file exist
-        basepath = os.getcwd()
-        self.assertTrue(os.path.exists(x509ClientTest.CERT_FILE))
-        self.assertTrue(os.path.exists(x509ClientTest.KEY_FILE))
-
-    # STEP 3. Test Login device
-    def test_https_device_login(self):
+    @inlineCallbacks
+    def _handle_device_login(self):
 
         class LoginResponseReader(Protocol):
             def __init__(self, finished):
@@ -139,12 +141,15 @@ class x509ClientTest(unittest.TestCase):
             def dataReceived(self, bytes):
                 # We should have our new certificate, json format
                 result = json.loads(bytes.decode('utf-8'))
-                print(result)
+                print('dataReceived', result)
+                # Call deferred callback...
+                self.finished.callback(result)
 
             def connectionLost(self, reason):
                 # print('Finished receiving body:', reason)
-                self.finished.callback(None)
-                reactor.stop()
+                # reactor.stop()
+                # self.finished.callback(None)
+                pass
 
         def gotResponse(response):
             # Reading response
@@ -157,16 +162,125 @@ class x509ClientTest(unittest.TestCase):
             print(failure.value.reasons[0].getTraceback())
             reactor.stop()
 
-        agent = Agent(reactor, x509ClientTest.WithCertificatePolicy())
+        # agent = Agent(reactor, x509ClientTest.WithCertificatePolicy())
+        self.assertIsNotNone(self.agent)
 
-        d = agent.request(
+        d = self.agent.request(
             b'GET',
             b'https://localhost:4040/api/device/device_login',
             Headers({'User-Agent': ['Twisted Web Client Example']}),
             None)
 
         d.addCallbacks(gotResponse, noResponse)
+        val = yield d
 
+        print('after _handle_device_login')
+        return val
+
+    @inlineCallbacks
+    def _handle_device_session_create(self, login_info):
+
+        class SessionResponseReader(Protocol):
+            def __init__(self, finished):
+                self.finished = finished
+
+            def dataReceived(self, bytes):
+                # We should have our new certificate, json format
+                result = json.loads(bytes.decode('utf-8'))
+                print('dataReceived', result)
+                # Call defered callback...
+                self.finished.callback(result)
+
+            def connectionLost(self, reason):
+                # print('Finished receiving body:', reason)
+                # reactor.stop()
+                # self.finished.callback(None)
+                pass
+
+        # /api/device/sessions
+        def gotResponse(response):
+            # Reading response
+            finished = Deferred()
+            response.deliverBody(SessionResponseReader(finished))
+            return finished
+
+        def noResponse(failure):
+            failure.trap(ResponseFailed)
+            print(failure.value.reasons[0].getTraceback())
+            reactor.stop()
+
+        # agent = Agent(reactor, x509ClientTest.WithCertificatePolicy())
+        self.assertIsNotNone(self.agent)
+
+        d = self.agent.request(
+            b'GET',
+            b'https://localhost:4040/api/device/sessions',
+            Headers({'User-Agent': ['Twisted Web Client Example']}),
+            None)
+
+        d.addCallbacks(gotResponse, noResponse)
+        val = yield d
+
+        print('after _handle_device_session_create')
+        return val
+
+    # STEP 1 : REGISTER DEVICE AND GET A CERTIFICATE
+    def test_https_device_registration(self):
+        self._handle_device_registration()
+        reactor.run()
+
+    # STEP 2, verify if certificate and key files exist
+    def test_certificate_files(self):
+        # Verify if certificate file exist
+        basepath = os.getcwd()
+        self.assertTrue(os.path.exists(x509ClientTest.CERT_FILE))
+        self.assertTrue(os.path.exists(x509ClientTest.KEY_FILE))
+
+    # STEP 3. Test Login device
+    def test_https_device_login(self):
+
+        def login_callback(result, myself: x509ClientTest):
+            print('login_callback', result, myself)
+
+            # Test result
+            myself.assertIsNotNone(result)
+
+            # Job done!
+            reactor.stop()
+
+        # Create agent with certificates
+        self.agent = Agent(reactor, x509ClientTest.WithCertificatePolicy())
+
+        d = self._handle_device_login()
+        d.addCallback(login_callback, self)
+        reactor.run()
+
+    # STEP 4: Login and create session ...
+    def test_https_device_create_session(self):
+
+        def session_callback(result,  myself: x509ClientTest):
+            print('result', result, myself)
+
+            # Job done
+            reactor.stop()
+
+        def login_callback(result, myself: x509ClientTest):
+            print('login_callback', result, myself)
+
+            # Test result
+            myself.assertIsNotNone(result)
+
+            d = myself._handle_device_session_create(result)
+            d.addCallback(session_callback, myself)
+
+            # Job done!
+            # reactor.stop()
+
+        # Create agent with certificates
+        self.agent = Agent(reactor, x509ClientTest.WithCertificatePolicy())
+
+        d = self._handle_device_login()
+        d.addCallback(login_callback, self)
         reactor.run()
 
     # STEP 3: connect to server to upload a file...
