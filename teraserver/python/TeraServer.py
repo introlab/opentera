@@ -68,6 +68,18 @@ def generate_certificates(config: ConfigManager):
         crypto.write_private_key_and_certificate(client_info, keyfile=device_key_path, certfile=device_certificate_path)
 
 
+def verify_file_upload_directory(config: ConfigManager, create=True):
+    file_upload_path = config.server_config['upload_path']
+
+    if not os.path.exists(file_upload_path):
+        if create:
+            # TODO Change permissions?
+            os.mkdir(file_upload_path, 0o700)
+        else:
+            return None
+    return file_upload_path
+
+
 if __name__ == '__main__':
 
     config_man = ConfigManager()
@@ -99,6 +111,9 @@ if __name__ == '__main__':
 
     # Generate certificate (if required)
     generate_certificates(config_man)
+
+    # Verify file upload path, create if does not exist
+    verify_file_upload_directory(config_man, True)
 
     # DATABASE CONFIG AND OPENING
     #############################
