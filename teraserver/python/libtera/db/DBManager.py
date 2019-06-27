@@ -24,6 +24,8 @@ from modules.FlaskModule.FlaskModule import flask_app
 
 # User access with roles
 from .DBManagerTeraUserAccess import DBManagerTeraUserAccess
+from .DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
+
 
 class DBManager:
     """db_infos = {
@@ -41,6 +43,11 @@ class DBManager:
     @staticmethod
     def userAccess(user: TeraUser):
         access = DBManagerTeraUserAccess(user=user)
+        return access
+
+    @staticmethod
+    def deviceAccess(device: TeraDevice):
+        access = DBManagerTeraDeviceAccess(device=device)
         return access
 
     @staticmethod
