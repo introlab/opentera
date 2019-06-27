@@ -20,7 +20,7 @@ class TeraDevice(db.Model, BaseModel):
     device_certificate = db.Column(db.String, nullable=True)
     device_enabled = db.Column(db.Boolean, nullable=False)
     device_onlineable = db.Column(db.Boolean, nullable=False)
-    device_profile = db.Column(db.String, nullable=True)
+    device_config = db.Column(db.String, nullable=True)
     device_notes = db.Column(db.String, nullable=True)
     device_lastonline = db.Column(db.TIMESTAMP, nullable=True)
 
@@ -34,7 +34,7 @@ class TeraDevice(db.Model, BaseModel):
         ignore_fields += ['device_kits', 'device_site', 'device_token', 'secret']
 
         if minimal:
-            ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_profile', 'device_notes',
+            ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_config', 'device_notes',
                               'device_lastonline']
 
         return super().to_json(ignore_fields=ignore_fields)
