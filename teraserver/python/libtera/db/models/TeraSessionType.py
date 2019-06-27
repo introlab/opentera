@@ -66,7 +66,7 @@ class TeraSessionType(db.Model, BaseModel):
         video_session.session_type_multiusers = False
         video_session.session_type_profile = ""
         video_session.session_type_color = "#00FF00"
-        video_session.session_type_category = TeraSessionType.SessionCategoryEnum.VIDEOCONFERENCE
+        video_session.session_type_category = TeraSessionType.SessionCategoryEnum.VIDEOCONFERENCE.value
         video_session.session_type_projects = [type_project]
         video_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
             int(TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value))]
@@ -79,7 +79,7 @@ class TeraSessionType(db.Model, BaseModel):
         sensor_session.session_type_multiusers = False
         sensor_session.session_type_profile = ""
         sensor_session.session_type_color = "#0000FF"
-        sensor_session.session_type_category = TeraSessionType.SessionCategoryEnum.FILETRANSFER
+        sensor_session.session_type_category = TeraSessionType.SessionCategoryEnum.FILETRANSFER.value
         sensor_session.session_type_projects = [type_project]
         sensor_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
             int(TeraDeviceType.DeviceTypeEnum.SENSOR.value))]
@@ -93,7 +93,7 @@ class TeraSessionType(db.Model, BaseModel):
         vsensor_session.session_type_profile = ""
         vsensor_session.session_type_color = "#00FFFF"
         vsensor_session.session_type_projects = [type_project]
-        vsensor_session.session_type_category = TeraSessionType.SessionCategoryEnum.STREAMING
+        vsensor_session.session_type_category = TeraSessionType.SessionCategoryEnum.STREAMING.value
         vsensor_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
             int(TeraDeviceType.DeviceTypeEnum.SENSOR.value)), TeraDeviceType.get_device_type(
             int(TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value))]
@@ -107,7 +107,7 @@ class TeraSessionType(db.Model, BaseModel):
         robot_session.session_type_profile = ""
         robot_session.session_type_color = "#FF00FF"
         robot_session.session_type_projects = [type_project]
-        robot_session.session_type_category = TeraSessionType.SessionCategoryEnum.TELEOPERATION
+        robot_session.session_type_category = TeraSessionType.SessionCategoryEnum.TELEOPERATION.value
         robot_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
             int(TeraDeviceType.DeviceTypeEnum.ROBOT.value))]
         db.session.add(robot_session)
