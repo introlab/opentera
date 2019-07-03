@@ -1,4 +1,5 @@
 twisted
+treq
 cryptography
 autobahn
 sqlalchemy

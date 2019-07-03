@@ -119,7 +119,7 @@ class DeviceQuerySessions(Resource):
         # TODO: Publish update to everyone who is subscribed to sites update...
         update_session = TeraSession.get_session_by_id(json_session['id_session'])
 
-        return jsonify([update_session.to_json()])
+        return jsonify(update_session.to_json())
 
     @LoginModule.certificate_required
     def delete(self):

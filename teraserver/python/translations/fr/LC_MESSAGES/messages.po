@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-07-03 09:17-0400\n"
+"POT-Creation-Date: 2019-07-03 15:01-0400\n"
 "PO-Revision-Date: 2019-03-28 16:24-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -353,17 +353,6 @@ msgstr ""
 msgid "Permettre l'accès via le web"
 msgstr ""
 
-#: modules/FlaskModule/API/device/DeviceQuerySessions.py:77
-#: modules/FlaskModule/API/user/QuerySessions.py:82
-msgid "Participants absents"
-msgstr ""
-
-#: modules/FlaskModule/API/device/DeviceQuerySessions.py:92
-#: modules/FlaskModule/API/user/QuerySessions.py:97
-#: modules/FlaskModule/API/user/QuerySessions.py:146
-msgid "Vous n'avez pas acces a au moins un participant de la seance."
-msgstr ""
-
 #: modules/FlaskModule/API/user/QuerySessionTypes.py:119
 msgid ""
 "Impossible de supprimer - pas administrateur dans tous les projets de ce "
@@ -372,6 +361,15 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/QuerySessionTypes.py:123
 msgid "Impossible de supprimer - des seances de ce type existent."
+msgstr ""
+
+#: modules/FlaskModule/API/user/QuerySessions.py:82
+msgid "Participants absents"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QuerySessions.py:97
+#: modules/FlaskModule/API/user/QuerySessions.py:146
+msgid "Vous n'avez pas acces a au moins un participant de la seance."
 msgstr ""
 
 #: modules/FlaskModule/API/user/QueryUsers.py:136
