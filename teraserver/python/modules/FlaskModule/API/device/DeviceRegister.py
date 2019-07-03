@@ -13,6 +13,8 @@ from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraKit import TeraKit
 from libtera.db.models.TeraKitDevice import TeraKitDevice
 from libtera.db.models.TeraDeviceType import TeraDeviceType
+from libtera.db.models.TeraSessionType import TeraSessionType
+
 import uuid
 
 class DeviceRegister(Resource):
@@ -72,6 +74,9 @@ class DeviceRegister(Resource):
                 kitDev.kit_device_device = device
                 kitDev.kit_device_optional = True
                 device.device_kits.append(kitDev)
+
+                # TODO remove session type
+                device.id_session_type = TeraSessionType.get_session_type_by_prefix('SENSOR').id_session_type
 
                 # Must sign request with CA/key and generate certificate
                 cert = generate_device_certificate(req, self.ca_info, device.device_uuid)

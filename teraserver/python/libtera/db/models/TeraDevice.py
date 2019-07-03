@@ -12,6 +12,8 @@ class TeraDevice(db.Model, BaseModel):
     secret = 'TeraDeviceSecret'
     id_device = db.Column(db.Integer, db.Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
     id_site = db.Column(db.Integer, db.ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=True)
+    id_session_type = db.Column(db.Integer, db.ForeignKey("t_sessions_types.id_session_type",
+                                                          ondelete='set null'), nullable=True)
     device_uuid = db.Column(db.String(36), nullable=False, unique=True)
     device_name = db.Column(db.String, nullable=False)
     device_type = db.Column(db.Integer, db.ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
@@ -26,12 +28,14 @@ class TeraDevice(db.Model, BaseModel):
 
     device_kits = db.relationship("TeraKitDevice")
     device_site = db.relationship("TeraSite")
+    device_session_type = db.relationship("TeraSessionType")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields += ['device_kits', 'device_site', 'device_token', 'device_certificate', 'secret']
+        ignore_fields += ['device_kits', 'device_site', 'device_token', 'device_certificate', 'secret',
+                          'device_session_type']
 
         if minimal:
             ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_config', 'device_notes',

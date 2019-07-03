@@ -29,7 +29,10 @@ class TeraSession(db.Model, BaseModel):
     __tablename__ = 't_sessions'
     id_session = db.Column(db.Integer, db.Sequence('id_session_sequence'), primary_key=True, autoincrement=True)
     id_session_type = db.Column(db.Integer, db.ForeignKey('t_sessions_types.id_session_type'), nullable=False)
-    id_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user'), nullable=False)
+    # TODO Update forms / c++ client, queries
+    id_creator_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user'), nullable=True)
+    id_creator_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device'), nullable=True)
+    id_creator_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant'), nullable=True)
     session_name = db.Column(db.String, nullable=False)
     session_start_datetime = db.Column(db.TIMESTAMP, nullable=False)
     session_duration = db.Column(db.Integer, nullable=False, default=0)
@@ -38,13 +41,16 @@ class TeraSession(db.Model, BaseModel):
     session_participants = db.relationship("TeraParticipant", secondary="t_sessions_participants",
                                            back_populates="participant_sessions")
 
-    session_user = db.relationship('TeraUser')
+    session_creator_user = db.relationship('TeraUser')
+    session_creator_device = db.relationship('TeraDevice')
+    session_creator_participant = db.relationship('TeraParticipant')
+
     session_session_type = db.relationship('TeraSessionType')
     session_events = db.relationship('TeraSessionEvent')
 
     def to_json(self, ignore_fields=[], minimal=False):
-        ignore_fields.extend(['session_participants', 'session_user',
-                              'session_session_type'])
+        ignore_fields.extend(['session_participants', 'session_creator_user', 'session_creator_device',
+                              'session_creator_participant', 'session_session_type'])
         if minimal:
             ignore_fields.extend([])
 
@@ -58,7 +64,12 @@ class TeraSession(db.Model, BaseModel):
             rval["session_participants_ids"] = session_part
 
             # Append user name
-            rval["session_user"] = self.session_user.get_fullname()
+            if self.session_creator_user:
+                rval["session_creator_user"] = self.session_creator_user.get_fullname()
+            elif self.session_creator_device:
+                rval["session_creator_device"] = self.session_creator_device.device_name
+            elif self.session_creator_participant:
+                rval["session_creator_participant"] = self.session_creator_participant.participant_name
 
             # Append session type infos
             # rval["session_session_type"] = self.session_session_type.to_json(ignore_fields=['id_session_type',
@@ -76,7 +87,7 @@ class TeraSession(db.Model, BaseModel):
         session_part2 = TeraParticipant.get_participant_by_name('Test Participant #2')
         for i in range(8):
             base_session = TeraSession()
-            base_session.session_user = session_user
+            base_session.session_creator_user = session_user
             ses_type = random.randint(1, 4)
             base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
             base_session.session_name = "Séance #" + str(i+1)

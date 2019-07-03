@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restful import Resource, reqparse
-from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSession import TeraSession
+from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule, current_device
 from sqlalchemy import exc
@@ -69,31 +69,28 @@ class DeviceQuerySessions(Resource):
         if 'id_session' not in json_session:
             return '', 400
 
-        can_update = False
-        session_parts_ids = []
-        if json_session['id_session'] == 0:
-            # New session - check if we have a participant list
-            if 'session_participants_ids' not in json_session:
-                return gettext('Participants absents'), 400
-            session_parts_ids = json_session['session_participants_ids']
-        else:
-            # Query the session
-            ses_to_update = TeraSession.get_session_by_id(json_session['id_session'])
-            for part in ses_to_update.session_participants:
-                session_parts_ids.append(part.id_participant)
+        # Validate that we have session participants for new sessions
+        if 'session_participants' not in json_session and json_session['id_session'] == 0:
+            return '', 400
 
-        accessibles_ids = device_access.get_accessible_participants_ids()
-        for part_id in session_parts_ids:
-            if part_id in accessibles_ids:
-                can_update = True
-                break
+        # We know we have a device
+        # Avoid identity thief
+        json_session['id_creator_device'] = current_device.id_device
 
-        if not can_update:
-            return gettext('Vous n\'avez pas acces a au moins un participant de la seance.'), 403
+        # Validate session type
+        session_types = device_access.get_accessible_session_types_ids()
+
+        if not json_session['id_session_type'] in session_types:
+            return '', 403
+
+        # Get participants
+        participants = json_session.pop('session_participants')
 
         # Do the update!
         if json_session['id_session'] > 0:
+
             # Already existing
+            # TODO handle participant list (remove, add) in session
             try:
                 TeraSession.update_session(json_session['id_session'], json_session)
             except exc.SQLAlchemyError:
@@ -105,9 +102,15 @@ class DeviceQuerySessions(Resource):
             try:
                 new_ses = TeraSession()
                 new_ses.from_json(json_session)
+
+                for uuid in participants:
+                    participant = TeraParticipant.get_participant_by_uuid(uuid)
+                    new_ses.session_participants.append(participant)
+
                 TeraSession.insert_session(new_ses)
                 # Update ID for further use
                 json_session['id_session'] = new_ses.id_session
+
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())

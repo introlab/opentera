@@ -42,3 +42,22 @@ class DBManagerTeraDeviceAccess:
             parts.append(part.id_participant)
 
         return parts
+
+    def get_accessible_session_types(self):
+        participants = self.get_accessible_participants()
+        project_list = []
+        # Fetch all projects for all participants
+        for part in participants:
+            project_list.append(part.participant_participant_group.id_project)
+
+        session_types = TeraSessionType.query.join(TeraSessionType.session_type_projects).filter(
+            TeraProject.id_project.in_(project_list)).all()
+
+        return session_types
+
+    def get_accessible_session_types_ids(self):
+        types = []
+        for my_type in self.get_accessible_session_types():
+            types.append(my_type.id_session_type)
+        return types
+

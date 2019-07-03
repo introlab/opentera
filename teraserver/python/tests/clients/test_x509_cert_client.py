@@ -18,6 +18,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 import base64
 import json
 
+# from libtera.db.models.TeraSession import TeraSession, TeraSessionParticipants, TeraSessionStatus
+import datetime
 
 class x509ClientTest(unittest.TestCase):
     # File information
@@ -211,12 +213,31 @@ class x509ClientTest(unittest.TestCase):
 
         # agent = Agent(reactor, x509ClientTest.WithCertificatePolicy())
         self.assertIsNotNone(self.agent)
+        self.assertIsNotNone(login_info['device_info'])
+        self.assertIsNotNone(login_info['participants_info'])
+
+        participants_uuids = []
+        for participant in login_info['participants_info']:
+            participants_uuids.append(participant['participant_uuid'])
+
+        session = {'id_session': 0,
+                   'id_session_type': login_info['device_info']['id_session_type'],
+                   'session_name': 'File transfer test',
+                   'session_start_datetime': str(datetime.datetime.now()),
+                   'session_status': 0,
+                   'session_participants': participants_uuids
+                   }
+        my_session = {'session': session}
+
+        json_val = json.dumps(my_session)
+        body = FileBodyProducer(BytesIO(json_val.encode('utf-8')))
 
         d = self.agent.request(
-            b'GET',
+            b'POST',
             b'https://localhost:4040/api/device/sessions',
-            Headers({'User-Agent': ['Twisted Web Client Example']}),
-            None)
+            Headers({'User-Agent': ['Twisted Web Client Example'],
+                     'Content-Type': ['application/json']}),
+            body)
 
         d.addCallbacks(gotResponse, noResponse)
         val = yield d
