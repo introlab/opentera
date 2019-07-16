@@ -9,8 +9,7 @@ from libtera.db.DBManager import DBManager
 import tempfile
 from shutil import copy2
 import zipfile
-
-
+from io import BytesIO
 class QueryDeviceData(Resource):
 
     def __init__(self, flaskModule=None):
@@ -62,25 +61,25 @@ class QueryDeviceData(Resource):
             if not datas:
                 return '', 200
             # File transfer requested data
-            # Create temporary files
-            # TODO: Clean the temporary folder sometimes...
-            tmp_dir = tempfile.mkstemp(prefix='tera_')
             src_dir = self.module.config.server_config['upload_path']
-            for data in datas:
-                copy2(src_dir + '/' + data.devicedata_uuid, tmp_dir + '/' + data.devicedata_original_filename)
 
             if len(datas) > 1:
                 # Zip contents
-                zfile = zipfile.ZipFile(tmp_dir + '/download.zip', mode='w')
+                # TODO: Check for large files VS available memory?
+                zip_ram = BytesIO()
+                zfile = zipfile.ZipFile(zip_ram, mode='w')
+
                 for data in datas:
-                    zfile.write(tmp_dir + '/' + data.devicedata_original_filename,
-                                arcname=data.devicedata_original_filename)
+                    zfile.write(src_dir + '/' + str(data.devicedata_uuid), arcname=data.devicedata_original_filename)
                 zfile.close()
-                filename = zfile.filename
+                zip_ram.seek(0)
+                # TODO: Change zip filename to a more contextual name?
+                return send_file(zip_ram, as_attachment=True, attachment_filename='download.zip')
             else:
-                filename = tmp_dir + '/' + datas[0].devicedata_original_filename
-            # return send_from_directory(tmp_dir.name, filename)
-            return send_file(filename, as_attachment=True)
+                # filename = tmp_dir + '/' + datas[0].devicedata_original_filename
+                filename = datas[0].devicedata_original_filename
+                return send_file(src_dir + '/' + str(datas[0].devicedata_uuid), as_attachment=True,
+                                 attachment_filename=filename)
 
     @auth.login_required
     def post(self):

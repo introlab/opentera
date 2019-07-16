@@ -3,16 +3,19 @@ from modules.LoginModule.LoginModule import LoginModule, current_device
 from flask import request, redirect, flash
 from werkzeug.utils import secure_filename
 from modules.FlaskModule.FlaskModule import flask_app
+
+from libtera.db.models.TeraDeviceData import TeraDeviceData
+from libtera.db.DBManager import DBManager
+from libtera.db.Base import db
+
+import datetime
+import uuid
 import os
 
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-# TODO MAKE THIS CONFIGURABLE?
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'dat'])
 
 
 class DeviceUpload(Resource):
@@ -32,24 +35,44 @@ class DeviceUpload(Resource):
         print(request)
         print('current_device', current_device)
 
+        if 'id_session' not in request.form:
+            return 'No ID Session specified', 400
+
         # check if the post request has the file part
         if 'file' not in request.files:
-            flash('No file part')
-            return '', 400
+            return 'No file specified', 400
 
         file = request.files['file']
+        id_session = request.form['id_session']
+
+        # TODO: Check if device can access the requested session
+        # Check if device is allowed to access the specified session
+        # device_access = DBManager.deviceAccess(current_device)
+        # file_session = device_access.query_session(session_id=id_session)
+        # if not file_session:
+        #     return '', 403
 
         # if user does not select file, browser also
         # submit an empty part without filename
         if file.filename == '':
-            flash('No selected file')
-            return '', 400
+            return 'No filename specified', 400
 
-        if file and allowed_file(file.filename):
+        if file:
             filename = secure_filename(file.filename)
-            # file.save(os.path.join(flask_app.config['UPLOAD_FOLDER'], filename))
-            return 'TODO Server should save file: ' + str(file) + ' ' + filename + ' in folder: ' \
-                   + flask_app.config['UPLOAD_FOLDER']
 
-        return 'File type not allowed: ' + secure_filename(file.filename) + ' allowed extensions : ' \
-               + str(ALLOWED_EXTENSIONS), 401
+            # Create file entry in database
+            file_db_entry = TeraDeviceData()
+            file_db_entry.devicedata_device = current_device
+            # file_db_entry.devicedata_session = file_session
+            file_db_entry.id_session = id_session
+            file_db_entry.devicedata_original_filename = filename
+            file_db_entry.devicedata_saved_date = datetime.datetime.now()
+            file_db_entry.devicedata_uuid = str(uuid.uuid4())
+            db.session.add(file_db_entry)
+            db.session.commit()
+
+            # Save file on disk
+            file.save(os.path.join(flask_app.config['UPLOAD_FOLDER'], file_db_entry.devicedata_uuid))
+            return '', 200
+
+        return '', 400

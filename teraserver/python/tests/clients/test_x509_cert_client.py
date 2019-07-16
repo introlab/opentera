@@ -285,6 +285,7 @@ class x509ClientTest(unittest.TestCase):
         producer = MultiPartProducer(
             {
                 "id_session": str(session_info['id_session']),
+                # Fields, Boundary, Coordinator. When Boundary==None, generate a boundary
                 "file": ('OpenIMU.dat', None, FileBodyProducer(BytesIO(os.urandom(1024 * 1024))))
             })
 
