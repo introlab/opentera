@@ -6,6 +6,11 @@
 set (ENV_PATH ${CMAKE_CURRENT_SOURCE_DIR}/python-${PYTHON_VERSION})
 file(MAKE_DIRECTORY ${ENV_PATH})
 
+# Define packages to install
+set (conda_packages
+    protobuf
+)
+
 if(WIN32)
     message(STATUS "env $ENV{HOMEPATH}")
     set(CONDA_PATH "$ENV{SYSTEMDRIVE}$ENV{HOMEPATH}/Miniconda3/Scripts/conda.exe")
@@ -15,10 +20,7 @@ else(WIN32)
     set(PYTHON_PATH ${ENV_PATH}/bin/python)
 endif(WIN32)
 
-# Define packages to install
-set (conda_packages
-    protobuf
-)
+
 
 # Use the requirements file instead of listing all packages in CMake.
 add_custom_target(

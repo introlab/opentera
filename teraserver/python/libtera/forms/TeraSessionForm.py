@@ -36,7 +36,7 @@ class TeraSessionForm:
         section.add_item(TeraFormItem("id_session", gettext("ID séance"), "hidden", True))
         section.add_item(TeraFormItem("session_name", gettext("Nom de la séance"), "text", True))
         section.add_item(TeraFormItem("id_session_type", gettext("Type de séance"), "array", True, item_values=st_list))
-        section.add_item(TeraFormItem("id_user", gettext("Créateur"), "array", True, item_values=users_list))
+        section.add_item(TeraFormItem("id_creator_user", gettext("Créateur"), "array", False, item_values=users_list))
         section.add_item(TeraFormItem("session_start_datetime", gettext("Date de début"), "datetime", True))
         section.add_item(TeraFormItem("session_duration", gettext("Durée"), "duration", True,
                                       item_options={"default": 0, "readonly": True}))

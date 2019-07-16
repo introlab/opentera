@@ -81,11 +81,11 @@ class QueryDeviceData(Resource):
                 filename = tmp_dir + '/' + datas[0].devicedata_original_filename
             # return send_from_directory(tmp_dir.name, filename)
             return send_file(filename, as_attachment=True)
-        
+
     @auth.login_required
     def post(self):
-        # parser = reqparse.RequestParser()
-        # parser.add_argument('device', type=str, location='json', help='Device to create / update', required=True)
+        parser = reqparse.RequestParser()
+        parser.add_argument('device_data', type=str, location='json', help='Device to create / update', required=True)
         #
         # current_user = TeraUser.get_user_by_uuid(session['user_id'])
         # user_access = DBManager.userAccess(current_user)

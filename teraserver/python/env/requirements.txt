@@ -31,3 +31,4 @@ service_identity
 jsonrpcclient
 # jwt
 PyJWT
+pypiwin32; sys_platform == 'win32'
