@@ -1,7 +1,6 @@
 
 # All modules
 __all__ = ['TeraDevice',
-           'TeraKit',
            'TeraParticipant',
            'TeraParticipantGroup',
            'TeraProject',
@@ -14,5 +13,5 @@ __all__ = ['TeraDevice',
            'TeraDeviceData',
            'TeraTest',
            'TeraTestType',
-           'TeraKitDevice',
-           'TeraSessionEvent']
+           'TeraSessionEvent',
+           'TeraDeviceSite']

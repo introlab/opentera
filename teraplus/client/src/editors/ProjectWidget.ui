@@ -196,17 +196,17 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
        <height>20</height>
       </size>
      </property>
-     <widget class="QWidget" name="tabKits">
+     <widget class="QWidget" name="tabDevices">
       <attribute name="icon">
        <iconset resource="../../resources/TeraClient.qrc">
-        <normaloff>:/icons/kit.png</normaloff>:/icons/kit.png</iconset>
+        <normaloff>:/icons/device.png</normaloff>:/icons/device.png</iconset>
       </attribute>
       <attribute name="title">
-       <string>Kits</string>
+       <string>Appareils</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QTableWidget" name="lstKits">
+        <widget class="QTableWidget" name="lstDevices">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -230,7 +230,7 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
          </attribute>
          <column>
           <property name="text">
-           <string>Kit</string>
+           <string>Appareil</string>
           </property>
          </column>
          <column>
@@ -241,7 +241,7 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnKits">
+        <widget class="QPushButton" name="btnDevices">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -252,11 +252,11 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
           <cursorShape>PointingHandCursor</cursorShape>
          </property>
          <property name="text">
-          <string>Gérer les kits</string>
+          <string>Gérer les appareils</string>
          </property>
          <property name="icon">
           <iconset resource="../../resources/TeraClient.qrc">
-           <normaloff>:/icons/kit.png</normaloff>:/icons/kit.png</iconset>
+           <normaloff>:/icons/device.png</normaloff>:/icons/device.png</iconset>
          </property>
          <property name="iconSize">
           <size>

@@ -34,7 +34,7 @@ ParticipantWidget::ParticipantWidget(ComManager *comMan, const TeraData *data, Q
     QUrlQuery query;
     query.addQueryItem(WEB_QUERY_ID_PARTICIPANT, QString::number(m_data->getId()));
     query.addQueryItem(WEB_QUERY_LIST,"");
-    queryDataRequest(WEB_KITINFO_PATH, query);
+    queryDataRequest(WEB_DEVICEINFO_PATH, query);
 }
 
 ParticipantWidget::~ParticipantWidget()
@@ -64,12 +64,12 @@ void ParticipantWidget::connectSignals()
     connect(m_comManager, &ComManager::formReceived, this, &ParticipantWidget::processFormsReply);
     connect(m_comManager, &ComManager::sessionsReceived, this, &ParticipantWidget::processSessionsReply);
     connect(m_comManager, &ComManager::sessionTypesReceived, this, &ParticipantWidget::processSessionTypesReply);
-    connect(m_comManager, &ComManager::kitsReceived, this, &ParticipantWidget::processKitsReply);
+    connect(m_comManager, &ComManager::devicesReceived, this, &ParticipantWidget::processDevicesReply);
     connect(m_comManager, &ComManager::deleteResultsOK, this, &ParticipantWidget::deleteDataReply);
 
     connect(ui->btnUndo, &QPushButton::clicked, this, &ParticipantWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &ParticipantWidget::btnSave_clicked);
-    connect(ui->btnKits, &QPushButton::clicked, this, &ParticipantWidget::btnKits_clicked);
+    connect(ui->btnDevices, &QPushButton::clicked, this, &ParticipantWidget::btnDevices_clicked);
     connect(ui->btnDelSession, &QPushButton::clicked, this, &ParticipantWidget::btnDeleteSession_clicked);
     connect(ui->tableSessions, &QTableWidget::currentItemChanged, this, &ParticipantWidget::currentSelectedSessionChanged);
     connect(ui->tableSessions, &QTableWidget::itemDoubleClicked, this, &ParticipantWidget::displaySessionDetails);
@@ -166,27 +166,31 @@ void ParticipantWidget::updateSession(TeraData *session)
     ui->tableSessions->resizeColumnsToContents();
 }
 
-void ParticipantWidget::updateKit(TeraData *kit)
+void ParticipantWidget::updateDevice(TeraData *device)
 {
     QListWidgetItem* item = nullptr;
-    for(int i=0; i<ui->lstKits->count(); i++){
-        int kit_id = ui->lstKits->item(i)->data(Qt::UserRole).toInt();
-        if (kit_id == kit->getId()){
-            // Kit already present
-            item = ui->lstKits->item(i);
+    for(int i=0; i<ui->lstDevices->count(); i++){
+        int device_id = ui->lstDevices->item(i)->data(Qt::UserRole).toInt();
+        if (device_id == device->getId()){
+            // Device already present
+            item = ui->lstDevices->item(i);
             break;
         }
     }
 
-    // New kit
+    QString device_name = device->getName();
+    if (device_name.isEmpty())
+        device_name = tr("(Appareil sans nom)");
+
+    // New Device?
     if (!item){
-        item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_KIT)), kit->getName());
-        item->setData(Qt::UserRole, kit->getId());
-        ui->lstKits->addItem(item);
+        item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_DEVICE)), device_name);
+        item->setData(Qt::UserRole, device->getId());
+        ui->lstDevices->addItem(item);
     }
 
-    // Update kit name
-    item->setText(kit->getName());
+    // Update device name
+    item->setText(device_name);
 }
 
 void ParticipantWidget::processFormsReply(QString form_type, QString data)
@@ -260,17 +264,17 @@ void ParticipantWidget::processSessionTypesReply(QList<TeraData> session_types)
     }
 }
 
-void ParticipantWidget::processKitsReply(QList<TeraData> kits)
+void ParticipantWidget::processDevicesReply(QList<TeraData> devices)
 {
-    for(TeraData kit:kits){
-        if (kit.hasFieldName("kit_participants")){
-            QVariantList kit_parts = kit.getFieldValue("kit_participants").toList();
+    for(TeraData device:devices){
+        if (device.hasFieldName("device_participants")){
+            QVariantList device_parts = device.getFieldValue("device_participants").toList();
 
-            for (int i=0; i<kit_parts.count(); i++){
-                QVariantMap part_info = kit_parts.at(i).toMap();
+            for (int i=0; i<device_parts.count(); i++){
+                QVariantMap part_info = device_parts.at(i).toMap();
                 if (part_info["id_participant"].toInt() == m_data->getId()){
                     // Kit is for the current participant
-                    updateKit(&kit);
+                    updateDevice(&device);
                     break;
                 }
             }
@@ -319,16 +323,16 @@ void ParticipantWidget::btnUndo_clicked()
         emit closeRequest();
 }
 
-void ParticipantWidget::btnKits_clicked()
+void ParticipantWidget::btnDevices_clicked()
 {
     if (m_diag_editor){
         m_diag_editor->deleteLater();
     }
     m_diag_editor = new QDialog(this);
-    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_KIT, m_diag_editor);
+    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_DEVICE, m_diag_editor);
     Q_UNUSED(list_widget)
 
-    m_diag_editor->setWindowTitle(tr("Kits"));
+    m_diag_editor->setWindowTitle(tr("Appareils"));
 
     m_diag_editor->open();
 }

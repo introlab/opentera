@@ -4,7 +4,6 @@
 #include "editors/UserWidget.h"
 #include "editors/SiteWidget.h"
 #include "editors/DeviceWidget.h"
-#include "editors/KitWidget.h"
 #include "editors/SessionTypeWidget.h"
 
 DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWidget *parent):
@@ -129,9 +128,6 @@ void DataListWidget::showEditor(TeraData *data)
         break;
         case TERADATA_DEVICE:
             m_editor = new DeviceWidget(m_comManager, data);
-        break;
-        case TERADATA_KIT:
-            m_editor = new KitWidget(m_comManager, data);
         break;
         case TERADATA_SESSIONTYPE:
             m_editor = new SessionTypeWidget(m_comManager, data);

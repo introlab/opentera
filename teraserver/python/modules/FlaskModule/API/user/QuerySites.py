@@ -19,6 +19,7 @@ class QuerySites(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id_site', type=int, help='id_site', required=False)
         parser.add_argument('id', type=int, help='id_site', required=False)
+        parser.add_argument('id_device', type=int, help='ID Device')
         parser.add_argument('user_uuid', type=str, help='uuid')
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
@@ -26,12 +27,14 @@ class QuerySites(Resource):
         args = parser.parse_args()
 
         sites = []
+        if args['id']:
+            args['id_site'] = args['id']
+
         # If we have no arguments, return all accessible sites
         if not any(args.values()):
             sites = user_access.get_accessible_sites()
-
         # If we have a user_uuid, query for the site of that user
-        if args['user_uuid']:
+        elif args['user_uuid']:
             queried_user = TeraUser.get_user_by_uuid(args['user_uuid'])
             if queried_user is not None:
                 current_sites = user_access.get_accessible_sites()
@@ -41,13 +44,11 @@ class QuerySites(Resource):
                 for site in queried_sites:
                     if site in current_sites:
                         sites.append(site)
-
-        if args['id']:
-            args['id_site'] = args['id']
-
-        if args['id_site']:
+        elif args['id_site']:
             if args['id_site'] in user_access.get_accessible_sites_ids():
-                sites.append(TeraSite.get_site_by_id(site_id=args['id_site']))
+                sites = sites.append(TeraSite.get_site_by_id(site_id=args['id_site']))
+        elif args['id_device']:
+            sites = user_access.query_sites_for_device(args['id_device'])
 
         try:
             sites_list = []
@@ -55,6 +56,8 @@ class QuerySites(Resource):
                 if site is not None:
                     site_json = site.to_json()
                     site_json['site_role'] = user_access.get_site_role(site_json['id_site'])
+                    if args['id_device']:
+                        site_json['id_device'] = args['id_device']
                     sites_list.append(site_json)
             return jsonify(sites_list)
         except InvalidRequestError:

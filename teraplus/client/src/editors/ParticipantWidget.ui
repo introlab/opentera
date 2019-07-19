@@ -829,17 +829,17 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabKits">
+     <widget class="QWidget" name="tabDevices">
       <attribute name="icon">
        <iconset resource="../../resources/TeraClient.qrc">
-        <normaloff>:/icons/kit.png</normaloff>:/icons/kit.png</iconset>
+        <normaloff>:/icons/device.png</normaloff>:/icons/device.png</iconset>
       </attribute>
       <attribute name="title">
-       <string>Kit(s)</string>
+       <string>Appareil(s)</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QListWidget" name="lstKits">
+        <widget class="QListWidget" name="lstDevices">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -852,7 +852,7 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnKits">
+        <widget class="QPushButton" name="btnDevices">
          <property name="minimumSize">
           <size>
            <width>0</width>

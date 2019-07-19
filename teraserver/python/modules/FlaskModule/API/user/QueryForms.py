@@ -8,8 +8,6 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.forms.TeraUserForm import TeraUserForm
 from libtera.forms.TeraSiteForm import TeraSiteForm
 from libtera.forms.TeraDeviceForm import TeraDeviceForm
-from libtera.forms.TeraKitDeviceForm import TeraKitDeviceForm
-from libtera.forms.TeraKitForm import TeraKitForm
 from libtera.forms.TeraProjectForm import TeraProjectForm
 from libtera.forms.TeraParticipantGroupForm import TeraParticipantGroupForm
 from libtera.forms.TeraParticipantForm import TeraParticipantForm
@@ -42,12 +40,6 @@ class QueryForms(Resource):
 
         if args['type'] == 'device':
             return jsonify(TeraDeviceForm.get_device_form(user_access=user_access))
-
-        if args['type'] == 'kit_device':
-            return jsonify(TeraKitDeviceForm.get_kit_device_form(user_access=user_access))
-
-        if args['type'] == 'kit':
-            return jsonify(TeraKitForm.get_kit_form(user_access=user_access))
 
         if args['type'] == 'project':
             return jsonify(TeraProjectForm.get_project_form(user_access=user_access))

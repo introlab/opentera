@@ -1,5 +1,4 @@
 from libtera.db.Base import db, BaseModel
-from libtera.db.models.TeraKit import kits_participants_table
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 
 import uuid
@@ -19,8 +18,7 @@ class TeraParticipant(db.Model, BaseModel):
     id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group',
                                                                ondelete='cascade'),
                                      nullable=False)
-
-    participant_kits = db.relationship("TeraKit", secondary=kits_participants_table, back_populates="kit_participants")
+    participant_devices = db.relationship("TeraDeviceParticipant")
 
     participant_sessions = db.relationship("TeraSession", secondary="t_sessions_participants",
                                            back_populates="session_participants")
@@ -52,7 +50,7 @@ class TeraParticipant(db.Model, BaseModel):
 
     def to_json(self, ignore_fields=[], minimal=False):
 
-        ignore_fields.extend(['participant_kits', 'participant_participant_group',
+        ignore_fields.extend(['participant_participant_group', 'participant_devices',
                               'participant_token', 'participant_sessions', 'secret'])
         if minimal:
             ignore_fields.extend([])

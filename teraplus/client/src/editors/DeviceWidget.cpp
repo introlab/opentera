@@ -19,8 +19,18 @@ DeviceWidget::DeviceWidget(ComManager *comMan, const TeraData *data, QWidget *pa
 
     // Query forms definition
     queryDataRequest(WEB_FORMS_PATH, QUrlQuery(WEB_FORMS_QUERY_DEVICE));
-    queryDataRequest(WEB_FORMS_PATH, QUrlQuery(WEB_FORMS_QUERY_KIT_DEVICE));
 
+    // Query available sites
+    QUrlQuery args;
+    args.addQueryItem(WEB_QUERY_LIST, "");
+    queryDataRequest(WEB_SITEINFO_PATH, args);
+
+    // Query associated participants
+    if (!dataIsNew()){
+        args.removeAllQueryItems(WEB_QUERY_LIST);
+        args.addQueryItem(WEB_QUERY_ID_DEVICE, QString::number(m_data->getId()));
+        queryDataRequest(WEB_DEVICEPARTICIPANTINFO_PATH, args);
+    }
 }
 
 DeviceWidget::~DeviceWidget()
@@ -46,15 +56,15 @@ void DeviceWidget::saveData(bool signal)
 
 void DeviceWidget::updateControlsState()
 {
-   ui->tabKits->setEnabled(!dataIsNew());
+   ui->tabSites->setEnabled(!dataIsNew());
 }
 
 void DeviceWidget::updateFieldsValue()
 {
     if (m_data && !hasPendingDataRequests()){
-        if (!ui->wdgDevice->formHasData())
+        if (!ui->wdgDevice->formHasData()){
             ui->wdgDevice->fillFormFromData(m_data->toJson());
-        else {
+        }else {
             ui->wdgDevice->resetFormValues();
         }
     }
@@ -68,10 +78,41 @@ bool DeviceWidget::validateData()
 void DeviceWidget::connectSignals()
 {
     connect(m_comManager, &ComManager::formReceived, this, &DeviceWidget::processFormsReply);
-    connect(m_comManager, &ComManager::kitDevicesReceived, this, &DeviceWidget::processKitDevicesReply);
+    connect(m_comManager, &ComManager::sitesReceived, this, &DeviceWidget::processSitesReply);
+    connect(m_comManager, &ComManager::deviceSitesReceived, this, &DeviceWidget::processDeviceSitesReply);
+    connect(m_comManager, &ComManager::deviceParticipantsReceived, this, &DeviceWidget::processDeviceParticipantsReply);
 
     connect(ui->btnSave, &QPushButton::clicked, this, &DeviceWidget::btnSave_clicked);
     connect(ui->btnUndo, &QPushButton::clicked, this, &DeviceWidget::btnUndo_clicked);
+    connect(ui->btnSites, &QPushButton::clicked, this, &DeviceWidget::btnSaveSites_clicked);
+}
+
+void DeviceWidget::updateSite(TeraData *site)
+{
+    int id_site = site->getId();
+    if (m_listSites_items.contains(id_site)){
+        QListWidgetItem* item = m_listSites_items[id_site];
+        item->setText(site->getName());
+    }else{
+        QListWidgetItem* item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_SITE)), site->getName());
+        item->setCheckState(Qt::Unchecked);
+        ui->lstSites->addItem(item);
+        m_listSites_items[id_site] = item;
+    }
+}
+
+void DeviceWidget::updateParticipant(TeraData *participant)
+{
+    int id_participant = participant->getFieldValue("id_participant").toInt();
+    QString participant_name = participant->getFieldValue("participant_name").toString();
+    if (m_listParticipants_items.contains(id_participant)){
+        QListWidgetItem* item = m_listParticipants_items[id_participant];
+        item->setText(participant_name);
+    }else{
+        QListWidgetItem* item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_PARTICIPANT)), participant_name);
+        ui->lstParticipants->addItem(item);
+        m_listParticipants_items[id_participant] = item;
+    }
 }
 
 void DeviceWidget::processFormsReply(QString form_type, QString data)
@@ -80,27 +121,63 @@ void DeviceWidget::processFormsReply(QString form_type, QString data)
         ui->wdgDevice->buildUiFromStructure(data);
         return;
     }
-    if (form_type == WEB_FORMS_QUERY_KIT_DEVICE){
-        ui->wdgKitDevice->buildUiFromStructure(data);
-        // Hide device name, since we already have it displayed elsewhere...
-        ui->wdgKitDevice->hideField("id_device");
 
-        if (!dataIsNew()){
-            queryDataRequest(WEB_KITDEVICE_PATH, QUrlQuery(QString(WEB_QUERY_ID_DEVICE) + "=" + QString::number(m_data->getId())));
-        }
-        return;
+}
+
+void DeviceWidget::processSitesReply(QList<TeraData> sites)
+{
+    // If our site list is empty, already query sites for that device
+    bool need_to_load_device_sites = m_listSites_items.isEmpty();
+
+    for(TeraData site:sites){
+        updateSite(&site);
+    }
+
+    if (need_to_load_device_sites && !dataIsNew()){
+        QUrlQuery args;
+        args.addQueryItem(WEB_QUERY_ID_DEVICE, QString::number(m_data->getId()));
+        args.addQueryItem(WEB_QUERY_LIST, "");
+        queryDataRequest(WEB_DEVICESITEINFO_PATH, args);
     }
 }
 
-void DeviceWidget::processKitDevicesReply(QList<TeraData> kit_devices)
+void DeviceWidget::processDeviceSitesReply(QList<TeraData> device_sites)
 {
-    for (int i=0; i<kit_devices.count(); i++){
-        if (kit_devices.at(i).hasFieldName("id_device")){
-            if (kit_devices.at(i).getFieldValue("id_device").toInt() == m_data->getId()){
-                ui->wdgKitDevice->fillFormFromData(kit_devices[i].toJson());
-                break;
-            }
+    if (device_sites.isEmpty())
+        return;
+
+    // Check if it is for us
+    if (device_sites.first().getFieldValue("id_device").toInt() != m_data->getId())
+        return;
+
+    // Uncheck all sites
+    for (QListWidgetItem* item:m_listSites_items){
+        item->setCheckState(Qt::Unchecked);
+    }
+    m_listDeviceSites_items.clear();
+
+    // Check required sites
+    for(TeraData device_site:device_sites){
+        int site_id = device_site.getFieldValue("id_site").toInt();
+        int device_site_id = device_site.getId();
+        if (m_listSites_items.contains(site_id)){
+            m_listSites_items[site_id]->setCheckState(Qt::Checked);
+            m_listDeviceSites_items[device_site_id] = m_listSites_items[site_id];
         }
+    }
+}
+
+void DeviceWidget::processDeviceParticipantsReply(QList<TeraData> device_parts)
+{
+    if (device_parts.isEmpty())
+        return;
+
+    // Check if it is for us
+    if (device_parts.first().getFieldValue("id_device").toInt() != m_data->getId())
+        return;
+
+    for (TeraData device_part:device_parts){
+        updateParticipant(&device_part);
     }
 }
 
@@ -128,4 +205,47 @@ void DeviceWidget::btnUndo_clicked()
 
     if (parent())
         emit closeRequest();
+}
+
+void DeviceWidget::btnSaveSites_clicked()
+{
+    QJsonDocument document;
+    QJsonObject base_obj;
+    QJsonArray devices;
+    QList<int> sites_to_delete;
+
+    for (int i=0; i<ui->lstSites->count(); i++){
+        // Build json list of devices and sites
+        if (ui->lstSites->item(i)->checkState()==Qt::Checked){
+            QJsonObject item_obj;
+            item_obj.insert("id_device", m_data->getId());
+            item_obj.insert("id_site", m_listSites_items.key(ui->lstSites->item(i)));
+            devices.append(item_obj);
+        }else{
+            int id_device_site = m_listDeviceSites_items.key(ui->lstSites->item(i),-1);
+            if (id_device_site>=0){
+                sites_to_delete.append(id_device_site);
+            }
+        }
+    }
+
+    // Delete queries
+    for (int id_device_site:sites_to_delete){
+        deleteDataRequest(WEB_DEVICESITEINFO_PATH, id_device_site);
+    }
+
+    if (!sites_to_delete.isEmpty()){
+        // Also refresh participants
+        ui->lstParticipants->clear();
+        m_listParticipants_items.clear();
+        QUrlQuery args;
+        args.addQueryItem(WEB_QUERY_ID_DEVICE, QString::number(m_data->getId()));
+        queryDataRequest(WEB_DEVICEPARTICIPANTINFO_PATH, args);
+    }
+
+    // Update query
+    base_obj.insert("device_site", devices);
+    document.setObject(base_obj);
+    postDataRequest(WEB_DEVICESITEINFO_PATH, document.toJson());
+
 }

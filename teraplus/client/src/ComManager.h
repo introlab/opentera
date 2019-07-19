@@ -92,7 +92,6 @@ signals:
     // Specific data signals
     void usersReceived(QList<TeraData> user_list);
     void sitesReceived(QList<TeraData> site_list);
-    void kitsReceived(QList<TeraData> kit_list);
     void sessionTypesReceived(QList<TeraData> st_list);
     void testDefsReceived(QList<TeraData> tests_list);
     void projectsReceived(QList<TeraData> projects_list);
@@ -101,8 +100,9 @@ signals:
     void groupsReceived(QList<TeraData> groups_list);
     void siteAccessReceived(QList<TeraData> access_list);
     void projectAccessReceived(QList<TeraData> access_list);
-    void kitDevicesReceived(QList<TeraData> kits_devices_list);
     void sessionsReceived(QList<TeraData> sessions_list);
+    void deviceSitesReceived(QList<TeraData> device_sites_list);
+    void deviceParticipantsReceived(QList<TeraData> device_participants_list);
 
     //void queryResultsReceived(QString object, QUrlQuery url_query, QString data);
     //void postResultsReceived(QString path, QString data);

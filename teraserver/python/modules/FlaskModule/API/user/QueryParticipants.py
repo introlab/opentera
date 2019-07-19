@@ -27,6 +27,7 @@ class QueryParticipants(Resource):
         parser.add_argument('id_site', type=int, help='id site')
         parser.add_argument('id_group', type=int)
         parser.add_argument('id_session', type=int)
+        parser.add_argument('id_device', type=int)
         parser.add_argument('list', type=bool)
         # parser.add_argument('participant_uuid', type=str, help='participant_uuid')
         # parser.add_argument('participant_name', type=str, help='participant_name')
@@ -49,6 +50,8 @@ class QueryParticipants(Resource):
             participants = user_access.query_participants_for_site(args['id_site'])
         elif args['id_group']:
             participants = user_access.query_participants_for_group(args['id_group'])
+        elif args['id_device']:
+            participants = user_access.query_participants_for_device(args['id_device'])
         elif args['id_session']:
             part_session = TeraSession.get_session_by_id(args['id_session'])
             participants = []

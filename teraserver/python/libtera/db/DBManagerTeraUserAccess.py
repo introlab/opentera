@@ -7,8 +7,8 @@ from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraKit import TeraKit
 from libtera.db.models.TeraSession import TeraSession
+from libtera.db.models.TeraDeviceSite import TeraDeviceSite
 
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
@@ -108,18 +108,6 @@ class DBManagerTeraUserAccess:
             devices.append(device.id_device)
 
         return devices
-
-    def get_accessible_kits(self, admin_only=False):
-        site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
-        return TeraKit.query.filter(TeraKit.id_site.in_(site_id_list)).all()
-
-    def get_accessible_kits_ids(self, admin_only=False):
-        kits = []
-
-        for kit in self.get_accessible_kits(admin_only=admin_only):
-            kits.append(kit.id_kit)
-
-        return kits
 
     def get_accessible_participants(self, admin_only=False):
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
@@ -227,6 +215,22 @@ class DBManagerTeraUserAccess:
             device = TeraDevice.query.filter_by(id_device=device_id).filter(TeraDevice.id_site.in_(sites_ids)).first()
         return device
 
+    def query_devices_for_site(self, site_id: int):
+        devices = []
+        if site_id in self.get_accessible_sites_ids():
+            site_devices = TeraDeviceSite.query_devices_for_site(site_id)
+            for site_device in site_devices:
+                devices.append(site_device.device_site_device)
+        return devices
+
+    def query_sites_for_device(self, device_id: int):
+        sites = []
+        if device_id in self.get_accessible_devices_ids():
+            site_devices = TeraDeviceSite.query_sites_for_device(device_id)
+            for site_device in site_devices:
+                sites.append(site_device.device_site_site)
+        return sites
+
     def query_session_type_by_id(self, session_type_id:int):
         proj_ids = self.get_accessible_projects_ids()
         session_type = TeraSessionType.query.filter_by(id_session_type=session_type_id).filter(TeraProject.id_project.
@@ -328,11 +332,18 @@ class DBManagerTeraUserAccess:
 
         return access
 
-    def query_participants_for_kit(self, kit_id: int):
-        from libtera.db.models.TeraParticipant import TeraParticipant
+    # def query_participants_for_kit(self, kit_id: int):
+    #     from libtera.db.models.TeraParticipant import TeraParticipant
+    #
+    #     parts = TeraParticipant.query.join(TeraParticipant.participant_kits).filter_by(id_kit=kit_id)\
+    #         .filter(TeraKit.id_kit.in_(self.get_accessible_kits_ids()),
+    #                 TeraParticipant.id_participant.in_(self.get_accessible_participants_ids())).all()
+    #     return parts
 
-        parts = TeraParticipant.query.join(TeraParticipant.participant_kits).filter_by(id_kit=kit_id)\
-            .filter(TeraKit.id_kit.in_(self.get_accessible_kits_ids()),
+    def query_participants_for_device(self, device_id: int):
+        from libtera.db.models.TeraParticipant import TeraParticipant
+        parts = TeraParticipant.query.join(TeraParticipant.participant_devices).filter_by(id_device=device_id)\
+            .filter(TeraDevice.id_device.in_(self.get_accessible_devices_ids()),
                     TeraParticipant.id_participant.in_(self.get_accessible_participants_ids())).all()
         return parts
 

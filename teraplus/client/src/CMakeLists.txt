@@ -21,7 +21,6 @@ set(headers
     editors/DataListWidget.h
     editors/SiteWidget.h
     editors/DeviceWidget.h
-    editors/KitWidget.h
     editors/ProjectWidget.h
     editors/GroupWidget.h
     editors/ParticipantWidget.h
@@ -48,7 +47,6 @@ set(srcs
     editors/DataListWidget.cpp
     editors/SiteWidget.cpp
     editors/DeviceWidget.cpp
-    editors/KitWidget.cpp
     editors/ProjectWidget.cpp
     editors/GroupWidget.cpp
     editors/ParticipantWidget.cpp
@@ -67,7 +65,6 @@ SET(uis
     editors/DataListWidget.ui
     editors/SiteWidget.ui
     editors/DeviceWidget.ui
-    editors/KitWidget.ui
     editors/ProjectWidget.ui
     editors/GroupWidget.ui
     editors/ParticipantWidget.ui

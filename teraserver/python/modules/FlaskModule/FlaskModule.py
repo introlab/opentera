@@ -78,9 +78,9 @@ class FlaskModule(BaseModule):
         from .API.user.QueryProjects import QueryProjects
         from .API.user.QueryParticipants import QueryParticipants
         from .API.user.QueryDevices import QueryDevices
-        from .API.user.QueryKits import QueryKits
         from .API.user.QuerySiteAccess import QuerySiteAccess
-        from .API.user.QueryKitDevice import QueryKitDevice
+        from .API.user.QueryDeviceSites import QueryDeviceSites
+        from .API.user.QueryDeviceParticipants import QueryDeviceParticipants
         from .API.user.QueryProjectAccess import QueryProjectAccess
         from .API.user.QueryParticipantGroup import QueryParticipantGroup
         from .API.user.QuerySessions import QuerySessions
@@ -96,10 +96,10 @@ class FlaskModule(BaseModule):
         self.api.add_resource(QueryProjects, '/api/user/projects', resource_class_args=[self])
         self.api.add_resource(QueryParticipants, '/api/user/participants', resource_class_args=[self])
         self.api.add_resource(QueryDevices, '/api/user/devices', resource_class_args=[self])
-        self.api.add_resource(QueryKits, '/api/user/kits', resource_class_args=[self])
+        self.api.add_resource(QueryDeviceSites, '/api/user/devicesites', resource_class_args=[self])
+        self.api.add_resource(QueryDeviceParticipants, '/api/user/deviceparticipants', resource_class_args=[self])
         self.api.add_resource(QuerySiteAccess, '/api/user/siteaccess', resource_class_args=[self])
         self.api.add_resource(QueryProjectAccess, '/api/user/projectaccess', resource_class_args=[self])
-        self.api.add_resource(QueryKitDevice, '/api/user/kitdevices', resource_class_args=[self])
         self.api.add_resource(QueryParticipantGroup, '/api/user/groups', resource_class_args=[self])
         self.api.add_resource(QuerySessions, '/api/user/sessions', resource_class_args=[self])
         self.api.add_resource(QuerySessionTypes, '/api/user/sessiontypes', resource_class_args=[self])

@@ -45,12 +45,11 @@ class DeviceUpload(Resource):
         file = request.files['file']
         id_session = request.form['id_session']
 
-        # TODO: Check if device can access the requested session
         # Check if device is allowed to access the specified session
-        # device_access = DBManager.deviceAccess(current_device)
-        # file_session = device_access.query_session(session_id=id_session)
-        # if not file_session:
-        #     return '', 403
+        device_access = DBManager.deviceAccess(current_device)
+        file_session = device_access.query_session(session_id=id_session)
+        if not file_session:
+            return '', 403
 
         # if user does not select file, browser also
         # submit an empty part without filename

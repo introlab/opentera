@@ -10,8 +10,6 @@ from cryptography.hazmat.primitives import hashes, serialization
 
 from libtera.db.Base import db
 from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraKit import TeraKit
-from libtera.db.models.TeraKitDevice import TeraKitDevice
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraSessionType import TeraSessionType
 
@@ -66,14 +64,6 @@ class DeviceRegister(Resource):
                 device.device_uuid = str(uuid.uuid4())
                 device.create_token()
                 device.update_last_online()
-
-                # TODO remove kits
-                kit = TeraKit.get_kit_by_name('Kit #1')
-                kitDev = TeraKitDevice()
-                kitDev.kit_device_kit = kit
-                kitDev.kit_device_device = device
-                kitDev.kit_device_optional = True
-                device.device_kits.append(kitDev)
 
                 # TODO remove session type
                 device.id_session_type = TeraSessionType.get_session_type_by_prefix('SENSOR').id_session_type

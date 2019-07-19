@@ -11,7 +11,7 @@ class TeraDevice(db.Model, BaseModel):
     __tablename__ = 't_devices'
     secret = 'TeraDeviceSecret'
     id_device = db.Column(db.Integer, db.Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
-    id_site = db.Column(db.Integer, db.ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=True)
+    # id_site = db.Column(db.Integer, db.ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=True)
     id_session_type = db.Column(db.Integer, db.ForeignKey("t_sessions_types.id_session_type",
                                                           ondelete='set null'), nullable=True)
     device_uuid = db.Column(db.String(36), nullable=False, unique=True)
@@ -22,26 +22,29 @@ class TeraDevice(db.Model, BaseModel):
     device_certificate = db.Column(db.String, nullable=True)
     device_enabled = db.Column(db.Boolean, nullable=False)
     device_onlineable = db.Column(db.Boolean, nullable=False)
+    device_optional = db.Column(db.Boolean, nullable=False, default=False)
     device_config = db.Column(db.String, nullable=True)
     device_notes = db.Column(db.String, nullable=True)
     device_lastonline = db.Column(db.TIMESTAMP, nullable=True)
 
-    device_kits = db.relationship("TeraKitDevice")
-    device_site = db.relationship("TeraSite")
+    device_sites = db.relationship("TeraDeviceSite")
     device_session_type = db.relationship("TeraSessionType")
+    device_participants = db.relationship("TeraDeviceParticipant")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields += ['device_kits', 'device_site', 'device_token', 'device_certificate', 'secret',
+        ignore_fields += ['device_sites', 'device_participants',  'device_token', 'device_certificate', 'secret',
                           'device_session_type']
 
         if minimal:
             ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_config', 'device_notes',
                               'device_lastonline']
 
-        return super().to_json(ignore_fields=ignore_fields)
+        device_json = super().to_json(ignore_fields=ignore_fields)
+
+        return device_json
 
     def create_token(self):
         # Creating token with user info
@@ -83,8 +86,8 @@ class TeraDevice(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_device_by_uuid(uuid):
-        device = TeraDevice.query.filter_by(device_uuid=uuid).first()
+    def get_device_by_uuid(dev_uuid):
+        device = TeraDevice.query.filter_by(device_uuid=dev_uuid).first()
         if device:
             device.update_last_online()
             return device
@@ -100,26 +103,25 @@ class TeraDevice(db.Model, BaseModel):
         return TeraDevice.query.filter_by(id_device=device_id).first()
 
     @staticmethod
+    # Available device = device not assigned to any participant
     def get_available_devices(ignore_disabled=True):
         if ignore_disabled:
-            return TeraDevice.query.outerjoin(TeraDevice.device_kits).filter(TeraDevice.device_kits == None).all()
+            return TeraDevice.query.outerjoin(TeraDevice.device_participants)\
+                .filter(TeraDevice.device_participants == None).all()
         else:
-            return TeraDevice.query.filter_by(device_enabled=True).outerjoin(TeraDevice.device_kits).\
-                filter(TeraDevice.device_kits == None).all()
+            return TeraDevice.query.filter_by(device_enabled=True).outerjoin(TeraDevice.device_participants).\
+                filter(TeraDevice.device_participants == None).all()
 
     @staticmethod
+    # Unvailable device = device assigned to at least one participant
     def get_unavailable_devices(ignore_disabled=True):
         if ignore_disabled:
-            return TeraDevice.query.join(TeraDevice.device_kits).all()
+            return TeraDevice.query.join(TeraDevice.device_participants).all()
         else:
-            return TeraDevice.query.filter_by(device_enabled=True).join(TeraDevice.device_kits).all()
+            return TeraDevice.query.filter_by(device_enabled=True).join(TeraDevice.device_participants).all()
 
     @staticmethod
     def create_defaults():
-        from libtera.db.models.TeraSite import TeraSite
-        from libtera.db.models.TeraKitDevice import TeraKitDevice
-        from libtera.db.models.TeraKit import TeraKit
-
         device = TeraDevice()
         device.device_name = 'Apple Watch #W05P1'
         # Forcing uuid for tests
@@ -128,15 +130,8 @@ class TeraDevice(db.Model, BaseModel):
         device.create_token()
         device.device_enabled = True
         device.device_onlineable = True
-        # device.device_project = TeraProject.get_project_by_projectname('Default Project #1')
-        device.device_site = TeraSite.get_site_by_sitename('Default Site')
-
-        kit = TeraKit.get_kit_by_name('Kit #1')
-        kitDev = TeraKitDevice()
-        kitDev.kit_device_kit = kit
-        kitDev.kit_device_device = device
-        kitDev.kit_device_optional = True
-        device.device_kits.append(kitDev)
+        # device.device_site = TeraSite.get_site_by_sitename('Default Site')
+        # device.device_participants = [TeraParticipant.get_participant_by_id(1)]
         db.session.add(device)
 
         device2 = TeraDevice()
@@ -146,8 +141,9 @@ class TeraDevice(db.Model, BaseModel):
         device2.create_token()
         device2.device_enabled = True
         device2.device_onlineable = True
-        # device.device_project = TeraProject.get_project_by_projectname('Default Project #1')
-        device2.device_site = TeraSite.get_site_by_sitename('Default Site')
+        # device2.device_sites = [TeraSite.get_site_by_sitename('Default Site')]
+        # device2.device_participants = [TeraParticipant.get_participant_by_id(1),
+        #                               TeraParticipant.get_participant_by_id(2)]
         db.session.add(device2)
 
         device3 = TeraDevice()
@@ -157,8 +153,8 @@ class TeraDevice(db.Model, BaseModel):
         device3.create_token()
         device3.device_enabled = True
         device3.device_onlineable = True
-        # device.device_project = TeraProject.get_project_by_projectname('Default Project #1')
-        device3.device_site = TeraSite.get_site_by_sitename('Default Site')
+        # device3.device_sites = [TeraSite.get_site_by_sitename('Default Site')]
+        # device3.device_participants = [TeraParticipant.get_participant_by_id(2)]
         db.session.add(device3)
 
         db.session.commit()

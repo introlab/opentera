@@ -147,8 +147,6 @@ QString TeraData::getDataTypeName(const TeraDataTypes &data_type)
         return "user";
     case TERADATA_SITE:
         return "site";
-    case TERADATA_KIT:
-        return "kit";
     case TERADATA_SESSIONTYPE:
         return "session_type";
     case TERADATA_TESTDEF:
@@ -165,10 +163,12 @@ QString TeraData::getDataTypeName(const TeraDataTypes &data_type)
         return "siteaccess";
     case TERADATA_PROJECTACCESS:
         return "projectaccess";
-    case TERADATA_KITDEVICE:
-        return "kit_device";
     case TERADATA_SESSION:
         return "session";
+    case TERADATA_DEVICESITE:
+        return "device_site";
+    case TERADATA_DEVICEPARTICIPANT:
+        return "device_participant";
     }
 
     return "";
@@ -176,18 +176,18 @@ QString TeraData::getDataTypeName(const TeraDataTypes &data_type)
 
 TeraDataTypes TeraData::getDataTypeFromPath(const QString &path)
 {
-    if (path==WEB_USERINFO_PATH)            return TERADATA_USER;
-    if (path==WEB_SITEINFO_PATH)            return TERADATA_SITE;
-    if (path==WEB_PROJECTINFO_PATH)         return TERADATA_PROJECT;
-    if (path==WEB_SITEACCESS_PATH)          return TERADATA_SITEACCESS;
-    if (path==WEB_KITINFO_PATH)             return TERADATA_KIT;
-    if (path==WEB_DEVICEINFO_PATH)          return TERADATA_DEVICE;
-    if (path==WEB_KITDEVICE_PATH)           return TERADATA_KITDEVICE;
-    if (path==WEB_PARTICIPANTINFO_PATH)     return TERADATA_PARTICIPANT;
-    if (path==WEB_PROJECTACCESS_PATH)       return TERADATA_PROJECTACCESS;
-    if (path==WEB_GROUPINFO_PATH)           return TERADATA_GROUP;
-    if (path==WEB_SESSIONINFO_PATH)         return TERADATA_SESSION;
-    if (path==WEB_SESSIONTYPE_PATH)        return TERADATA_SESSIONTYPE;
+    if (path==WEB_USERINFO_PATH)                return TERADATA_USER;
+    if (path==WEB_SITEINFO_PATH)                return TERADATA_SITE;
+    if (path==WEB_PROJECTINFO_PATH)             return TERADATA_PROJECT;
+    if (path==WEB_SITEACCESS_PATH)              return TERADATA_SITEACCESS;
+    if (path==WEB_DEVICEINFO_PATH)              return TERADATA_DEVICE;
+    if (path==WEB_PARTICIPANTINFO_PATH)         return TERADATA_PARTICIPANT;
+    if (path==WEB_PROJECTACCESS_PATH)           return TERADATA_PROJECTACCESS;
+    if (path==WEB_GROUPINFO_PATH)               return TERADATA_GROUP;
+    if (path==WEB_SESSIONINFO_PATH)             return TERADATA_SESSION;
+    if (path==WEB_SESSIONTYPE_PATH)             return TERADATA_SESSIONTYPE;
+    if (path==WEB_DEVICESITEINFO_PATH)          return TERADATA_DEVICESITE;
+    if (path==WEB_DEVICEPARTICIPANTINFO_PATH)   return TERADATA_DEVICEPARTICIPANT;
 
     LOG_ERROR("Unknown data type for path: " + path, "TeraData::getDataTypeFromPath");
 
@@ -200,8 +200,6 @@ QString TeraData::getPathForDataType(const TeraDataTypes &data_type)
     if (data_type==TERADATA_SITE)           return WEB_SITEINFO_PATH;
     if (data_type==TERADATA_PROJECT)        return WEB_PROJECTINFO_PATH;
     if (data_type==TERADATA_DEVICE)         return WEB_DEVICEINFO_PATH;
-    if (data_type==TERADATA_KITDEVICE)      return WEB_KITDEVICE_PATH;
-    if (data_type==TERADATA_KIT)            return WEB_KITINFO_PATH;
     if (data_type==TERADATA_PARTICIPANT)    return WEB_PARTICIPANTINFO_PATH;
     if (data_type==TERADATA_PROJECTACCESS)  return WEB_PROJECTACCESS_PATH;
     if (data_type==TERADATA_GROUP)          return WEB_GROUPINFO_PATH;
@@ -220,8 +218,6 @@ QString TeraData::getIconFilenameForDataType(const TeraDataTypes &data_type)
         return "://icons/software_user.png";
     case TERADATA_SITE:
         return "://icons/site.png";
-    case TERADATA_KIT:
-        return "://icons/kit.png";
     case TERADATA_SESSIONTYPE:
     case TERADATA_SESSION:
         return "://icons/session.png";
@@ -281,44 +277,6 @@ bool TeraData::fromJson(const QJsonValue &value)
 QJsonObject TeraData::toJson()
 {
     QJsonObject object;
-    /*for (int i=0; i<metaObject()->propertyCount(); i++){
-        QString fieldName = QString(metaObject()->property(i).name());
-        if (fieldName != "objectName" && fieldName != "data_type"){
-            QVariant fieldData =  metaObject()->property(i).read(this);
-            if (fieldData.canConvert(QMetaType::QString)){
-                QDateTime date_tester = QDateTime::fromString(fieldData.toString(), Qt::ISODateWithMs);
-                if (date_tester.isValid()){
-                    object[fieldName] = fieldData.toDateTime().toString(Qt::ISODateWithMs);
-                }else{
-                    object[fieldName] = fieldData.toString();
-                }
-            }else if (fieldData.canConvert(QMetaType::QJsonValue)){
-                object[fieldName] = metaObject()->property(i).read(this).toJsonValue();
-            }else{
-                LOG_WARNING("Field " + fieldName + " can't be 'jsonized'", "TeraData::toJson");
-            }
-        }
-    }*//*
-    for (int i=0; i<dynamicPropertyNames().count(); i++){
-        QString fieldName = QString(dynamicPropertyNames().at(i));
-        // Ignore "metaObject" properties
-        if (!hasMetaProperty(fieldName)){
-            QVariant fieldData = getFieldValue(fieldName);
-            if (fieldData.canConvert(QMetaType::QString)){
-                QDateTime date_tester = QDateTime::fromString(fieldData.toString(), Qt::ISODateWithMs);
-                if (date_tester.isValid()){
-                    object[fieldName] = fieldData.toDateTime().toString(Qt::ISODateWithMs);
-                }else{
-                    object[fieldName] = fieldData.toString();
-                }
-            }else if (fieldData.canConvert(QMetaType::QJsonValue)){
-                object[fieldName] = fieldData.toJsonValue();
-            }else{
-                LOG_WARNING("Field " + fieldName + " can't be 'jsonized'", "TeraData::toJson");
-            }
-        }
-    }*/
-    //qDebug() << object;
 
     for (int i=0; i<m_fieldsValue.count(); i++){
         QString fieldName = m_fieldsValue.keys().at(i);

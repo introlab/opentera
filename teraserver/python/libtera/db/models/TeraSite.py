@@ -6,6 +6,16 @@ class TeraSite(db.Model, BaseModel):
     id_site = db.Column(db.Integer, db.Sequence('id_site_sequence'), primary_key=True, autoincrement=True)
     site_name = db.Column(db.String, nullable=False, unique=True)
 
+    site_devices = db.relationship("TeraDeviceSite")
+
+    def to_json(self, ignore_fields=None, minimal=False):
+        if ignore_fields is None:
+            ignore_fields = []
+
+        ignore_fields.extend(['site_devices'])
+
+        return super().to_json(ignore_fields=ignore_fields)
+
     @staticmethod
     def create_defaults():
         base_site = TeraSite()

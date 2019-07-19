@@ -20,6 +20,11 @@ GroupWidget::GroupWidget(ComManager *comMan, const TeraData *data, QWidget *pare
     // Query form definition
     queryDataRequest(WEB_FORMS_PATH, QUrlQuery(WEB_FORMS_QUERY_GROUP));
 
+    // Query participants of that group
+    QUrlQuery query;
+    query.addQueryItem(WEB_QUERY_ID_GROUP, QString::number(m_data->getId()));
+    queryDataRequest(WEB_PARTICIPANTINFO_PATH, query);
+
     setData(data);
 
 }

@@ -222,8 +222,6 @@ ComManager::signal_ptr ComManager::getSignalFunctionForDataType(const TeraDataTy
         return &ComManager::usersReceived;
     case TERADATA_SITE:
         return &ComManager::sitesReceived;
-    case TERADATA_KIT:
-        return &ComManager::kitsReceived;
     case TERADATA_SESSIONTYPE:
         return &ComManager::sessionTypesReceived;
     case TERADATA_TESTDEF:
@@ -238,8 +236,6 @@ ComManager::signal_ptr ComManager::getSignalFunctionForDataType(const TeraDataTy
         return &ComManager::participantsReceived;
     case TERADATA_SITEACCESS:
         return &ComManager::siteAccessReceived;
-    case TERADATA_KITDEVICE:
-        return &ComManager::kitDevicesReceived;
     case TERADATA_PROJECTACCESS:
         return &ComManager::projectAccessReceived;
     case TERADATA_SESSION:
@@ -310,9 +306,6 @@ bool ComManager::handleDataReply(const QString& reply_path, const QString &reply
     case TERADATA_SITE:
         emit sitesReceived(items);
         break;
-    case TERADATA_KIT:
-        emit kitsReceived(items);
-        break;
     case TERADATA_SESSIONTYPE:
         emit sessionTypesReceived(items);
         break;
@@ -334,15 +327,17 @@ bool ComManager::handleDataReply(const QString& reply_path, const QString &reply
     case TERADATA_SITEACCESS:
         emit siteAccessReceived(items);
         break;
-    case TERADATA_KITDEVICE:
-        emit kitDevicesReceived(items);
-        break;
     case TERADATA_PROJECTACCESS:
         emit projectAccessReceived(items);
         break;
     case TERADATA_SESSION:
         emit sessionsReceived(items);
         break;
+    case TERADATA_DEVICESITE:
+        emit deviceSitesReceived(items);
+        break;
+    case TERADATA_DEVICEPARTICIPANT:
+        emit deviceParticipantsReceived(items);
 /*    default:
         emit getSignalFunctionForDataType(items_type);*/
 

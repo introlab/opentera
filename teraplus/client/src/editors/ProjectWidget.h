@@ -29,12 +29,12 @@ private slots:
     void processProjectAccessReply(QList<TeraData> access);
     void processUsersReply(QList<TeraData> users);
     void processGroupsReply(QList<TeraData> groups);
-    void processKitsReply(QList<TeraData> kits);
+    void processDevicesReply(QList<TeraData> devices);
 
     void btnSave_clicked();
     void btnUndo_clicked();
     void btnUpdateAccess_clicked();
-    void btnKits_clicked();
+    void btnDevices_clicked();
     void btnUsers_clicked();
 
 private:
@@ -42,7 +42,7 @@ private:
 
     QMap<int, int>               m_tableUsers_ids_rows;
     QMap<int, QListWidgetItem*>  m_listGroups_items;
-    QMap<int, QTableWidgetItem*> m_listKits_items;
+    QMap<int, QTableWidgetItem*> m_listDevices_items;
 
     QDialog*                     m_diag_editor;
 
@@ -50,7 +50,7 @@ private:
 
     void updateProjectAccess(const TeraData* access);
     void updateGroup(const TeraData* group);
-    void updateKit(const TeraData* kit);
+    void updateDevice(const TeraData* device);
 
     void updateControlsState();
     void updateFieldsValue();

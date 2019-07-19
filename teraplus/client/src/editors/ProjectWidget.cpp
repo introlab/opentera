@@ -63,7 +63,7 @@ void ProjectWidget::setData(const TeraData *data)
         args.addQueryItem(WEB_QUERY_ID_PROJECT, QString::number(data->getFieldValue("id_project").toInt()));
         args.addQueryItem(WEB_QUERY_LIST, "");
         queryDataRequest(WEB_GROUPINFO_PATH, args);
-        queryDataRequest(WEB_KITINFO_PATH, args);
+        queryDataRequest(WEB_DEVICEINFO_PATH, args);
 
     }else{
         ui->tabProjectInfos->setEnabled(false);
@@ -76,12 +76,12 @@ void ProjectWidget::connectSignals()
     connect(m_comManager, &ComManager::projectAccessReceived, this, &ProjectWidget::processProjectAccessReply);
     connect(m_comManager, &ComManager::usersReceived, this, &ProjectWidget::processUsersReply);
     connect(m_comManager, &ComManager::groupsReceived, this, &ProjectWidget::processGroupsReply);
-    connect(m_comManager, &ComManager::kitsReceived, this, &ProjectWidget::processKitsReply);
+    connect(m_comManager, &ComManager::devicesReceived, this, &ProjectWidget::processDevicesReply);
 
     connect(ui->btnUndo, &QPushButton::clicked, this, &ProjectWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &ProjectWidget::btnSave_clicked);
     connect(ui->btnUpdateRoles, &QPushButton::clicked, this, &ProjectWidget::btnUpdateAccess_clicked);
-    connect(ui->btnKits, &QPushButton::clicked, this, &ProjectWidget::btnKits_clicked);
+    connect(ui->btnDevices, &QPushButton::clicked, this, &ProjectWidget::btnDevices_clicked);
     connect(ui->btnUsers, &QPushButton::clicked, this, &ProjectWidget::btnUsers_clicked);
 
 }
@@ -136,14 +136,14 @@ void ProjectWidget::updateGroup(const TeraData *group)
     }
 }
 
-void ProjectWidget::updateKit(const TeraData *kit)
+void ProjectWidget::updateDevice(const TeraData *device)
 {
-    int id_kit = kit->getId();
+    int id_device = device->getId();
     QString participants_string = tr("Aucun");
 
     // Build participant string if availables
-    if (kit->hasFieldName("kit_participants")){
-        QVariantList participants = kit->getFieldValue("kit_participants").toList();
+    if (device->hasFieldName("device_participants")){
+        QVariantList participants = device->getFieldValue("device_participants").toList();
         participants_string = "";
         for (int i=0; i<participants.count(); i++){
             QVariantMap part_info = participants.at(i).toMap();
@@ -153,24 +153,27 @@ void ProjectWidget::updateKit(const TeraData *kit)
         }
     }
 
-    if (m_listKits_items.contains(id_kit)){
-       QTableWidgetItem* item = m_listKits_items[id_kit];
-       item->setText(kit->getName());
-        ui->lstKits->item(item->row(), 1)->setText(participants_string);
+    if (m_listDevices_items.contains(id_device)){
+        QTableWidgetItem* item = m_listDevices_items[id_device];
+        item->setText(device->getName());
+        ui->lstDevices->item(item->row(), 1)->setText(participants_string);
     }else{
-        ui->lstKits->setRowCount(ui->lstKits->rowCount()+1);
-        QTableWidgetItem* item = new QTableWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_KIT)), kit->getName());
-        ui->lstKits->setItem(ui->lstKits->rowCount()-1, 0, item);
-        m_listKits_items[id_kit] = item;
+        ui->lstDevices->setRowCount(ui->lstDevices->rowCount()+1);
+        QString device_name = device->getName();
+        if (device_name.isEmpty())
+            device_name = tr("(Appareil sans nom)");
+        QTableWidgetItem* item = new QTableWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_DEVICE)), device_name);
+        ui->lstDevices->setItem(ui->lstDevices->rowCount()-1, 0, item);
+        m_listDevices_items[id_device] = item;
 
         item = new QTableWidgetItem(participants_string);
-        ui->lstKits->setItem(ui->lstKits->rowCount()-1, 1, item);
+        ui->lstDevices->setItem(ui->lstDevices->rowCount()-1, 1, item);
     }
 }
 
 void ProjectWidget::updateControlsState()
 {
-    ui->btnKits->setVisible(!m_limited);
+    ui->btnDevices->setVisible(!m_limited);
     ui->btnUsers->setVisible(!m_limited);
     ui->frameButtons->setVisible(!m_limited);
     ui->btnUpdateRoles->setVisible(!m_limited);
@@ -245,14 +248,14 @@ void ProjectWidget::processGroupsReply(QList<TeraData> groups)
     }*/
 }
 
-void ProjectWidget::processKitsReply(QList<TeraData> kits)
+void ProjectWidget::processDevicesReply(QList<TeraData> devices)
 {
     if (!m_data)
         return;
 
-    for (int i=0; i<kits.count(); i++){
-        if (kits.at(i).getFieldValue("id_project").toInt() == m_data->getId()/*m_listProjects_items.contains(kits.at(i).getFieldValue("id_project").toInt())*/){
-            updateKit(&kits.at(i));
+    for (int i=0; i<devices.count(); i++){
+        if (devices.at(i).getFieldValue("id_project").toInt() == m_data->getId()/*m_listProjects_items.contains(kits.at(i).getFieldValue("id_project").toInt())*/){
+            updateDevice(&devices.at(i));
         }
     }
 
@@ -317,16 +320,16 @@ void ProjectWidget::btnUpdateAccess_clicked()
 
 }
 
-void ProjectWidget::btnKits_clicked()
+void ProjectWidget::btnDevices_clicked()
 {
     if (m_diag_editor){
         m_diag_editor->deleteLater();
     }
     m_diag_editor = new QDialog(this);
-    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_KIT, m_diag_editor);
+    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_DEVICE, m_diag_editor);
     Q_UNUSED(list_widget)
 
-    m_diag_editor->setWindowTitle(tr("Kits"));
+    m_diag_editor->setWindowTitle(tr("Appareils"));
 
     m_diag_editor->open();
 }

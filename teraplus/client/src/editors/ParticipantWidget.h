@@ -41,7 +41,7 @@ private:
     bool validateData();
 
     void updateSession(TeraData *session);
-    void updateKit(TeraData* kit);
+    void updateDevice(TeraData* device);
 
     void updateCalendars(QDate left_date);
     QDate getMinimumSessionDate();
@@ -49,12 +49,12 @@ private slots:
     void processFormsReply(QString form_type, QString data);
     void processSessionsReply(QList<TeraData> sessions);
     void processSessionTypesReply(QList<TeraData> session_types);
-    void processKitsReply(QList<TeraData> kits);
+    void processDevicesReply(QList<TeraData> devices);
     void deleteDataReply(QString path, int id);
 
     void btnSave_clicked();
     void btnUndo_clicked();
-    void btnKits_clicked();
+    void btnDevices_clicked();
     void btnDeleteSession_clicked();
 
     void currentSelectedSessionChanged(QTableWidgetItem* current, QTableWidgetItem* previous);

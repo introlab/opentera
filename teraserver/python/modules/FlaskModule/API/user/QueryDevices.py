@@ -21,24 +21,30 @@ class QueryDevices(Resource):
 
         parser = reqparse.RequestParser()
         parser.add_argument('id_device', type=int, help='id_device')
+        parser.add_argument('id_site', type=int, help='ID Site')
         parser.add_argument('list', type=bool)
         parser.add_argument('available', type=inputs.boolean)
+        parser.add_argument('participants', type=bool)
+        parser.add_argument('sites', type=bool)
         # parser.add_argument('device_uuid', type=str, help='device_uuid')
 
         args = parser.parse_args()
 
         devices = []
         # If we have no arguments, return all accessible devices
-        if not args['id_device']:
+        if not args['id_device'] and not args['id_site']:
             devices = user_access.get_accessible_devices()
-        else:
+        elif args['id_device']:
             devices = [user_access.query_device_by_id(device_id=args['id_device'])]
+        elif args['id_site']:
+            # Check if has access to the requested site
+            devices = user_access.query_devices_for_site(args['id_site'])
 
-        if args['available'] is not None:
-            if args['available']:
-                devices = TeraDevice.get_available_devices()
-            else:
-                devices = TeraDevice.get_unavailable_devices()
+        # if args['available'] is not None:
+        #     if args['available']:
+        #         devices = TeraDevice.get_available_devices()
+        #     else:
+        #         devices = TeraDevice.get_unavailable_devices()
 
         try:
             device_list = []
@@ -48,6 +54,34 @@ class QueryDevices(Resource):
                         device_json = device.to_json()
                     else:
                         device_json = device.to_json(minimal=True)
+
+                    if args['participants'] is not None:
+                        # Add participants information to the device, is available
+                        dev_participants = user_access.query_participants_for_device(device.id_device)
+                        parts = []
+                        for part in dev_participants:
+                            part_info = {'id_participant': part.id_participant}
+                            if args['list'] is None:
+                                part_info['participant_name'] = part.participant_name
+                            part_info['id_project'] = part.participant_participant_group.participant_group_project.\
+                                id_project
+                            if args['list'] is None:
+                                part_info['project_name'] = part.participant_participant_group.participant_group_project\
+                                    .project_name
+                            parts.append(part_info)
+                        device_json['device_participants'] = parts
+
+                    if args['sites'] is not None:
+                        # Add sites
+                        sites_list = []
+                        for device_site in device.device_sites:
+                            ignore_site_fields = []
+                            if args['list'] is not None:
+                                ignore_site_fields = ['site_name']
+                            site_json = device_site.device_site_site.to_json(ignore_fields=ignore_site_fields)
+                            sites_list.append(site_json)
+
+                        device_json['device_sites'] = sites_list
                     # if args['available'] is not None:
                     #     if not args['available']:
                     #         device_json['id_kit'] = device.device_kits[0].id_kit
@@ -72,17 +106,14 @@ class QueryDevices(Resource):
         # Validate if we have an id
         if 'id_device' not in json_device:
             return '', 400
-
-        # Check if current user can modify the posted device
-        if json_device['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True) and \
-                json_device['id_site'] > 0:
-            return '', 403
-
-        # Devices without a site can only be modified by super admins
-        if json_device['id_site'] == 0:
+        # New devices can only be added by super admins
+        if json_device['id_device'] == 0:
             if not current_user.user_superadmin:
                 return '', 403
-            json_device['id_site'] = None
+        else:
+            # Check if current user can modify the posted device
+            if json_device['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
+                return '', 403
 
         # Do the update!
         if json_device['id_device'] > 0:

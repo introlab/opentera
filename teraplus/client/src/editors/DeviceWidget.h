@@ -2,6 +2,7 @@
 #define DEVICEWIDGET_H
 
 #include <QWidget>
+#include <QListWidgetItem>
 
 #include "DataEditorWidget.h"
 
@@ -22,18 +23,28 @@ public:
 private:
     Ui::DeviceWidget *ui;
 
+    QMap<int, QListWidgetItem*>  m_listSites_items;
+    QMap<int, QListWidgetItem*>  m_listDeviceSites_items;
+    QMap<int, QListWidgetItem*>  m_listParticipants_items;
+
     void updateControlsState();
     void updateFieldsValue();
     bool validateData();
 
     void connectSignals();
 
+    void updateSite(TeraData *site);
+    void updateParticipant(TeraData *participant);
+
 private slots:
     void processFormsReply(QString form_type, QString data);
-    void processKitDevicesReply(QList<TeraData> kit_devices);
+    void processSitesReply(QList<TeraData> sites);
+    void processDeviceSitesReply(QList<TeraData> device_sites);
+    void processDeviceParticipantsReply(QList<TeraData> device_parts);
 
     void btnSave_clicked();
     void btnUndo_clicked();
+    void btnSaveSites_clicked();
 
 };
 

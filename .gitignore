@@ -69,3 +69,4 @@ node_modules/
 /teraserver/python/certificates/site_cert.pem
 /teraserver/python/certificates/site_key.pem
 /teraplus/client/resources/icons/device.psd
+/teraserver/python/uploads

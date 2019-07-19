@@ -1,5 +1,4 @@
 from libtera.db.Base import db, BaseModel
-from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 
 
@@ -45,6 +44,7 @@ class TeraProject(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults():
+        from libtera.db.models.TeraSite import TeraSite
         base_project = TeraProject()
         base_project.project_name = 'Default Project #1'
         base_project.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
