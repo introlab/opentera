@@ -46,44 +46,52 @@ class DeviceRegister(Resource):
 
         # We should receive a certificate signing request (base64)
         if request.content_type == 'application/octet-stream':
-            try:
-                # Read certificate request
-                req = x509.load_pem_x509_csr(request.data, default_backend())
+            # try:
+            # Read certificate request
+            req = x509.load_pem_x509_csr(request.data, default_backend())
 
-                # Create TeraDevice
-                device = TeraDevice()
+            # Create TeraDevice
+            device = TeraDevice()
 
-                # Required field(s)
-                # Name should be taken from CSR
-                device.device_name = str(req.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value)
-                # TODO set flags properly
-                device.device_onlineable = False
-                # TODO WARNING - Should be disabled when created...
-                device.device_enabled = True
-                device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
-                device.device_uuid = str(uuid.uuid4())
-                device.create_token()
-                device.update_last_online()
+            # Required field(s)
+            # Name should be taken from CSR
+            device.device_name = str(req.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value)
+            # TODO set flags properly
+            device.device_onlineable = False
+            # TODO WARNING - Should be disabled when created...
+            device.device_enabled = True
+            device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
+            device.device_uuid = str(uuid.uuid4())
+            device.create_token()
+            device.update_last_online()
 
-                # TODO remove session type
-                device.id_session_type = TeraSessionType.get_session_type_by_prefix('SENSOR').id_session_type
+            # Must sign request with CA/key and generate certificate
+            cert = generate_device_certificate(req, self.ca_info, device.device_uuid)
 
-                # Must sign request with CA/key and generate certificate
-                cert = generate_device_certificate(req, self.ca_info, device.device_uuid)
+            # Update certificate
+            device.device_certificate = cert.public_bytes(serialization.Encoding.PEM).decode('utf-8')
 
-                # Update certificate
-                device.device_certificate = cert.public_bytes(serialization.Encoding.PEM).decode('utf-8')
+            # Store
+            db.session.add(device)
 
-                # Store
-                db.session.add(device)
-                db.session.commit()
+            # TODO remove participant assignation
+            from libtera.db.models.TeraParticipant import TeraParticipant
+            from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+            participant1 = TeraParticipant.get_participant_by_id(1)
+            device_partipant = TeraDeviceParticipant()
+            device_partipant.device_participant_participant = participant1
+            device_partipant.device_participant_device = device
+            db.session.add(device_partipant)
 
-                result = dict()
-                result['certificate'] = device.device_certificate
+            # Commit to database
+            db.session.commit()
 
-                # Return certificate...
-                return jsonify(result)
-            except:
-                return 'Error processing request', 400
+            result = dict()
+            result['certificate'] = device.device_certificate
+
+            # Return certificate...
+            return jsonify(result)
+            # except:
+            #     return 'Error processing request', 400
         else:
             return 'Invalid content type', 400

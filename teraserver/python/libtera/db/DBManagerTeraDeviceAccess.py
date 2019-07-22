@@ -20,7 +20,7 @@ class DBManagerTeraDeviceAccess:
     def query_session(self, session_id: int):
         sessions = []
         for part in self.device.device_participants:
-            for ses in part.participant_sessions:
+            for ses in part.device_participant_participant.participant_sessions:
                 if ses.id_session == session_id:
                     sessions = [TeraSession.get_session_by_id(session_id)]
                     return sessions
@@ -38,14 +38,17 @@ class DBManagerTeraDeviceAccess:
         return parts
 
     def get_accessible_session_types(self):
+        from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
+
         participants = self.get_accessible_participants()
         project_list = []
         # Fetch all projects for all participants
         for part in participants:
-            project_list.append(part.participant_participant_group.id_project)
+            project_list.append(part.device_participant_participant.participant_participant_group.id_project)
 
-        session_types = TeraSessionType.query.join(TeraSessionType.session_type_projects).filter(
-            TeraProject.id_project.in_(project_list)).all()
+        session_types = TeraSessionType.query.join(TeraSessionType.session_type_projects).join(
+            TeraSessionType.session_type_devices_types).filter(TeraProject.id_project.in_(project_list))\
+            .filter(TeraSessionTypeDeviceType.id_device_type == self.device.device_type).all()
 
         return session_types
 

@@ -1,14 +1,6 @@
 from libtera.db.Base import db, BaseModel
 from enum import Enum, unique
 
-
-sessions_types_devices_table = db.Table('t_sessions_types_devices', db.Column('id_session_type', db.Integer,
-                                                                              db.ForeignKey(
-                                                                                  't_sessions_types.id_session_type',
-                                                                                  ondelete='cascade')),
-                                        db.Column('id_device_type', db.Integer,
-                                                  db.ForeignKey('t_devices_types.id_device_type', ondelete='cascade')))
-
 sessions_types_projects_table = db.Table('t_sessions_types_projects', db.Column('id_session_type', db.Integer,
                                                                                 db.ForeignKey(
                                                                                   't_sessions_types.id_session_type',
@@ -41,12 +33,12 @@ class TeraSessionType(db.Model, BaseModel):
 
     session_type_projects = db.relationship("TeraProject", secondary=sessions_types_projects_table)
 
-    session_type_uses_devices_types = db.relationship("TeraDeviceType", secondary=sessions_types_devices_table)
+    session_type_devices_types = db.relationship("TeraSessionTypeDeviceType")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['session_type_projects', 'session_type_uses_devices_types'])
+        ignore_fields.extend(['session_type_projects', 'session_type_devices_types', 'SessionCategoryEnum'])
         if minimal:
             ignore_fields.extend(['session_type_prefix', 'session_type_online', 'session_type_multiusers',
                                   'session_type_profile'])
@@ -56,7 +48,7 @@ class TeraSessionType(db.Model, BaseModel):
     @staticmethod
     def create_defaults():
         from libtera.db.models.TeraProject import TeraProject
-        from libtera.db.models.TeraDeviceType import TeraDeviceType
+        # from libtera.db.models.TeraDeviceType import TeraDeviceType
 
         type_project = TeraProject.get_project_by_projectname('Default Project #1')
         video_session = TeraSessionType()
@@ -68,8 +60,8 @@ class TeraSessionType(db.Model, BaseModel):
         video_session.session_type_color = "#00FF00"
         video_session.session_type_category = TeraSessionType.SessionCategoryEnum.VIDEOCONFERENCE.value
         video_session.session_type_projects = [type_project]
-        video_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
-            int(TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value))]
+        # video_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
+        #     int(TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value))]
         db.session.add(video_session)
 
         sensor_session = TeraSessionType()
@@ -81,8 +73,8 @@ class TeraSessionType(db.Model, BaseModel):
         sensor_session.session_type_color = "#0000FF"
         sensor_session.session_type_category = TeraSessionType.SessionCategoryEnum.FILETRANSFER.value
         sensor_session.session_type_projects = [type_project]
-        sensor_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
-            int(TeraDeviceType.DeviceTypeEnum.SENSOR.value))]
+        # sensor_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
+        #     int(TeraDeviceType.DeviceTypeEnum.SENSOR.value))]
         db.session.add(sensor_session)
 
         vsensor_session = TeraSessionType()
@@ -94,9 +86,9 @@ class TeraSessionType(db.Model, BaseModel):
         vsensor_session.session_type_color = "#00FFFF"
         vsensor_session.session_type_projects = [type_project]
         vsensor_session.session_type_category = TeraSessionType.SessionCategoryEnum.STREAMING.value
-        vsensor_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
-            int(TeraDeviceType.DeviceTypeEnum.SENSOR.value)), TeraDeviceType.get_device_type(
-            int(TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value))]
+        # vsensor_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
+        #     int(TeraDeviceType.DeviceTypeEnum.SENSOR.value)), TeraDeviceType.get_device_type(
+        #     int(TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value))]
         db.session.add(vsensor_session)
 
         robot_session = TeraSessionType()
@@ -108,8 +100,8 @@ class TeraSessionType(db.Model, BaseModel):
         robot_session.session_type_color = "#FF00FF"
         robot_session.session_type_projects = [type_project]
         robot_session.session_type_category = TeraSessionType.SessionCategoryEnum.TELEOPERATION.value
-        robot_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
-            int(TeraDeviceType.DeviceTypeEnum.ROBOT.value))]
+        # robot_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
+        #     int(TeraDeviceType.DeviceTypeEnum.ROBOT.value))]
         db.session.add(robot_session)
 
         db.session.commit()

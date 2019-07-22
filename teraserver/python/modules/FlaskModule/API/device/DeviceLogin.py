@@ -21,12 +21,21 @@ class DeviceLogin(Resource):
         # Reply device information
         reply = {'device_info': current_device.to_json()}
 
+        device_access = db_man.deviceAccess(current_device)
+
         # Reply participant information
-        participants = db_man.deviceAccess(current_device).get_accessible_participants()
+        participants = device_access.get_accessible_participants()
         reply['participants_info'] = list()
 
         for participant in participants:
-            reply['participants_info'].append(participant.to_json())
+            reply['participants_info'].append(participant.device_participant_participant.to_json())
+
+        # Reply accessible sessions type ids
+        session_types = device_access.get_accessible_session_types()
+        reply['session_types_info'] = list()
+
+        for st in session_types:
+            reply['session_types_info'].append(st.to_json())
 
         # TODO Handle sessions
         if current_device.device_onlineable:

@@ -15,12 +15,14 @@ class TeraDeviceForm:
         device_types = TeraDeviceType.get_devices_types()
         device_types_list = []
         for dev_type in device_types:
-            device_types_list.append(TeraFormValue(value_id=dev_type.id_device_type, value=dev_type.device_type_name))
-
-        # sites = user_access.get_accessible_sites()
-        # sites_list = []
-        # for site in sites:
-        #     sites_list.append(TeraFormValue(value_id=site.id_site, value=site.site_name))
+            name = ''
+            if dev_type.id_device_type == TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value:
+                name = gettext('Vidéconférence')
+            if dev_type.id_device_type == TeraDeviceType.DeviceTypeEnum.SENSOR.value:
+                name = gettext('Capteur')
+            if dev_type.id_device_type == TeraDeviceType.DeviceTypeEnum.ROBOT.value:
+                name = gettext('Robot')
+            device_types_list.append(TeraFormValue(value_id=dev_type.id_device_type, value=name))
 
         # Sections
         section = TeraFormSection("informations", gettext("Informations"))

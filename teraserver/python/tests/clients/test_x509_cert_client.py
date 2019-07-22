@@ -217,13 +217,17 @@ class x509ClientTest(unittest.TestCase):
         self.assertIsNotNone(self.agent)
         self.assertIsNotNone(login_info['device_info'])
         self.assertIsNotNone(login_info['participants_info'])
+        self.assertIsNotNone(login_info['session_types_info'])
 
         participants_uuids = []
         for participant in login_info['participants_info']:
             participants_uuids.append(participant['participant_uuid'])
 
+        # For now, uses the first session type in the provided list
+        session_type = login_info['session_types_info'][0]
         session = {'id_session': 0,
-                   'id_session_type': login_info['device_info']['id_session_type'],
+                   # 'id_session_type': login_info['device_info']['id_session_type'],
+                   'id_session_type': session_type['id_session_type'],
                    'session_name': 'File transfer test',
                    'session_start_datetime': str(datetime.datetime.now()),
                    'session_status': 0,
