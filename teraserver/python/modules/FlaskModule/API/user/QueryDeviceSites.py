@@ -70,7 +70,7 @@ class QueryDeviceSites(Resource):
 
         # Validate if we have an id
         for json_device_site in json_device_sites:
-            if 'id_device' not in json_device_site and 'id_site' not in json_device_site:
+            if 'id_device' not in json_device_site or 'id_site' not in json_device_site:
                 return '', 400
 
             # Check if current user can modify the posted device

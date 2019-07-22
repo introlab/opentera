@@ -338,6 +338,10 @@ bool ComManager::handleDataReply(const QString& reply_path, const QString &reply
         break;
     case TERADATA_DEVICEPARTICIPANT:
         emit deviceParticipantsReceived(items);
+        break;
+    case TERADATA_SESSIONTYPEDEVICETYPE:
+        emit sessionTypesDeviceTypesReceived(items);
+        break;
 /*    default:
         emit getSignalFunctionForDataType(items_type);*/
 

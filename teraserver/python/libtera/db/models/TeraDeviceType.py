@@ -42,4 +42,13 @@ class TeraDeviceType(db.Model, BaseModel):
     def get_device_type(dev_type: int):
         return TeraDeviceType.query.filter_by(id_device_type=dev_type).first()
 
+    def get_name(self):
+        name = 'Inconnu'
+        if self.id_device_type == TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value:
+            name = 'Vidéoconférence'
+        if self.id_device_type == TeraDeviceType.DeviceTypeEnum.SENSOR.value:
+            name = 'Capteur'
+        if self.id_device_type == TeraDeviceType.DeviceTypeEnum.ROBOT.value:
+            name = 'Robot'
+        return name
 

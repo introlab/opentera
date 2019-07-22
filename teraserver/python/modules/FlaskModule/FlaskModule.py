@@ -87,6 +87,7 @@ class FlaskModule(BaseModule):
         from .API.user.QuerySessionTypes import QuerySessionTypes
         from .API.user.QuerySessionEvents import QuerySessionEvents
         from .API.user.QueryDeviceData import QueryDeviceData
+        from .API.user.QuerySessionTypeDeviceType import QuerySessionTypeDeviceType
         self.api.add_resource(Login, '/api/user/login', resource_class_args=[self])
         self.api.add_resource(Logout, '/api/user/logout', resource_class_args=[self])
         self.api.add_resource(QuerySites, '/api/user/sites', resource_class_args=[self])
@@ -103,6 +104,8 @@ class FlaskModule(BaseModule):
         self.api.add_resource(QueryParticipantGroup, '/api/user/groups', resource_class_args=[self])
         self.api.add_resource(QuerySessions, '/api/user/sessions', resource_class_args=[self])
         self.api.add_resource(QuerySessionTypes, '/api/user/sessiontypes', resource_class_args=[self])
+        self.api.add_resource(QuerySessionTypeDeviceType, '/api/user/sessiontypedevicetypes',
+                              resource_class_args=[self])
         self.api.add_resource(QuerySessionEvents, '/api/user/sessionevents', resource_class_args=[self])
         self.api.add_resource(QueryDeviceData, '/api/user/data', resource_class_args=[self])
 

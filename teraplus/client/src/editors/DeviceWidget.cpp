@@ -25,11 +25,15 @@ DeviceWidget::DeviceWidget(ComManager *comMan, const TeraData *data, QWidget *pa
     args.addQueryItem(WEB_QUERY_LIST, "");
     queryDataRequest(WEB_SITEINFO_PATH, args);
 
-    // Query associated participants
+    // Query associated participants and session types
     if (!dataIsNew()){
         args.removeAllQueryItems(WEB_QUERY_LIST);
         args.addQueryItem(WEB_QUERY_ID_DEVICE, QString::number(m_data->getId()));
         queryDataRequest(WEB_DEVICEPARTICIPANTINFO_PATH, args);
+
+        args.removeAllQueryItems(WEB_QUERY_ID_DEVICE);
+        args.addQueryItem(WEB_QUERY_ID_DEVICE_TYPE, m_data->getFieldValue("device_type").toString());
+        queryDataRequest(WEB_SESSIONTYPEDEVICETYPE_PATH, args);
     }
 }
 
@@ -81,6 +85,7 @@ void DeviceWidget::connectSignals()
     connect(m_comManager, &ComManager::sitesReceived, this, &DeviceWidget::processSitesReply);
     connect(m_comManager, &ComManager::deviceSitesReceived, this, &DeviceWidget::processDeviceSitesReply);
     connect(m_comManager, &ComManager::deviceParticipantsReceived, this, &DeviceWidget::processDeviceParticipantsReply);
+    connect(m_comManager, &ComManager::sessionTypesDeviceTypesReceived, this, &DeviceWidget::processSessionTypesReply);
 
     connect(ui->btnSave, &QPushButton::clicked, this, &DeviceWidget::btnSave_clicked);
     connect(ui->btnUndo, &QPushButton::clicked, this, &DeviceWidget::btnUndo_clicked);
@@ -112,6 +117,20 @@ void DeviceWidget::updateParticipant(TeraData *participant)
         QListWidgetItem* item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_PARTICIPANT)), participant_name);
         ui->lstParticipants->addItem(item);
         m_listParticipants_items[id_participant] = item;
+    }
+}
+
+void DeviceWidget::updateSessionType(TeraData *session_type)
+{
+    int id_session_type = session_type->getFieldValue("id_session_type").toInt();
+    QString session_type_name = session_type->getFieldValue("session_type_name").toString();
+    if (m_listSessionTypes_items.contains(id_session_type)){
+        QListWidgetItem* item = m_listSessionTypes_items[id_session_type];
+        item->setText(session_type_name);
+    }else{
+        QListWidgetItem* item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_SESSIONTYPE)), session_type_name);
+        ui->lstSessionTypes->addItem(item);
+        m_listSessionTypes_items[id_session_type] = item;
     }
 }
 
@@ -178,6 +197,20 @@ void DeviceWidget::processDeviceParticipantsReply(QList<TeraData> device_parts)
 
     for (TeraData device_part:device_parts){
         updateParticipant(&device_part);
+    }
+}
+
+void DeviceWidget::processSessionTypesReply(QList<TeraData> session_types)
+{
+    if (session_types.isEmpty())
+        return;
+
+    // Check if it is for us
+    if (session_types.first().getFieldValue("id_device_type").toInt() != m_data->getFieldValue("device_type").toInt())
+        return;
+
+    for (TeraData session_type:session_types){
+        updateSessionType(&session_type);
     }
 }
 

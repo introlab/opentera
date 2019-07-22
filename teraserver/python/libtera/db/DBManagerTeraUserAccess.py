@@ -363,3 +363,12 @@ class DBManagerTeraUserAccess:
             return TeraSessionEvent.get_events_for_session(id_session=session_id)
 
         return []
+
+    def query_session_types_for_device(self, device_type_id: int):
+        from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
+        session_types_ids = self.get_accessible_session_types_ids()
+
+        session_types = TeraSessionTypeDeviceType.query.filter(TeraSessionTypeDeviceType.id_session_type.
+                                                               in_(session_types_ids))\
+            .filter_by(id_device_type=device_type_id).all()
+        return session_types

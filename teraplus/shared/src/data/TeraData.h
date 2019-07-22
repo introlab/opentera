@@ -24,7 +24,8 @@ enum TeraDataTypes {
     TERADATA_PROJECTACCESS,
     TERADATA_SESSION,
     TERADATA_DEVICESITE,
-    TERADATA_DEVICEPARTICIPANT
+    TERADATA_DEVICEPARTICIPANT,
+    TERADATA_SESSIONTYPEDEVICETYPE
 };
 
 
@@ -50,8 +51,12 @@ public:
     int getId() const;
     QString getIdFieldName() const;
     void setId(const int& id);
+
     virtual QString getName() const;
     void setName(const QString& name);
+
+    bool hasEnabledField();
+    bool isEnabled();
 
     bool isNew();
 
@@ -79,6 +84,7 @@ private:
     QString     m_objectName;
     QString     m_idField;
     QString     m_nameField;
+    QString     m_enabledField;
 
     QVariantMap m_fieldsValue;
 

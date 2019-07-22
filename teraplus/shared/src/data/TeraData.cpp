@@ -63,6 +63,16 @@ void TeraData::setName(const QString &name)
     setFieldValue(m_nameField, name);
 }
 
+bool TeraData::hasEnabledField()
+{
+    return hasFieldName(m_enabledField);
+}
+
+bool TeraData::isEnabled()
+{
+    return getFieldValue(m_enabledField).toBool();
+}
+
 bool TeraData::isNew()
 {
     return getId()<=0;
@@ -169,6 +179,8 @@ QString TeraData::getDataTypeName(const TeraDataTypes &data_type)
         return "device_site";
     case TERADATA_DEVICEPARTICIPANT:
         return "device_participant";
+    case TERADATA_SESSIONTYPEDEVICETYPE:
+        return "session_type_device_type";
     }
 
     return "";
@@ -188,6 +200,7 @@ TeraDataTypes TeraData::getDataTypeFromPath(const QString &path)
     if (path==WEB_SESSIONTYPE_PATH)             return TERADATA_SESSIONTYPE;
     if (path==WEB_DEVICESITEINFO_PATH)          return TERADATA_DEVICESITE;
     if (path==WEB_DEVICEPARTICIPANTINFO_PATH)   return TERADATA_DEVICEPARTICIPANT;
+    if (path==WEB_SESSIONTYPEDEVICETYPE_PATH)   return TERADATA_SESSIONTYPEDEVICETYPE;
 
     LOG_ERROR("Unknown data type for path: " + path, "TeraData::getDataTypeFromPath");
 
@@ -255,6 +268,7 @@ void TeraData::setDataType(TeraDataTypes data_type)
     m_objectName = getDataTypeName(m_data_type);
     m_idField = "id_" + m_objectName;
     m_nameField = m_objectName + "_name";
+    m_enabledField = m_objectName + "_enabled";
 
 
 }

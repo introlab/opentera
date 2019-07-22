@@ -257,7 +257,25 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
        <item>
         <widget class="QListWidget" name="lstParticipants">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabSessionTypes">
+      <attribute name="icon">
+       <iconset resource="../../resources/TeraClient.qrc">
+        <normaloff>:/icons/session.png</normaloff>:/icons/session.png</iconset>
+      </attribute>
+      <attribute name="title">
+       <string>Types de séances</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QListWidget" name="lstSessionTypes">
+         <property name="enabled">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

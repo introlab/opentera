@@ -26,6 +26,7 @@ private:
     QMap<int, QListWidgetItem*>  m_listSites_items;
     QMap<int, QListWidgetItem*>  m_listDeviceSites_items;
     QMap<int, QListWidgetItem*>  m_listParticipants_items;
+    QMap<int, QListWidgetItem*>  m_listSessionTypes_items;
 
     void updateControlsState();
     void updateFieldsValue();
@@ -35,12 +36,14 @@ private:
 
     void updateSite(TeraData *site);
     void updateParticipant(TeraData *participant);
+    void updateSessionType(TeraData *session_type);
 
 private slots:
     void processFormsReply(QString form_type, QString data);
     void processSitesReply(QList<TeraData> sites);
     void processDeviceSitesReply(QList<TeraData> device_sites);
     void processDeviceParticipantsReply(QList<TeraData> device_parts);
+    void processSessionTypesReply(QList<TeraData> session_types);
 
     void btnSave_clicked();
     void btnUndo_clicked();

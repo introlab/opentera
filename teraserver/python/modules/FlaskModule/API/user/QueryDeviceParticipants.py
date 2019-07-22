@@ -70,7 +70,7 @@ class QueryDeviceParticipants(Resource):
 
         # Validate if we have an id
         for json_device_part in json_device_parts:
-            if 'id_participant' not in json_device_part and 'id_device' not in json_device_part:
+            if 'id_participant' not in json_device_part or 'id_device' not in json_device_part:
                 return '', 400
 
             # Check if current user can modify the posted device

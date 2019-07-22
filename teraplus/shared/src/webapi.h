@@ -16,6 +16,7 @@
 #define WEB_GROUPINFO_PATH                  "/api/user/groups"
 #define WEB_SESSIONINFO_PATH                "/api/user/sessions"
 #define WEB_SESSIONTYPE_PATH                "/api/user/sessiontypes"
+#define WEB_SESSIONTYPEDEVICETYPE_PATH      "/api/user/sessiontypedevicetypes"
 
 #define WEB_FORMS_PATH                  "/api/user/forms"
 #define WEB_FORMS_QUERY_USER_PROFILE    "type=user_profile"
@@ -36,6 +37,7 @@
 #define WEB_QUERY_ID_PARTICIPANT    "id_participant"
 #define WEB_QUERY_ID_PROJECT        "id_project"
 #define WEB_QUERY_ID_DEVICE         "id_device"
+#define WEB_QUERY_ID_DEVICE_TYPE    "id_device_type"
 #define WEB_QUERY_ID_GROUP          "id_group"
 #define WEB_QUERY_ID_SESSION        "id_session"
 

@@ -103,6 +103,7 @@ signals:
     void sessionsReceived(QList<TeraData> sessions_list);
     void deviceSitesReceived(QList<TeraData> device_sites_list);
     void deviceParticipantsReceived(QList<TeraData> device_participants_list);
+    void sessionTypesDeviceTypesReceived(QList<TeraData> session_types_device_types_list);
 
     //void queryResultsReceived(QString object, QUrlQuery url_query, QString data);
     //void postResultsReceived(QString path, QString data);

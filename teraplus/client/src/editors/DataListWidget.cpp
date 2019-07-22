@@ -65,10 +65,17 @@ void DataListWidget::updateDataInList(TeraData* data, bool select_item){
     item->setData(Qt::UserRole, data->getId());
 
     //Customize color and icons, if needed, according to data_type
-    if (m_dataType==TERADATA_USER){
+    /*if (m_dataType==TERADATA_USER){
         if (data->getFieldValue("user_enabled").toBool())
             item->setTextColor(Qt::green);
         else {
+            item->setTextColor(Qt::red);
+        }
+    }*/
+    if (data->hasEnabledField()){
+        if (data->isEnabled()){
+            item->setTextColor(Qt::green);
+        }else{
             item->setTextColor(Qt::red);
         }
     }
