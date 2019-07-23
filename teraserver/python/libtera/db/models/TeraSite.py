@@ -37,7 +37,7 @@ class TeraSite(db.Model, BaseModel):
         return TeraSite.query.filter_by(site_name=sitename).first()
 
     @staticmethod
-    def get_site_by_id(site_id):
+    def get_site_by_id(site_id: int):
         return TeraSite.query.filter_by(id_site=site_id).first()
 
     @staticmethod

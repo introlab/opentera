@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include <QTableWidgetItem>
+
 #include "DataEditorWidget.h"
 #include "GlobalMessageBox.h"
 
@@ -25,14 +27,19 @@ public:
 private:
     Ui::GroupWidget *ui;
 
+    QMap<int, QTableWidgetItem*> m_listParticipants_items;
+
     void updateControlsState();
     void updateFieldsValue();
+
+    void updateParticipant(TeraData* participant);
 
     bool validateData();
 
 private slots:
     void processFormsReply(QString form_type, QString data);
     void postResultReply(QString path);
+    void processParticipants(QList<TeraData> participants);
 
     void btnSave_clicked();
     void btnUndo_clicked();

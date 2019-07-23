@@ -85,7 +85,7 @@ void SiteWidget::connectSignals()
     connect(ui->btnUndo, &QPushButton::clicked, this, &SiteWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &SiteWidget::btnSave_clicked);
     connect(ui->btnUpdateRoles, &QPushButton::clicked, this, &SiteWidget::btnUpdateAccess_clicked);
-    connect(ui->btnProjects, &QPushButton::clicked, this, &SiteWidget::btnProjects_clicked);
+    //connect(ui->btnProjects, &QPushButton::clicked, this, &SiteWidget::btnProjects_clicked);
     connect(ui->btnDevices, &QPushButton::clicked, this, &SiteWidget::btnDevices_clicked);
     connect(ui->btnUsers, &QPushButton::clicked, this, &SiteWidget::btnUsers_clicked);
 
@@ -200,7 +200,7 @@ void SiteWidget::updateControlsState()
 {
     ui->btnDevices->setVisible(!m_limited);
     ui->btnUsers->setVisible(!m_limited);
-    ui->btnProjects->setVisible(!m_limited);
+    //ui->btnProjects->setVisible(!m_limited);
 
 }
 
@@ -348,15 +348,14 @@ void SiteWidget::btnProjects_clicked()
     if (m_diag_editor){
         m_diag_editor->deleteLater();
     }
-   /* m_diag_editor = new QDialog(this);
-    UserWidget* user_editor = new UserWidget(m_comManager, &(m_comManager->getCurrentUser()), m_diag_editor);
-    user_editor->setLimited(true);
-    connect(user_editor, &UserWidget::closeRequest, m_diag_editor, &QDialog::accept);
-    connect(m_diag_editor, &QDialog::finished, this, &MainWindow::editorDialogFinished);
 
-    m_diag_editor->setWindowTitle(tr("Votre compte"));
+    m_diag_editor = new QDialog(this);
+    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_PROJECT, m_diag_editor);
+    Q_UNUSED(list_widget)
 
-    m_diag_editor->open();*/
+    m_diag_editor->setWindowTitle(tr("Projets"));
+
+    m_diag_editor->open();
 }
 
 void SiteWidget::btnDevices_clicked()

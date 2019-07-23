@@ -206,7 +206,7 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
        <item>
         <widget class="QListWidget" name="lstProjects">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
@@ -225,32 +225,6 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="btnProjects">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>32</height>
-          </size>
-         </property>
-         <property name="cursor">
-          <cursorShape>PointingHandCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string>Gérer les projets</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../resources/TeraClient.qrc">
-           <normaloff>:/icons/project.png</normaloff>:/icons/project.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>24</width>
-           <height>24</height>
-          </size>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tabDevices">
@@ -265,13 +239,16 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
        <item>
         <widget class="QTableWidget" name="lstDevices">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
          </property>
          <property name="gridStyle">
           <enum>Qt::SolidLine</enum>

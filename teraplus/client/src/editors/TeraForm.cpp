@@ -217,6 +217,42 @@ TeraData* TeraForm::getFormDataObject(const TeraDataTypes data_type)
     return rval;
 }
 
+QColor TeraForm::getGradientColor(const int &lower_thresh, const int &middle_thresh, const int &higher_thresh, const int &value)
+{
+    QColor lower_color = QColor(Qt::green).toHsv();
+    QColor middle_color = QColor(232, 97, 0).toHsv(); // orange
+    QColor higger_color = QColor(Qt::red).toHsv();
+
+    QColor grad_color;
+    qreal hue;
+    qreal sat;
+    qreal val;
+
+    int current_value = value;
+
+    if (current_value < lower_thresh)
+        current_value = lower_thresh;
+    if (current_value > higher_thresh)
+        current_value = higher_thresh;
+
+    if (current_value <= middle_thresh){
+        qreal ratio = static_cast<qreal>(current_value-lower_thresh) / middle_thresh;
+        hue = doLinearInterpolation(lower_color.hueF(), middle_color.hueF(), ratio);
+        sat = doLinearInterpolation(lower_color.saturationF(), middle_color.saturationF(), ratio);
+        val = doLinearInterpolation(lower_color.valueF(), middle_color.valueF(), ratio);
+    }else{
+        qreal ratio = static_cast<qreal>(current_value-middle_thresh) / static_cast<qreal>(higher_thresh-middle_thresh);
+        hue = doLinearInterpolation(middle_color.hueF(), higger_color.hueF(), ratio);
+        sat = doLinearInterpolation(middle_color.saturationF(), higger_color.saturationF(), ratio);
+        val = doLinearInterpolation(middle_color.valueF(), higger_color.valueF(), ratio);
+    }
+
+    grad_color.setHsvF(hue, sat, val);
+
+    return grad_color;
+
+}
+
 bool TeraForm::formHasData()
 {
     return !m_initialValues.isEmpty();
@@ -228,7 +264,7 @@ void TeraForm::resetFormValues()
         if (m_widgets.contains(field)){
             setWidgetValue(m_widgets[field], m_initialValues[field]);
         } else{
-           LOG_WARNING("No widget for field: " + field, "TeraForm::fillFormFromData");
+           LOG_WARNING("No widget for field: " + field, "TeraForm::resetFormValues");
         }
     }
 
@@ -820,6 +856,11 @@ bool TeraForm::validateWidget(QWidget *widget, bool include_hidden)
         widget->setStyleSheet("background-color: #ffaaaa;");
     }
     return rval;
+}
+
+qreal TeraForm::doLinearInterpolation(const qreal &p1, const qreal &p2, const qreal &value)
+{
+    return (p1 + (p2-p1)*value);
 }
 
 void TeraForm::widgetValueChanged()

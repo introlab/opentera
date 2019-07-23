@@ -136,6 +136,7 @@ void ParticipantWidget::updateSession(TeraData *session)
         status_item = new QTableWidgetItem("");
         ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 3, status_item);
         duration_item = new QTableWidgetItem("");
+        duration_item->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
         ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 4, duration_item);
         user_item = new QTableWidgetItem("");
         ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 5, user_item);
@@ -146,7 +147,8 @@ void ParticipantWidget::updateSession(TeraData *session)
 
     // Update values
     name_item->setText(session->getName());
-    date_item->setText(session->getFieldValue("session_start_datetime").toDateTime().toString("dd-MM-yyyy hh:mm:ss"));
+    QDateTime session_date = session->getFieldValue("session_start_datetime").toDateTime();
+    date_item->setText(session_date.toString("dd-MM-yyyy hh:mm:ss"));
     int session_type = session->getFieldValue("id_session_type").toInt();
     if (m_ids_session_types.contains(session_type)){
         type_item->setText(m_ids_session_types[session_type]->getFieldValue("session_type_name").toString());
@@ -155,13 +157,26 @@ void ParticipantWidget::updateSession(TeraData *session)
         type_item->setText("Inconnu");
     }
     duration_item->setText(QTime(0,0).addSecs(session->getFieldValue("session_duration").toInt()).toString("hh:mm:ss"));
-    user_item->setText(session->getFieldValue("session_user").toString());
     TeraSessionStatus::SessionStatus session_status = static_cast<TeraSessionStatus::SessionStatus>(session->getFieldValue("session_status").toInt());
     status_item->setText(TeraSessionStatus::getStatusName(session_status));
     // Set color depending on status_item
     //status_item->setTextColor(QColor(TeraSessionStatus::getStatusColor(session_status)));
     status_item->setTextColor(Qt::black);
     status_item->setBackgroundColor(QColor(TeraSessionStatus::getStatusColor(session_status)));
+    //QColor back_color = TeraForm::getGradientColor(3, 18, 33, static_cast<int>(session_date.daysTo(QDateTime::currentDateTime())));
+    //back_color.setAlphaF(0.5);
+    //date_item->setBackgroundColor(back_color);
+
+    // Session creator
+    if (!session->getFieldValue("session_creator_user").isNull())
+        user_item->setText(session->getFieldValue("session_creator_user").toString());
+    else if(!session->getFieldValue("session_creator_device").isNull())
+        user_item->setText(tr("Appareil: ") + session->getFieldValue("session_creator_device").toString());
+    else if(!session->getFieldValue("session_creator_participant").isNull())
+        user_item->setText(tr("Participant: ") + session->getFieldValue("session_creator_participant").toString());
+    else {
+        user_item->setText(tr("Inconnu"));
+    }
 
     ui->tableSessions->resizeColumnsToContents();
 }

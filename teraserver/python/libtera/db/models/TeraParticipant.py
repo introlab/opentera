@@ -15,6 +15,7 @@ class TeraParticipant(db.Model, BaseModel):
     participant_name = db.Column(db.String, nullable=False)
     participant_token = db.Column(db.String, nullable=False, unique=True)
     participant_lastonline = db.Column(db.TIMESTAMP, nullable=True)
+    participant_enabled = db.Column(db.Boolean, nullable=False, default=True)
     id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group',
                                                                ondelete='cascade'),
                                      nullable=False)

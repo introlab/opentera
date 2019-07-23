@@ -249,6 +249,7 @@ QString TeraData::getIconFilenameForDataType(const TeraDataTypes &data_type)
     }
 
 }
+
 /*
 bool TeraData::hasMetaProperty(const QString &fieldName) const
 {

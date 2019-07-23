@@ -46,9 +46,12 @@ class QuerySites(Resource):
                         sites.append(site)
         elif args['id_site']:
             if args['id_site'] in user_access.get_accessible_sites_ids():
-                sites = sites.append(TeraSite.get_site_by_id(site_id=args['id_site']))
+                sites = [TeraSite.get_site_by_id(site_id=args['id_site'])]
         elif args['id_device']:
             sites = user_access.query_sites_for_device(args['id_device'])
+
+        if sites is None:
+            sites = []
 
         try:
             sites_list = []

@@ -59,6 +59,8 @@ public:
     QJsonDocument getFormDataJson(bool include_unmodified_data=false);
     TeraData *getFormDataObject(const TeraDataTypes data_type);
 
+    static QColor getGradientColor(const int& lower_thresh, const int& middle_thresh, const int& higher_thresh, const int& value);
+
 private:
     Ui::TeraForm*                                   ui;
     QMap<QString, QWidget*>                         m_widgets;
@@ -90,6 +92,8 @@ private:
     void setWidgetValue(QWidget* widget, const QVariant& value);
 
     bool validateWidget(QWidget* widget, bool include_hidden=false);
+
+    static qreal doLinearInterpolation(const qreal &p1, const qreal &p2, const qreal &value);
 
 private slots:
     void widgetValueChanged();

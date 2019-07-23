@@ -81,16 +81,20 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
      margin-top: 2px; /* make non-selected tabs look smaller */
  }
 
-QToolBox{background-color:  rgba(128,128,140,25%);}
+QToolBox{background-color:  rgba(128,150,150,25%);}
 
 QToolBox::tab {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 grey, stop: 0.2  black, stop:1 grey);
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 blue, stop: 0.2  darkblue, stop:1 blue);
     border-radius: 5px;
     color: darkgray;
 }
 
-QToolBox::tab:selected { /* italicize selected tabs */
+QToolBox::tab:selected {
     font: bold;
+    color: white;
+}
+
+QToolBox::tab:!selected {
     color: white;
 }
 

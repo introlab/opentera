@@ -63,8 +63,11 @@ void ProjectWidget::setData(const TeraData *data)
         args.addQueryItem(WEB_QUERY_ID_PROJECT, QString::number(data->getFieldValue("id_project").toInt()));
         args.addQueryItem(WEB_QUERY_LIST, "");
         queryDataRequest(WEB_GROUPINFO_PATH, args);
-        queryDataRequest(WEB_DEVICEINFO_PATH, args);
 
+        args = QUrlQuery();
+        args.addQueryItem(WEB_QUERY_ID_SITE, QString::number(data->getFieldValue("id_site").toInt()));
+        args.addQueryItem(WEB_QUERY_PARTICIPANTS, "");
+        queryDataRequest(WEB_DEVICEINFO_PATH, args);
     }else{
         ui->tabProjectInfos->setEnabled(false);
     }
@@ -81,7 +84,7 @@ void ProjectWidget::connectSignals()
     connect(ui->btnUndo, &QPushButton::clicked, this, &ProjectWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &ProjectWidget::btnSave_clicked);
     connect(ui->btnUpdateRoles, &QPushButton::clicked, this, &ProjectWidget::btnUpdateAccess_clicked);
-    connect(ui->btnDevices, &QPushButton::clicked, this, &ProjectWidget::btnDevices_clicked);
+    //connect(ui->btnDevices, &QPushButton::clicked, this, &ProjectWidget::btnDevices_clicked);
     connect(ui->btnUsers, &QPushButton::clicked, this, &ProjectWidget::btnUsers_clicked);
 
 }
@@ -140,6 +143,7 @@ void ProjectWidget::updateDevice(const TeraData *device)
 {
     int id_device = device->getId();
     QString participants_string = tr("Aucun");
+    int part_count = 0;
 
     // Build participant string if availables
     if (device->hasFieldName("device_participants")){
@@ -147,11 +151,19 @@ void ProjectWidget::updateDevice(const TeraData *device)
         participants_string = "";
         for (int i=0; i<participants.count(); i++){
             QVariantMap part_info = participants.at(i).toMap();
-            participants_string += part_info["participant_name"].toString();
-            if (i<participants.count()-1)
-                participants_string += ", ";
+            // Only consider participants of that project.
+            if (part_info["id_project"].toInt() == m_data->getId()){
+                if (part_count>0)
+                    participants_string += ", ";
+                participants_string += part_info["participant_name"].toString();
+                part_count++;
+            }
         }
     }
+
+    // Ignore devices without any participant in that project
+    if (participants_string.isEmpty())
+        return;
 
     if (m_listDevices_items.contains(id_device)){
         QTableWidgetItem* item = m_listDevices_items[id_device];
@@ -173,7 +185,7 @@ void ProjectWidget::updateDevice(const TeraData *device)
 
 void ProjectWidget::updateControlsState()
 {
-    ui->btnDevices->setVisible(!m_limited);
+    //ui->btnDevices->setVisible(!m_limited);
     ui->btnUsers->setVisible(!m_limited);
     ui->frameButtons->setVisible(!m_limited);
     ui->btnUpdateRoles->setVisible(!m_limited);
@@ -254,9 +266,9 @@ void ProjectWidget::processDevicesReply(QList<TeraData> devices)
         return;
 
     for (int i=0; i<devices.count(); i++){
-        if (devices.at(i).getFieldValue("id_project").toInt() == m_data->getId()/*m_listProjects_items.contains(kits.at(i).getFieldValue("id_project").toInt())*/){
+        //if (devices.at(i).getFieldValue("id_project").toInt() == m_data->getId()){
             updateDevice(&devices.at(i));
-        }
+        //}
     }
 
 }

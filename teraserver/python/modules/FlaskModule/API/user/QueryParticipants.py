@@ -71,6 +71,16 @@ class QueryParticipants(Resource):
                     if args['id_participant']:
                         # Adds project information to participant
                         participant_json['id_project'] = participant.participant_participant_group.id_project
+                    if args['id_group']:
+                        # Adds last session information to participant
+                        participant_sessions = TeraSession.get_sessions_for_participant(
+                            part_id=participant.id_participant)
+                        if participant_sessions:
+                            participant_json['participant_lastsession'] = \
+                                participant_sessions[-1].session_start_datetime.isoformat()
+                        else:
+                            participant_json['participant_lastsession'] = None
+
                     participant_list.append(participant_json)
                 else:
                     participant_json = participant.to_json(minimal=True)
