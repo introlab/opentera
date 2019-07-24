@@ -71,6 +71,9 @@ class QueryParticipants(Resource):
                     if args['id_participant']:
                         # Adds project information to participant
                         participant_json['id_project'] = participant.participant_participant_group.id_project
+                        # Adds site information do participant
+                        participant_json['id_site'] = participant.participant_participant_group.\
+                            participant_group_project.id_site
                     if args['id_group']:
                         # Adds last session information to participant
                         participant_sessions = TeraSession.get_sessions_for_participant(

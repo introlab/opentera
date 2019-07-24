@@ -47,6 +47,7 @@ class QueryDeviceSites(Resource):
                 if args['list'] is None:
                     json_ds['site_name'] = ds.device_site_site.site_name
                     json_ds['device_name'] = ds.device_site_device.device_name
+                    json_ds['device_available'] = not ds.device_site_device.device_participants
                 device_site_list.append(json_ds)
 
             return jsonify(device_site_list)

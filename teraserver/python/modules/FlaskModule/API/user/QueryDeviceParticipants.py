@@ -23,6 +23,7 @@ class QueryDeviceParticipants(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id_device', type=int, help='id_device')
         parser.add_argument('id_participant', type=int, help='id_participant')
+        parser.add_argument('id_site', type=int, help='id_site')
         parser.add_argument('list', type=bool)
 
         args = parser.parse_args()
@@ -35,11 +36,14 @@ class QueryDeviceParticipants(Resource):
         if args['id_device']:
             if args['id_device'] in user_access.get_accessible_devices_ids():
                 device_part = TeraDeviceParticipant.query_participants_for_device(device_id=args['id_device'])
-        else:
-            if args['id_participant']:
-                if args['id_participant'] in user_access.get_accessible_participants_ids():
-                    device_part = TeraDeviceParticipant.query_devices_for_participant(
-                        participant_id=args['id_participant'])
+        elif args['id_participant']:
+            if args['id_participant'] in user_access.get_accessible_participants_ids():
+                device_part = TeraDeviceParticipant.query_devices_for_participant(
+                    participant_id=args['id_participant'])
+        elif args['id_site']:
+            # Get devices and participants for that specific site
+            device_part = user_access.query_device_participants_for_site(site_id=args['id_site'])
+
         try:
             device_part_list = []
             for dp in device_part:
@@ -104,6 +108,9 @@ class QueryDeviceParticipants(Resource):
                     TeraDeviceParticipant.insert_device_participant(new_device_part)
                     # Update ID for further use
                     json_device_part['id_device_participant'] = new_device_part.id_device_participant
+                    json_device_part['participant_name'] = new_device_part.device_participant_participant.\
+                        participant_name
+                    json_device_part['device_name'] = new_device_part.device_participant_device.device_name
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())

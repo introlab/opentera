@@ -15,6 +15,7 @@ set(headers
     GlobalMessageBox.h
     ConfigWidget.h
     HistoryCalendarWidget.h
+    DeviceAssignDialog.h
     editors/DataEditorWidget.h
     editors/UserWidget.h
     editors/TeraForm.h
@@ -41,6 +42,7 @@ set(srcs
     GlobalMessageBox.cpp
     ConfigWidget.cpp
     HistoryCalendarWidget.cpp
+    DeviceAssignDialog.cpp
     editors/DataEditorWidget.cpp
     editors/UserWidget.cpp
     editors/TeraForm.cpp
@@ -60,6 +62,7 @@ SET(uis
     ProjectNavigator.ui
     notification.ui
     ConfigWidget.ui
+    DeviceAssignDialog.ui
     editors/UserWidget.ui
     editors/TeraForm.ui
     editors/DataListWidget.ui

@@ -209,15 +209,16 @@ TeraDataTypes TeraData::getDataTypeFromPath(const QString &path)
 
 QString TeraData::getPathForDataType(const TeraDataTypes &data_type)
 {
-    if (data_type==TERADATA_USER)           return WEB_USERINFO_PATH;
-    if (data_type==TERADATA_SITE)           return WEB_SITEINFO_PATH;
-    if (data_type==TERADATA_PROJECT)        return WEB_PROJECTINFO_PATH;
-    if (data_type==TERADATA_DEVICE)         return WEB_DEVICEINFO_PATH;
-    if (data_type==TERADATA_PARTICIPANT)    return WEB_PARTICIPANTINFO_PATH;
-    if (data_type==TERADATA_PROJECTACCESS)  return WEB_PROJECTACCESS_PATH;
-    if (data_type==TERADATA_GROUP)          return WEB_GROUPINFO_PATH;
-    if (data_type==TERADATA_SESSION)        return WEB_SESSIONINFO_PATH;
-    if (data_type==TERADATA_SESSIONTYPE)    return WEB_SESSIONTYPE_PATH;
+    if (data_type==TERADATA_USER)               return WEB_USERINFO_PATH;
+    if (data_type==TERADATA_SITE)               return WEB_SITEINFO_PATH;
+    if (data_type==TERADATA_PROJECT)            return WEB_PROJECTINFO_PATH;
+    if (data_type==TERADATA_DEVICE)             return WEB_DEVICEINFO_PATH;
+    if (data_type==TERADATA_PARTICIPANT)        return WEB_PARTICIPANTINFO_PATH;
+    if (data_type==TERADATA_PROJECTACCESS)      return WEB_PROJECTACCESS_PATH;
+    if (data_type==TERADATA_GROUP)              return WEB_GROUPINFO_PATH;
+    if (data_type==TERADATA_SESSION)            return WEB_SESSIONINFO_PATH;
+    if (data_type==TERADATA_SESSIONTYPE)        return WEB_SESSIONTYPE_PATH;
+    if (data_type==TERADATA_DEVICEPARTICIPANT)  return WEB_DEVICEPARTICIPANTINFO_PATH;
 
     LOG_ERROR("Unknown path for data_type: " + getDataTypeName(data_type), "TeraData::getPathForDataType");
 

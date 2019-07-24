@@ -596,7 +596,7 @@ void TeraForm::checkConditionsForItem(QWidget *item)
                 if (check_item){
                     if (check_item->property("condition").isValid())
                         checkConditionsForItem(check_item);
-                    if (check_item->isHidden()){
+                    if (check_item->isHidden() && check_item->property("item_type").toString()!="hidden"){
                         setWidgetVisibility(item, check_item, false);
                         return;
                     }
@@ -614,6 +614,15 @@ void TeraForm::checkConditionsForItem(QWidget *item)
                         if (sender_index == value || sender_value == value){
                             condition_met = true;
                         }
+                    }
+                    if (op == "<>"){
+                        if (sender_index != value || sender_value != value){
+                            condition_met = true;
+                        }
+                    }
+                    if (op.toUpper() == "NOT NULL"){
+                        if (!sender_index.isNull() || !sender_value.isNull())
+                            condition_met = true;
                     }
 
                     // Hide/show that item

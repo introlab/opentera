@@ -22,6 +22,7 @@ class TeraParticipantForm:
         # Items
         section.add_item(TeraFormItem("id_participant", gettext("ID Participant"), "hidden", True))
         section.add_item(TeraFormItem("id_project", gettext("ID Projet"), "hidden", True))
+        section.add_item(TeraFormItem("id_site", gettext("ID Site"), "hidden", True))
         section.add_item(TeraFormItem("participant_uuid", gettext("UUID Participant"), "hidden", True))
         section.add_item(TeraFormItem("participant_name", gettext("Nom Participant"), "text", True))
         section.add_item(TeraFormItem("participant_enabled", gettext("Participant actif"), "boolean", True))

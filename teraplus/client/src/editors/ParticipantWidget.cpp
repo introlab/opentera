@@ -30,11 +30,15 @@ ParticipantWidget::ParticipantWidget(ComManager *comMan, const TeraData *data, Q
     // Query sessions types
     queryDataRequest(WEB_SESSIONTYPE_PATH);
 
-    // Query kits for that participant
+    // Query devices for that participant
     QUrlQuery query;
     query.addQueryItem(WEB_QUERY_ID_PARTICIPANT, QString::number(m_data->getId()));
-    query.addQueryItem(WEB_QUERY_LIST,"");
-    queryDataRequest(WEB_DEVICEINFO_PATH, query);
+    queryDataRequest(WEB_DEVICEPARTICIPANTINFO_PATH, query);
+
+    // Query devices for the current site
+    query.removeQueryItem(WEB_QUERY_ID_PARTICIPANT);
+    query.addQueryItem(WEB_QUERY_ID_SITE, QString::number(m_data->getFieldValue("id_site").toInt()));
+    queryDataRequest(WEB_DEVICESITEINFO_PATH, query);
 }
 
 ParticipantWidget::~ParticipantWidget()
@@ -64,18 +68,24 @@ void ParticipantWidget::connectSignals()
     connect(m_comManager, &ComManager::formReceived, this, &ParticipantWidget::processFormsReply);
     connect(m_comManager, &ComManager::sessionsReceived, this, &ParticipantWidget::processSessionsReply);
     connect(m_comManager, &ComManager::sessionTypesReceived, this, &ParticipantWidget::processSessionTypesReply);
-    connect(m_comManager, &ComManager::devicesReceived, this, &ParticipantWidget::processDevicesReply);
+    connect(m_comManager, &ComManager::deviceSitesReceived, this, &ParticipantWidget::processDeviceSitesReply);
+    connect(m_comManager, &ComManager::deviceParticipantsReceived, this, &ParticipantWidget::processDeviceParticipantsReply);
     connect(m_comManager, &ComManager::deleteResultsOK, this, &ParticipantWidget::deleteDataReply);
 
     connect(ui->btnUndo, &QPushButton::clicked, this, &ParticipantWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &ParticipantWidget::btnSave_clicked);
-    connect(ui->btnDevices, &QPushButton::clicked, this, &ParticipantWidget::btnDevices_clicked);
     connect(ui->btnDelSession, &QPushButton::clicked, this, &ParticipantWidget::btnDeleteSession_clicked);
+    connect(ui->btnAddDevice, &QPushButton::clicked, this, &ParticipantWidget::btnAddDevice_clicked);
+    connect(ui->btnDelDevice, &QPushButton::clicked, this, &ParticipantWidget::btnDelDevice_clicked);
+
     connect(ui->tableSessions, &QTableWidget::currentItemChanged, this, &ParticipantWidget::currentSelectedSessionChanged);
     connect(ui->tableSessions, &QTableWidget::itemDoubleClicked, this, &ParticipantWidget::displaySessionDetails);
     connect(ui->lstFilters, &QListWidget::itemChanged, this, &ParticipantWidget::currentTypeFiltersChanged);
     connect(ui->btnNextCal, &QPushButton::clicked, this, &ParticipantWidget::displayNextMonth);
     connect(ui->btnPrevCal, &QPushButton::clicked, this, &ParticipantWidget::displayPreviousMonth);
+
+    connect(ui->lstAvailDevices, &QListWidget::currentItemChanged, this, &ParticipantWidget::currentAvailDeviceChanged);
+    connect(ui->lstDevices, &QListWidget::currentItemChanged, this, &ParticipantWidget::currentDeviceChanged);
 }
 
 void ParticipantWidget::updateControlsState()
@@ -181,31 +191,64 @@ void ParticipantWidget::updateSession(TeraData *session)
     ui->tableSessions->resizeColumnsToContents();
 }
 
-void ParticipantWidget::updateDevice(TeraData *device)
+void ParticipantWidget::updateDeviceSite(TeraData *device_site)
 {
-    QListWidgetItem* item = nullptr;
-    for(int i=0; i<ui->lstDevices->count(); i++){
-        int device_id = ui->lstDevices->item(i)->data(Qt::UserRole).toInt();
-        if (device_id == device->getId()){
-            // Device already present
-            item = ui->lstDevices->item(i);
-            break;
-        }
+    int id_device = device_site->getFieldValue("id_device").toInt();
+
+    // Check if device is already assigned to this participant
+    if (m_listDevices_items.contains(id_device)){
+        // It is - return
+        return;
     }
 
-    QString device_name = device->getName();
-    if (device_name.isEmpty())
-        device_name = tr("(Appareil sans nom)");
+    QListWidgetItem* item;
+    // Check if device already exists in available list
+    if (m_listAvailDevices_items.contains(id_device)){
+        item = m_listAvailDevices_items[id_device];
+    }else{
+        // Must create a new item
+        item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_DEVICE)),"");
+        ui->lstAvailDevices->addItem(item);
+        m_listAvailDevices_items[id_device] = item;
+    }
 
-    // New Device?
-    if (!item){
-        item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_DEVICE)), device_name);
-        item->setData(Qt::UserRole, device->getId());
+    // Update values
+    item->setText(device_site->getFieldValue("device_name").toString());
+    if (device_site->hasFieldName("device_available")){
+        if (!device_site->getFieldValue("device_available").toBool())
+            item->setIcon(QIcon("://icons/device_installed.png"));
+        else
+            item->setIcon(QIcon(TeraData::getIconFilenameForDataType(TERADATA_DEVICE)));
+        item->setData(Qt::UserRole, device_site->getFieldValue("device_available").toBool());
+    }
+}
+
+void ParticipantWidget::updateDeviceParticipant(TeraData *device_participant)
+{
+    int id_device = device_participant->getFieldValue("id_device").toInt();
+    QListWidgetItem* item;
+
+    // Check if device is in the available list
+    if (m_listAvailDevices_items.contains(id_device)){
+        // It is - remove it from the list
+        ui->lstAvailDevices->removeItemWidget(m_listAvailDevices_items[id_device]);
+        delete m_listAvailDevices_items[id_device];
+        m_listAvailDevices_items.remove(id_device);
+    }
+
+    // Check if device already exists in participant list
+    if (m_listDevices_items.contains(id_device)){
+        item = m_listDevices_items[id_device];
+    }else{
+        // Must create a new item
+        item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_DEVICE)),"");
         ui->lstDevices->addItem(item);
+        m_listDevices_items[id_device] = item;
+        item->setData(Qt::UserRole, device_participant->getId());
     }
 
-    // Update device name
-    item->setText(device_name);
+    // Update values
+    item->setText(device_participant->getFieldValue("device_name").toString());
 }
 
 void ParticipantWidget::processFormsReply(QString form_type, QString data)
@@ -279,20 +322,24 @@ void ParticipantWidget::processSessionTypesReply(QList<TeraData> session_types)
     }
 }
 
-void ParticipantWidget::processDevicesReply(QList<TeraData> devices)
+void ParticipantWidget::processDeviceSitesReply(QList<TeraData> device_sites)
 {
-    for(TeraData device:devices){
-        if (device.hasFieldName("device_participants")){
-            QVariantList device_parts = device.getFieldValue("device_participants").toList();
+    // Check if device is for us
+    for(TeraData device_site:device_sites){
+        if (device_site.getFieldValue("id_site").toInt() == m_data->getFieldValue("id_site").toInt()){
+            // For us! Update device...
+            updateDeviceSite(&device_site);
+        }
+    }
+}
 
-            for (int i=0; i<device_parts.count(); i++){
-                QVariantMap part_info = device_parts.at(i).toMap();
-                if (part_info["id_participant"].toInt() == m_data->getId()){
-                    // Kit is for the current participant
-                    updateDevice(&device);
-                    break;
-                }
-            }
+void ParticipantWidget::processDeviceParticipantsReply(QList<TeraData> device_participants)
+{
+    // Check if device is for us
+    for(TeraData device_part:device_participants){
+        if (device_part.getFieldValue("id_participant").toInt() == m_data->getId()){
+            // For us! Update device...
+            updateDeviceParticipant(&device_part);
         }
     }
 }
@@ -302,13 +349,31 @@ void ParticipantWidget::deleteDataReply(QString path, int id)
     if (id==0)
         return;
 
-    if (path == TeraData::getPathForDataType(TERADATA_SESSION)){
+    if (path == WEB_SESSIONINFO_PATH){
         // A session got deleted - check if it affects the current display
         if (m_listSessions_items.contains(id)){
             ui->tableSessions->removeRow(m_listSessions_items[id]->row());
             delete m_ids_sessions[id];
             m_ids_sessions.remove(id);
             m_listSessions_items.remove(id);
+        }
+    }
+
+    if (path == WEB_DEVICEPARTICIPANTINFO_PATH){
+        // A participant device association was deleted
+        for (QListWidgetItem* item: m_listDevices_items.values()){
+            // Check for id_device_participant, which is stored in "data" of the item
+            if (item->data(Qt::UserRole).toInt() == id){
+                // We found it - remove it and request update
+                m_listDevices_items.remove(m_listDevices_items.key(item));
+                ui->lstDevices->removeItemWidget(item);
+                delete item;
+                // Request refresh of available devices
+                QUrlQuery query;
+                query.addQueryItem(WEB_QUERY_ID_SITE, QString::number(m_data->getFieldValue("id_site").toInt()));
+                queryDataRequest(WEB_DEVICESITEINFO_PATH, query);
+                break;
+            }
         }
     }
 }
@@ -338,20 +403,6 @@ void ParticipantWidget::btnUndo_clicked()
         emit closeRequest();
 }
 
-void ParticipantWidget::btnDevices_clicked()
-{
-    if (m_diag_editor){
-        m_diag_editor->deleteLater();
-    }
-    m_diag_editor = new QDialog(this);
-    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_DEVICE, m_diag_editor);
-    Q_UNUSED(list_widget)
-
-    m_diag_editor->setWindowTitle(tr("Appareils"));
-
-    m_diag_editor->open();
-}
-
 void ParticipantWidget::btnDeleteSession_clicked()
 {
     if (!ui->tableSessions->currentItem())
@@ -364,6 +415,64 @@ void ParticipantWidget::btnDeleteSession_clicked()
     if (answer == QMessageBox::Yes){
         // We must delete!
         m_comManager->doDelete(TeraData::getPathForDataType(TERADATA_SESSION), m_listSessions_items.key(base_item));
+    }
+}
+
+void ParticipantWidget::btnAddDevice_clicked()
+{
+    QListWidgetItem* item_toadd = ui->lstAvailDevices->currentItem();
+
+    if (!item_toadd)
+        return;
+
+    int id_device = m_listAvailDevices_items.key(item_toadd);
+    if (!item_toadd->data(Qt::UserRole).toBool()){
+        // Item is already assigned to at least 1 participant - show dialog.
+        DeviceAssignDialog* diag = new DeviceAssignDialog(m_comManager, id_device, this);
+        diag->exec();
+        qDebug() << diag->result();
+        if (diag->result() == DeviceAssignDialog::DEVICEASSIGN_CANCEL){
+            return;
+        }
+
+        if (diag->result() == DeviceAssignDialog::DEVICEASSIGN_DEASSIGN){
+            // Delete all associated participants
+            for (int id:diag->getDeviceParticipantsIds()){
+                deleteDataRequest(WEB_DEVICEPARTICIPANTINFO_PATH, id);
+            }
+        }
+    }
+
+    // Add device to participant
+    QJsonDocument document;
+    QJsonObject base_obj;
+    QJsonArray devices;
+
+    QJsonObject item_obj;
+    item_obj.insert("id_device", id_device);
+    item_obj.insert("id_participant", m_data->getId());
+
+    // Update query
+    base_obj.insert("device_participant", item_obj);
+    document.setObject(base_obj);
+    postDataRequest(WEB_DEVICEPARTICIPANTINFO_PATH, document.toJson());
+}
+
+void ParticipantWidget::btnDelDevice_clicked()
+{
+    QListWidgetItem* item_todel = ui->lstDevices->currentItem();
+
+    if (!item_todel)
+        return;
+
+    //int id_device = m_listDevices_items.key(item_todel);
+
+    GlobalMessageBox diag;
+    QMessageBox::StandardButton answer = diag.showYesNo(tr("Déassignation?"),
+                                                        tr("Êtes-vous sûrs de vouloir désassigner """) + item_todel->text() + """?");
+    if (answer == QMessageBox::Yes){
+        // We must delete!
+        m_comManager->doDelete(WEB_DEVICEPARTICIPANTINFO_PATH, item_todel->data(Qt::UserRole).toInt());
     }
 }
 
@@ -459,5 +568,17 @@ void ParticipantWidget::displayPreviousMonth(){
     new_date = new_date.addMonths(-1);
 
     updateCalendars(new_date);
+}
+
+void ParticipantWidget::currentAvailDeviceChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    Q_UNUSED(previous)
+    ui->btnAddDevice->setEnabled(current);
+}
+
+void ParticipantWidget::currentDeviceChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    Q_UNUSED(previous)
+    ui->btnDelDevice->setEnabled(current);
 }
 

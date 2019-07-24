@@ -23,6 +23,18 @@ class TeraSessionForm:
         for user in users:
             users_list.append(TeraFormValue(value_id=user.id_user, value=user.get_fullname()))
 
+        # Devices
+        devices = user_access.get_accessible_devices()
+        devices_list = list()
+        for device in devices:
+            devices_list.append(TeraFormValue(value_id=device.id_device, value=device.device_name))
+
+        # Participants
+        participants = user_access.get_accessible_participants()
+        parts_list = list()
+        for part in participants:
+            parts_list.append(TeraFormValue(value_id=part.id_participant, value=part.participant_name))
+
         # Session status
         status_list = []
         for status in TeraSessionStatus:
@@ -36,7 +48,26 @@ class TeraSessionForm:
         section.add_item(TeraFormItem("id_session", gettext("ID séance"), "hidden", True))
         section.add_item(TeraFormItem("session_name", gettext("Nom de la séance"), "text", True))
         section.add_item(TeraFormItem("id_session_type", gettext("Type de séance"), "array", True, item_values=st_list))
-        section.add_item(TeraFormItem("id_creator_user", gettext("Créateur"), "array", False, item_values=users_list))
+        section.add_item(TeraFormItem('session_creator_user', gettext('Nom créateur (Utilisateur)'), 'hidden', False))
+        section.add_item(TeraFormItem("id_creator_user", gettext("Créateur (Utilisateur)"), "array", True,
+                                      item_values=users_list, item_options={"readonly": True},
+                                      item_condition=TeraFormItemCondition(condition_item='session_creator_user',
+                                                                           condition_operator='NOT NULL',
+                                                                           condition_condition=None)))
+        section.add_item(TeraFormItem('session_creator_device', gettext('Nom créateur (Appareil)'), 'hidden', False))
+        section.add_item(TeraFormItem("id_creator_device", gettext("Créateur (Appareil)"), "array", True,
+                                      item_values=devices_list, item_options={"readonly": True},
+                                      item_condition=TeraFormItemCondition(condition_item='session_creator_device',
+                                                                           condition_operator='NOT NULL',
+                                                                           condition_condition=None)
+                                      ))
+        section.add_item(TeraFormItem('session_creator_participant', gettext('Nom créateur (Participant)'), 'hidden',
+                                      False))
+        section.add_item(TeraFormItem("id_creator_participant", gettext("Créateur (Participant)"), "array", True,
+                                      item_values=parts_list, item_options={"readonly": True},
+                                      item_condition=TeraFormItemCondition(condition_item='session_creator_participant',
+                                                                           condition_operator='NOT NULL',
+                                                                           condition_condition=None)))
         section.add_item(TeraFormItem("session_start_datetime", gettext("Date de début"), "datetime", True))
         section.add_item(TeraFormItem("session_duration", gettext("Durée"), "duration", True,
                                       item_options={"default": 0, "readonly": True}))

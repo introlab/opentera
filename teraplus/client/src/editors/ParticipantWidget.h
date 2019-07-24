@@ -7,6 +7,7 @@
 
 #include "DataEditorWidget.h"
 #include "GlobalMessageBox.h"
+#include "DeviceAssignDialog.h"
 
 #include "TeraSessionStatus.h"
 
@@ -33,6 +34,9 @@ private:
     QMap<int, TeraData*>            m_ids_session_types;
     QMap<int, TeraData*>            m_ids_sessions;
 
+    QMap<int, QListWidgetItem*>     m_listAvailDevices_items;   // int  = device_id
+    QMap<int, QListWidgetItem*>     m_listDevices_items;        // int  = device_id
+
     QDialog*                     m_diag_editor;
 
     void updateControlsState();
@@ -41,27 +45,35 @@ private:
     bool validateData();
 
     void updateSession(TeraData *session);
-    void updateDevice(TeraData* device);
+    void updateDeviceSite(TeraData* device_site);
+    void updateDeviceParticipant(TeraData* device_participant);
 
     void updateCalendars(QDate left_date);
     QDate getMinimumSessionDate();
+
 private slots:
     void processFormsReply(QString form_type, QString data);
     void processSessionsReply(QList<TeraData> sessions);
     void processSessionTypesReply(QList<TeraData> session_types);
-    void processDevicesReply(QList<TeraData> devices);
+    //void processDevicesReply(QList<TeraData> devices);
+    void processDeviceSitesReply(QList<TeraData> device_sites);
+    void processDeviceParticipantsReply(QList<TeraData> device_participants);
     void deleteDataReply(QString path, int id);
 
     void btnSave_clicked();
     void btnUndo_clicked();
-    void btnDevices_clicked();
     void btnDeleteSession_clicked();
+    void btnAddDevice_clicked();
+    void btnDelDevice_clicked();
 
     void currentSelectedSessionChanged(QTableWidgetItem* current, QTableWidgetItem* previous);
     void displaySessionDetails(QTableWidgetItem* session_item);
     void currentTypeFiltersChanged(QListWidgetItem* changed);
     void displayNextMonth();
     void displayPreviousMonth();
+
+    void currentAvailDeviceChanged(QListWidgetItem* current, QListWidgetItem* previous);
+    void currentDeviceChanged(QListWidgetItem* current, QListWidgetItem* previous);
 };
 
 #endif // PARTICIPANTWIDGET_H

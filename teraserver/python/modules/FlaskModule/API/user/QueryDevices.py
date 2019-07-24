@@ -60,11 +60,15 @@ class QueryDevices(Resource):
                         dev_participants = user_access.query_participants_for_device(device.id_device)
                         parts = []
                         for part in dev_participants:
-                            part_info = {'id_participant': part.id_participant}
-                            if args['list'] is None:
-                                part_info['participant_name'] = part.participant_name
-                            part_info['id_project'] = part.participant_participant_group.participant_group_project.\
-                                id_project
+                            part_info = {'id_participant': part.id_participant,
+                                         'participant_name': part.participant_name,
+                                         'id_project':
+                                             part.participant_participant_group.participant_group_project.id_project
+                                         }
+                            # if args['list'] is None:
+                            #    part_info['participant_name'] = part.participant_name
+                            # part_info['id_project'] = part.participant_participant_group.participant_group_project.\
+                            #     id_project
                             if args['list'] is None:
                                 part_info['project_name'] = part.participant_participant_group.participant_group_project\
                                     .project_name
