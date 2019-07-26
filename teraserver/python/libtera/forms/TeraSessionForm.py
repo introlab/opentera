@@ -75,4 +75,7 @@ class TeraSessionForm:
         section.add_item(TeraFormItem("session_status", gettext("État"), "hidden", True, item_values=status_list))
         section.add_item(TeraFormItem("session_comments", gettext("Commentaires"), "longtext", False))
 
+        # Hidden as handled elsewhere
+        section.add_item(TeraFormItem("session_participants_ids", gettext("Participants"), "hidden", False))
+
         return form.to_dict()

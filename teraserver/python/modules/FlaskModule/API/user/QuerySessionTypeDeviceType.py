@@ -90,8 +90,7 @@ class QuerySessionTypeDeviceType(Resource):
             if json_stdt['id_session_type_device_type'] > 0:
                 # Already existing
                 try:
-                    TeraSessionTypeDeviceType.update_session_type_device_type(json_stdt['id_session_type_device_type'],
-                                                                    json_stdt)
+                    TeraSessionTypeDeviceType.update(json_stdt['id_session_type_device_type'], json_stdt)
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
@@ -100,7 +99,7 @@ class QuerySessionTypeDeviceType(Resource):
                 try:
                     new_stdt = TeraSessionTypeDeviceType()
                     new_stdt.from_json(json_stdt)
-                    TeraSessionTypeDeviceType.insert_session_type_device_type(new_stdt)
+                    TeraSessionTypeDeviceType.insert(new_stdt)
                     # Update ID for further use
                     json_stdt['id_session_type_device_type'] = new_stdt.id_session_type_device_type
                 except exc.SQLAlchemyError:
@@ -133,7 +132,7 @@ class QuerySessionTypeDeviceType(Resource):
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraSessionTypeDeviceType.delete_session_type_device_type(id_session_type_device_type=id_todel)
+            TeraSessionTypeDeviceType.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

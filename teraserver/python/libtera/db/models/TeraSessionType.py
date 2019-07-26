@@ -107,33 +107,12 @@ class TeraSessionType(db.Model, BaseModel):
         db.session.commit()
 
     @staticmethod
-    def get_count():
-        count = db.session.query(db.func.count(TeraSessionType.id_session_type))
-        return count.first()[0]
-
-    @staticmethod
     def get_session_type_by_id(ses_type_id: int):
         return TeraSessionType.query.filter_by(id_session_type=ses_type_id).first()
 
     @staticmethod
     def get_session_type_by_prefix(prefix: str):
         return TeraSessionType.query.filter_by(session_type_prefix=prefix).first()
-
-    @staticmethod
-    def update_session_type(id_session_type: int, values={}):
-        TeraSessionType.query.filter_by(id_session_type=id_session_type).update(values)
-        db.session.commit()
-
-    @staticmethod
-    def insert_session_type(session_type):
-        session_type.id_session_type = None
-        db.session.add(session_type)
-        db.session.commit()
-
-    @staticmethod
-    def delete_session_type(id_session_type: int):
-        TeraSessionType.query.filter_by(id_session_type=id_session_type).delete()
-        db.session.commit()
 
     @staticmethod
     def get_category_name(category: SessionCategoryEnum):

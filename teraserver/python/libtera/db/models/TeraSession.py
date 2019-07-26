@@ -3,18 +3,8 @@ from libtera.db.Base import db, BaseModel
 from enum import Enum
 import random
 from datetime import datetime, timedelta
+
 from sqlalchemy import event
-
-
-class TeraSessionParticipants(db.Model, BaseModel):
-    __tablename__ = 't_sessions_participants'
-    id_session_participant = db.Column(db.Integer, db.Sequence('id_session_participant'), primary_key=True,
-                                       autoincrement=True)
-    id_session = db.Column(db.Integer, db.ForeignKey('t_sessions.id_session', ondelete='cascade'))
-    id_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant', ondelete='cascade'))
-
-    session_participant_session = db.relationship('TeraSession')
-    session_participant_participant = db.relationship('TeraParticipant')
 
 
 class TeraSessionStatus(Enum):
@@ -50,7 +40,7 @@ class TeraSession(db.Model, BaseModel):
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['session_participants', 'session_creator_user', 'session_creator_device',
-                              'session_creator_participant', 'session_session_type'])
+                              'session_creator_participant', 'session_session_type', 'session_events'])
         if minimal:
             ignore_fields.extend([])
 
@@ -104,11 +94,6 @@ class TeraSession(db.Model, BaseModel):
         db.session.commit()
 
     @staticmethod
-    def get_count():
-        count = db.session.query(db.func.count(TeraSession.id_session))
-        return count.first()[0]
-
-    @staticmethod
     def get_session_by_id(ses_id: int):
         return TeraSession.query.filter_by(id_session=ses_id).first()
 
@@ -126,20 +111,3 @@ class TeraSession(db.Model, BaseModel):
     @staticmethod
     def get_sessions_for_type(session_type_id: int):
         return TeraSession.query.filter_by(id_session_type=session_type_id).all()
-
-    @staticmethod
-    def update_session(id_session: int, values={}):
-        TeraSession.query.filter_by(id_session=id_session).update(values)
-        db.session.commit()
-
-    @staticmethod
-    def insert_session(session):
-        session.id_session = None
-        db.session.add(session)
-        db.session.commit()
-
-    @staticmethod
-    def delete_session(id_session: int):
-        db.session.delete(TeraSession.query.filter_by(id_session=id_session).first())
-        db.session.commit()
-

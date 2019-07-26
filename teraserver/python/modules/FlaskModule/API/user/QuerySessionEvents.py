@@ -73,7 +73,7 @@ class QuerySessionEvents(Resource):
         if json_event['id_session_event'] > 0:
             # Already existing
             try:
-                TeraSessionEvent.update_session(json_event['id_session_event'], json_event)
+                TeraSessionEvent.update(json_event['id_session_event'], json_event)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -83,7 +83,7 @@ class QuerySessionEvents(Resource):
             try:
                 new_event = TeraSessionEvent()
                 new_event.from_json(json_event)
-                TeraSessionEvent.insert_session_event(new_event)
+                TeraSessionEvent.insert(new_event)
                 # Update ID for further use
                 json_event['id_session_event'] = new_event.id_session
             except exc.SQLAlchemyError:
@@ -116,7 +116,7 @@ class QuerySessionEvents(Resource):
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraSessionEvent.delete_session_event(id_session_event=id_todel)
+            TeraSessionEvent.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

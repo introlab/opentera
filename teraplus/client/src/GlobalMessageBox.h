@@ -15,6 +15,7 @@ public:
     StandardButton showYesNo(const QString& title, const QString& text);
     void showWarning(const QString& title, const QString& text);
     void showError(const QString& title, const QString& text);
+    void showInfo(const QString& title, const QString& text);
 
 
 private:

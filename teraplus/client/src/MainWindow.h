@@ -9,8 +9,11 @@
 #include "editors/UserWidget.h"
 #include "ConfigWidget.h"
 
+#include "DownloadProgressDialog.h"
+
 #include "ComManager.h"
 #include "Message.h"
+#include "DownloadedFile.h"
 
 namespace Ui {
 class MainWindow;
@@ -39,6 +42,9 @@ private slots:
     void com_postReplyOK();
     void com_deleteResultsOK(QString path, int id);
 
+    void com_downloadProgress(DownloadedFile* file);
+    void com_downloadCompleted(DownloadedFile* file);
+
     void addMessage(Message::MessageType msg_type, QString msg);
     void addMessage(const Message& msg);
     bool hasWaitingMessage();
@@ -61,10 +67,11 @@ private:
 
     Ui::MainWindow *ui;
 
-    ComManager*         m_comManager;
-    QDialog*            m_diag_editor;
-    DataEditorWidget*   m_data_editor;
-    TeraDataTypes       m_waiting_for_data_type;
+    ComManager*             m_comManager;
+    QDialog*                m_diag_editor;
+    DataEditorWidget*       m_data_editor;
+    DownloadProgressDialog* m_download_dialog;
+    TeraDataTypes           m_waiting_for_data_type;
 
     // Message system
     QList<Message>  m_messages;

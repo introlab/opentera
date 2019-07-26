@@ -65,19 +65,3 @@ class TeraDeviceParticipant(db.Model, BaseModel):
     @staticmethod
     def query_device_participant_for_participant_device(device_id: int, participant_id: int):
         return TeraDeviceParticipant.query.filter_by(id_device=device_id, id_participant=participant_id).first()
-
-    @staticmethod
-    def update_device_participant(id_device_participant, values={}):
-        TeraDeviceParticipant.query.filter_by(id_device_participant=id_device_participant).update(values)
-        db.session.commit()
-
-    @staticmethod
-    def insert_device_participant(device_participant):
-        device_participant.id_device_participant = None
-        db.session.add(device_participant)
-        db.session.commit()
-
-    @staticmethod
-    def delete_device_participant(id_device_participant):
-        TeraDeviceParticipant.query.filter_by(id_device_participant=id_device_participant).delete()
-        db.session.commit()

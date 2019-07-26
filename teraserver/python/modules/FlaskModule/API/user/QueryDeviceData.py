@@ -1,15 +1,16 @@
 from flask import jsonify, session, request, send_file #send_from_directory
 from flask_restful import Resource, reqparse, inputs
 from modules.Globals import auth
+from modules.FlaskModule.FlaskModule import flask_app
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceData import TeraDeviceData
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from libtera.db.DBManager import DBManager
-import tempfile
-from shutil import copy2
 import zipfile
 from io import BytesIO
+
+
 class QueryDeviceData(Resource):
 
     def __init__(self, flaskModule=None):
@@ -54,6 +55,7 @@ class QueryDeviceData(Resource):
             for data in datas:
                 if data is not None:
                     data_json = data.to_json()
+                    data_json['device_name'] = data.devicedata_device.device_name
                     data_list.append(data_json)
 
             return jsonify(data_list)
@@ -137,25 +139,28 @@ class QueryDeviceData(Resource):
 
     @auth.login_required
     def delete(self):
-        # parser = reqparse.RequestParser()
-        # parser.add_argument('id', type=int, help='ID to delete', required=True)
-        # current_user = TeraUser.get_user_by_uuid(session['user_id'])
-        # user_access = DBManager.userAccess(current_user)
-        #
-        # args = parser.parse_args()
-        # id_todel = args['id']
-        #
-        # # Check if current user can delete
-        # if user_access.query_device_by_id(device_id=id_todel) is None:
-        #     return '', 403
-        #
-        # # If we are here, we are allowed to delete. Do so.
-        # try:
-        #     TeraDevice.delete_device(id_device=id_todel)
-        # except exc.SQLAlchemyError:
-        #     import sys
-        #     print(sys.exc_info())
-        #     return 'Database error', 500
-        #
-        # return '', 200
-        return '', 501
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        user_access = DBManager.userAccess(current_user)
+
+        args = parser.parse_args()
+        id_todel = args['id']
+
+        # Get data in itself to validate we can delete it
+        data = TeraDeviceData.get_data_by_id(id_todel)
+
+        # Check if current user can delete
+        if data.id_device not in user_access.get_accessible_devices_ids(admin_only=True):
+            return '', 403
+
+        # If we are here, we are allowed to delete. Do so.
+        try:
+            data.delete(file_path=flask_app.config['UPLOAD_FOLDER'])
+        except exc.SQLAlchemyError:
+            import sys
+            print(sys.exc_info())
+            return 'Database error', 500
+
+        return '', 200
+

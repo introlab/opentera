@@ -46,6 +46,7 @@ public:
     void fillFormFromData(const QString& structure);
     bool formHasData();
     void resetFormValues();
+    void setHighlightConditions(const bool& hightlight);
 
     bool validateFormData(bool include_hidden=false);
     QStringList getInvalidFormDataLabels(bool include_hidden=false);
@@ -67,6 +68,7 @@ private:
     QMap<QWidget*, QFormLayout::TakeRowResult>      m_hidden_rows;
     QString                                         m_objectType;
     QVariantMap                                     m_initialValues;
+    bool                                            m_highlightConditionals;
 
     void buildFormFromStructure(QWidget* page, const QVariantList &structure);
     void setDefaultValues();

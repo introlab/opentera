@@ -28,11 +28,6 @@ class TeraSite(db.Model, BaseModel):
         db.session.commit()
 
     @staticmethod
-    def get_count():
-        count = db.session.query(db.func.count(TeraSite.id_site))
-        return count.first()[0]
-
-    @staticmethod
     def get_site_by_sitename(sitename):
         return TeraSite.query.filter_by(site_name=sitename).first()
 
@@ -47,20 +42,3 @@ class TeraSite(db.Model, BaseModel):
         if isinstance(filter_args, dict):
             return TeraSite.query.filter_by(**filter_args).all()
         return None
-
-    @staticmethod
-    def update_site(id_site, values={}):
-        TeraSite.query.filter_by(id_site=id_site).update(values)
-        db.session.commit()
-
-    @staticmethod
-    def insert_site(site):
-        site.id_site = None
-
-        db.session.add(site)
-        db.session.commit()
-
-    @staticmethod
-    def delete_site(id_site):
-        TeraSite.query.filter_by(id_site=id_site).delete()
-        db.session.commit()

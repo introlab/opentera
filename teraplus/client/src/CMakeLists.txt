@@ -16,6 +16,8 @@ set(headers
     ConfigWidget.h
     HistoryCalendarWidget.h
     DeviceAssignDialog.h
+    DownloadedFile.h
+    DownloadProgressDialog.h
     editors/DataEditorWidget.h
     editors/UserWidget.h
     editors/TeraForm.h
@@ -43,6 +45,8 @@ set(srcs
     ConfigWidget.cpp
     HistoryCalendarWidget.cpp
     DeviceAssignDialog.cpp
+    DownloadedFile.cpp
+    DownloadProgressDialog.cpp
     editors/DataEditorWidget.cpp
     editors/UserWidget.cpp
     editors/TeraForm.cpp
@@ -63,6 +67,7 @@ SET(uis
     notification.ui
     ConfigWidget.ui
     DeviceAssignDialog.ui
+    DownloadProgressDialog.ui
     editors/UserWidget.ui
     editors/TeraForm.ui
     editors/DataListWidget.ui

@@ -77,7 +77,7 @@ class QuerySessionTypes(Resource):
         if json_session_type['id_session_type'] > 0:
             # Already existing
             try:
-                TeraSessionType.update_session_type(json_session_type['id_session_type'], json_session_type)
+                TeraSessionType.update(json_session_type['id_session_type'], json_session_type)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -87,7 +87,7 @@ class QuerySessionTypes(Resource):
             try:
                 new_st = TeraSessionType()
                 new_st.from_json(json_session_type)
-                TeraSessionType.insert_session_type(new_st)
+                TeraSessionType.insert(new_st)
                 # Update ID for further use
                 json_session_type['id_session_type'] = new_st.id_session_type
             except exc.SQLAlchemyError:
@@ -124,7 +124,7 @@ class QuerySessionTypes(Resource):
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraSessionType.delete_session_type(id_session_type=id_todel)
+            TeraSessionType.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

@@ -85,6 +85,18 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
             if (handled) emit queryResultsOK(reply_path, reply_query);
         }
 
+        if (reply_path == WEB_DEVICEDATAINFO_PATH && reply_query.hasQueryItem(WEB_QUERY_DOWNLOAD)){
+           // qDebug() << "Download complete.";
+            handled = true;
+
+            // Remove reply from current download list, if present
+            if (m_currentDownloads.contains(reply)){
+                DownloadedFile* file = m_currentDownloads.take(reply);
+                emit downloadCompleted(file);
+                file->deleteLater();
+            }
+        }
+
         if (!handled){
             // General case
             handled=handleDataReply(reply_path, reply_data, reply_query);
@@ -154,6 +166,27 @@ void ComManager::doUpdateCurrentUser()
     doQuery(QString(WEB_USERINFO_PATH), QUrlQuery("user_uuid=" + m_currentUser.getFieldValue("user_uuid").toUuid().toString(QUuid::WithoutBraces)));
 }
 
+void ComManager::doDownload(const QString &save_path, const QString &path, const QUrlQuery &query_args)
+{
+    QUrl query = m_serverUrl;
+
+    query.setPath(path);
+    if (!query_args.isEmpty()){
+        query.setQuery(query_args);
+    }
+    QNetworkReply* reply = m_netManager->get(QNetworkRequest(query));
+    if (reply){
+        DownloadedFile* file_to_download = new DownloadedFile(reply, save_path);
+        m_currentDownloads[reply] = file_to_download;
+
+        connect(file_to_download, &DownloadedFile::downloadProgress, this, &ComManager::downloadProgress);
+    }
+
+    emit waitingForReply(true);
+
+    LOG_DEBUG("DOWNLOADING: " + path + ", with " + query_args.toString() + ", to " + save_path, "ComManager::doQuery");
+}
+
 TeraData &ComManager::getCurrentUser()
 {
     return m_currentUser;
@@ -212,6 +245,11 @@ bool ComManager::isCurrentUserSuperAdmin()
     return rval;
 }
 
+bool ComManager::hasPendingDownloads()
+{
+    return !m_currentDownloads.isEmpty();
+}
+
 ComManager::signal_ptr ComManager::getSignalFunctionForDataType(const TeraDataTypes &data_type)
 {
     switch(data_type){
@@ -240,9 +278,10 @@ ComManager::signal_ptr ComManager::getSignalFunctionForDataType(const TeraDataTy
         return &ComManager::projectAccessReceived;
     case TERADATA_SESSION:
         return &ComManager::sessionsReceived;
+    default:
+        LOG_WARNING("Signal for object " + TeraData::getDataTypeName(data_type) + " unspecified.", "ComManager::getSignalFunctionForDataType");
+        return nullptr;
     }
-
-    return nullptr;
 }
 
 
@@ -341,6 +380,9 @@ bool ComManager::handleDataReply(const QString& reply_path, const QString &reply
         break;
     case TERADATA_SESSIONTYPEDEVICETYPE:
         emit sessionTypesDeviceTypesReceived(items);
+        break;
+    case TERADATA_DEVICEDATA:
+        emit deviceDatasReceived(items);
         break;
 /*    default:
         emit getSignalFunctionForDataType(items_type);*/
@@ -443,6 +485,7 @@ void ComManager::onNetworkFinished(QNetworkReply *reply)
             reply_msg = reply->errorString();*/
         emit networkError(reply->error(), reply_msg);
     }
+
     reply->deleteLater();
 }
 

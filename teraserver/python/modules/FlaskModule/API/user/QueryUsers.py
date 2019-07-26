@@ -125,7 +125,7 @@ class QueryUsers(Resource):
         if json_user['id_user'] > 0:
             # Already existing user
             try:
-                TeraUser.update_user(json_user['id_user'], json_user)
+                TeraUser.update(json_user['id_user'], json_user)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -145,7 +145,7 @@ class QueryUsers(Resource):
             try:
                 new_user = TeraUser()
                 new_user.from_json(json_user)
-                TeraUser.insert_user(new_user)
+                TeraUser.insert(new_user)
                 # Update ID User for further use
                 json_user['id_user'] = new_user.id_user;
             except exc.SQLAlchemyError:
@@ -187,7 +187,7 @@ class QueryUsers(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
-        userAccess = DBManager.userAccess(current_user)
+        # userAccess = DBManager.userAccess(current_user)
 
         args = parser.parse_args()
         id_todel = args['id']
@@ -199,7 +199,7 @@ class QueryUsers(Resource):
 
         # If we are here, we are allowed to delete that user. Do so.
         try:
-            TeraUser.delete_user(id_user=id_todel)
+            TeraUser.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

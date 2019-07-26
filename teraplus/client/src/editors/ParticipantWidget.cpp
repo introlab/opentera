@@ -31,14 +31,16 @@ ParticipantWidget::ParticipantWidget(ComManager *comMan, const TeraData *data, Q
     queryDataRequest(WEB_SESSIONTYPE_PATH);
 
     // Query devices for that participant
-    QUrlQuery query;
-    query.addQueryItem(WEB_QUERY_ID_PARTICIPANT, QString::number(m_data->getId()));
-    queryDataRequest(WEB_DEVICEPARTICIPANTINFO_PATH, query);
+    if (!m_data->isNew()){
+        QUrlQuery query;
+        query.addQueryItem(WEB_QUERY_ID_PARTICIPANT, QString::number(m_data->getId()));
+        queryDataRequest(WEB_DEVICEPARTICIPANTINFO_PATH, query);
 
-    // Query devices for the current site
-    query.removeQueryItem(WEB_QUERY_ID_PARTICIPANT);
-    query.addQueryItem(WEB_QUERY_ID_SITE, QString::number(m_data->getFieldValue("id_site").toInt()));
-    queryDataRequest(WEB_DEVICESITEINFO_PATH, query);
+        // Query devices for the current site
+        query.removeQueryItem(WEB_QUERY_ID_PARTICIPANT);
+        query.addQueryItem(WEB_QUERY_ID_SITE, QString::number(m_data->getFieldValue("id_site").toInt()));
+        queryDataRequest(WEB_DEVICESITEINFO_PATH, query);
+    }
 }
 
 ParticipantWidget::~ParticipantWidget()
@@ -90,6 +92,7 @@ void ParticipantWidget::connectSignals()
 
 void ParticipantWidget::updateControlsState()
 {
+    ui->tabParticipantInfos->setEnabled(!m_data->isNew());
     ui->wdgParticipant->setEnabled(!isWaitingOrLoading() && !m_limited);
 
     // Buttons update
@@ -430,7 +433,6 @@ void ParticipantWidget::btnAddDevice_clicked()
         // Item is already assigned to at least 1 participant - show dialog.
         DeviceAssignDialog* diag = new DeviceAssignDialog(m_comManager, id_device, this);
         diag->exec();
-        qDebug() << diag->result();
         if (diag->result() == DeviceAssignDialog::DEVICEASSIGN_CANCEL){
             return;
         }

@@ -46,24 +46,3 @@ class TeraParticipantGroup(db.Model, BaseModel):
         base_pgroup2.id_project = TeraProject.get_project_by_projectname('Default Project #2').id_project
         db.session.add(base_pgroup2)
         db.session.commit()
-
-    @staticmethod
-    def get_count():
-        count = db.session.query(db.func.count(TeraParticipantGroup.id_participant_group))
-        return count.first()[0]
-
-    @staticmethod
-    def update_participant_group(id_participant_group: int, values={}):
-        TeraParticipantGroup.query.filter_by(id_participant_group=id_participant_group).update(values)
-        db.session.commit()
-
-    @staticmethod
-    def insert_participant_group(group):
-        group.id_participant_group = None
-        db.session.add(group)
-        db.session.commit()
-
-    @staticmethod
-    def delete_participant_group(id_participant_group: int):
-        TeraParticipantGroup.query.filter_by(id_participant_group=id_participant_group).delete()
-        db.session.commit()

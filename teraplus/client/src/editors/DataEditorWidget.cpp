@@ -80,7 +80,8 @@ void DataEditorWidget::setReady(){
     m_editState = STATE_READY;
     setEnabled(true);
     setVisible(true);
-    QApplication::restoreOverrideCursor();
+    while (QApplication::overrideCursor())
+        QApplication::restoreOverrideCursor();
     updateControlsState();
     m_undoing=false;
     emit stateReady();
@@ -91,7 +92,8 @@ void DataEditorWidget::setEditing(){
         return;
     setEnabled(true);
     setVisible(true);
-    QApplication::restoreOverrideCursor();
+    while (QApplication::overrideCursor())
+        QApplication::restoreOverrideCursor();
     m_editState = STATE_EDITING;
     updateControlsState();
     emit stateEditing();
@@ -114,7 +116,7 @@ void DataEditorWidget::setLoading(){
 
     m_editState = STATE_LOADING;
     setEnabled(false);
-    QApplication::setOverrideCursor(Qt::BusyCursor);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     setVisible(false);
     emit stateLoading();
 }
@@ -149,6 +151,14 @@ void DataEditorWidget::deleteDataRequest(const QString &path, const int &id)
     QString query_name = getQueryDataName(path, QUrlQuery("del_id=" + QString::number(id)));
     m_requests.append(query_name);
     m_comManager->doDelete(path, id);
+    setWaiting();
+}
+
+void DataEditorWidget::downloadDataRequest(const QString &save_path, const QString &path, const QUrlQuery &query_args)
+{
+    QString query_name = getQueryDataName(path, query_args);
+    m_requests.append(query_name);
+    m_comManager->doDownload(save_path, path, query_args);
     setWaiting();
 }
 

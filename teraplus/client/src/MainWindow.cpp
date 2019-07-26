@@ -16,6 +16,7 @@ MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
     m_comManager = com_manager;
     m_diag_editor = nullptr;
     m_data_editor = nullptr;
+    m_download_dialog = nullptr;
     m_waiting_for_data_type = TERADATA_NONE;
     m_currentMessage.setMessage(Message::MESSAGE_NONE,"");
 
@@ -47,6 +48,8 @@ void MainWindow::connectSignals()
     connect(m_comManager, &ComManager::postResultsOK, this, &MainWindow::com_postReplyOK);
     connect(m_comManager, &ComManager::dataReceived, this, &MainWindow::processGenericDataReply);
     connect(m_comManager, &ComManager::deleteResultsOK, this, &MainWindow::com_deleteResultsOK);
+    connect(m_comManager, &ComManager::downloadProgress, this, &MainWindow::com_downloadProgress);
+    connect(m_comManager, &ComManager::downloadCompleted, this, &MainWindow::com_downloadCompleted);
 
     connect(&m_msgTimer, &QTimer::timeout, this, &MainWindow::showNextMessage);
 
@@ -317,6 +320,28 @@ void MainWindow::com_postReplyOK()
 void MainWindow::com_deleteResultsOK(QString path, int id)
 {
     ui->wdgMainMenu->removeItem(TeraData::getDataTypeFromPath(path), id);
+}
+
+void MainWindow::com_downloadProgress(DownloadedFile *file)
+{
+    if (!m_download_dialog){
+        // New download request - create dialog and add file
+        m_download_dialog = new DownloadProgressDialog(this);
+        m_download_dialog->show();
+    }
+    m_download_dialog->updateDownloadedFile(file);
+}
+
+void MainWindow::com_downloadCompleted(DownloadedFile *file)
+{
+    if (m_download_dialog){
+        if (m_download_dialog->downloadFileCompleted(file)){
+            // If we are here, no more downloads are pending. Close download dialog.
+            m_download_dialog->close();
+            m_download_dialog->deleteLater();
+            m_download_dialog = nullptr;
+        }
+    }
 }
 
 void MainWindow::on_btnLogout_clicked()

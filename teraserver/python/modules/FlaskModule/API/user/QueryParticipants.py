@@ -131,7 +131,7 @@ class QueryParticipants(Resource):
             try:
                 new_part = TeraParticipant()
                 new_part.from_json(json_participant)
-                TeraParticipant.insert_participant(new_part)
+                TeraParticipant.insert(new_part)
                 # Update ID for further use
                 json_participant['id_participant'] = new_part.id_participant
             except exc.SQLAlchemyError:

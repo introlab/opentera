@@ -75,7 +75,7 @@ class DeviceQuerySessionEvents(Resource):
         if json_event['id_session_event'] > 0:
             # Already existing
             try:
-                TeraSessionEvent.update_session(json_event['id_session_event'], json_event)
+                TeraSessionEvent.update(json_event['id_session_event'], json_event)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -85,7 +85,7 @@ class DeviceQuerySessionEvents(Resource):
             try:
                 new_event = TeraSessionEvent()
                 new_event.from_json(json_event)
-                TeraSessionEvent.insert_session_event(new_event)
+                TeraSessionEvent.insert(new_event)
                 # Update ID for further use
                 json_event['id_session_event'] = new_event.id_session
             except exc.SQLAlchemyError:

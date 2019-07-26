@@ -26,11 +26,6 @@ class TeraProjectAccess(db.Model, BaseModel):
         return rval
 
     @staticmethod
-    def get_count():
-        count = db.session.query(db.func.count(TeraProjectAccess.id_project_access))
-        return count.first()[0]
-
-    @staticmethod
     def build_superadmin_access_object(project_id: int, user_id: int):
         from libtera.db.models.TeraProject import TeraProject
         from libtera.db.models.TeraUser import TeraUser

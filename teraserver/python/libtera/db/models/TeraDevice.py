@@ -158,20 +158,8 @@ class TeraDevice(db.Model, BaseModel):
 
         db.session.commit()
 
-    @staticmethod
-    def get_count():
-        count = db.session.query(db.func.count(TeraDevice.id_device))
-        return count.first()[0]
-
-    @staticmethod
-    def update_device(id_device, values={}):
-        TeraDevice.query.filter_by(id_device=id_device).update(values)
-        db.session.commit()
-
-    @staticmethod
-    def insert_device(device):
-        device.id_device = None
-
+    @classmethod
+    def insert(cls, device):
         # Generate UUID
         device.device_uuid = str(uuid.uuid4())
 
@@ -181,10 +169,4 @@ class TeraDevice(db.Model, BaseModel):
         # Create token
         device.create_token()
 
-        db.session.add(device)
-        db.session.commit()
-
-    @staticmethod
-    def delete_device(id_device):
-        TeraDevice.query.filter_by(id_device=id_device).delete()
-        db.session.commit()
+        super().insert(device)

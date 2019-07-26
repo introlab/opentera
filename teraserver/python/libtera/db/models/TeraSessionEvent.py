@@ -32,11 +32,6 @@ class TeraSessionEvent(db.Model, BaseModel):
         return rval
 
     @staticmethod
-    def get_count():
-        count = db.session.query(db.func.count(TeraSessionEvent.id_session_event))
-        return count.first()[0]
-
-    @staticmethod
     def get_session_event_by_id(event_id: int):
         return TeraSessionEvent.query.filter_by(id_session_event=event_id).first()
 
@@ -45,20 +40,3 @@ class TeraSessionEvent(db.Model, BaseModel):
         from .TeraSession import TeraSession
         return db.session.query(TeraSessionEvent).join(TeraSessionEvent.session_event_session)\
             .filter(TeraSession.id_session == id_session)
-
-    @staticmethod
-    def update_session_event(id_session_event: int, values={}):
-        TeraSessionEvent.query.filter_by(id_session_event=id_session_event).update(values)
-        db.session.commit()
-
-    @staticmethod
-    def insert_session_event(session_event):
-        session_event.id_session_event = None
-        db.session.add(session_event)
-        db.session.commit()
-
-    @staticmethod
-    def delete_session_event(id_session_event: int):
-        db.session.delete(TeraSessionEvent.query.filter_by(id_session_event=id_session_event).first())
-        db.session.commit()
-

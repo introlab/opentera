@@ -2,11 +2,13 @@
 #define SESSIONWIDGET_H
 
 #include <QWidget>
+#include <QTableWidgetItem>
 
 #include "DataEditorWidget.h"
 #include "GlobalMessageBox.h"
 
 #include "TeraSessionStatus.h"
+#include "DownloadedFile.h"
 
 namespace Ui {
 class SessionWidget;
@@ -26,21 +28,32 @@ public:
 private:
     Ui::SessionWidget *ui;
 
+    QMap<int, QTableWidgetItem*> m_listDeviceDatas;
+
     void updateControlsState();
     void updateFieldsValue();
 
     bool validateData();
 
     void updateParticipant(TeraData* participant);
+    void updateDeviceData(TeraData* device_data);
 
 private slots:
     void btnSave_clicked();
     void btnUndo_clicked();
-
+    void btnDownload_clicked();
+    void btnDeleteData_clicked();
+    void btnDownloadAll_clicked();
 
     void processFormsReply(QString form_type, QString data);
     void processParticipantsReply(QList<TeraData> participants);
+    void processDeviceDatasReply(QList<TeraData> device_datas);
     void postResultReply(QString path);
+    void deleteDataReply(QString path, int id);
+
+    void onDownloadCompleted(DownloadedFile* file);
+
+    void currentSelectedDataChanged(QTableWidgetItem* current, QTableWidgetItem* previous);
 };
 
 #endif // SESSIONWIDGET_H

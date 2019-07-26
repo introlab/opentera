@@ -83,7 +83,7 @@ class QueryParticipantGroup(Resource):
         if json_group['id_participant_group'] > 0:
             # Already existing
             try:
-                TeraParticipantGroup.update_participant_group(json_group['id_participant_group'], json_group)
+                TeraParticipantGroup.update(json_group['id_participant_group'], json_group)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -93,7 +93,7 @@ class QueryParticipantGroup(Resource):
             try:
                 new_group = TeraParticipantGroup()
                 new_group.from_json(json_group)
-                TeraParticipantGroup.insert_participant_group(new_group)
+                TeraParticipantGroup.insert(new_group)
                 # Update ID for further use
                 json_group['id_participant_group'] = new_group.id_participant_group
             except exc.SQLAlchemyError:
@@ -125,7 +125,7 @@ class QueryParticipantGroup(Resource):
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraParticipantGroup.delete_participant_group(id_participant_group=id_todel)
+            TeraParticipantGroup.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

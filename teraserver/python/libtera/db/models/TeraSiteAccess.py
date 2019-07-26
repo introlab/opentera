@@ -80,27 +80,5 @@ class TeraSiteAccess(db.Model, BaseModel):
         return access
 
     @staticmethod
-    def get_count():
-        count = db.session.query(db.func.count(TeraSiteAccess.id_site_access))
-        return count.first()[0]
-
-    # def to_json(self, ignore_fields=[]):
-    #     if ignore_fields is None:
-    #         ignore_fields = []
-    #     rval = super().to_json(ignore_fields=ignore_fields)
-    #
-    #     # Add access in json format, if needed
-    #     if 'access_sitegroups' in rval:
-    #         access_list = []
-    #         for group in self.access_usergroups:
-    #             access_list.append(group.to_json(ignore_fields=['sitegroup_access']))
-    #         rval['access_sitegroups'] = access_list
-    #
-    #     return rval
-    #
-    # def __str__(self):
-    #     return self.to_json()
-
-    @staticmethod
     def create_defaults():
         pass

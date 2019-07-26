@@ -79,19 +79,3 @@ class TeraSessionTypeDeviceType(db.Model, BaseModel):
     def query_session_type_device_for_device_session_type(device_type_id: int, session_type_id: int):
         return TeraSessionTypeDeviceType.query.filter_by(id_device_type=device_type_id,
                                                          id_session_type=session_type_id).first()
-
-    @staticmethod
-    def update_session_type_device_type(id_stdt, values={}):
-        TeraSessionTypeDeviceType.query.filter_by(id_session_type_device_type=id_stdt).update(values)
-        db.session.commit()
-
-    @staticmethod
-    def insert_session_type_device_type(session_type_device_type):
-        session_type_device_type.id_session_type_device_type = None
-        db.session.add(session_type_device_type)
-        db.session.commit()
-
-    @staticmethod
-    def delete_session_type_device_type(id_session_type_device_type):
-        TeraSessionTypeDeviceType.query.filter_by(id_session_type_device_type=id_session_type_device_type).delete()
-        db.session.commit()

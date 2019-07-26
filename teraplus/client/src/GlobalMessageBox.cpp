@@ -81,6 +81,20 @@ void GlobalMessageBox::showError(const QString &title, const QString &text)
     exec();
 }
 
+void GlobalMessageBox::showInfo(const QString &title, const QString &text)
+{
+    setIcon(QMessageBox::Information);
+    setWindowTitle(title);
+    setTextFormat(Qt::RichText);
+    QString display_text = text;
+    display_text.replace("\n","<br>");
+    setText(display_text);
+    setModal(true);
+    setStandardButtons(QMessageBox::Ok);
+    button(QMessageBox::Ok)->setCursor(Qt::PointingHandCursor);
+    exec();
+}
+
 void GlobalMessageBox::closeEvent(QCloseEvent *evt){
     if (clickedButton() == nullptr)
         m_xPressed = true;

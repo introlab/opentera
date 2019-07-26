@@ -92,7 +92,7 @@ class DeviceQuerySessions(Resource):
             # Already existing
             # TODO handle participant list (remove, add) in session
             try:
-                TeraSession.update_session(json_session['id_session'], json_session)
+                TeraSession.update(json_session['id_session'], json_session)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -107,7 +107,7 @@ class DeviceQuerySessions(Resource):
                     participant = TeraParticipant.get_participant_by_uuid(uuid)
                     new_ses.session_participants.append(participant)
 
-                TeraSession.insert_session(new_ses)
+                TeraSession.insert(new_ses)
                 # Update ID for further use
                 json_session['id_session'] = new_ses.id_session
 

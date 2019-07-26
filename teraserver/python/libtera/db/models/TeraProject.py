@@ -64,11 +64,6 @@ class TeraProject(db.Model, BaseModel):
         db.session.commit()
 
     @staticmethod
-    def get_count():
-        count = db.session.query(db.func.count(TeraProject.id_project))
-        return count.first()[0]
-
-    @staticmethod
     def get_project_by_projectname(projectname):
         return TeraProject.query.filter_by(project_name=projectname).first()
 
@@ -83,20 +78,3 @@ class TeraProject(db.Model, BaseModel):
         if isinstance(filter_args, dict):
             return TeraProject.query.filter_by(**filter_args).all()
         return None
-
-    @staticmethod
-    def update_project(id_project: int, values={}):
-        TeraProject.query.filter_by(id_project=id_project).update(values)
-        db.session.commit()
-
-    @staticmethod
-    def insert_project(project):
-        project.id_project = None
-
-        db.session.add(project)
-        db.session.commit()
-
-    @staticmethod
-    def delete_project(id_project: int):
-        TeraProject.query.filter_by(id_project=id_project).delete()
-        db.session.commit()

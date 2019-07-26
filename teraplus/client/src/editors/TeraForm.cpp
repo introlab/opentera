@@ -9,6 +9,8 @@ TeraForm::TeraForm(QWidget *parent) :
     ui(new Ui::TeraForm)
 {
     ui->setupUi(this);
+
+    m_highlightConditionals = true;
 }
 
 TeraForm::~TeraForm()
@@ -270,6 +272,11 @@ void TeraForm::resetFormValues()
 
 }
 
+void TeraForm::setHighlightConditions(const bool &hightlight)
+{
+    m_highlightConditionals = hightlight;
+}
+
 void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structure)
 {
     QFormLayout* layout = new QFormLayout(page);
@@ -345,7 +352,8 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
                 }
                 if (item_data.contains("condition")){
                     item_widget->setProperty("condition", item_data["condition"]);
-                    item_frame->setStyleSheet("background-color:darkgrey;");
+                    if (m_highlightConditionals)
+                        item_frame->setStyleSheet("background-color:darkgrey;");
                 }
                 if (item_data.contains("readonly")){
                     item_widget->setProperty("readonly", item_data["readonly"].toBool());

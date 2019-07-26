@@ -100,7 +100,7 @@ class QuerySessions(Resource):
         if json_session['id_session'] > 0:
             # Already existing
             try:
-                TeraSession.update_session(json_session['id_session'], json_session)
+                TeraSession.update(json_session['id_session'], json_session)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -110,7 +110,7 @@ class QuerySessions(Resource):
             try:
                 new_ses = TeraSession()
                 new_ses.from_json(json_session)
-                TeraSession.insert_session(new_ses)
+                TeraSession.insert(new_ses)
                 # Update ID for further use
                 json_session['id_session'] = new_ses.id_session
             except exc.SQLAlchemyError:
@@ -147,7 +147,7 @@ class QuerySessions(Resource):
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraSession.delete_session(id_session=id_todel)
+            TeraSession.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

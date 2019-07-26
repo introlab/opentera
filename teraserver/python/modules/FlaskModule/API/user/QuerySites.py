@@ -89,7 +89,7 @@ class QuerySites(Resource):
         if json_site['id_site'] > 0:
             # Already existing
             try:
-                TeraSite.update_site(json_site['id_site'], json_site)
+                TeraSite.update(json_site['id_site'], json_site)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -99,7 +99,7 @@ class QuerySites(Resource):
             try:
                 new_site = TeraSite()
                 new_site.from_json(json_site)
-                TeraSite.insert_site(new_site)
+                TeraSite.insert(new_site)
                 # Update ID for further use
                 json_site['id_site'] = new_site.id_site
             except exc.SQLAlchemyError:
@@ -128,7 +128,7 @@ class QuerySites(Resource):
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraSite.delete_site(id_site=id_todel)
+            TeraSite.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

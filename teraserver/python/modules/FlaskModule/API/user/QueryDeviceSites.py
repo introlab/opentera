@@ -91,7 +91,7 @@ class QueryDeviceSites(Resource):
             if json_device_site['id_device_site'] > 0:
                 # Already existing
                 try:
-                    TeraDeviceSite.update_device_site(json_device_site['id_device_site'], json_device_site)
+                    TeraDeviceSite.update(json_device_site['id_device_site'], json_device_site)
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
@@ -100,7 +100,7 @@ class QueryDeviceSites(Resource):
                 try:
                     new_device_site = TeraDeviceSite()
                     new_device_site.from_json(json_device_site)
-                    TeraDeviceSite.insert_device_site(new_device_site)
+                    TeraDeviceSite.insert(new_device_site)
                     # Update ID for further use
                     json_device_site['id_device_site'] = new_device_site.id_device_site
                 except exc.SQLAlchemyError:
@@ -140,11 +140,11 @@ class QueryDeviceSites(Resource):
                 device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
                     device_id=device_site.id_device, participant_id=part.id_participant)
                 if device_part:
-                    TeraDeviceParticipant.delete_device_participant(device_part.id_device_participant)
+                    TeraDeviceParticipant.delete(device_part.id_device_participant)
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraDeviceSite.delete_device_site(id_device_site=id_todel)
+            TeraDeviceSite.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

@@ -121,27 +121,15 @@ class TeraParticipant(db.Model, BaseModel):
 
         db.session.commit()
 
-    @staticmethod
-    def get_count():
-        count = db.session.query(db.func.count(TeraParticipant.id_participant))
-        return count.first()[0]
-
-    @staticmethod
-    def update_participant(id_participant: int, values={}):
-        TeraParticipant.query.filter_by(id_participant=id_participant).update(values)
-        db.session.commit()
-
-    @staticmethod
-    def insert_participant(participant):
-        participant.id_participant = None
+    @classmethod
+    def insert(cls, participant):
         participant.participant_lastonline = None
-        db.session.add(participant)
-        db.session.commit()
+        super().insert(participant)
 
-    @staticmethod
-    def delete_participant(id_participant: int):
-        part = TeraParticipant.query.filter_by(id_participant=id_participant).first()
-        db.session.delete(part)
+    @classmethod
+    def delete(cls, id_todel: int):
+        super().delete(id_todel)
+
         # Check if we need to delete orphan sessions (sessions that have no more participants left
         from libtera.db.models.TeraSession import TeraSession
         orphans = TeraSession.query.outerjoin(TeraSession.session_participants).filter(
@@ -151,16 +139,3 @@ class TeraParticipant(db.Model, BaseModel):
             for orphan in orphans:
                 db.session.delete(orphan)
         db.session.commit()
-
-# @event.listens_for(TeraParticipant, 'after_delete')
-# def after_delete_trigger(mapper, connection, target):
-#     # Check if we need to delete orphan sessions (sessions that have no more participants left
-#     from libtera.db.models.TeraSession import TeraSession
-#     orphans = TeraSession.query.outerjoin(TeraSession.session_participants).filter(
-#         TeraSession.session_participants == None).all()
-#
-#     if orphans:
-#         for orphan in orphans:
-#             db.session.delete(orphan)
-#         db.session.commit()
-

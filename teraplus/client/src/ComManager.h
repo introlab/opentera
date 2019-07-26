@@ -28,6 +28,7 @@
 #include "webapi.h"
 
 #include "TeraData.h"
+#include "DownloadedFile.h"
 
 
 class ComManager : public QObject
@@ -45,12 +46,15 @@ public:
     void doPost(const QString &path, const QString &post_data);
     void doDelete(const QString &path, const int& id);
     void doUpdateCurrentUser();
+    void doDownload(const QString& save_path, const QString &path, const QUrlQuery &query_args = QUrlQuery());
 
     TeraData &getCurrentUser();
     QString getCurrentUserSiteRole(int site_id);
     QString getCurrentUserProjectRole(int project_id);
     bool isCurrentUserSuperAdmin();
     typedef void (ComManager::* signal_ptr)(QList<TeraData>);
+
+    bool hasPendingDownloads();
 
     static signal_ptr getSignalFunctionForDataType(const TeraDataTypes& data_type);
 
@@ -64,6 +68,8 @@ protected:
     QNetworkAccessManager*  m_netManager;
     QNetworkCookieJar       m_cookieJar;
     QWebSocket*             m_webSocket;
+
+    QMap<QNetworkReply*, DownloadedFile*>   m_currentDownloads;
 
     bool                    m_loggingInProgress;
 
@@ -104,12 +110,16 @@ signals:
     void deviceSitesReceived(QList<TeraData> device_sites_list);
     void deviceParticipantsReceived(QList<TeraData> device_participants_list);
     void sessionTypesDeviceTypesReceived(QList<TeraData> session_types_device_types_list);
+    void deviceDatasReceived(QList<TeraData> device_data_list);
 
     //void queryResultsReceived(QString object, QUrlQuery url_query, QString data);
     //void postResultsReceived(QString path, QString data);
     void queryResultsOK(QString path, QUrlQuery url_query);
     void postResultsOK(QString path);
     void deleteResultsOK(QString path, int id);
+
+    void downloadCompleted(DownloadedFile* file);
+    void downloadProgress(DownloadedFile* file);
 
 public slots:
 
@@ -130,6 +140,7 @@ private slots:
     void onNetworkSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 
     void onTimerConnectTimeout();
+
 };
 
 #endif // COMMANAGER_H

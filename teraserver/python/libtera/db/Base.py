@@ -28,3 +28,52 @@ class BaseModel:
             else:
                 print('Attribute ' + name + ' not found.')
 
+    @classmethod
+    def clean_values(cls, values: dict):
+        # This method is used to remove item from the values dict that are not properties of the object
+        obj_properties = list()
+
+        # Build available properties
+        for name in dir(cls):
+            value = getattr(cls, name)
+            if not name.startswith('__') and not inspect.ismethod(value) and not inspect.isfunction(value) and not \
+                    name.startswith('_') and not name.startswith('query') and not name.startswith('metadata'):
+                obj_properties.append(name)
+
+        # Remove any property not in the available list
+        clean_values = values.copy()
+        for value in values:
+            if value not in obj_properties:
+                del clean_values[value]
+
+        return clean_values
+
+    @classmethod
+    def get_count(cls):
+        count = db.session.query(cls).count()
+        return count
+
+    @classmethod
+    def get_primary_key_name(cls):
+        from sqlalchemy import inspect
+        return inspect(cls).primary_key[0].name
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        values = cls.clean_values(values)
+        cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).update(values)
+        db.session.commit()
+
+    @classmethod
+    def insert(cls, db_object):
+        # Clear primary key value
+        setattr(db_object, cls.get_primary_key_name(), None)
+
+        # Add to database session and commit
+        db.session.add(db_object)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, id_todel):
+        cls.query.filter(getattr(cls, cls.get_primary_key_name()) == id_todel).delete()
+        db.session.commit()

@@ -98,7 +98,7 @@ class QueryProjects(Resource):
         if json_project['id_project'] > 0:
             # Already existing
             try:
-                TeraProject.update_project(json_project['id_project'], json_project)
+                TeraProject.update(json_project['id_project'], json_project)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -108,7 +108,7 @@ class QueryProjects(Resource):
             try:
                 new_project = TeraProject()
                 new_project.from_json(json_project)
-                TeraProject.insert_project(new_project)
+                TeraProject.insert(new_project)
                 # Update ID for further use
                 json_project['id_project'] = new_project.id_project
             except exc.SQLAlchemyError:
@@ -140,7 +140,7 @@ class QueryProjects(Resource):
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraProject.delete_project(id_project=id_todel)
+            TeraProject.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

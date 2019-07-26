@@ -92,11 +92,6 @@ class TeraUser(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_count():
-        user_count = db.session.query(db.func.count(TeraUser.id_user))
-        return user_count.first()[0]
-
-    @staticmethod
     def get_user_by_username(username):
         return TeraUser.query.filter_by(user_username=username).first()
 
@@ -110,8 +105,8 @@ class TeraUser(db.Model, BaseModel):
         user = TeraUser.query.filter_by(id_user=id_user).first()
         return user
 
-    @staticmethod
-    def update_user(id_user, values={}):
+    @classmethod
+    def update(cls, id_user, values={}):
         # Remove the password field is present and if empty
         if 'user_password' in values:
             if values['user_password'] == '':
@@ -124,13 +119,10 @@ class TeraUser(db.Model, BaseModel):
             if isinstance(values['user_profile'], dict):
                 values['user_profile'] = json.dumps(values['user_profile'])
 
-        TeraUser.query.filter_by(id_user=id_user).update(values)
-        db.session.commit()
+        super().update(id_user, values)
 
-    @staticmethod
-    def insert_user(user):
-        user.id_user = None
-
+    @classmethod
+    def insert(cls, user):
         # Encrypts password
         user.user_password = TeraUser.encrypt_password(user.user_password)
 
@@ -143,13 +135,8 @@ class TeraUser(db.Model, BaseModel):
         # Converts profile from dict, if needed
         if isinstance(user.user_profile, dict):
             user.user_profile = json.dumps(user.user_profile)
-        db.session.add(user)
-        db.session.commit()
 
-    @staticmethod
-    def delete_user(id_user):
-        TeraUser.query.filter_by(id_user=id_user).delete()
-        db.session.commit()
+        super().insert(user)
 
     @staticmethod
     def create_defaults():

@@ -1,6 +1,7 @@
 from libtera.db.Base import db, BaseModel
 import uuid
 import datetime
+import os
 from shutil import rmtree
 
 
@@ -71,7 +72,15 @@ class TeraDeviceData(db.Model, BaseModel):
         data2.devicedata_uuid = str(uuid.uuid4())
         # Create "file"
         with open(upload_path + '/' + data2.devicedata_uuid, 'wb') as fout:
-            fout.write(os.urandom(1024 * 1024 * 10))
+            fout.write(os.urandom(1024 * 1024 * 100))
         db.session.add(data2)
+        db.session.commit()
+
+    def delete(self, file_path):
+        # Delete physical file from the disk
+        os.remove(os.path.join(file_path, self.devicedata_uuid))
+
+        # Delete data from the database
+        db.session.delete(self)
         db.session.commit()
 

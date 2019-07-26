@@ -30,11 +30,6 @@ class TeraDeviceType(db.Model, BaseModel):
         db.session.commit()
 
     @staticmethod
-    def get_count():
-        count = db.session.query(db.func.count(TeraDeviceType.id_device_type))
-        return count.first()[0]
-
-    @staticmethod
     def get_devices_types():
         return TeraDeviceType.query.all()
 

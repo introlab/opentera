@@ -62,29 +62,3 @@ class TeraDeviceSite(db.Model, BaseModel):
     @staticmethod
     def query_device_site_for_device_site(device_id: int, site_id: int):
         return TeraDeviceSite.query.filter_by(id_device=device_id, id_site=site_id).first()
-
-    @staticmethod
-    def update_device_site(id_device_site, values={}):
-        TeraDeviceSite.query.filter_by(id_device_site=id_device_site).update(values)
-        db.session.commit()
-
-    @staticmethod
-    def insert_device_site(device_site):
-        device_site.id_device_site = None
-
-        db.session.add(device_site)
-        db.session.commit()
-
-    @staticmethod
-    def delete_device_site(id_device_site):
-        TeraDeviceSite.query.filter_by(id_device_site=id_device_site).delete()
-        db.session.commit()
-
-    @staticmethod
-    def delete_device_sites(device_sites):
-        if not isinstance(device_sites, list):
-            return
-
-        for devicesite in device_sites:
-            db.session.delete(devicesite)
-        db.session.commit()
