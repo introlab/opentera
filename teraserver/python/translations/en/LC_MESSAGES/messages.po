@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-07-17 10:14-0400\n"
+"POT-Creation-Date: 2019-08-21 08:21-0400\n"
 "PO-Revision-Date: 2019-03-28 16:24-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,117 +18,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: libtera/forms/TeraDeviceForm.py:26 libtera/forms/TeraKitDeviceForm.py:25
-#: libtera/forms/TeraKitForm.py:24 libtera/forms/TeraParticipantForm.py:19
+#: libtera/forms/TeraDeviceForm.py:22 libtera/forms/TeraParticipantForm.py:19
 #: libtera/forms/TeraParticipantGroupForm.py:20
-#: libtera/forms/TeraProjectForm.py:19 libtera/forms/TeraSessionForm.py:32
-#: libtera/forms/TeraSessionTypeForm.py:20 libtera/forms/TeraSiteForm.py:12
+#: libtera/forms/TeraProjectForm.py:19 libtera/forms/TeraSessionForm.py:44
+#: libtera/forms/TeraSessionTypeForm.py:28 libtera/forms/TeraSiteForm.py:12
 #: libtera/forms/TeraUserForm.py:12
 msgid "Informations"
 msgstr "Informations"
 
-#: libtera/forms/TeraDeviceForm.py:30
+#: libtera/forms/TeraDeviceForm.py:26
 msgid "ID Appareil"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:31
+#: libtera/forms/TeraDeviceForm.py:27
 msgid "UUID Appareil"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:32
+#: libtera/forms/TeraDeviceForm.py:28
 msgid "Nom appareil"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:33
+#: libtera/forms/TeraDeviceForm.py:29
 msgid "Type appareil"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:35
+#: libtera/forms/TeraDeviceForm.py:31
 msgid "Jeton d'accès"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:37
+#: libtera/forms/TeraDeviceForm.py:33
 msgid "Certificat"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:39
-msgid "Site d'appartenance"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:41
+#: libtera/forms/TeraDeviceForm.py:35
 msgid "Activé?"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:42
+#: libtera/forms/TeraDeviceForm.py:36
+msgid "Optionel?"
+msgstr ""
+
+#: libtera/forms/TeraDeviceForm.py:37
 msgid "Peut se connecter?"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:44 libtera/forms/TeraUserForm.py:27
+#: libtera/forms/TeraDeviceForm.py:39 libtera/forms/TeraUserForm.py:27
 msgid "Notes"
 msgstr "Notes"
 
-#: libtera/forms/TeraDeviceForm.py:45 libtera/forms/TeraKitForm.py:33
-#: libtera/forms/TeraParticipantForm.py:28 libtera/forms/TeraUserForm.py:29
+#: libtera/forms/TeraDeviceForm.py:40 libtera/forms/TeraParticipantForm.py:32
+#: libtera/forms/TeraUserForm.py:29
 msgid "Dernière connexion"
 msgstr "Last Connection"
 
-#: libtera/forms/TeraDeviceForm.py:48 libtera/forms/TeraDeviceForm.py:50
-msgid "Paramètres"
-msgstr ""
-
-#: libtera/forms/TeraKitDeviceForm.py:29
-msgid "ID Lien Kit-Appareil"
-msgstr ""
-
-#: libtera/forms/TeraKitDeviceForm.py:30
-msgid "Kit"
-msgstr ""
-
-#: libtera/forms/TeraKitDeviceForm.py:31
-msgid "Appareil"
-msgstr ""
-
-#: libtera/forms/TeraKitDeviceForm.py:32
-msgid "Optionnel?"
-msgstr ""
-
-#: libtera/forms/TeraKitForm.py:28
-msgid "ID Kit"
-msgstr ""
-
-#: libtera/forms/TeraKitForm.py:29
-msgid "Nom du kit"
-msgstr ""
-
-#: libtera/forms/TeraKitForm.py:30 libtera/forms/TeraProjectForm.py:25
-msgid "Site"
-msgstr ""
-
-#: libtera/forms/TeraKitForm.py:31 libtera/forms/TeraParticipantGroupForm.py:26
-msgid "Projet"
-msgstr ""
-
-#: libtera/forms/TeraKitForm.py:32
-msgid "Kit partageable?"
+#: libtera/forms/TeraDeviceForm.py:43 libtera/forms/TeraDeviceForm.py:45
+msgid "Configuration"
 msgstr ""
 
 #: libtera/forms/TeraParticipantForm.py:23
 msgid "ID Participant"
 msgstr ""
 
-#: libtera/forms/TeraParticipantForm.py:24
-msgid "UUID Participant"
+#: libtera/forms/TeraParticipantForm.py:24 libtera/forms/TeraProjectForm.py:23
+msgid "ID Projet"
 msgstr ""
 
-#: libtera/forms/TeraParticipantForm.py:25
-msgid "Nom Participant"
+#: libtera/forms/TeraParticipantForm.py:25 libtera/forms/TeraSiteForm.py:16
+msgid "ID Site"
 msgstr ""
 
 #: libtera/forms/TeraParticipantForm.py:26
-msgid "Jeton Participant"
+msgid "UUID Participant"
+msgstr ""
+
+#: libtera/forms/TeraParticipantForm.py:27
+msgid "Nom Participant"
+msgstr ""
+
+#: libtera/forms/TeraParticipantForm.py:28
+msgid "Participant actif"
 msgstr ""
 
 #: libtera/forms/TeraParticipantForm.py:30
+msgid "Jeton Participant"
+msgstr ""
+
+#: libtera/forms/TeraParticipantForm.py:34
 msgid "Groupe"
 msgstr ""
 
@@ -140,13 +115,17 @@ msgstr ""
 msgid "Nom du groupe"
 msgstr ""
 
+#: libtera/forms/TeraParticipantGroupForm.py:26
+msgid "Projet"
+msgstr ""
+
 #: libtera/forms/TeraParticipantGroupForm.py:27
 #: libtera/forms/TeraProjectForm.py:24
 msgid "Nom du projet"
 msgstr ""
 
-#: libtera/forms/TeraProjectForm.py:23
-msgid "ID Projet"
+#: libtera/forms/TeraProjectForm.py:25
+msgid "Site"
 msgstr ""
 
 #: libtera/forms/TeraProjectForm.py:26
@@ -157,68 +136,92 @@ msgstr ""
 msgid "Nom du site initial"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:36
+#: libtera/forms/TeraSessionForm.py:48
 msgid "ID séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:37
+#: libtera/forms/TeraSessionForm.py:49
 msgid "Nom de la séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:38
+#: libtera/forms/TeraSessionForm.py:50
 msgid "Type de séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:39
-msgid "Créateur"
+#: libtera/forms/TeraSessionForm.py:51
+msgid "Nom créateur (Utilisateur)"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:40
+#: libtera/forms/TeraSessionForm.py:52
+msgid "Créateur (Utilisateur)"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:57
+msgid "Nom créateur (Appareil)"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:58
+msgid "Créateur (Appareil)"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:64
+msgid "Nom créateur (Participant)"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:66
+msgid "Créateur (Participant)"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:71
 msgid "Date de début"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:41
+#: libtera/forms/TeraSessionForm.py:72
 msgid "Durée"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:44
+#: libtera/forms/TeraSessionForm.py:75
 msgid "État"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:45
+#: libtera/forms/TeraSessionForm.py:76
 msgid "Commentaires"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:24
+#: libtera/forms/TeraSessionForm.py:79
+msgid "Participants"
+msgstr ""
+
+#: libtera/forms/TeraSessionTypeForm.py:32
 msgid "ID Type Séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:25
+#: libtera/forms/TeraSessionTypeForm.py:33
 msgid "Nom du type de séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:26
+#: libtera/forms/TeraSessionTypeForm.py:34
 msgid "Code du type de séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:28
+#: libtera/forms/TeraSessionTypeForm.py:36
+msgid "Catégorie"
+msgstr ""
+
+#: libtera/forms/TeraSessionTypeForm.py:38
 msgid "Séance assistée?"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:29
+#: libtera/forms/TeraSessionTypeForm.py:39
 msgid "Séance de groupe?"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:30
+#: libtera/forms/TeraSessionTypeForm.py:40
 msgid "Couleur d'affichage"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:31
-msgid "Paramètres spécifiques"
-msgstr ""
-
-#: libtera/forms/TeraSiteForm.py:16
-msgid "ID Site"
+#: libtera/forms/TeraSessionTypeForm.py:41
+msgid "Configuration spécifiques"
 msgstr ""
 
 #: libtera/forms/TeraSiteForm.py:17
@@ -353,6 +356,33 @@ msgstr "Allow Fullscreen Session"
 msgid "Permettre l'accès via le web"
 msgstr "Allow Web Access"
 
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:34
+#: modules/FlaskModule/API/user/QueryDeviceSites.py:34
+#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:33
+msgid "Arguments manquants"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:83
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:140
+#: modules/FlaskModule/API/user/QueryDeviceSites.py:80
+#: modules/FlaskModule/API/user/QueryDeviceSites.py:133
+#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:78
+#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:131
+msgid "Accès refusé"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:136
+#: modules/FlaskModule/API/user/QueryDeviceSites.py:129
+#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:128
+msgid "Non-trouvé"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:148
+#: modules/FlaskModule/API/user/QueryDeviceSites.py:151
+#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:139
+msgid "Erreur base de données"
+msgstr ""
+
 #: modules/FlaskModule/API/user/QuerySessionTypes.py:119
 msgid ""
 "Impossible de supprimer - pas administrateur dans tous les projets de ce "
@@ -388,5 +418,38 @@ msgstr ""
 #~ msgstr "User Group(s)"
 
 #~ msgid "Nom du participant"
+#~ msgstr ""
+
+#~ msgid "Site d'appartenance"
+#~ msgstr ""
+
+#~ msgid "Paramètres"
+#~ msgstr ""
+
+#~ msgid "ID Lien Kit-Appareil"
+#~ msgstr ""
+
+#~ msgid "Kit"
+#~ msgstr ""
+
+#~ msgid "Appareil"
+#~ msgstr ""
+
+#~ msgid "Optionnel?"
+#~ msgstr ""
+
+#~ msgid "ID Kit"
+#~ msgstr ""
+
+#~ msgid "Nom du kit"
+#~ msgstr ""
+
+#~ msgid "Kit partageable?"
+#~ msgstr ""
+
+#~ msgid "Créateur"
+#~ msgstr ""
+
+#~ msgid "Paramètres spécifiques"
 #~ msgstr ""
 

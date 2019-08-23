@@ -85,6 +85,8 @@ class x509ClientTest(unittest.TestCase):
         # Encode in PEM format
         encoded_csr = client_info['csr'].public_bytes(serialization.Encoding.PEM)
 
+        print('encoded_csr(PEM)', encoded_csr.decode('utf-8'))
+
         class CertificateReader(Protocol):
             def __init__(self, finished):
                 self.finished = finished
