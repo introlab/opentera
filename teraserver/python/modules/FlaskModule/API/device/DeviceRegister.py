@@ -90,6 +90,11 @@ class DeviceRegister(Resource):
                 result = dict()
                 result['certificate'] = device.device_certificate
 
+                f = open(self.module.config.server_config['ssl_path'] + '/'
+                         + self.module.config.server_config['ca_certificate'])
+
+                result['ca_info'] = f.read()
+
                 # Return certificate...
                 return jsonify(result)
             else:

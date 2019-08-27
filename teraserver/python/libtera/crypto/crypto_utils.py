@@ -182,13 +182,28 @@ def generate_device_certificate(csr, ca_info, device_uuid):
 
     ca = ca_info['certificate']
     ca_key = ca_info['private_key']
+
     # WARNING, subject needs to be verified by CA, do not use csr subject
+    # builder = builder.subject_name(
+    #     x509.Name([
+    #         x509.NameAttribute(NameOID.COMMON_NAME, u'10.0.1.8'),
+    #         x509.NameAttribute(NameOID.USER_ID, str(device_uuid)),
+    #         x509.NameAttribute(NameOID.COUNTRY_NAME, u'CA'),
+    #         x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u'QC'),
+    #         x509.NameAttribute(NameOID.LOCALITY_NAME, u'Sherbrooke'),
+    #         x509.NameAttribute(NameOID.ORGANIZATION_NAME, u'UdeS'),
+    #         x509.NameAttribute(NameOID.EMAIL_ADDRESS, u'test@noemail.com')
+    #     ])
+    # )
+
+
     builder = builder.subject_name(
         x509.Name([
             x509.NameAttribute(NameOID.COMMON_NAME, u'Device'),
             x509.NameAttribute(NameOID.USER_ID, str(device_uuid))
         ])
     )
+
     builder = builder.issuer_name(ca.subject)
     builder = builder.not_valid_before(datetime.datetime.now() - datetime.timedelta(hours=1))
     builder = builder.not_valid_after(datetime.datetime.now() + datetime.timedelta(days=3650))
