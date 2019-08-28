@@ -37,6 +37,36 @@ class DeviceRegister(Resource):
 
         print(self.ca_info)
 
+    def create_device(self, name):
+        # Create TeraDevice
+        device = TeraDevice()
+
+        # Required field(s)
+        # Name should be taken from CSR
+        device.device_name = name
+        # TODO set flags properly
+        device.device_onlineable = False
+        # TODO WARNING - Should be disabled when created...
+        device.device_enabled = True
+        device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
+        device.device_uuid = str(uuid.uuid4())
+        device.create_token()
+        device.update_last_online()
+
+        # Store
+        db.session.add(device)
+
+        # TODO remove participant assignation
+        from libtera.db.models.TeraParticipant import TeraParticipant
+        from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+        participant1 = TeraParticipant.get_participant_by_id(1)
+        device_partipant = TeraDeviceParticipant()
+        device_partipant.device_participant_participant = participant1
+        device_partipant.device_participant_device = device
+        db.session.add(device_partipant)
+
+        return device
+
     def get(self):
         print(request)
         return '', 200
@@ -44,27 +74,16 @@ class DeviceRegister(Resource):
     def post(self):
         print(request)
 
-        # We should receive a certificate signing request (base64)
+        # We should receive a certificate signing request (base64) in an octet-stream
         if request.content_type == 'application/octet-stream':
             # try:
             # Read certificate request
             req = x509.load_pem_x509_csr(request.data, default_backend())
 
             if req.is_signature_valid:
-                # Create TeraDevice
-                device = TeraDevice()
 
-                # Required field(s)
                 # Name should be taken from CSR
-                device.device_name = str(req.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value)
-                # TODO set flags properly
-                device.device_onlineable = False
-                # TODO WARNING - Should be disabled when created...
-                device.device_enabled = True
-                device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
-                device.device_uuid = str(uuid.uuid4())
-                device.create_token()
-                device.update_last_online()
+                device = self.create_device(str(req.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value))
 
                 # Must sign request with CA/key and generate certificate
                 cert = generate_device_certificate(req, self.ca_info, device.device_uuid)
@@ -75,25 +94,15 @@ class DeviceRegister(Resource):
                 # Store
                 db.session.add(device)
 
-                # TODO remove participant assignation
-                from libtera.db.models.TeraParticipant import TeraParticipant
-                from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
-                participant1 = TeraParticipant.get_participant_by_id(1)
-                device_partipant = TeraDeviceParticipant()
-                device_partipant.device_participant_participant = participant1
-                device_partipant.device_participant_device = device
-                db.session.add(device_partipant)
-
                 # Commit to database
                 db.session.commit()
 
                 result = dict()
                 result['certificate'] = device.device_certificate
+                result['ca_info'] = self.ca_info['certificate'].public_bytes(serialization.Encoding.PEM).decode('utf-8')
+                result['token'] = device.device_token
 
-                f = open(self.module.config.server_config['ssl_path'] + '/'
-                         + self.module.config.server_config['ca_certificate'])
-
-                result['ca_info'] = f.read()
+                test = jsonify(result)
 
                 # Return certificate...
                 return jsonify(result)
@@ -101,5 +110,31 @@ class DeviceRegister(Resource):
                 return 'Invalid CSR signature', 400
                 # except:
                 #     return 'Error processing request', 400
+
+        elif request.content_type == 'application/json':
+            try:
+                device_info = request.json['device_info']
+
+                # Check if we have device name
+                if 'device_name' not in device_info:
+                    return 'Invalid content type', 400
+
+                device_name = device_info['device_name']
+                device = self.create_device(device_name)
+
+                # Store
+                db.session.add(device)
+
+                # Commit to database
+                db.session.commit()
+
+                result = dict()
+                result['token'] = device.device_token
+
+                # Return token
+                return jsonify(result)
+
+            except:
+                return 'Invalid JSON', 400
         else:
             return 'Invalid content type', 400
