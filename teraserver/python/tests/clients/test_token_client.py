@@ -105,6 +105,52 @@ class TokenClientTest(unittest.TestCase):
         print('_handle_device_registration', registration_info)
         return registration_info
 
+    @defer.inlineCallbacks
+    def _handle_device_login(self, token):
+
+        class LoginResponseReader(Protocol):
+            def __init__(self, finished):
+                self.finished = finished
+
+            def dataReceived(self, bytes):
+                # We should have our new certificate, json format
+                result = json.loads(bytes.decode('utf-8'))
+                print('dataReceived', result)
+                # Call deferred callback...
+                self.finished.callback(result)
+
+            def connectionLost(self, reason):
+                # print('Finished receiving body:', reason)
+                # reactor.stop()
+                # self.finished.callback(None)
+                pass
+
+        def gotResponse(response):
+            # Reading response
+            finished = defer.Deferred()
+            response.deliverBody(LoginResponseReader(finished))
+            return finished
+
+        def noResponse(failure):
+            failure.trap(ResponseFailed)
+            print(failure.value.reasons[0].getTraceback())
+            reactor.stop()
+
+        # agent = Agent(reactor, x509ClientTest.WithCertificatePolicy())
+        self.assertIsNotNone(self.agent)
+
+        d = self.agent.request(
+            b'GET',
+            b'https://localhost:4040/api/device/device_login' + b'?token=' + token.encode('utf-8'),
+            Headers({'User-Agent': ['Twisted Web Client Example']}),
+            None)
+
+        d.addCallbacks(gotResponse, noResponse)
+        val = yield d
+
+        print('after _handle_device_login')
+        return val
+
     # STEP 1 : REGISTER DEVICE AND GET A CERTIFICATE
     def test_https_device_registration(self):
         self._handle_device_registration()
@@ -123,3 +169,19 @@ class TokenClientTest(unittest.TestCase):
     def test_https_device_login(self):
         token = self.getToken()
         print(token)
+
+        def login_callback(result, myself: TokenClientTest):
+            print('login_callback', result, myself)
+
+            # Test result
+            myself.assertIsNotNone(result)
+
+            # Job done!
+            reactor.stop()
+
+        # Create the ssl agent
+        self.agent = Agent(reactor, TokenClientTest.NoCertificatePolicy())
+
+        d = self._handle_device_login(token)
+        d.addCallback(login_callback, self)
+        reactor.run()

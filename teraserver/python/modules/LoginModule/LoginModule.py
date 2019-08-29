@@ -170,30 +170,28 @@ class LoginModule(BaseModule):
                     return f(*args, **kwargs)
 
             # Then verify tokens...
-            try:
-                # Parse args
-                parser = reqparse.RequestParser()
-                parser.add_argument('token', type=str, help='Token', required=True)
-                args = parser.parse_args(strict=False)
 
-                # Verify token.
-                if 'token' in args:
-                    # Load participant from DB
-                    _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(args['token'])
+            # Parse args
+            parser = reqparse.RequestParser()
+            parser.add_argument('token', type=str, help='Token', required=False)
+            token_args = parser.parse_args(strict=False)
 
-                    if current_participant and current_participant.participant_enabled:
-                        # Returns the function if authenticated with token
-                        return f(*args, **kwargs)
+            # Verify token.
+            if 'token' in token_args:
+                # Load participant from DB
+                _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_args['token'])
 
-                    # Load device from DB
-                    _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(args['token'])
+                if current_participant and current_participant.participant_enabled:
+                    # Returns the function if authenticated with token
+                    return f(*args, **kwargs)
 
-                    # Device must be found and enabled
-                    if current_device and current_device.device_enabled:
-                        # Returns the function if authenticated with token
-                        return f(*args, **kwargs)
-            except:
-                return 'Forbidden', 403
+                # Load device from DB
+                _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(token_args['token'])
+
+                # Device must be found and enabled
+                if current_device and current_device.device_enabled:
+                    # Returns the function if authenticated with token
+                    return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.
             return 'Forbidden', 403
