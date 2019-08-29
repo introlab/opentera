@@ -47,25 +47,18 @@ def generate_certificates(config: ConfigManager):
     site_key_path = config.server_config['ssl_path'] + '/' + config.server_config['site_private_key']
     ca_certificate_path = config.server_config['ssl_path'] + '/' + config.server_config['ca_certificate']
     ca_key_path = config.server_config['ssl_path'] + '/' + config.server_config['ca_private_key']
-    device_certificate_path = config.server_config['ssl_path'] + '/devices/client_certificate.pem'
-    device_key_path = config.server_config['ssl_path'] + '/devices/client_key.pem'
 
     if not os.path.exists(site_certificate_path) or not os.path.exists(site_key_path):
         print('Generating Site certificate and key')
         site_info = crypto.generate_local_certificate()
-        # Safe files
+        # Save files
         crypto.write_private_key_and_certificate(site_info, keyfile=site_key_path, certfile=site_certificate_path)
 
     if not os.path.exists(ca_certificate_path) or not os.path.exists(ca_key_path):
         print('Generating Site certificate and key')
         ca_info = crypto.generate_ca_certificate(common_name='Local CA')
-        # Safe files
+        # Save files
         crypto.write_private_key_and_certificate(ca_info, keyfile=ca_key_path, certfile=ca_certificate_path)
-        print('Generating test device certificate')
-        client_info = crypto.create_certificate_signing_request('Test Device')
-        client_info['certificate'] = crypto.generate_device_certificate(client_info['csr'], ca_info,
-                                                                        'b707e0b2-e649-47e7-a938-2b949c423f73')
-        crypto.write_private_key_and_certificate(client_info, keyfile=device_key_path, certfile=device_certificate_path)
 
 
 def verify_file_upload_directory(config: ConfigManager, create=True):

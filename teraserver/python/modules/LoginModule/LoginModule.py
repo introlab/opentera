@@ -100,14 +100,14 @@ class LoginModule(BaseModule):
                 # Load participant from DB
                 _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(args['token'])
 
-                if current_participant:
+                if current_participant and current_participant.participant_enabled:
                     # Returns the function if authenticated with token
                     return f(*args, **kwargs)
 
                 # Load device from DB
                 _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(args['token'])
 
-                if current_device:
+                if current_device and current_device.device_enabled:
                     # Returns the function if authenticated with token
                     return f(*args, **kwargs)
 
@@ -135,10 +135,67 @@ class LoginModule(BaseModule):
                 # Load participant from DB
                 _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_uuid(
                     request.headers['X-Participant-Uuid'])
-                if current_participant:
+                if current_participant and current_participant.participant_enabled:
                     return f(*args, **kwargs)
 
             # Any other case, do not call function
+            return 'Forbidden', 403
+
+        return decorated
+
+    @staticmethod
+    def token_or_certificate_required(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+
+            # Since certificates are more secure than tokens, we will test for them first
+
+            # Headers are modified in TwistedModule to add certificate information if available.
+            # We are interested in the content of two fields : X-Device-Uuid, X-Participant-Uuid
+            if request.headers.__contains__('X-Device-Uuid'):
+                # Load device from DB
+                _request_ctx_stack.top.current_device = TeraDevice.get_device_by_uuid(
+                    request.headers['X-Device-Uuid'])
+
+                # Device must be found and enabled
+                if current_device and current_device.device_enabled:
+                    return f(*args, **kwargs)
+
+            elif request.headers.__contains__('X-Participant-Uuid'):
+                # Load participant from DB
+                _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_uuid(
+                    request.headers['X-Participant-Uuid'])
+
+                if current_participant and current_participant.participant_enabled:
+                    return f(*args, **kwargs)
+
+            # Then verify tokens...
+            try:
+                # Parse args
+                parser = reqparse.RequestParser()
+                parser.add_argument('token', type=str, help='Token', required=True)
+                args = parser.parse_args(strict=False)
+
+                # Verify token.
+                if 'token' in args:
+                    # Load participant from DB
+                    _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(args['token'])
+
+                    if current_participant and current_participant.participant_enabled:
+                        # Returns the function if authenticated with token
+                        return f(*args, **kwargs)
+
+                    # Load device from DB
+                    _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(args['token'])
+
+                    # Device must be found and enabled
+                    if current_device and current_device.device_enabled:
+                        # Returns the function if authenticated with token
+                        return f(*args, **kwargs)
+            except:
+                return 'Forbidden', 403
+
+            # Any other case, do not call function since no valid auth found.
             return 'Forbidden', 403
 
         return decorated

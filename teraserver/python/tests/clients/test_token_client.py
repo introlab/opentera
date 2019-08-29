@@ -12,12 +12,15 @@ from twisted.web.iweb import IPolicyForHTTPS
 from treq.multipart import MultiPartProducer
 from zope.interface import implementer
 import json
+import os
 
 # from libtera.db.models.TeraSession import TeraSession, TeraSessionParticipants, TeraSessionStatus
 import datetime
 
 
 class TokenClientTest(unittest.TestCase):
+    TOKEN_FILE = os.getcwd() + '/device.token.json'
+
     @implementer(IPolicyForHTTPS)
     class NoCertificatePolicy(client.BrowserLikePolicyForHTTPS):
         def creatorForNetloc(self, hostname, port):
@@ -36,6 +39,13 @@ class TokenClientTest(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @staticmethod
+    def getToken():
+        with open(TokenClientTest.TOKEN_FILE, 'r') as f:
+            data = json.load(f)
+            # TokenClientTest.assertEquals(True, data.__contains__('token'))
+            return data['token']
+
     @defer.inlineCallbacks
     def _handle_device_registration(self):
 
@@ -48,6 +58,9 @@ class TokenClientTest(unittest.TestCase):
             def dataReceived(self, bytes):
                 # We should have our new certificate, json format
                 result = json.loads(bytes.decode('utf-8'))
+
+                with open(TokenClientTest.TOKEN_FILE, 'w') as f:
+                    json.dump(result, f)
 
                 global registration_info
                 registration_info = result
@@ -97,3 +110,16 @@ class TokenClientTest(unittest.TestCase):
         self._handle_device_registration()
         reactor.run()
 
+    # STEP 2 : VERIFY TOKEN FILE
+    def test_token_file_valid(self):
+        self.assertTrue(os.path.exists(TokenClientTest.TOKEN_FILE))
+        try:
+            token = TokenClientTest.getToken()
+            self.assertNotEqual(0, len(token))
+        except:
+            self.assertTrue(False)
+
+    # STEP 3 : LOGIN WITH TOKEN
+    def test_https_device_login(self):
+        token = self.getToken()
+        print(token)

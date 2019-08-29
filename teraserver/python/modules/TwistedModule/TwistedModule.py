@@ -89,24 +89,15 @@ class TwistedModule(BaseModule):
         # Create a Twisted Web Site
         site = MySite(root_resource)
 
-        # ssl_factory = ssl.DefaultOpenSSLContextFactory(
-        #      privateKeyFileName=self.config.server_config['ssl_path'] + '/key.pem',
-        #      certificateFileName=self.config.server_config['ssl_path'] + '/ca.pem')
-
         # List of available CA clients certificates
-
-        # Test certificate
-        cert = ssl.Certificate.loadPEM(open(self.config.server_config['ssl_path'] +
-                                            '/devices/client_certificate.pem', 'rb').read())
-
-        # TODO READ OTHER CERTIFICATES FROM DB...
+        # TODO READ OTHER CERTIFICATES FROM FILE/DB...
         # caCerts=[cert.original]
         caCerts = []
 
         # Use verify = True to verify certificates
         self.ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
-                                             requireCertificate=False,
-                                             enableSessions=False)
+                                                  requireCertificate=False,
+                                                  enableSessions=False)
 
         ctx = self.ssl_factory.getContext()
         ctx.use_privatekey_file(self.config.server_config['ssl_path'] + '/'

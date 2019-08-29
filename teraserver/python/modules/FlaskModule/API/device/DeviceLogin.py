@@ -11,7 +11,7 @@ class DeviceLogin(Resource):
         Resource.__init__(self)
         self.parser = reqparse.RequestParser()
 
-    @LoginModule.certificate_required
+    @LoginModule.token_or_certificate_required
     def get(self):
 
         # Redis key is handled in LoginModule

@@ -15,7 +15,7 @@ class DeviceQuerySessions(Resource):
         Resource.__init__(self)
         self.module = flaskModule
 
-    @LoginModule.certificate_required
+    @LoginModule.token_or_certificate_required
     def get(self):
         device_access = DBManager.deviceAccess(current_device)
 
@@ -51,7 +51,7 @@ class DeviceQuerySessions(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @LoginModule.certificate_required
+    @LoginModule.token_or_certificate_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('session', type=str, location='json', help='Session to create / update',
@@ -121,6 +121,6 @@ class DeviceQuerySessions(Resource):
 
         return jsonify(update_session.to_json())
 
-    @LoginModule.certificate_required
+    @LoginModule.token_or_certificate_required
     def delete(self):
         return '', 403
