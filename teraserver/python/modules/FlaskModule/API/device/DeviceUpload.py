@@ -43,7 +43,7 @@ class DeviceUpload(Resource):
             return 'No file specified', 400
 
         file = request.files['file']
-        id_session = request.form['id_session']
+        id_session = int(request.form['id_session'])
 
         # Check if device is allowed to access the specified session
         device_access = DBManager.deviceAccess(current_device)
