@@ -1,5 +1,6 @@
 from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraDeviceType import TeraDeviceType
+from libtera.db.models.TeraServerSettings import TeraServerSettings
 
 import uuid
 import jwt
@@ -9,7 +10,7 @@ import datetime
 
 class TeraDevice(db.Model, BaseModel):
     __tablename__ = 't_devices'
-    secret = 'TeraDeviceSecret'
+    secret = None
     id_device = db.Column(db.Integer, db.Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
     # id_site = db.Column(db.Integer, db.ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=True)
     # id_session_type = db.Column(db.Integer, db.ForeignKey("t_sessions_types.id_session_type",
@@ -30,6 +31,12 @@ class TeraDevice(db.Model, BaseModel):
     device_sites = db.relationship("TeraDeviceSite")
     # device_session_types = db.relationship("TeraSessionTypeDeviceType")
     device_participants = db.relationship("TeraDeviceParticipant")
+
+    def __init__(self):
+        self.secret = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerTokenKey)
+        if self.secret is None:
+            # Fallback - should not happen
+            self.secret = 'TeraDeviceSecret'
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -55,7 +62,7 @@ class TeraDevice(db.Model, BaseModel):
         }
 
         # TODO key should be secret ?
-        self.device_token = jwt.encode(payload, TeraDevice.secret, 'HS256').decode('utf-8')
+        self.device_token = jwt.encode(payload, self.secret, 'HS256').decode('utf-8')
 
         return self.device_token
 
@@ -69,7 +76,7 @@ class TeraDevice(db.Model, BaseModel):
 
         if device:
             # Validate token
-            data = jwt.decode(token.encode('utf-8'), TeraDevice.secret, 'HS256')
+            data = jwt.decode(token.encode('utf-8'), device.secret, 'HS256')
 
             if data['device_uuid'] == device.device_uuid \
                     and data['device_name'] == device.device_name \

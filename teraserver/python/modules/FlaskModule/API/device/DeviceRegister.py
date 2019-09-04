@@ -15,12 +15,14 @@ from libtera.db.models.TeraSessionType import TeraSessionType
 
 import uuid
 
+
 class DeviceRegister(Resource):
     """
     Registration process requires a POST with a certificate signing request (CSR)
     Will return the certificate with newly created device UUID, but disabled.
     Administrators will need to put the device in a site and enable it before use.
     """
+
     def __init__(self, flaskModule=None):
         Resource.__init__(self)
         self.module = flaskModule

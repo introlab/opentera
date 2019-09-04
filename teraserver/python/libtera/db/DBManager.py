@@ -19,6 +19,7 @@ from libtera.db.models.TeraDeviceData import TeraDeviceData
 from libtera.db.models.TeraDeviceSite import TeraDeviceSite
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
+from libtera.db.models.TeraServerSettings import TeraServerSettings
 
 from libtera.ConfigManager import ConfigManager
 
@@ -54,6 +55,10 @@ class DBManager:
 
     @staticmethod
     def create_defaults(config: ConfigManager):
+        if TeraServerSettings.get_count() == 0:
+            print ('No server settings - creating defaults')
+            TeraServerSettings.create_defaults()
+
         if TeraSite.get_count() == 0:
             print('No sites - creating defaults')
             TeraSite.create_defaults()
