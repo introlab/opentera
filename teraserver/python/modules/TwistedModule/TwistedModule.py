@@ -21,6 +21,7 @@ from twisted.web.wsgi import WSGIResource
 from twisted.python import log
 from OpenSSL import SSL
 import sys
+import os
 
 
 class MyHTTPChannel(HTTPChannel):
@@ -81,10 +82,15 @@ class TwistedModule(BaseModule):
 
         # create resource for static assets
         # static_resource = File(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates', 'assets'))
+        base_folder = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        static_resource = File(os.path.join(base_folder, 'static'))
+        static_resource.contentTypes['.js'] = 'text/javascript'
+        static_resource.forbidden = True
 
         # the path "/assets" served by our File stuff and
         # the path "/wss" served by our WebSocket stuff
-        root_resource = WSGIRootResource(wsgi_resource, {b'wss': wss_resource})
+        # root_resource = WSGIRootResource(wsgi_resource, {b'wss': wss_resource})
+        root_resource = WSGIRootResource(wsgi_resource, {b'assets': static_resource, b'wss': wss_resource})
 
         # Create a Twisted Web Site
         site = MySite(root_resource)

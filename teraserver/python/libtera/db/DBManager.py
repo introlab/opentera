@@ -56,7 +56,7 @@ class DBManager:
     @staticmethod
     def create_defaults(config: ConfigManager):
         if TeraServerSettings.get_count() == 0:
-            print ('No server settings - creating defaults')
+            print('No server settings - creating defaults')
             TeraServerSettings.create_defaults()
 
         if TeraSite.get_count() == 0:

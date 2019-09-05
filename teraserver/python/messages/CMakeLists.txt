@@ -19,6 +19,10 @@ endif(WIN32)
 set(PROTOBUF_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/python)
 file(MAKE_DIRECTORY ${PROTOBUF_OUTPUT_PATH})
 
+# Output directory for javascript files
+set(PROTOBUF_JS_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/python/static/js/protobuf)
+file(MAKE_DIRECTORY ${PROTOBUF_JS_OUTPUT_PATH})
+
 # Targets
 set(protobuf_python_targets)
 
@@ -30,7 +34,7 @@ foreach(file ${protofiles})
     list(APPEND protobuf_python_targets ${output_target})
     #Add command to generate target
     add_custom_target(${output_target}
-        COMMAND ${PROTOC_EXECUTABLE} ${file} -I=${CMAKE_CURRENT_SOURCE_DIR} -I${GOOGLE_PROTO_PATH} --python_out ${PROTOBUF_OUTPUT_PATH}
+        COMMAND ${PROTOC_EXECUTABLE} ${file} -I=${CMAKE_CURRENT_SOURCE_DIR} -I${GOOGLE_PROTO_PATH} --python_out ${PROTOBUF_OUTPUT_PATH} --js_out=import_style=commonjs,binary:${PROTOBUF_JS_OUTPUT_PATH}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         DEPENDS python-env ${file} )
 endforeach(file)
