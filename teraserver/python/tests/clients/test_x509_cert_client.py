@@ -287,7 +287,7 @@ class x509ClientTest(unittest.TestCase):
         self.assertIsNotNone(self.agent)
         self.assertIsNotNone(session_info)
 
-        # 1 Mb of data
+        # 100 Mb of data
         producer = MultiPartProducer(
             {
                 "id_session": str(session_info['id_session']),
