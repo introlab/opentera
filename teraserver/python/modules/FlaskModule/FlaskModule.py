@@ -127,6 +127,7 @@ class FlaskModule(BaseModule):
         from .Views.Upload import Upload
         from .Views.Auth import Auth
         from .Views.Participant import Participant
+        from .Views.DeviceRegistration import DeviceRegistration
 
         # Default arguments
         args = []
@@ -137,3 +138,5 @@ class FlaskModule(BaseModule):
         flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
         flask_app.add_url_rule('/auth/', view_func=Auth.as_view('auth', *args, **kwargs))
         flask_app.add_url_rule('/participant/', view_func=Participant.as_view('participant', *args, **kwargs))
+        flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
+                                                                                            **kwargs))
