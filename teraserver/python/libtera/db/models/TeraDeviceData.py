@@ -72,7 +72,7 @@ class TeraDeviceData(db.Model, BaseModel):
         data2.devicedata_uuid = str(uuid.uuid4())
         # Create "file"
         with open(upload_path + '/' + data2.devicedata_uuid, 'wb') as fout:
-            fout.write(os.urandom(1024 * 1024 * 100))
+            fout.write(os.urandom(1024 * 1024 * 10))
         db.session.add(data2)
         db.session.commit()
 
