@@ -60,6 +60,11 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
         # TODO use protobuf ?
         print('TeraWebSocketProtocol onMessage', self, msg, binary)
 
+        if binary:
+            # Decode protobuf before parsing
+
+            pass
+
         # Parse JSON (protobuf content)
         try:
             message = Parse(msg, TeraMessage)

@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
    <head>
-		<script data-main="assets/js/protobuf/google-protobuf.js" src="assets/js/protobuf/require.js"></script>
-		<script src="assets/js/protobuf/ServerCommand_pb.js"></script>
+		<script src="assets/js/protobuf/protobuf.js"></script>
 		<script type="text/javascript">
 
             function httpGet(theUrl)
@@ -49,14 +48,38 @@
 			 };
 			 function send() {
 				//var msg = "Test"; //document.getElementById('message').value;
-				var msg = proto.opentera.protobuf.ServerCommand();
-				msg.prototype.setType(proto.opentera.protobuf.ServerCommand.CommandType.REGISTER_DEVICE);
-				if (sock) {
-				   sock.send(msg.prototype.serializeBinary());
-				   log("Sent: " + msg);
-				} else {
-				   log("Not connected.");
-				}
+				protobuf.load("assets/js/protobuf/messages/ServerCommand.proto", function(err, root){
+					if (err)
+						throw err;
+					
+					//console.log(root);
+					
+					// Build server command message
+					var ServerCommand = root.lookupType("opentera.protobuf.ServerCommand");
+					var values = {type: ServerCommand.CommandType.REGISTER_DEVICE};
+					var sc_msg = ServerCommand.create(values);
+					
+					// Build TeraMessage
+					protobuf.load("assets/js/protobuf/messages/TeraMessage.proto", function(err, root){
+						if (err)
+							throw err;
+							
+						var TeraMessage = root.lookupType("opentera.protobuf.TeraMessage");
+						var header_values = {time: (new Date()).getTime()};
+						var values = {head: header_values, data: {type: "opentera.protobuf.ServerCommand"}};
+						var msg = TeraMessage.create(values);						
+						var msg_bytes = TeraMessage.encode(msg).finish();
+					
+						console.log(msg_bytes);
+						if (sock) {
+							sock.send(msg_bytes);
+							log("Sent: " + msg.toJSON());
+						} else {
+							log("Not connected.");
+						}
+						
+					});
+				});
 			 };
 			 function log(m) {
 				ellog.innerHTML += m + '\n';
