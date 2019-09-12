@@ -44,6 +44,7 @@ class DeviceUpload(Resource):
 
             id_session = int(request.headers['X-Id-Session'])
             filename = secure_filename(request.headers['X-Filename'])
+            creation_date = datetime.datetime(request.headers['X-Filedate'])
 
             # Check if device is allowed to access the specified session
             device_access = DBManager.deviceAccess(current_device)
@@ -57,7 +58,8 @@ class DeviceUpload(Resource):
             # file_db_entry.devicedata_session = file_session
             file_db_entry.id_session = id_session
             file_db_entry.devicedata_original_filename = filename
-            file_db_entry.devicedata_saved_date = datetime.datetime.now()
+            file_db_entry.devicedata_name = filename
+            file_db_entry.devicedata_saved_date = creation_date
             file_db_entry.devicedata_uuid = str(uuid.uuid4())
             db.session.add(file_db_entry)
             db.session.commit()
