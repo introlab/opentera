@@ -14,6 +14,7 @@ class TeraDeviceData(db.Model, BaseModel):
     devicedata_original_filename = db.Column(db.String, nullable=False)
     devicedata_saved_date = db.Column(db.TIMESTAMP, nullable=False)
     devicedata_uuid = db.Column(db.String(36), nullable=False, unique=True)
+    devicedata_filesize = db.Column(db.Integer, nullable=False)
 
     devicedata_device = db.relationship("TeraDevice")
     devicedata_session = db.relationship("TeraSession")
@@ -59,8 +60,10 @@ class TeraDeviceData(db.Model, BaseModel):
         data1.devicedata_saved_date = datetime.datetime.now()
         data1.devicedata_uuid = str(uuid.uuid4())
         # Create "file"
+        filesize = 1024 * 1024
         with open(upload_path + '/' + data1.devicedata_uuid, 'wb') as fout:
-            fout.write(os.urandom(1024 * 1024))
+            fout.write(os.urandom(filesize))
+        data1.devicedata_filesize = filesize
         db.session.add(data1)
 
         data2 = TeraDeviceData()
@@ -71,8 +74,10 @@ class TeraDeviceData(db.Model, BaseModel):
         data2.devicedata_saved_date = datetime.datetime.now()
         data2.devicedata_uuid = str(uuid.uuid4())
         # Create "file"
+        filesize = 1024 * 1024 * 10
         with open(upload_path + '/' + data2.devicedata_uuid, 'wb') as fout:
-            fout.write(os.urandom(1024 * 1024 * 10))
+            fout.write(os.urandom(filesize))
+        data2.devicedata_filesize = filesize
         db.session.add(data2)
         db.session.commit()
 

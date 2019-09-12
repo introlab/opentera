@@ -59,6 +59,7 @@ class DeviceUpload(Resource):
             file_db_entry.devicedata_original_filename = filename
             file_db_entry.devicedata_saved_date = datetime.datetime.now()
             file_db_entry.devicedata_uuid = str(uuid.uuid4())
+            file_db_entry.devicedata_filesize = request.data.length
             db.session.add(file_db_entry)
             db.session.commit()
 
