@@ -83,9 +83,6 @@ class DeviceQuerySessions(Resource):
         if not json_session['id_session_type'] in session_types:
             return '', 403
 
-        # Get participants
-        participants = json_session.pop('session_participants')
-
         # Do the update!
         if json_session['id_session'] > 0:
 
@@ -102,6 +99,7 @@ class DeviceQuerySessions(Resource):
             try:
                 new_ses = TeraSession()
                 new_ses.from_json(json_session)
+                participants = json_session.pop('session_participants')
 
                 for uuid in participants:
                     participant = TeraParticipant.get_participant_by_uuid(uuid)
