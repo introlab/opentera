@@ -98,8 +98,8 @@ class DeviceQuerySessions(Resource):
             # New
             try:
                 new_ses = TeraSession()
-                new_ses.from_json(json_session)
                 participants = json_session.pop('session_participants')
+                new_ses.from_json(json_session)
 
                 for uuid in participants:
                     participant = TeraParticipant.get_participant_by_uuid(uuid)
