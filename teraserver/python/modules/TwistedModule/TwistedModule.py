@@ -113,7 +113,7 @@ class TwistedModule(BaseModule):
                                  + self.config.server_config['site_certificate'])
 
         # Certificate verification callback
-        ctx.set_verify(SSL.VERIFY_PEER, self.verifyCallback)
+        ctx.set_verify(SSL.VERIFY_NONE, self.verifyCallback)
 
         # With self-signed certs we have to explicitely tell the server to trust certificates
         ctx.load_verify_locations(self.config.server_config['ssl_path'] + '/'
