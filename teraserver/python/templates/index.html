@@ -34,11 +34,9 @@
             ellog = document.getElementById('log');
             var wsuri;
 
-            if (window.location.protocol === "file:") {
-               wsuri = httpGet("https://127.0.0.1:4040/api/user/login")
-            } else {
-               wsuri = httpGet("https://" + window.location.hostname + ":4040/api/user/login")
-            }
+
+            wsuri = httpGet("https://" + window.location.hostname + ":{{port}}/api/user/login")
+
 
             wsuri = JSON.parse(wsuri)['websocket_url']
 
