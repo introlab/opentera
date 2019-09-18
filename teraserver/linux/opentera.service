@@ -5,7 +5,7 @@ After=network-online.target
 [Service]
 User=letd2801
 Group=letd2801
-ExecStart=/usr/bin/python3 /home/letd2801/work/opentera.git/teraserver/python/TeraServer.py
+ExecStart=/home/letd2801/work/opentera.git/teraserver/python/start_conda.sh
 WorkingDirectory=/home/letd2801/work/opentera.git/teraserver/python
 StandardOutput=syslog+console
 StandardError=syslog+console
