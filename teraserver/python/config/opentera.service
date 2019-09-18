@@ -5,7 +5,7 @@ After=network-online.target
 [Service]
 User=letd2801
 Group=letd2801
-ExecStart=/home/letd2801/work/opentera.git/teraserver/python/start_conda.sh
+ExecStart=python3 TeraServer.py
 WorkingDirectory=/home/letd2801/work/opentera.git/teraserver/python
 StandardOutput=syslog+console
 StandardError=syslog+console
@@ -16,3 +16,4 @@ KillSignal=SIGINT
 
 [Install]
 WantedBy=multi-user.target
+
