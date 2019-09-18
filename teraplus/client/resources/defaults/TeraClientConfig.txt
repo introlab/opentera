@@ -13,19 +13,19 @@
 			"url": "10.0.1.8",
 			"port": 4040,
 			"webport": 40001, 
-			"pref": 1
-		},
-		"3IT": {
-			"url": "telesante.3it.usherbrooke.ca",
-			"port": 40000,
-			"webport": 40001,
 			"pref": 2
+		},
+		"3IT-Telesante": {
+			"url": "telesante.3it.usherbrooke.ca",
+			"port": 40040,
+			"webport": 40001,
+			"pref": 3
 		},
 		"Test": {
 			"url": "10.0.1.12",
 			"port": 40000,
 			"webport": 40001,
-			"pref": 3
+			"pref": 4
 		}
 	}
 }

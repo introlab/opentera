@@ -1,0 +1,18 @@
+[Unit]
+Description=OpenTeraServer
+After=network-online.target
+
+[Service]
+User=letd2801
+Group=letd2801
+ExecStart=/usr/bin/python3 /home/letd2801/work/opentera.git/teraserver/python/TeraServer.py
+WorkingDirectory=/home/letd2801/work/opentera.git/teraserver/python
+StandardOutput=syslog+console
+StandardError=syslog+console
+Restart=always
+RestartSec=10s
+KillMode=process
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

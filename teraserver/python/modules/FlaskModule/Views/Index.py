@@ -15,7 +15,9 @@ class Index(MethodView):
     @auth.login_required
     def get(self):
         print('get')
-        return render_template('index.html')
+        hostname = self.flaskModule.config.server_config['hostname']
+        port = self.flaskModule.config.server_config['port']
+        return render_template('index.html', hostname=hostname, port=port)
 
     @auth.login_required
     def post(self):
