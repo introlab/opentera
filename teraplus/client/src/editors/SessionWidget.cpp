@@ -134,18 +134,22 @@ void SessionWidget::updateDeviceData(TeraData *device_data)
         item = new QTableWidgetItem();
         ui->tableData->setItem(current_row, 2, item);
 
+        item = new QTableWidgetItem();
+        ui->tableData->setItem(current_row, 3, item);
+
         // Action button
         QPushButton* btnDownload = new QPushButton(tr("Télécharger"));
         btnDownload->setProperty("id_device_data", device_data->getId());
         btnDownload->setCursor(Qt::PointingHandCursor);
         connect(btnDownload, &QPushButton::clicked, this, &SessionWidget::btnDownload_clicked);
-        ui->tableData->setCellWidget(current_row, 3, btnDownload);
+        ui->tableData->setCellWidget(current_row, 4, btnDownload);
     }
 
     // Update values
     base_item->setText(device_data->getFieldValue("device_name").toString());
     ui->tableData->item(base_item->row(), 1)->setText(device_data->getFieldValue("devicedata_saved_date").toDateTime().toString("dd-MM-yyyy hh:mm:ss"));
     ui->tableData->item(base_item->row(), 2)->setText(device_data->getFieldValue("devicedata_name").toString());
+    ui->tableData->item(base_item->row(), 3)->setText(QString::number((device_data->getFieldValue("devicedata_filesize").toInt() / 1024.0 / 1024.0)) + " MB");
 }
 
 void SessionWidget::processFormsReply(QString form_type, QString data)

@@ -41,6 +41,13 @@ class TeraDeviceData(db.Model, BaseModel):
         return TeraDeviceData.query.filter_by(id_session=session_id).all()
 
     @staticmethod
+    def get_data_for_participant(part_id: int):
+        from libtera.db.models.TeraSession import TeraSession
+        from libtera.db.models.TeraParticipant import TeraParticipant
+        return TeraDeviceData.query.join(TeraSession).filter(TeraSession.session_participants.
+                                                             any(id_participant=part_id)).all()
+
+    @staticmethod
     def create_defaults(upload_path: str):
         from .TeraSession import TeraSession
         from .TeraDevice import TeraDevice

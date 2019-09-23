@@ -260,7 +260,7 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
           <bool>true</bool>
          </property>
          <attribute name="horizontalHeaderDefaultSectionSize">
-          <number>175</number>
+          <number>150</number>
          </attribute>
          <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
           <bool>true</bool>
@@ -285,7 +285,12 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
          </column>
          <column>
           <property name="text">
-           <string/>
+           <string>Taille</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Action</string>
           </property>
          </column>
         </widget>

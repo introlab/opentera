@@ -77,5 +77,6 @@ class TeraSessionForm:
 
         # Hidden as handled elsewhere
         section.add_item(TeraFormItem("session_participants_ids", gettext("Participants"), "hidden", False))
+        section.add_item(TeraFormItem("session_has_device_data", gettext("A données capteur"), "hidden", False))
 
         return form.to_dict()

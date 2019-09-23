@@ -173,6 +173,15 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
    </item>
    <item>
     <widget class="QTableWidget" name="tableDownloads">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="dragDropOverwriteMode">
+      <bool>false</bool>
+     </property>
      <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
      </attribute>

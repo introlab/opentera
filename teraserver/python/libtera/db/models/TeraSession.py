@@ -64,6 +64,10 @@ class TeraSession(db.Model, BaseModel):
             # Append session type infos
             # rval["session_session_type"] = self.session_session_type.to_json(ignore_fields=['id_session_type',
             #                                                                                'session_type_profile'])
+
+            # Append session components
+            from libtera.db.models.TeraDeviceData import TeraDeviceData
+            rval['session_has_device_data'] = len(TeraDeviceData.get_data_for_session(self.id_session)) > 0
         return rval
 
     @staticmethod

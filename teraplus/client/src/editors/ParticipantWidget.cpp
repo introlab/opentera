@@ -17,7 +17,7 @@ ParticipantWidget::ParticipantWidget(ComManager *comMan, const TeraData *data, Q
        ui->setupUi(this);
     }
     setAttribute(Qt::WA_StyledBackground); //Required to set a background image
-
+    ui->btnDownloadAll->hide();
     setLimited(false);
 
     // Connect signals and slots
@@ -73,12 +73,14 @@ void ParticipantWidget::connectSignals()
     connect(m_comManager, &ComManager::deviceSitesReceived, this, &ParticipantWidget::processDeviceSitesReply);
     connect(m_comManager, &ComManager::deviceParticipantsReceived, this, &ParticipantWidget::processDeviceParticipantsReply);
     connect(m_comManager, &ComManager::deleteResultsOK, this, &ParticipantWidget::deleteDataReply);
+    connect(m_comManager, &ComManager::downloadCompleted, this, &ParticipantWidget::onDownloadCompleted);
 
     connect(ui->btnUndo, &QPushButton::clicked, this, &ParticipantWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &ParticipantWidget::btnSave_clicked);
     connect(ui->btnDelSession, &QPushButton::clicked, this, &ParticipantWidget::btnDeleteSession_clicked);
     connect(ui->btnAddDevice, &QPushButton::clicked, this, &ParticipantWidget::btnAddDevice_clicked);
     connect(ui->btnDelDevice, &QPushButton::clicked, this, &ParticipantWidget::btnDelDevice_clicked);
+    connect(ui->btnDownloadAll, &QPushButton::clicked, this, &ParticipantWidget::btnDowloadAll_clicked);
 
     connect(ui->tableSessions, &QTableWidget::currentItemChanged, this, &ParticipantWidget::currentSelectedSessionChanged);
     connect(ui->tableSessions, &QTableWidget::itemDoubleClicked, this, &ParticipantWidget::displaySessionDetails);
@@ -128,6 +130,7 @@ void ParticipantWidget::updateSession(TeraData *session)
     QTableWidgetItem* duration_item;
     QTableWidgetItem* user_item;
     QTableWidgetItem* status_item;
+    QToolButton* btnDownload = nullptr;
 
     if (m_listSessions_items.contains(id_session)){
         // Already there, get items
@@ -137,22 +140,57 @@ void ParticipantWidget::updateSession(TeraData *session)
        status_item = ui->tableSessions->item(name_item->row(), 3);
        duration_item = ui->tableSessions->item(name_item->row(), 4);
        user_item = ui->tableSessions->item(name_item->row(), 5);
+       if (ui->tableSessions->cellWidget(name_item->row(), 6))
+           if(ui->tableSessions->cellWidget(name_item->row(), 6)->layout())
+               if(ui->tableSessions->cellWidget(name_item->row(), 6)->layout()->itemAt(1))
+                  btnDownload = dynamic_cast<QToolButton*>(ui->tableSessions->cellWidget(name_item->row(), 6)->layout()->itemAt(1)->widget());
        delete m_ids_sessions[id_session];
     }else{
+
         ui->tableSessions->setRowCount(ui->tableSessions->rowCount()+1);
+        int current_row = ui->tableSessions->rowCount()-1;
         name_item = new QTableWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_SESSION)),"");
-        ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 0, name_item);
+        ui->tableSessions->setItem(current_row, 0, name_item);
         date_item = new QTableWidgetItem("");
-        ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 1, date_item);
+        ui->tableSessions->setItem(current_row, 1, date_item);
         type_item = new QTableWidgetItem("");
-        ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 2, type_item);
+        ui->tableSessions->setItem(current_row, 2, type_item);
         status_item = new QTableWidgetItem("");
-        ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 3, status_item);
+        ui->tableSessions->setItem(current_row, 3, status_item);
         duration_item = new QTableWidgetItem("");
         duration_item->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-        ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 4, duration_item);
+        ui->tableSessions->setItem(current_row, 4, duration_item);
         user_item = new QTableWidgetItem("");
-        ui->tableSessions->setItem(ui->tableSessions->rowCount()-1, 5, user_item);
+        ui->tableSessions->setItem(current_row, 5, user_item);
+
+        // Create action buttons
+        QFrame* action_frame = new QFrame();
+        QHBoxLayout* layout = new QHBoxLayout();
+        layout->setContentsMargins(0,0,0,0);
+        layout->setAlignment(Qt::AlignLeft);
+        action_frame->setLayout(layout);
+
+        // Delete
+        QToolButton* btnDelete = new QToolButton();
+        btnDelete->setIcon(QIcon(":/icons/delete.png"));
+        btnDelete->setProperty("id_session", session->getId());
+        btnDelete->setCursor(Qt::PointingHandCursor);
+        btnDelete->setMaximumWidth(32);
+        btnDelete->setToolTip(tr("Supprimer"));
+        connect(btnDelete, &QToolButton::clicked, this, &ParticipantWidget::btnDeleteSession_clicked);
+        layout->addWidget(btnDelete);
+
+        // Download data
+        btnDownload = new QToolButton();
+        btnDownload->setIcon(QIcon(":/icons/save.png"));
+        btnDownload->setProperty("id_session", session->getId());
+        btnDownload->setCursor(Qt::PointingHandCursor);
+        btnDownload->setMaximumWidth(32);
+        btnDownload->setToolTip(tr("Télécharger les données"));
+        connect(btnDownload, &QToolButton::clicked, this, &ParticipantWidget::btnDownloadSession_clicked);
+        layout->addWidget(btnDownload);
+
+        ui->tableSessions->setCellWidget(current_row, 6, action_frame);
 
         m_listSessions_items[id_session] = name_item;
     }
@@ -189,6 +227,13 @@ void ParticipantWidget::updateSession(TeraData *session)
         user_item->setText(tr("Participant: ") + session->getFieldValue("session_creator_participant").toString());
     else {
         user_item->setText(tr("Inconnu"));
+    }
+
+    // Download data
+    if (btnDownload){
+        btnDownload->setVisible(session->getFieldValue("session_has_device_data").toBool());
+        if (session->getFieldValue("session_has_device_data").toBool())
+            ui->btnDownloadAll->show();
     }
 
     ui->tableSessions->resizeColumnsToContents();
@@ -381,6 +426,17 @@ void ParticipantWidget::deleteDataReply(QString path, int id)
     }
 }
 
+void ParticipantWidget::onDownloadCompleted(DownloadedFile *file)
+{
+    if (!m_comManager->hasPendingDownloads()){
+        setEnabled(true);
+        setReady();
+    }
+
+    GlobalMessageBox msgbox;
+    msgbox.showInfo(tr("Téléchargement"), tr("Téléchargement terminé: ") + file->getFullFilename());
+}
+
 void ParticipantWidget::btnSave_clicked()
 {
     if (!validateData()){
@@ -408,6 +464,15 @@ void ParticipantWidget::btnUndo_clicked()
 
 void ParticipantWidget::btnDeleteSession_clicked()
 {
+    // Check if the sender is a QToolButton (from the action column)
+    QToolButton* action_btn = dynamic_cast<QToolButton*>(sender());
+    if (action_btn){
+        // Select row according to the session id of that button
+        int id_session = action_btn->property("id_session").toInt();
+        QTableWidgetItem* session_item = m_listSessions_items[id_session];
+        ui->tableSessions->selectRow(session_item->row());
+    }
+
     if (!ui->tableSessions->currentItem())
         return;
 
@@ -475,6 +540,38 @@ void ParticipantWidget::btnDelDevice_clicked()
     if (answer == QMessageBox::Yes){
         // We must delete!
         m_comManager->doDelete(WEB_DEVICEPARTICIPANTINFO_PATH, item_todel->data(Qt::UserRole).toInt());
+    }
+}
+
+void ParticipantWidget::btnDownloadSession_clicked()
+{
+    QToolButton* button = dynamic_cast<QToolButton*>(sender());
+    if (button){
+        // Query folder to save file
+        QString save_path = QFileDialog::getExistingDirectory(this, tr("Sélectionnez un dossier pour le téléchargement"),
+                                                              QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+        if (!save_path.isEmpty()){
+            int id_session = button->property("id_session").toInt();
+            QUrlQuery args;
+            args.addQueryItem(WEB_QUERY_DOWNLOAD, "");
+            args.addQueryItem(WEB_QUERY_ID_SESSION, QString::number(id_session));
+            downloadDataRequest(save_path, WEB_DEVICEDATAINFO_PATH, args);
+            setWaiting();
+        }
+    }
+}
+
+void ParticipantWidget::btnDowloadAll_clicked()
+{
+    QString save_path = QFileDialog::getExistingDirectory(this, tr("Sélectionnez un dossier pour le téléchargement"),
+                                                          QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+    if (!save_path.isEmpty()){
+        int id_participant = m_data->getId();
+        QUrlQuery args;
+        args.addQueryItem(WEB_QUERY_DOWNLOAD, "");
+        args.addQueryItem(WEB_QUERY_ID_PARTICIPANT, QString::number(id_participant));
+        downloadDataRequest(save_path, WEB_DEVICEDATAINFO_PATH, args);
+        setWaiting();
     }
 }
 

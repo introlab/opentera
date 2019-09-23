@@ -9,6 +9,7 @@ from sqlalchemy import exc
 from libtera.db.DBManager import DBManager
 import zipfile
 from io import BytesIO
+from slugify import slugify
 
 
 class QueryDeviceData(Resource):
@@ -26,6 +27,7 @@ class QueryDeviceData(Resource):
         parser.add_argument('id_device_data', type=int)
         parser.add_argument('id_device', type=int, help='id_device')
         parser.add_argument('id_session', type=int)
+        parser.add_argument('id_participant', type=int)
         parser.add_argument('download')
 
         args = parser.parse_args()
@@ -42,6 +44,10 @@ class QueryDeviceData(Resource):
             if not user_access.query_session(session_id=args['id_session']):
                 return '', 403
             datas = TeraDeviceData.get_data_for_session(session_id=args['id_session'])
+        elif args['id_participant']:
+            if args['id_participant'] not in user_access.get_accessible_participants_ids():
+                return '', 403
+            datas = TeraDeviceData.get_data_for_participant(part_id=args['id_participant'])
         elif args['id_device_data']:
             datas = [TeraDeviceData.get_data_by_id(args['id_device_data'])]
             if datas[0] is not None:
@@ -69,14 +75,29 @@ class QueryDeviceData(Resource):
                 # Zip contents
                 # TODO: Check for large files VS available memory?
                 zip_ram = BytesIO()
-                zfile = zipfile.ZipFile(zip_ram, mode='w')
+                zfile = zipfile.ZipFile(zip_ram, compression=zipfile.ZIP_LZMA, mode='w')
 
                 for data in datas:
-                    zfile.write(src_dir + '/' + str(data.devicedata_uuid), arcname=data.devicedata_original_filename)
+                    archive_name = slugify(data.devicedata_session.session_name) + '/' + \
+                                   data.devicedata_original_filename
+                    zfile.write(src_dir + '/' + str(data.devicedata_uuid), arcname=archive_name)
                 zfile.close()
                 zip_ram.seek(0)
-                # TODO: Change zip filename to a more contextual name?
-                return send_file(zip_ram, as_attachment=True, attachment_filename='download.zip')
+
+                file_name = 'download'
+                if args['id_session']:
+                    file_name = slugify(data.devicedata_session.session_name)
+                elif args['id_participant']:
+                    from libtera.db.models.TeraParticipant import TeraParticipant
+                    file_name = slugify(TeraParticipant.get_participant_by_id(part_id=args['id_participant'])
+                                        .participant_name)
+
+                response = send_file(zip_ram, as_attachment=True, attachment_filename=file_name + '.zip',
+                                     mimetype='application/octet-stream')
+                response.headers.extend({
+                  'Content-Length': zip_ram.getbuffer().nbytes
+                })
+                return response
             else:
                 # filename = tmp_dir + '/' + datas[0].devicedata_original_filename
                 filename = datas[0].devicedata_original_filename

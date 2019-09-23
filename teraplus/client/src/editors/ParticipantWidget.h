@@ -4,6 +4,10 @@
 #include <QWidget>
 #include <QTableWidgetItem>
 #include <QListWidgetItem>
+#include <QToolButton>
+#include <QFrame>
+#include <QFileDialog>
+#include <QStandardPaths>
 
 #include "DataEditorWidget.h"
 #include "GlobalMessageBox.h"
@@ -59,12 +63,15 @@ private slots:
     void processDeviceSitesReply(QList<TeraData> device_sites);
     void processDeviceParticipantsReply(QList<TeraData> device_participants);
     void deleteDataReply(QString path, int id);
+    void onDownloadCompleted(DownloadedFile* file);
 
     void btnSave_clicked();
     void btnUndo_clicked();
     void btnDeleteSession_clicked();
     void btnAddDevice_clicked();
     void btnDelDevice_clicked();
+    void btnDownloadSession_clicked();
+    void btnDowloadAll_clicked();
 
     void currentSelectedSessionChanged(QTableWidgetItem* current, QTableWidgetItem* previous);
     void displaySessionDetails(QTableWidgetItem* session_item);
