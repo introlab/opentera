@@ -46,3 +46,10 @@ class TeraParticipantGroup(db.Model, BaseModel):
         base_pgroup2.id_project = TeraProject.get_project_by_projectname('Default Project #2').id_project
         db.session.add(base_pgroup2)
         db.session.commit()
+
+    @classmethod
+    def delete(cls, id_todel):
+        super().delete(id_todel)
+
+        from libtera.db.models.TeraSession import TeraSession
+        TeraSession.delete_orphaned_sessions()

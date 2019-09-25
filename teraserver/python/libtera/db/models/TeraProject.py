@@ -78,3 +78,10 @@ class TeraProject(db.Model, BaseModel):
         if isinstance(filter_args, dict):
             return TeraProject.query.filter_by(**filter_args).all()
         return None
+
+    @classmethod
+    def delete(cls, id_todel):
+        super().delete(id_todel)
+
+        from libtera.db.models.TeraSession import TeraSession
+        TeraSession.delete_orphaned_sessions()

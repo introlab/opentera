@@ -163,7 +163,7 @@ class QueryParticipants(Resource):
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraParticipant.delete_participant(id_participant=id_todel)
+            TeraParticipant.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

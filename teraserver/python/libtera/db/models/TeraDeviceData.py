@@ -3,6 +3,7 @@ import uuid
 import datetime
 import os
 from shutil import rmtree
+from modules.FlaskModule.FlaskModule import flask_app
 
 
 class TeraDeviceData(db.Model, BaseModel):
@@ -35,6 +36,10 @@ class TeraDeviceData(db.Model, BaseModel):
     @staticmethod
     def get_data_by_id(device_data_id: int):
         return TeraDeviceData.query.filter_by(id_device_data=device_data_id).first()
+
+    @staticmethod
+    def get_data_by_uuid(device_data_uuid):
+        return TeraDeviceData.query.filter_by(devicedata_uuid=device_data_uuid).first()
 
     @staticmethod
     def get_data_for_session(session_id: int):
@@ -88,11 +93,45 @@ class TeraDeviceData(db.Model, BaseModel):
         db.session.add(data2)
         db.session.commit()
 
-    def delete(self, file_path):
+    def delete(self):
+        # file_path = flask_app.config['UPLOAD_FOLDER']
         # Delete physical file from the disk
-        os.remove(os.path.join(file_path, self.devicedata_uuid))
+        # os.remove(os.path.join(file_path, self.devicedata_uuid))
+        TeraDeviceData.delete_files([self])
 
         # Delete data from the database
         db.session.delete(self)
         db.session.commit()
+
+    @staticmethod
+    def delete_files(datas: list):
+        file_path = flask_app.config['UPLOAD_FOLDER']
+
+        for data in datas:
+            file_name = os.path.join(file_path, data.devicedata_uuid)
+            if os.path.exists(file_name):
+                print('TeraDeviceData: Deleted ' + file_name)
+                os.remove(file_name)
+            else:
+                print('TeraDeviceData: File not found: ' + file_name)
+
+    @staticmethod
+    def delete_files_for_device(id_device: int):
+        datas = TeraDeviceData.get_data_for_device(id_device)
+        TeraDeviceData.delete_files(datas)
+
+    @staticmethod
+    def delete_files_for_session(id_session: int):
+        datas = TeraDeviceData.get_data_for_session(id_session)
+        TeraDeviceData.delete_files(datas)
+
+    @staticmethod
+    def delete_orphaned_files():
+        # Use with caution - this will take some time to process with a lot of files...
+        file_path = flask_app.config['UPLOAD_FOLDER']
+        for file in os.listdir(file_path):
+            if not TeraDeviceData.get_data_by_uuid(file):
+                file_name = os.path.join(file_path, file)
+                print('TeraDeviceData: Orphaned file found and deleted: ' + file_name)
+                os.remove(file_name)
 

@@ -115,3 +115,24 @@ class TeraSession(db.Model, BaseModel):
     @staticmethod
     def get_sessions_for_type(session_type_id: int):
         return TeraSession.query.filter_by(id_session_type=session_type_id).all()
+
+    @staticmethod
+    def delete_orphaned_sessions(commit_changes=True):
+        from libtera.db.models.TeraDeviceData import TeraDeviceData
+        orphans = TeraSession.query.outerjoin(TeraSession.session_participants).filter(
+            TeraSession.session_participants == None).all()
+
+        if orphans:
+            for orphan in orphans:
+                TeraDeviceData.delete_files_for_session(orphan.id_session)
+                db.session.delete(orphan)
+
+        if commit_changes:
+            db.session.commit()
+
+    @classmethod
+    def delete(cls, id_todel):
+        from libtera.db.models.TeraDeviceData import TeraDeviceData
+        TeraDeviceData.delete_files_for_session(id_todel)
+
+        super().delete(id_todel)

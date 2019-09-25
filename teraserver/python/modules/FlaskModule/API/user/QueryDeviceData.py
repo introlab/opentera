@@ -177,7 +177,7 @@ class QueryDeviceData(Resource):
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            data.delete(file_path=flask_app.config['UPLOAD_FOLDER'])
+            data.delete()
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

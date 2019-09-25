@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-09-23 10:12-0400\n"
+"POT-Creation-Date: 2019-09-25 09:29-0400\n"
 "PO-Revision-Date: 2019-03-28 16:24-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -190,6 +190,10 @@ msgstr ""
 
 #: libtera/forms/TeraSessionForm.py:79
 msgid "Participants"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:80
+msgid "A données capteur"
 msgstr ""
 
 #: libtera/forms/TeraSessionTypeForm.py:32

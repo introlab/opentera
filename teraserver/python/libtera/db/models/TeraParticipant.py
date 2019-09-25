@@ -132,10 +132,6 @@ class TeraParticipant(db.Model, BaseModel):
 
         # Check if we need to delete orphan sessions (sessions that have no more participants left
         from libtera.db.models.TeraSession import TeraSession
-        orphans = TeraSession.query.outerjoin(TeraSession.session_participants).filter(
-            TeraSession.session_participants == None).all()
+        TeraSession.delete_orphaned_sessions(False)
 
-        if orphans:
-            for orphan in orphans:
-                db.session.delete(orphan)
         db.session.commit()

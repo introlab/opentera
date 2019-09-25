@@ -70,3 +70,5 @@ node_modules/
 /teraserver/python/certificates/site_key.pem
 /teraplus/client/resources/icons/device.psd
 /teraserver/python/uploads
+build-teraplus-Desktop_Qt_5_13_1_MSVC2017_64bit-Debug
+build-teraserver-Desktop_Qt_5_13_1_MSVC2017_64bit-Debug

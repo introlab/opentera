@@ -179,3 +179,10 @@ class TeraDevice(db.Model, BaseModel):
         device.create_token()
 
         super().insert(device)
+
+    @classmethod
+    def delete(cls, id_todel):
+        super().delete(id_todel)
+
+        from libtera.db.models.TeraDeviceData import TeraDeviceData
+        TeraDeviceData.delete_files_for_device(id_todel)
