@@ -5,6 +5,7 @@ from libtera.ConfigManager import ConfigManager
 from flask_babel import Babel
 
 from modules.BaseModule import BaseModule, ModuleNames
+from libtera.db.models.TeraServerSettings import TeraServerSettings
 
 flask_app = Flask("OpenTera")
 
@@ -19,7 +20,7 @@ def get_locale():
     if user is not None:
         return user.locale
     # otherwise try to guess the language from the user accept
-    # header the browser transmits.  We support de/fr/en in this
+    # header the browser transmits.  We support fr/en in this
     # example.  The best match wins.
     return request.accept_languages.best_match(['fr', 'en'])
 
@@ -38,10 +39,15 @@ class FlaskModule(BaseModule):
         BaseModule.__init__(self, ModuleNames.FLASK_MODULE_NAME.value, config)
 
         flask_app.debug = True
-        flask_app.secret_key = 'development'
+        # flask_app.secret_key = 'development'
+        # Change secret key to use server UUID
+        # This is used for session encryption
+        flask_app.secret_key = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerUUID)
+
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         # TODO set upload folder in config
+        # TODO remove this configuration, it is not useful?
         flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
 
         # Not sure.

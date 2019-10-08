@@ -121,7 +121,7 @@ class QueryParticipants(Resource):
         if json_participant['id_participant'] > 0:
             # Already existing
             try:
-                TeraParticipant.update_participant(json_participant['id_participant'], json_participant)
+                TeraParticipant.update(json_participant['id_participant'], json_participant)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
