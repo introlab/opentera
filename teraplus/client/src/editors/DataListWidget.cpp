@@ -13,11 +13,9 @@ DataListWidget::DataListWidget(ComManager *comMan, TeraDataTypes data_type, QWid
     m_dataType(data_type)
 {
 
-    if (parent){
-        ui->setupUi(parent);
-    }else {
-        ui->setupUi(this);
-    }
+
+    ui->setupUi(this);
+
 
     m_editor = nullptr;
     setSearching(false);

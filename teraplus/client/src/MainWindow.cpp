@@ -8,6 +8,7 @@
 #include "editors/GroupWidget.h"
 #include "editors/ParticipantWidget.h"
 
+
 MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -386,8 +387,11 @@ void MainWindow::on_btnEditUser_clicked()
     // Hold all selection from happening in the project manager
     ui->wdgMainMenu->setOnHold(true);
 
-    m_diag_editor = new QDialog(this);
-    UserWidget* user_editor = new UserWidget(m_comManager, &(m_comManager->getCurrentUser()), m_diag_editor);
+    m_diag_editor = new BaseDialog(this);
+    UserWidget* user_editor = new UserWidget(m_comManager, &(m_comManager->getCurrentUser()), nullptr);
+
+    m_diag_editor->setCentralWidget(user_editor);
+
     user_editor->setLimited(true);
     connect(user_editor, &UserWidget::closeRequest, m_diag_editor, &QDialog::accept);
     connect(m_diag_editor, &QDialog::finished, this, &MainWindow::editorDialogFinished);
@@ -406,8 +410,10 @@ void MainWindow::on_btnConfig_clicked()
     // Hold all selection from happening in the project manager
     ui->wdgMainMenu->setOnHold(true);
 
-    m_diag_editor = new QDialog(this);
-    ConfigWidget* config_editor = new ConfigWidget(m_comManager, m_diag_editor);
+    m_diag_editor = new BaseDialog(this);
+    ConfigWidget* config_editor = new ConfigWidget(m_comManager, nullptr);
+    m_diag_editor->setCentralWidget(config_editor);
+
     m_diag_editor->setFixedSize(size().width()-50, size().height()-150);
     //m_diag_editor->move(25,75);
 

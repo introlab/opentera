@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 
     //Set application style
     #ifndef WIN32 // Don't set style on Windows - it creates some issues with combobox look.
-    //app->setStyle("windows");
+        //app->setStyle("windows");
     #endif
 
 

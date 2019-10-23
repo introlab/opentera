@@ -14,7 +14,8 @@
    <string>Assignation d'un appareil</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QPushButton#btnConnect{background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(0, 170, 0), stop: 1 rgb(75, 200, 0));}
+   <string notr="true">/*
+QPushButton#btnConnect{background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(0, 170, 0), stop: 1 rgb(75, 200, 0));}
 QPushButton#btnDelSession{background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(117, 0, 0), stop: 1 rgb(200, 0, 0));}
 QWidget{background-color: rgba(0,0,0,0);color:white;border-radius:5px}
 QWidget#DeviceAssignDialog{background-color:rgba(128,128,128,25%);}
@@ -68,23 +69,17 @@ QWidget#lineOffline{background-color:red;}
 QWidget#lineBoth{background-color:rgb(255,0,255);}
 
 
-QTabWidget::pane { /* The tab widget frame */
-	/*background-color:  rgba(0,128,200,30%);*/
-	/* background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                 stop: 0  rgba(0,128,200,50%), 
-								stop: 0.5  rgba(0,128,200,25%)
-								stop: 1.0  rgba(0,128,200,25%));*/
+QTabWidget::pane { 
 	background-color: rgba(128,128,140,25%);
 	border-radius: 5px;
     border: 2px solid rgba(128,128,140,50%);
  }
 
  QTabWidget::tab-bar {
-     left: 5px; /* move to the right by 5px */
+     left: 5px; 
  }
 
-/* Style the tab using the tab sub-control. Note that
-     it reads QTabBar _not_ QTabWidget */
+
  QTabBar::tab,QTableWidget::tab,QHeaderView::section {
      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                  stop: 0  rgba(128,128,140,50%),  stop: 1.0  rgba(128,128,140,25%));
@@ -97,18 +92,18 @@ min-height:25px;
  }
 
  QTabBar::tab:selected, QTabBar::tab:hover {
-/*     background-color: rgba(0,128,200,70%);*/
+
 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                  stop: 0  rgba(128,128,140,70%),  stop: 1.0  rgba(128,128,140,50%));
  }
 
  QTabBar::tab:selected {
      border-color:rgba(128,128,140,60%);
-     border-bottom-color:rgba(128,128,140,60%); /* same as pane color */
+     border-bottom-color:rgba(128,128,140,60%); 
  }
 
  QTabBar::tab:!selected {
-     margin-top: 2px; /* make non-selected tabs look smaller */
+     margin-top: 2px; 
  }
  QCalendarWidget QWidget#qt_calendar_navigationbar { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop: 0 #cccccc, stop: 1 #333333); }
     QCalendarWidget QToolButton {
@@ -137,10 +132,10 @@ QCalendarWidget QSpinBox::down-button {subcontrol-origin: border; subcontrol-pos
 QCalendarWidget QSpinBox::up-arrow { width:16px; height:16px; }
 QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
 
-   /* header row */
+
     QCalendarWidget QWidget { alternate-background-color: #0d5ca6; }
      
-    /* normal days */
+ 
     QCalendarWidget QAbstractItemView:enabled
     {
     font-size:12px;
@@ -150,9 +145,9 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
     selection-color: rgb(0, 255, 0);
     }
      
-    /* days in other months */
+    
     QCalendarWidget QAbstractItemView:disabled { color: rgb(64, 64, 64); }
-
+*/
 </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">

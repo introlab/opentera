@@ -12,7 +12,7 @@
 #include "DataEditorWidget.h"
 #include "GlobalMessageBox.h"
 #include "DeviceAssignDialog.h"
-
+#include "BaseDialog.h"
 #include "TeraSessionStatus.h"
 
 namespace Ui {
@@ -41,7 +41,7 @@ private:
     QMap<int, QListWidgetItem*>     m_listAvailDevices_items;   // int  = device_id
     QMap<int, QListWidgetItem*>     m_listDevices_items;        // int  = device_id
 
-    QDialog*                     m_diag_editor;
+    BaseDialog*                     m_diag_editor;
 
     void updateControlsState();
     void updateFieldsValue();

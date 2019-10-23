@@ -18,6 +18,7 @@ set(headers
     DeviceAssignDialog.h
     DownloadedFile.h
     DownloadProgressDialog.h
+    BaseDialog.h
     editors/DataEditorWidget.h
     editors/UserWidget.h
     editors/TeraForm.h
@@ -47,6 +48,7 @@ set(srcs
     DeviceAssignDialog.cpp
     DownloadedFile.cpp
     DownloadProgressDialog.cpp
+    BaseDialog.cpp
     editors/DataEditorWidget.cpp
     editors/UserWidget.cpp
     editors/TeraForm.cpp
@@ -68,6 +70,7 @@ SET(uis
     ConfigWidget.ui
     DeviceAssignDialog.ui
     DownloadProgressDialog.ui
+    BaseDialog.ui
     editors/UserWidget.ui
     editors/TeraForm.ui
     editors/DataListWidget.ui

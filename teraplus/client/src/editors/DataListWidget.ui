@@ -20,7 +20,8 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#DataListWidget{background-image: url(:/pictures/TeRA_Background.png); }
+   <string notr="true">/*
+QWidget#DataListWidget{background-image: url(://TeRA_Background.png); }
 QPushButton#btnConnect, QFrame{background-color:rgb(80,180,80)}
 
 QWidget{background-color: rgba(0,0,0,0);color:white;border-radius:5px;}
@@ -53,7 +54,7 @@ QTreeWidget::branch:closed:has-children:has-siblings  {
             border-image: none;
             image:url(:/pictures/controls/branch_opened.png);
     }
-
+*/
 </string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">

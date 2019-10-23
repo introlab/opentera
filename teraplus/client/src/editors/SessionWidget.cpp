@@ -8,11 +8,9 @@ SessionWidget::SessionWidget(ComManager *comMan, const TeraData *data, QWidget *
     DataEditorWidget(comMan, data, parent),
     ui(new Ui::SessionWidget)
 {
-    if (parent){
-       ui->setupUi(parent);
-    }else {
-       ui->setupUi(this);
-    }
+
+    ui->setupUi(this);
+
     setAttribute(Qt::WA_StyledBackground); //Required to set a background image
 
     ui->wdgSession->setHighlightConditions(false); // Hide conditional questions indicator

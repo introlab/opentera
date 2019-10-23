@@ -7,11 +7,9 @@ DeviceWidget::DeviceWidget(ComManager *comMan, const TeraData *data, QWidget *pa
     DataEditorWidget(comMan, data, parent),
     ui(new Ui::DeviceWidget)
 {
-    if (parent){
-        ui->setupUi(parent);
-    }else {
-        ui->setupUi(this);
-    }
+
+    ui->setupUi(this);
+
     setAttribute(Qt::WA_StyledBackground); //Required to set a background image
 
     // Connect signals and slots

@@ -7,6 +7,7 @@
 #include <QDialog>
 
 #include "editors/UserWidget.h"
+#include "BaseDialog.h"
 #include "ConfigWidget.h"
 
 #include "DownloadProgressDialog.h"
@@ -68,7 +69,7 @@ private:
     Ui::MainWindow *ui;
 
     ComManager*             m_comManager;
-    QDialog*                m_diag_editor;
+    BaseDialog*             m_diag_editor;
     DataEditorWidget*       m_data_editor;
     DownloadProgressDialog* m_download_dialog;
     TeraDataTypes           m_waiting_for_data_type;

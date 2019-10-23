@@ -10,6 +10,11 @@ ClientApp::ClientApp(int &argc, char **argv)
     m_loginDiag = nullptr;
     m_mainWindow = nullptr;
 
+    QFile file(":/stylesheet.qss");
+    file.open(QFile::ReadOnly);
+    QString stylesheet = QLatin1String(file.readAll());
+    setStyleSheet(stylesheet);
+
     setApplicationName(QString("TeraClient v") + QString(TERAPLUS_VERSION));
     qDebug() << "Starting App " << applicationName();
 

@@ -82,5 +82,6 @@
         <file>icons/device_installed.png</file>
         <file>icons/device_offline.png</file>
         <file>icons/device_online.png</file>
+        <file>stylesheet.qss</file>
     </qresource>
 </RCC>

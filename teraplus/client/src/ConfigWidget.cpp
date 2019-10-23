@@ -6,11 +6,11 @@ ConfigWidget::ConfigWidget(ComManager *comMan, QWidget *parent) :
     ui(new Ui::ConfigWidget),
     m_comManager(comMan)
 {
-    if (parent){
-        ui->setupUi(parent);
-    }else {
-        ui->setupUi(this);
-    }
+
+    ui->setupUi(this);
+
+
+    setAttribute(Qt::WA_StyledBackground); //Required to set a background image
 
     m_dataListEditor = nullptr;
 

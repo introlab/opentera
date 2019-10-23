@@ -11,11 +11,9 @@ ParticipantWidget::ParticipantWidget(ComManager *comMan, const TeraData *data, Q
 
     m_diag_editor = nullptr;
 
-    if (parent){
-       ui->setupUi(parent);
-    }else {
-       ui->setupUi(this);
-    }
+
+    ui->setupUi(this);
+
     setAttribute(Qt::WA_StyledBackground); //Required to set a background image
     ui->btnDownloadAll->hide();
     setLimited(false);
@@ -586,11 +584,18 @@ void ParticipantWidget::displaySessionDetails(QTableWidgetItem *session_item)
     if (m_diag_editor){
         m_diag_editor->deleteLater();
     }
-    m_diag_editor = new QDialog(this);
+    m_diag_editor = new BaseDialog(this);
+
+
+
+
+
+
     int id_session = m_listSessions_items.key(ui->tableSessions->item(session_item->row(),0));
     TeraData* ses_data = m_ids_sessions[id_session];
     if (ses_data){
-        SessionWidget* ses_widget = new SessionWidget(m_comManager, ses_data, m_diag_editor);
+        SessionWidget* ses_widget = new SessionWidget(m_comManager, ses_data, nullptr);
+        m_diag_editor->setCentralWidget(ses_widget);
 
         m_diag_editor->setWindowTitle(tr("Séance"));
         m_diag_editor->setMinimumSize(this->width(), this->height());

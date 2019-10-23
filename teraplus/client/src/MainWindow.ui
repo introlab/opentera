@@ -18,7 +18,8 @@
     <normaloff>:/icons/ESTRAD.ico</normaloff>:/icons/ESTRAD.ico</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#MainWindow{background-image: url(://TeRA_Background.png); }
+   <string notr="true">/*
+QWidget#MainWindow{background-image: url(://TeRA_Background.png); }
 QWidget{background-color: rgba(0,0,0,0);color:white;border-radius:5px;}
 
 QWidget#toolsWidget,QWidget#InToolsWidget{background-color:rgba(0,128,200,20%);}
@@ -62,7 +63,8 @@ QTreeWidget::branch:closed:has-children  {
     QTreeWidget::branch:open:has-children:has-siblings   {
             border-image: none;
             image:url(://controls/branch_opened.png);
-    }</string>
+    }
+*/</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -112,7 +114,7 @@ QTreeWidget::branch:closed:has-children  {
      <x>0</x>
      <y>0</y>
      <width>948</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

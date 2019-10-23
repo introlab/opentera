@@ -14,7 +14,8 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QPushButton#btnConnect{background-color:rgb(80,180,80)}
+   <string notr="true">/*
+QPushButton#btnConnect{background-color:rgb(80,180,80)}
 QWidget{background-color: rgba(0,0,0,0);color:white;border-radius:5px}
 QWidget#mainWidget{background-color:rgba(128,128,128,25%);}
 QWidget#frmProfile,QWidget#pageProfile{background-color:rgba(108,8,156,25%);}
@@ -67,23 +68,18 @@ QWidget#lineOffline{background-color:red;}
 QWidget#lineBoth{background-color:rgb(255,0,255);}
 
 
-QTabWidget::pane { /* The tab widget frame */
-	/*background-color:  rgba(0,128,200,30%);*/
-	/* background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                 stop: 0  rgba(0,128,200,50%), 
-								stop: 0.5  rgba(0,128,200,25%)
-								stop: 1.0  rgba(0,128,200,25%));*/
+QTabWidget::pane { 
+
 	background-color: rgba(128,128,140,25%);
 	border-radius: 5px;
     border: 2px solid rgba(128,128,140,50%);
  }
 
  QTabWidget::tab-bar {
-     left: 5px; /* move to the right by 5px */
+     left: 5px; 
  }
 
-/* Style the tab using the tab sub-control. Note that
-     it reads QTabBar _not_ QTabWidget */
+
  QTabBar::tab,QTableWidget::tab,QHeaderView::section {
      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                  stop: 0  rgba(128,128,140,50%),  stop: 1.0  rgba(128,128,140,25%));
@@ -96,20 +92,19 @@ min-height:25px;
  }
 
  QTabBar::tab:selected, QTabBar::tab:hover {
-/*     background-color: rgba(0,128,200,70%);*/
+
 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                  stop: 0  rgba(128,128,140,70%),  stop: 1.0  rgba(128,128,140,50%));
  }
 
  QTabBar::tab:selected {
      border-color:rgba(128,128,140,60%);
-     border-bottom-color:rgba(128,128,140,60%); /* same as pane color */
- }
+     border-bottom-color:rgba(128,128,140,60%); 
 
  QTabBar::tab:!selected {
-     margin-top: 2px; /* make non-selected tabs look smaller */
+     margin-top: 2px; 
  }
-
+*/
 
 </string>
   </property>

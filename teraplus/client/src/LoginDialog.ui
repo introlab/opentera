@@ -27,7 +27,8 @@
     <normaloff>:/icons/ESTRAD.ico</normaloff>:/icons/ESTRAD.ico</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">QDialog {background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 rgb(64,64,64), stop: 1.0 rgb(40,40,40)); spacing: 3px;} 
+   <string notr="true">/*
+QDialog {background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 rgb(64,64,64), stop: 1.0 rgb(40,40,40)); spacing: 3px;} 
 
 QLabel#lblMessage{color:gold;}
 
@@ -45,7 +46,8 @@ QPushButton[checkable=true]:!checked,QToolButton[checkable=true]:!checked{color:
 
 
 QLineEdit:disabled,QComboBox:disabled,QPushButton:disabled{background-color:rgba(220,220,220,10%);color: white;}
-QGroupBox#grpLogos{background-color:rgba(200,200,200,200);}</string>
+QGroupBox#grpLogos{background-color:rgba(200,200,200,200);}
+*/</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">

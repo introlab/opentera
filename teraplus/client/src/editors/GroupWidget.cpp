@@ -5,11 +5,9 @@ GroupWidget::GroupWidget(ComManager *comMan, const TeraData *data, QWidget *pare
     DataEditorWidget(comMan, data, parent),
     ui(new Ui::GroupWidget)
 {   
-    if (parent){
-       ui->setupUi(parent);
-    }else {
-       ui->setupUi(this);
-    }
+
+    ui->setupUi(this);
+
     setAttribute(Qt::WA_StyledBackground); //Required to set a background image
 
     setLimited(false);
