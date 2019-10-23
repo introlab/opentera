@@ -44,28 +44,25 @@ class DeviceRegister(Resource):
         device = TeraDevice()
 
         # Required field(s)
-        # Name should be taken from CSR
+        # Name should be taken from CSR or JSON request
         device.device_name = name
         # TODO set flags properly
         device.device_onlineable = False
         # TODO WARNING - Should be disabled when created...
-        device.device_enabled = True
+        device.device_enabled = False
         device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
         device.device_uuid = str(uuid.uuid4())
         device.create_token()
         device.update_last_online()
 
-        # Store
-        db.session.add(device)
-
-        # TODO remove participant assignation
-        from libtera.db.models.TeraParticipant import TeraParticipant
-        from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
-        participant1 = TeraParticipant.get_participant_by_id(1)
-        device_partipant = TeraDeviceParticipant()
-        device_partipant.device_participant_participant = participant1
-        device_partipant.device_participant_device = device
-        db.session.add(device_partipant)
+        # Test participant assignation
+        # from libtera.db.models.TeraParticipant import TeraParticipant
+        # from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+        # participant1 = TeraParticipant.get_participant_by_id(1)
+        # device_partipant = TeraDeviceParticipant()
+        # device_partipant.device_participant_participant = participant1
+        # device_partipant.device_participant_device = device
+        # db.session.add(device_partipant)
 
         return device
 

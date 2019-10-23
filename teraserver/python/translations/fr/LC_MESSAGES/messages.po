@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-09-25 09:29-0400\n"
-"PO-Revision-Date: 2019-03-28 16:24-0400\n"
+"POT-Creation-Date: 2019-10-08 11:00-0400\n"
+"PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -417,43 +417,4 @@ msgstr ""
 #: modules/FlaskModule/API/user/QueryUsers.py:142
 msgid "Username unavailable."
 msgstr ""
-
-#~ msgid "Groupe(s) utilisateur(s)"
-#~ msgstr ""
-
-#~ msgid "Nom du participant"
-#~ msgstr ""
-
-#~ msgid "Site d'appartenance"
-#~ msgstr ""
-
-#~ msgid "Paramètres"
-#~ msgstr ""
-
-#~ msgid "ID Lien Kit-Appareil"
-#~ msgstr ""
-
-#~ msgid "Kit"
-#~ msgstr ""
-
-#~ msgid "Appareil"
-#~ msgstr ""
-
-#~ msgid "Optionnel?"
-#~ msgstr ""
-
-#~ msgid "ID Kit"
-#~ msgstr ""
-
-#~ msgid "Nom du kit"
-#~ msgstr ""
-
-#~ msgid "Kit partageable?"
-#~ msgstr ""
-
-#~ msgid "Créateur"
-#~ msgstr ""
-
-#~ msgid "Paramètres spécifiques"
-#~ msgstr ""
 

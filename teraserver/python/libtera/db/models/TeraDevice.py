@@ -80,9 +80,8 @@ class TeraDevice(db.Model, BaseModel):
                               TeraServerSettings.get_server_setting_value(
                                   TeraServerSettings.ServerTokenKey), 'HS256')
 
-            if data['device_uuid'] == device.device_uuid \
-                    and data['device_name'] == device.device_name \
-                    and data['device_type'] == device.device_type:
+            # Only validating UUID since other fields can change in database after token is generated.
+            if data['device_uuid'] == device.device_uuid:
 
                 # Update last online
                 device.update_last_online()

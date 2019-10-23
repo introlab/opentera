@@ -39,5 +39,8 @@ add_subdirectory(shared)
 # Client
 add_subdirectory(client)
 
+# Package
+add_subdirectory(package)
+
 # Readme and other files
 add_custom_target(readme SOURCES README.md)

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-09-25 09:29-0400\n"
-"PO-Revision-Date: 2019-03-28 16:24-0400\n"
+"POT-Creation-Date: 2019-10-08 11:00-0400\n"
+"PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -24,7 +24,7 @@ msgstr ""
 #: libtera/forms/TeraSessionTypeForm.py:28 libtera/forms/TeraSiteForm.py:12
 #: libtera/forms/TeraUserForm.py:12
 msgid "Informations"
-msgstr "Informations"
+msgstr ""
 
 #: libtera/forms/TeraDeviceForm.py:26
 msgid "ID Appareil"
@@ -64,12 +64,12 @@ msgstr ""
 
 #: libtera/forms/TeraDeviceForm.py:39 libtera/forms/TeraUserForm.py:27
 msgid "Notes"
-msgstr "Notes"
+msgstr ""
 
 #: libtera/forms/TeraDeviceForm.py:40 libtera/forms/TeraParticipantForm.py:32
 #: libtera/forms/TeraUserForm.py:29
 msgid "Dernière connexion"
-msgstr "Last Connection"
+msgstr ""
 
 #: libtera/forms/TeraDeviceForm.py:43 libtera/forms/TeraDeviceForm.py:45
 msgid "Configuration"
@@ -238,11 +238,11 @@ msgstr ""
 
 #: libtera/forms/TeraUserForm.py:16
 msgid "ID Utilisateur"
-msgstr "User ID"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:17
 msgid "UUID Utilisateur"
-msgstr "User UUID"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:18
 msgid "Nom complet Utilisateur"
@@ -250,31 +250,31 @@ msgstr ""
 
 #: libtera/forms/TeraUserForm.py:19
 msgid "Code utilisateur"
-msgstr "User Code"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:20
 msgid "Activé"
-msgstr "Activated"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:21
 msgid "Prénom"
-msgstr "Surname"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:22
 msgid "Nom"
-msgstr "Name"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:23
 msgid "Courriel"
-msgstr "Email"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:25 libtera/forms/TeraUserForm.py:81
 msgid "Mot de passe"
-msgstr "Password"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:26
 msgid "Super administrateur"
-msgstr "Super Administrator"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:28
 msgid "Profil"
@@ -282,83 +282,83 @@ msgstr ""
 
 #: libtera/forms/TeraUserForm.py:39
 msgid "Configuration audio-vidéo"
-msgstr "Audio/Video Configuration"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:43
 msgid "Caméra"
-msgstr "Camera"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:44
 msgid "Type de caméra"
-msgstr "Camera Type"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:45
 msgid "Caméra réseau"
-msgstr "Network Camera"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:46
 msgid "Capture d'écran"
-msgstr "Scren Capture"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:50
 msgid "Adresse du flux de la caméra"
-msgstr "Camera Stream Address"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:54
 msgid "Trames par seconde"
-msgstr "Frames per second"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:59
 msgid "Résolution"
-msgstr "Resolution"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:67
 msgid "Caméra contrôlable (PTZ)"
-msgstr "PTZ Camera"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:68
 msgid "Type de contrôle"
-msgstr "Control Type"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:69
 msgid "Vivotek"
-msgstr "Vivotek"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:69
 msgid "ONVIF (générique)"
-msgstr "ONVIF (generic)"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:72
 msgid "Adresse réseau"
-msgstr "Network Address"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:75
 msgid "Port"
-msgstr "Port"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:78
 msgid "Nom utilisateur"
-msgstr "Username"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:85
 msgid "Microphone"
-msgstr "Microphone"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:86
 msgid "Caméra secondaire"
-msgstr "Secondary Camera"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:88
 msgid "Configuration générale"
-msgstr "General Configuration"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:90
 msgid "Affichage en plein écran en séance"
-msgstr "Allow Fullscreen Session"
+msgstr ""
 
 #: libtera/forms/TeraUserForm.py:92
 msgid "Permettre l'accès via le web"
-msgstr "Allow Web Access"
+msgstr ""
 
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:34
 #: modules/FlaskModule/API/user/QueryDeviceSites.py:34
@@ -417,43 +417,4 @@ msgstr ""
 #: modules/FlaskModule/API/user/QueryUsers.py:142
 msgid "Username unavailable."
 msgstr ""
-
-#~ msgid "Groupe(s) utilisateur(s)"
-#~ msgstr "User Group(s)"
-
-#~ msgid "Nom du participant"
-#~ msgstr ""
-
-#~ msgid "Site d'appartenance"
-#~ msgstr ""
-
-#~ msgid "Paramètres"
-#~ msgstr ""
-
-#~ msgid "ID Lien Kit-Appareil"
-#~ msgstr ""
-
-#~ msgid "Kit"
-#~ msgstr ""
-
-#~ msgid "Appareil"
-#~ msgstr ""
-
-#~ msgid "Optionnel?"
-#~ msgstr ""
-
-#~ msgid "ID Kit"
-#~ msgstr ""
-
-#~ msgid "Nom du kit"
-#~ msgstr ""
-
-#~ msgid "Kit partageable?"
-#~ msgstr ""
-
-#~ msgid "Créateur"
-#~ msgstr ""
-
-#~ msgid "Paramètres spécifiques"
-#~ msgstr ""
 

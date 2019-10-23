@@ -75,7 +75,7 @@ class QueryDeviceData(Resource):
                 # Zip contents
                 # TODO: Check for large files VS available memory?
                 zip_ram = BytesIO()
-                zfile = zipfile.ZipFile(zip_ram, compression=zipfile.ZIP_LZMA, mode='w')
+                zfile = zipfile.ZipFile(zip_ram, compression=zipfile.ZIP_DEFLATED, mode='w')
 
                 for data in datas:
                     archive_name = slugify(data.devicedata_session.session_name) + '/' + \
