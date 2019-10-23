@@ -114,29 +114,25 @@ class DeviceRegister(Resource):
                 #     return 'Error processing request', 400
 
         elif request.content_type == 'application/json':
-            try:
-                device_info = request.json['device_info']
+            device_info = request.json['device_info']
 
-                # Check if we have device name
-                if 'device_name' not in device_info:
-                    return 'Invalid content type', 400
+            # Check if we have device name
+            if 'device_name' not in device_info:
+                return 'Invalid content type', 400
 
-                device_name = device_info['device_name']
-                device = self.create_device(device_name)
+            device_name = device_info['device_name']
+            device = self.create_device(device_name)
 
-                # Store
-                db.session.add(device)
+            # Store
+            db.session.add(device)
 
-                # Commit to database
-                db.session.commit()
+            # Commit to database
+            db.session.commit()
 
-                result = dict()
-                result['token'] = device.device_token
+            result = dict()
+            result['token'] = device.device_token
 
-                # Return token
-                return jsonify(result)
-
-            except:
-                return 'Invalid JSON', 400
+            # Return token
+            return jsonify(result)
         else:
             return 'Invalid content type', 400
