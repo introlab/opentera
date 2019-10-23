@@ -68,6 +68,12 @@ void ProjectWidget::setData(const TeraData *data)
         args.addQueryItem(WEB_QUERY_ID_SITE, QString::number(data->getFieldValue("id_site").toInt()));
         args.addQueryItem(WEB_QUERY_PARTICIPANTS, "");
         queryDataRequest(WEB_DEVICEINFO_PATH, args);
+
+        // Query sessions types
+        args = QUrlQuery();
+        args.addQueryItem(WEB_QUERY_ID_PROJECT, QString::number(data->getId()));
+        queryDataRequest(WEB_SESSIONTYPEPROJECT_PATH, args);
+
     }else{
         ui->tabProjectInfos->setEnabled(false);
     }
@@ -80,6 +86,7 @@ void ProjectWidget::connectSignals()
     connect(m_comManager, &ComManager::usersReceived, this, &ProjectWidget::processUsersReply);
     connect(m_comManager, &ComManager::groupsReceived, this, &ProjectWidget::processGroupsReply);
     connect(m_comManager, &ComManager::devicesReceived, this, &ProjectWidget::processDevicesReply);
+    connect(m_comManager, &ComManager::sessionTypesProjectsReceived, this, &ProjectWidget::processSessionTypesProjectReply);
 
     connect(ui->btnUndo, &QPushButton::clicked, this, &ProjectWidget::btnUndo_clicked);
     connect(ui->btnSave, &QPushButton::clicked, this, &ProjectWidget::btnSave_clicked);
@@ -183,6 +190,19 @@ void ProjectWidget::updateDevice(const TeraData *device)
     }
 }
 
+void ProjectWidget::updateSessionType(const TeraData *st)
+{
+    int id_session_type = st->getId();
+    if (m_listSessionTypes_items.contains(id_session_type)){
+        QListWidgetItem* item = m_listSessionTypes_items[id_session_type];
+        item->setText(st->getFieldValue("session_type_name").toString());
+    }else{
+        QListWidgetItem* item = new QListWidgetItem(QIcon(TeraData::getIconFilenameForDataType(TERADATA_SESSION)), st->getFieldValue("session_type_name").toString());
+        ui->lstSessions->addItem(item);
+        m_listSessionTypes_items[id_session_type] = item;
+    }
+}
+
 void ProjectWidget::updateControlsState()
 {
     //ui->btnDevices->setVisible(!m_limited);
@@ -271,6 +291,18 @@ void ProjectWidget::processDevicesReply(QList<TeraData> devices)
         //}
     }
 
+}
+
+void ProjectWidget::processSessionTypesProjectReply(QList<TeraData> stps)
+{
+    if (!m_data)
+        return;
+
+    for (int i=0; i<stps.count(); i++){
+        if (stps.at(i).getFieldValue("id_project") == m_data->getId()){
+            updateSessionType(&stps.at(i));
+        }
+    }
 }
 
 void ProjectWidget::btnSave_clicked()

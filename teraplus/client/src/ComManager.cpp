@@ -384,6 +384,9 @@ bool ComManager::handleDataReply(const QString& reply_path, const QString &reply
     case TERADATA_DEVICEDATA:
         emit deviceDatasReceived(items);
         break;
+    case TERADATA_SESSIONTYPEPROJECT:
+        emit sessionTypesProjectsReceived(items);
+        break;
 /*    default:
         emit getSignalFunctionForDataType(items_type);*/
 

@@ -1,6 +1,8 @@
 #include "ParticipantWidget.h"
 #include "ui_ParticipantWidget.h"
 
+#include <QLocale>
+
 #include "editors/DataListWidget.h"
 #include "editors/SessionWidget.h"
 
@@ -203,7 +205,7 @@ void ParticipantWidget::updateSession(TeraData *session)
     int session_type = session->getFieldValue("id_session_type").toInt();
     if (m_ids_session_types.contains(session_type)){
         type_item->setText(m_ids_session_types[session_type]->getFieldValue("session_type_name").toString());
-        type_item->setTextColor(QColor(m_ids_session_types[session_type]->getFieldValue("session_type_color").toString()));
+        type_item->setForeground(QColor(m_ids_session_types[session_type]->getFieldValue("session_type_color").toString()));
     }else{
         type_item->setText("Inconnu");
     }
@@ -212,8 +214,8 @@ void ParticipantWidget::updateSession(TeraData *session)
     status_item->setText(TeraSessionStatus::getStatusName(session_status));
     // Set color depending on status_item
     //status_item->setTextColor(QColor(TeraSessionStatus::getStatusColor(session_status)));
-    status_item->setTextColor(Qt::black);
-    status_item->setBackgroundColor(QColor(TeraSessionStatus::getStatusColor(session_status)));
+    status_item->setForeground(Qt::black);
+    status_item->setBackground(QColor(TeraSessionStatus::getStatusColor(session_status)));
     //QColor back_color = TeraForm::getGradientColor(3, 18, 33, static_cast<int>(session_date.daysTo(QDateTime::currentDateTime())));
     //back_color.setAlphaF(0.5);
     //date_item->setBackgroundColor(back_color);
@@ -621,15 +623,15 @@ void ParticipantWidget::currentTypeFiltersChanged(QListWidgetItem *changed)
 
 void ParticipantWidget::updateCalendars(QDate left_date){
     ui->calMonth1->setCurrentPage(left_date.year(),left_date.month());
-    ui->lblMonth1->setText(QDate::longMonthName(left_date.month()) + " " + QString::number(left_date.year()));
+    ui->lblMonth1->setText(QLocale::system().standaloneMonthName(left_date.month()) + " " + QString::number(left_date.year()));
 
     left_date = left_date.addMonths(1);
     ui->calMonth2->setCurrentPage(left_date.year(),left_date.month());
-    ui->lblMonth2->setText(QDate::longMonthName(left_date.month()) + " " + QString::number(left_date.year()));
+    ui->lblMonth2->setText(QLocale::system().standaloneMonthName(left_date.month()) + " " + QString::number(left_date.year()));
 
     left_date = left_date.addMonths(1);
     ui->calMonth3->setCurrentPage(left_date.year(),left_date.month());
-    ui->lblMonth3->setText(QDate::longMonthName(left_date.month()) + " " + QString::number(left_date.year()));
+    ui->lblMonth3->setText(QLocale::system().standaloneMonthName(left_date.month()) + " " + QString::number(left_date.year()));
 
     // Check if we must enable the previous month button
     QDate min_date = getMinimumSessionDate();

@@ -110,6 +110,7 @@ signals:
     void deviceSitesReceived(QList<TeraData> device_sites_list);
     void deviceParticipantsReceived(QList<TeraData> device_participants_list);
     void sessionTypesDeviceTypesReceived(QList<TeraData> session_types_device_types_list);
+    void sessionTypesProjectsReceived(QList<TeraData> session_types_projects_list);
     void deviceDatasReceived(QList<TeraData> device_data_list);
 
     //void queryResultsReceived(QString object, QUrlQuery url_query, QString data);

@@ -20,6 +20,7 @@ from libtera.db.models.TeraDeviceSite import TeraDeviceSite
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
 from libtera.db.models.TeraServerSettings import TeraServerSettings
+from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 
 from libtera.ConfigManager import ConfigManager
 
@@ -93,6 +94,7 @@ class DBManager:
             print("No session type - creating defaults")
             TeraSessionType.create_defaults()
             TeraSessionTypeDeviceType.create_defaults()
+            TeraSessionTypeProject.create_defaults()
 
         if TeraSession.get_count() == 0:
             print('No session - creating defaults')
@@ -114,7 +116,7 @@ class DBManager:
         db.app = flask_app
 
         # Init tables
-        # db.drop_all()
+        db.drop_all()
         db.create_all()
 
     @staticmethod

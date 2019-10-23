@@ -96,10 +96,10 @@ void GroupWidget::updateParticipant(TeraData *participant)
     item->setText(participant->getName());
     if (participant->isEnabled()){
        ui->tableParticipants->item(item->row(), 1)->setText(tr("En cours"));
-       ui->tableParticipants->item(item->row(), 1)->setTextColor(Qt::green);
+       ui->tableParticipants->item(item->row(), 1)->setForeground(Qt::green);
     }else{
        ui->tableParticipants->item(item->row(), 1)->setText(tr("Terminé"));
-       ui->tableParticipants->item(item->row(), 1)->setTextColor(Qt::red);
+       ui->tableParticipants->item(item->row(), 1)->setForeground(Qt::red);
     }
     QString date_val_str = tr("Aucune connexion");
     if (!participant->getFieldValue("participant_lastonline").isNull()){
@@ -114,7 +114,7 @@ void GroupWidget::updateParticipant(TeraData *participant)
             // Set background color for last session date
             QColor back_color = TeraForm::getGradientColor(0, 3, 7, static_cast<int>(date_val.daysTo(QDateTime::currentDateTime())));
             back_color.setAlphaF(0.5);
-            ui->tableParticipants->item(item->row(), 3)->setBackgroundColor(back_color);
+            ui->tableParticipants->item(item->row(), 3)->setBackground(back_color);
         }
     }
     ui->tableParticipants->item(item->row(), 3)->setText(date_val_str);

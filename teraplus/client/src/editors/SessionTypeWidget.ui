@@ -38,12 +38,10 @@ QTextEdit:!enabled#txtProfile{background-color: rgba(255,255,255,60%);color:blac
 QFrame#frmSelUser{background-color:rgba(100,100,200,50%);}
 QFrame#frmAudio,QFrame#frmCam1,QFrame#frmCam2,QFrame#frmSensors,QFrame#frmWebRTC,QFrame#frmVirtualCam,QFrame#frmExternalPrograms{background-color:rgba(100,100,200,35%);}
 
-QCheckBox::indicator:unchecked:!enabled { background-color:rgba(128,0,0,100%);}
-QCheckBox::indicator:checked:!enabled { background-color:green;}
-QCheckBox::indicator:unchecked{ background-color:red;border-radius:3px;}
-QCheckBox::indicator:checked {background-color:rgb(0,255,0);border-radius:3px;}
-QCheckBox:checked{color:lightgreen;background-color:rgba(0,0,0,0%);}
-QCheckBox:!checked{color:red;background-color:rgba(0,0,0,0%);}
+QCheckBox::indicator:unchecked:!enabled,QListWidget::indicator:unchecked:!enabled { background-color:rgba(128,0,0,100%);}
+QCheckBox::indicator:checked:!enabled,QListWidget::indicator:checked:!enabled { background-color:green;}
+QCheckBox::indicator:unchecked,QListWidget::indicator:unchecked{ background-color:red;border-radius:3px;}
+QCheckBox::indicator:checked, QListWidget::indicator:checked {background-color:rgb(0,255,0);border-radius:3px;}
 
 QPushButton{background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #2198c0, stop: 1 #0d5ca6);}
 QPushButton:checked{background-color:rgb(128,128,128); border:1px solid rgba(255,255,255,50%);}
@@ -119,6 +117,9 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>2</number>
+   </property>
    <item>
     <widget class="TeraForm" name="wdgSessionType" native="true">
      <property name="sizePolicy">
@@ -185,6 +186,72 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabSessionTypeInfos">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <widget class="QWidget" name="tabProjects">
+      <attribute name="icon">
+       <iconset resource="../../resources/TeraClient.qrc">
+        <normaloff>:/icons/project.png</normaloff>:/icons/project.png</iconset>
+      </attribute>
+      <attribute name="title">
+       <string>Projets</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QListWidget" name="lstProjects">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnProjects">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>Mettre à jour les projets de ce type de séance</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../resources/TeraClient.qrc">
+           <normaloff>:/icons/project.png</normaloff>:/icons/project.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

@@ -18,6 +18,7 @@
 #define WEB_SESSIONINFO_PATH                "/api/user/sessions"
 #define WEB_SESSIONTYPE_PATH                "/api/user/sessiontypes"
 #define WEB_SESSIONTYPEDEVICETYPE_PATH      "/api/user/sessiontypedevicetypes"
+#define WEB_SESSIONTYPEPROJECT_PATH         "/api/user/sessiontypeprojects"
 
 #define WEB_FORMS_PATH                  "/api/user/forms"
 #define WEB_FORMS_QUERY_USER_PROFILE    "type=user_profile"
@@ -42,6 +43,7 @@
 #define WEB_QUERY_ID_GROUP          "id_group"
 #define WEB_QUERY_ID_SESSION        "id_session"
 #define WEB_QUERY_ID_DEVICE_DATA    "id_device_data"
+#define WEB_QUERY_ID_SESSION_TYPE   "id_session_type"
 
 #define WEB_QUERY_AVAILABLE         "available"
 #define WEB_QUERY_PARTICIPANTS      "participants"
