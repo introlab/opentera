@@ -168,8 +168,13 @@ class DBManagerTeraUserAccess:
         return sites_ids
 
     def get_accessible_session_types(self, admin_only=False):
+        from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+        if self.user.user_superadmin:
+            return TeraSessionType.query.all()
+
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
-        return TeraSessionType.query.filter(TeraProject.id_project.in_(project_id_list)).all()
+        # return TeraSessionType.query.filter(TeraProject.id_project.in_(project_id_list)).all()
+        return TeraSessionType.query.join(TeraSessionTypeProject).filter(TeraSessionTypeProject.id_project.in_(project_id_list)).all()
 
     def get_accessible_session_types_ids(self, admin_only=False):
         st_ids = []
@@ -241,6 +246,14 @@ class DBManagerTeraUserAccess:
     def query_projects_for_site(self, site_id: int):
         proj_ids = self.get_accessible_projects_ids()
         projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids)).all()
+        return projects
+
+    def query_projects_for_session_type(self, session_type_id: int):
+        from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+        proj_ids = self.get_accessible_projects_ids()
+        projects = TeraProject.query.join(TeraSessionTypeProject.session_type_project_project).filter(
+            TeraSessionTypeProject.id_session_type == session_type_id).filter(TeraProject.id_project.in_(proj_ids))\
+            .all()
         return projects
 
     def query_participants_for_site(self, site_id: int):
@@ -384,4 +397,13 @@ class DBManagerTeraUserAccess:
         session_types = TeraSessionTypeDeviceType.query.filter(TeraSessionTypeDeviceType.id_session_type.
                                                                in_(session_types_ids))\
             .filter_by(id_device_type=device_type_id).all()
+        return session_types
+
+    def query_session_types_for_project(self, project_id: int):
+        from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+        session_types_ids = self.get_accessible_session_types_ids()
+
+        session_types = TeraSessionTypeProject.query.filter(TeraSessionTypeProject.id_session_type.
+                                                            in_(session_types_ids))\
+            .filter_by(id_project=project_id).all()
         return session_types

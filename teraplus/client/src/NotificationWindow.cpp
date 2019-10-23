@@ -1,6 +1,7 @@
 #include "NotificationWindow.h"
 
 #include <QMessageBox>
+#include <QScreen>
 
 NotificationWindow::NotificationWindow(QWidget *parent, NotificationType type, int level, int width, int height, int duration)
  : QWidget(parent), m_type(type), m_width(width), m_height(height), m_duration(duration),m_id(-1)
@@ -10,9 +11,10 @@ NotificationWindow::NotificationWindow(QWidget *parent, NotificationType type, i
 
     setContentsMargins(0,0,0,0);
 
-    QDesktopWidget desktop;
+    //QDesktopWidget desktop;
     //or screenGeometry(), depending on your needs
-    QRect mainScreenSize = desktop.availableGeometry(desktop.primaryScreen());
+    //QRect mainScreenSize = desktop.availableGeometry(desktop.primaryScreen());
+    QRect mainScreenSize = QGuiApplication::primaryScreen()->availableGeometry();
 
     setGeometry(mainScreenSize.width() - m_width,
                 mainScreenSize.height() - (level * m_height),
@@ -102,9 +104,10 @@ int NotificationWindow::getNotificationType()
 
 void NotificationWindow::resetPosition(int level)
 {
-    QDesktopWidget desktop;
+    //QDesktopWidget desktop;
     //or screenGeometry(), depending on your needs
-    QRect mainScreenSize = desktop.availableGeometry(desktop.primaryScreen());
+    //QRect mainScreenSize = desktop.availableGeometry(desktop.primaryScreen());
+    QRect mainScreenSize = QGuiApplication::primaryScreen()->availableGeometry();
 
     setGeometry(mainScreenSize.width() - m_width,
                 mainScreenSize.height() - (m_height * level),

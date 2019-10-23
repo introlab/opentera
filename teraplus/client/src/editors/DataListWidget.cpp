@@ -72,15 +72,15 @@ void DataListWidget::updateDataInList(TeraData* data, bool select_item){
     }*/
     if (data->hasEnabledField()){
         if (data->isEnabled()){
-            item->setTextColor(Qt::green);
+            item->setForeground(Qt::green);
         }else{
-            item->setTextColor(Qt::red);
+            item->setForeground(Qt::red);
         }
     }
 
     QString color_field = TeraData::getDataTypeName(m_dataType) + "_color";
     if (data->hasFieldName(color_field)){
-        item->setTextColor(QColor(data->getFieldValue(color_field).toString()));
+        item->setForeground(QColor(data->getFieldValue(color_field).toString()));
     }
 
     if (select_item){
