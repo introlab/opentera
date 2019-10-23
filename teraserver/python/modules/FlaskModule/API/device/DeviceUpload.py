@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from modules.FlaskModule.FlaskModule import flask_app
 
 from libtera.db.models.TeraDeviceData import TeraDeviceData
+from libtera.db.models.TeraSessionEvent import TeraSessionEvent
 from libtera.db.DBManager import DBManager
 from libtera.db.Base import db
 
@@ -69,6 +70,31 @@ class DeviceUpload(Resource):
             fo = open(os.path.join(flask_app.config['UPLOAD_FOLDER'], file_db_entry.devicedata_uuid), "wb")
             fo.write(request.data)
             fo.close()
+
+            # Parse events if requested
+            if request.headers.__contains__('X-Parse-Logfile-Events'):
+                print('Parsing events')
+                with open(os.path.join(flask_app.config['UPLOAD_FOLDER'], file_db_entry.devicedata_uuid), "r") as fp:
+                    for line in fp:
+                        parts = line.strip('\n').split('\t')
+                        if len(parts) == 5:
+                            # Valid log
+                            timestamp = datetime.datetime.fromtimestamp(float(parts[0]))
+                            event_type = int(parts[1])
+                            context = parts[2]
+                            # Skipping formatted datetime at parts[3]
+                            log_data = parts[4]
+
+                            event = TeraSessionEvent()
+                            event.id_session = id_session
+                            event.session_event_datetime = timestamp
+                            event.id_session_event_type = event_type
+                            event.session_event_context = context
+                            event.session_event_text = log_data
+
+                            db.session.add(event)
+                            db.session.commit()
+
             return '', 200
 
         elif request.content_type.__contains__('multipart/form-data'):

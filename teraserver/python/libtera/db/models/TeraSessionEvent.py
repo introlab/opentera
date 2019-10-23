@@ -6,11 +6,18 @@ from enum import Enum, unique
 class TeraSessionEvent(db.Model, BaseModel):
     @unique
     class SessionEventTypes(Enum):
-        INFO = 1
-        CONNECTED = 2
-        DISCONNECTED = 3
-        ERROR = 4
-        WARNING = 5
+        GENERAL_ERROR = 0
+        GENERAL_INFO = 1
+        GENERAL_WARNING = 2
+        SESSION_START = 3
+        SESSION_STOP = 4
+        DEVICE_ON_CHARGE = 5
+        DEVICE_OFF_CHARGE = 6
+        DEVICE_LOW_BATT = 7
+        DEVICE_STORAGE_LOW = 8
+        DEVICE_STORAGE_FULL = 9
+        DEVICE_EVENT = 10
+        USER_EVENT = 11
 
     __tablename__ = 't_sessions_events'
     id_session_event = db.Column(db.Integer, db.Sequence('id_session_events_sequence'), primary_key=True,
@@ -19,6 +26,7 @@ class TeraSessionEvent(db.Model, BaseModel):
     id_session_event_type = db.Column(db.Integer, nullable=False)
     session_event_datetime = db.Column(db.TIMESTAMP, nullable=False)
     session_event_text = db.Column(db.String, nullable=True)
+    session_event_context = db.Column(db.String, nullable=True)
 
     session_event_session = db.relationship('TeraSession')
 
