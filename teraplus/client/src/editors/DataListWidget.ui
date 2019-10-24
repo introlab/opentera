@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>730</width>
-    <height>438</height>
+    <width>885</width>
+    <height>505</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -164,25 +164,13 @@ QTreeWidget::branch:closed:has-children:has-siblings  {
           <number>0</number>
          </property>
          <item>
-          <widget class="QPushButton" name="btnSearch">
-           <property name="maximumSize">
-            <size>
-             <width>16</width>
-             <height>16</height>
-            </size>
-           </property>
+          <widget class="QToolButton" name="btnSearch">
            <property name="text">
-            <string/>
+            <string>...</string>
            </property>
            <property name="icon">
             <iconset resource="../../resources/TeraClient.qrc">
              <normaloff>:/icons/search.png</normaloff>:/icons/search.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>16</width>
-             <height>16</height>
-            </size>
            </property>
           </widget>
          </item>
@@ -215,18 +203,9 @@ QTreeWidget::branch:closed:has-children:has-siblings  {
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnClear">
-           <property name="maximumSize">
-            <size>
-             <width>16</width>
-             <height>16</height>
-            </size>
-           </property>
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
+          <widget class="QToolButton" name="btnClear">
            <property name="text">
-            <string/>
+            <string>...</string>
            </property>
            <property name="icon">
             <iconset resource="../../resources/TeraClient.qrc">
@@ -280,84 +259,36 @@ QTreeWidget::branch:closed:has-children:has-siblings  {
          <property name="sizeConstraint">
           <enum>QLayout::SetFixedSize</enum>
          </property>
-         <item alignment="Qt::AlignLeft">
-          <widget class="QPushButton" name="btnNew">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
+         <item>
+          <widget class="QToolButton" name="btnNew">
            <property name="text">
-            <string/>
+            <string>...</string>
            </property>
            <property name="icon">
             <iconset resource="../../resources/TeraClient.qrc">
              <normaloff>:/icons/new.png</normaloff>:/icons/new.png</iconset>
            </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
           </widget>
          </item>
-         <item alignment="Qt::AlignLeft">
-          <widget class="QPushButton" name="btnCopy">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
+         <item>
+          <widget class="QToolButton" name="btnCopy">
            <property name="text">
-            <string/>
+            <string>...</string>
            </property>
            <property name="icon">
             <iconset resource="../../resources/TeraClient.qrc">
              <normaloff>:/icons/copy.png</normaloff>:/icons/copy.png</iconset>
            </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="shortcut">
-            <string>Ctrl+S</string>
-           </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnDelete">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
+          <widget class="QToolButton" name="btnDelete">
            <property name="text">
-            <string/>
+            <string>...</string>
            </property>
            <property name="icon">
             <iconset resource="../../resources/TeraClient.qrc">
              <normaloff>:/icons/delete.png</normaloff>:/icons/delete.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
            </property>
           </widget>
          </item>

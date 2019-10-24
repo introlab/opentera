@@ -91,6 +91,6 @@ void ConfigWidget::connectSignals()
     connect(m_comManager, &ComManager::waitingForReply, this, &ConfigWidget::com_Waiting);
     connect(m_comManager, &ComManager::networkError, this, &ConfigWidget::com_NetworkError);
 
-    connect(ui->btnClose, &QPushButton::clicked, this, &ConfigWidget::closeRequest);
+    //connect(ui->btnClose, &QPushButton::clicked, this, &ConfigWidget::closeRequest);
 }
 

@@ -117,6 +117,12 @@ QWidget#pageSection1{
      <property name="styleSheet">
       <string notr="true"/>
      </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -125,8 +131,8 @@ QWidget#pageSection1{
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>400</width>
-        <height>266</height>
+        <width>396</width>
+        <height>262</height>
        </rect>
       </property>
       <attribute name="label">

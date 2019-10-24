@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-10-23 10:57-0400\n"
+"POT-Creation-Date: 2019-10-24 10:12-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -363,6 +363,7 @@ msgstr ""
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:34
 #: modules/FlaskModule/API/user/QueryDeviceSites.py:34
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:33
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:33
 msgid "Arguments manquants"
 msgstr ""
 
@@ -372,19 +373,26 @@ msgstr ""
 #: modules/FlaskModule/API/user/QueryDeviceSites.py:133
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:78
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:131
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:130
 msgid "Accès refusé"
 msgstr ""
 
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:136
 #: modules/FlaskModule/API/user/QueryDeviceSites.py:129
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:128
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:127
 msgid "Non-trouvé"
 msgstr ""
 
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:148
 #: modules/FlaskModule/API/user/QueryDeviceSites.py:151
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:139
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:138
 msgid "Erreur base de données"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:77
+msgid "Acces refuse"
 msgstr ""
 
 #: modules/FlaskModule/API/user/QuerySessionTypes.py:119

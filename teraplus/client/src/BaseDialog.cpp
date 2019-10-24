@@ -11,12 +11,16 @@ BaseDialog::BaseDialog(QWidget *parent)
     m_centralWidgetLayout->setMargin(0);
     m_centralWidgetLayout->setContentsMargins(0,0,0,0);
 
+    // setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
+
+    connect(m_ui.btnClose, &QPushButton::clicked, this, &QDialog::accept);
+
 }
 
 void BaseDialog::setCentralWidget(QWidget *widget)
 {
     widget->setParent(m_ui.centralWidget);
     m_centralWidgetLayout->addWidget(widget);
-    //widget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    widget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 }
 

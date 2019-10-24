@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QAction>
+#include <QPushButton>
 #include <QMenu>
 
 #include <QTreeWidgetItem>

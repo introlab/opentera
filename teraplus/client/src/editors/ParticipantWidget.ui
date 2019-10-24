@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>669</width>
+    <width>869</width>
     <height>640</height>
    </rect>
   </property>
@@ -281,8 +281,8 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>633</width>
-            <height>208</height>
+            <width>797</width>
+            <height>198</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -292,24 +292,22 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
               <number>3</number>
              </property>
              <item>
-              <widget class="QPushButton" name="btnPrevCal">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
                </property>
-               <property name="maximumSize">
+               <property name="sizeHint" stdset="0">
                 <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
+                 <width>40</width>
+                 <height>20</height>
                 </size>
                </property>
-               <property name="cursor">
-                <cursorShape>PointingHandCursor</cursorShape>
-               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QToolButton" name="btnPrevCal">
                <property name="text">
-                <string/>
+                <string>...</string>
                </property>
                <property name="icon">
                 <iconset resource="../../resources/TeraClient.qrc">
@@ -539,34 +537,13 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
               </layout>
              </item>
              <item>
-              <widget class="QPushButton" name="btnNextCal">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="cursor">
-                <cursorShape>PointingHandCursor</cursorShape>
-               </property>
+              <widget class="QToolButton" name="btnNextCal">
                <property name="text">
-                <string/>
+                <string>...</string>
                </property>
                <property name="icon">
                 <iconset resource="../../resources/TeraClient.qrc">
                  <normaloff>:/controls/branch_closed.png</normaloff>:/controls/branch_closed.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>16</width>
-                 <height>16</height>
-                </size>
                </property>
               </widget>
              </item>

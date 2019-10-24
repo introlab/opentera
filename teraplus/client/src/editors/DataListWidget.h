@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QJsonDocument>
-
+#include <QPushButton>
 #include "DataEditorWidget.h"
 
 #include "TeraData.h"
