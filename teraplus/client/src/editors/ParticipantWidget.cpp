@@ -431,10 +431,13 @@ void ParticipantWidget::onDownloadCompleted(DownloadedFile *file)
     if (!m_comManager->hasPendingDownloads()){
         setEnabled(true);
         setReady();
+        if (!m_diag_editor){
+            GlobalMessageBox msgbox;
+            msgbox.showInfo(tr("Téléchargement"), tr("Téléchargement terminé: ") + file->getFullFilename());
+        }
     }
 
-    GlobalMessageBox msgbox;
-    msgbox.showInfo(tr("Téléchargement"), tr("Téléchargement terminé: ") + file->getFullFilename());
+
 }
 
 void ParticipantWidget::btnSave_clicked()

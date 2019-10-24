@@ -227,6 +227,47 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
        <height>20</height>
       </size>
      </property>
+     <widget class="QWidget" name="tabEvents">
+      <attribute name="icon">
+       <iconset resource="../../resources/TeraClient.qrc">
+        <normaloff>:/icons/log.png</normaloff>:/icons/log.png</iconset>
+      </attribute>
+      <attribute name="title">
+       <string>Événements</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QTableWidget" name="tableEvents">
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>125</number>
+         </attribute>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Date / Heure</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Contexte</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Description</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tabData">
       <attribute name="icon">
        <iconset resource="../../resources/TeraClient.qrc">
@@ -392,42 +433,6 @@ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
          <property name="enabled">
           <bool>false</bool>
          </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tabEvents">
-      <attribute name="icon">
-       <iconset resource="../../resources/TeraClient.qrc">
-        <normaloff>:/icons/log.png</normaloff>:/icons/log.png</iconset>
-      </attribute>
-      <attribute name="title">
-       <string>Événements</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
-       <item>
-        <widget class="QTableWidget" name="tableEvents">
-         <attribute name="horizontalHeaderDefaultSectionSize">
-          <number>125</number>
-         </attribute>
-         <attribute name="horizontalHeaderStretchLastSection">
-          <bool>true</bool>
-         </attribute>
-         <column>
-          <property name="text">
-           <string>Date / Heure</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Type</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Événement</string>
-          </property>
-         </column>
         </widget>
        </item>
       </layout>

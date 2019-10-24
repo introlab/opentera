@@ -21,6 +21,7 @@ from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
 from libtera.db.models.TeraServerSettings import TeraServerSettings
 from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from libtera.db.models.TeraSessionEvent import TeraSessionEvent
 
 from libtera.ConfigManager import ConfigManager
 
@@ -100,6 +101,7 @@ class DBManager:
             print('No session - creating defaults')
             TeraSession.create_defaults()
             TeraDeviceData.create_defaults(config.server_config['upload_path'])
+            TeraSessionEvent.create_defaults()
 
     @staticmethod
     def open(db_infos, echo=False):

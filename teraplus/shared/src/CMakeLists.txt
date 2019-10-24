@@ -16,6 +16,7 @@ set(sharedlib_headers
     ConfigManager.h
     data/TeraData.h
     data/TeraSessionStatus.h
+    data/TeraSessionEvent.h
     WebAPI.h
 )
 
@@ -24,6 +25,7 @@ set(sharedlib_srcs
     ConfigManager.cpp
     data/TeraData.cpp
     data/TeraSessionStatus.cpp
+    data/TeraSessionEvent.cpp
 )
 
 include_directories(

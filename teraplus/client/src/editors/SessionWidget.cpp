@@ -31,6 +31,9 @@ SessionWidget::SessionWidget(ComManager *comMan, const TeraData *data, QWidget *
     // Query session device data
     queryDataRequest(WEB_DEVICEDATAINFO_PATH, query);
 
+    // Query session events
+    queryDataRequest(WEB_SESSIONEVENT_PATH, query);
+
     setData(data);
 
 }
@@ -147,7 +150,45 @@ void SessionWidget::updateDeviceData(TeraData *device_data)
     base_item->setText(device_data->getFieldValue("device_name").toString());
     ui->tableData->item(base_item->row(), 1)->setText(device_data->getFieldValue("devicedata_saved_date").toDateTime().toString("dd-MM-yyyy hh:mm:ss"));
     ui->tableData->item(base_item->row(), 2)->setText(device_data->getFieldValue("devicedata_name").toString());
-    ui->tableData->item(base_item->row(), 3)->setText(QString::number((device_data->getFieldValue("devicedata_filesize").toInt() / 1024.0 / 1024.0)) + " MB");
+    ui->tableData->item(base_item->row(), 3)->setText(QString::number((device_data->getFieldValue("devicedata_filesize").toInt() / 1024.0 / 1024.0), 'f', 2) + " MB");
+}
+
+void SessionWidget::updateEvent(TeraData *event)
+{
+    int id_event = event->getId();
+    int event_type = event->getFieldValue("id_session_event_type").toInt();
+    QTableWidgetItem* base_item;
+
+    if (m_listSessionEvents.contains(id_event)){
+        // Item is already present
+        base_item = m_listSessionEvents[id_event];
+    }else{
+        ui->tableEvents->setRowCount(ui->tableEvents->rowCount()+1);
+        int current_row = ui->tableEvents->rowCount()-1;
+
+        // Must create new item
+        base_item = new QTableWidgetItem();
+        base_item->setIcon(QIcon(TeraSessionEvent::getIconFilenameForEventType(event_type)));
+
+        ui->tableEvents->setItem(current_row, 0, base_item);
+        m_listSessionEvents[id_event] = base_item;
+
+        QTableWidgetItem* item = new QTableWidgetItem();
+        ui->tableEvents->setItem(current_row, 1, item);
+
+        item = new QTableWidgetItem();
+        ui->tableEvents->setItem(current_row, 2, item);
+
+        item = new QTableWidgetItem();
+        ui->tableEvents->setItem(current_row, 3, item);
+    }
+
+    // Update values
+    // Type, Date, Context, Description
+    base_item->setText(TeraSessionEvent::getEventTypeName(event_type));
+    ui->tableEvents->item(base_item->row(), 1)->setText(event->getFieldValue("session_event_datetime").toDateTime().toString("dd-MM-yyyy hh:mm:ss"));
+    ui->tableEvents->item(base_item->row(), 2)->setText(event->getFieldValue("session_event_context").toString());
+    ui->tableEvents->item(base_item->row(), 3)->setText(event->getFieldValue("session_event_text").toString());
 }
 
 void SessionWidget::processFormsReply(QString form_type, QString data)
@@ -187,6 +228,16 @@ void SessionWidget::processDeviceDatasReply(QList<TeraData> device_datas)
     }
 }
 
+void SessionWidget::processSessionEventsReply(QList<TeraData> events)
+{
+    for (TeraData event:events){
+        if (event.getFieldValue("id_session").toInt() == m_data->getId()){
+            // Event is for us
+            updateEvent(&event);
+        }
+    }
+}
+
 void SessionWidget::postResultReply(QString path)
 {
     // OK, data was saved!
@@ -213,10 +264,9 @@ void SessionWidget::onDownloadCompleted(DownloadedFile *file)
     if (!m_comManager->hasPendingDownloads()){
         setEnabled(true);
         setReady();
+        GlobalMessageBox msgbox;
+        msgbox.showInfo(tr("Téléchargement"), tr("Téléchargement terminé: ") + file->getFullFilename());
     }
-
-    GlobalMessageBox msgbox;
-    msgbox.showInfo(tr("Téléchargement"), tr("Téléchargement terminé: ") + file->getFullFilename());
 }
 
 void SessionWidget::currentSelectedDataChanged(QTableWidgetItem *current, QTableWidgetItem *previous)
@@ -232,6 +282,7 @@ void SessionWidget::connectSignals()
     connect(m_comManager, &ComManager::postResultsOK, this, &SessionWidget::postResultReply);
     connect(m_comManager, &ComManager::participantsReceived, this, &SessionWidget::processParticipantsReply);
     connect(m_comManager, &ComManager::deviceDatasReceived, this, &SessionWidget::processDeviceDatasReply);
+    connect(m_comManager, &ComManager::sessionEventsReceived, this, &SessionWidget::processSessionEventsReply);
     connect(m_comManager, &ComManager::downloadCompleted, this, &SessionWidget::onDownloadCompleted);
     connect(m_comManager, &ComManager::deleteResultsOK, this, &SessionWidget::deleteDataReply);
 

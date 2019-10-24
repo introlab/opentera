@@ -86,7 +86,7 @@ bool ComManager::processNetworkReply(QNetworkReply *reply)
         }
 
         if (reply_path == WEB_DEVICEDATAINFO_PATH && reply_query.hasQueryItem(WEB_QUERY_DOWNLOAD)){
-           // qDebug() << "Download complete.";
+            //qDebug() << "Download complete.";
             handled = true;
 
             // Remove reply from current download list, if present
@@ -386,6 +386,9 @@ bool ComManager::handleDataReply(const QString& reply_path, const QString &reply
         break;
     case TERADATA_SESSIONTYPEPROJECT:
         emit sessionTypesProjectsReceived(items);
+        break;
+    case TERADATA_SESSIONEVENT:
+        emit sessionEventsReceived(items);
         break;
 /*    default:
         emit getSignalFunctionForDataType(items_type);*/

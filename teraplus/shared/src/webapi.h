@@ -19,6 +19,7 @@
 #define WEB_SESSIONTYPE_PATH                "/api/user/sessiontypes"
 #define WEB_SESSIONTYPEDEVICETYPE_PATH      "/api/user/sessiontypedevicetypes"
 #define WEB_SESSIONTYPEPROJECT_PATH         "/api/user/sessiontypeprojects"
+#define WEB_SESSIONEVENT_PATH               "/api/user/sessionevents"
 
 #define WEB_FORMS_PATH                  "/api/user/forms"
 #define WEB_FORMS_QUERY_USER_PROFILE    "type=user_profile"

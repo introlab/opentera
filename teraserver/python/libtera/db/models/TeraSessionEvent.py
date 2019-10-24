@@ -1,6 +1,8 @@
 from libtera.db.Base import db, BaseModel
 
 from enum import Enum, unique
+from datetime import datetime, timedelta
+import random
 
 
 class TeraSessionEvent(db.Model, BaseModel):
@@ -31,13 +33,29 @@ class TeraSessionEvent(db.Model, BaseModel):
     session_event_session = db.relationship('TeraSession')
 
     def to_json(self, ignore_fields=[], minimal=False):
-        ignore_fields.extend(['session_event_session'])
+        ignore_fields.extend(['session_event_session', 'SessionEventTypes'])
         if minimal:
             ignore_fields.extend([])
 
         rval = super().to_json(ignore_fields=ignore_fields)
 
         return rval
+
+    @staticmethod
+    def create_defaults():
+        from libtera.db.models.TeraSession import TeraSession
+
+        base_session = TeraSession.get_session_by_name('Séance #1')
+        for i in range(12):
+            event = TeraSessionEvent()
+            event.session_event_session = base_session
+            event.id_session_event_type = i
+            event.session_event_datetime = datetime.now() - timedelta(hours=random.randint(0, 10)) - timedelta(
+                minutes=random.randint(0, 45))
+            event.session_event_context = 'Défaut'
+            event.session_event_text = str(TeraSessionEvent.SessionEventTypes(i))
+            db.session.add(event)
+        db.session.commit()
 
     @staticmethod
     def get_session_event_by_id(event_id: int):

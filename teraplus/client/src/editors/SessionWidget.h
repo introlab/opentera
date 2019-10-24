@@ -8,6 +8,7 @@
 #include "GlobalMessageBox.h"
 
 #include "TeraSessionStatus.h"
+#include "TeraSessionEvent.h"
 #include "DownloadedFile.h"
 #include "BaseDialog.h"
 
@@ -30,6 +31,7 @@ private:
     Ui::SessionWidget *ui;
 
     QMap<int, QTableWidgetItem*> m_listDeviceDatas;
+    QMap<int, QTableWidgetItem*> m_listSessionEvents;
 
     void updateControlsState();
     void updateFieldsValue();
@@ -38,6 +40,7 @@ private:
 
     void updateParticipant(TeraData* participant);
     void updateDeviceData(TeraData* device_data);
+    void updateEvent(TeraData* event);
 
 private slots:
     void btnSave_clicked();
@@ -49,6 +52,7 @@ private slots:
     void processFormsReply(QString form_type, QString data);
     void processParticipantsReply(QList<TeraData> participants);
     void processDeviceDatasReply(QList<TeraData> device_datas);
+    void processSessionEventsReply(QList<TeraData> events);
     void postResultReply(QString path);
     void deleteDataReply(QString path, int id);
 
