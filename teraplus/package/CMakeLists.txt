@@ -51,7 +51,7 @@ if (WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE_DIR:TeraClient>/TeraClient.exe" "$<TARGET_FILE_DIR:TeraClient>/deploy/TeraClient.exe"
         COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE_DIR:TeraClient>/opentera_shared.dll" "$<TARGET_FILE_DIR:TeraClient>/deploy/opentera_shared.dll"
         # Copy default configs to deploy directory
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/defaults" "$<TARGET_FILE_DIR:TeraClient>/deploy"
+        # COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/defaults" "$<TARGET_FILE_DIR:TeraClient>/deploy"
     )
 
     # Uses NSIS packaging system on Windows

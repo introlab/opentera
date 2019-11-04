@@ -104,8 +104,11 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/editors
     ${CMAKE_CURRENT_BINARY_DIR})
 
+# Application icon
+SET(icon openteraico.rc)
+
 # create an executable file named "TeraClient" from the source files
-add_executable(TeraClient MACOSX_BUNDLE WIN32 ${srcs} ${headers} ${moc_srcs} ${client_qrc} ${moc_uis})
+add_executable(TeraClient MACOSX_BUNDLE WIN32 ${icon} ${srcs} ${headers} ${moc_srcs} ${client_qrc} ${moc_uis})
 qt5_use_modules(TeraClient Core Network Multimedia WebSockets WebEngine WebEngineWidgets WebSockets)
 
 # Linking with Qt libraries and others

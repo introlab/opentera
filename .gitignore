@@ -72,3 +72,4 @@ node_modules/
 /teraserver/python/uploads
 build-teraplus-Desktop_Qt_5_13_1_MSVC2017_64bit-Debug
 build-teraserver-Desktop_Qt_5_13_1_MSVC2017_64bit-Debug
+build-teraplus-Desktop_Qt_5_13_1_MSVC2017_64bit-Release

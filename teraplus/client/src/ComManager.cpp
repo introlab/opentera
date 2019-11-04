@@ -430,7 +430,7 @@ void ComManager::onSocketDisconnected()
 
 void ComManager::onSocketSslErrors(const QList<QSslError> &errors)
 {
-    Q_UNUSED(errors);
+    Q_UNUSED(errors)
 
     // WARNING: Never ignore SSL errors in production code.
     // The proper way to handle self-signed certificates is to add a custom root

@@ -17,9 +17,12 @@
    <iconset resource="../resources/TeraClient.qrc">
     <normaloff>:/icons/ESTRAD.ico</normaloff>:/icons/ESTRAD.ico</iconset>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <property name="styleSheet">
    <string notr="true">
-/*QWidget#MainWindow{background-image: url(://TeRA_Background.png); }
+QFrame{background-color: rgba(100,100,100,10%); }/*QWidget#MainWindow{background-image: url(://TeRA_Background.png); }
 QWidget{background-color: rgba(0,0,0,0);color:white;border-radius:5px;}
 
 QWidget#toolsWidget,QWidget#InToolsWidget{background-color:rgba(0,128,200,20%);}

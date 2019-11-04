@@ -342,6 +342,7 @@ void ParticipantWidget::processSessionTypesReply(QList<TeraData> session_types)
             s->setData(Qt::UserRole,st.getId());
             s->setCheckState(Qt::Checked);
             s->setForeground(QColor(st.getFieldValue("session_type_color").toString()));
+            s->setFont(QFont("Arial",10));
            /* QPixmap* pxmap = new QPixmap(8,16);
             pxmap->fill(Qt::transparent);
             QPainter* paint = new QPainter(pxmap);

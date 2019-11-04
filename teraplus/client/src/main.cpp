@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
     // Force use of ANGLE instead of Desktop OpenGL - some memory leak may happen with WebRTC on Intel Graphics Cards otherwise.
     QApplication::setAttribute(Qt::AA_UseOpenGLES, true);
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
+    QApplication::setAttribute(Qt::AA_DisableWindowContextHelpButton, true);
 
     ClientApp* app = new ClientApp(argc, argv);
 

@@ -6,6 +6,8 @@ LoginDialog::LoginDialog(QWidget *parent) :
     ui(new Ui::LoginDialog)
 {
     ui->setupUi(this);
+    //setAttribute(Qt::WA_StyledBackground);
+    //setStyleSheet("QDialog{background-image: url(://TeRA_Background.png); }");
 
     // Setup properties
     setSizeGripEnabled(false);

@@ -4,7 +4,7 @@
 
     Will appear red, this means stylesheet must be defined for widget type.
 */
-QWidget{background-color: rgba(10,10,10, 100%);color:white;border-radius:5px;}
+QWidget{background-color: rgba(0, 0, 0, 10%);color:white;border-radius:5px;}
 
 /*
     QToolBar
@@ -332,7 +332,7 @@ QGroupBox#grpLogos{background-color:rgba(200,200,200,75%);}
 QLabel#lblMessage{color:gold;}
 
 /* Customizations for MainWindow */
-QWidget#MainWindow{background-image: url(://TeRA_Background.png); }
+QMainWindow{background-image: url(://TeRA_Background.png); }
 QWidget#toolsWidget,QWidget#InToolsWidget{background-color:rgba(0,128,200,20%);}
 QWidget#topWidget{background-color:rgba(0,128,200,50%);}
 QFrame#frameMenu,QFrame#frameVideo{border: 1px solid rgba(150,150,150,50%);}

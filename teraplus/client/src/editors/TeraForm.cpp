@@ -283,6 +283,7 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
     layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
     //layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     layout->setVerticalSpacing(3);
+    layout->setAlignment(Qt::AlignTop);
 
     for (QVariant item:structure){
         if (item.canConvert(QMetaType::QVariantMap)){

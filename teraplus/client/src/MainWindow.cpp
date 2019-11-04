@@ -14,6 +14,8 @@ MainWindow::MainWindow(ComManager *com_manager, QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_StyledBackground);
+
     m_comManager = com_manager;
     m_diag_editor = nullptr;
     m_data_editor = nullptr;
