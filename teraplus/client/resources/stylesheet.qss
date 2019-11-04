@@ -4,7 +4,7 @@
 
     Will appear red, this means stylesheet must be defined for widget type.
 */
-QWidget{background-color: rgba(255,10,10, 60%);color:white;border-radius:5px;}
+QWidget{background-color: rgba(10,10,10, 100%);color:white;border-radius:5px;}
 
 /*
     QToolBar
@@ -104,12 +104,26 @@ QTreeWidget::branch:open:has-children:has-siblings   {
 }
 
 
+
+
+
+/*
+    QLineEdit
+*/
+QLineEdit{
+    background-color: rgba(0,0,0,50%);
+    color:rgba(255,255,255,100%);
+}
+
+QLineEdit:!enabled{
+    background-color: rgba(0,0,0,0);
+    color:rgba(255,255,255,25%);
+}
+
+/*
 QPlainTextEdit,QListWidget,QComboBox{background-color: rgba(255,255,255,20%); color: black;}
-QLineEdit{background-color: rgba(0,0,0,0);color:rgba(255,255,255,50%);}
-QLineEdit:!enabled{background-color: rgba(0,0,0,0);color:rgba(255,255,255,25%);}
-
-QPlainTextEdit,QLineEdit,QListWidget,QComboBox,QTextEdit,QSpinBox{background-color: rgba(255,255,255,50%); color: black;}
-
+QPlainTextEdit,QListWidget,QComboBox,QTextEdit,QSpinBox{background-color: rgba(255,255,255,50%); color: black;}
+*/
 
 /*
     QComboBox

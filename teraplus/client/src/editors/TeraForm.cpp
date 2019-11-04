@@ -361,7 +361,7 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
                 }
                 item_widget->setProperty("item_type", item_type);
 
-                item_widget->setMinimumHeight(30);
+                item_widget->setMinimumHeight(25);
 
                 // Add widget to layout
                 layout->addRow(item_frame, item_widget);
