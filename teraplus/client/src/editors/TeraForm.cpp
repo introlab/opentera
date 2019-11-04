@@ -281,6 +281,8 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
 {
     QFormLayout* layout = new QFormLayout(page);
     layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+    //layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+    layout->setVerticalSpacing(3);
 
     for (QVariant item:structure){
         if (item.canConvert(QMetaType::QVariantMap)){
@@ -349,6 +351,8 @@ void TeraForm::buildFormFromStructure(QWidget *page, const QVariantList &structu
                 if (item_data.contains("required")){
                     item_widget->setProperty("required", item_data["required"]);
                     item_label->setText("<font color=red>*</font> " + item_label->text());
+                }else{
+                    item_label->setText("  " + item_label->text());
                 }
                 if (item_data.contains("condition")){
                     item_widget->setProperty("condition", item_data["condition"]);

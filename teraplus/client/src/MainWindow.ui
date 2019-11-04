@@ -18,8 +18,8 @@
     <normaloff>:/icons/ESTRAD.ico</normaloff>:/icons/ESTRAD.ico</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">/*
-QWidget#MainWindow{background-image: url(://TeRA_Background.png); }
+   <string notr="true">
+/*QWidget#MainWindow{background-image: url(://TeRA_Background.png); }
 QWidget{background-color: rgba(0,0,0,0);color:white;border-radius:5px;}
 
 QWidget#toolsWidget,QWidget#InToolsWidget{background-color:rgba(0,128,200,20%);}
@@ -114,7 +114,7 @@ QTreeWidget::branch:closed:has-children  {
      <x>0</x>
      <y>0</y>
      <width>948</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -247,6 +247,9 @@ QTreeWidget::branch:closed:has-children  {
         </item>
         <item>
          <widget class="QToolButton" name="btnCloseMessage">
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
           <property name="text">
            <string>...</string>
           </property>
@@ -381,12 +384,21 @@ QTreeWidget::branch:closed:has-children  {
                </property>
                <item>
                 <widget class="QToolButton" name="btnEditUser">
+                 <property name="cursor">
+                  <cursorShape>PointingHandCursor</cursorShape>
+                 </property>
                  <property name="text">
                   <string>...</string>
                  </property>
                  <property name="icon">
                   <iconset resource="../resources/TeraClient.qrc">
                    <normaloff>:/icons/user_info.png</normaloff>:/icons/user_info.png</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
                  </property>
                 </widget>
                </item>
@@ -418,12 +430,21 @@ QTreeWidget::branch:closed:has-children  {
                </item>
                <item>
                 <widget class="QToolButton" name="btnConfig">
+                 <property name="cursor">
+                  <cursorShape>PointingHandCursor</cursorShape>
+                 </property>
                  <property name="text">
                   <string>...</string>
                  </property>
                  <property name="icon">
                   <iconset resource="../resources/TeraClient.qrc">
                    <normaloff>:/icons/options.png</normaloff>:/icons/options.png</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
                  </property>
                 </widget>
                </item>
@@ -500,6 +521,9 @@ QTreeWidget::branch:closed:has-children  {
             </item>
             <item>
              <widget class="QToolButton" name="btnVideoSwitch">
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
               <property name="text">
                <string>...</string>
               </property>

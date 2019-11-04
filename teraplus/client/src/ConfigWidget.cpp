@@ -23,6 +23,8 @@ ConfigWidget::ConfigWidget(ComManager *comMan, QWidget *parent) :
 
     connectSignals();
 
+    ui->lstSections->setCurrentRow(0);
+
 }
 
 ConfigWidget::~ConfigWidget()
@@ -50,7 +52,7 @@ void ConfigWidget::setupSections()
     addSection(tr("Évaluations"), QIcon(TeraData::getIconFilenameForDataType(TERADATA_TESTDEF)), TERADATA_TESTDEF);
 
     //ui->lstSections->setItemSelected(ui->lstSections->item(0),true);
-    ui->lstSections->item(0)->setSelected(true);
+    //ui->lstSections->item(0)->setSelected(true);
 }
 
 void ConfigWidget::currentSectionChanged(QListWidgetItem *current, QListWidgetItem *previous)

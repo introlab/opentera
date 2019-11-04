@@ -198,10 +198,7 @@ QGroupBox#grpLogos{background-color:rgba(200,200,200,200);}
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <layout class="QFormLayout" name="layoutLogin">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::ExpandingFieldsGrow</enum>
-      </property>
+     <layout class="QGridLayout" name="gridLayout_2">
       <property name="verticalSpacing">
        <number>6</number>
       </property>

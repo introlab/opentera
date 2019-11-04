@@ -166,7 +166,7 @@ void DataListWidget::connectSignals()
     connect(m_comManager, ComManager::getSignalFunctionForDataType(m_dataType), this, &DataListWidget::setDataList);
 
     connect(ui->txtSearch, &QLineEdit::textChanged, this, &DataListWidget::searchChanged);
-    connect(ui->btnClear, &QPushButton::clicked, this, &DataListWidget::clearSearch);
+    //connect(ui->btnClear, &QPushButton::clicked, this, &DataListWidget::clearSearch);
     connect(ui->lstData, &QListWidget::currentItemChanged, this, &DataListWidget::lstData_currentItemChanged);
     connect(ui->btnNew, &QPushButton::clicked, this, &DataListWidget::newDataRequested);
     connect(ui->btnDelete, &QPushButton::clicked, this, &DataListWidget::deleteDataRequested);
@@ -338,11 +338,11 @@ void DataListWidget::setSearching(bool search){
     if (search){
         m_searching = true;
         ui->txtSearch->setStyleSheet("color:white;");
-        ui->btnClear->setVisible(true);
+        //ui->btnClear->setVisible(true);
     }else{
         m_searching=false;
         ui->txtSearch->setStyleSheet("color:rgba(255,255,255,50%);");
-        ui->btnClear->setVisible(false);
+        //ui->btnClear->setVisible(false);
     }
 }
 

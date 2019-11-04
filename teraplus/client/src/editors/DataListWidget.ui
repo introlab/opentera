@@ -152,25 +152,33 @@ QTreeWidget::branch:closed:has-children:has-siblings  {
           <number>0</number>
          </property>
          <property name="leftMargin">
-          <number>5</number>
+          <number>0</number>
          </property>
          <property name="topMargin">
           <number>0</number>
          </property>
          <property name="rightMargin">
-          <number>5</number>
+          <number>0</number>
          </property>
          <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
-          <widget class="QToolButton" name="btnSearch">
-           <property name="text">
-            <string>...</string>
+          <widget class="QLabel" name="lblFind">
+           <property name="maximumSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
            </property>
-           <property name="icon">
-            <iconset resource="../../resources/TeraClient.qrc">
-             <normaloff>:/icons/search.png</normaloff>:/icons/search.png</iconset>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="../../resources/TeraClient.qrc">:/icons/search.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -200,16 +208,8 @@ QTreeWidget::branch:closed:has-children:has-siblings  {
            <property name="placeholderText">
             <string>Recherche...</string>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="btnClear">
-           <property name="text">
-            <string>...</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../resources/TeraClient.qrc">
-             <normaloff>:/icons/delete_old.png</normaloff>:/icons/delete_old.png</iconset>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -261,6 +261,9 @@ QTreeWidget::branch:closed:has-children:has-siblings  {
          </property>
          <item>
           <widget class="QToolButton" name="btnNew">
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="text">
             <string>...</string>
            </property>
@@ -268,10 +271,19 @@ QTreeWidget::branch:closed:has-children:has-siblings  {
             <iconset resource="../../resources/TeraClient.qrc">
              <normaloff>:/icons/new.png</normaloff>:/icons/new.png</iconset>
            </property>
+           <property name="iconSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
           </widget>
          </item>
          <item>
           <widget class="QToolButton" name="btnCopy">
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="text">
             <string>...</string>
            </property>
@@ -279,16 +291,31 @@ QTreeWidget::branch:closed:has-children:has-siblings  {
             <iconset resource="../../resources/TeraClient.qrc">
              <normaloff>:/icons/copy.png</normaloff>:/icons/copy.png</iconset>
            </property>
+           <property name="iconSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
           </widget>
          </item>
          <item>
           <widget class="QToolButton" name="btnDelete">
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="text">
             <string>...</string>
            </property>
            <property name="icon">
             <iconset resource="../../resources/TeraClient.qrc">
              <normaloff>:/icons/delete.png</normaloff>:/icons/delete.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
            </property>
           </widget>
          </item>

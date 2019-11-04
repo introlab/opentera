@@ -281,7 +281,7 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>797</width>
+            <width>827</width>
             <height>198</height>
            </rect>
           </property>
@@ -306,6 +306,9 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
              </item>
              <item>
               <widget class="QToolButton" name="btnPrevCal">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="text">
                 <string>...</string>
                </property>
@@ -538,6 +541,9 @@ QCalendarWidget QSpinBox::down-arrow { width:16px; height:16px; }
              </item>
              <item>
               <widget class="QToolButton" name="btnNextCal">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="text">
                 <string>...</string>
                </property>
