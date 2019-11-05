@@ -87,7 +87,6 @@ if __name__ == '__main__':
     else:
         application_path = os.path.dirname(os.path.abspath(__file__))
 
-
     config_file = None
 
     # Set environment variable for reading configuration file
