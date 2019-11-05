@@ -347,9 +347,9 @@ void SiteWidget::btnProjects_clicked()
         m_diag_editor->deleteLater();
     }
 
-    m_diag_editor = new QDialog(this);
-    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_PROJECT, m_diag_editor);
-    Q_UNUSED(list_widget)
+    m_diag_editor = new BaseDialog(this);
+    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_PROJECT, nullptr);
+    m_diag_editor->setCentralWidget(list_widget);
 
     m_diag_editor->setWindowTitle(tr("Projets"));
 
@@ -361,11 +361,12 @@ void SiteWidget::btnDevices_clicked()
     if (m_diag_editor){
         m_diag_editor->deleteLater();
     }
-    m_diag_editor = new QDialog(this);
-    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_DEVICE, m_diag_editor);
-    Q_UNUSED(list_widget)
+    m_diag_editor = new BaseDialog(this);
+    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_DEVICE, nullptr);
+    m_diag_editor->setCentralWidget(list_widget);
 
     m_diag_editor->setWindowTitle(tr("Appareils"));
+    m_diag_editor->setMinimumHeight(700);
 
     m_diag_editor->open();
 }
@@ -375,11 +376,12 @@ void SiteWidget::btnUsers_clicked()
     if (m_diag_editor){
         m_diag_editor->deleteLater();
     }
-    m_diag_editor = new QDialog(this);
-    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_USER, m_diag_editor);
-    Q_UNUSED(list_widget)
+    m_diag_editor = new BaseDialog(this);
+    DataListWidget* list_widget = new DataListWidget(m_comManager, TERADATA_USER, nullptr);
+    m_diag_editor->setCentralWidget(list_widget);
 
     m_diag_editor->setWindowTitle(tr("Utilisateurs"));
+    m_diag_editor->setMinimumHeight(700);
 
     m_diag_editor->open();
 }

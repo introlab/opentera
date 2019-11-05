@@ -156,7 +156,7 @@ void ProjectNavigator::updateSite(const TeraData *site)
     int index = ui->cmbSites->findData(site->getId());
     if (index>=0){
         // Site already present, update infos
-        ui->cmbSites->itemText(index) = site->getName();
+        ui->cmbSites->setItemText(index, site->getName());
     }else{
         // Add the site
         ui->cmbSites->addItem(site->getName(), site->getId());

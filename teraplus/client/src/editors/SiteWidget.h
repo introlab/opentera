@@ -7,6 +7,7 @@
 
 #include "DataEditorWidget.h"
 #include "GlobalMessageBox.h"
+#include "BaseDialog.h"
 
 namespace Ui {
 class SiteWidget;
@@ -45,7 +46,7 @@ private:
     QMap<int, QListWidgetItem*>  m_listProjects_items;
     QMap<int, QTableWidgetItem*> m_listDevices_items;
 
-    QDialog*                    m_diag_editor;
+    BaseDialog*                  m_diag_editor;
 
     void connectSignals();
 
