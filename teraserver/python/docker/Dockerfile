@@ -57,7 +57,7 @@ EXPOSE 4040/tcp
 ENV OPENTERA_CONFIG_PATH /opentera/teraserver/python/config/TeraServerConfig.ini
 
 # Run the required services and python script
-CMD ls -l && ./start.sh
+CMD ls -l && ./start_docker.sh
 
 
 
