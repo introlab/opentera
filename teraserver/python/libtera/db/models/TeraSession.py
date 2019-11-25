@@ -18,25 +18,27 @@ class TeraSessionStatus(Enum):
 class TeraSession(db.Model, BaseModel):
     __tablename__ = 't_sessions'
     id_session = db.Column(db.Integer, db.Sequence('id_session_sequence'), primary_key=True, autoincrement=True)
-    id_session_type = db.Column(db.Integer, db.ForeignKey('t_sessions_types.id_session_type'), nullable=False)
+    id_session_type = db.Column(db.Integer, db.ForeignKey('t_sessions_types.id_session_type', ondelete='cascade'),
+                                nullable=False)
     # TODO Update forms / c++ client, queries
-    id_creator_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user'), nullable=True)
-    id_creator_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device'), nullable=True)
-    id_creator_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant'), nullable=True)
+    id_creator_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user', ondelete='set null'), nullable=True)
+    id_creator_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device', ondelete='set null'), nullable=True)
+    id_creator_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant', ondelete='set null'),
+                                       nullable=True)
     session_name = db.Column(db.String, nullable=False)
     session_start_datetime = db.Column(db.TIMESTAMP, nullable=False)
     session_duration = db.Column(db.Integer, nullable=False, default=0)
     session_status = db.Column(db.Integer, nullable=False)
     session_comments = db.Column(db.String, nullable=True)
     session_participants = db.relationship("TeraParticipant", secondary="t_sessions_participants",
-                                           back_populates="participant_sessions")
+                                           back_populates="participant_sessions", cascade="delete")
 
     session_creator_user = db.relationship('TeraUser')
     session_creator_device = db.relationship('TeraDevice')
     session_creator_participant = db.relationship('TeraParticipant')
 
     session_session_type = db.relationship('TeraSessionType')
-    session_events = db.relationship('TeraSessionEvent')
+    session_events = db.relationship('TeraSessionEvent', cascade="delete")
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['session_participants', 'session_creator_user', 'session_creator_device',
@@ -126,6 +128,7 @@ class TeraSession(db.Model, BaseModel):
             for orphan in orphans:
                 TeraDeviceData.delete_files_for_session(orphan.id_session)
                 db.session.delete(orphan)
+                # TeraSession.delete(orphan.id_session)
 
         if commit_changes:
             db.session.commit()
