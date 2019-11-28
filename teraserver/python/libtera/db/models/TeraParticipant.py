@@ -80,8 +80,8 @@ class TeraParticipant(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_participant_by_uuid(uuid):
-        participant = TeraParticipant.query.filter_by(participant_uuid=uuid).first()
+    def get_participant_by_uuid(p_uuid):
+        participant = TeraParticipant.query.filter_by(participant_uuid=p_uuid).first()
 
         if participant:
             participant.update_last_online()
@@ -124,6 +124,7 @@ class TeraParticipant(db.Model, BaseModel):
     @classmethod
     def insert(cls, participant):
         participant.participant_lastonline = None
+        participant.participant_uuid = str(uuid.uuid4())
         super().insert(participant)
 
     @classmethod

@@ -43,7 +43,7 @@ add_custom_command(
 # Always proceed...
 add_custom_target(
   python-env
-  COMMAND ${PYTHON_PATH} -m pip install -r ${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt
+  COMMAND ${PYTHON_PATH} -m pip install -r ${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt --upgrade
   WORKING_DIRECTORY ${ENV_PATH}
   DEPENDS ${PYTHON_PATH} python-requirements
 )
