@@ -259,13 +259,15 @@ class DBManagerTeraUserAccess:
     def query_participants_for_site(self, site_id: int):
         part_ids = self.get_accessible_participants_ids()
         participants = TeraParticipant.query.join(TeraParticipantGroup, TeraProject)\
-            .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids)).all()
+            .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids))\
+            .order_by(TeraParticipant.id_participant.asc()).all()
         return participants
 
     def query_participants_for_group(self, group_id: int):
         part_ids = self.get_accessible_participants_ids()
         participants = TeraParticipant.query.filter(TeraParticipant.id_participant_group == group_id,
-                                                    TeraParticipant.id_participant.in_(part_ids)).all()
+                                                    TeraParticipant.id_participant.in_(part_ids))\
+            .order_by(TeraParticipant.id_participant.asc()).all()
         return participants
 
     def query_access_for_site(self, site_id: int):
