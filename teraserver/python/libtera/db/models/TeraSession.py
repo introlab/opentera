@@ -112,7 +112,7 @@ class TeraSession(db.Model, BaseModel):
         from libtera.db.models.TeraParticipant import TeraParticipant
         return TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
                                                                                part_id)\
-            .order_by(TeraSession.session_start_datetime.asc()).all()
+            .order_by(TeraSession.session_start_datetime.desc()).all()
 
     @staticmethod
     def get_sessions_for_type(session_type_id: int):
