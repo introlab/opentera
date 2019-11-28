@@ -125,6 +125,7 @@ class TeraParticipant(db.Model, BaseModel):
     def insert(cls, participant):
         participant.participant_lastonline = None
         participant.participant_uuid = str(uuid.uuid4())
+        participant.create_token()
         super().insert(participant)
 
     @classmethod
