@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package opentera.protobuf;
+
+// Arguments of basic type
+// to be tested with has_double_value, has_float_value, etc.
+message Value {
+    oneof arg_value {
+        double double_value = 1;
+        float float_value = 2;
+        int64 int_value = 3;
+        uint64 uint_value = 4;
+        bool bool_value = 5;
+        bytes bytes_value = 6;
+        string string_value = 7;
+    }
+}
+
+
+message RPCMessage {
+    //Name of the method
+    string method = 1;
+    //Reply to with full pattern for redis pub reply
+    string reply_to = 2;
+    //Store an id in here if needed
+    uint64 id = 3;
+    //Current timestamp
+    double timestamp = 4;
+    //Value array
+    repeated Value args = 5;
+}

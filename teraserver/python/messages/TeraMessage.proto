@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package opentera.protobuf;
+
+message TeraMessage {
+    message Header {
+        uint32 version = 1;
+        double time = 2;
+        uint32 seq = 3;
+        string source = 4;
+        string dest = 5;
+    }
+
+    Header head = 1;
+
+    repeated google.protobuf.Any data = 2;
+}

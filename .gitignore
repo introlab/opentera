@@ -1,0 +1,75 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Rope
+.ropeproject
+
+# Django stuff:
+*.log
+*.pot
+
+# Sphinx documentation
+docs/_build/
+
+build-teraplus-Desktop_Qt_5_12_0_MSVC2017_64bit-Debug
+*.user
+build-teraserver-Desktop_Qt_5_12_0_MSVC2017_64bit-Debug
+.idea
+python-3.6
+
+
+# Node modules
+node_modules/
+/teraplus/CMakeLists.txt.user.4.9-pre1
+/teraserver/CMakeLists.txt.user.4.9-pre1
+/teraserver/python/config/TeraServerConfig.ini~0b30c4625222f7c8696ca353a9e47d17d15d6cb5
+/teraserver/python/messages/python/*
+/teraserver/python/certificates/ca_cert.pem
+/teraserver/python/certificates/ca_key.pem
+/teraserver/python/certificates/devices/client_certificate.pem
+/teraserver/python/certificates/devices/client_key.pem
+/teraserver/python/certificates/site_cert.pem
+/teraserver/python/certificates/site_key.pem
+/teraplus/client/resources/icons/device.psd
+/teraserver/python/uploads
+build-teraplus-Desktop_Qt_5_13_1_MSVC2017_64bit-Debug
+build-teraserver-Desktop_Qt_5_13_1_MSVC2017_64bit-Debug
+build-teraplus-Desktop_Qt_5_13_1_MSVC2017_64bit-Release

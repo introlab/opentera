@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package opentera.protobuf;
+
+message DeviceEvent {
+
+    enum EventType
+    {
+        DEVICE_CONNECTED = 0;
+        DEVICE_DISCONNECTED = 1;
+        DEVICE_DELETED = 2;
+        DEVICE_ADDED = 3;
+    }
+    string device_uuid = 1;
+    EventType type = 2;
+}

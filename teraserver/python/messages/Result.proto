@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package opentera.protobuf;
+
+message Result {
+
+    enum ResultType
+    {
+        RESULT_OK = 0;
+        RESULT_ERROR = 1;
+        RESULT_WARNING = 2;
+    }
+
+    ResultType type = 1;
+    int64 code = 2;
+    string message = 3;
+}
