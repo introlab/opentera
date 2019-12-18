@@ -4,6 +4,8 @@ from flask_restful import Api
 from libtera.ConfigManager import ConfigManager
 from flask_babel import Babel
 
+from flask_swagger_ui import get_swaggerui_blueprint
+
 from modules.BaseModule import BaseModule, ModuleNames
 from libtera.db.models.TeraServerSettings import TeraServerSettings
 
@@ -61,6 +63,9 @@ class FlaskModule(BaseModule):
 
         # Init Views
         self.init_views()
+
+        # Init API docs
+        self.init_api_docs()
 
     def setup_module_pubsub(self):
         # Additional subscribe
@@ -149,3 +154,16 @@ class FlaskModule(BaseModule):
         flask_app.add_url_rule('/participant/', view_func=Participant.as_view('participant', *args, **kwargs))
         flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
                                                                                             **kwargs))
+
+    def init_api_docs(self):
+        swagger_url = '/api/docs'
+        api_url = '/static/swagger.json'
+        # Call factory function to create the swagger blueprint
+        swaggerui_blueprint = get_swaggerui_blueprint(
+            swagger_url,
+            api_url,
+            config={'app_name': 'OpenTeraServer'}
+        )
+
+        flask_app.register_blueprint(swaggerui_blueprint, url_prefix=swagger_url)
+
