@@ -12,7 +12,9 @@ flask-login
 flask-httpauth
 flask-socketio
 flask-session
+# Should be removed when using only flask-restplus
 flask-restful
+flask-restplus
 flask-security
 flask-babel
 flask-migrate
