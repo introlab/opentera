@@ -82,6 +82,7 @@ class FlaskModule(BaseModule):
 
     def init_views(self):
         from .Views.Index import Index
+        from .Views.Login import Login
 
         # Default arguments
         args = []
@@ -89,6 +90,7 @@ class FlaskModule(BaseModule):
 
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
+        flask_app.add_url_rule('/login', view_func=Login.as_view('login', *args, **kwargs))
 
     def init_api_docs(self):
         pass
