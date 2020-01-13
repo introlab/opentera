@@ -68,7 +68,7 @@ function loginReply(response, status, request){
 		$('#txtmessage').css('color','green');
 		clearInterval(timerId);
 		timerId=-1;
-		//window.location.replace("/user?webId=" + response);
+		//window.location.replace("/home?webId=" + response);
 	}else{
 		//clearInterval(timerId);
 		console.log("loginReply: " + response);

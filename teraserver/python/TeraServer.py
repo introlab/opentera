@@ -29,7 +29,7 @@ from modules.FlaskModule.FlaskModule import FlaskModule
 from modules.TwistedModule.TwistedModule import TwistedModule
 
 from libtera.ConfigManager import ConfigManager
-from modules.Globals import db_man
+from modules.Globals import db_man, TeraServerConstants
 from modules.UserManagerModule.UserManagerModule import UserManagerModule
 from modules.WebRTCModule.WebRTCModule import WebRTCModule
 
@@ -71,6 +71,25 @@ def verify_file_upload_directory(config: ConfigManager, create=True):
         else:
             return None
     return file_upload_path
+
+
+def init_shared_variables(config):
+    # Create user token
+    from libtera.db.models.TeraServerSettings import TeraServerSettings
+    user_token_key = TeraServerSettings.generate_token_key(32)
+
+    # Create redis client
+    import redis
+    redis_client = redis.Redis(host=config.redis_config['hostname'], port=config.redis_config['port'],
+                               db=config.redis_config['db'])
+
+    # Set API Token Keys
+    from modules.Globals import TeraServerConstants
+    redis_client.set(TeraServerConstants.RedisVar_UserTokenAPIKey, user_token_key)
+    redis_client.set(TeraServerConstants.RedisVar_DeviceTokenAPIKey,
+                     TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerDeviceTokenKey))
+    redis_client.set(TeraServerConstants.RedisVar_ParticipantTokenAPIKey,
+                     TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerParticipantTokenKey))
 
 
 if __name__ == '__main__':
@@ -125,6 +144,9 @@ if __name__ == '__main__':
 
     # Create default values, if required
     db_man.create_defaults(config=config_man)
+
+    # Create Redis variables shared with services
+    init_shared_variables(config=config_man)
 
     # Main Flask module
     flask_module = FlaskModule(config_man)

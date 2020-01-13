@@ -19,9 +19,18 @@ class Login(Resource):
         servername = self.module.config.server_config['hostname']
         port = self.module.config.server_config['port']
 
+        # Get user token key from redis
+        from modules.Globals import TeraServerConstants
+        token_key = self.module.redisGet(TeraServerConstants.RedisVar_UserTokenAPIKey)
+
+        # Get token for user
+        from libtera.db.models.TeraUser import TeraUser
+        user_token = TeraUser.get_token_for_user(session['user_id'], token_key)
+
         # Return reply as json object
         reply = {"websocket_url": "wss://" + servername + ":" + str(port) + "/wss?id=" + session['_id'],
-                 "user_uuid": session['user_id']}
+                 "user_uuid": session['user_id'],
+                 "user_token": user_token}
         json_reply = jsonify(reply)
 
         return json_reply

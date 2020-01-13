@@ -13,20 +13,29 @@ class TeraServerSettings(db.Model, BaseModel):
     server_settings_value = db.Column(db.String, nullable=False, unique=False)
 
     # Constants
-    ServerTokenKey = "TokenEncryptionKey"
+    ServerDeviceTokenKey = "TokenEncryptionKey"
+    ServerParticipantTokenKey = "ParticipantTokenEncryptionKey"
     ServerUUID = "ServerUUID"
 
     @staticmethod
     def create_defaults():
         # Create defaults settings
         # Token Encryption Key
-        token_symbols = digits + ascii_uppercase + ascii_lowercase
-        token_key = ''.join(random.choice(token_symbols) for i in range(32))  # Key length = 32 chars
-        TeraServerSettings.set_server_setting(TeraServerSettings.ServerTokenKey, token_key)
+        TeraServerSettings.set_server_setting(TeraServerSettings.ServerDeviceTokenKey,
+                                              TeraServerSettings.generate_token_key(32))
+
+        TeraServerSettings.set_server_setting(TeraServerSettings.ServerParticipantTokenKey,
+                                              TeraServerSettings.generate_token_key(32))
 
         # Unique server id
         server_uuid = str(uuid.uuid4())
         TeraServerSettings.set_server_setting(TeraServerSettings.ServerUUID, server_uuid)
+
+    @staticmethod
+    def generate_token_key(length: int) -> str:
+        token_symbols = digits + ascii_uppercase + ascii_lowercase
+        token_key = ''.join(random.choice(token_symbols) for i in range(length))  # Key length = 32 chars
+        return token_key
 
     @staticmethod
     def get_server_setting_value(setting_name: string):
