@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
    <head>
+      <script src="/static/js/login.js"></script>
+      <script src="/static/js/jquery-3.3.1.min.js"></script>
    </head>
    <body>
       <h1>BureauActif - Login</h1>
@@ -14,13 +16,18 @@
 
 
       <div class="container">
-      <label for="uname"><b>Username</b></label>
-      <input type="text" placeholder="Enter Username" name="uname" required>
+      <form action="/login" method="post" id="loginform">
+         <label for="uname"><b>Username</b></label>
+         <input type="text" name="name" id="name" placeholder="Utilisateur" oninput="validateInput('#name');" />
+         <label for="psw"><b>Password</b></label>
+         <input type="password" name="password" id="password" placeholder="Mot de passe" oninput="validateInput('#password');" />
+         <input type="submit" value="Connexion" onclick="doLogin('{{ backend_hostname }}', {{ backend_port }});return false;"/>
 
-      <label for="psw"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" name="psw" required>
+      </form>
+      <div id="messages" style="display:none;">
+         <label id="txtmessage">Prêt à se connecter!</label>
+     </div>
 
-      <button type="submit">Login</button>
       <label>
         <input type="checkbox" checked="checked" name="remember"> Remember me
       </label>

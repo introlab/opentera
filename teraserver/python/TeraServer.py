@@ -129,11 +129,12 @@ if __name__ == '__main__':
     # Main Flask module
     flask_module = FlaskModule(config_man)
 
-    # LOGIN MANAGER
-    ###############
+    # LOGIN MANAGER, must be initialized after Flask
+    #################################################
     login_module = LoginModule(config_man)
 
-    # Twisted will run flask
+    # Twisted will run flask, must be initialized after Flask
+    #########################################################
     twisted_module = TwistedModule(config_man)
 
     user_manager_module = UserManagerModule(config_man)

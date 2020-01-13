@@ -167,3 +167,10 @@ class FlaskModule(BaseModule):
 
         flask_app.register_blueprint(swaggerui_blueprint, url_prefix=swagger_url)
 
+        @flask_app.after_request
+        def apply_caching(response):
+            # This is required to expose the backend API to rendered webpages from other sources, such as services
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+            return response
+

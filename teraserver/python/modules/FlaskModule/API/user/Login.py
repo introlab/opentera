@@ -25,3 +25,9 @@ class Login(Resource):
         json_reply = jsonify(reply)
 
         return json_reply
+
+    @auth.login_required
+    def post(self):
+        # Authentification using a form (typically) or a post request
+        print("User Login using POST")
+        return "TODO", 501
