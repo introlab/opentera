@@ -1,5 +1,6 @@
 from flask.views import MethodView
-from flask import render_template
+from flask import render_template, request
+from services.BureauActif.AccessManager import AccessManager
 
 
 class Index(MethodView):
@@ -11,8 +12,11 @@ class Index(MethodView):
         self.flaskModule = kwargs.get('flaskModule', None)
         print(self.flaskModule)
 
+    @AccessManager.token_required
     def get(self):
         print('get')
+        print(request.cookies['BureauActifToken'])
+
         hostname = self.flaskModule.config.server_config['hostname']
         port = self.flaskModule.config.server_config['port']
         return render_template('index.html', hostname=hostname, port=port)

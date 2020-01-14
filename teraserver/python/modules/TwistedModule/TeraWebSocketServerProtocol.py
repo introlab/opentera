@@ -106,7 +106,7 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
 
         if request.params.__contains__('id'):
 
-            # Look for id in
+            # Look for session id in
             id = request.params['id']
             print('testing id: ', id)
 

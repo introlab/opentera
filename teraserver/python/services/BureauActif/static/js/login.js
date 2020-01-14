@@ -68,7 +68,11 @@ function loginReply(response, status, request){
 		$('#txtmessage').css('color','green');
 		clearInterval(timerId);
 		timerId=-1;
-		//window.location.replace("/home?webId=" + response);
+		// Set cookie with the access token for 30 minutes
+        setCookie("BureauActifToken", response["user_token"], 30);
+
+		// Redirect to location
+		window.location.replace("/?token=" + );
 	}else{
 		//clearInterval(timerId);
 		console.log("loginReply: " + response);
@@ -86,4 +90,11 @@ function loginError(event, status){
 	$('#txtmessage').text(status.responseText);
 	$('#messages').css('display','block');
 	//$("#loginform :input").prop("disabled", false);
+}
+
+function setCookie(cname, cvalue, exminutes) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exminutes*60*1000));
+  var expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
