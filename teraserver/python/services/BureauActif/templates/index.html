@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <html>
    <head>
+      <script src="/static/js/opentera.js"></script>
+      <script src="/static/js/jquery-3.3.1.min.js"></script>
    </head>
-   <body>
+   <body >
       <h1>BureauActif Index</h1>
+      <button onclick="doGetRequest('{{ backend_hostname }}', {{ backend_port }}, '/api/user/sites');">Get sites</button>
+      <button onclick="doGetRequest('{{ backend_hostname }}', {{ backend_port }}, '/api/user/projects');">Get projects</button>
+      <button onclick="doGetRequest('{{ backend_hostname }}', {{ backend_port }}, '/api/user/users');">Get users</button>
+      <button onclick="doGetRequest('{{ backend_hostname }}', {{ backend_port }}, '/api/user/devices');">Get devices</button>
+      <button onclick="doGetRequest('{{ backend_hostname }}', {{ backend_port }}, '/api/user/online');">Get online users</button>
    </body>
 </html>
 

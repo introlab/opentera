@@ -13,10 +13,13 @@ class Login(MethodView):
 
     def get(self):
         print('get')
+        # Set variables for template
         hostname = self.flaskModule.config.server_config['hostname']
         port = self.flaskModule.config.server_config['port']
         backend_hostname = self.flaskModule.config.backend_config['hostname']
         backend_port = self.flaskModule.config.backend_config['port']
+
+        # Render page
         return render_template('login.html', hostname=hostname, port=port,
                                backend_hostname=backend_hostname, backend_port=backend_port)
 

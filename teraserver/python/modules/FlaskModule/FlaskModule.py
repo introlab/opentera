@@ -139,7 +139,6 @@ class FlaskModule(BaseModule):
     def init_views(self):
         from .Views.Index import Index
         from .Views.Upload import Upload
-        from .Views.Auth import Auth
         from .Views.Participant import Participant
         from .Views.DeviceRegistration import DeviceRegistration
 
@@ -150,7 +149,6 @@ class FlaskModule(BaseModule):
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
         flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
-        flask_app.add_url_rule('/auth/', view_func=Auth.as_view('auth', *args, **kwargs))
         flask_app.add_url_rule('/participant/', view_func=Participant.as_view('participant', *args, **kwargs))
         flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
                                                                                             **kwargs))

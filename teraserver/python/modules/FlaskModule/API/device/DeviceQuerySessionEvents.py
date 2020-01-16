@@ -1,6 +1,5 @@
 from flask import jsonify, session, request
 from flask_restful import Resource, reqparse
-from modules.Globals import auth
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent
 from modules.LoginModule.LoginModule import LoginModule, current_device

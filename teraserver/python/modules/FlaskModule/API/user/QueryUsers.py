@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restful import Resource, reqparse
 from sqlalchemy import exc
-from modules.Globals import auth
+from modules.LoginModule.LoginModule import multi_auth
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
@@ -16,7 +16,7 @@ class QueryUsers(Resource):
         Resource.__init__(self)
         self.module = flaskModule
 
-    @auth.login_required
+    @multi_auth.login_required
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user_uuid', type=str, help='uuid')
@@ -85,7 +85,7 @@ class QueryUsers(Resource):
         # except InvalidRequestError:
         #     return '', 500
 
-    @auth.login_required
+    @multi_auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
@@ -182,7 +182,7 @@ class QueryUsers(Resource):
 
         return jsonify([update_user.to_json()])
 
-    @auth.login_required
+    @multi_auth.login_required
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)

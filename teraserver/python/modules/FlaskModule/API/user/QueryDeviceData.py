@@ -1,6 +1,6 @@
 from flask import jsonify, session, request, send_file #send_from_directory
 from flask_restful import Resource, reqparse, inputs
-from modules.Globals import auth
+from modules.LoginModule.LoginModule import multi_auth
 from modules.FlaskModule.FlaskModule import flask_app
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceData import TeraDeviceData
@@ -18,7 +18,7 @@ class QueryDeviceData(Resource):
         Resource.__init__(self)
         self.module = flaskModule
 
-    @auth.login_required
+    @multi_auth.login_required
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -104,7 +104,7 @@ class QueryDeviceData(Resource):
                 return send_file(src_dir + '/' + str(datas[0].devicedata_uuid), as_attachment=True,
                                  attachment_filename=filename)
 
-    @auth.login_required
+    @multi_auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('device_data', type=str, location='json', help='Device to create / update', required=True)
@@ -158,7 +158,7 @@ class QueryDeviceData(Resource):
 
         return '', 501
 
-    @auth.login_required
+    @multi_auth.login_required
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)

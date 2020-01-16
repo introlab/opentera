@@ -72,7 +72,7 @@ function loginReply(response, status, request){
         setCookie("BureauActifToken", response["user_token"], 30);
 
 		// Redirect to location
-		window.location.replace("/?token=" + );
+		window.location.replace("/");
 	}else{
 		//clearInterval(timerId);
 		console.log("loginReply: " + response);
@@ -92,9 +92,3 @@ function loginError(event, status){
 	//$("#loginform :input").prop("disabled", false);
 }
 
-function setCookie(cname, cvalue, exminutes) {
-  var d = new Date();
-  d.setTime(d.getTime() + (exminutes*60*1000));
-  var expires = "expires="+ d.toUTCString();
-  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}

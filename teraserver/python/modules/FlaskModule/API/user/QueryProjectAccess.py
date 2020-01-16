@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restful import Resource, reqparse
 from sqlalchemy import exc
-from modules.Globals import auth
+from modules.LoginModule.LoginModule import multi_auth
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.DBManager import DBManager
@@ -13,7 +13,7 @@ class QueryProjectAccess(Resource):
         Resource.__init__(self)
         self.module = flaskModule
 
-    @auth.login_required
+    @multi_auth.login_required
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id_user', type=int, help='User ID')
@@ -49,7 +49,7 @@ class QueryProjectAccess(Resource):
 
         return 'Unknown error', 500
 
-    @auth.login_required
+    @multi_auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('project_access', type=str, location='json', help='Project access to create / update',
@@ -90,7 +90,7 @@ class QueryProjectAccess(Resource):
 
         return jsonify(json_rval)
 
-    @auth.login_required
+    @multi_auth.login_required
     def delete(self):
 
         return '', 501

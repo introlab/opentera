@@ -1,6 +1,6 @@
 from flask import jsonify, session
 from flask_restful import Resource, reqparse
-from modules.Globals import auth
+from modules.LoginModule.LoginModule import http_auth
 
 
 class Login(Resource):
@@ -10,7 +10,7 @@ class Login(Resource):
         Resource.__init__(self)
         self.parser = reqparse.RequestParser()
 
-    @auth.login_required
+    @http_auth.login_required
     def get(self):
 
         session.permanent = True
@@ -35,7 +35,7 @@ class Login(Resource):
 
         return json_reply
 
-    @auth.login_required
+    @http_auth.login_required
     def post(self):
         # Authentification using a form (typically) or a post request
         print("User Login using POST")

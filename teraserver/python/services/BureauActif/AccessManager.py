@@ -41,6 +41,7 @@ class AccessManager:
                 return redirect("login")
 
             if token_dict['user_uuid']:
+                # TODO: Validate user_uuid from online users list in Redis
                 return f(*args, **kwargs)
             #
             # _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(args['token'])

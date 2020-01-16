@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restful import Resource, reqparse
-from modules.Globals import auth
+from modules.LoginModule.LoginModule import multi_auth
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from libtera.db.DBManager import DBManager
@@ -15,7 +15,7 @@ class QuerySessionTypeProject(Resource):
         Resource.__init__(self)
         self.module = flaskModule
 
-    @auth.login_required
+    @multi_auth.login_required
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -53,7 +53,7 @@ class QuerySessionTypeProject(Resource):
         except InvalidRequestError:
             return '', 400
 
-    @auth.login_required
+    @multi_auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('session_type_project', type=str, location='json',
@@ -111,7 +111,7 @@ class QuerySessionTypeProject(Resource):
 
         return jsonify(update_stp)
 
-    @auth.login_required
+    @multi_auth.login_required
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)

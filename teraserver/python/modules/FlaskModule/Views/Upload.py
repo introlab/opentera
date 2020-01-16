@@ -1,7 +1,7 @@
 
 from flask.views import MethodView
 from flask import render_template, request, redirect, flash
-from modules.Globals import auth
+from modules.LoginModule.LoginModule import multi_auth
 from werkzeug.utils import secure_filename
 from modules.FlaskModule.FlaskModule import flask_app
 import os
@@ -17,19 +17,19 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'dat', 'mp4
 
 class Upload(MethodView):
     # Decorators everywhere?
-    decorators = [auth.login_required]
+    decorators = [multi_auth.login_required]
 
     def __init__(self, *args, **kwargs):
         print('Index.__init__', args, kwargs)
         self.flaskModule = kwargs.get('flaskModule', None)
         print(self.flaskModule)
 
-    # @auth.login_required
+    # @multi_auth.login_required
     def get(self):
         print('get')
         return render_template('upload.html')
 
-    # @auth.login_required
+    # @multi_auth.login_required
     def post(self):
         print('post', request)
 

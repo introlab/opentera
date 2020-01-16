@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restful import Resource, reqparse
-from modules.Globals import auth
+from modules.LoginModule.LoginModule import multi_auth
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from libtera.db.models.TeraUser import TeraUser
@@ -15,7 +15,7 @@ class QueryProjects(Resource):
         Resource.__init__(self)
         self.module = flaskModule
 
-    @auth.login_required
+    @multi_auth.login_required
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id_project', type=int, help='id_project')
@@ -69,7 +69,7 @@ class QueryProjects(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @auth.login_required
+    @multi_auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('project', type=str, location='json', help='Project to create / update', required=True)
@@ -121,7 +121,7 @@ class QueryProjects(Resource):
 
         return jsonify([update_project.to_json()])
 
-    @auth.login_required
+    @multi_auth.login_required
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)

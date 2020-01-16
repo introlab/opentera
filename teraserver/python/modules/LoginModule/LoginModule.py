@@ -4,12 +4,11 @@ from flask import session, jsonify
 
 from modules.FlaskModule.FlaskModule import flask_app
 from modules.BaseModule import BaseModule, ModuleNames
+from modules.Globals import TeraServerConstants
 
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraDevice import TeraDevice
-
-from modules.Globals import auth
 
 from libtera.ConfigManager import ConfigManager
 import datetime
@@ -19,11 +18,19 @@ from werkzeug.local import LocalProxy
 from flask_restful import Resource, reqparse
 from functools import wraps
 
+from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
+
 # Current participant identity, stacked
 current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant', None))
 
 # Current device identity, stacked
 current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_device', None))
+
+# Authentification schemes
+http_auth = HTTPBasicAuth()
+token_auth = HTTPTokenAuth("OpenTera")
+multi_auth = MultiAuth(http_auth, token_auth)
+
 
 
 class LoginModule(BaseModule):
@@ -64,7 +71,8 @@ class LoginModule(BaseModule):
         self.login_manager.user_loader(self.load_user)
 
         # Setup verify password function
-        auth.verify_password(self.verify_password)
+        http_auth.verify_password(self.verify_password)
+        token_auth.verify_token(self.verify_token)
 
     def load_user(self, user_id):
         print('LoginModule - load_user', user_id)
@@ -83,6 +91,25 @@ class LoginModule(BaseModule):
 
             self.redisSet(session['_id'], session['user_id'], ex=60)
             return True
+        return False
+
+    def verify_token(self, token_value):
+        import jwt
+        try:
+            token_dict = jwt.decode(token_value, self.redisGet(TeraServerConstants.RedisVar_UserTokenAPIKey))
+        except jwt.exceptions.InvalidSignatureError as e:
+            print(e)
+            return False
+
+        if token_dict['user_uuid']:
+            registered_user = TeraUser.get_user_by_uuid(token_dict['user_uuid'])
+            # TODO: Validate if user is also online?
+            if registered_user is not None:
+                registered_user.update_last_online()
+                login_user(registered_user, remember=True)
+                # TODO: Set user online in Redis??
+                return True
+
         return False
 
     @staticmethod
