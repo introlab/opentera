@@ -2,9 +2,9 @@ from werkzeug.local import LocalProxy
 from functools import wraps
 from flask import _request_ctx_stack, request, redirect
 from flask_restplus import reqparse
-from services.BureauActif.FlaskModule import FlaskModule
-from modules.Globals import TeraServerConstants
+
 from services.BureauActif.Globals import api_user_token_key, TokenCookieName
+from services.BureauActif.TeraClient import TeraClient
 
 # Current client identity, stacked
 current_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_client', None))
@@ -41,7 +41,9 @@ class AccessManager:
                 return redirect("login")
 
             if token_dict['user_uuid']:
-                # TODO: Validate user_uuid from online users list in Redis
+                _request_ctx_stack.top.current_client = TeraClient(token_dict['user_uuid'], token_value, )
+
+                # TODO: Validate user_uuid from online users list in Redis?
                 return f(*args, **kwargs)
             #
             # _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(args['token'])

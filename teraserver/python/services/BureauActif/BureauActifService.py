@@ -9,7 +9,7 @@ import services.BureauActif.Globals as Globals
 if __name__ == '__main__':
 
     # Load configuration
-    config_man = ConfigManager()
+    from services.BureauActif.Globals import config_man
     config_man.load_config('BureauActifService.ini')
 
     # DATABASE CONFIG AND OPENING
