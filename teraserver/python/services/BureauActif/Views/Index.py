@@ -24,7 +24,7 @@ class Index(MethodView):
 
         # current_client.do_get_request_to_backend('/api/user/users?user_uuid=' + current_client.user_uuid)
         # print(current_client.get_role_for_site(1))
-        print(current_client.get_role_for_project(1))
+        # print(current_client.get_role_for_project(1))
 
         return render_template('index.html', hostname=hostname, port=port,
                                backend_hostname=backend_hostname, backend_port=backend_port)

@@ -9,6 +9,7 @@ class TeraDeviceType(db.Model, BaseModel):
         VIDEOCONFERENCE = 1
         ROBOT = 2
         SENSOR = 3
+        BUREAU_ACTIF = 4
 
         def describe(self):
             return self.name, self.value
@@ -45,5 +46,7 @@ class TeraDeviceType(db.Model, BaseModel):
             name = 'Capteur'
         if self.id_device_type == TeraDeviceType.DeviceTypeEnum.ROBOT.value:
             name = 'Robot'
+        if self.id_device_type == TeraDeviceType.DeviceTypeEnum.BUREAU_ACTIF.value:
+            name = 'Bureau Actif'
         return name
 
