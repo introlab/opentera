@@ -1,7 +1,8 @@
 from flask import jsonify, session, request
-from flask_restful import Resource, reqparse
+from flask_restplus import Resource, reqparse
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import multi_auth
+from modules.FlaskModule.FlaskModule import api
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
@@ -10,9 +11,9 @@ from libtera.db.DBManager import DBManager
 
 class QuerySites(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
     def get(self):

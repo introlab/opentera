@@ -1,18 +1,26 @@
 from flask import Flask, request, g
 from flask_session import Session
-from flask_restful import Api
+from flask_restplus import Api
 from libtera.ConfigManager import ConfigManager
 from flask_babel import Babel
-
-from flask_swagger_ui import get_swaggerui_blueprint
-
 from modules.BaseModule import BaseModule, ModuleNames
 from libtera.db.models.TeraServerSettings import TeraServerSettings
 
-flask_app = Flask("OpenTera")
+# Flask application
+flask_app = Flask("TeraServer")
 
 # Translations
 babel = Babel(flask_app)
+
+# API
+api = Api(flask_app,
+          version='1.0.0', title='OpenTeraServer API',
+          description='TeraServer API Documentation', doc='/doc')
+
+# Namespaces
+user_api_ns = api.namespace('api/user', description='API for user calls')
+device_api_ns = api.namespace('api/device', description='API for device calls')
+participant_api_ns = api.namespace('api/participant', description='API for participant calls')
 
 
 @babel.localeselector
@@ -56,16 +64,12 @@ class FlaskModule(BaseModule):
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
 
         self.session = Session(flask_app)
-        self.api = Api(flask_app)
 
         # Init API
         self.init_api()
 
         # Init Views
         self.init_views()
-
-        # Init API docs
-        self.init_api_docs()
 
     def setup_module_pubsub(self):
         # Additional subscribe
@@ -79,6 +83,10 @@ class FlaskModule(BaseModule):
         pass
 
     def init_api(self):
+
+        # Default arguments
+        kwargs = {'flaskModule': self}
+
         # Users...
         from .API.user.Login import Login
         from .API.user.Logout import Logout
@@ -100,28 +108,28 @@ class FlaskModule(BaseModule):
         from .API.user.QueryDeviceData import QueryDeviceData
         from .API.user.QuerySessionTypeDeviceType import QuerySessionTypeDeviceType
         from .API.user.QuerySessionTypeProject import QuerySessionTypeProject
-        self.api.add_resource(Login, '/api/user/login', resource_class_args=[self])
-        self.api.add_resource(Logout, '/api/user/logout', resource_class_args=[self])
-        self.api.add_resource(QuerySites, '/api/user/sites', resource_class_args=[self])
-        self.api.add_resource(QueryUsers, '/api/user/users', resource_class_args=[self])
-        self.api.add_resource(QueryForms, '/api/user/forms', resource_class_args=[self])
-        self.api.add_resource(QueryOnlineUsers, '/api/user/online', resource_class_args=[self])
-        self.api.add_resource(QueryProjects, '/api/user/projects', resource_class_args=[self])
-        self.api.add_resource(QueryParticipants, '/api/user/participants', resource_class_args=[self])
-        self.api.add_resource(QueryDevices, '/api/user/devices', resource_class_args=[self])
-        self.api.add_resource(QueryDeviceSites, '/api/user/devicesites', resource_class_args=[self])
-        self.api.add_resource(QueryDeviceParticipants, '/api/user/deviceparticipants', resource_class_args=[self])
-        self.api.add_resource(QuerySiteAccess, '/api/user/siteaccess', resource_class_args=[self])
-        self.api.add_resource(QueryProjectAccess, '/api/user/projectaccess', resource_class_args=[self])
-        self.api.add_resource(QueryParticipantGroup, '/api/user/groups', resource_class_args=[self])
-        self.api.add_resource(QuerySessions, '/api/user/sessions', resource_class_args=[self])
-        self.api.add_resource(QuerySessionTypes, '/api/user/sessiontypes', resource_class_args=[self])
-        self.api.add_resource(QuerySessionTypeDeviceType, '/api/user/sessiontypedevicetypes',
-                              resource_class_args=[self])
-        self.api.add_resource(QuerySessionTypeProject, '/api/user/sessiontypeprojects',
-                              resource_class_args=[self])
-        self.api.add_resource(QuerySessionEvents, '/api/user/sessionevents', resource_class_args=[self])
-        self.api.add_resource(QueryDeviceData, '/api/user/data', resource_class_args=[self])
+        # Resources
+        user_api_ns.add_resource(Login, '/login', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(Logout, '/logout', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QuerySites, '/sites', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryUsers, '/users', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryForms, '/forms', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryOnlineUsers, '/online', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryProjects, '/projects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryParticipants, '/participants', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryDevices, '/devices', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryDeviceSites, '/devicesites', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryDeviceParticipants, '/deviceparticipants', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QuerySiteAccess, '/siteaccess', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryProjectAccess, '/projectaccess', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryParticipantGroup, '/groups', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QuerySessions, '/sessions', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QuerySessionTypes, '/sessiontypes', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QuerySessionTypeDeviceType, '/sessiontypedevicetypes', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QuerySessionTypeProject, '/sessiontypeprojects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QuerySessionEvents, '/sessionevents', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryDeviceData, '/data', resource_class_kwargs=kwargs)
+        api.add_namespace(user_api_ns)
 
         # Devices
         from .API.device.DeviceLogin import DeviceLogin
@@ -129,12 +137,13 @@ class FlaskModule(BaseModule):
         from .API.device.DeviceRegister import DeviceRegister
         from .API.device.DeviceQuerySessions import DeviceQuerySessions
         from .API.device.DeviceQuerySessionEvents import DeviceQuerySessionEvents
-
-        self.api.add_resource(DeviceLogin, '/api/device/device_login', resource_class_args=[self])
-        self.api.add_resource(DeviceUpload, '/api/device/device_upload', resource_class_args=[self])
-        self.api.add_resource(DeviceRegister, '/api/device/device_register', resource_class_args=[self])
-        self.api.add_resource(DeviceQuerySessions, '/api/device/sessions', resource_class_args=[self])
-        self.api.add_resource(DeviceQuerySessionEvents, '/api/device/sessionevents', resource_class_args=[self])
+        # Resources
+        device_api_ns.add_resource(DeviceLogin, '/device_login', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceUpload, '/device_upload', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceRegister, '/device_register', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQuerySessionEvents, '/sessionevents', resource_class_kwargs=kwargs)
+        api.add_namespace(device_api_ns)
 
     def init_views(self):
         from .Views.Index import Index
@@ -148,27 +157,15 @@ class FlaskModule(BaseModule):
 
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
-        flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
-        flask_app.add_url_rule('/participant/', view_func=Participant.as_view('participant', *args, **kwargs))
-        flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
-                                                                                            **kwargs))
+        # flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
+        # flask_app.add_url_rule('/participant/', view_func=Participant.as_view('participant', *args, **kwargs))
+        # flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
+        #                                                                                    **kwargs))
 
-    def init_api_docs(self):
-        swagger_url = '/api/docs'
-        api_url = '/static/swagger.json'
-        # Call factory function to create the swagger blueprint
-        swaggerui_blueprint = get_swaggerui_blueprint(
-            swagger_url,
-            api_url,
-            config={'app_name': 'OpenTeraServer'}
-        )
-
-        flask_app.register_blueprint(swaggerui_blueprint, url_prefix=swagger_url)
-
-        @flask_app.after_request
-        def apply_caching(response):
-            # This is required to expose the backend API to rendered webpages from other sources, such as services
-            response.headers["Access-Control-Allow-Origin"] = "*"
-            response.headers["Access-Control-Allow-Headers"] = "*"
-            return response
+    @flask_app.after_request
+    def apply_caching(response):
+        # This is required to expose the backend API to rendered webpages from other sources, such as services
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        return response
 

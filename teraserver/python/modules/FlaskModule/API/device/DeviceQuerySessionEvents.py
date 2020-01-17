@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restful import Resource, reqparse
+from flask_restplus import Resource, reqparse
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent
 from modules.LoginModule.LoginModule import LoginModule, current_device
@@ -10,8 +10,8 @@ from sqlalchemy import exc
 
 class DeviceQuerySessionEvents(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
+    def __init__(self, _api, flaskModule=None):
+        Resource.__init__(self, _api)
         self.module = flaskModule
 
     @LoginModule.token_or_certificate_required

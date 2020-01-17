@@ -1,6 +1,7 @@
 from flask import jsonify, session, request, send_file #send_from_directory
-from flask_restful import Resource, reqparse, inputs
+from flask_restplus import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import multi_auth
+from modules.FlaskModule.FlaskModule import api
 from modules.FlaskModule.FlaskModule import flask_app
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceData import TeraDeviceData
@@ -14,9 +15,9 @@ from slugify import slugify
 
 class QueryDeviceData(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
     def get(self):

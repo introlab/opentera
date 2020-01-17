@@ -1,4 +1,4 @@
-from flask_restful import Resource, reqparse
+from flask_restplus import Resource, reqparse
 from modules.LoginModule.LoginModule import LoginModule, current_device
 from flask import request, redirect, flash
 from werkzeug.utils import secure_filename
@@ -21,8 +21,8 @@ def allowed_file(filename):
 
 class DeviceUpload(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
+    def __init__(self, _api, flaskModule=None):
+        Resource.__init__(self, _api)
         self.module = flaskModule
 
     @LoginModule.token_or_certificate_required

@@ -1,16 +1,26 @@
 from flask import jsonify, session
-from flask_restful import Resource, reqparse
+from flask_restplus import Resource, reqparse, fields
 from modules.LoginModule.LoginModule import http_auth
+from modules.FlaskModule.FlaskModule import user_api_ns as api
+
+
+model = api.model('Login', {
+    'websocket_url': fields.String,
+    'user_uuid': fields.String,
+    'user_token': fields.String
+})
 
 
 class Login(Resource):
 
-    def __init__(self, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self)
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
         self.parser = reqparse.RequestParser()
 
     @http_auth.login_required
+    @api.doc(description='Login with HTTPAuth')
+    @api.marshal_with(model)
     def get(self):
 
         session.permanent = True
@@ -31,12 +41,5 @@ class Login(Resource):
         reply = {"websocket_url": "wss://" + servername + ":" + str(port) + "/wss?id=" + session['_id'],
                  "user_uuid": session['user_id'],
                  "user_token": user_token}
-        json_reply = jsonify(reply)
 
-        return json_reply
-
-    @http_auth.login_required
-    def post(self):
-        # Authentification using a form (typically) or a post request
-        print("User Login using POST")
-        return "TODO", 501
+        return reply

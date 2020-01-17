@@ -1,6 +1,7 @@
 from flask import jsonify, session
-from flask_restful import Resource, reqparse
+from flask_restplus import Resource, reqparse
 from modules.LoginModule.LoginModule import multi_auth
+from modules.FlaskModule.FlaskModule import api
 from libtera.db.DBManager import DBManager
 
 from libtera.db.models.TeraUser import TeraUser
@@ -17,9 +18,9 @@ from libtera.forms.TeraSessionForm import TeraSessionForm
 
 class QueryForms(Resource):
 
-    def __init__(self, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self)
+    def __init__(self, _api, *args, **kwargs):
+        self.module = kwargs.get('flaskModule', None)
+        Resource.__init__(self, _api, *args, **kwargs)
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('type', type=str, help='Definition type required', required=True)
 

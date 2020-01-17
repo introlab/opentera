@@ -1,14 +1,16 @@
 from flask_login import logout_user
-from flask_restful import Resource, reqparse
+from flask_restplus import Resource, reqparse
 from flask import session
+from modules.FlaskModule.FlaskModule import api
 
 
 class Logout(Resource):
-    def __init__(self, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self)
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
         self.parser = reqparse.RequestParser()
 
+    @api.doc(description='Logout')
     def get(self):
         print('logout user')
         logout_user()

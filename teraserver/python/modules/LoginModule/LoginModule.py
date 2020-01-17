@@ -15,7 +15,7 @@ import datetime
 
 from flask import current_app, request, jsonify, _request_ctx_stack
 from werkzeug.local import LocalProxy
-from flask_restful import Resource, reqparse
+from flask_restplus import Resource, reqparse
 from functools import wraps
 
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
@@ -30,7 +30,6 @@ current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_dev
 http_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth("OpenTera")
 multi_auth = MultiAuth(http_auth, token_auth)
-
 
 
 class LoginModule(BaseModule):

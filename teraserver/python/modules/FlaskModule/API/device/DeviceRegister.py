@@ -1,4 +1,4 @@
-from flask_restful import Resource, reqparse
+from flask_restplus import Resource, reqparse
 from flask import jsonify
 from flask import request
 import base64
@@ -23,8 +23,8 @@ class DeviceRegister(Resource):
     Administrators will need to put the device in a site and enable it before use.
     """
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
+    def __init__(self, _api, flaskModule=None):
+        Resource.__init__(self, _api)
         self.module = flaskModule
 
         self.ca_info = dict()

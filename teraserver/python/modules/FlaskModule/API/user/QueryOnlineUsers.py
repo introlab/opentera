@@ -1,6 +1,7 @@
 from flask import jsonify, session
-from flask_restful import Resource, reqparse
+from flask_restplus import Resource, reqparse
 from modules.LoginModule.LoginModule import multi_auth
+from modules.FlaskModule.FlaskModule import api
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
 from libtera.redis.AsyncRedisSubscribeWait import AsyncRedisSubscribeWait
@@ -10,9 +11,9 @@ import datetime
 
 
 class QueryOnlineUsers(Resource):
-    def __init__(self, flaskModule):
-        Resource.__init__(self)
-        self.flaskModule = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.flaskModule = kwargs.get('flaskModule', None)
         self.parser = reqparse.RequestParser()
 
     @multi_auth.login_required
