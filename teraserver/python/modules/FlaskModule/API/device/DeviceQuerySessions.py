@@ -7,7 +7,7 @@ from modules.LoginModule.LoginModule import LoginModule, current_device
 from sqlalchemy import exc
 from flask_babel import gettext
 from sqlalchemy.exc import InvalidRequestError
-
+from modules.FlaskModule.FlaskModule import device_api_ns as api
 
 class DeviceQuerySessions(Resource):
 

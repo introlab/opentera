@@ -1,7 +1,7 @@
 from flask import jsonify, session, request, send_file #send_from_directory
 from flask_restplus import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import multi_auth
-from modules.FlaskModule.FlaskModule import api
+from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.FlaskModule import flask_app
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceData import TeraDeviceData
@@ -20,6 +20,7 @@ class QueryDeviceData(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
+    @api.doc(description='GET device data')
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)

@@ -3,6 +3,7 @@ from modules.LoginModule.LoginModule import LoginModule, current_device
 from flask import request, redirect, flash
 from werkzeug.utils import secure_filename
 from modules.FlaskModule.FlaskModule import flask_app
+from modules.FlaskModule.FlaskModule import device_api_ns as api
 
 from libtera.db.models.TeraDeviceData import TeraDeviceData
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent

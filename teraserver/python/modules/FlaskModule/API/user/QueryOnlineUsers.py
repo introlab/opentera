@@ -1,7 +1,7 @@
 from flask import jsonify, session
 from flask_restplus import Resource, reqparse
 from modules.LoginModule.LoginModule import multi_auth
-from modules.FlaskModule.FlaskModule import api
+from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
 from libtera.redis.AsyncRedisSubscribeWait import AsyncRedisSubscribeWait

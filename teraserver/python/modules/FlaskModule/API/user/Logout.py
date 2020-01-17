@@ -1,7 +1,7 @@
 from flask_login import logout_user
 from flask_restplus import Resource, reqparse
 from flask import session
-from modules.FlaskModule.FlaskModule import api
+from modules.FlaskModule.FlaskModule import user_api_ns as api
 
 
 class Logout(Resource):

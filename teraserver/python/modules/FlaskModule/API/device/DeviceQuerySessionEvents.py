@@ -6,7 +6,7 @@ from modules.LoginModule.LoginModule import LoginModule, current_device
 from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
-
+from modules.FlaskModule.FlaskModule import device_api_ns as api
 
 class DeviceQuerySessionEvents(Resource):
 

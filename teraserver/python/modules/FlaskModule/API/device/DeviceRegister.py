@@ -12,7 +12,7 @@ from libtera.db.Base import db
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraSessionType import TeraSessionType
-
+from modules.FlaskModule.FlaskModule import device_api_ns as api
 import uuid
 
 

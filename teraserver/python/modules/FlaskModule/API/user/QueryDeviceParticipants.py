@@ -1,13 +1,32 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
+from flask_restplus import Resource, reqparse, fields
 from modules.LoginModule.LoginModule import multi_auth
-from modules.FlaskModule.FlaskModule import api
+from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from flask_babel import gettext
+
+
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_device', type=int, help='id_device')
+get_parser.add_argument('id_participant', type=int, help='id_participant')
+get_parser.add_argument('id_site', type=int, help='id_site')
+get_parser.add_argument('list', type=bool)
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('device_participant', type=str, location='json',
+                         help='Device participant to create / update', required=True)
+
+
+model = api.model('QueryDeviceParticipants', {
+    'participant_name': fields.String,
+    'device_name': fields.String,
+    'user_token': fields.String
+})
 
 
 class QueryDeviceParticipants(Resource):
@@ -17,17 +36,13 @@ class QueryDeviceParticipants(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='GET devices that are related to a participant.')
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_device', type=int, help='id_device')
-        parser.add_argument('id_participant', type=int, help='id_participant')
-        parser.add_argument('id_site', type=int, help='id_site')
-        parser.add_argument('list', type=bool)
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         device_part = []
         # If we have no arguments, return error
@@ -60,11 +75,8 @@ class QueryDeviceParticipants(Resource):
             return '', 400
 
     @multi_auth.login_required
+    @api.expect(post_parser)
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('device_participant', type=str, location='json',
-                            help='Device participant to create / update', required=True)
-
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 
