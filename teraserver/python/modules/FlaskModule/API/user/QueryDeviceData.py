@@ -1,5 +1,5 @@
 from flask import jsonify, session, request, send_file #send_from_directory
-from flask_restplus import Resource, reqparse, inputs
+from flask_restplus import Resource, reqparse, inputs, fields
 from modules.LoginModule.LoginModule import multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.FlaskModule import flask_app
@@ -20,7 +20,19 @@ class QueryDeviceData(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
-    @api.doc(description='GET device data')
+    @api.doc(description='Get device data information. Optionaly download the data. '
+                         'Only one of the ID parameter is supported at once',
+             responses={200: 'Success - returns list of datas or a downloadable file, if \'download\' parameter is '
+                             'specified',
+                        500: 'Required parameter is missing',
+                        403: 'Logged user doesn\'t have permission to access the requested data'})
+    @api.param('id_device_data', description='Specific ID of device data to request data.', type='integer')
+    @api.param('id_device', description='ID of the device from which to request all data', type='integer')
+    @api.param('id_session', description='ID of session from which to request all data', type='integer')
+    @api.param('id_participant', description='ID of participant from which to request all data', type='integer')
+    @api.param('download', description='If this flag is set, data will be downloaded instead of queried. '
+                                       'In the case there\'s multiple files in the dataset, data will be zipped '
+                                       'before the download process begins', type='boolean')
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -106,61 +118,66 @@ class QueryDeviceData(Resource):
                 return send_file(src_dir + '/' + str(datas[0].devicedata_uuid), as_attachment=True,
                                  attachment_filename=filename)
 
-    @multi_auth.login_required
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('device_data', type=str, location='json', help='Device to create / update', required=True)
-        #
-        # current_user = TeraUser.get_user_by_uuid(session['user_id'])
-        # user_access = DBManager.userAccess(current_user)
-        # # Using request.json instead of parser, since parser messes up the json!
-        # json_device = request.json['device']
-        #
-        # # Validate if we have an id
-        # if 'id_device' not in json_device:
-        #     return '', 400
-        #
-        # # Check if current user can modify the posted device
-        # if json_device['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True) and \
-        #         json_device['id_site'] > 0:
-        #     return '', 403
-        #
-        # # Devices without a site can only be modified by super admins
-        # if json_device['id_site'] == 0:
-        #     if not current_user.user_superadmin:
-        #         return '', 403
-        #     json_device['id_site'] = None
-        #
-        # # Do the update!
-        # if json_device['id_device'] > 0:
-        #     # Already existing
-        #     try:
-        #         TeraDevice.update_device(json_device['id_device'], json_device)
-        #     except exc.SQLAlchemyError:
-        #         import sys
-        #         print(sys.exc_info())
-        #         return '', 500
-        # else:
-        #     # New
-        #     try:
-        #         new_device = TeraDevice()
-        #         new_device.from_json(json_device)
-        #         TeraDevice.insert_device(new_device)
-        #         # Update ID for further use
-        #         json_device['id_device'] = new_device.id_device
-        #     except exc.SQLAlchemyError:
-        #         import sys
-        #         print(sys.exc_info())
-        #         return '', 500
-        #
-        # # TODO: Publish update to everyone who is subscribed to devices update...
-        # update_device = TeraDevice.get_device_by_id(json_device['id_device'])
-        #
-        # return jsonify([update_device.to_json()])
+    # @multi_auth.login_required
+    # def post(self):
+    #     parser = reqparse.RequestParser()
+    #     parser.add_argument('device_data', type=str, location='json', help='Device to create / update', required=True)
+    #     #
+    #     # current_user = TeraUser.get_user_by_uuid(session['user_id'])
+    #     # user_access = DBManager.userAccess(current_user)
+    #     # # Using request.json instead of parser, since parser messes up the json!
+    #     # json_device = request.json['device']
+    #     #
+    #     # # Validate if we have an id
+    #     # if 'id_device' not in json_device:
+    #     #     return '', 400
+    #     #
+    #     # # Check if current user can modify the posted device
+    #     # if json_device['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True) and \
+    #     #         json_device['id_site'] > 0:
+    #     #     return '', 403
+    #     #
+    #     # # Devices without a site can only be modified by super admins
+    #     # if json_device['id_site'] == 0:
+    #     #     if not current_user.user_superadmin:
+    #     #         return '', 403
+    #     #     json_device['id_site'] = None
+    #     #
+    #     # # Do the update!
+    #     # if json_device['id_device'] > 0:
+    #     #     # Already existing
+    #     #     try:
+    #     #         TeraDevice.update_device(json_device['id_device'], json_device)
+    #     #     except exc.SQLAlchemyError:
+    #     #         import sys
+    #     #         print(sys.exc_info())
+    #     #         return '', 500
+    #     # else:
+    #     #     # New
+    #     #     try:
+    #     #         new_device = TeraDevice()
+    #     #         new_device.from_json(json_device)
+    #     #         TeraDevice.insert_device(new_device)
+    #     #         # Update ID for further use
+    #     #         json_device['id_device'] = new_device.id_device
+    #     #     except exc.SQLAlchemyError:
+    #     #         import sys
+    #     #         print(sys.exc_info())
+    #     #         return '', 500
+    #     #
+    #     # # TODO: Publish update to everyone who is subscribed to devices update...
+    #     # update_device = TeraDevice.get_device_by_id(json_device['id_device'])
+    #     #
+    #     # return jsonify([update_device.to_json()])
+    #
+    #     return '', 501
 
-        return '', 501
-
     @multi_auth.login_required
+    @api.doc(description='Delete device data, including all related files.',
+             responses={200: 'Success - device data and all related files deleted',
+                        500: 'Database or file deletion error occurred',
+                        403: 'Logged user doesn\'t have permission to delete the requested data'})
+    @api.param('id', description='Specific device data ID to delete', type='integer')
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)

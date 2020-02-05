@@ -19,8 +19,8 @@ class Login(Resource):
         self.parser = reqparse.RequestParser()
 
     @http_auth.login_required
-    @api.doc(description='Login with HTTPAuth')
-    @api.marshal_with(model)
+    @api.doc(description='Login to the server using HTTP Basic Authentification (HTTPAuth)')
+    @api.marshal_with(model, mask=None)
     def get(self):
 
         session.permanent = True
