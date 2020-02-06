@@ -12,6 +12,19 @@ import zipfile
 from io import BytesIO
 from slugify import slugify
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_device_data', type=int, help='Specific ID of device data to request data.')
+get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all data')
+get_parser.add_argument('id_session', type=int, help='ID of session from which to request all data')
+get_parser.add_argument('id_participant', type=int, help='ID of participant from which to request all data')
+get_parser.add_argument('download', type=bool, help='If this flag is set, data will be downloaded instead of queried. '
+                                                    'In the case there\'s multiple files in the dataset, data will be '
+                                                    'zipped before the download process begins')
+
+delete_parser = api.parser()
+delete_parser.add_argument('id', type=int, help='Specific device data ID to delete', required=True)
+
 
 class QueryDeviceData(Resource):
 
@@ -20,31 +33,18 @@ class QueryDeviceData(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
+    @api.expect(get_parser)
     @api.doc(description='Get device data information. Optionaly download the data. '
                          'Only one of the ID parameter is supported at once',
              responses={200: 'Success - returns list of datas or a downloadable file, if \'download\' parameter is '
                              'specified',
                         500: 'Required parameter is missing',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
-    @api.param('id_device_data', description='Specific ID of device data to request data.', type='integer')
-    @api.param('id_device', description='ID of the device from which to request all data', type='integer')
-    @api.param('id_session', description='ID of session from which to request all data', type='integer')
-    @api.param('id_participant', description='ID of participant from which to request all data', type='integer')
-    @api.param('download', description='If this flag is set, data will be downloaded instead of queried. '
-                                       'In the case there\'s multiple files in the dataset, data will be zipped '
-                                       'before the download process begins', type='boolean')
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_device_data', type=int)
-        parser.add_argument('id_device', type=int, help='id_device')
-        parser.add_argument('id_session', type=int)
-        parser.add_argument('id_participant', type=int)
-        parser.add_argument('download')
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         datas = []
         # If we have no arguments, don't do anything!
@@ -177,10 +177,9 @@ class QueryDeviceData(Resource):
              responses={200: 'Success - device data and all related files deleted',
                         500: 'Database or file deletion error occurred',
                         403: 'Logged user doesn\'t have permission to delete the requested data'})
-    @api.param('id', description='Specific device data ID to delete', type='integer')
+    @api.expect(delete_parser)
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        parser = delete_parser
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 

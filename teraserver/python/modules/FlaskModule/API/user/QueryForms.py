@@ -25,6 +25,12 @@ class QueryForms(Resource):
         self.parser.add_argument('type', type=str, help='Definition type required', required=True)
 
     @multi_auth.login_required
+    @api.doc(description='Get json description of standard input form for the specified data type.',
+             responses={200: 'Success',
+                        500: 'Unknown or unsupported data type'})
+    @api.param(name='type', type='string', description='Data type of the required form. Currently, the following data '
+                                                       'types are supported: \n user_profile\nuser\nsite\ndevice\n'
+                                                       'project\ngroup\nparticipant\nsession_type\nsession')
     def get(self):
         args = self.parser.parse_args(strict=True)
         current_user = TeraUser.get_user_by_uuid(session['user_id'])

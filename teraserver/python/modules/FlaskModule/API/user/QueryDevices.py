@@ -8,6 +8,25 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from libtera.db.DBManager import DBManager
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_device', type=int, help='ID of the device to query'
+                        )
+get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
+get_parser.add_argument('available', type=bool, help='Flag that indicates if only available (devices not associated to '
+                                                     'a participant) should be returned')
+get_parser.add_argument('participants', type=bool, help='Flag that indicates if associated participant(s) information '
+                                                        'should be included in the returned device list')
+get_parser.add_argument('sites', type=bool, help='Flag that indicates if associated site(s) information should be '
+                                                 'included in the returned device list')
+get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('device', type=str, location='json', help='Device to create / update', required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='Device ID to delete', required=True)
+
 
 class QueryDevices(Resource):
 
@@ -16,18 +35,16 @@ class QueryDevices(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get devices information. Only one of the ID parameter is supported at once. If no ID is '
+                         'specified, returns all accessible devices for the logged user',
+             responses={200: 'Success - returns list of devices',
+                        500: 'Database error'})
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_device', type=int, help='id_device')
-        parser.add_argument('id_site', type=int, help='ID Site')
-        parser.add_argument('list', type=bool)
-        parser.add_argument('available', type=inputs.boolean)
-        parser.add_argument('participants', type=bool)
-        parser.add_argument('sites', type=bool)
-        # parser.add_argument('device_uuid', type=str, help='device_uuid')
+        parser = get_parser
 
         args = parser.parse_args()
 
@@ -99,9 +116,15 @@ class QueryDevices(Resource):
             return '', 500
 
     @multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create / update devices. id_device must be set to "0" to create a new device. Only '
+                         'superadmins can create new devices.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t create/update the specified device',
+                        400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
+                        500: 'Internal error occured when saving device'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('device', type=str, location='json', help='Device to create / update', required=True)
+        # parser = post_parser
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -148,9 +171,13 @@ class QueryDevices(Resource):
         return jsonify([update_device.to_json()])
 
     @multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific device',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete device (can delete if superadmin)',
+                        500: 'Device not found or database error.'})
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        parser = delete_parser
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 
@@ -158,7 +185,8 @@ class QueryDevices(Resource):
         id_todel = args['id']
 
         # Check if current user can delete
-        if user_access.query_device_by_id(device_id=id_todel) is None:
+        # if user_access.query_device_by_id(device_id=id_todel) is None:
+        if not current_user.user_superadmin:
             return '', 403
 
         # If we are here, we are allowed to delete. Do so.

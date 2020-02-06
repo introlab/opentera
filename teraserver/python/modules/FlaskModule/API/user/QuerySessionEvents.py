@@ -9,6 +9,17 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from flask_babel import gettext
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_session', type=int, help='ID of the session to query events for', required=True)
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('session_event', type=str, location='json', help='Session event to create / update',
+                         required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='Session event ID to delete', required=True)
+
 
 class QuerySessionEvents(Resource):
 
@@ -17,19 +28,23 @@ class QuerySessionEvents(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get events for a specific session',
+             responses={200: 'Success - returns list of events',
+                        400: 'Required parameter is missing (id_session)',
+                        500: 'Database error'})
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_session', type=int, help='id_session')
+        parser = get_parser
 
         args = parser.parse_args()
 
         sessions_events = []
         # Can't query sessions event, unless we have a parameter - id_session
         if not any(args.values()):
-            return '', 500
+            return '', 400
         elif args['id_session']:
             sessions_events = user_access.query_session_events(args['id_session'])
 
@@ -45,10 +60,15 @@ class QuerySessionEvents(Resource):
             return '', 500
 
     @multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create / update session events. id_session_event must be set to "0" to create a new '
+                         'event. An event can be created/modified if the user has access to the session.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t create/update the specified event',
+                        400: 'Badly formed JSON or missing fields(id_session_event or id_session) in the JSON body',
+                        500: 'Internal error when saving device'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('session_event', type=str, location='json', help='Event to create / update',
-                            required=True)
+        # parser = post_parser
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -98,9 +118,13 @@ class QuerySessionEvents(Resource):
         return jsonify([update_event.to_json()])
 
     @multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific session event',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete event (no access to that session)',
+                        500: 'Database error.'})
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        parser = delete_parser
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 

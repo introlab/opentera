@@ -10,6 +10,19 @@ from flask_babel import gettext
 from libtera.db.DBManager import DBManager
 from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_user', type=int, help='ID of the user to query')
+get_parser.add_argument('user_uuid', type=int, help='User UUID to query')
+get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information (ID, name, '
+                                                'enabled)')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='User ID to delete', required=True)
+
 
 class QueryUsers(Resource):
 
@@ -18,11 +31,12 @@ class QueryUsers(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get user information. If no id specified, returns all accessible users',
+             responses={200: 'Success',
+                        500: 'Database error'})
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('user_uuid', type=str, help='uuid')
-        parser.add_argument('id_user', type=int, help='User ID')
-        parser.add_argument('list', type=bool, help='Request user list (ID, name, enabled)')
+        parser = get_parser
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         args = parser.parse_args()
@@ -87,6 +101,16 @@ class QueryUsers(Resource):
         #     return '', 500
 
     @multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create / update user. id_user must be set to "0" to create a new user. User can be modified '
+                         'if: current user is super admin or user is part of a project which the current user is admin.'
+                         ' Promoting a user to super admin is restricted to super admins.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t create/update the specified user',
+                        400: 'Badly formed JSON or missing field(id_user or missing password when new user) in the '
+                             'JSON body',
+                        409: 'Username is already taken',
+                        500: 'Internal error when saving user'})
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
@@ -184,6 +208,11 @@ class QueryUsers(Resource):
         return jsonify([update_user.to_json()])
 
     @multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific user',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete user (only super admin can delete)',
+                        500: 'Database error.'})
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)
