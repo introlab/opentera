@@ -237,7 +237,7 @@ class DBManagerTeraUserAccess:
                 sites.append(site_device.device_site_site)
         return sites
 
-    def query_session_type_by_id(self, session_type_id:int):
+    def query_session_type_by_id(self, session_type_id: int):
         proj_ids = self.get_accessible_projects_ids()
         session_type = TeraSessionType.query.filter_by(id_session_type=session_type_id).filter(TeraProject.id_project.
                                                                                                in_(proj_ids)).first()
@@ -260,6 +260,13 @@ class DBManagerTeraUserAccess:
         part_ids = self.get_accessible_participants_ids()
         participants = TeraParticipant.query.join(TeraParticipantGroup, TeraProject)\
             .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids))\
+            .order_by(TeraParticipant.id_participant.asc()).all()
+        return participants
+
+    def query_participants_for_project(self, project_id: int):
+        part_ids = self.get_accessible_participants_ids()
+        participants = TeraParticipant.query.join(TeraParticipantGroup)\
+            .filter(TeraParticipantGroup.id_project == project_id, TeraParticipant.id_participant.in_(part_ids))\
             .order_by(TeraParticipant.id_participant.asc()).all()
         return participants
 

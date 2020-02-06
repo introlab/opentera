@@ -26,6 +26,7 @@ class QueryParticipants(Resource):
         parser.add_argument('id', type=int)
         parser.add_argument('id_kit', type=int)
         parser.add_argument('id_site', type=int, help='id site')
+        parser.add_argument('id_project', type=int)
         parser.add_argument('id_group', type=int)
         parser.add_argument('id_session', type=int)
         parser.add_argument('id_device', type=int)
@@ -49,6 +50,8 @@ class QueryParticipants(Resource):
             participants = user_access.query_participants_for_kit(args['id_kit'])
         elif args['id_site']:
             participants = user_access.query_participants_for_site(args['id_site'])
+        elif args['id_project']:
+            participants = user_access.query_participants_for_project(args['id_project'])
         elif args['id_group']:
             participants = user_access.query_participants_for_group(args['id_group'])
         elif args['id_device']:
@@ -98,7 +101,7 @@ class QueryParticipants(Resource):
     @multi_auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('participant', type=str, location='json', help='Partiicpant to create / update',
+        parser.add_argument('participant', type=str, location='json', help='Participant to create / update',
                             required=True)
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
