@@ -1,4 +1,6 @@
 from flask_restplus import Resource, reqparse
+
+from modules.FlaskModule.Views.Upload import ALLOWED_EXTENSIONS
 from modules.LoginModule.LoginModule import LoginModule, current_device
 from flask import request, redirect, flash
 from werkzeug.utils import secure_filename

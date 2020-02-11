@@ -23,6 +23,7 @@ class QueryDevices(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id_device', type=int, help='id_device')
         parser.add_argument('id_site', type=int, help='ID Site')
+        parser.add_argument('device_type', type=int, help='Type')
         parser.add_argument('list', type=bool)
         parser.add_argument('available', type=inputs.boolean)
         parser.add_argument('participants', type=bool)
@@ -33,10 +34,15 @@ class QueryDevices(Resource):
 
         devices = []
         # If we have no arguments, return all accessible devices
-        if not args['id_device'] and not args['id_site']:
+        if not args['id_device'] and not args['id_site'] and not args['device_type']:
             devices = user_access.get_accessible_devices()
         elif args['id_device']:
             devices = [user_access.query_device_by_id(device_id=args['id_device'])]
+        elif args['device_type']:
+            if args['id_site']:
+                devices = user_access.query_devices_by_type_by_site(args['device_type'], args['id_site'])
+            else:
+                devices = user_access.query_devices_by_type(args['device_type'])
         elif args['id_site']:
             # Check if has access to the requested site
             devices = user_access.query_devices_for_site(args['id_site'])

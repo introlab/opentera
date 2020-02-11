@@ -229,6 +229,18 @@ class DBManagerTeraUserAccess:
                 devices.append(site_device.device_site_device)
         return devices
 
+    def query_devices_by_type(self, type_device: int):
+        devices = TeraDevice.query.filter_by(device_type=type_device).order_by(TeraDevice.id_device.asc()).all()
+        return devices
+
+    def query_devices_by_type_by_site(self, type_device: int, site_id: int):
+        devices = []
+        if site_id in self.get_accessible_sites_ids():
+            devices = TeraDevice.query.join(TeraDeviceSite)\
+                .filter(TeraDeviceSite.id_site == site_id, TeraDevice.device_type == type_device)\
+                .order_by(TeraDevice.id_device.asc()).all()
+        return devices
+
     def query_sites_for_device(self, device_id: int):
         sites = []
         if device_id in self.get_accessible_devices_ids():

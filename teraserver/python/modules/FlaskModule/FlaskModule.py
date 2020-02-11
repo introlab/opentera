@@ -167,5 +167,6 @@ class FlaskModule(BaseModule):
         # This is required to expose the backend API to rendered webpages from other sources, such as services
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "*"
         return response
 
