@@ -50,7 +50,7 @@ class TeraParticipantTest(unittest.TestCase):
         participantGroup.id_project = 1
 
         participant = TeraParticipant()
-        participant.participant_code = 'TestCode'
+        participant.participant_name = 'Test Participant'
         participant.participant_uuid = str(uuid.uuid4())
         participant.participant_participant_group = participantGroup
 
@@ -71,7 +71,7 @@ class TeraParticipantTest(unittest.TestCase):
         self.assertEqual(loadedParticipant.participant_uuid, participant.participant_uuid)
 
     def test_json(self):
-        participant = TeraParticipant.get_participant_by_code('TestCode')
+        participant = TeraParticipant.get_participant_by_name('Test Participant')
 
         json = participant.to_json()
 

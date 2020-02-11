@@ -79,8 +79,8 @@ class TeraSession(db.Model, BaseModel):
         from libtera.db.models.TeraParticipant import TeraParticipant
 
         session_user = TeraUser.get_user_by_id(1)
-        session_part = TeraParticipant.get_participant_by_code('TestP1')
-        session_part2 = TeraParticipant.get_participant_by_code('TestP2')
+        session_part = TeraParticipant.get_participant_by_name('Participant #1')
+        session_part2 = TeraParticipant.get_participant_by_name('Participant #2')
         for i in range(8):
             base_session = TeraSession()
             base_session.session_creator_user = session_user

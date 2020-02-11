@@ -8,6 +8,7 @@ from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 from libtera.db.models.TeraUser import TeraUser
 from libtera.ConfigManager import ConfigManager
 
+
 class DBManagerTeraUserAccessTest(unittest.TestCase):
 
     filename = 'DBManagerTeraUserAccessTest.db'

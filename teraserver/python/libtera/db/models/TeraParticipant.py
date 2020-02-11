@@ -12,11 +12,9 @@ class TeraParticipant(db.Model, BaseModel):
     __tablename__ = 't_participants'
     id_participant = db.Column(db.Integer, db.Sequence('id_participant_sequence'), primary_key=True, autoincrement=True)
     participant_uuid = db.Column(db.String(36), nullable=False, unique=True)
-    participant_code = db.Column(db.String, nullable=False)
+    participant_name = db.Column(db.String, nullable=False)
     participant_username = db.Column(db.String(50), nullable=True, unique=True)
     participant_email = db.Column(db.String, nullable=True, unique=True)
-    participant_firstname = db.Column(db.String, nullable=True)
-    participant_lastname = db.Column(db.String, nullable=True)
     participant_password = db.Column(db.String, nullable=True)
     participant_token = db.Column(db.String, nullable=False, unique=True)
     participant_lastonline = db.Column(db.TIMESTAMP, nullable=True)
@@ -48,7 +46,6 @@ class TeraParticipant(db.Model, BaseModel):
             'participant_uuid': self.participant_uuid
         }
 
-        # TODO key should be secret ?
         self.participant_token = jwt.encode(payload, TeraServerSettings.get_server_setting_value(
             TeraServerSettings.ServerParticipantTokenKey), algorithm='HS256').decode('utf-8')
 
@@ -103,8 +100,12 @@ class TeraParticipant(db.Model, BaseModel):
         return TeraParticipant.query.filter_by(participant_username=username).first()
 
     @staticmethod
-    def get_participant_by_code(code):
-        return TeraParticipant.query.filter_by(participant_code=code).first()
+    def get_participant_by_email(email: str):
+        return TeraParticipant.query.filter_by(participant_email=email).first()
+
+    @staticmethod
+    def get_participant_by_name(name):
+        return TeraParticipant.query.filter_by(participant_name=name).first()
 
     @staticmethod
     def get_participant_by_id(part_id: int):
@@ -113,29 +114,23 @@ class TeraParticipant(db.Model, BaseModel):
     @staticmethod
     def create_defaults():
         participant1 = TeraParticipant()
-        participant1.participant_code = 'TestP1'
-        participant1.participant_firstname = 'Participant #1 First Name'
-        participant1.participant_lastname = 'Participant #1 Last Name'
+        participant1.participant_name = 'Participant #1'
         participant1.participant_active = True
         participant1.participant_uuid = str(uuid.uuid4())
         participant1.participant_participant_group = \
             TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
 
         token1 = participant1.create_token()
-        print('token1 ', token1)
         db.session.add(participant1)
 
         participant2 = TeraParticipant()
-        participant2.participant_code = 'TestP2'
-        participant2.participant_firstname = 'Participant #2 First Name'
-        participant2.participant_lastname = 'Participant #2 Last Name'
+        participant2.participant_name = 'Participant #2'
         participant2.participant_active = True
         participant2.participant_uuid = str(uuid.uuid4())
         participant2.participant_participant_group = \
             TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group B')
 
         token2 = participant2.create_token()
-        print('token2 ', token2)
         db.session.add(participant2)
 
         db.session.commit()
