@@ -9,6 +9,23 @@ from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_participant', type=int, help='ID of the participant to query')
+get_parser.add_argument('id', type=int, help='Alias for "id_participant"')
+get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all participants')
+get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all participants')
+get_parser.add_argument('id_group', type=int, help='ID of the participant groups from which to get all participants')
+get_parser.add_argument('id_session', type=int, help='ID of the session from which to get all participants')
+get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all participants associated')
+get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('participant', type=str, location='json', help='Participant to create / update', required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='Participant ID to delete', required=True)
+
 
 class QueryParticipants(Resource):
 
@@ -17,22 +34,16 @@ class QueryParticipants(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get participants information. Only one of the ID parameter is supported and required at once',
+             responses={200: 'Success - returns list of participants',
+                        400: 'No parameters specified at least one id must be used',
+                        500: 'Database error'})
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_participant', type=int, help='id_participant')
-        parser.add_argument('id', type=int)
-        parser.add_argument('id_kit', type=int)
-        parser.add_argument('id_site', type=int, help='id site')
-        parser.add_argument('id_project', type=int)
-        parser.add_argument('id_group', type=int)
-        parser.add_argument('id_session', type=int)
-        parser.add_argument('id_device', type=int)
-        parser.add_argument('list', type=bool)
-        # parser.add_argument('participant_uuid', type=str, help='participant_uuid')
-        # parser.add_argument('participant_name', type=str, help='participant_name')
+        parser = get_parser
 
         args = parser.parse_args()
 
@@ -46,8 +57,6 @@ class QueryParticipants(Resource):
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
                 participants = [TeraParticipant.get_participant_by_id(args['id_participant'])]
-        elif args['id_kit']:
-            participants = user_access.query_participants_for_kit(args['id_kit'])
         elif args['id_site']:
             participants = user_access.query_participants_for_site(args['id_site'])
         elif args['id_project']:
@@ -69,9 +78,6 @@ class QueryParticipants(Resource):
             for participant in participants:
                 if args['list'] is None:
                     participant_json = participant.to_json()
-                    if args['id_kit']:
-                        # Adds kit information to participant
-                        participant_json['id_kit'] = args['id_kit']
                     if args['id_participant']:
                         # Adds project information to participant
                         participant_json['id_project'] = participant.participant_participant_group.id_project
@@ -99,10 +105,16 @@ class QueryParticipants(Resource):
             return '', 500
 
     @multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create / update participants. id_participant must be set to "0" to create a new '
+                         'participant. A participant can be created/modified if the user has admin rights to the '
+                         'project.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t create/update the specified device',
+                        400: 'Badly formed JSON or missing fields(id_participant_group or id_project) in the JSON body',
+                        500: 'Internal error when saving device'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('participant', type=str, location='json', help='Participant to create / update',
-                            required=True)
+        parser = post_parser
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -149,9 +161,14 @@ class QueryParticipants(Resource):
         return jsonify([update_participant.to_json()])
 
     @multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific participant',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete participant (only project admin can delete)',
+                        500: 'Database error.'})
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        parser = delete_parser
+
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 

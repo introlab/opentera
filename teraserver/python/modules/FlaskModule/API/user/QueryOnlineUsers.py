@@ -17,6 +17,8 @@ class QueryOnlineUsers(Resource):
         self.parser = reqparse.RequestParser()
 
     @multi_auth.login_required
+    @api.doc(description='Get online users. CURRENTLY UNIMPLEMENTED.',
+             responses={200: 'Success'})
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         args = self.parser.parse_args()
@@ -52,9 +54,9 @@ class QueryOnlineUsers(Resource):
         except InvalidRequestError:
             return '', 500
 
-    def post(self):
-        return '', 501
-
-    def delete(self):
-        return '', 501
+    # def post(self):
+    #     return '', 501
+    #
+    # def delete(self):
+    #     return '', 501
 

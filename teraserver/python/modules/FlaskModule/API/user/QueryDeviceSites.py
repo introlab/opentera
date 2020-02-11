@@ -10,6 +10,22 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from flask_babel import gettext
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all associated sites'
+                        )
+get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
+get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information (ids only)')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('device_site', type=str, location='json',
+                         help='Device site association to create / update', required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='Specific device-site association ID to delete. Be careful: this'
+                                                ' is not the device or the site ID, but the ID of the '
+                                                'association itself!', required=True)
+
 
 class QueryDeviceSites(Resource):
 
@@ -18,14 +34,17 @@ class QueryDeviceSites(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get devices that are related to a site. Only one "ID" parameter required and supported'
+                         ' at once.',
+             responses={200: 'Success - returns list of devices - sites association',
+                        400: 'Required parameter is missing (must have at least one id)',
+                        500: 'Error occured when loading devices for sites'})
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_device', type=int, help='id_device')
-        parser.add_argument('id_site', type=int, help='id_site')
-        parser.add_argument('list', type=bool)
+        parser = get_parser
 
         args = parser.parse_args()
 
@@ -54,13 +73,17 @@ class QueryDeviceSites(Resource):
             return jsonify(device_site_list)
 
         except InvalidRequestError:
-            return '', 400
+            return '', 500
 
     @multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create/update devices associated with a site.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t modify device association',
+                        400: 'Badly formed JSON or missing fields(id_site or id_device) in the JSON body',
+                        500: 'Internal error occured when saving device association'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('device_site', type=str, location='json', help='Device site to create / update',
-                            required=True)
+        parser = post_parser
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -115,9 +138,13 @@ class QueryDeviceSites(Resource):
         return jsonify(update_device_site)
 
     @multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific device-site association.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete device association',
+                        500: 'Device-site association not found or database error.'})
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        parser = delete_parser
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 

@@ -13,9 +13,21 @@ flask_app = Flask("TeraServer")
 babel = Babel(flask_app)
 
 # API
+authorizations = {
+    'HTTPAuth': {
+        'type': 'basic',
+        'in': 'header'
+    },
+    'Token Authentification': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'OpenTera'
+    }
+}
 api = Api(flask_app,
           version='1.0.0', title='OpenTeraServer API',
-          description='TeraServer API Documentation', doc='/doc')
+          description='TeraServer API Documentation', doc='/doc',
+          authorizations=authorizations)
 
 # Namespaces
 user_api_ns = api.namespace('api/user', description='API for user calls')

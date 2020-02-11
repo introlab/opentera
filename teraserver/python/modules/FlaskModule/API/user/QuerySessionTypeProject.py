@@ -9,6 +9,21 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from flask_babel import gettext
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_project', type=int, help='Project ID to query associated session types from')
+get_parser.add_argument('id_session_type', type=int, help='Session type ID to query associated projects from')
+get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information (ids only)')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('session_type_project', type=str, location='json',
+                         help='Device type - project association to create / update', required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='Specific device-type - project association ID to delete. '
+                                                'Be careful: this is not the session-type or project ID, but the ID'
+                                                ' of the association itself!', required=True)
+
 
 class QuerySessionTypeProject(Resource):
 
@@ -17,14 +32,17 @@ class QuerySessionTypeProject(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get devices types that are associated with a project. Only one "ID" parameter required and '
+                         'supported at once.',
+             responses={200: 'Success - returns list of devices-types - projects association',
+                        400: 'Required parameter is missing (must have at least one id)',
+                        500: 'Error when getting association'})
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_project', type=int)
-        parser.add_argument('id_session_type', type=int)
-        parser.add_argument('list', type=bool)
+        parser = get_parser
 
         args = parser.parse_args()
 
@@ -52,13 +70,18 @@ class QuerySessionTypeProject(Resource):
             return jsonify(stp_list)
 
         except InvalidRequestError:
-            return '', 400
+            return '', 500
 
     @multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create/update session-type - project association.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t modify association (session type must be accessible from project '
+                             'access)',
+                        400: 'Badly formed JSON or missing fields(id_project or id_session_type) in the JSON body',
+                        500: 'Internal error occured when saving association'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('session_type_project', type=str, location='json',
-                            help='Session type project to create / update', required=True)
+        # parser = post_parser
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -113,9 +136,14 @@ class QuerySessionTypeProject(Resource):
         return jsonify(update_stp)
 
     @multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific session-type - project association.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete association (no access to session-type or project)',
+                        500: 'Association not found or database error.'})
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        parser = delete_parser
+
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
 

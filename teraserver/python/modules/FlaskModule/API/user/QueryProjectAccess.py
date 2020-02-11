@@ -7,6 +7,15 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.DBManager import DBManager
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all projects roles')
+get_parser.add_argument('id_project', type=int, help='ID of the project from which to request all users roles')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('project_access', type=str, location='json',
+                         help='Project access to create / update', required=True)
+
 
 class QueryProjectAccess(Resource):
 
@@ -15,10 +24,13 @@ class QueryProjectAccess(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get user roles for projects. Only one  parameter required and supported at once.',
+             responses={200: 'Success - returns list of users roles in projects',
+                        400: 'Required parameter is missing (must have at least one id)',
+                        500: 'Error occured when loading project roles'})
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_user', type=int, help='User ID')
-        parser.add_argument('id_project', type=int, help='Site ID')
+        parser = get_parser
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -51,10 +63,14 @@ class QueryProjectAccess(Resource):
         return 'Unknown error', 500
 
     @multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create/update project access for an user.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t modify this project or user access (project admin access required)',
+                        400: 'Badly formed JSON or missing fields(id_user or id_project) in the JSON body',
+                        500: 'Database error'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('project_access', type=str, location='json', help='Project access to create / update',
-                            required=True)
+        parser = post_parser
 
         current_user = TeraUser.get_user_by_uuid(session['user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -91,8 +107,8 @@ class QueryProjectAccess(Resource):
 
         return jsonify(json_rval)
 
-    @multi_auth.login_required
-    def delete(self):
-
-        return '', 501
+    # @multi_auth.login_required
+    # def delete(self):
+    #
+    #     return '', 501
 
