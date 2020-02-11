@@ -56,8 +56,7 @@ class QueryDeviceSites(Resource):
         if args['id_device']:
             if args['id_device'] in user_access.get_accessible_devices_ids():
                 device_site = TeraDeviceSite.query_sites_for_device(device_id=args['id_device'])
-        else:
-            if args['id_site']:
+        elif args['id_site']:
                 if args['id_site'] in user_access.get_accessible_sites_ids():
                     device_site = TeraDeviceSite.query_devices_for_site(site_id=args['id_site'])
         try:
@@ -104,8 +103,8 @@ class QueryDeviceSites(Resource):
                 return gettext('Accès refusé'), 403
 
             # Check if already exists
-            device_site = TeraDeviceSite.query_device_site_for_device_site(device_id=json_device_site['id_device'],
-                                                                           site_id=json_device_site['id_site'])
+            device_site = TeraDeviceSite.get_device_site_id_for_device_and_site(device_id=json_device_site['id_device'],
+                                                                                site_id=json_device_site['id_site'])
             if device_site:
                 json_device_site['id_device_site'] = device_site.id_device_site
             else:

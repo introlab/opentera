@@ -13,7 +13,7 @@ from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user to query')
-get_parser.add_argument('user_uuid', type=int, help='User UUID to query')
+get_parser.add_argument('user_uuid', type=str, help='User UUID to query')
 get_parser.add_argument('self', type=bool, help='Query information about the currently logged user')
 get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information (ID, name, '
                                                 'enabled)')

@@ -111,6 +111,7 @@ class FlaskModule(BaseModule):
         from .API.user.QueryDevices import QueryDevices
         from .API.user.QuerySiteAccess import QuerySiteAccess
         from .API.user.QueryDeviceSites import QueryDeviceSites
+        from .API.user.QueryDeviceProjects import QueryDeviceProjects
         from .API.user.QueryDeviceParticipants import QueryDeviceParticipants
         from .API.user.QueryProjectAccess import QueryProjectAccess
         from .API.user.QueryParticipantGroup import QueryParticipantGroup
@@ -120,6 +121,7 @@ class FlaskModule(BaseModule):
         from .API.user.QueryDeviceData import QueryDeviceData
         from .API.user.QuerySessionTypeDeviceType import QuerySessionTypeDeviceType
         from .API.user.QuerySessionTypeProject import QuerySessionTypeProject
+
         # Resources
         user_api_ns.add_resource(Login, '/login', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(Logout, '/logout', resource_class_kwargs=kwargs)
@@ -131,6 +133,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(QueryParticipants, '/participants', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryDevices, '/devices', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryDeviceSites, '/devicesites', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryDeviceProjects, '/deviceprojects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryDeviceParticipants, '/deviceparticipants', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QuerySiteAccess, '/siteaccess', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryProjectAccess, '/projectaccess', resource_class_kwargs=kwargs)
@@ -149,6 +152,7 @@ class FlaskModule(BaseModule):
         from .API.device.DeviceRegister import DeviceRegister
         from .API.device.DeviceQuerySessions import DeviceQuerySessions
         from .API.device.DeviceQuerySessionEvents import DeviceQuerySessionEvents
+
         # Resources
         device_api_ns.add_resource(DeviceLogin, '/device_login', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceUpload, '/device_upload', resource_class_kwargs=kwargs)
