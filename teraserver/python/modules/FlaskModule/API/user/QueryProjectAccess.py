@@ -11,6 +11,8 @@ from libtera.db.DBManager import DBManager
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all projects roles')
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to request all users roles')
+get_parser.add_argument('admins', type=bool, help='Flag to limit to projects from which the user is an admin or '
+                                                  'users in project that have the admin role')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('project_access', type=str, location='json',
@@ -25,7 +27,7 @@ class QueryProjectAccess(Resource):
 
     @multi_auth.login_required
     @api.expect(get_parser)
-    @api.doc(description='Get user roles for projects. Only one  parameter required and supported at once.',
+    @api.doc(description='Get user roles for projects. Only one ID parameter required and supported at once.',
              responses={200: 'Success - returns list of users roles in projects',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading project roles'})
@@ -46,12 +48,13 @@ class QueryProjectAccess(Resource):
             user_id = args['id_user']
 
             if user_id in user_access.get_accessible_users_ids():
-                access = user_access.query_project_access_for_user(user_id=user_id)
+                access = user_access.query_project_access_for_user(user_id=user_id,
+                                                                   admin_only=args['admins'] is not None)
 
         # Query access for project id
         if args['id_project']:
             project_id = args['id_project']
-            access = user_access.query_access_for_project(project_id=project_id)
+            access = user_access.query_access_for_project(project_id=project_id, admin_only=args['admins'] is not None)
 
         if access is not None:
             access_list = []
