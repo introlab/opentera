@@ -78,7 +78,9 @@ class FlaskModule(BaseModule):
         self.session = Session(flask_app)
 
         # Init API
-        self.init_api()
+        self.init_user_api()
+        self.init_device_api()
+        self.init_participant_api()
 
         # Init Views
         self.init_views()
@@ -94,7 +96,7 @@ class FlaskModule(BaseModule):
         print('FlaskModule - Received message ', pattern, channel, message)
         pass
 
-    def init_api(self):
+    def init_user_api(self):
 
         # Default arguments
         kwargs = {'flaskModule': self}
@@ -143,6 +145,10 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(QueryDeviceData, '/data', resource_class_kwargs=kwargs)
         api.add_namespace(user_api_ns)
 
+    def init_device_api(self):
+        # Default arguments
+        kwargs = {'flaskModule': self}
+
         # Devices
         from .API.device.DeviceLogin import DeviceLogin
         from .API.device.DeviceUpload import DeviceUpload
@@ -157,6 +163,27 @@ class FlaskModule(BaseModule):
         device_api_ns.add_resource(DeviceQuerySessionEvents, '/sessionevents', resource_class_kwargs=kwargs)
         api.add_namespace(device_api_ns)
 
+    def init_participant_api(self):
+        # Default arguments
+        kwargs = {'flaskModule': self}
+
+        # Participants
+        from .API.participant.ParticipantLogin import ParticipantLogin
+        from .API.participant.ParticipantLogout import ParticipantLogout
+        from .API.participant.ParticipantQueryDeviceData import ParticipantQueryDeviceData
+        from .API.participant.ParticipantQueryDevices import ParticipantQueryDevices
+        from .API.participant.ParticipantQueryParticipants import ParticipantQueryParticipants
+        from .API.participant.ParticipantQuerySessions import ParticipantQuerySessions
+        # Resources
+        participant_api_ns.add_resource(ParticipantLogin, '/login', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantLogout, '/logout', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantQueryDeviceData, '/device_data', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantQueryDevices, '/devices', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantQueryParticipants, '/participants', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantQuerySessions, '/sessions', resource_class_kwargs=kwargs)
+
+        api.add_namespace(participant_api_ns)
+
     def init_views(self):
         from .Views.Index import Index
         from .Views.Upload import Upload
@@ -168,7 +195,7 @@ class FlaskModule(BaseModule):
         kwargs = {'flaskModule': self}
 
         # Will create a function that calls the __index__ method with args, kwargs
-        flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
+        flask_app.add_url_rule('/index', view_func=Index.as_view('index', *args, **kwargs))
         # flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
         # flask_app.add_url_rule('/participant/', view_func=Participant.as_view('participant', *args, **kwargs))
         # flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
