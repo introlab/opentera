@@ -39,12 +39,30 @@ class ConfigManager:
         if self.validate_webrtc_config(config_json['WebRTC']):
             self.webrtc_config = config_json["WebRTC"]
 
+    def create_defaults(self):
+        # Server fake config
+        server_required_fields = ['name', 'port', 'ssl_path', 'hostname',
+                           'site_certificate', 'site_private_key', 'ca_certificate', 'ca_private_key', 'upload_path']
+        for field in server_required_fields:
+            self.server_config[field] = ''
+        self.server_config['upload_path'] = 'uploads'
+
+        # Database fake config
+        database_required_fields = ['name', 'port', 'url', 'username', 'password']
+        for field in database_required_fields:
+            self.db_config[field] = ''
+
+        # Redis fake config
+        redis_required_fields = ['hostname', 'port', 'db', 'username', 'password']
+        for field in redis_required_fields:
+            self.redis_config[field] = ''
+
     @staticmethod
     def validate_server_config(config):
         rval = True
 
         required_fields = ['name', 'port', 'ssl_path', 'hostname',
-                           'site_certificate', 'site_private_key', 'ca_certificate', 'ca_private_key']
+                           'site_certificate', 'site_private_key', 'ca_certificate', 'ca_private_key', 'upload_path']
         for field in required_fields:
             if field not in config:
                 print('ERROR: Server Config - missing server ' + field)

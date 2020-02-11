@@ -9,6 +9,7 @@ from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.Base import db
+from libtera.ConfigManager import ConfigManager
 import uuid
 import os
 from passlib.hash import bcrypt
@@ -24,14 +25,20 @@ class TeraParticipantTest(unittest.TestCase):
 
     db_man = DBManager()
 
+    config = ConfigManager()
+
     def setUp(self):
         if os.path.isfile(self.filename):
             print('removing database')
             os.remove(self.filename)
 
         self.db_man.open_local(self.SQLITE)
+
+        # Create default config
+        self.config.create_defaults()
+
         # Creating default users / tests.
-        self.db_man.create_defaults()
+        self.db_man.create_defaults(self.config)
 
     def tearDown(self):
         pass
@@ -39,11 +46,11 @@ class TeraParticipantTest(unittest.TestCase):
     def test_token(self):
 
         participantGroup = TeraParticipantGroup()
-        participantGroup.participantgroup_name = 'participants'
+        participantGroup.participant_group_name = 'participants'
         participantGroup.id_project = 1
 
         participant = TeraParticipant()
-        participant.participant_name = 'Test User'
+        participant.participant_code = 'TestCode'
         participant.participant_uuid = str(uuid.uuid4())
         participant.participant_participant_group = participantGroup
 
@@ -64,7 +71,7 @@ class TeraParticipantTest(unittest.TestCase):
         self.assertEqual(loadedParticipant.participant_uuid, participant.participant_uuid)
 
     def test_json(self):
-        participant = TeraParticipant.get_participant_by_name('Test Participant #1')
+        participant = TeraParticipant.get_participant_by_code('TestCode')
 
         json = participant.to_json()
 

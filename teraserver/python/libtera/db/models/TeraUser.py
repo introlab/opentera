@@ -54,7 +54,7 @@ class TeraUser(db.Model, BaseModel):
             'user_uuid': user_uuid
         }
 
-        return jwt.encode(payload, token_key, 'HS256').decode('utf-8')
+        return jwt.encode(payload, token_key, algorithm='HS256').decode('utf-8')
 
     def get_fullname(self):
         return self.user_firstname + ' ' + self.user_lastname

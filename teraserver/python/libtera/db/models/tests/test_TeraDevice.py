@@ -13,6 +13,7 @@ from libtera.db.Base import db
 import uuid
 import os
 from passlib.hash import bcrypt
+from libtera.ConfigManager import ConfigManager
 
 
 class TeraDeviceTest(unittest.TestCase):
@@ -25,14 +26,20 @@ class TeraDeviceTest(unittest.TestCase):
 
     db_man = DBManager()
 
+    config = ConfigManager()
+
     def setUp(self):
         if os.path.isfile(self.filename):
             print('removing database')
             os.remove(self.filename)
 
         self.db_man.open_local(self.SQLITE)
+
+        # Create default config
+        self.config.create_defaults()
+
         # Creating default users / tests.
-        self.db_man.create_defaults()
+        self.db_man.create_defaults(self.config)
 
     def test_defaults(self):
         pass

@@ -95,7 +95,8 @@ class LoginModule(BaseModule):
     def verify_token(self, token_value):
         import jwt
         try:
-            token_dict = jwt.decode(token_value, self.redisGet(TeraServerConstants.RedisVar_UserTokenAPIKey))
+            token_dict = jwt.decode(token_value, self.redisGet(TeraServerConstants.RedisVar_UserTokenAPIKey),
+                                    algorithms='HS256')
         except jwt.exceptions.InvalidSignatureError as e:
             print(e)
             return False

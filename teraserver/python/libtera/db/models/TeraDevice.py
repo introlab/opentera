@@ -62,7 +62,7 @@ class TeraDevice(db.Model, BaseModel):
         }
 
         self.device_token = jwt.encode(payload, TeraServerSettings.get_server_setting_value(
-            TeraServerSettings.ServerDeviceTokenKey), 'HS256').decode('utf-8')
+            TeraServerSettings.ServerDeviceTokenKey), algorithm='HS256').decode('utf-8')
 
         return self.device_token
 
@@ -78,7 +78,7 @@ class TeraDevice(db.Model, BaseModel):
             # Validate token, key loaded from DB
             data = jwt.decode(token.encode('utf-8'),
                               TeraServerSettings.get_server_setting_value(
-                                  TeraServerSettings.ServerDeviceTokenKey), 'HS256')
+                                  TeraServerSettings.ServerDeviceTokenKey), algorithms='HS256')
 
             # Only validating UUID since other fields can change in database after token is generated.
             if data['device_uuid'] == device.device_uuid:

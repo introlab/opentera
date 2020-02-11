@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-02-11 09:07-0500\n"
+"POT-Creation-Date: 2020-02-11 10:00-0500\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -414,15 +414,15 @@ msgstr ""
 msgid "Vous n'avez pas acces a au moins un participant de la seance."
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:161
+#: modules/FlaskModule/API/user/QueryUsers.py:164
 msgid "Password required"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:163
+#: modules/FlaskModule/API/user/QueryUsers.py:166
 msgid "Invalid password"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:167
+#: modules/FlaskModule/API/user/QueryUsers.py:170
 msgid "Username unavailable."
 msgstr ""
 

@@ -9,6 +9,7 @@ from libtera.db.Base import db
 import uuid
 import os
 from passlib.hash import bcrypt
+from libtera.ConfigManager import ConfigManager
 
 
 class TeraUserTest(unittest.TestCase):
@@ -21,14 +22,20 @@ class TeraUserTest(unittest.TestCase):
 
     db_man = DBManager()
 
+    config = ConfigManager()
+
     def setUp(self):
         if os.path.isfile(self.filename):
             print('removing database')
             os.remove(self.filename)
 
         self.db_man.open_local(self.SQLITE)
+
+        # Create default config
+        self.config.create_defaults()
+
         # Creating default users / tests.
-        self.db_man.create_defaults()
+        self.db_man.create_defaults(self.config)
 
     def tearDown(self):
         pass
@@ -45,11 +52,11 @@ class TeraUserTest(unittest.TestCase):
         self.assertTrue(TeraUser.verify_password('admin', 'admin'), 'admin user default password is admin')
 
         # Verify that superadmin can access all sites
-        sites = self.db_man.get_user_sites(admin)
+        sites = DBManager.userAccess(admin).get_accessible_sites()
         self.assertEqual(len(sites), TeraSite.get_count(), 'admin user can access all sites')
 
         # Verify that superadmin can access all projects
-        projects = self.db_man.get_user_projects(admin)
+        projects = DBManager.userAccess(admin).get_accessible_projects()
         self.assertEqual(len(projects), TeraProject.get_count())
 
     def test_siteadmin(self):
@@ -62,12 +69,12 @@ class TeraUserTest(unittest.TestCase):
                         'siteadmin user default password is admin')
 
         # Verify that site can access only its site
-        sites = TeraSiteAccess.get_accessible_sites_for_user(siteadmin)
+        sites = DBManager.userAccess(siteadmin).get_accessible_sites()
         self.assertEqual(len(sites), 1, 'siteadmin user can access 1 site')
         self.assertEqual(sites[0].site_name, 'Default Site')
 
         # Verify that siteadmin can access all sites project
-        projects = TeraProjectAccess.get_accessible_projects_for_user(siteadmin)
+        projects = DBManager.userAccess(siteadmin).get_accessible_projects()
         self.assertEqual(len(projects), 2)
 
     def test_multisite_user(self):
@@ -79,10 +86,10 @@ class TeraUserTest(unittest.TestCase):
                         'user2 user default password is user2')
 
         # Verify that site can access only its site
-        sites = TeraSiteAccess.get_accessible_sites_for_user(multi)
+        sites = DBManager.userAccess(multi).get_accessible_sites()
         self.assertEqual(len(sites), 1, 'multi user can access 1 site')
         self.assertEqual(sites[0].site_name, 'Default Site')
 
         # Verify that multi can access 2 projects
-        projects = TeraProjectAccess.get_accessible_projects_for_user(multi)
+        projects = DBManager.userAccess(multi).get_accessible_projects()
         self.assertEqual(len(projects), 2)
