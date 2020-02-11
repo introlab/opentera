@@ -11,6 +11,8 @@ from libtera.db.DBManager import DBManager
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all site roles')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to request all users roles')
+get_parser.add_argument('admins', type=bool, help='Flag to limit to sites from which the user is an admin or '
+                                                  'users in site that have the admin role')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('site_access', type=str, location='json', help='Site access to create / update', required=True)
@@ -45,12 +47,12 @@ class QuerySiteAccess(Resource):
             user_id = args['id_user']
 
             if user_id in user_access.get_accessible_users_ids():
-                access = user_access.query_site_access_for_user(user_id=user_id)
+                access = user_access.query_site_access_for_user(user_id=user_id, admin_only=args['admins'] is not None)
 
         # Query access for site id
         if args['id_site']:
             site_id = args['id_site']
-            access = user_access.query_access_for_site(site_id=site_id)
+            access = user_access.query_access_for_site(site_id=site_id, admin_only=args['admins'] is not None)
 
         if access is not None:
             access_list = []
