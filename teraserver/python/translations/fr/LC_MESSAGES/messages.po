@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-01-16 10:21-0500\n"
+"POT-Creation-Date: 2020-02-11 09:07-0500\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -360,69 +360,69 @@ msgstr ""
 msgid "Permettre l'accès via le web"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:34
-#: modules/FlaskModule/API/user/QueryDeviceSites.py:34
-#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:33
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:33
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:62
+#: modules/FlaskModule/API/user/QueryDeviceSites.py:54
+#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:53
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:52
 msgid "Arguments manquants"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:83
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:140
-#: modules/FlaskModule/API/user/QueryDeviceSites.py:80
-#: modules/FlaskModule/API/user/QueryDeviceSites.py:133
-#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:78
-#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:131
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:130
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:113
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:174
+#: modules/FlaskModule/API/user/QueryDeviceSites.py:104
+#: modules/FlaskModule/API/user/QueryDeviceSites.py:161
+#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:103
+#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:160
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:159
 msgid "Accès refusé"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:136
-#: modules/FlaskModule/API/user/QueryDeviceSites.py:129
-#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:128
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:127
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:170
+#: modules/FlaskModule/API/user/QueryDeviceSites.py:157
+#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:157
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:156
 msgid "Non-trouvé"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:148
-#: modules/FlaskModule/API/user/QueryDeviceSites.py:151
-#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:139
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:138
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:182
+#: modules/FlaskModule/API/user/QueryDeviceSites.py:179
+#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:168
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:167
 msgid "Erreur base de données"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:77
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:101
 msgid "Acces refuse"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessionTypes.py:119
+#: modules/FlaskModule/API/user/QuerySessionTypes.py:147
 msgid ""
 "Impossible de supprimer - pas administrateur dans tous les projets de ce "
 "type."
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessionTypes.py:123
+#: modules/FlaskModule/API/user/QuerySessionTypes.py:151
 msgid "Impossible de supprimer - des seances de ce type existent."
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessions.py:82
+#: modules/FlaskModule/API/user/QuerySessions.py:105
 msgid "Participants absents"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessions.py:97
-#: modules/FlaskModule/API/user/QuerySessions.py:146
+#: modules/FlaskModule/API/user/QuerySessions.py:120
+#: modules/FlaskModule/API/user/QuerySessions.py:175
 msgid "Vous n'avez pas acces a au moins un participant de la seance."
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:136
+#: modules/FlaskModule/API/user/QueryUsers.py:161
 msgid "Password required"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:138
+#: modules/FlaskModule/API/user/QueryUsers.py:163
 msgid "Invalid password"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:142
+#: modules/FlaskModule/API/user/QueryUsers.py:167
 msgid "Username unavailable."
 msgstr ""
 

@@ -34,7 +34,7 @@ class QuerySessionEvents(Resource):
                         400: 'Required parameter is missing (id_session)',
                         500: 'Database error'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         parser = get_parser
@@ -70,7 +70,7 @@ class QuerySessionEvents(Resource):
     def post(self):
         # parser = post_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_event' not in request.json:
@@ -125,7 +125,7 @@ class QuerySessionEvents(Resource):
                         500: 'Database error.'})
     def delete(self):
         parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()

@@ -33,7 +33,7 @@ class QueryForms(Resource):
                                                        'project\ngroup\nparticipant\nsession_type\nsession')
     def get(self):
         args = self.parser.parse_args(strict=True)
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         if args['type'] == 'user_profile':

@@ -14,6 +14,7 @@ from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user to query')
 get_parser.add_argument('user_uuid', type=int, help='User UUID to query')
+get_parser.add_argument('self', type=bool, help='Query information about the currently logged user')
 get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information (ID, name, '
                                                 'enabled)')
 
@@ -38,23 +39,25 @@ class QueryUsers(Resource):
     def get(self):
         parser = get_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         args = parser.parse_args()
 
         user_access = DBManager.userAccess(current_user)
 
         users = []
-        # If we have no arguments, return all accessible users
-        if not any(args.values()):
-            users = user_access.get_accessible_users()
 
         # If we have a user_uuid, query for that user if accessible
         if args['user_uuid']:
             if args['user_uuid'] in user_access.get_accessible_users_uuids():
                 users.append(TeraUser.get_user_by_uuid(args['user_uuid']))
-        if args['id_user']:
+        elif args['id_user']:
             if args['id_user'] in user_access.get_accessible_users_ids():
                 users.append(current_user.get_user_by_id(args['id_user']))
+        elif args['self'] is not None:
+            users.append(current_user)
+        else:
+            # If we have no arguments, return all accessible users
+            users = user_access.get_accessible_users()
 
         # If we have a id_project, query for users of that project, if accessible
         # TODO
@@ -115,7 +118,7 @@ class QueryUsers(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
 
         user_access = DBManager.userAccess(current_user)
 
@@ -216,7 +219,7 @@ class QueryUsers(Resource):
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         # userAccess = DBManager.userAccess(current_user)
 
         args = parser.parse_args()

@@ -41,7 +41,7 @@ class QueryDeviceData(Resource):
                         500: 'Required parameter is missing',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = get_parser.parse_args()
@@ -123,7 +123,7 @@ class QueryDeviceData(Resource):
     #     parser = reqparse.RequestParser()
     #     parser.add_argument('device_data', type=str, location='json', help='Device to create / update', required=True)
     #     #
-    #     # current_user = TeraUser.get_user_by_uuid(session['user_id'])
+    #     # current_user = TeraUser.get_user_by_uuid(session['_user_id'])
     #     # user_access = DBManager.userAccess(current_user)
     #     # # Using request.json instead of parser, since parser messes up the json!
     #     # json_device = request.json['device']
@@ -180,7 +180,7 @@ class QueryDeviceData(Resource):
     @api.expect(delete_parser)
     def delete(self):
         parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()

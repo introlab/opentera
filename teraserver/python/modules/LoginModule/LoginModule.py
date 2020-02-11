@@ -86,9 +86,9 @@ class LoginModule(BaseModule):
             registered_user.update_last_online()
 
             login_user(registered_user, remember=True)
-            print('Setting key with expiration in 60s', session['_id'], session['user_id'])
+            print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
 
-            self.redisSet(session['_id'], session['user_id'], ex=60)
+            self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
         return False
 

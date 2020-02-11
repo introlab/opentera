@@ -36,7 +36,7 @@ class QuerySites(Resource):
     def get(self):
         parser = get_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         args = parser.parse_args()
 
@@ -93,7 +93,7 @@ class QuerySites(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('site', type=str, location='json', help='Site to create / update', required=True)
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_site = request.json['site']
@@ -143,7 +143,7 @@ class QuerySites(Resource):
     def delete(self):
         parser = delete_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
 
         args = parser.parse_args()
         id_todel = args['id']

@@ -13,7 +13,7 @@ get_parser = api.parser()
 get_parser.add_argument('id_device', type=int, help='ID of the device to query'
                         )
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
-get_parser.add_argument('device_type', type=int, help='Type of device from which to get all associated devices')
+get_parser.add_argument('id_device_type', type=int, help='ID of device type from which to get all devices')
 get_parser.add_argument('available', type=bool, help='Flag that indicates if only available (devices not associated to '
                                                      'a participant) should be returned')
 get_parser.add_argument('participants', type=bool, help='Flag that indicates if associated participant(s) information '
@@ -42,7 +42,7 @@ class QueryDevices(Resource):
              responses={200: 'Success - returns list of devices',
                         500: 'Database error'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         parser = get_parser
@@ -55,11 +55,11 @@ class QueryDevices(Resource):
             devices = user_access.get_accessible_devices()
         elif args['id_device']:
             devices = [user_access.query_device_by_id(device_id=args['id_device'])]
-        elif args['device_type']:
+        elif args['id_device_type']:
             if args['id_site']:
-                devices = user_access.query_devices_by_type_by_site(args['device_type'], args['id_site'])
+                devices = user_access.query_devices_by_type_by_site(args['id_device_type'], args['id_site'])
             else:
-                devices = user_access.query_devices_by_type(args['device_type'])
+                devices = user_access.query_devices_by_type(args['id_device_type'])
         elif args['id_site']:
             # Check if has access to the requested site
             devices = user_access.query_devices_for_site(args['id_site'])
@@ -132,7 +132,7 @@ class QueryDevices(Resource):
     def post(self):
         # parser = post_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_device = request.json['device']
@@ -184,7 +184,7 @@ class QueryDevices(Resource):
                         500: 'Device not found or database error.'})
     def delete(self):
         parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()

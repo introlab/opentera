@@ -31,7 +31,7 @@ class QuerySiteAccess(Resource):
     def get(self):
         parser = get_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         args = parser.parse_args()
 
@@ -71,7 +71,7 @@ class QuerySiteAccess(Resource):
     def post(self):
         # parser = post_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_sites = request.json['site_access']

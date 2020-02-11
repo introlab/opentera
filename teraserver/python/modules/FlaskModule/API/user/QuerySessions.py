@@ -35,7 +35,7 @@ class QuerySessions(Resource):
                         400: 'No parameters specified at least one id must be used',
                         500: 'Database error'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         parser = get_parser
@@ -81,7 +81,7 @@ class QuerySessions(Resource):
     def post(self):
         # parser = post_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:
@@ -156,7 +156,7 @@ class QuerySessions(Resource):
     def delete(self):
         parser = delete_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()

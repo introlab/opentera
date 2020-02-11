@@ -20,7 +20,7 @@ class QueryOnlineUsers(Resource):
     @api.doc(description='Get online users. CURRENTLY UNIMPLEMENTED.',
              responses={200: 'Success'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         args = self.parser.parse_args()
 
         my_args = {}
@@ -28,7 +28,7 @@ class QueryOnlineUsers(Resource):
         try:
 
             # This needs to be an unique name
-            my_name = 'module.' + self.flaskModule.module_name + '.OnlineUsers.' + session['user_id']
+            my_name = 'module.' + self.flaskModule.module_name + '.OnlineUsers.' + session['_user_id']
 
             req = AsyncRedisSubscribeWait(my_name, self.flaskModule)
             req.listen()

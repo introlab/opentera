@@ -39,7 +39,7 @@ class QuerySessionTypeProject(Resource):
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error when getting association'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         parser = get_parser
@@ -83,7 +83,7 @@ class QuerySessionTypeProject(Resource):
     def post(self):
         # parser = post_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -144,7 +144,7 @@ class QuerySessionTypeProject(Resource):
     def delete(self):
         parser = delete_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()

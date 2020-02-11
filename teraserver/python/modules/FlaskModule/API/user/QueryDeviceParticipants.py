@@ -51,7 +51,7 @@ class QueryDeviceParticipants(Resource):
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading devices for participant'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = get_parser.parse_args()
@@ -94,7 +94,7 @@ class QueryDeviceParticipants(Resource):
                         400: 'Badly formed JSON or missing fields(id_participant or id_device) in the JSON body',
                         500: 'Internal error occured when saving device association'})
     def post(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -158,7 +158,7 @@ class QueryDeviceParticipants(Resource):
                         500: 'Device-participant association not found or database error.'})
     def delete(self):
         parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()
