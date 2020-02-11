@@ -9,6 +9,7 @@ flask
 flask-sqlalchemy
 flask-oauthlib
 flask-login
+flask-login-multi
 flask-httpauth
 flask-socketio
 flask-session

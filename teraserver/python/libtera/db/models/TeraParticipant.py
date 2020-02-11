@@ -6,6 +6,7 @@ import uuid
 import jwt
 import time
 import datetime
+from passlib.hash import bcrypt
 
 
 class TeraParticipant(db.Model, BaseModel):
@@ -29,6 +30,8 @@ class TeraParticipant(db.Model, BaseModel):
                                            back_populates="session_participants")
 
     participant_participant_group = db.relationship('TeraParticipantGroup')
+
+    authenticated = False
 
     def __init__(self):
         pass
@@ -63,6 +66,44 @@ class TeraParticipant(db.Model, BaseModel):
             ignore_fields.extend([])
 
         return super().to_json(ignore_fields=ignore_fields)
+
+    def is_authenticated(self):
+        return self.authenticated
+
+    def is_active(self):
+        return self.participant_active
+
+    def is_login_enabled(self):
+        return self.participant_login_enabled
+
+    def get_id(self):
+        return self.participant_uuid
+
+    @staticmethod
+    def encrypt_password(password):
+        return bcrypt.hash(password)
+
+    @staticmethod
+    def is_anonymous():
+        return False
+
+    @staticmethod
+    def verify_password(username, password):
+        # Query User with that username
+        participant = TeraParticipant.get_participant_by_username(username)
+        if participant is None:
+            print('TeraParticipant: verify_password - participant ' + username + ' not found.')
+            return None
+
+        # Check if enabled
+        if not TeraParticipant.participant_active or not TeraParticipant.participant_login_enabled:
+            print('TeraUser: verify_password - user ' + username + ' is inactive or login is disabled.')
+            return None
+
+        # Check password
+        if bcrypt.verify(password, participant.participant_password):
+            participant.authenticated = True
+            return participant
 
     @staticmethod
     def get_participant_by_token(token):

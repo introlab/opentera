@@ -29,6 +29,7 @@ current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_dev
 # Authentification schemes
 http_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth("OpenTera")
+
 multi_auth = MultiAuth(http_auth, token_auth)
 
 
@@ -224,3 +225,4 @@ class LoginModule(BaseModule):
             return 'Forbidden', 403
 
         return decorated
+
