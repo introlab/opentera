@@ -52,6 +52,10 @@ class TeraDeviceSite(db.Model, BaseModel):
         return TeraDeviceSite.query.filter_by(id_device_site=device_site_id).first()
 
     @staticmethod
+    def get_device_site_id_for_device_and_site(device_id: int, site_id: int):
+        return TeraDeviceSite.query.filter_by(id_device=device_id, id_site=site_id).first()
+
+    @staticmethod
     def query_devices_for_site(site_id: int):
         return TeraDeviceSite.query.filter_by(id_site=site_id).all()
 
@@ -59,6 +63,3 @@ class TeraDeviceSite(db.Model, BaseModel):
     def query_sites_for_device(device_id: int):
         return TeraDeviceSite.query.filter_by(id_device=device_id).all()
 
-    @staticmethod
-    def query_device_site_for_device_site(device_id: int, site_id: int):
-        return TeraDeviceSite.query.filter_by(id_device=device_id, id_site=site_id).first()

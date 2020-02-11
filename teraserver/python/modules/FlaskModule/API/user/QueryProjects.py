@@ -14,7 +14,7 @@ get_parser = api.parser()
 get_parser.add_argument('id_project', type=int, help='ID of the project to query')
 get_parser.add_argument('id', type=int, help='Alias for "id_project"')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all projects')
-get_parser.add_argument('user_uuid', type=int, help='User UUID from which to get all projects that are accessible')
+get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get all projects that are accessible')
 get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
 
 post_parser = reqparse.RequestParser()
