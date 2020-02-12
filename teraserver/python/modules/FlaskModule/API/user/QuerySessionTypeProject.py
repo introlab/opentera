@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
@@ -31,7 +31,7 @@ class QuerySessionTypeProject(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get devices types that are associated with a project. Only one "ID" parameter required and '
                          'supported at once.',
@@ -72,7 +72,7 @@ class QuerySessionTypeProject(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create/update session-type - project association.',
              responses={200: 'Success',
@@ -135,7 +135,7 @@ class QuerySessionTypeProject(Resource):
 
         return jsonify(update_stp)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific session-type - project association.',
              responses={200: 'Success',

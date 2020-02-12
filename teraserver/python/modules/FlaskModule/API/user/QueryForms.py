@@ -1,6 +1,6 @@
 from flask import jsonify, session
 from flask_restplus import Resource, reqparse
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.DBManager import DBManager
 
@@ -24,7 +24,7 @@ class QueryForms(Resource):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('type', type=str, help='Definition type required', required=True)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.doc(description='Get json description of standard input form for the specified data type.',
              responses={200: 'Success',
                         500: 'Unknown or unsupported data type'})

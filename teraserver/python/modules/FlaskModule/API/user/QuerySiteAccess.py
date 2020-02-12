@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
@@ -24,7 +24,7 @@ class QuerySiteAccess(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get user roles for sites. Only one  parameter required and supported at once.',
              responses={200: 'Success - returns list of users roles in projects',
@@ -63,7 +63,7 @@ class QuerySiteAccess(Resource):
 
         return 'Unknown error', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create/update site access for an user.',
              responses={200: 'Success',
@@ -108,7 +108,7 @@ class QuerySiteAccess(Resource):
 
         return jsonify(json_rval)
 
-    # @multi_auth.login_required
+    # @user_multi_auth.login_required
     # def delete(self):
     #
     #     return '', 501

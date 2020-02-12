@@ -1,6 +1,6 @@
 from flask import jsonify, session, request, send_file #send_from_directory
 from flask_restplus import Resource, reqparse, inputs, fields
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.FlaskModule import flask_app
 from libtera.db.models.TeraUser import TeraUser
@@ -32,7 +32,7 @@ class QueryDeviceData(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get device data information. Optionaly download the data. '
                          'Only one of the ID parameter is supported at once',
@@ -118,7 +118,7 @@ class QueryDeviceData(Resource):
                 return send_file(src_dir + '/' + str(datas[0].devicedata_uuid), as_attachment=True,
                                  attachment_filename=filename)
 
-    # @multi_auth.login_required
+    # @user_multi_auth.login_required
     # def post(self):
     #     parser = reqparse.RequestParser()
     #     parser.add_argument('device_data', type=str, location='json', help='Device to create / update', required=True)
@@ -172,7 +172,7 @@ class QueryDeviceData(Resource):
     #
     #     return '', 501
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.doc(description='Delete device data, including all related files.',
              responses={200: 'Success - device data and all related files deleted',
                         500: 'Database or file deletion error occurred',

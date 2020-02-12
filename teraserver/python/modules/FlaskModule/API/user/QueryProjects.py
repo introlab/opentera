@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -30,7 +30,7 @@ class QueryProjects(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get projects information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of participants',
@@ -83,7 +83,7 @@ class QueryProjects(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update projects. id_project must be set to "0" to create a new '
                          'project. A project can be created/modified if the user has admin rights to the '
@@ -142,7 +142,7 @@ class QueryProjects(Resource):
 
         return jsonify([update_project.to_json()])
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific project',
              responses={200: 'Success',

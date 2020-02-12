@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraSession import TeraSession
@@ -33,7 +33,7 @@ class QueryParticipants(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get participants information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of participants',
@@ -104,7 +104,7 @@ class QueryParticipants(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update participants. id_participant must be set to "0" to create a new '
                          'participant. A participant can be created/modified if the user has admin rights to the '
@@ -160,7 +160,7 @@ class QueryParticipants(Resource):
 
         return jsonify([update_participant.to_json()])
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific participant',
              responses={200: 'Success',

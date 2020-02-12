@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSessionType import TeraSessionType
@@ -29,7 +29,7 @@ class QuerySessionTypes(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get session type information. If no id_session_type specified, returns all available '
                          'session types',
@@ -65,7 +65,7 @@ class QuerySessionTypes(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update session type. id_session_type must be set to "0" to create a new '
                          'type. A session type can be created/modified if the user has access to a related session type'
@@ -122,7 +122,7 @@ class QuerySessionTypes(Resource):
 
         return jsonify([update_session_type.to_json()])
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific session type',
              responses={200: 'Success',

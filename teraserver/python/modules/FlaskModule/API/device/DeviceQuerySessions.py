@@ -9,6 +9,7 @@ from flask_babel import gettext
 from sqlalchemy.exc import InvalidRequestError
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 
+
 class DeviceQuerySessions(Resource):
 
     def __init__(self, _api, flaskModule=None):

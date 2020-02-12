@@ -1,6 +1,6 @@
 from flask import jsonify, session
 from flask_restplus import Resource, reqparse, fields
-from modules.LoginModule.LoginModule import http_auth
+from modules.LoginModule.LoginModule import user_http_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 
 
@@ -18,7 +18,7 @@ class Login(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.parser = reqparse.RequestParser()
 
-    @http_auth.login_required
+    @user_http_auth.login_required
     @api.doc(description='Login to the server using HTTP Basic Authentification (HTTPAuth)')
     @api.marshal_with(model, mask=None)
     def get(self):

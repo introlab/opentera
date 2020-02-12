@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
@@ -31,7 +31,7 @@ class QueryUsers(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get user information. If no id specified, returns all accessible users',
              responses={200: 'Success',
@@ -103,7 +103,7 @@ class QueryUsers(Resource):
         # except InvalidRequestError:
         #     return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update user. id_user must be set to "0" to create a new user. User can be modified '
                          'if: current user is super admin or user is part of a project which the current user is admin.'
@@ -210,7 +210,7 @@ class QueryUsers(Resource):
 
         return jsonify([update_user.to_json()])
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific user',
              responses={200: 'Success',

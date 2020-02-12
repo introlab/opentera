@@ -26,11 +26,18 @@ current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'curren
 # Current device identity, stacked
 current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_device', None))
 
-# Authentification schemes
-http_auth = HTTPBasicAuth()
-token_auth = HTTPTokenAuth("OpenTera")
+# Current user identity, stacked
+current_user = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_user', None))
 
-multi_auth = MultiAuth(http_auth, token_auth)
+# Authentication schemes for users
+user_http_auth = HTTPBasicAuth()
+user_token_auth = HTTPTokenAuth("OpenTera")
+user_multi_auth = MultiAuth(user_http_auth, user_token_auth)
+
+# Authentication schemes for participant
+participant_http_auth = HTTPBasicAuth()
+participant_token_auth = HTTPTokenAuth("OpenTera")
+participant_multi_auth = MultiAuth(participant_http_auth, participant_token_auth)
 
 
 class LoginModule(BaseModule):
@@ -70,30 +77,58 @@ class LoginModule(BaseModule):
         # Setup user loader function
         self.login_manager.user_loader(self.load_user)
 
-        # Setup verify password function
-        http_auth.verify_password(self.verify_password)
-        token_auth.verify_token(self.verify_token)
+        # Setup verify password function for users
+        user_http_auth.verify_password(self.user_verify_password)
+        user_token_auth.verify_token(self.user_verify_token)
+
+        # Setup verify password function for participants
+        participant_http_auth.verify_password(self.participant_verify_password)
+        participant_token_auth.verify_token(self.participant_verify_token)
 
     def load_user(self, user_id):
-        print('LoginModule - load_user', user_id)
-        return TeraUser.get_user_by_uuid(user_id)
+        print('LoginModule - load_user', self, user_id)
 
-    def verify_password(self, username, password):
-        print('LoginModule - Verifying password for ', username)
+        # Depending if we have a user or a participant online, return the right object.
+        # Here current_user or current_participant are already invalid
+        # Need to fetch them from database
+
+        user = TeraUser.get_user_by_uuid(user_id)
+        participant = TeraParticipant.get_participant_by_uuid(user_id)
+
+        if participant and user:
+            print('ERROR uuid exists for user and participant!')
+            # TODO throw exception?
+            return None
+
+        if user:
+            return user
+
+        if participant:
+            return participant
+
+        return None
+
+    def user_verify_password(self, username, password):
+        print('LoginModule - user_verify_password ', username)
 
         if TeraUser.verify_password(username=username, password=password):
-            registered_user = TeraUser.get_user_by_username(username)
-            print('Found user: ', registered_user)
-            registered_user.update_last_online()
 
-            login_user(registered_user, remember=True)
+            _request_ctx_stack.top.current_user = TeraUser.get_user_by_username(username)
+
+            print('user_verify_password, found user: ', current_user)
+            current_user.update_last_online()
+
+            login_user(current_user, remember=True)
             print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
 
             self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
         return False
 
-    def verify_token(self, token_value):
+    def user_verify_token(self, token_value):
+        """
+        Tokens key is dynamic and stored in a redis variable for users.
+        """
         import jwt
         try:
             token_dict = jwt.decode(token_value, self.redisGet(TeraServerConstants.RedisVar_UserTokenAPIKey),
@@ -103,18 +138,56 @@ class LoginModule(BaseModule):
             return False
 
         if token_dict['user_uuid']:
-            registered_user = TeraUser.get_user_by_uuid(token_dict['user_uuid'])
+            _request_ctx_stack.top.current_user = TeraUser.get_user_by_uuid(token_dict['user_uuid'])
             # TODO: Validate if user is also online?
-            if registered_user is not None:
-                registered_user.update_last_online()
-                login_user(registered_user, remember=True)
+            if current_user is not None:
+                current_user.update_last_online()
+                login_user(current_user, remember=True)
                 # TODO: Set user online in Redis??
                 return True
 
         return False
 
+    def participant_verify_password(self, username, password):
+        print('LoginModule - participant_verify_password for ', username)
+
+        if TeraParticipant.verify_password(username=username, password=password):
+
+            _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_username(username)
+
+            print('participant_verify_password, found user: ', current_participant)
+            current_participant.update_last_online()
+
+            login_user(current_participant, remember=True)
+            print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
+
+            self.redisSet(session['_id'], session['_user_id'], ex=60)
+            return True
+        return False
+
+    def participant_verify_token(self, token_value):
+        """
+        Tokens for participants are stored in the DB.
+        """
+        print('LoginModule - participant_verify_token for ', token_value, self)
+
+        # TeraParticipant verifies if the participant is active and login is enabled
+        _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_value)
+
+        if current_participant is not None:
+            current_participant.update_last_online()
+            login_user(current_participant, remember=True)
+            # TODO: Set user online in Redis??
+            return True
+
+        return False
+
     @staticmethod
     def token_required(f):
+        """
+        Use this decorator for token in url as param.
+        Acceptable for devices and participants.
+        """
         @wraps(f)
         def decorated(*args, **kwargs):
             # Parse args
@@ -146,6 +219,10 @@ class LoginModule(BaseModule):
 
     @staticmethod
     def certificate_required(f):
+        """
+        Use this decorator if UUID is stored in a client certificate.
+        Acceptable for devices and participants.
+        """
         @wraps(f)
         def decorated(*args, **kwargs):
 
@@ -173,6 +250,11 @@ class LoginModule(BaseModule):
 
     @staticmethod
     def token_or_certificate_required(f):
+        """
+        Use this decorator if UUID is stored in a client certificate or token in url params.
+        Acceptable for devices and participants.
+        TODO - Avoid duplication of implementations from token_required, certificate_required.
+        """
         @wraps(f)
         def decorated(*args, **kwargs):
 

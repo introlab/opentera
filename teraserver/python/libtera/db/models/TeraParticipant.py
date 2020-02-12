@@ -109,17 +109,12 @@ class TeraParticipant(db.Model, BaseModel):
     def get_participant_by_token(token):
         participant = TeraParticipant.query.filter_by(participant_token=token).first()
 
-        if participant:
+        if participant and TeraParticipant.participant_active and TeraParticipant.participant_login_enabled:
             # Validate token
             data = jwt.decode(token.encode('utf-8'), TeraServerSettings.get_server_setting_value(
                 TeraServerSettings.ServerParticipantTokenKey), algorithms='HS256')
 
             if data['participant_uuid'] == participant.participant_uuid:
-
-                # Update last online
-                # TOCHECK: Should it be really here???
-                participant.update_last_online()
-
                 return participant
             else:
                 return None
@@ -131,7 +126,6 @@ class TeraParticipant(db.Model, BaseModel):
         participant = TeraParticipant.query.filter_by(participant_uuid=p_uuid).first()
 
         if participant:
-            participant.update_last_online()
             return participant
 
         return None
@@ -162,6 +156,10 @@ class TeraParticipant(db.Model, BaseModel):
             TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
 
         token1 = participant1.create_token()
+        participant1.participant_username = 'participant1'
+        participant1.participant_password = TeraParticipant.encrypt_password('opentera')
+        participant1.participant_login_enabled = True
+
         db.session.add(participant1)
 
         participant2 = TeraParticipant()
