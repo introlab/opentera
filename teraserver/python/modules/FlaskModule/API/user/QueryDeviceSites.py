@@ -3,8 +3,8 @@ from flask_restplus import Resource, reqparse
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraDeviceSite import TeraDeviceSite
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -21,10 +21,8 @@ post_parser = reqparse.RequestParser()
 post_parser.add_argument('device_site', type=str, location='json',
                          help='Device site association to create / update', required=True)
 
-delete_parser = reqparse.RequestParser()
-delete_parser.add_argument('id', type=int, help='Specific device-site association ID to delete. Be careful: this'
-                                                ' is not the device or the site ID, but the ID of the '
-                                                'association itself!', required=True)
+# delete_parser = reqparse.RequestParser()
+# delete_parser.add_argument('id', type=int, help='ID of the site to delete all devices from.', required=True)
 
 
 class QueryDeviceSites(Resource):
@@ -48,26 +46,28 @@ class QueryDeviceSites(Resource):
 
         args = parser.parse_args()
 
-        device_site = []
+        device_proj = []
         # If we have no arguments, return error
         if not any(args.values()):
             return gettext('Arguments manquants'), 400
 
         if args['id_device']:
             if args['id_device'] in user_access.get_accessible_devices_ids():
-                device_site = TeraDeviceSite.query_sites_for_device(device_id=args['id_device'])
+                device_proj = TeraDeviceProject.query_sites_for_device(device_id=args['id_device'])
         elif args['id_site']:
-                if args['id_site'] in user_access.get_accessible_sites_ids():
-                    device_site = TeraDeviceSite.query_devices_for_site(site_id=args['id_site'])
+            if args['id_site'] in user_access.get_accessible_sites_ids():
+                device_proj = TeraDeviceProject.query_devices_for_site(site_id=args['id_site'])
         try:
             device_site_list = []
-            for ds in device_site:
-                json_ds = ds.to_json()
+            for dp in device_proj:
+                json_dp = dp.to_json()
+                json_dp['id_site'] = dp.device_project_project.project_site.id_site
                 if args['list'] is None:
-                    json_ds['site_name'] = ds.device_site_site.site_name
-                    json_ds['device_name'] = ds.device_site_device.device_name
-                    json_ds['device_available'] = not ds.device_site_device.device_participants
-                device_site_list.append(json_ds)
+                    json_dp['site_name'] = dp.device_project_project.project_site.site_name
+                    json_dp['device_name'] = dp.device_project_device.device_name
+                    json_dp['device_available'] = not dp.device_project_device.device_participants
+                    json_dp['project_name'] = dp.device_project_project.project_name
+                device_site_list.append(json_dp)
 
             return jsonify(device_site_list)
 
@@ -102,79 +102,85 @@ class QueryDeviceSites(Resource):
                     json_device_site['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
                 return gettext('Accès refusé'), 403
 
-            # Check if already exists
-            device_site = TeraDeviceSite.get_device_site_id_for_device_and_site(device_id=json_device_site['id_device'],
-                                                                                site_id=json_device_site['id_site'])
-            if device_site:
-                json_device_site['id_device_site'] = device_site.id_device_site
-            else:
-                json_device_site['id_device_site'] = 0
+            # Get list of all projects for that site
+            projects = user_access.query_projects_for_site(json_device_site['id_site'])
 
-            # Do the update!
-            if json_device_site['id_device_site'] > 0:
-                # Already existing
-                try:
-                    TeraDeviceSite.update(json_device_site['id_device_site'], json_device_site)
-                except exc.SQLAlchemyError:
-                    import sys
-                    print(sys.exc_info())
-                    return '', 500
-            else:
-                try:
-                    new_device_site = TeraDeviceSite()
-                    new_device_site.from_json(json_device_site)
-                    TeraDeviceSite.insert(new_device_site)
-                    # Update ID for further use
-                    json_device_site['id_device_site'] = new_device_site.id_device_site
-                except exc.SQLAlchemyError:
-                    import sys
-                    print(sys.exc_info())
-                    return '', 500
+            # Associate device with all projects in that site
+            for project in projects:
+                # Check if association already exists
+                device_project = TeraDeviceProject.get_device_project_id_for_device_and_project(
+                    device_id=json_device_site['id_device'], project_id=project.id_project)
+                if device_project:
+                    json_device_site['id_device_project'] = device_project.id_device_project
+                else:
+                    json_device_site['id_device_project'] = 0
+
+                # Do the update!
+                if json_device_site['id_device_project'] > 0:
+                    # Already existing
+                    try:
+                        TeraDeviceProject.update(json_device_site['id_device_project'], json_device_site)
+                    except exc.SQLAlchemyError:
+                        import sys
+                        print(sys.exc_info())
+                        return '', 500
+                else:
+                    try:
+                        new_device_proj = TeraDeviceProject()
+                        json_device_site['id_project'] = project.id_project
+                        new_device_proj.from_json(json_device_site)
+                        TeraDeviceProject.insert(new_device_proj)
+                    except exc.SQLAlchemyError:
+                        import sys
+                        print(sys.exc_info())
+                        return '', 500
+                del json_device_site['id_device_project']
 
         # TODO: Publish update to everyone who is subscribed to devices update...
         update_device_site = json_device_sites
 
         return jsonify(update_device_site)
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
-    @api.doc(description='Delete a specific device-site association.',
-             responses={200: 'Success',
-                        403: 'Logged user can\'t delete device association',
-                        500: 'Device-site association not found or database error.'})
-    def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-        user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
-        id_todel = args['id']
-
-        # Check if current user can delete
-        device_site = TeraDeviceSite.get_device_site_by_id(id_todel)
-        if not device_site:
-            return gettext('Non-trouvé'), 500
-
-        if device_site.id_site not in user_access.get_accessible_sites_ids(admin_only=True) or device_site.id_device \
-                not in user_access.get_accessible_devices_ids(admin_only=True):
-            return gettext('Accès refusé'), 403
-
-        # Delete participants associated with that device, since the site was changed.
-        associated_participants = TeraDeviceParticipant.query_participants_for_device(device_id=device_site.id_device)
-        for part in associated_participants:
-            if part.device_participant_participant.participant_participant_group.participant_group_project.\
-                    project_site.id_site == device_site.id_site:
-                device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
-                    device_id=device_site.id_device, participant_id=part.id_participant)
-                if device_part:
-                    TeraDeviceParticipant.delete(device_part.id_device_participant)
-
-        # If we are here, we are allowed to delete. Do so.
-        try:
-            TeraDeviceSite.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
-            import sys
-            print(sys.exc_info())
-            return gettext('Erreur base de données'), 500
-
-        return '', 200
+    # @user_multi_auth.login_required
+    # @api.expect(delete_parser)
+    # @api.doc(description='Delete a specific device-site association.',
+    #          responses={200: 'Success',
+    #                     403: 'Logged user can\'t delete device association',
+    #                     500: 'Device-site association not found or database error.'})
+    # def delete(self):
+    #     parser = delete_parser
+    #     current_user = TeraUser.get_user_by_uuid(session['_user_id'])
+    #     user_access = DBManager.userAccess(current_user)
+    #
+    #     args = parser.parse_args()
+    #     id_todel = args['id']
+    #
+    #     # Check if current user can delete
+    #
+    #     device_site = TeraDeviceSite.get_device_site_by_id(id_todel)
+    #     if not device_site:
+    #         return gettext('Non-trouvé'), 500
+    #
+    #     if device_site.id_site not in user_access.get_accessible_sites_ids(admin_only=True) or device_site.id_device \
+    #             not in user_access.get_accessible_devices_ids(admin_only=True):
+    #         return gettext('Accès refusé'), 403
+    #
+    #     # Delete participants associated with that device, since the site was changed.
+    #     associated_participants = TeraDeviceParticipant.query_participants_for_device(device_id=device_site.id_device)
+    #     for part in associated_participants:
+    #         if part.device_participant_participant.participant_participant_group.participant_group_project.\
+    #                 project_site.id_site == device_site.id_site:
+    #             device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
+    #                 device_id=device_site.id_device, participant_id=part.id_participant)
+    #             if device_part:
+    #                 TeraDeviceParticipant.delete(device_part.id_device_participant)
+    #
+    #     # If we are here, we are allowed to delete. Do so.
+    #     try:
+    #         TeraDeviceSite.delete(id_todel=id_todel)
+    #     except exc.SQLAlchemyError:
+    #         import sys
+    #         print(sys.exc_info())
+    #         return gettext('Erreur base de données'), 500
+    #
+    #     return '', 200

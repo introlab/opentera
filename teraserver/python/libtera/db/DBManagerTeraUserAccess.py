@@ -7,8 +7,8 @@ from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraDevice import TeraDevice
+from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 from libtera.db.models.TeraSession import TeraSession
-from libtera.db.models.TeraDeviceSite import TeraDeviceSite
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
@@ -221,32 +221,48 @@ class DBManagerTeraUserAccess:
             device = TeraDevice.query.filter_by(id_device=device_id).filter(TeraDevice.id_site.in_(sites_ids)).first()
         return device
 
-    def query_devices_for_site(self, site_id: int):
+    def query_devices_for_site(self, site_id: int, device_type_id: int):
         devices = []
         if site_id in self.get_accessible_sites_ids():
-            site_devices = TeraDeviceSite.query_devices_for_site(site_id)
-            for site_device in site_devices:
-                devices.append(site_device.device_site_device)
+            query = TeraDevice.query.join(TeraDeviceProject).join(TeraProject.project_site) \
+                .filter(TeraProject.id_site == site_id) \
+                .order_by(TeraDevice.id_device.asc())
+            if device_type_id:
+                query = query.filter(TeraDevice.device_type == device_type_id)
+            devices = query.all()
         return devices
 
-    def query_devices_by_type(self, type_device: int):
-        devices = TeraDevice.query.filter_by(device_type=type_device).order_by(TeraDevice.id_device.asc()).all()
-        return devices
-
-    def query_devices_by_type_by_site(self, type_device: int, site_id: int):
+    def query_devices_for_project(self, project_id: int, device_type_id: int):
         devices = []
-        if site_id in self.get_accessible_sites_ids():
-            devices = TeraDevice.query.join(TeraDeviceSite)\
-                .filter(TeraDeviceSite.id_site == site_id, TeraDevice.device_type == type_device)\
-                .order_by(TeraDevice.id_device.asc()).all()
+        if project_id in self.get_accessible_projects_ids():
+            query = TeraDevice.query.join(TeraDeviceProject).filter_by(id_project=project_id)\
+                .order_by(TeraDevice.id_device.asc())
+            if device_type_id:
+                query = query.filter(TeraDevice.device_type == device_type_id)
+            devices = query.all()
         return devices
+
+    def query_devices_by_type(self, id_type_device: int):
+        accessibles_devices = self.get_accessible_devices_ids()
+        devices = TeraDevice.query.filter_by(device_type=id_type_device).filter(TeraDevice
+                                                                                .id_device.in_(accessibles_devices))\
+            .order_by(TeraDevice.id_device.asc()).all()
+        return devices
+
+    # def query_devices_by_type_by_site(self, id_type_device: int, site_id: int):
+    #     devices = []
+    #     if site_id in self.get_accessible_sites_ids():
+    #         devices = TeraDevice.query.join(TeraDeviceProject).join(TeraProject.project_site)\
+    #             .filter(TeraProject.id_site == site_id, TeraDevice.device_type == id_type_device)\
+    #             .order_by(TeraDevice.id_device.asc()).all()
+    #     return devices
 
     def query_sites_for_device(self, device_id: int):
         sites = []
         if device_id in self.get_accessible_devices_ids():
-            site_devices = TeraDeviceSite.query_sites_for_device(device_id)
+            site_devices = TeraDeviceProject.query_sites_for_device(device_id)
             for site_device in site_devices:
-                sites.append(site_device.device_site_site)
+                sites.append(site_device.device_project_project.project_site)
         return sites
 
     def query_session_type_by_id(self, session_type_id: int):
@@ -381,14 +397,6 @@ class DBManagerTeraUserAccess:
 
         return access
 
-    # def query_participants_for_kit(self, kit_id: int):
-    #     from libtera.db.models.TeraParticipant import TeraParticipant
-    #
-    #     parts = TeraParticipant.query.join(TeraParticipant.participant_kits).filter_by(id_kit=kit_id)\
-    #         .filter(TeraKit.id_kit.in_(self.get_accessible_kits_ids()),
-    #                 TeraParticipant.id_participant.in_(self.get_accessible_participants_ids())).all()
-    #     return parts
-
     def query_participants_for_device(self, device_id: int):
         from libtera.db.models.TeraParticipant import TeraParticipant
         parts = TeraParticipant.query.join(TeraParticipant.participant_devices).filter_by(id_device=device_id)\
@@ -399,13 +407,15 @@ class DBManagerTeraUserAccess:
     def query_device_participants_for_site(self, site_id: int):
         device_parts = []
         if site_id in self.get_accessible_sites_ids():
-            device_sites = TeraDeviceSite.query.filter_by(id_site=site_id).all()
+            device_sites = TeraDeviceProject.query_devices_for_site(site_id=site_id)
             device_ids = list()
             for device_site in device_sites:
-                if device_site.device_site_device.id_device not in device_ids:
-                    device_ids.append(device_site.device_site_device.id_device)
-            device_parts = TeraDeviceParticipant.query.join(TeraDeviceParticipant.device_participant_device)\
-                .filter(TeraDevice.id_device.in_(device_ids)).all()
+                if device_site.device_project_device.id_device not in device_ids:
+                    device_ids.append(device_site.device_project_device.id_device)
+                device_parts = TeraDeviceParticipant.query.join(TeraDeviceParticipant.device_participant_device)\
+                    .join(TeraParticipant).join(TeraParticipant.participant_participant_group)\
+                    .join(TeraParticipantGroup.participant_group_project).join(TeraProject.project_site)\
+                    .filter_by(id_site=site_id).filter(TeraDevice.id_device.in_(device_ids)).all()
         return device_parts
 
     def query_session(self, session_id: int):
