@@ -30,12 +30,12 @@ current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_dev
 current_user = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_user', None))
 
 # Authentication schemes for users
-user_http_auth = HTTPBasicAuth()
+user_http_auth = HTTPBasicAuth(realm='user')
 user_token_auth = HTTPTokenAuth("OpenTera")
 user_multi_auth = MultiAuth(user_http_auth, user_token_auth)
 
 # Authentication schemes for participant
-participant_http_auth = HTTPBasicAuth()
+participant_http_auth = HTTPBasicAuth(realm='participant')
 participant_token_auth = HTTPTokenAuth("OpenTera")
 participant_multi_auth = MultiAuth(participant_http_auth, participant_token_auth)
 
