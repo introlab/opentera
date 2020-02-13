@@ -5,7 +5,9 @@ from libtera.ConfigManager import ConfigManager
 
 # Same directory
 from .TwistedModuleWebSocketServerFactory import TwistedModuleWebSocketServerFactory
-from .TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
+from .TeraWebSocketServerUserProtocol import TeraWebSocketServerUserProtocol
+from .TeraWebSocketServerParticipantProtocol import TeraWebSocketServerParticipantProtocol
+
 
 # WebSockets
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
@@ -16,7 +18,7 @@ from twisted.internet import reactor, ssl
 from twisted.python.threadpool import ThreadPool
 from twisted.web.http import HTTPChannel
 from twisted.web.server import Site
-from twisted.web.static import File
+from twisted.web.static import File, Data
 from twisted.web.wsgi import WSGIResource
 from twisted.python import log
 from OpenSSL import SSL
@@ -70,12 +72,22 @@ class TwistedModule(BaseModule):
 
         # create a Twisted Web resource for our WebSocket server
         # Use IP stored in config
-        wss_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % (self.config.server_config['hostname'],
+
+        # USERS
+        wss_user_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % (self.config.server_config['hostname'],
                                                           self.config.server_config['port']),
                                                           redis_config=self.config.redis_config)
 
-        wss_factory.protocol = TeraWebSocketServerProtocol
-        wss_resource = WebSocketResource(wss_factory)
+        wss_user_factory.protocol = TeraWebSocketServerUserProtocol
+        wss_user_resource = WebSocketResource(wss_user_factory)
+
+        # PARTICIPANTS
+        wss_participant_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % (self.config.server_config['hostname'],
+                                                          self.config.server_config['port']),
+                                                          redis_config=self.config.redis_config)
+
+        wss_participant_factory.protocol = TeraWebSocketServerParticipantProtocol
+        wss_participant_resource = WebSocketResource(wss_participant_factory)
 
         # create a Twisted Web WSGI resource for our Flask server
         wsgi_resource = WSGIResource(reactor, reactor.getThreadPool(), flask_app)
@@ -90,7 +102,14 @@ class TwistedModule(BaseModule):
         # the path "/assets" served by our File stuff and
         # the path "/wss" served by our WebSocket stuff
         # root_resource = WSGIRootResource(wsgi_resource, {b'wss': wss_resource})
-        root_resource = WSGIRootResource(wsgi_resource, {b'assets': static_resource, b'wss': wss_resource})
+
+        # TODO do better?
+        wss_root = Data("", "text/plain")
+        wss_root.putChild(b'user', wss_user_resource)
+        wss_root.putChild(b'participant', wss_participant_resource)
+
+        # Establish root resource
+        root_resource = WSGIRootResource(wsgi_resource, {b'assets': static_resource, b'wss': wss_root})
 
         # Create a Twisted Web Site
         site = MySite(root_resource)

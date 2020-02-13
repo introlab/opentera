@@ -38,7 +38,7 @@ class Login(Resource):
         user_token = TeraUser.get_token_for_user(session['_user_id'], token_key)
 
         # Return reply as json object
-        reply = {"websocket_url": "wss://" + servername + ":" + str(port) + "/wss?id=" + session['_id'],
+        reply = {"websocket_url": "wss://" + servername + ":" + str(port) + "/wss/user?id=" + session['_id'],
                  "user_uuid": session['_user_id'],
                  "user_token": user_token}
 
