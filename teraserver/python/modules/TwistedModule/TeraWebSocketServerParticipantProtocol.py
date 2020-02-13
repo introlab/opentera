@@ -11,7 +11,7 @@ from modules.BaseModule import ModuleNames, create_module_topic_from_name
 
 # Messages
 from messages.python.TeraMessage_pb2 import TeraMessage
-from messages.python.UserEvent_pb2 import UserEvent
+from messages.python.ParticipantEvent_pb2 import ParticipantEvent
 from google.protobuf.any_pb2 import Any
 import datetime
 from google.protobuf.json_format import MessageToJson
@@ -37,8 +37,18 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
         ret = yield self.subscribe(self.answer_topic())
 
         if self.participant:
-            # TODO Advertise that we have a new participant
-            pass
+            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            participant_connected = ParticipantEvent()
+            participant_connected.participant_uuid = str(self.participant.participant_uuid)
+            participant_connected.type = ParticipantEvent.PARTICIPANT_CONNECTED
+            # Need to use Any container
+            any_message = Any()
+            any_message.Pack(participant_connected)
+            tera_message.data.extend([any_message])
+
+            # Publish to login module (bytes)
+            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+                         tera_message.SerializeToString())
 
     def onMessage(self, msg, binary):
         # Handle websocket communication
@@ -47,7 +57,6 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
 
         if binary:
             # Decode protobuf before parsing
-
             pass
 
         # Parse JSON (protobuf content)
@@ -89,17 +98,37 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
         """
         print('onConnect')
 
-        if request.params.__contains__('token'):
+        if request.params.__contains__('id'):
+            # Look for session id in
+            my_id = request.params['id']
+            print('TeraWebSocketServerParticipantProtocol - testing id: ', my_id)
 
-            # Look for token
-            token = request.params['token']
-            print('TeraWebSocketServerParticipantProtocol - testing token: ', token)
+            value = self.redisGet(my_id[0])
 
-            self.participant = TeraParticipant.get_participant_by_token(token[0])
+            if value is not None:
+                # Needs to be converted from bytes to string to work
+                participant_uuid = value.decode("utf-8")
+                print('TeraWebSocketServerParticipantProtocol - participant uuid ', participant_uuid)
 
-            if self.participant is not None:
-                print('TeraWebSocketServerParticipantProtocol - Participant connected ', self.participant)
-                return
+                # User verification
+                self.participant = TeraParticipant.get_participant_by_uuid(participant_uuid)
+                if self.participant is not None:
+                    # Remove key
+                    print('TeraWebSocketServerParticipantProtocol - OK! removing key')
+                    self.redisDelete(my_id[0])
+                    return
+
+        # if request.params.__contains__('token'):
+        #
+        #     # Look for token
+        #     token = request.params['token']
+        #     print('TeraWebSocketServerParticipantProtocol - testing token: ', token)
+        #
+        #     self.participant = TeraParticipant.get_participant_by_token(token[0])
+        #
+        #     if self.participant is not None:
+        #         print('TeraWebSocketServerParticipantProtocol - Participant connected ', self.participant)
+        #         return
 
         # if we get here we need to close the websocket, auth failed.
         # To deny a connection, raise an Exception
@@ -113,8 +142,20 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
 
     def onClose(self, wasClean, code, reason):
         if self.participant:
-            # TODO advertise that participant leaved
-            pass
+            # Advertise that participant leaved
+            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            participant_disconnected = ParticipantEvent()
+            participant_disconnected.participant_uuid = str(self.participant.participant_uuid)
+            participant_disconnected.type = ParticipantEvent.PARTICIPANT_DISCONNECTED
+
+            # Need to use Any container
+            any_message = Any()
+            any_message.Pack(participant_disconnected)
+            tera_message.data.extend([any_message])
+
+            # Publish to login module (bytes)
+            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+                         tera_message.SerializeToString())
 
         print('TeraWebSocketServerParticipantProtocol - onClose', self, wasClean, code, reason)
 
@@ -124,6 +165,8 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
     def answer_topic(self):
         if self.participant:
             return 'websocket.participant.' + self.participant.participant_uuid
+
+        return ""
 
     def create_tera_message(self, dest='', seq=0):
         tera_message = TeraMessage()

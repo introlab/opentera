@@ -106,10 +106,10 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
         if request.params.__contains__('id'):
 
             # Look for session id in
-            id = request.params['id']
-            print('TeraWebSocketServerUserProtocol - testing id: ', id)
+            my_id = request.params['id']
+            print('TeraWebSocketServerUserProtocol - testing id: ', my_id)
 
-            value = self.redisGet(id[0])
+            value = self.redisGet(my_id[0])
 
             if value is not None:
                 # Needs to be converted from bytes to string to work
@@ -121,7 +121,7 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
                 if self.user is not None:
                     # Remove key
                     print('TeraWebSocketServerUserProtocol - OK! removing key')
-                    self.redisDelete(id[0])
+                    self.redisDelete(my_id[0])
                     return
 
         # if we get here we need to close the websocket, auth failed.

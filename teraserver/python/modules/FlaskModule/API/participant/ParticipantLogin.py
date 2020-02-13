@@ -39,7 +39,8 @@ class ParticipantLogin(Resource):
             port = self.module.config.server_config['port']
 
             # Return reply as json object
-            reply = {"websocket_url": "wss://" + servername + ":" + str(port) + "/wss?id=" + session['_id'],
+            reply = {"websocket_url": "wss://" + servername + ":"
+                                      + str(port) + "/wss/participant?id=" + session['_id'],
                      "participant_uuid": session['_user_id'],
                      "participant_token": current_participant.participant_token}
 

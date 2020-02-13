@@ -189,7 +189,7 @@ class FlaskModule(BaseModule):
         api.add_namespace(participant_api_ns)
 
     def init_views(self):
-        from .Views.Index import Index
+        from .Views.User import User
         from .Views.Upload import Upload
         from .Views.Participant import Participant
         from .Views.DeviceRegistration import DeviceRegistration
@@ -198,10 +198,13 @@ class FlaskModule(BaseModule):
         args = []
         kwargs = {'flaskModule': self}
 
-        # Will create a function that calls the __index__ method with args, kwargs
-        flask_app.add_url_rule('/index', view_func=Index.as_view('index', *args, **kwargs))
+        # User test view
+        flask_app.add_url_rule('/user', view_func=User.as_view('user', *args, **kwargs))
+
+        # Participant test view
+        flask_app.add_url_rule('/participant', view_func=Participant.as_view('participant', *args, **kwargs))
+
         # flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
-        # flask_app.add_url_rule('/participant/', view_func=Participant.as_view('participant', *args, **kwargs))
         # flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
         #                                                                                    **kwargs))
 
