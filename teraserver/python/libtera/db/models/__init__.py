@@ -15,4 +15,4 @@ __all__ = ['TeraDevice',
            'TeraTest',
            'TeraTestType',
            'TeraSessionEvent',
-           'TeraDeviceSite']
+           'TeraDeviceProject']

@@ -13,7 +13,9 @@ get_parser = api.parser()
 get_parser.add_argument('id_device', type=int, help='ID of the device to query'
                         )
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
-get_parser.add_argument('id_device_type', type=int, help='ID of device type from which to get all devices')
+get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all associated devices')
+get_parser.add_argument('device_type', type=int, help='ID of device type from which to get all devices. Can be '
+                                                      'combined with id_site or id_project.')
 get_parser.add_argument('available', type=bool, help='Flag that indicates if only available (devices not associated to '
                                                      'a participant) should be returned')
 get_parser.add_argument('participants', type=bool, help='Flag that indicates if associated participant(s) information '
@@ -38,7 +40,7 @@ class QueryDevices(Resource):
     @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get devices information. Only one of the ID parameter is supported at once. If no ID is '
-                         'specified, returns all accessible devices for the logged user',
+                         'specified, returns all accessible devices for the logged user.',
              responses={200: 'Success - returns list of devices',
                         500: 'Database error'})
     def get(self):
@@ -51,18 +53,17 @@ class QueryDevices(Resource):
 
         devices = []
         # If we have no arguments, return all accessible devices
-        if not args['id_device'] and not args['id_site'] and not args['id_device_type']:
+        if not args['id_device'] and not args['id_site'] and not args['device_type'] and not args['id_project']:
             devices = user_access.get_accessible_devices()
         elif args['id_device']:
             devices = [user_access.query_device_by_id(device_id=args['id_device'])]
-        elif args['id_device_type']:
-            if args['id_site']:
-                devices = user_access.query_devices_by_type_by_site(args['id_device_type'], args['id_site'])
-            else:
-                devices = user_access.query_devices_by_type(args['id_device_type'])
         elif args['id_site']:
             # Check if has access to the requested site
-            devices = user_access.query_devices_for_site(args['id_site'])
+            devices = user_access.query_devices_for_site(args['id_site'], args['device_type'])
+        elif args['id_project']:
+            devices = user_access.query_devices_for_project(args['id_project'], args['device_type'])
+        elif args['device_type']:
+            devices = user_access.query_devices_by_type(args['device_type'])
 
         # if args['available'] is not None:
         #     if args['available']:
