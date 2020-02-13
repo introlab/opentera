@@ -44,7 +44,7 @@ class TeraDeviceParticipant(db.Model, BaseModel):
 
         dev_participant = TeraDeviceParticipant()
         dev_participant.device_participant_device = device2
-        dev_participant.device_participant_participant = participant1
+        dev_participant.device_participant_participant = participant2
         db.session.add(dev_participant)
 
         db.session.commit()

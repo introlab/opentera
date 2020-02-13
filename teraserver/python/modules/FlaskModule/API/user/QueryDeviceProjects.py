@@ -160,7 +160,7 @@ class QueryDeviceProjects(Resource):
             return gettext('Non-trouvé'), 500
 
         if device_project.id_project not in user_access.get_accessible_projects_ids(admin_only=True) or \
-                device_project.device_project_device_site.id_device not in \
+                device_project.device_project_device.id_device not in \
                 user_access.get_accessible_devices_ids(admin_only=True):
             return gettext('Accès refusé'), 403
 

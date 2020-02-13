@@ -103,11 +103,12 @@ class QueryDevices(Resource):
                     if args['sites'] is not None:
                         # Add sites
                         sites_list = []
-                        for device_site in device.device_sites:
+                        device_sites = user_access.query_sites_for_device(device.id_device)
+                        for device_site in device_sites:
                             ignore_site_fields = []
                             if args['list'] is not None:
                                 ignore_site_fields = ['site_name']
-                            site_json = device_site.device_site_site.to_json(ignore_fields=ignore_site_fields)
+                            site_json = device_site.to_json(ignore_fields=ignore_site_fields)
                             sites_list.append(site_json)
 
                         device_json['device_sites'] = sites_list
@@ -116,6 +117,7 @@ class QueryDevices(Resource):
                     #         device_json['id_kit'] = device.device_kits[0].id_kit
                     #         device_json['kit_name'] = device.device_kits[0].kit_device_kit.kit_name
                     #         device_json['kit_device_optional'] = device.device_kits[0].kit_device_optional
+
                     device_list.append(device_json)
             return jsonify(device_list)
 
