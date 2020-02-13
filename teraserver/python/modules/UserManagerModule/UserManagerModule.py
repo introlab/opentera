@@ -126,6 +126,20 @@ class UserManagerModule(BaseModule):
 
             self.publish(tera_message.head.dest, tera_message.SerializeToString())
 
+    def handle_user_disconnected(self, header, user_event: UserEvent):
+        self.registry.user_offline(user_event.user_uuid)
+
+        for user_uuid in self.registry.online_users():
+            # TODO Check for permissions...
+            # Send to everyone?
+            tera_message = self.create_tera_message(dest='websocket.user.' + user_uuid)
+
+            any_message = Any()
+            any_message.Pack(user_event)
+            tera_message.data.extend([any_message])
+
+            self.publish(tera_message.head.dest, tera_message.SerializeToString())
+
     def handle_participant_connected(self, header, participant_event: ParticipantEvent):
         self.participant_registry.participant_online(participant_event.participant_uuid)
 

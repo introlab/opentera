@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-02-13 11:13-0500\n"
+"POT-Creation-Date: 2020-02-13 13:04-0500\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -362,7 +362,7 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:62
 #: modules/FlaskModule/API/user/QueryDeviceProjects.py:54
-#: modules/FlaskModule/API/user/QueryDeviceSites.py:54
+#: modules/FlaskModule/API/user/QueryDeviceSites.py:52
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:53
 #: modules/FlaskModule/API/user/QuerySessionTypeProject.py:52
 msgid "Arguments manquants"
@@ -370,10 +370,9 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:113
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:174
-#: modules/FlaskModule/API/user/QueryDeviceProjects.py:110
-#: modules/FlaskModule/API/user/QueryDeviceProjects.py:193
+#: modules/FlaskModule/API/user/QueryDeviceProjects.py:105
+#: modules/FlaskModule/API/user/QueryDeviceProjects.py:165
 #: modules/FlaskModule/API/user/QueryDeviceSites.py:103
-#: modules/FlaskModule/API/user/QueryDeviceSites.py:160
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:103
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:160
 #: modules/FlaskModule/API/user/QuerySessionTypeProject.py:159
@@ -381,27 +380,17 @@ msgid "Accès refusé"
 msgstr ""
 
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:170
-#: modules/FlaskModule/API/user/QueryDeviceProjects.py:188
-#: modules/FlaskModule/API/user/QueryDeviceSites.py:156
+#: modules/FlaskModule/API/user/QueryDeviceProjects.py:160
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:157
 #: modules/FlaskModule/API/user/QuerySessionTypeProject.py:156
 msgid "Non-trouvé"
 msgstr ""
 
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:182
-#: modules/FlaskModule/API/user/QueryDeviceProjects.py:212
-#: modules/FlaskModule/API/user/QueryDeviceSites.py:178
+#: modules/FlaskModule/API/user/QueryDeviceProjects.py:184
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:168
 #: modules/FlaskModule/API/user/QuerySessionTypeProject.py:167
 msgid "Erreur base de données"
-msgstr ""
-
-#: modules/FlaskModule/API/user/QueryDeviceProjects.py:116
-msgid "Projet inconnu"
-msgstr ""
-
-#: modules/FlaskModule/API/user/QueryDeviceProjects.py:131
-msgid "Impossible d'associer l'appareil au site du projet"
 msgstr ""
 
 #: modules/FlaskModule/API/user/QuerySessionTypeProject.py:101
@@ -438,4 +427,10 @@ msgstr ""
 #: modules/FlaskModule/API/user/QueryUsers.py:170
 msgid "Username unavailable."
 msgstr ""
+
+#~ msgid "Projet inconnu"
+#~ msgstr ""
+
+#~ msgid "Impossible d'associer l'appareil au site du projet"
+#~ msgstr ""
 
