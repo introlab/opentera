@@ -31,7 +31,8 @@ class TeraDevice(db.Model, BaseModel):
     # device_sites = db.relationship("TeraDeviceSite")
     device_projects = db.relationship('TeraDeviceProject')
     # device_session_types = db.relationship("TeraSessionTypeDeviceType")
-    device_participants = db.relationship("TeraDeviceParticipant")
+    device_participants = db.relationship("TeraParticipant",  secondary="t_devices_participants",
+                                          back_populates="participant_devices")
 
     def __init__(self):
         self.secret = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerDeviceTokenKey)

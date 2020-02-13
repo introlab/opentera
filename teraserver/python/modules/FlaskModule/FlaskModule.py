@@ -181,7 +181,7 @@ class FlaskModule(BaseModule):
         # Resources
         participant_api_ns.add_resource(ParticipantLogin, '/login', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantLogout, '/logout', resource_class_kwargs=kwargs)
-        participant_api_ns.add_resource(ParticipantQueryDeviceData, '/device_data', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantQueryDeviceData, '/data', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantQueryDevices, '/devices', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantQueryParticipants, '/participants', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantQuerySessions, '/sessions', resource_class_kwargs=kwargs)

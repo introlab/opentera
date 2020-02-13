@@ -30,6 +30,7 @@ from modules.FlaskModule.FlaskModule import flask_app
 # User access with roles
 from .DBManagerTeraUserAccess import DBManagerTeraUserAccess
 from .DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
+from .DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
 
 # Alembic
 from alembic.config import Config
@@ -57,6 +58,11 @@ class DBManager:
     @staticmethod
     def deviceAccess(device: TeraDevice):
         access = DBManagerTeraDeviceAccess(device=device)
+        return access
+
+    @staticmethod
+    def participantAccess(participant: TeraParticipant):
+        access = DBManagerTeraParticipantAccess(participant=participant)
         return access
 
     def create_defaults(self, config: ConfigManager):

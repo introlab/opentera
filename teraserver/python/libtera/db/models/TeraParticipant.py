@@ -24,7 +24,9 @@ class TeraParticipant(db.Model, BaseModel):
     id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group',
                                                                ondelete='cascade'),
                                      nullable=False)
-    participant_devices = db.relationship("TeraDeviceParticipant")
+
+    participant_devices = db.relationship("TeraDevice", secondary="t_devices_participants",
+                                          back_populates="device_participants")
 
     participant_sessions = db.relationship("TeraSession", secondary="t_sessions_participants",
                                            back_populates="session_participants")

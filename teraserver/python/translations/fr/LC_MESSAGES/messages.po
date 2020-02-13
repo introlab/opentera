@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-02-13 13:04-0500\n"
+"POT-Creation-Date: 2020-02-13 13:42-0500\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -58,7 +58,7 @@ msgstr ""
 msgid "Optionel?"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:37
+#: libtera/forms/TeraDeviceForm.py:37 libtera/forms/TeraParticipantForm.py:33
 msgid "Peut se connecter?"
 msgstr ""
 
@@ -66,7 +66,7 @@ msgstr ""
 msgid "Notes"
 msgstr ""
 
-#: libtera/forms/TeraDeviceForm.py:40 libtera/forms/TeraParticipantForm.py:32
+#: libtera/forms/TeraDeviceForm.py:40 libtera/forms/TeraParticipantForm.py:40
 #: libtera/forms/TeraUserForm.py:29
 msgid "Dernière connexion"
 msgstr ""
@@ -96,14 +96,27 @@ msgid "Nom Participant"
 msgstr ""
 
 #: libtera/forms/TeraParticipantForm.py:28
+msgid "Courriel Participant"
+msgstr ""
+
+#: libtera/forms/TeraParticipantForm.py:29
 msgid "Participant actif"
 msgstr ""
 
-#: libtera/forms/TeraParticipantForm.py:30
+#: libtera/forms/TeraParticipantForm.py:31
 msgid "Jeton Participant"
 msgstr ""
 
-#: libtera/forms/TeraParticipantForm.py:34
+#: libtera/forms/TeraParticipantForm.py:35
+msgid "Identification connexion"
+msgstr ""
+
+#: libtera/forms/TeraParticipantForm.py:38 libtera/forms/TeraUserForm.py:25
+#: libtera/forms/TeraUserForm.py:81
+msgid "Mot de passe"
+msgstr ""
+
+#: libtera/forms/TeraParticipantForm.py:42
 msgid "Groupe"
 msgstr ""
 
@@ -266,10 +279,6 @@ msgstr ""
 
 #: libtera/forms/TeraUserForm.py:23
 msgid "Courriel"
-msgstr ""
-
-#: libtera/forms/TeraUserForm.py:25 libtera/forms/TeraUserForm.py:81
-msgid "Mot de passe"
 msgstr ""
 
 #: libtera/forms/TeraUserForm.py:26

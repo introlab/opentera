@@ -10,8 +10,7 @@ from libtera.db.DBManager import DBManager
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('id_device', type=int, help='ID of the device to query'
-                        )
+get_parser.add_argument('id_device', type=int, help='ID of the device to query')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all associated devices')
 get_parser.add_argument('device_type', type=int, help='ID of device type from which to get all devices. Can be '

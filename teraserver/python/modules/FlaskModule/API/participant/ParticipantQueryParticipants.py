@@ -2,10 +2,14 @@ from flask import jsonify, session
 from flask_restplus import Resource, reqparse, fields
 from modules.LoginModule.LoginModule import participant_multi_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
-
+from libtera.db.models.TeraParticipant import TeraParticipant
+from libtera.db.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
+from libtera.db.DBManager import DBManager
 
 # Parser definition(s)
 get_parser = api.parser()
+get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
+
 post_parser = api.parser()
 
 
@@ -25,7 +29,30 @@ class ParticipantQueryParticipants(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
-        return '', 501
+        current_participant = TeraParticipant.get_participant_by_uuid(session['_user_id'])
+        participant_access = DBManager.participantAccess(current_participant)
+
+        args = get_parser.parse_args(strict=True)
+
+        sessions_list = []
+
+        minimal = False
+        if args['list']:
+            minimal = True
+
+        # For Now return participant info
+        current_participant = TeraParticipant.get_participant_by_uuid(session['_user_id'])
+        participant_access = DBManager.participantAccess(current_participant)
+
+        args = get_parser.parse_args()
+
+        sessions_list = []
+
+        minimal = False
+        if args['list']:
+            minimal = True
+
+        return current_participant.to_json(minimal=minimal)
 
     @participant_multi_auth.login_required
     @api.expect(post_parser)
