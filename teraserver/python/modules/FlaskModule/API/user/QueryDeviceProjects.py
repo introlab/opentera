@@ -168,8 +168,7 @@ class QueryDeviceProjects(Resource):
         associated_participants = TeraDeviceParticipant.query_participants_for_device(
             device_id=device_project.device_project_device.id_device)
         for part in associated_participants:
-            if part.device_participant_participant.participant_participant_group.participant_group_project.id_project ==\
-                    device_project.id_project:
+            if part.device_participant_participant.participant_project.id_project == device_project.id_project:
                 device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
                     device_id=device_project.device_project_device.id_device, participant_id=part.id_participant)
                 if device_part:

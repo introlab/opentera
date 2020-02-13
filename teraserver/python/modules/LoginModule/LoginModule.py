@@ -201,7 +201,7 @@ class LoginModule(BaseModule):
                 # Load participant from DB
                 _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(args['token'])
 
-                if current_participant and current_participant.participant_active:
+                if current_participant and current_participant.participant_enabled:
                     # Returns the function if authenticated with token
                     return f(*args, **kwargs)
 
@@ -240,7 +240,7 @@ class LoginModule(BaseModule):
                 # Load participant from DB
                 _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_uuid(
                     request.headers['X-Participant-Uuid'])
-                if current_participant and current_participant.participant_active:
+                if current_participant and current_participant.participant_enabled:
                     return f(*args, **kwargs)
 
             # Any other case, do not call function
@@ -276,7 +276,7 @@ class LoginModule(BaseModule):
                 _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_uuid(
                     request.headers['X-Participant-Uuid'])
 
-                if current_participant and current_participant.participant_active:
+                if current_participant and current_participant.participant_enabled:
                     return f(*args, **kwargs)
 
             # Then verify tokens...
@@ -291,7 +291,7 @@ class LoginModule(BaseModule):
                 # Load participant from DB
                 _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_args['token'])
 
-                if current_participant and current_participant.participant_active:
+                if current_participant and current_participant.participant_enabled:
                     # Returns the function if authenticated with token
                     return f(*args, **kwargs)
 

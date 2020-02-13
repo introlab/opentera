@@ -44,7 +44,7 @@ class DBManagerTeraDeviceAccess:
         project_list = []
         # Fetch all projects for all participants
         for part in participants:
-            project_list.append(part.device_participant_participant.participant_participant_group.id_project)
+            project_list.append(part.device_participant_participant.participant_project.id_project)
 
         session_types = TeraSessionType.query.join(TeraSessionType.session_type_projects).join(
             TeraSessionType.session_type_devices_types).filter(TeraProject.id_project.in_(project_list))\

@@ -112,11 +112,12 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_participants(self, admin_only=False):
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
-        groups = TeraParticipantGroup.query.filter(TeraParticipantGroup.id_project.in_(project_id_list)).all()
+        # groups = TeraParticipantGroup.query.filter(TeraParticipantGroup.id_project.in_(project_id_list)).all()
         participant_list = []
-        for group in groups:
-            participant_list.extend(TeraParticipant.query.
-                                    filter_by(id_participant_group=group.id_participant_group).all())
+        # for group in groups:
+        #     participant_list.extend(TeraParticipant.query.
+        #                             filter_by(id_participant_group=group.id_participant_group).all())
+        participant_list.extend(TeraParticipant.query.filter(TeraParticipant.id_project.in_(project_id_list)))
 
         return participant_list
 
@@ -286,15 +287,15 @@ class DBManagerTeraUserAccess:
 
     def query_participants_for_site(self, site_id: int):
         part_ids = self.get_accessible_participants_ids()
-        participants = TeraParticipant.query.join(TeraParticipantGroup, TeraProject)\
+        participants = TeraParticipant.query.join(TeraProject)\
             .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids))\
             .order_by(TeraParticipant.id_participant.asc()).all()
         return participants
 
     def query_participants_for_project(self, project_id: int):
         part_ids = self.get_accessible_participants_ids()
-        participants = TeraParticipant.query.join(TeraParticipantGroup)\
-            .filter(TeraParticipantGroup.id_project == project_id, TeraParticipant.id_participant.in_(part_ids))\
+        participants = TeraParticipant.query.filter(TeraParticipant.id_project == project_id,
+                                                    TeraParticipant.id_participant.in_(part_ids))\
             .order_by(TeraParticipant.id_participant.asc()).all()
         return participants
 
@@ -413,8 +414,7 @@ class DBManagerTeraUserAccess:
                 if device_site.device_project_device.id_device not in device_ids:
                     device_ids.append(device_site.device_project_device.id_device)
                 device_parts = TeraDeviceParticipant.query.join(TeraDeviceParticipant.device_participant_device)\
-                    .join(TeraParticipant).join(TeraParticipant.participant_participant_group)\
-                    .join(TeraParticipantGroup.participant_group_project).join(TeraProject.project_site)\
+                    .join(TeraParticipant).join(TeraParticipant.participant_project).join(TeraProject.project_site)\
                     .filter_by(id_site=site_id).filter(TeraDevice.id_device.in_(device_ids)).all()
         return device_parts
 
