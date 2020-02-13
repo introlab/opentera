@@ -86,16 +86,14 @@ class QueryDevices(Resource):
                         for part in dev_participants:
                             part_info = {'id_participant': part.id_participant,
                                          'participant_name': part.participant_name,
-                                         'id_project':
-                                             part.participant_participant_group.participant_group_project.id_project
+                                         'id_project': part.participant_project.id_project
                                          }
                             # if args['list'] is None:
                             #    part_info['participant_name'] = part.participant_name
                             # part_info['id_project'] = part.participant_participant_group.participant_group_project.\
                             #     id_project
                             if args['list'] is None:
-                                part_info['project_name'] = part.participant_participant_group.participant_group_project\
-                                    .project_name
+                                part_info['project_name'] = part.participant_project.project_name
                             parts.append(part_info)
                         device_json['device_participants'] = parts
 

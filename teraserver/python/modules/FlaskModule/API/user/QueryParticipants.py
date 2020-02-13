@@ -19,6 +19,8 @@ get_parser.add_argument('id_group', type=int, help='ID of the participant groups
 get_parser.add_argument('id_session', type=int, help='ID of the session from which to get all participants')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all participants associated')
 get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('no_group', type=bool, help='Flag that limits the returned data with only participants without'
+                                                    ' a group')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('participant', type=str, location='json', help='Participant to create / update', required=True)
@@ -76,15 +78,19 @@ class QueryParticipants(Resource):
         try:
             participant_list = []
             for participant in participants:
+                # No group flag
+                if args['no_group'] is not None:
+                    if participant.id_participant_group is not None:
+                        continue
+                # List
                 if args['list'] is None:
                     participant_json = participant.to_json()
                     if args['id_participant']:
                         # Adds project information to participant
-                        participant_json['id_project'] = participant.participant_participant_group.id_project
+                        # participant_json['id_project'] = participant.participant_project.id_project
                         # Adds site information do participant
-                        participant_json['id_site'] = participant.participant_participant_group.\
-                            participant_group_project.id_site
-                    if args['id_group']:
+                        participant_json['id_site'] = participant.participant_project.id_site
+                    if args['id_group'] or args['id_participant']:
                         # Adds last session information to participant
                         participant_sessions = TeraSession.get_sessions_for_participant(
                             part_id=participant.id_participant)
@@ -111,7 +117,7 @@ class QueryParticipants(Resource):
                          'project.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified device',
-                        400: 'Badly formed JSON or missing fields(id_participant_group or id_project) in the JSON body',
+                        400: 'Badly formed JSON or missing fields(id_participant or id_project) in the JSON body',
                         500: 'Internal error when saving device'})
     def post(self):
         parser = post_parser
@@ -125,13 +131,17 @@ class QueryParticipants(Resource):
         json_participant = request.json['participant']
 
         # Validate if we have an id
-        if 'id_participant' not in json_participant or 'id_participant_group' not in json_participant:
+        if 'id_participant' not in json_participant or 'id_project' not in json_participant:
             return '', 400
 
         # Check if current user can modify the posted group
         # User can modify or add a group if it has admin access to that project
-        if json_participant['id_participant_group'] not in user_access.get_accessible_groups_ids(admin_only=True):
+        if json_participant['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True):
             return '', 403
+
+        # If participant group = 0, set it to none
+        if json_participant['id_participant_group'] == 0:
+            json_participant['id_participant_group'] = None
 
         # Do the update!
         if json_participant['id_participant'] > 0:
@@ -157,8 +167,10 @@ class QueryParticipants(Resource):
 
         # TODO: Publish update to everyone who is subscribed to sites update...
         update_participant = TeraParticipant.get_participant_by_id(json_participant['id_participant'])
+        update_participant_json = update_participant.to_json()
+        # update_participant_json['id_site'] = update_participant.participant_project.id_site
 
-        return jsonify([update_participant.to_json()])
+        return jsonify([update_participant_json])
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)
@@ -179,7 +191,7 @@ class QueryParticipants(Resource):
         # Only project admins can delete a participant
         part = TeraParticipant.get_participant_by_id(id_todel)
 
-        if user_access.get_project_role(part.participant_participant_group.id_project) != 'admin':
+        if user_access.get_project_role(part.participant_project.id_project) != 'admin':
             return '', 403
 
         # If we are here, we are allowed to delete. Do so.
