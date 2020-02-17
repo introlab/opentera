@@ -23,7 +23,7 @@ class TeraParticipant(db.Model, BaseModel):
     participant_login_enabled = db.Column(db.Boolean, nullable=False, default=False)
     id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group',
                                                                ondelete='cascade'), nullable=True)
-                                                                                                                        
+
     id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
 
     participant_devices = db.relationship("TeraDevice", secondary="t_devices_participants",

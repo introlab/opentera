@@ -34,20 +34,6 @@ class ParticipantQueryParticipants(Resource):
 
         args = get_parser.parse_args(strict=True)
 
-        sessions_list = []
-
-        minimal = False
-        if args['list']:
-            minimal = True
-
-        # For Now return participant info
-        current_participant = TeraParticipant.get_participant_by_uuid(session['_user_id'])
-        participant_access = DBManager.participantAccess(current_participant)
-
-        args = get_parser.parse_args()
-
-        sessions_list = []
-
         minimal = False
         if args['list']:
             minimal = True
