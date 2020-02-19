@@ -144,7 +144,7 @@ class ParticipantQueryDeviceDataTest(unittest.TestCase):
         for item in json_data:
             self.assertEqual(id_device, item['id_device'])
 
-    def test_query_http_auth_id_device(self):
+    def test_query_http_auth_id_session(self):
 
         id_session = 1
         params = {
