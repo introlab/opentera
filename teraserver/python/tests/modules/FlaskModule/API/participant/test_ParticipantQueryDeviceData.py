@@ -21,7 +21,8 @@ class ParticipantQueryDeviceDataTest(unittest.TestCase):
         auth_response = get(url=url, verify=False, auth=(username, password))
         # HTTP AUTH REQUIRED TO GET TOKEN
         self.assertEqual(auth_response.status_code, 200)
-        json_auth = json.loads(auth_response.text)
+        self.assertEqual(auth_response.headers['Content-Type'], 'application/json')
+        json_auth = auth_response.json()
         self.assertTrue(json_auth.__contains__('participant_token'))
         return json_auth['participant_token']
 
@@ -51,7 +52,7 @@ class ParticipantQueryDeviceDataTest(unittest.TestCase):
         response = self._request_with_http_auth('participant1', 'opentera')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = json.loads(response.text)
+        json_data = response.json()
         self.assertGreater(len(json_data), 0)
 
         for data_item in json_data:
@@ -71,7 +72,7 @@ class ParticipantQueryDeviceDataTest(unittest.TestCase):
         response = self._request_with_token_auth(token)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = json.loads(response.text)
+        json_data = response.json()
         self.assertGreater(len(json_data), 0)
 
         for data_item in json_data:
@@ -102,5 +103,70 @@ class ParticipantQueryDeviceDataTest(unittest.TestCase):
         response = self._request_with_http_auth('participant1', 'opentera', params)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = json.loads(response.text)
+        json_data = response.json()
         self.assertGreater(len(json_data), 0)
+
+    def test_query_http_auth_illegal_params(self):
+        params = {
+            'id_device_data': 1,
+            'id_device': 1,
+            'id_session': 1,
+            'download': False,
+            'illegal': 'illegal'
+        }
+        response = self._request_with_http_auth('participant1', 'opentera', params)
+        self.assertEqual(response.status_code, 400)
+
+    def test_query_http_auth_all_params_download(self):
+        params = {
+            'id_device_data': 1,
+            'id_device': 1,
+            'id_session': 1,
+            'download': True
+        }
+        response = self._request_with_http_auth('participant1', 'opentera', params)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/octet-stream')
+        length = int(response.headers['Content-Length'])
+        self.assertGreater(length, 0)
+        self.assertEqual(length, len(response.content))
+
+    def test_query_http_auth_id_device(self):
+
+        id_device = 1
+        params = {
+            'id_device': id_device
+        }
+        response = self._request_with_http_auth('participant1', 'opentera', params)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        for item in json_data:
+            self.assertEqual(id_device, item['id_device'])
+
+    def test_query_http_auth_id_session(self):
+
+        id_session = 1
+        params = {
+            'id_session': id_session
+        }
+        response = self._request_with_http_auth('participant1', 'opentera', params)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        for item in json_data:
+            self.assertEqual(id_session, item['id_session'])
+
+    def test_query_http_auth_id_device_data(self):
+
+        id_device_data = 1
+        params = {
+            'id_device_data': id_device_data
+        }
+        response = self._request_with_http_auth('participant1', 'opentera', params)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        for item in json_data:
+            self.assertEqual(id_device_data, item['id_device_data'])
+

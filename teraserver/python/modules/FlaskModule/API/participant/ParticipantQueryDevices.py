@@ -26,9 +26,8 @@ class ParticipantQueryDevices(Resource):
 
     @participant_multi_auth.login_required
     @api.expect(get_parser)
-    @api.doc(description='To be documented '
-                         'To be documented',
-             responses={200: 'Success - To be documented',
+    @api.doc(description='Query devices associated with a participant.',
+             responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
@@ -39,18 +38,16 @@ class ParticipantQueryDevices(Resource):
 
         args = get_parser.parse_args(strict=True)
 
-        devices_list = []
-
         minimal = False
         if args['list']:
             minimal = True
 
+        filters = {}
         if args['id_device']:
-            for device in participant_access.query_device(args['id_device']):
-                devices_list.append(device.to_json(minimal=minimal))
-        else:
-            for device in current_participant.participant_devices:
-                devices_list.append(device.to_json(minimal=minimal))
+            filters['id_device'] = args['id_device']
+
+        # List comprehension, get all devices with filter
+        devices_list = [data.to_json(minimal=minimal) for data in participant_access.query_device(filters)]
 
         return devices_list
 

@@ -3,6 +3,7 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraParticipant import TeraParticipant
+from libtera.db.models.TeraSessionParticipants import TeraSessionParticipants
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraSessionType import TeraSessionType
@@ -20,28 +21,24 @@ class DBManagerTeraParticipantAccess:
     def __init__(self, participant: TeraParticipant):
         self.participant = participant
 
-    def query_session(self, session_id: int):
-        sessions = []
+    def query_session(self, filters: dict):
+        # Make sure you filter results with id_participant to return TeraDevices
+        # that are accessible by current participant
+        result = TeraSession.query.filter_by(**filters).join(TeraSessionParticipants). \
+            filter_by(id_participant=self.participant.id_participant).all()
+        return result
 
-        for session in self.participant.participant_sessions:
-            if session.id_session == session_id:
-                # TODO do we need to make a request to DB?
-                sessions = [TeraSession.get_session_by_id(session_id)]
-                return sessions
-        return sessions
+    def query_device(self, filters: dict):
+        # Make sure you filter results with id_participant to return TeraDevices
+        # that are accessible by current participant
+        result = TeraDevice.query.filter_by(**filters).join(TeraDeviceParticipant).\
+            filter_by(id_participant=self.participant.id_participant).all()
+        return result
 
-    def query_device(self, device_id: int):
-        devices = []
-        for device in self.participant.participant_devices:
-            if device.id_device == device_id:
-                # TODO do we need to make a request to DB?
-                devices = [TeraDevice.get_device_by_id(device_id)]
-                return devices
-        return devices
+    def query_device_data(self, filters: dict):
+        # Make sure you filter results with id_participant to return TeraDeviceData
+        # that are accessible by current participant
+        result = TeraDeviceData.query.filter_by(**filters).join(TeraSession).join(TeraSessionParticipants).\
+            filter_by(id_participant=self.participant.id_participant).all()
+        return result
 
-    def query_device_data(self, device_id: int):
-        device_data = []
-        for device in self.participant.participant_devices:
-            if device.id_device == device_id:
-                return TeraDeviceData.get_data_for_device(device.id_device)
-        return []

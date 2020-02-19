@@ -15,9 +15,10 @@ get_parser = api.parser()
 get_parser.add_argument('id_device_data', type=int, help='Specific ID of device data to request data.')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all data')
 get_parser.add_argument('id_session', type=int, help='ID of session from which to request all data')
-get_parser.add_argument('download', type=inputs.boolean, help='If this flag is set, data will be downloaded instead of queried. '
-                                                    'In the case there\'s multiple files in the dataset, data will be '
-                                                    'zipped before the download process begins', default=False)
+get_parser.add_argument('download', type=inputs.boolean,
+                        help='If this flag is set, data will be downloaded instead of queried. '
+                        'In the case there\'s multiple files in the dataset, data will be '
+                        'zipped before the download process begins', default=False)
 
 post_parser = api.parser()
 
@@ -32,7 +33,7 @@ class ParticipantQueryDeviceData(Resource):
     @participant_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get device data information. Optionaly download the data.',
-             responses={200: 'Success - To be documented',
+             responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
@@ -43,25 +44,20 @@ class ParticipantQueryDeviceData(Resource):
 
         args = get_parser.parse_args(strict=True)
 
-        # Storing TeraDeviceData objects.
-        device_data_list = []
+        filters = {}
 
-        # TODO Filter by id_device_data
+        # Add filters
+        if args['id_device_data']:
+            filters['id_device_data'] = args['id_device_data']
+
         if args['id_device']:
-            for data in participant_access.query_device_data(args['id_device']):
-                if args['id_session']:
-                    if data.id_session == args['id_session']:
-                        device_data_list.append(data)
-                else:
-                    device_data_list.append(data)
-        else:
-            for device in current_participant.participant_devices:
-                for data in participant_access.query_device_data(device.id_device):
-                    if args['id_session']:
-                        if data.id_session == args['id_session']:
-                            device_data_list.append(data)
-                    else:
-                        device_data_list.append(data)
+            filters['id_device'] = args['id_device']
+
+        if args['id_session']:
+            filters['id_session'] = args['id_session']
+
+        # Get all TeraDeviceData matching filters...
+        device_data_list = participant_access.query_device_data(filters)
 
         # Asking for download ?
         if args['download'] is False or len(device_data_list) == 0:
@@ -90,9 +86,6 @@ class ParticipantQueryDeviceData(Resource):
 
                 response = send_file(zip_ram, as_attachment=True, attachment_filename=file_name + '.zip',
                                      mimetype='application/octet-stream')
-                response.headers.extend({
-                    'Content-Length': zip_ram.getbuffer().nbytes
-                })
                 return response
             else:
                 # Single file
