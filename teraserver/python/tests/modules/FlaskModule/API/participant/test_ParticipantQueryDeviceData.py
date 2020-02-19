@@ -83,3 +83,12 @@ class ParticipantQueryDeviceDataTest(unittest.TestCase):
             self.assertTrue(data_item.__contains__('id_device'))
             self.assertTrue(data_item.__contains__('id_device_data'))
             self.assertTrue(data_item.__contains__('id_session'))
+
+    def test_query_invalid_http_auth(self):
+        response = self._request_with_http_auth('invalid', 'invalid')
+        self.assertEqual(response.status_code, 401)
+
+    def test_query_invalid_token_auth(self):
+        response = self._request_with_token_auth('invalid')
+        self.assertEqual(response.status_code, 401)
+
