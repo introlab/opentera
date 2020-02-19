@@ -43,25 +43,20 @@ class ParticipantQueryDeviceData(Resource):
 
         args = get_parser.parse_args(strict=True)
 
-        # Storing TeraDeviceData objects.
-        device_data_list = []
+        filters = {}
 
-        # TODO Filter by id_device_data
+        # Add filters
+        if args['id_device_data']:
+            filters['id_device_data'] = args['id_device_data']
+
         if args['id_device']:
-            for data in participant_access.query_device_data(args['id_device']):
-                if args['id_session']:
-                    if data.id_session == args['id_session']:
-                        device_data_list.append(data)
-                else:
-                    device_data_list.append(data)
-        else:
-            for device in current_participant.participant_devices:
-                for data in participant_access.query_device_data(device.id_device):
-                    if args['id_session']:
-                        if data.id_session == args['id_session']:
-                            device_data_list.append(data)
-                    else:
-                        device_data_list.append(data)
+            filters['id_device'] = args['id_device']
+
+        if args['id_session']:
+            filters['id_session'] = args['id_session']
+
+        # Get all TeraDeviceData matching filters...
+        device_data_list = participant_access.query_device_data(filters)
 
         # Asking for download ?
         if args['download'] is False or len(device_data_list) == 0:
@@ -90,9 +85,6 @@ class ParticipantQueryDeviceData(Resource):
 
                 response = send_file(zip_ram, as_attachment=True, attachment_filename=file_name + '.zip',
                                      mimetype='application/octet-stream')
-                response.headers.extend({
-                    'Content-Length': zip_ram.getbuffer().nbytes
-                })
                 return response
             else:
                 # Single file

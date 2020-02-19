@@ -3,6 +3,7 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraParticipant import TeraParticipant
+from libtera.db.models.TeraSessionParticipants import TeraSessionParticipants
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraSessionType import TeraSessionType
@@ -39,9 +40,11 @@ class DBManagerTeraParticipantAccess:
                 return devices
         return devices
 
-    def query_device_data(self, device_id: int):
-        device_data = []
-        for device in self.participant.participant_devices:
-            if device.id_device == device_id:
-                return TeraDeviceData.get_data_for_device(device.id_device)
-        return []
+    def query_device_data(self, filters: dict):
+        # Make sure you filter results with id_participant to return TeraDeviceData
+        # that are only accessible by current participant
+        result = TeraDeviceData.query.filter_by(**filters).join(TeraSession).join(TeraSessionParticipants).\
+            filter_by(id_participant=self.participant.id_participant).all()
+
+        return result
+
