@@ -15,9 +15,10 @@ get_parser = api.parser()
 get_parser.add_argument('id_device_data', type=int, help='Specific ID of device data to request data.')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all data')
 get_parser.add_argument('id_session', type=int, help='ID of session from which to request all data')
-get_parser.add_argument('download', type=inputs.boolean, help='If this flag is set, data will be downloaded instead of queried. '
-                                                    'In the case there\'s multiple files in the dataset, data will be '
-                                                    'zipped before the download process begins', default=False)
+get_parser.add_argument('download', type=inputs.boolean,
+                        help='If this flag is set, data will be downloaded instead of queried. '
+                        'In the case there\'s multiple files in the dataset, data will be '
+                        'zipped before the download process begins', default=False)
 
 post_parser = api.parser()
 
@@ -32,7 +33,7 @@ class ParticipantQueryDeviceData(Resource):
     @participant_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get device data information. Optionaly download the data.',
-             responses={200: 'Success - To be documented',
+             responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})

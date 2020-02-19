@@ -19,7 +19,7 @@ class ParticipantLogout(Resource):
 
     @api.expect(get_parser)
     @api.doc(description='Logout participant',
-             responses={200: 'Success - To be documented',
+             responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})

@@ -26,9 +26,8 @@ class ParticipantQueryDevices(Resource):
 
     @participant_multi_auth.login_required
     @api.expect(get_parser)
-    @api.doc(description='To be documented '
-                         'To be documented',
-             responses={200: 'Success - To be documented',
+    @api.doc(description='Query devices associated with a participant.',
+             responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})

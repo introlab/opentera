@@ -22,9 +22,8 @@ class ParticipantQuerySessions(Resource):
 
     @participant_multi_auth.login_required
     @api.expect(get_parser)
-    @api.doc(description='To be documented '
-                         'To be documented',
-             responses={200: 'Success - To be documented',
+    @api.doc(description='Get session associated with participant.',
+             responses={200: 'Success',
                         400: 'Bad request',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
