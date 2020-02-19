@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
+from flask_restplus import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
@@ -15,7 +15,7 @@ get_parser = api.parser()
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all associated sites'
                         )
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information (ids only)')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ids only)')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('device_site', type=str, location='json',

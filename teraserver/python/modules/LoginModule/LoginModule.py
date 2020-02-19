@@ -140,7 +140,7 @@ class LoginModule(BaseModule):
         if token_dict['user_uuid']:
             _request_ctx_stack.top.current_user = TeraUser.get_user_by_uuid(token_dict['user_uuid'])
             # TODO: Validate if user is also online?
-            if current_user is not None:
+            if current_user:
                 current_user.update_last_online()
                 login_user(current_user, remember=True)
                 # TODO: Set user online in Redis??
@@ -174,7 +174,7 @@ class LoginModule(BaseModule):
         # TeraParticipant verifies if the participant is active and login is enabled
         _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_value)
 
-        if current_participant is not None:
+        if current_participant:
             current_participant.update_last_online()
             login_user(current_participant, remember=True)
             # TODO: Set user online in Redis??

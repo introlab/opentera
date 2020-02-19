@@ -1,5 +1,5 @@
 from flask import jsonify, session, send_file
-from flask_restplus import Resource, reqparse, fields
+from flask_restplus import Resource, reqparse, fields, inputs
 from modules.LoginModule.LoginModule import participant_multi_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant
@@ -15,9 +15,9 @@ get_parser = api.parser()
 get_parser.add_argument('id_device_data', type=int, help='Specific ID of device data to request data.')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all data')
 get_parser.add_argument('id_session', type=int, help='ID of session from which to request all data')
-get_parser.add_argument('download', type=bool, help='If this flag is set, data will be downloaded instead of queried. '
+get_parser.add_argument('download', type=inputs.boolean, help='If this flag is set, data will be downloaded instead of queried. '
                                                     'In the case there\'s multiple files in the dataset, data will be '
-                                                    'zipped before the download process begins')
+                                                    'zipped before the download process begins', default=False)
 
 post_parser = api.parser()
 
@@ -64,7 +64,7 @@ class ParticipantQueryDeviceData(Resource):
                         device_data_list.append(data)
 
         # Asking for download ?
-        if args['download'] is None or len(device_data_list) == 0:
+        if args['download'] is False or len(device_data_list) == 0:
             # Convert to json
             json_list = []
             for data in device_data_list:

@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
+from flask_restplus import Resource, reqparse, inputs
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.LoginModule.LoginModule import user_multi_auth
 from libtera.db.models.TeraUser import TeraUser
@@ -18,8 +18,8 @@ get_parser.add_argument('id_project', type=int, help='ID of the project from whi
 get_parser.add_argument('id_group', type=int, help='ID of the participant groups from which to get all participants')
 get_parser.add_argument('id_session', type=int, help='ID of the session from which to get all participants')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all participants associated')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
-get_parser.add_argument('no_group', type=bool, help='Flag that limits the returned data with only participants without'
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('no_group', type=inputs.boolean, help='Flag that limits the returned data with only participants without'
                                                     ' a group')
 
 post_parser = reqparse.RequestParser()

@@ -15,13 +15,13 @@ get_parser.add_argument('id_site', type=int, help='ID of the site from which to 
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all associated devices')
 get_parser.add_argument('device_type', type=int, help='ID of device type from which to get all devices. Can be '
                                                       'combined with id_site or id_project.')
-get_parser.add_argument('available', type=bool, help='Flag that indicates if only available (devices not associated to '
+get_parser.add_argument('available', type=inputs.boolean, help='Flag that indicates if only available (devices not associated to '
                                                      'a participant) should be returned')
-get_parser.add_argument('participants', type=bool, help='Flag that indicates if associated participant(s) information '
+get_parser.add_argument('participants', type=inputs.boolean, help='Flag that indicates if associated participant(s) information '
                                                         'should be included in the returned device list')
-get_parser.add_argument('sites', type=bool, help='Flag that indicates if associated site(s) information should be '
+get_parser.add_argument('sites', type=inputs.boolean, help='Flag that indicates if associated site(s) information should be '
                                                  'included in the returned device list')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('device', type=str, location='json', help='Device to create / update', required=True)

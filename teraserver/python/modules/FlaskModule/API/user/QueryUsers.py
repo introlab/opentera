@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
+from flask_restplus import Resource, reqparse, inputs
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -14,8 +14,8 @@ from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user to query')
 get_parser.add_argument('user_uuid', type=str, help='User UUID to query')
-get_parser.add_argument('self', type=bool, help='Query information about the currently logged user')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information (ID, name, '
+get_parser.add_argument('self', type=inputs.boolean, help='Query information about the currently logged user')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ID, name, '
                                                 'enabled)')
 
 post_parser = reqparse.RequestParser()
