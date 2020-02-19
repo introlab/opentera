@@ -18,9 +18,10 @@ get_parser.add_argument('id_device_data', type=int, help='Specific ID of device 
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all data')
 get_parser.add_argument('id_session', type=int, help='ID of session from which to request all data')
 get_parser.add_argument('id_participant', type=int, help='ID of participant from which to request all data')
-get_parser.add_argument('download', type=bool, help='If this flag is set, data will be downloaded instead of queried. '
-                                                    'In the case there\'s multiple files in the dataset, data will be '
-                                                    'zipped before the download process begins')
+get_parser.add_argument('download', type=inputs.boolean,
+                        help='If this flag is set, data will be downloaded instead of queried. '
+                        'In the case there\'s multiple files in the dataset, data will be '
+                        'zipped before the download process begins')
 
 delete_parser = api.parser()
 delete_parser.add_argument('id', type=int, help='Specific device data ID to delete', required=True)

@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
+from flask_restplus import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
@@ -13,7 +13,7 @@ from flask_babel import gettext
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_session_type', type=int, help='ID of the session type to query')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('session_type', type=str, location='json', help='Session type to create / update',

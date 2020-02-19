@@ -92,3 +92,15 @@ class ParticipantQueryDeviceDataTest(unittest.TestCase):
         response = self._request_with_token_auth('invalid')
         self.assertEqual(response.status_code, 401)
 
+    def test_query_http_auth_all_params(self):
+        params = {
+            'id_device_data': 1,
+            'id_device': 1,
+            'id_session': 1,
+            'download': False
+        }
+        response = self._request_with_http_auth('participant1', 'opentera', params)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = json.loads(response.text)
+        self.assertGreater(len(json_data), 0)

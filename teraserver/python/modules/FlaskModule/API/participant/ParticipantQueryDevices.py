@@ -1,5 +1,5 @@
 from flask import jsonify, session
-from flask_restplus import Resource, reqparse, fields
+from flask_restplus import Resource, reqparse, fields, inputs
 from modules.LoginModule.LoginModule import participant_multi_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant
@@ -12,7 +12,7 @@ from slugify import slugify
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_device', type=int, help='ID of the device to query')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 post_parser = api.parser()
 

@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
+from flask_restplus import Resource, reqparse, inputs
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -11,7 +11,7 @@ from libtera.db.DBManager import DBManager
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all site roles')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to request all users roles')
-get_parser.add_argument('admins', type=bool, help='Flag to limit to sites from which the user is an admin or '
+get_parser.add_argument('admins', type=inputs.boolean, help='Flag to limit to sites from which the user is an admin or '
                                                   'users in site that have the admin role')
 
 post_parser = reqparse.RequestParser()
