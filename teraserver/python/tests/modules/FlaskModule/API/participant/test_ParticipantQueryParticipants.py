@@ -112,3 +112,4 @@ class ParticipantQueryParticipantsTest(unittest.TestCase):
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
         self.assertGreater(len(json_data), 0)
+

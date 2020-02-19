@@ -33,7 +33,7 @@ class ParticipantLoginTest(unittest.TestCase):
         backend_response = self._http_auth('participant1', 'opentera')
         self.assertEqual(backend_response.status_code, 200)
         self.assertEqual(backend_response.headers['Content-Type'], 'application/json')
-        json_data = json.loads(backend_response.text)
+        json_data = backend_response.json()
         self.assertGreater(len(json_data), 0)
 
         # Validate fields in json response
@@ -53,7 +53,7 @@ class ParticipantLoginTest(unittest.TestCase):
         httpauth_response = self._http_auth('participant1', 'opentera')
         self.assertEqual(httpauth_response.status_code, 200)
         self.assertEqual(httpauth_response.headers['Content-Type'], 'application/json')
-        json_data = json.loads(httpauth_response.text)
+        json_data = httpauth_response.json()
         self.assertGreater(len(json_data), 0)
 
         # Try to login with token, should not work since we accept only http basic auth only on this endpoint
