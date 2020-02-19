@@ -35,18 +35,16 @@ class ParticipantQuerySessions(Resource):
 
         args = get_parser.parse_args(strict=True)
 
-        sessions_list = []
-
         minimal = False
         if args['list']:
             minimal = True
 
+        filters = {}
         if args['id_session']:
-            for ses in participant_access.query_session(args['id_session']):
-                sessions_list.append(ses.to_json(minimal=minimal))
-        else:
-            for ses in current_participant.participant_sessions:
-                sessions_list.append(ses.to_json(minimal=minimal))
+            filters['id_session'] = args['id_session']
+
+        # List comprehension, get all sessions with filter
+        sessions_list = [data.to_json(minimal=minimal) for data in participant_access.query_session(filters)]
 
         return sessions_list
 
