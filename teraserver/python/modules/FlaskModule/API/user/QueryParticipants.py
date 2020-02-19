@@ -117,7 +117,8 @@ class QueryParticipants(Resource):
                          'project.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified device',
-                        400: 'Badly formed JSON or missing fields(id_participant or id_project) in the JSON body',
+                        400: 'Badly formed JSON or missing fields(id_participant or id_project/id_group [only one of '
+                             'them]) in the JSON body, or mismatch between id_project and participant group project',
                         500: 'Internal error when saving device'})
     def post(self):
         parser = post_parser
@@ -131,13 +132,36 @@ class QueryParticipants(Resource):
         json_participant = request.json['participant']
 
         # Validate if we have an id
-        if 'id_participant' not in json_participant or 'id_project' not in json_participant:
+        if 'id_participant' not in json_participant or ('id_project' not in json_participant
+                                                        and 'id_participant_group' not in json_participant):
             return '', 400
 
-        # Check if current user can modify the posted group
         # User can modify or add a group if it has admin access to that project
-        if json_participant['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True):
-            return '', 403
+        if 'id_project' in json_participant:
+            if json_participant['id_project'] >0 and \
+                    json_participant['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True):
+                return 'No admin access to project', 403
+
+        # Check if current user can modify the posted group
+        if 'id_participant_group' in json_participant:
+            if json_participant['id_participant_group'] > 0 and \
+                    json_participant['id_participant_group'] not in \
+                    user_access.get_accessible_groups_ids(admin_only=True):
+                return 'No admin access to group', 403
+
+        # If we have both an id_group and an id_project, make sure that the id_project in the group matches
+        if 'id_project' in json_participant and 'id_participant_group' in json_participant:
+            if json_participant['id_participant_group'] > 0:
+                from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
+                participant_group = TeraParticipantGroup.get_participant_group_by_id(
+                    json_participant['id_participant_group'])
+                if participant_group is None:
+                    return 'Participant group not found.', 500
+                if participant_group.id_project != json_participant['id_project'] \
+                        and json_participant['id_project'] > 0:
+                    return 'Mismatch between id_project and group\'s project', 400
+                # Force id_project to group project.
+                json_participant['id_project'] = participant_group.id_project
 
         # If participant group = 0, set it to none
         if json_participant['id_participant_group'] == 0:
@@ -148,10 +172,12 @@ class QueryParticipants(Resource):
             # Already existing
             try:
                 TeraParticipant.update(json_participant['id_participant'], json_participant)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return e.args, 500
+            except NameError as e:
+                return e.args, 500
         else:
             # New
             try:
@@ -160,10 +186,12 @@ class QueryParticipants(Resource):
                 TeraParticipant.insert(new_part)
                 # Update ID for further use
                 json_participant['id_participant'] = new_part.id_participant
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return e.args, 500
+            except NameError as e:
+                return e.args, 500
 
         # TODO: Publish update to everyone who is subscribed to sites update...
         update_participant = TeraParticipant.get_participant_by_id(json_participant['id_participant'])
