@@ -14,8 +14,8 @@ class TeraParticipant(db.Model, BaseModel):
     id_participant = db.Column(db.Integer, db.Sequence('id_participant_sequence'), primary_key=True, autoincrement=True)
     participant_uuid = db.Column(db.String(36), nullable=False, unique=True)
     participant_name = db.Column(db.String, nullable=False)
-    participant_username = db.Column(db.String(50), nullable=True, unique=True)
-    participant_email = db.Column(db.String, nullable=True, unique=True)
+    participant_username = db.Column(db.String(50), nullable=True)
+    participant_email = db.Column(db.String, nullable=True)
     participant_password = db.Column(db.String, nullable=True)
     participant_token = db.Column(db.String, nullable=False, unique=True)
     participant_lastonline = db.Column(db.TIMESTAMP, nullable=True)
@@ -153,6 +153,14 @@ class TeraParticipant(db.Model, BaseModel):
         return TeraParticipant.query.filter_by(id_participant=part_id).first()
 
     @staticmethod
+    def is_participant_username_available(username: str) -> bool:
+        # No username = always available
+        if username is None or username == '':
+            return True
+
+        return TeraParticipant.query.filter_by(participant_username=username).first() is None
+
+    @staticmethod
     def create_defaults():
         from libtera.db.models.TeraProject import TeraProject
         project1 = TeraProject.get_project_by_projectname('Default Project #1')
@@ -185,10 +193,21 @@ class TeraParticipant(db.Model, BaseModel):
         db.session.commit()
 
     @classmethod
+    def update(cls, update_id: int, values: dict):
+        # Check if username is available
+        if 'participant_username' in values:
+            if not TeraParticipant.is_participant_username_available(values['participant_username']):
+                raise NameError('Participant username already in use.')
+        super().update(update_id, values)
+
+    @classmethod
     def insert(cls, participant):
         participant.participant_lastonline = None
         participant.participant_uuid = str(uuid.uuid4())
         participant.create_token()
+        # Check if username is available
+        if not TeraParticipant.is_participant_username_available(participant.participant_username):
+            raise NameError('Participant username already in use.')
         super().insert(participant)
 
     @classmethod
