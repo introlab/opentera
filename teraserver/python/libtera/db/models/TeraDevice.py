@@ -25,6 +25,7 @@ class TeraDevice(db.Model, BaseModel):
     device_onlineable = db.Column(db.Boolean, nullable=False)
     device_optional = db.Column(db.Boolean, nullable=False, default=False)
     device_config = db.Column(db.String, nullable=True)
+    device_infos = db.Column(db.String, nullable=True)
     device_notes = db.Column(db.String, nullable=True)
     device_lastonline = db.Column(db.TIMESTAMP, nullable=True)
 
@@ -48,7 +49,7 @@ class TeraDevice(db.Model, BaseModel):
 
         if minimal:
             ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_config', 'device_notes',
-                              'device_lastonline']
+                              'device_lastonline', 'device_infos']
 
         device_json = super().to_json(ignore_fields=ignore_fields)
 

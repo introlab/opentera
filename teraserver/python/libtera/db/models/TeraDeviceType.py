@@ -15,7 +15,7 @@ class TeraDeviceType(db.Model, BaseModel):
             return self.name, self.value
 
     __tablename__ = 't_devices_types'
-    id_device_type = db.Column(db.Integer, db.Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
+    id_device_type = db.Column(db.Integer, db.Sequence('id_device_type_sequence'), primary_key=True, autoincrement=True)
     device_type_name = db.Column(db.String, nullable=False)
 
     device_type_session_types = db.relationship("TeraSessionTypeDeviceType")

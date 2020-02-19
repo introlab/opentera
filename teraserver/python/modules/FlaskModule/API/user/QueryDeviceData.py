@@ -108,9 +108,9 @@ class QueryDeviceData(Resource):
 
                 response = send_file(zip_ram, as_attachment=True, attachment_filename=file_name + '.zip',
                                      mimetype='application/octet-stream')
-                response.headers.extend({
-                  'Content-Length': zip_ram.getbuffer().nbytes
-                })
+                # response.headers.extend({
+                #   'Content-Length': zip_ram.getbuffer().nbytes
+                # })
                 return response
             else:
                 # filename = tmp_dir + '/' + datas[0].devicedata_original_filename

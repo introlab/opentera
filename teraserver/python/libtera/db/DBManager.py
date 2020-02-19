@@ -12,6 +12,7 @@ from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraDeviceType import TeraDeviceType
+from libtera.db.models.TeraDeviceSubType import TeraDeviceSubType
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraSessionType import TeraSessionType
@@ -93,6 +94,10 @@ class DBManager:
         if TeraDeviceType.get_count() == 0:
             print('No device types - creating defaults')
             TeraDeviceType.create_defaults()
+
+        if TeraDeviceSubType.get_count() == 0:
+            print("No device sub types - creating defaults")
+            TeraDeviceSubType.create_defaults()
 
         if TeraDevice.get_count() == 0:
             print('No device - creating defaults')

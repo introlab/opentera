@@ -123,6 +123,7 @@ class FlaskModule(BaseModule):
         from .API.user.QueryDeviceData import QueryDeviceData
         from .API.user.QuerySessionTypeDeviceType import QuerySessionTypeDeviceType
         from .API.user.QuerySessionTypeProject import QuerySessionTypeProject
+        from .API.user.QueryDeviceSubTypes import QueryDeviceSubTypes
 
         # Resources
         user_api_ns.add_resource(Login, '/login', resource_class_kwargs=kwargs)
@@ -146,6 +147,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(QuerySessionTypeProject, '/sessiontypeprojects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QuerySessionEvents, '/sessionevents', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryDeviceData, '/data', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryDeviceSubTypes, '/devicesubtypes', resource_class_kwargs=kwargs)
         api.add_namespace(user_api_ns)
 
     def init_device_api(self):

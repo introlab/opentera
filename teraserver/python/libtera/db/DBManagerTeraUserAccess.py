@@ -5,6 +5,7 @@ from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraDeviceType import TeraDeviceType
+from libtera.db.models.TeraDeviceSubType import TeraDeviceSubType
 from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraDeviceProject import TeraDeviceProject
@@ -109,6 +110,22 @@ class DBManagerTeraUserAccess:
             devices.append(device.id_device)
 
         return devices
+
+    def get_accessible_devices_types(self, admin_only=False):
+        if self.user.user_superadmin:
+            return TeraDeviceType.query.all()
+
+        from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
+        session_types_id_list = self.get_accessible_session_types_ids(admin_only=admin_only)
+        return TeraDeviceType.query.join(TeraSessionTypeDeviceType).join(TeraSessionType).\
+            filter(TeraSessionType.id_session_type.in_(session_types_id_list)).all()
+
+    def get_accessible_devices_types_ids(self, admin_only=False):
+        device_types = []
+        accessible_dts = self.get_accessible_devices_types(admin_only=admin_only)
+        for dt in accessible_dts:
+            device_types.append(dt.id_device_type)
+        return device_types
 
     def get_accessible_participants(self, admin_only=False):
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
@@ -452,3 +469,4 @@ class DBManagerTeraUserAccess:
                                                             in_(session_types_ids))\
             .filter_by(id_project=project_id).all()
         return session_types
+
