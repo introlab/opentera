@@ -19,6 +19,8 @@ class TeraDevice(db.Model, BaseModel):
     device_name = db.Column(db.String, nullable=False)
     device_type = db.Column(db.Integer, db.ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
                             nullable=False)
+    id_device_subtype = db.Column(db.Integer, db.ForeignKey('t_devices_subtypes.id_device_subtype',
+                                                            ondelete='set null'), nullable=True)
     device_token = db.Column(db.String, nullable=False, unique=True)
     device_certificate = db.Column(db.String, nullable=True)
     device_enabled = db.Column(db.Boolean, nullable=False)
@@ -34,6 +36,7 @@ class TeraDevice(db.Model, BaseModel):
     # device_session_types = db.relationship("TeraSessionTypeDeviceType")
     device_participants = db.relationship("TeraParticipant",  secondary="t_devices_participants",
                                           back_populates="participant_devices")
+    device_subtype = db.relationship('TeraDeviceSubType')
 
     def __init__(self):
         self.secret = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerDeviceTokenKey)
@@ -45,7 +48,8 @@ class TeraDevice(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields += ['device_projects', 'device_participants',  'device_token', 'device_certificate', 'secret']
+        ignore_fields += ['device_projects', 'device_participants',  'device_token', 'device_certificate', 'secret',
+                          'device_subtype']
 
         if minimal:
             ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_config', 'device_notes',

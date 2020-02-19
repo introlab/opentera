@@ -39,6 +39,27 @@ class TeraFormSection:
         return section
 
 
+class TeraFormItemCondition:
+
+    # condition_item = any item in the form
+    # condition_operator = operator of the form "=", "<>", ">" ...
+    # condition_condition = value to check. Special flags: "changed"
+    # hook = api call to get new values for that item when condition is true
+    def __init__(self, condition_item: str,  condition_operator: str, condition_condition, hook: str = None):
+        self.condition = condition_condition
+        self.item = condition_item
+        self.operator = condition_operator
+        self.hook = hook
+
+    def to_dict(self):
+        item_condition = {"item": self.item,
+                          "op": self.operator,
+                          "condition": self.condition}
+        if self.hook:
+            item_condition["hook"] = self.hook
+        return item_condition
+
+
 class TeraFormValue:
 
     def __init__(self, value_id: string, value: string):
@@ -46,28 +67,17 @@ class TeraFormValue:
         self.value = value
 
     def to_dict(self):
-        return {"id": self.id, "value": self.value}
-
-
-class TeraFormItemCondition:
-
-    def __init__(self, condition_item: string,  condition_operator, condition_condition: string):
-        self.condition = condition_condition
-        self.item = condition_item
-        self.operator = condition_operator
-
-    def to_dict(self):
-        item_condition = {"item": self.item,
-                          "op": self.operator,
-                          "condition": self.condition}
-        return item_condition
+        base_dict = {"id": self.id, "value": self.value}
+        return base_dict
 
 
 class TeraFormItem:
 
-    def __init__(self, item_id: string, item_label: string, item_type: string, item_required: bool = False,
-                 item_values: list = None, item_default: string = None, item_condition: TeraFormItemCondition = None,
-                 item_options={}):
+    def __init__(self, item_id: str, item_label: str, item_type: str, item_required: bool = False,
+                 item_values: list = None, item_default: str = None, item_condition: TeraFormItemCondition = None,
+                 item_options=None):
+        if item_options is None:
+            item_options = {}
         self.id = item_id
         self.label = item_label
         self.type = item_type
