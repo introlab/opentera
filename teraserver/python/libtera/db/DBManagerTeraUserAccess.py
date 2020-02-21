@@ -408,6 +408,12 @@ class DBManagerTeraUserAccess:
                 .filter(TeraDevice.id_device.in_(device_ids)).all()
         return device_parts
 
+    def query_device_participants_by_type(self, id_device_type: int, participant_id: int):
+        device_parts = TeraDeviceParticipant.query.join(TeraDevice)\
+            .filter(TeraDevice.device_type == id_device_type, TeraDeviceParticipant.id_participant == participant_id)\
+            .order_by(TeraDeviceParticipant.id_device_participant.asc()).all()
+        return device_parts
+
     def query_session(self, session_id: int):
         from libtera.db.models.TeraParticipant import TeraParticipant
         from libtera.db.models.TeraSession import TeraSession

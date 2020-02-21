@@ -19,6 +19,8 @@ get_parser.add_argument('id_participant', type=int, help='ID of the participant 
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all devices and associated '
                                                   'participants')
 get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information (ids only)')
+get_parser.add_argument('id_device_type', type=int, help='ID of device type from which to get all devices and '
+                                                         'associated participants')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('device_participant', type=str, location='json',
@@ -66,8 +68,12 @@ class QueryDeviceParticipants(Resource):
                 device_part = TeraDeviceParticipant.query_participants_for_device(device_id=args['id_device'])
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
-                device_part = TeraDeviceParticipant.query_devices_for_participant(
-                    participant_id=args['id_participant'])
+                if args['id_device_type']:
+                    device_part = user_access.query_device_participants_by_type(id_device_type=args['id_device_type'],
+                                                                                participant_id=args['id_participant'])
+                else:
+                    device_part = TeraDeviceParticipant.query_devices_for_participant(
+                        participant_id=args['id_participant'])
         elif args['id_site']:
             # Get devices and participants for that specific site
             device_part = user_access.query_device_participants_for_site(site_id=args['id_site'])
