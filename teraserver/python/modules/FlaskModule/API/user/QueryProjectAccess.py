@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
+from flask_restplus import Resource, reqparse, inputs
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
@@ -11,7 +11,7 @@ from libtera.db.DBManager import DBManager
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all projects roles')
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to request all users roles')
-get_parser.add_argument('admins', type=bool, help='Flag to limit to projects from which the user is an admin or '
+get_parser.add_argument('admins', type=inputs.boolean, help='Flag to limit to projects from which the user is an admin or '
                                                   'users in project that have the admin role')
 
 post_parser = reqparse.RequestParser()
@@ -25,7 +25,7 @@ class QueryProjectAccess(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get user roles for projects. Only one ID parameter required and supported at once.',
              responses={200: 'Success - returns list of users roles in projects',
@@ -65,7 +65,7 @@ class QueryProjectAccess(Resource):
 
         return 'Unknown error', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create/update project access for an user.',
              responses={200: 'Success',
@@ -110,7 +110,7 @@ class QueryProjectAccess(Resource):
 
         return jsonify(json_rval)
 
-    # @multi_auth.login_required
+    # @user_multi_auth.login_required
     # def delete(self):
     #
     #     return '', 501

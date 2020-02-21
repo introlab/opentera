@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent
@@ -27,7 +27,7 @@ class QuerySessionEvents(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get events for a specific session',
              responses={200: 'Success - returns list of events',
@@ -59,7 +59,7 @@ class QuerySessionEvents(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update session events. id_session_event must be set to "0" to create a new '
                          'event. An event can be created/modified if the user has access to the session.',
@@ -117,7 +117,7 @@ class QuerySessionEvents(Resource):
 
         return jsonify([update_event.to_json()])
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific session event',
              responses={200: 'Success',

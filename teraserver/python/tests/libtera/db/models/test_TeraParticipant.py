@@ -71,7 +71,7 @@ class TeraParticipantTest(unittest.TestCase):
         self.assertEqual(loadedParticipant.participant_uuid, participant.participant_uuid)
 
     def test_json(self):
-        participant = TeraParticipant.get_participant_by_name('Test Participant')
+        participant = TeraParticipant.get_participant_by_name('Participant #1')
 
         json = participant.to_json()
 

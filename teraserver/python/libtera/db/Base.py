@@ -77,3 +77,9 @@ class BaseModel:
     def delete(cls, id_todel):
         cls.query.filter(getattr(cls, cls.get_primary_key_name()) == id_todel).delete()
         db.session.commit()
+
+    @classmethod
+    def query_with_filters(cls, filters=None):
+        if filters is None:
+            filters = dict()
+        return cls.query.filter_by(**filters).all()

@@ -1,6 +1,6 @@
 from flask import jsonify, session
 from flask_restplus import Resource, reqparse
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
@@ -16,7 +16,7 @@ class QueryOnlineUsers(Resource):
         self.flaskModule = kwargs.get('flaskModule', None)
         self.parser = reqparse.RequestParser()
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.doc(description='Get online users. CURRENTLY UNIMPLEMENTED.',
              responses={200: 'Success'})
     def get(self):

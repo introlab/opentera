@@ -1,6 +1,7 @@
 from libtera.db.Base import db, BaseModel
 from enum import Enum, unique
 
+
 class TeraSessionType(db.Model, BaseModel):
     @unique
     class SessionCategoryEnum(Enum):

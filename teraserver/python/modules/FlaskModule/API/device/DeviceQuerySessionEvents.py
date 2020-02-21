@@ -8,6 +8,7 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 
+
 class DeviceQuerySessionEvents(Resource):
 
     def __init__(self, _api, flaskModule=None):

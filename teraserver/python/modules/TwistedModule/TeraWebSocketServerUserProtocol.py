@@ -22,17 +22,16 @@ from google.protobuf.message import DecodeError
 from twisted.internet import defer
 
 
-class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
+class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
     def __init__(self, config):
         RedisClient.__init__(self, config=config)
         WebSocketServerProtocol.__init__(self)
         self.user = None
-        self.participant = None
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
-        print('TeraWebSocketServerProtocol redisConnectionMade (redis)')
+        print('TeraWebSocketServerUserProtocol redisConnectionMade (redis)')
 
         # This will wait until subscribe result is available...
         ret = yield self.subscribe(self.answer_topic())
@@ -58,7 +57,7 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
     def onMessage(self, msg, binary):
         # Handle websocket communication
         # TODO use protobuf ?
-        print('TeraWebSocketProtocol onMessage', self, msg, binary)
+        print('TeraWebSocketServerUserProtocol onMessage', self, msg, binary)
 
         if binary:
             # Decode protobuf before parsing
@@ -70,13 +69,13 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
             message = Parse(msg, TeraMessage)
             self.publish(message.head.dest, message)
         except ParseError:
-            print('TeraMessage parse error...')
+            print('TeraWebSocketServerUserProtocol - TeraMessage parse error...')
 
         # Echo for debug
         self.sendMessage(msg, binary)
 
     def redisMessageReceived(self, pattern, channel, message):
-        print('TeraWebSocketServerProtocol redis message received', pattern, channel, message)
+        print('TeraWebSocketServerUserProtocol redis message received', pattern, channel, message)
 
         # Forward as JSON to websocket
         try:
@@ -93,56 +92,45 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
             self.sendMessage(json.encode('utf-8'), False)
 
         except DecodeError:
-            print('DecodeError ', pattern, channel, message)
+            print('TeraWebSocketServerUserProtocol - DecodeError ', pattern, channel, message)
             self.sendMessage(message.encode('utf-8'), False)
         except:
-            print('Failure in redisMessageReceived')
+            print('TeraWebSocketServerUserProtocol - Failure in redisMessageReceived')
 
     def onConnect(self, request):
         """
         Cannot send message at this stage, needs to verify connection here.
         """
-        print('onConnect')
+        print('TeraWebSocketServerUserProtocol - onConnect')
 
         if request.params.__contains__('id'):
 
             # Look for session id in
-            id = request.params['id']
-            print('testing id: ', id)
+            my_id = request.params['id']
+            print('TeraWebSocketServerUserProtocol - testing id: ', my_id)
 
-            value = self.redisGet(id[0])
+            value = self.redisGet(my_id[0])
 
             if value is not None:
                 # Needs to be converted from bytes to string to work
                 user_uuid = value.decode("utf-8")
-                print('user uuid ', user_uuid)
+                print('TeraWebSocketServerUserProtocol - user uuid ', user_uuid)
 
                 # User verification
                 self.user = TeraUser.get_user_by_uuid(user_uuid)
                 if self.user is not None:
                     # Remove key
-                    print('OK! removing key')
-                    self.redisDelete(id[0])
+                    print('TeraWebSocketServerUserProtocol - OK! removing key')
+                    self.redisDelete(my_id[0])
                     return
-
-        if request.params.__contains__('token'):
-
-            # Look for token
-            token = request.params['token']
-            print('testing token: ', token)
-
-            self.participant = TeraParticipant.get_participant_by_token(token[0])
-
-            if self.participant is not None:
-                print('Participant connected ', self.participant)
-                return
 
         # if we get here we need to close the websocket, auth failed.
         # To deny a connection, raise an Exception
-        raise ConnectionDeny(ConnectionDeny.FORBIDDEN, "Websocket authentication failed (key, uuid).")
+        raise ConnectionDeny(ConnectionDeny.FORBIDDEN,
+                             "TeraWebSocketServerUserProtocol Websocket authentication failed (key, uuid).")
 
     def onOpen(self):
-        print(type(self).__name__, 'onOpen')
+        print(type(self).__name__, 'TeraWebSocketServerUserProtocol - onOpen')
         # Moved handling code in redisConnectionMade...
         # because it always occurs after onOpen...
 
@@ -163,20 +151,14 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
             self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
 
-        elif self.participant:
-            # TODO advertise that participant leaved
-            pass
-
         print('onClose', self, wasClean, code, reason)
 
     def onOpenHandshakeTimeout(self):
-        print('onOpenHandshakeTimeout', self)
+        print('TeraWebSocketServerUserProtocol - onOpenHandshakeTimeout', self)
 
     def answer_topic(self):
         if self.user:
             return 'websocket.user.' + self.user.user_uuid
-        if self.participant:
-            return 'websocket.participant.' + self.participant.participant_uuid
 
     def create_tera_message(self, dest='', seq=0):
 

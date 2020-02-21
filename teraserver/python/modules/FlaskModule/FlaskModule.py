@@ -123,6 +123,7 @@ class FlaskModule(BaseModule):
         from .API.user.QueryDeviceData import QueryDeviceData
         from .API.user.QuerySessionTypeDeviceType import QuerySessionTypeDeviceType
         from .API.user.QuerySessionTypeProject import QuerySessionTypeProject
+        from .API.user.QueryDeviceSubTypes import QueryDeviceSubTypes
 
         # Resources
         user_api_ns.add_resource(Login, '/login', resource_class_kwargs=kwargs)
@@ -146,6 +147,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(QuerySessionTypeProject, '/sessiontypeprojects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QuerySessionEvents, '/sessionevents', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryDeviceData, '/data', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryDeviceSubTypes, '/devicesubtypes', resource_class_kwargs=kwargs)
         api.add_namespace(user_api_ns)
 
     def init_device_api(self):
@@ -181,7 +183,7 @@ class FlaskModule(BaseModule):
         # Resources
         participant_api_ns.add_resource(ParticipantLogin, '/login', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantLogout, '/logout', resource_class_kwargs=kwargs)
-        participant_api_ns.add_resource(ParticipantQueryDeviceData, '/device_data', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantQueryDeviceData, '/data', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantQueryDevices, '/devices', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantQueryParticipants, '/participants', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantQuerySessions, '/sessions', resource_class_kwargs=kwargs)
@@ -189,7 +191,7 @@ class FlaskModule(BaseModule):
         api.add_namespace(participant_api_ns)
 
     def init_views(self):
-        from .Views.Index import Index
+        from .Views.User import User
         from .Views.Upload import Upload
         from .Views.Participant import Participant
         from .Views.DeviceRegistration import DeviceRegistration
@@ -198,10 +200,13 @@ class FlaskModule(BaseModule):
         args = []
         kwargs = {'flaskModule': self}
 
-        # Will create a function that calls the __index__ method with args, kwargs
-        flask_app.add_url_rule('/index', view_func=Index.as_view('index', *args, **kwargs))
+        # User test view
+        flask_app.add_url_rule('/user', view_func=User.as_view('user', *args, **kwargs))
+
+        # Participant test view
+        flask_app.add_url_rule('/participant', view_func=Participant.as_view('participant', *args, **kwargs))
+
         # flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
-        # flask_app.add_url_rule('/participant/', view_func=Participant.as_view('participant', *args, **kwargs))
         # flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
         #                                                                                    **kwargs))
 

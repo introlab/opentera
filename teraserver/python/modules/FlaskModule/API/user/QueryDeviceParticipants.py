@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse, fields
-from modules.LoginModule.LoginModule import multi_auth
+from flask_restplus import Resource, reqparse, fields, inputs
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
@@ -18,9 +18,9 @@ get_parser.add_argument('id_participant', type=int, help='ID of the participant 
                                                          'devices')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all devices and associated '
                                                   'participants')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information (ids only)')
 get_parser.add_argument('id_device_type', type=int, help='ID of device type from which to get all devices and '
                                                          'associated participants')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ids only)')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('device_participant', type=str, location='json',
@@ -45,7 +45,7 @@ class QueryDeviceParticipants(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get devices that are related to a participant. Only one "ID" parameter required and supported'
                          ' at once.',
@@ -92,7 +92,7 @@ class QueryDeviceParticipants(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create/update devices associated with a participant.',
              responses={200: 'Success',
@@ -156,7 +156,7 @@ class QueryDeviceParticipants(Resource):
 
         return jsonify(update_device_part)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific device-participant association.',
              responses={200: 'Success',

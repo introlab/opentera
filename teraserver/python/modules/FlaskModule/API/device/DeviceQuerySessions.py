@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
+from flask_restplus import Resource, reqparse, inputs
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.DBManager import DBManager
@@ -8,6 +8,7 @@ from sqlalchemy import exc
 from flask_babel import gettext
 from sqlalchemy.exc import InvalidRequestError
 from modules.FlaskModule.FlaskModule import device_api_ns as api
+
 
 class DeviceQuerySessions(Resource):
 
@@ -22,7 +23,7 @@ class DeviceQuerySessions(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id_session', type=int, help='id_session')
         # parser.add_argument('id_participant', type=int)
-        # parser.add_argument('list', type=bool)
+        # parser.add_argument('list', type=inputs.boolean)
         #
         args = parser.parse_args()
         #

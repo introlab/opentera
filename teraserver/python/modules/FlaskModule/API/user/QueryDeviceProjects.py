@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
-from modules.LoginModule.LoginModule import multi_auth
+from flask_restplus import Resource, reqparse, inputs
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceProject import TeraDeviceProject
@@ -15,7 +15,7 @@ get_parser = api.parser()
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all associated projects'
                         )
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all associated devices')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information (ids only)')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ids only)')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('device_project', type=str, location='json',
@@ -33,10 +33,10 @@ class QueryDeviceProjects(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
-    @api.doc(description='Get devices that are associated with a project. By default, a device is also associated to '
-                         'the project\'s site. Only one "ID" parameter required and supported at once.',
+    @api.doc(description='Get devices that are associated with a project. Only one "ID" parameter required and '
+                         'supported at once.',
              responses={200: 'Success - returns list of devices - project association',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading devices for projects'})
@@ -65,9 +65,8 @@ class QueryDeviceProjects(Resource):
                 json_dj = dj.to_json()
                 if args['list'] is None:
                     json_dj['project_name'] = dj.device_project_project.project_name
-                    json_dj['device_name'] = dj.device_project_device_site.device_site_device.device_name
-                    json_dj['device_available'] = not dj.device_project_device_site.device_site_device.\
-                        device_participants
+                    json_dj['device_name'] = dj.device_project_device.device_name
+                    json_dj['device_available'] = not dj.device_project_device.device_participants
                 device_project_list.append(json_dj)
 
             return jsonify(device_project_list)
@@ -75,20 +74,16 @@ class QueryDeviceProjects(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
-    @api.doc(description='Create/update devices associated with a project. If the device is not associated to the '
-                         'project\'s site, the device will be associated if the user is a site admin, or an error will'
-                         'be returned otherwise',
+    @api.doc(description='Create/update devices associated with a project.',
              responses={200: 'Success',
-                        403: 'Logged user can\'t modify device association - the device is not associated to the '
-                             'project\'s site and the current user isn\'t admin of that site or the user isn\'t admin '
+                        403: 'Logged user can\'t modify device association - the user isn\'t admin '
                              'of the project or current user can\'t access the device.',
                         400: 'Badly formed JSON or missing fields(id_project or id_device) in the JSON body',
                         500: 'Internal error occured when saving device association'})
     def post(self):
         from libtera.db.models.TeraProject import TeraProject
-        from libtera.db.models.TeraDeviceSite import TeraDeviceSite
         # parser = post_parser
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
@@ -109,27 +104,6 @@ class QueryDeviceProjects(Resource):
                     json_device_project['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
                 return gettext('Accès refusé'), 403
 
-            # TODO: Check if device is associated with the parent site and get id_device_site
-            # Check if device is already associated with the project site
-            current_project = TeraProject.get_project_by_id(json_device_project['id_project'] )
-            if current_project is None:
-                return gettext('Projet inconnu', 400)
-
-            device_site = TeraDeviceSite.get_device_site_id_for_device_and_site(
-                device_id=json_device_project['id_device'], site_id=current_project.id_site)
-
-            if device_site is None:
-                # No association for that device for the parent site - create an association, if user has the rights to
-                if current_project.id_site in user_access.get_accessible_sites_ids(admin_only=True):
-                    # Can create
-                    device_site = TeraDeviceSite()
-                    device_site.id_device = json_device_project['id_device']
-                    device_site.id_site = current_project.id_site
-                    TeraDeviceSite.insert(device_site)
-                else:
-                    # No permission to create (site admin) - abord
-                    return gettext('Impossible d\'associer l\'appareil au site du projet'), 403
-
             # Check if already exists
             device_project = TeraDeviceProject.get_device_project_id_for_device_and_project(
                 device_id=json_device_project['id_device'], project_id=json_device_project['id_project'])
@@ -138,8 +112,6 @@ class QueryDeviceProjects(Resource):
                 json_device_project['id_device_project'] = device_project.id_device_project
             else:
                 json_device_project['id_device_project'] = 0
-
-            json_device_project['id_device_site'] = device_site.id_device_site
 
             # Do the update!
             if json_device_project['id_device_project'] > 0:
@@ -167,7 +139,7 @@ class QueryDeviceProjects(Resource):
 
         return jsonify(update_device_project)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific device-project association.',
              responses={200: 'Success',
@@ -188,18 +160,17 @@ class QueryDeviceProjects(Resource):
             return gettext('Non-trouvé'), 500
 
         if device_project.id_project not in user_access.get_accessible_projects_ids(admin_only=True) or \
-                device_project.device_project_device_site.id_device not in \
+                device_project.device_project_device.id_device not in \
                 user_access.get_accessible_devices_ids(admin_only=True):
             return gettext('Accès refusé'), 403
 
         # Delete participants associated with that device, since the project was changed.
         associated_participants = TeraDeviceParticipant.query_participants_for_device(
-            device_id=device_project.device_project_device_site.id_device)
+            device_id=device_project.device_project_device.id_device)
         for part in associated_participants:
-            if part.device_participant_participant.participant_participant_group.participant_group_project.id_project ==\
-                    device_project.id_project:
+            if part.device_participant_participant.participant_project.id_project == device_project.id_project:
                 device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
-                    device_id=device_project.device_project_device_site.id_device, participant_id=part.id_participant)
+                    device_id=device_project.device_project_device.id_device, participant_id=part.id_participant)
                 if device_part:
                     TeraDeviceParticipant.delete(device_part.id_device_participant)
 

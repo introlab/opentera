@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
-from modules.LoginModule.LoginModule import multi_auth
+from flask_restplus import Resource, reqparse, inputs
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
@@ -13,7 +13,7 @@ from flask_babel import gettext
 get_parser = api.parser()
 get_parser.add_argument('id_project', type=int, help='Project ID to query associated session types from')
 get_parser.add_argument('id_session_type', type=int, help='Session type ID to query associated projects from')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information (ids only)')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ids only)')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('session_type_project', type=str, location='json',
@@ -31,7 +31,7 @@ class QuerySessionTypeProject(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get devices types that are associated with a project. Only one "ID" parameter required and '
                          'supported at once.',
@@ -72,7 +72,7 @@ class QuerySessionTypeProject(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create/update session-type - project association.',
              responses={200: 'Success',
@@ -135,7 +135,7 @@ class QuerySessionTypeProject(Resource):
 
         return jsonify(update_stp)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific session-type - project association.',
              responses={200: 'Success',

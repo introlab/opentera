@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
@@ -28,7 +28,7 @@ class QuerySites(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get site information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of sites',
@@ -80,7 +80,7 @@ class QuerySites(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update site. id_site must be set to "0" to create a new '
                          'site. A site can be created/modified if the user has admin rights to the site itself or is'
@@ -134,7 +134,7 @@ class QuerySites(Resource):
 
         return jsonify([update_site.to_json()])
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific site',
              responses={200: 'Success',

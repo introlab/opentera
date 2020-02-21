@@ -1,6 +1,7 @@
 from flask import jsonify, session
+from flask_login import logout_user
 from flask_restplus import Resource, reqparse, fields
-from modules.LoginModule.LoginModule import http_auth
+from modules.LoginModule.LoginModule import participant_multi_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 
 
@@ -17,22 +18,14 @@ class ParticipantLogout(Resource):
         Resource.__init__(self, _api)
 
     @api.expect(get_parser)
-    @api.doc(description='To be documented '
-                         'To be documented',
-             responses={200: 'Success - To be documented',
+    @api.doc(description='Logout participant',
+             responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
-        return '', 501
+        print('logout participant')
+        logout_user()
+        session.clear()
+        return "Participant logged out.", 200
 
-    # Handle auth
-    @api.expect(post_parser)
-    @api.doc(description='To be documented '
-                         'To be documented',
-             responses={200: 'Success - To be documented',
-                        500: 'Required parameter is missing',
-                        501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
-    def post(self):
-        return '', 501

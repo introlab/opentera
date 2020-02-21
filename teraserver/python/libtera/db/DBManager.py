@@ -12,11 +12,11 @@ from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraDeviceType import TeraDeviceType
+from libtera.db.models.TeraDeviceSubType import TeraDeviceSubType
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraDeviceData import TeraDeviceData
-from libtera.db.models.TeraDeviceSite import TeraDeviceSite
 from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
@@ -31,6 +31,7 @@ from modules.FlaskModule.FlaskModule import flask_app
 # User access with roles
 from .DBManagerTeraUserAccess import DBManagerTeraUserAccess
 from .DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
+from .DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
 
 # Alembic
 from alembic.config import Config
@@ -58,6 +59,11 @@ class DBManager:
     @staticmethod
     def deviceAccess(device: TeraDevice):
         access = DBManagerTeraDeviceAccess(device=device)
+        return access
+
+    @staticmethod
+    def participantAccess(participant: TeraParticipant):
+        access = DBManagerTeraParticipantAccess(participant=participant)
         return access
 
     def create_defaults(self, config: ConfigManager):
@@ -89,10 +95,13 @@ class DBManager:
             print('No device types - creating defaults')
             TeraDeviceType.create_defaults()
 
+        if TeraDeviceSubType.get_count() == 0:
+            print("No device sub types - creating defaults")
+            TeraDeviceSubType.create_defaults()
+
         if TeraDevice.get_count() == 0:
             print('No device - creating defaults')
             TeraDevice.create_defaults()
-            TeraDeviceSite.create_defaults()
             TeraDeviceProject.create_defaults()
             TeraDeviceParticipant.create_defaults()
 

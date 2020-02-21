@@ -1,6 +1,6 @@
 from flask import jsonify, session, request, send_file #send_from_directory
 from flask_restplus import Resource, reqparse, inputs, fields
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.FlaskModule import flask_app
 from libtera.db.models.TeraUser import TeraUser
@@ -18,9 +18,10 @@ get_parser.add_argument('id_device_data', type=int, help='Specific ID of device 
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all data')
 get_parser.add_argument('id_session', type=int, help='ID of session from which to request all data')
 get_parser.add_argument('id_participant', type=int, help='ID of participant from which to request all data')
-get_parser.add_argument('download', type=bool, help='If this flag is set, data will be downloaded instead of queried. '
-                                                    'In the case there\'s multiple files in the dataset, data will be '
-                                                    'zipped before the download process begins')
+get_parser.add_argument('download', type=inputs.boolean,
+                        help='If this flag is set, data will be downloaded instead of queried. '
+                        'In the case there\'s multiple files in the dataset, data will be '
+                        'zipped before the download process begins')
 
 delete_parser = api.parser()
 delete_parser.add_argument('id', type=int, help='Specific device data ID to delete', required=True)
@@ -32,7 +33,7 @@ class QueryDeviceData(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get device data information. Optionaly download the data. '
                          'Only one of the ID parameter is supported at once',
@@ -108,9 +109,9 @@ class QueryDeviceData(Resource):
 
                 response = send_file(zip_ram, as_attachment=True, attachment_filename=file_name + '.zip',
                                      mimetype='application/octet-stream')
-                response.headers.extend({
-                  'Content-Length': zip_ram.getbuffer().nbytes
-                })
+                # response.headers.extend({
+                #   'Content-Length': zip_ram.getbuffer().nbytes
+                # })
                 return response
             else:
                 # filename = tmp_dir + '/' + datas[0].devicedata_original_filename
@@ -118,7 +119,7 @@ class QueryDeviceData(Resource):
                 return send_file(src_dir + '/' + str(datas[0].devicedata_uuid), as_attachment=True,
                                  attachment_filename=filename)
 
-    # @multi_auth.login_required
+    # @user_multi_auth.login_required
     # def post(self):
     #     parser = reqparse.RequestParser()
     #     parser.add_argument('device_data', type=str, location='json', help='Device to create / update', required=True)
@@ -172,7 +173,7 @@ class QueryDeviceData(Resource):
     #
     #     return '', 501
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.doc(description='Delete device data, including all related files.',
              responses={200: 'Success - device data and all related files deleted',
                         500: 'Database or file deletion error occurred',

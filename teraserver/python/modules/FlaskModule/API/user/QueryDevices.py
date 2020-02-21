@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse, inputs
-from modules.LoginModule.LoginModule import multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDevice import TeraDevice
@@ -10,17 +10,19 @@ from libtera.db.DBManager import DBManager
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('id_device', type=int, help='ID of the device to query'
-                        )
+get_parser.add_argument('id_device', type=int, help='ID of the device to query')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
-get_parser.add_argument('id_device_type', type=int, help='ID of device type from which to get all devices')
-get_parser.add_argument('available', type=bool, help='Flag that indicates if only available (devices not associated to '
-                                                     'a participant) should be returned')
-get_parser.add_argument('participants', type=bool, help='Flag that indicates if associated participant(s) information '
-                                                        'should be included in the returned device list')
-get_parser.add_argument('sites', type=bool, help='Flag that indicates if associated site(s) information should be '
-                                                 'included in the returned device list')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all associated devices')
+get_parser.add_argument('device_type', type=int, help='ID of device type from which to get all devices. Can be '
+                                                      'combined with id_site or id_project.')
+get_parser.add_argument('available', type=inputs.boolean, help='Flag that indicates if only available (devices not '
+                                                               'associated to a participant) should be returned')
+get_parser.add_argument('participants', type=inputs.boolean, help='Flag that indicates if associated participant(s) '
+                                                                  'information should be included in the returned '
+                                                                  'device list')
+get_parser.add_argument('sites', type=inputs.boolean, help='Flag that indicates if associated site(s) information '
+                                                           'should be included in the returned device list')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('device', type=str, location='json', help='Device to create / update', required=True)
@@ -35,10 +37,10 @@ class QueryDevices(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get devices information. Only one of the ID parameter is supported at once. If no ID is '
-                         'specified, returns all accessible devices for the logged user',
+                         'specified, returns all accessible devices for the logged user.',
              responses={200: 'Success - returns list of devices',
                         500: 'Database error'})
     def get(self):
@@ -51,18 +53,17 @@ class QueryDevices(Resource):
 
         devices = []
         # If we have no arguments, return all accessible devices
-        if not args['id_device'] and not args['id_site'] and not args['id_device_type']:
+        if not args['id_device'] and not args['id_site'] and not args['device_type'] and not args['id_project']:
             devices = user_access.get_accessible_devices()
         elif args['id_device']:
             devices = [user_access.query_device_by_id(device_id=args['id_device'])]
-        elif args['id_device_type']:
-            if args['id_site']:
-                devices = user_access.query_devices_by_type_by_site(args['id_device_type'], args['id_site'])
-            else:
-                devices = user_access.query_devices_by_type(args['id_device_type'])
         elif args['id_site']:
             # Check if has access to the requested site
-            devices = user_access.query_devices_for_site(args['id_site'])
+            devices = user_access.query_devices_for_site(args['id_site'], args['device_type'])
+        elif args['id_project']:
+            devices = user_access.query_devices_for_project(args['id_project'], args['device_type'])
+        elif args['device_type']:
+            devices = user_access.query_devices_by_type(args['device_type'])
 
         # if args['available'] is not None:
         #     if args['available']:
@@ -86,27 +87,26 @@ class QueryDevices(Resource):
                         for part in dev_participants:
                             part_info = {'id_participant': part.id_participant,
                                          'participant_name': part.participant_name,
-                                         'id_project':
-                                             part.participant_participant_group.participant_group_project.id_project
+                                         'id_project': part.participant_project.id_project
                                          }
                             # if args['list'] is None:
                             #    part_info['participant_name'] = part.participant_name
                             # part_info['id_project'] = part.participant_participant_group.participant_group_project.\
                             #     id_project
                             if args['list'] is None:
-                                part_info['project_name'] = part.participant_participant_group.participant_group_project\
-                                    .project_name
+                                part_info['project_name'] = part.participant_project.project_name
                             parts.append(part_info)
                         device_json['device_participants'] = parts
 
                     if args['sites'] is not None:
                         # Add sites
                         sites_list = []
-                        for device_site in device.device_sites:
+                        device_sites = user_access.query_sites_for_device(device.id_device)
+                        for device_site in device_sites:
                             ignore_site_fields = []
                             if args['list'] is not None:
                                 ignore_site_fields = ['site_name']
-                            site_json = device_site.device_site_site.to_json(ignore_fields=ignore_site_fields)
+                            site_json = device_site.to_json(ignore_fields=ignore_site_fields)
                             sites_list.append(site_json)
 
                         device_json['device_sites'] = sites_list
@@ -115,13 +115,14 @@ class QueryDevices(Resource):
                     #         device_json['id_kit'] = device.device_kits[0].id_kit
                     #         device_json['kit_name'] = device.device_kits[0].kit_device_kit.kit_name
                     #         device_json['kit_device_optional'] = device.device_kits[0].kit_device_optional
+
                     device_list.append(device_json)
             return jsonify(device_list)
 
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update devices. id_device must be set to "0" to create a new device. Only '
                          'superadmins can create new devices.',
@@ -176,7 +177,7 @@ class QueryDevices(Resource):
 
         return jsonify([update_device.to_json()])
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific device',
              responses={200: 'Success',

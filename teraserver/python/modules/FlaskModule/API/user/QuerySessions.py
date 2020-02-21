@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
-from modules.LoginModule.LoginModule import multi_auth
+from flask_restplus import Resource, reqparse, inputs
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSession import TeraSession
@@ -13,7 +13,7 @@ from flask_babel import gettext
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query')
 get_parser.add_argument('id_participant', type=int, help='ID of the participant from which to get all sessions')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
@@ -28,7 +28,7 @@ class QuerySessions(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get sessions information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of sessions',
@@ -68,7 +68,7 @@ class QuerySessions(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update session. id_session must be set to "0" to create a new '
                          'session. A session can be created/modified if the user has access to at least one participant'
@@ -146,7 +146,7 @@ class QuerySessions(Resource):
 
         return jsonify([update_session.to_json()])
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific session',
              responses={200: 'Success',

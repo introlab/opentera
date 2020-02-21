@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package opentera.protobuf;
+
+message ParticipantEvent {
+
+    enum EventType
+    {
+        PARTICIPANT_CONNECTED = 0;
+        PARTICIPANT_DISCONNECTED = 1;
+        PARTICIPANT_DELETED = 2;
+        PARTICIPANT_ADDED = 3;
+    }
+    string participant_uuid = 1;
+    EventType type = 2;
+
+}

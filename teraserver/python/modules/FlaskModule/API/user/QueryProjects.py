@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
-from modules.LoginModule.LoginModule import multi_auth
+from flask_restplus import Resource, reqparse, inputs
+from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -15,7 +15,7 @@ get_parser.add_argument('id_project', type=int, help='ID of the project to query
 get_parser.add_argument('id', type=int, help='Alias for "id_project"')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all projects')
 get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get all projects that are accessible')
-get_parser.add_argument('list', type=bool, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('project', type=str, location='json', help='Project to create / update', required=True)
@@ -30,7 +30,7 @@ class QueryProjects(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get projects information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of participants',
@@ -83,7 +83,7 @@ class QueryProjects(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update projects. id_project must be set to "0" to create a new '
                          'project. A project can be created/modified if the user has admin rights to the '
@@ -142,7 +142,7 @@ class QueryProjects(Resource):
 
         return jsonify([update_project.to_json()])
 
-    @multi_auth.login_required
+    @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific project',
              responses={200: 'Success',
