@@ -127,6 +127,15 @@ class DBManagerTeraUserAccess:
             device_types.append(dt.id_device_type)
         return device_types
 
+    def get_accessible_devices_subtypes(self, admin_only=False):
+        device_subtypes = []
+        accessible_dts = self.get_accessible_devices_types(admin_only=admin_only)
+        for dt in accessible_dts:
+            subtypes = TeraDeviceSubType.get_device_subtypes_for_type(dt.id_device_type)
+            device_subtypes.extend(subtypes)
+
+        return device_subtypes
+
     def get_accessible_participants(self, admin_only=False):
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
         # groups = TeraParticipantGroup.query.filter(TeraParticipantGroup.id_project.in_(project_id_list)).all()
