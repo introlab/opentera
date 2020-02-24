@@ -48,12 +48,12 @@ class TeraDevice(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields += ['device_projects', 'device_participants',  'device_token', 'device_certificate', 'secret',
+        ignore_fields += ['device_projects', 'device_participants', 'device_certificate', 'secret',
                           'device_subtype']
 
         if minimal:
             ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_config', 'device_notes',
-                              'device_lastonline', 'device_infos']
+                              'device_lastonline', 'device_infos',  'device_token']
 
         device_json = super().to_json(ignore_fields=ignore_fields)
 
