@@ -164,8 +164,9 @@ class QueryParticipants(Resource):
                 json_participant['id_project'] = participant_group.id_project
 
         # If participant group = 0, set it to none
-        if json_participant['id_participant_group'] == 0:
-            json_participant['id_participant_group'] = None
+        if 'id_participant_group' in json_participant:
+            if json_participant['id_participant_group'] == 0:
+                json_participant['id_participant_group'] = None
 
         # Do the update!
         if json_participant['id_participant'] > 0:

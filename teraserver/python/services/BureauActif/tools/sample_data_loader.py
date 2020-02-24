@@ -1,7 +1,4 @@
 import os
-import sys
-from requests import get, post
-import json
 import csv
 
 
@@ -103,6 +100,9 @@ def load_data_from_path(path):
                 else:
                     print('Unknown file:', file, ' skipping...')
 
+        return file_data
 
-if __name__ == '__main__':
-    load_data_from_path('/Users/dominic/Downloads/Rasp8')
+
+# if __name__ == '__main__':
+#     result = load_data_from_path('/Users/dominic/Downloads/Rasp8')
+#     print(result)
