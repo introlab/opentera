@@ -197,7 +197,7 @@ if __name__ == '__main__':
     config = Config()
 
     # Get data from files
-    result = load_data_from_path('/Users/dominic/Downloads/Rasp8')
+    result = load_data_from_path('C:\Data\Rasp8')
 
     # Login admin
     admin_info = login_user(config)
