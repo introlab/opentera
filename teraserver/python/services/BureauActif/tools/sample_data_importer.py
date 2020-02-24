@@ -18,12 +18,14 @@ class Config:
     user_device_endpoint = '/api/user/devices'
     user_device_project_endpoint = '/api/user/deviceprojects'
     user_device_participant_endpoint = '/api/user/deviceparticipants'
+    user_session_type_project = '/api/user/sessiontypeprojects'
 
     # Device endpoints
     device_login_endpoint = '/api/device/login'
     device_session_endpoint = '/api/device/sessions'
+    device_session_data_endpoint = '/api/device/device_upload'
 
-
+    # Super secure.
     username = 'admin'
     password = 'admin'
 
@@ -132,19 +134,61 @@ def add_device_participant(config: Config, id_participant: int, id_device: int):
     return {}
 
 
-def create_device_session(config: Config, session_participants: list, id_session_type: int):
-    url = _make_url(config.hostname, config.port, config.device_session_endpoint)
+def create_device_session(config: Config, token: str, session_name: str,
+                          session_datetime: datetime, session_participants: list, id_session_type: int):
+    url = _make_url(config.hostname, config.port, config.device_session_endpoint) + '?token=' + token
     try:
         session_dict = {'session': {'id_session': 0,
-                                    'id_session_type': 2,  # TODO get session types from server
+                                    'session_name': session_name,
+                                    'session_start_datetime': str(session_datetime),
+                                    'session_status': 0,  # Not started...
+                                    'id_session_type': id_session_type,
                                     'session_participants': session_participants}}
 
-        response = post(url=url, json=session_dict, verify=False, auth=(config.username, config.password))
+        response = post(url=url, json=session_dict, verify=False)
+    except:
+        return {}
+
+    if response.status_code == 200:
+        return response.json()
+    return {}
+
+
+def add_session_type_project(config: Config, id_project: int, id_session_type: int):
+
+    url = _make_url(config.hostname, config.port, config.user_session_type_project)
+    try:
+        session_type_project_dict = {'session_type_project': {'id_project': id_project,
+                                                              'id_session_type': id_session_type}}
+        response = post(url=url, json=session_type_project_dict, verify=False, auth=(config.username, config.password))
     except:
         return {}
 
     if response.status_code == 200:
         return response.json().pop()
+    return {}
+
+
+def create_session_data(config: Config, token: str, filename: str, data, id_session: int,
+                        date: datetime = datetime.now()):
+    url = _make_url(config.hostname, config.port, config.device_session_data_endpoint) + '?token=' + token
+
+    # id_session = int(request.headers['X-Id-Session'])
+    # filename = secure_filename(request.headers['X-Filename'])
+    # creation_date = datetime.datetime.strptime(request.headers['X-Filedate'], '%Y-%m-%d %H:%M:%S')
+
+    try:
+        request_headers = {'X-Id-Session':  str(id_session),
+                           'X-Filename': filename,
+                           'X-Filedate': date.strftime('%Y-%m-%d %H:%M:%S'),
+                           'Content-Type': 'application/octet-stream'}
+
+        response = post(url=url, data=data, headers=request_headers, verify=False)
+    except:
+        return {}
+
+    if response.status_code == 200:
+        return response.json()
     return {}
 
 
@@ -161,12 +205,28 @@ if __name__ == '__main__':
     # create_participant(config1, 'PartBA_1')
     site_info = create_site(config, 'Bureau Actif Site ' + str(datetime.now()))
     project_info = create_project(config, 'Projet Bureau Actif', site_info['id_site'])
+    project_session_type_info = add_session_type_project(config, project_info['id_project'], 2)
+
     participant_info = create_participant(config, 'MyParticipant', project_info['id_project'])
     device_info = create_device(config, 'MonBureau')
     device_project_info = add_device_project(config, project_info['id_project'], device_info['id_device'])
     device_participant_info = add_device_participant(config, participant_info['id_participant'],
                                                      device_info['id_device'])
 
-    print(site_info, project_info, participant_info, device_info, device_project_info, device_participant_info)
+    # TODO get session types from server
+    device_session_info = create_device_session(config,
+                                                device_info['device_token'], 'MySession', datetime.now(),
+                                                [participant_info['participant_uuid']], 2)
+
+    create_session_data(config, device_info['device_token'], 'MyFile', [], device_session_info['id_session'],
+                        datetime.now())
+
+    print(site_info, project_info,
+          participant_info,
+          device_info,
+          project_session_type_info,
+          device_project_info,
+          device_participant_info,
+          device_session_info)
 
 
