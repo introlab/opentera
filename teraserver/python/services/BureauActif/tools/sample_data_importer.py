@@ -141,7 +141,7 @@ def create_device_session(config: Config, token: str, session_name: str,
         session_dict = {'session': {'id_session': 0,
                                     'session_name': session_name,
                                     'session_start_datetime': str(session_datetime),
-                                    'session_status': 0,  # Not started...
+                                    'session_status': 2,  # Done...
                                     'id_session_type': id_session_type,
                                     'session_participants': session_participants}}
 
@@ -205,6 +205,7 @@ if __name__ == '__main__':
     # create_participant(config1, 'PartBA_1')
     site_info = create_site(config, 'Bureau Actif Site ' + str(datetime.now()))
     project_info = create_project(config, 'Projet Bureau Actif', site_info['id_site'])
+    # TODO get session types from server, hardcoded to 2 = SENSOR_DATA
     project_session_type_info = add_session_type_project(config, project_info['id_project'], 2)
 
     participant_info = create_participant(config, 'MyParticipant', project_info['id_project'])
@@ -213,20 +214,30 @@ if __name__ == '__main__':
     device_participant_info = add_device_participant(config, participant_info['id_participant'],
                                                      device_info['id_device'])
 
-    # TODO get session types from server
-    device_session_info = create_device_session(config,
-                                                device_info['device_token'], 'MySession', datetime.now(),
-                                                [participant_info['participant_uuid']], 2)
+    # Config from results, remove from dict
+    device_config = result['config']
+    del result['config']
 
-    create_session_data(config, device_info['device_token'], 'MyFile', [], device_session_info['id_session'],
-                        datetime.now())
+    for key in result:
+        # TODO get session types from server, hardcoded to 2 = SENSOR_DATA
+        print('Processing: ', key)
 
-    print(site_info, project_info,
-          participant_info,
-          device_info,
-          project_session_type_info,
-          device_project_info,
-          device_participant_info,
-          device_session_info)
+        # Put config in each datasets
+        result[key]['config'] = device_config
+
+        # Get time from key
+        device_date = datetime.strptime(key, '%Y-%m-%d')
+
+        # Create json data
+        device_data = json.dumps(result[key])
+
+        # Create session
+        device_session_info = create_device_session(config,
+                                                    device_info['device_token'], 'Session-' + key, device_date,
+                                                    [participant_info['participant_uuid']], 2)
+
+        # Send data
+        create_session_data(config, device_info['device_token'], key + '.json', device_data.encode('utf-8'),
+                            device_session_info['id_session'], device_date)
 
 
