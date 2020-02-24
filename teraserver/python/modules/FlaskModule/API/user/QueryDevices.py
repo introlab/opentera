@@ -167,8 +167,6 @@ class QueryDevices(Resource):
                 TeraDevice.insert(new_device)
                 # Update ID for further use
                 json_device['id_device'] = new_device.id_device
-                # Add token to ease device login
-                json_device['device_token'] = new_device.device_token
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
