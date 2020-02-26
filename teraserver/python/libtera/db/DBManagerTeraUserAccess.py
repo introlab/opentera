@@ -201,7 +201,8 @@ class DBManagerTeraUserAccess:
 
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
         # return TeraSessionType.query.filter(TeraProject.id_project.in_(project_id_list)).all()
-        return TeraSessionType.query.join(TeraSessionTypeProject).filter(TeraSessionTypeProject.id_project.in_(project_id_list)).all()
+        return TeraSessionType.query.join(TeraSessionTypeProject)\
+            .filter(TeraSessionTypeProject.id_project.in_(project_id_list)).all()
 
     def get_accessible_session_types_ids(self, admin_only=False):
         st_ids = []
@@ -210,6 +211,20 @@ class DBManagerTeraUserAccess:
             st_ids.append(st.id_session_type)
 
         return st_ids
+
+    def get_accessible_sessions(self, admin_only=False):
+        from libtera.db.models.TeraSession import TeraSession
+        part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
+        return TeraSession.query.join(TeraSession.session_participants).\
+            filter(TeraParticipant.id_participant.in_(part_ids)).all()
+
+    def get_accessible_sessions_ids(self, admin_only=False):
+        ses_ids = []
+
+        for ses in self.get_accessible_sessions(admin_only=admin_only):
+            ses_ids.append(ses.id_session)
+
+        return ses_ids
 
     def get_projects_roles(self):
         projects_roles = {}
@@ -479,3 +494,12 @@ class DBManagerTeraUserAccess:
             .filter_by(id_project=project_id).all()
         return session_types
 
+    def query_assets_for_service(self, uuid_service: str):
+        from libtera.db.models.TeraAsset import TeraAsset
+        from sqlalchemy import or_
+
+        session_ids = self.get_accessible_sessions_ids()
+        device_ids = self.get_accessible_devices_ids()
+        return TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids))\
+            .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None))\
+            .filter(TeraAsset.asset_service_uuid == uuid_service).all()

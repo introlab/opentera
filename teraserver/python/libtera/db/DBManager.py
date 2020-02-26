@@ -23,6 +23,7 @@ from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceTyp
 from libtera.db.models.TeraServerSettings import TeraServerSettings
 from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent
+from libtera.db.models.TeraAsset import TeraAsset
 
 from libtera.ConfigManager import ConfigManager
 
@@ -116,6 +117,7 @@ class DBManager:
             TeraSession.create_defaults()
             TeraDeviceData.create_defaults(config.server_config['upload_path'])
             TeraSessionEvent.create_defaults()
+            TeraAsset.create_defaults()
 
     def open(self, db_infos, echo=False):
         self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
