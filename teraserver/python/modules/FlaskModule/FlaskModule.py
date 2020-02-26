@@ -210,11 +210,12 @@ class FlaskModule(BaseModule):
         # flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
         #                                                                                    **kwargs))
 
-    @flask_app.after_request
-    def apply_caching(response):
-        # This is required to expose the backend API to rendered webpages from other sources, such as services
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "*"
-        response.headers["Access-Control-Allow-Methods"] = "*"
-        return response
+
+@flask_app.after_request
+def apply_caching(response):
+    # This is required to expose the backend API to rendered webpages from other sources, such as services
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    return response
 

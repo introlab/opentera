@@ -1,6 +1,6 @@
 from flask import Flask, request, g
 from flask_session import Session
-from flask_restful import Api
+from flask_restplus import Api
 from .ConfigManager import ConfigManager
 from flask_babel import Babel
 
@@ -11,6 +11,28 @@ flask_app = Flask("BureauActifService")
 
 # Translations
 babel = Babel(flask_app)
+
+# API
+# TODO - Fix auth
+authorizations = {
+    'HTTPAuth': {
+        'type': 'basic',
+        'in': 'header'
+    },
+    'Token Authentication': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'OpenTera'
+    }
+}
+
+api = Api(flask_app,
+          version='1.0.0', title='BureauActifService API',
+          description='BureauActifService API Documentation', doc='/doc',
+          authorizations=authorizations)
+
+# Namespaces
+default_api_ns = api.namespace('api', description='default API')
 
 
 @babel.localeselector
@@ -55,16 +77,12 @@ class FlaskModule(BaseModule):
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
 
         self.session = Session(flask_app)
-        self.api = Api(flask_app)
 
         # Init API
         self.init_api()
 
         # Init Views
         self.init_views()
-
-        # Init API docs
-        self.init_api_docs()
 
     def setup_module_pubsub(self):
         # Additional subscribe
@@ -78,7 +96,13 @@ class FlaskModule(BaseModule):
         pass
 
     def init_api(self):
-        pass
+        # Default arguments
+        kwargs = {'flaskModule': self}
+
+        from .API.Upload import Upload
+
+        # Resources
+        default_api_ns.add_resource(Upload, '/upload', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from .Views.Index import Index
@@ -89,9 +113,14 @@ class FlaskModule(BaseModule):
         kwargs = {'flaskModule': self}
 
         # Will create a function that calls the __index__ method with args, kwargs
-        flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
+        flask_app.add_url_rule('/index', view_func=Index.as_view('index', *args, **kwargs))
         flask_app.add_url_rule('/login', view_func=Login.as_view('login', *args, **kwargs))
 
-    def init_api_docs(self):
-        pass
 
+@flask_app.after_request
+def apply_caching(response):
+    # This is required to expose the backend API to rendered webpages from other sources, such as services
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    return response
