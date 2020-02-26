@@ -69,6 +69,5 @@ class TeraClient:
 
         return 'Undefined'
 
-
     def __repr__(self):
         return '<TeraClient - UUID: ' + self.__user_uuid + ', Token: ' + self.__user_token + '>'
