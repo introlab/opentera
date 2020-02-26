@@ -1,5 +1,5 @@
-from services.BureauActif.libbureauactif.db.Base import db, BaseModel
-import uuid
+from services.BureauActif.libbureauactif.db.Base import db
+from libtera.db.Base import BaseModel
 import datetime
 import os
 
