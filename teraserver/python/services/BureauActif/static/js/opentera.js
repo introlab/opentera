@@ -24,7 +24,7 @@ function getCookie(cname) {
 function doGetRequest(request_url, request_port, request_path){
     $.ajax({
           type: "GET",
-          url: 'https://' + request_url + ':' + request_port + request_path,
+          url: 'https://' + request_url + request_path,
           success: getRequestSuccess,
           error: getRequestError,
           beforeSend: function (xhr) {

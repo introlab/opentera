@@ -1,5 +1,5 @@
 from flask.views import MethodView
-from flask import render_template
+from flask import render_template, request
 
 
 class Login(MethodView):
@@ -18,6 +18,11 @@ class Login(MethodView):
         port = self.flaskModule.config.server_config['port']
         backend_hostname = self.flaskModule.config.backend_config['hostname']
         backend_port = self.flaskModule.config.backend_config['port']
+        if 'X_EXTERNALHOST' in request.headers:
+            backend_hostname = request.headers['X_EXTERNALHOST'];
+
+        if 'X_EXTERNALPORT' in request.headers:
+            backend_port = request.headers['X_EXTERNALPORT'];
 
         # Render page
         return render_template('login.html', hostname=hostname, port=port,

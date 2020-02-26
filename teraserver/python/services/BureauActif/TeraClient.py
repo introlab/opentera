@@ -2,6 +2,7 @@ import uuid
 from services.BureauActif.Globals import config_man
 from requests import Response
 
+
 class TeraClient:
 
     def __init__(self, u_uuid: uuid, token: str):

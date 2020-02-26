@@ -29,7 +29,8 @@ import os
 class MyHTTPChannel(HTTPChannel):
     def allHeadersReceived(self):
         # Verify if we have a client with a certificate...
-        cert = self.transport.getPeerCertificate()
+        # cert = self.transport.getPeerCertificate()
+        cert = getattr(self.transport, "getPeerCertificate", None)
 
         # Current request
         req = self.requests[-1]
@@ -138,7 +139,8 @@ class TwistedModule(BaseModule):
         ctx.load_verify_locations(self.config.server_config['ssl_path'] + '/'
                                   + self.config.server_config['ca_certificate'])
 
-        reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
+        # reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
+        reactor.listenTCP(self.config.server_config['port'], site)
 
     def __del__(self):
         pass

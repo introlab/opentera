@@ -23,7 +23,6 @@ if __name__ == '__main__':
     }
 
     # Global redis client
-
     Globals.redis_client = RedisClient(config_man.redis_config)
     Globals.api_user_token_key = Globals.redis_client.redisGet(TeraServerConstants.RedisVar_UserTokenAPIKey)
 

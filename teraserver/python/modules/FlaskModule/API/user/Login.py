@@ -1,4 +1,4 @@
-from flask import jsonify, session
+from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse, fields
 from modules.LoginModule.LoginModule import user_http_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -28,6 +28,11 @@ class Login(Resource):
         # Redis key is handled in LoginModule
         servername = self.module.config.server_config['hostname']
         port = self.module.config.server_config['port']
+        if 'X_EXTERNALHOST' in request.headers:
+            servername = request.headers['X_EXTERNALHOST'];
+
+        if 'X_EXTERNALPORT' in request.headers:
+            port = request.headers['X_EXTERNALPORT'];
 
         # Get user token key from redis
         from modules.Globals import TeraServerConstants
