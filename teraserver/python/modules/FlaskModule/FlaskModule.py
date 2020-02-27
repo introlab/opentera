@@ -158,6 +158,7 @@ class FlaskModule(BaseModule):
 
         # Devices
         from .API.device.DeviceLogin import DeviceLogin
+        from .API.device.DeviceLogout import DeviceLogout
         from .API.device.DeviceUpload import DeviceUpload
         from .API.device.DeviceRegister import DeviceRegister
         from .API.device.DeviceQuerySessions import DeviceQuerySessions
@@ -165,6 +166,7 @@ class FlaskModule(BaseModule):
 
         # Resources
         device_api_ns.add_resource(DeviceLogin, '/device_login', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceLogout, '/device_logout', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceUpload, '/device_upload', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceRegister, '/device_register', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
