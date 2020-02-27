@@ -32,7 +32,7 @@ class Login(Resource):
             if ':' in request.headers['X_EXTERNALHOST']:
                 servername, port = request.headers['X_EXTERNALHOST'].split(':', 1)
             else:
-                servername, port = request.headers['X_EXTERNALHOST']
+                servername = request.headers['X_EXTERNALHOST']
 
         if 'X_EXTERNALPORT' in request.headers:
             port = request.headers['X_EXTERNALPORT'];
