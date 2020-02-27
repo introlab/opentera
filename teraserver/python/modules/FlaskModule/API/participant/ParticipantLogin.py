@@ -1,4 +1,4 @@
-from flask import jsonify, session
+from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse, fields
 from modules.LoginModule.LoginModule import participant_http_auth, current_participant
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
@@ -37,6 +37,18 @@ class ParticipantLogin(Resource):
             # Redis key is handled in LoginModule
             servername = self.module.config.server_config['hostname']
             port = self.module.config.server_config['port']
+
+            if 'X_EXTERNALHOST' in request.headers:
+                if ':' in request.headers['X_EXTERNALHOST']:
+                    servername, port = request.headers['X_EXTERNALHOST'].split(':', 1)
+                else:
+                    servername = request.headers['X_EXTERNALHOST']
+
+            if 'X_EXTERNALPORT' in request.headers:
+                port = request.headers['X_EXTERNALPORT']
+
+            print('ParticipantLogin - setting key with expiration in 60s', session['_id'], session['_user_id'])
+            self.module.redisSet(session['_id'], session['_user_id'], ex=60)
 
             # Return reply as json object
             reply = {"websocket_url": "wss://" + servername + ":"

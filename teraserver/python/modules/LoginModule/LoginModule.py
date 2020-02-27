@@ -119,9 +119,8 @@ class LoginModule(BaseModule):
             current_user.update_last_online()
 
             login_user(current_user, remember=True)
-            print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
-
-            self.redisSet(session['_id'], session['_user_id'], ex=60)
+            # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
+            # self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
         return False
 
@@ -143,7 +142,6 @@ class LoginModule(BaseModule):
             if current_user:
                 current_user.update_last_online()
                 login_user(current_user, remember=True)
-                # TODO: Set user online in Redis??
                 return True
 
         return False
@@ -155,13 +153,12 @@ class LoginModule(BaseModule):
 
             _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_username(username)
 
-            print('participant_verify_password, found user: ', current_participant)
+            print('participant_verify_password, found participant: ', current_participant)
             current_participant.update_last_online()
 
             login_user(current_participant, remember=True)
-            print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
-
-            self.redisSet(session['_id'], session['_user_id'], ex=60)
+            # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
+            # self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
         return False
 
@@ -177,7 +174,6 @@ class LoginModule(BaseModule):
         if current_participant:
             current_participant.update_last_online()
             login_user(current_participant, remember=True)
-            # TODO: Set user online in Redis??
             return True
 
         return False
@@ -204,6 +200,7 @@ class LoginModule(BaseModule):
 
                 # Device must be found and enabled
                 if current_device and current_device.device_enabled:
+                    login_user(current_device, remember=True)
                     return f(*args, **kwargs)
 
             elif request.headers.__contains__('X-Participant-Uuid'):
@@ -212,6 +209,7 @@ class LoginModule(BaseModule):
                     request.headers['X-Participant-Uuid'])
 
                 if current_participant and current_participant.participant_enabled:
+                    login_user(current_participant, remember=True)
                     return f(*args, **kwargs)
 
             # Then verify tokens...
@@ -231,6 +229,7 @@ class LoginModule(BaseModule):
 
                     if current_participant and current_participant.participant_enabled:
                         # Returns the function if authenticated with token
+                        login_user(current_participant, remember=True)
                         return f(*args, **kwargs)
 
                     # Load device from DB
@@ -239,6 +238,7 @@ class LoginModule(BaseModule):
                     # Device must be found and enabled
                     if current_device and current_device.device_enabled:
                         # Returns the function if authenticated with token
+                        login_user(current_device, remember=True)
                         return f(*args, **kwargs)
 
             # Parse args
@@ -253,6 +253,7 @@ class LoginModule(BaseModule):
 
                 if current_participant and current_participant.participant_enabled:
                     # Returns the function if authenticated with token
+                    login_user(current_participant, remember=True)
                     return f(*args, **kwargs)
 
                 # Load device from DB
@@ -261,6 +262,7 @@ class LoginModule(BaseModule):
                 # Device must be found and enabled
                 if current_device and current_device.device_enabled:
                     # Returns the function if authenticated with token
+                    login_user(current_device, remember=True)
                     return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.

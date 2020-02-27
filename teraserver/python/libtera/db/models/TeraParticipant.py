@@ -76,6 +76,9 @@ class TeraParticipant(db.Model, BaseModel):
     def is_authenticated(self):
         return self.authenticated
 
+    def is_anonymous(self):
+        return False
+
     def is_active(self):
         return self.participant_enabled
 
@@ -121,6 +124,7 @@ class TeraParticipant(db.Model, BaseModel):
                 TeraServerSettings.ServerParticipantTokenKey), algorithms='HS256')
 
             if data['participant_uuid'] == participant.participant_uuid:
+                participant.authenticated = True
                 return participant
             else:
                 return None

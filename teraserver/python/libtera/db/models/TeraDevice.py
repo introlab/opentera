@@ -38,6 +38,8 @@ class TeraDevice(db.Model, BaseModel):
                                           back_populates="participant_devices")
     device_subtype = db.relationship('TeraDeviceSubType')
 
+    authenticated = False
+
     def __init__(self):
         self.secret = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerDeviceTokenKey)
         if self.secret is None:
@@ -58,6 +60,21 @@ class TeraDevice(db.Model, BaseModel):
         device_json = super().to_json(ignore_fields=ignore_fields)
 
         return device_json
+
+    def is_authenticated(self):
+        return self.authenticated
+
+    def is_anonymous(self):
+        return False
+
+    def is_active(self):
+        return self.device_enabled
+
+    def get_id(self):
+        return self.device_uuid
+
+    def is_login_enabled(self):
+        return self.device_onlineable
 
     def create_token(self):
         # Creating token with user info
@@ -92,7 +109,7 @@ class TeraDevice(db.Model, BaseModel):
 
                 # Update last online
                 device.update_last_online()
-
+                device.authenticated = True
                 return device
             else:
                 return None

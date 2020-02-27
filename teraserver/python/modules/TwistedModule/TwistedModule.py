@@ -7,7 +7,7 @@ from libtera.ConfigManager import ConfigManager
 from .TwistedModuleWebSocketServerFactory import TwistedModuleWebSocketServerFactory
 from .TeraWebSocketServerUserProtocol import TeraWebSocketServerUserProtocol
 from .TeraWebSocketServerParticipantProtocol import TeraWebSocketServerParticipantProtocol
-
+from .TeraWebSocketServerDeviceProtocol import TeraWebSocketServerDeviceProtocol
 
 # WebSockets
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
@@ -90,6 +90,14 @@ class TwistedModule(BaseModule):
         wss_participant_factory.protocol = TeraWebSocketServerParticipantProtocol
         wss_participant_resource = WebSocketResource(wss_participant_factory)
 
+        # DEVICES
+        wss_device_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % (self.config.server_config['hostname'],
+                                                          self.config.server_config['port']),
+                                                          redis_config=self.config.redis_config)
+
+        wss_device_factory.protocol = TeraWebSocketServerDeviceProtocol
+        wss_device_resource = WebSocketResource(wss_device_factory)
+
         # create a Twisted Web WSGI resource for our Flask server
         wsgi_resource = WSGIResource(reactor, reactor.getThreadPool(), flask_app)
 
@@ -108,6 +116,7 @@ class TwistedModule(BaseModule):
         wss_root = Data("", "text/plain")
         wss_root.putChild(b'user', wss_user_resource)
         wss_root.putChild(b'participant', wss_participant_resource)
+        wss_root.putChild(b'device', wss_device_resource)
 
         # Establish root resource
         root_resource = WSGIRootResource(wsgi_resource, {b'assets': static_resource, b'wss': wss_root})

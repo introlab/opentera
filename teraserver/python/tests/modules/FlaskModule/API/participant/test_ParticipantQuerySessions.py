@@ -18,7 +18,7 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
         pass
 
     def _make_url(self, hostname, port, endpoint):
-        return 'https://' + hostname + ':' + str(port) + endpoint
+        return 'http://' + hostname + ':' + str(port) + endpoint
 
     def _get_token_with_login_http_auth(self, username, password):
         url = self._make_url(self.host, self.port, self.login_endpoint)
