@@ -57,7 +57,6 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
         if binary:
             # Decode protobuf before parsing
-
             pass
 
         # Parse JSON (protobuf content)

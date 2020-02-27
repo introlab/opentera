@@ -31,6 +31,8 @@ class MyHTTPChannel(HTTPChannel):
         # Verify if we have a client with a certificate...
         # cert = self.transport.getPeerCertificate()
         cert = getattr(self.transport, "getPeerCertificate", None)
+        if cert:
+            cert = self.transport.getPeerCertificate()
 
         # Current request
         req = self.requests[-1]
@@ -148,8 +150,10 @@ class TwistedModule(BaseModule):
         ctx.load_verify_locations(self.config.server_config['ssl_path'] + '/'
                                   + self.config.server_config['ca_certificate'])
 
-        # reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
-        reactor.listenTCP(self.config.server_config['port'], site)
+        if self.config.server_config['use_ssl']:
+            reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
+        else:
+            reactor.listenTCP(self.config.server_config['port'], site)
 
     def __del__(self):
         pass
