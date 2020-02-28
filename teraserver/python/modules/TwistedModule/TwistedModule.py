@@ -115,7 +115,7 @@ class TwistedModule(BaseModule):
         # the path "/wss" served by our WebSocket stuff
         # root_resource = WSGIRootResource(wsgi_resource, {b'wss': wss_resource})
 
-        # Avoid using the wss resource with at root
+        # Avoid using the wss resource at root level
         wss_root = resource.ForbiddenResource()
 
         wss_root.putChild(b'user', wss_user_resource)
