@@ -19,6 +19,7 @@ from twisted.python.threadpool import ThreadPool
 from twisted.web.http import HTTPChannel
 from twisted.web.server import Site
 from twisted.web.static import File, Data
+from twisted.web import resource
 from twisted.web.wsgi import WSGIResource
 from twisted.python import log
 from OpenSSL import SSL
@@ -116,6 +117,9 @@ class TwistedModule(BaseModule):
 
         # TODO do better?
         wss_root = Data("", "text/plain")
+        # Avoid using the wss resource with at root
+        wss_root.forbidden = resource.ForbiddenResource()
+
         wss_root.putChild(b'user', wss_user_resource)
         wss_root.putChild(b'participant', wss_participant_resource)
         wss_root.putChild(b'device', wss_device_resource)
