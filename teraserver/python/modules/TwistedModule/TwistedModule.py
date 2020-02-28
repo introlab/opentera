@@ -18,7 +18,7 @@ from twisted.internet import reactor, ssl
 from twisted.python.threadpool import ThreadPool
 from twisted.web.http import HTTPChannel
 from twisted.web.server import Site
-from twisted.web.static import File, Data
+from twisted.web.static import File
 from twisted.web import resource
 from twisted.web.wsgi import WSGIResource
 from twisted.python import log
@@ -115,10 +115,8 @@ class TwistedModule(BaseModule):
         # the path "/wss" served by our WebSocket stuff
         # root_resource = WSGIRootResource(wsgi_resource, {b'wss': wss_resource})
 
-        # TODO do better?
-        wss_root = Data("", "text/plain")
         # Avoid using the wss resource with at root
-        wss_root.forbidden = resource.ForbiddenResource()
+        wss_root = resource.ForbiddenResource()
 
         wss_root.putChild(b'user', wss_user_resource)
         wss_root.putChild(b'participant', wss_participant_resource)
