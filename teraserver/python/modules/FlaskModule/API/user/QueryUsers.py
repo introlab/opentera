@@ -14,9 +14,10 @@ from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user to query')
 get_parser.add_argument('user_uuid', type=str, help='User UUID to query')
+get_parser.add_argument('username', type=str, help='Username of the user to query')
 get_parser.add_argument('self', type=inputs.boolean, help='Query information about the currently logged user')
-get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ID, name, '
-                                                'enabled)')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
+                                                          '(ID, name, enabled)')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
@@ -55,6 +56,8 @@ class QueryUsers(Resource):
                 users.append(current_user.get_user_by_id(args['id_user']))
         elif args['self'] is not None:
             users.append(current_user)
+        elif args['username'] is not None:
+            users.append(current_user.get_user_by_username(args['username']))
         else:
             # If we have no arguments, return all accessible users
             users = user_access.get_accessible_users()
@@ -175,7 +178,7 @@ class QueryUsers(Resource):
                 new_user.from_json(json_user)
                 TeraUser.insert(new_user)
                 # Update ID User for further use
-                json_user['id_user'] = new_user.id_user;
+                json_user['id_user'] = new_user.id_user
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())

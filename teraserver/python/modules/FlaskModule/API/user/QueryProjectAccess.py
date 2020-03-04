@@ -11,8 +11,9 @@ from libtera.db.DBManager import DBManager
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all projects roles')
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to request all users roles')
-get_parser.add_argument('admins', type=inputs.boolean, help='Flag to limit to projects from which the user is an admin or '
-                                                  'users in project that have the admin role')
+get_parser.add_argument('admins', type=inputs.boolean,
+                        help='Flag to limit to projects from which the user is an admin or '
+                             'users in project that have the admin role')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('project_access', type=str, location='json',
@@ -114,4 +115,3 @@ class QueryProjectAccess(Resource):
     # def delete(self):
     #
     #     return '', 501
-
