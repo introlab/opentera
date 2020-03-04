@@ -116,6 +116,8 @@ class QueryDevices(Resource):
                     #         device_json['kit_name'] = device.device_kits[0].kit_device_kit.kit_name
                     #         device_json['kit_device_optional'] = device.device_kits[0].kit_device_optional
 
+                    if device.id_device_subtype is not None:
+                        device_json['device_subtype'] = device.device_subtype.to_json()
                     device_list.append(device_json)
             return jsonify(device_list)
 

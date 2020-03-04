@@ -85,6 +85,7 @@ class QueryDeviceParticipants(Resource):
                 if args['list'] is None:
                     json_dp['participant_name'] = dp.device_participant_participant.participant_name
                     json_dp['device_name'] = dp.device_participant_device.device_name
+                    json_dp['device_participant_device'] = dp.device_participant_device.to_json()
                 device_part_list.append(json_dp)
 
             return jsonify(device_part_list)

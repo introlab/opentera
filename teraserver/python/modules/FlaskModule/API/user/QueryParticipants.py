@@ -13,14 +13,17 @@ from sqlalchemy import exc
 get_parser = api.parser()
 get_parser.add_argument('id_participant', type=int, help='ID of the participant to query')
 get_parser.add_argument('id', type=int, help='Alias for "id_participant"')
+get_parser.add_argument('username', type=str, help='Username of the participant to query')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all participants')
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all participants')
 get_parser.add_argument('id_group', type=int, help='ID of the participant groups from which to get all participants')
 get_parser.add_argument('id_session', type=int, help='ID of the session from which to get all participants')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all participants associated')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
-get_parser.add_argument('no_group', type=inputs.boolean, help='Flag that limits the returned data with only participants without'
-                                                    ' a group')
+get_parser.add_argument('full', type=inputs.boolean, help='Flag that expands the returned data to include all '
+                                                          'information')
+get_parser.add_argument('no_group', type=inputs.boolean,
+                        help='Flag that limits the returned data with only participants without a group')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('participant', type=str, location='json', help='Participant to create / update', required=True)
@@ -59,6 +62,8 @@ class QueryParticipants(Resource):
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
                 participants = [TeraParticipant.get_participant_by_id(args['id_participant'])]
+        elif args['username'] is not None:
+            participants = [TeraParticipant.get_participant_by_username(args['username'])]
         elif args['id_site']:
             participants = user_access.query_participants_for_site(args['id_site'])
         elif args['id_project']:
@@ -76,36 +81,42 @@ class QueryParticipants(Resource):
                     participants.append(part)
 
         try:
-            participant_list = []
-            for participant in participants:
-                # No group flag
-                if args['no_group'] is not None:
-                    if participant.id_participant_group is not None:
-                        continue
-                # List
-                if args['list'] is None:
-                    participant_json = participant.to_json()
-                    if args['id_participant']:
-                        # Adds project information to participant
-                        # participant_json['id_project'] = participant.participant_project.id_project
-                        # Adds site information do participant
-                        participant_json['id_site'] = participant.participant_project.id_site
-                    if args['id_group'] or args['id_participant']:
-                        # Adds last session information to participant
-                        participant_sessions = TeraSession.get_sessions_for_participant(
-                            part_id=participant.id_participant)
-                        if participant_sessions:
-                            participant_json['participant_lastsession'] = \
-                                participant_sessions[-1].session_start_datetime.isoformat()
+            if participants:
+                participant_list = []
+                for participant in participants:
+                    if participant is not None:
+                        # No group flag
+                        if args['no_group'] is not None:
+                            if participant.id_participant_group is not None:
+                                continue
+                        # List
+                        if args['list'] is None:
+                            participant_json = participant.to_json()
+                            if args['id_participant']:
+                                # Adds project information to participant
+                                # participant_json['id_project'] = participant.participant_project.id_project
+                                # Adds site information do participant
+                                participant_json['id_site'] = participant.participant_project.id_site
+                            if args['id_group'] or args['id_participant']:
+                                # Adds last session information to participant
+                                participant_sessions = TeraSession.get_sessions_for_participant(
+                                    part_id=participant.id_participant)
+                                if participant_sessions:
+                                    participant_json['participant_lastsession'] = \
+                                        participant_sessions[-1].session_start_datetime.isoformat()
+                                else:
+                                    participant_json['participant_lastsession'] = None
+
+                            if args['full'] is not None:
+                                if participant.id_participant_group is not None:
+                                    participant_json['participant_participant_group'] = participant.participant_participant_group.to_json()
+                                participant_json['participant_project'] = participant.participant_project.to_json()
+                            participant_list.append(participant_json)
                         else:
-                            participant_json['participant_lastsession'] = None
+                            participant_json = participant.to_json(minimal=True)
+                            participant_list.append(participant_json)
 
-                    participant_list.append(participant_json)
-                else:
-                    participant_json = participant.to_json(minimal=True)
-                    participant_list.append(participant_json)
-
-            return jsonify(participant_list)
+                return jsonify(participant_list)
 
         except InvalidRequestError:
             return '', 500
@@ -138,7 +149,7 @@ class QueryParticipants(Resource):
 
         # User can modify or add a group if it has admin access to that project
         if 'id_project' in json_participant:
-            if json_participant['id_project'] >0 and \
+            if json_participant['id_project'] > 0 and \
                     json_participant['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True):
                 return 'No admin access to project', 403
 
@@ -231,4 +242,3 @@ class QueryParticipants(Resource):
             return 'Database error', 500
 
         return '', 200
-

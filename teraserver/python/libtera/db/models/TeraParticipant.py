@@ -32,7 +32,7 @@ class TeraParticipant(db.Model, BaseModel):
     participant_sessions = db.relationship("TeraSession", secondary="t_sessions_participants",
                                            back_populates="session_participants")
 
-    participant_participant_group = db.relationship('TeraParticipantGroup')
+    participant_participant_group = db.relationship("TeraParticipantGroup")
 
     participant_project = db.relationship("TeraProject")
 
