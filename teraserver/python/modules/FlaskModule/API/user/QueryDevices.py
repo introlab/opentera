@@ -6,7 +6,7 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDevice import TeraDevice
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
-from libtera.db.DBManager import DBManager
+from libtera.db.DBManager import DBManager, TeraDeviceProject
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -22,6 +22,8 @@ get_parser.add_argument('participants', type=inputs.boolean, help='Flag that ind
                                                                   'device list')
 get_parser.add_argument('sites', type=inputs.boolean, help='Flag that indicates if associated site(s) information '
                                                            'should be included in the returned device list')
+get_parser.add_argument('projects', type=inputs.boolean, help='Flag that indicates if associated project(s) information'
+                                                              'should be included in the returned device list')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 post_parser = reqparse.RequestParser()
@@ -110,6 +112,19 @@ class QueryDevices(Resource):
                             sites_list.append(site_json)
 
                         device_json['device_sites'] = sites_list
+
+                    if args['projects'] is not None:
+                        # Add projects
+                        projects_list = []
+                        device_projects = TeraDeviceProject.query_projects_for_device(device.id_device)
+                        for device_project in device_projects:
+                            ignore_project_fields = []
+                            if args['list'] is not None:
+                                ignore_project_fields = ['project_name']
+                            project_json = device_project.to_json(ignore_fields=ignore_project_fields)
+                            projects_list.append(project_json)
+
+                        device_json['device_projects'] = projects_list
                     # if args['available'] is not None:
                     #     if not args['available']:
                     #         device_json['id_kit'] = device.device_kits[0].id_kit
