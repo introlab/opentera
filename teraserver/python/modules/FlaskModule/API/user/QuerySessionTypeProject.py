@@ -89,7 +89,7 @@ class QuerySessionTypeProject(Resource):
         # Using request.json instead of parser, since parser messes up the json!
         json_stps = request.json['session_type_project']
         if not isinstance(json_stps, list):
-            json_stdts = [json_stps]
+            json_stps = [json_stps]
 
         # Validate if we have an id
         for json_stp in json_stps:

@@ -124,6 +124,7 @@ class FlaskModule(BaseModule):
         from .API.user.QuerySessionTypeDeviceType import QuerySessionTypeDeviceType
         from .API.user.QuerySessionTypeProject import QuerySessionTypeProject
         from .API.user.QueryDeviceSubTypes import QueryDeviceSubTypes
+        from .API.user.QueryAssets import QueryAssets
 
         # Resources
         user_api_ns.add_resource(Login, '/login', resource_class_kwargs=kwargs)
@@ -148,6 +149,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(QuerySessionEvents, '/sessionevents', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryDeviceData, '/data', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryDeviceSubTypes, '/devicesubtypes', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryAssets, '/assets', resource_class_kwargs=kwargs)
         api.add_namespace(user_api_ns)
 
     def init_device_api(self):
@@ -156,6 +158,7 @@ class FlaskModule(BaseModule):
 
         # Devices
         from .API.device.DeviceLogin import DeviceLogin
+        from .API.device.DeviceLogout import DeviceLogout
         from .API.device.DeviceUpload import DeviceUpload
         from .API.device.DeviceRegister import DeviceRegister
         from .API.device.DeviceQuerySessions import DeviceQuerySessions
@@ -163,6 +166,7 @@ class FlaskModule(BaseModule):
 
         # Resources
         device_api_ns.add_resource(DeviceLogin, '/device_login', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceLogout, '/device_logout', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceUpload, '/device_upload', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceRegister, '/device_register', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
@@ -210,11 +214,12 @@ class FlaskModule(BaseModule):
         # flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
         #                                                                                    **kwargs))
 
-    @flask_app.after_request
-    def apply_caching(response):
-        # This is required to expose the backend API to rendered webpages from other sources, such as services
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "*"
-        response.headers["Access-Control-Allow-Methods"] = "*"
-        return response
+
+@flask_app.after_request
+def apply_caching(response):
+    # This is required to expose the backend API to rendered webpages from other sources, such as services
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    return response
 

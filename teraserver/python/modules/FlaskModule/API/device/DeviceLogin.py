@@ -1,4 +1,4 @@
-from flask import jsonify, session
+from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse
 from modules.LoginModule.LoginModule import LoginModule, current_device
 from modules.Globals import db_man
@@ -18,6 +18,15 @@ class DeviceLogin(Resource):
         # Redis key is handled in LoginModule
         servername = self.module.config.server_config['hostname']
         port = self.module.config.server_config['port']
+
+        if 'X_EXTERNALHOST' in request.headers:
+            if ':' in request.headers['X_EXTERNALHOST']:
+                servername, port = request.headers['X_EXTERNALHOST'].split(':', 1)
+            else:
+                servername = request.headers['X_EXTERNALHOST']
+
+        if 'X_EXTERNALPORT' in request.headers:
+            port = request.headers['X_EXTERNALPORT']
 
         # Reply device information
         reply = {'device_info': current_device.to_json()}
@@ -43,8 +52,11 @@ class DeviceLogin(Resource):
             # Permanent ?
             session.permanent = True
 
+            print('DeviceLogin - setting key with expiration in 60s', session['_id'], session['_user_id'])
+            self.module.redisSet(session['_id'], session['_user_id'], ex=60)
+
             # Add websocket URL
-            reply['websocket_url'] = "wss://" + servername + ":" + str(port) + "/wss?id=" + session['_id']
+            reply['websocket_url'] = "wss://" + servername + ":" + str(port) + "/wss/device?id=" + session['_id']
 
         # Return reply as json object
         return jsonify(reply)

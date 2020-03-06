@@ -46,6 +46,12 @@ class TeraSessionTypeDeviceType(db.Model, BaseModel):
         db.session.add(devices)
 
         devices = TeraSessionTypeDeviceType()
+        devices.session_type_device_session_type = sensor_session
+        devices.session_type_device_device_type = TeraDeviceType.get_device_type(
+            int(TeraDeviceType.DeviceTypeEnum.BUREAU_ACTIF.value))
+        db.session.add(devices)
+
+        devices = TeraSessionTypeDeviceType()
         devices.session_type_device_session_type = vsensor_session
         devices.session_type_device_device_type = TeraDeviceType.get_device_type(
             int(TeraDeviceType.DeviceTypeEnum.SENSOR.value))

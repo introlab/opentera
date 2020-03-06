@@ -72,7 +72,7 @@ function loginReply(response, status, request){
         setCookie("BureauActifToken", response["user_token"], 30);
 
 		// Redirect to location
-		window.location.replace("/");
+		window.location.replace("/bureau");
 	}else{
 		//clearInterval(timerId);
 		console.log("loginReply: " + response);

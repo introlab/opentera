@@ -4,7 +4,6 @@ from autobahn.websocket.types import ConnectionRequest, ConnectionResponse, Conn
 
 # OpenTera
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.redis.RedisClient import RedisClient
 from modules.BaseModule import ModuleNames, create_module_topic_from_name
 
@@ -50,9 +49,6 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
             # Publish to login module (bytes)
             self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
-        elif self.participant:
-            # TODO Advertise that we have a new participant
-            pass
 
     def onMessage(self, msg, binary):
         # Handle websocket communication
@@ -61,7 +57,6 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
         if binary:
             # Decode protobuf before parsing
-
             pass
 
         # Parse JSON (protobuf content)

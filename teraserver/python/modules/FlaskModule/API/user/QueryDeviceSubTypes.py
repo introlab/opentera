@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
+from flask_restplus import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
@@ -12,6 +12,7 @@ from libtera.db.DBManager import DBManager
 get_parser = api.parser()
 get_parser.add_argument('id_device_subtype', type=int, help='ID of the device subtype to query')
 get_parser.add_argument('id_device_type', type=int, help='ID of the device type from which to get all subtypes')
+get_parser.add_argument('list', type=inputs.boolean, help='List of all device types')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('device_subtype', type=str, location='json', help='Device subtype to create / update',
@@ -45,17 +46,20 @@ class QueryDeviceSubTypes(Resource):
 
         device_subtypes = []
         # If we have no arguments, return all accessible devices
-        if not args['id_device_subtype'] and not args['id_device_type']:
+        if args['id_device_subtype'] is None and args['id_device_type'] is None and args['list'] is None:
             return 'Missing parameters', 400
 
         if args['id_device_subtype']:
             device_subtypes = TeraDeviceSubType.query.filter(TeraDeviceSubType.id_device_type.
-                                                             in_(user_access.get_accessible_devices_types_ids())).all()
+                                                             in_(user_access.get_accessible_devices_types_ids())).\
+                filter_by(id_device_subtype=args['id_device_subtype']).all()
         elif args['id_device_type']:
             # Check if has access to the id_device_type
             if not args['id_device_type'] in user_access.get_accessible_devices_types_ids():
                 return 'No access to device type', 403
             device_subtypes = TeraDeviceSubType.get_device_subtypes_for_type(args['id_device_type'])
+        elif args['list']:
+            device_subtypes = user_access.get_accessible_devices_subtypes()
 
         try:
             device_subtypes_list = []

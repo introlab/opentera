@@ -62,6 +62,9 @@ class TeraUser(db.Model, BaseModel):
     def is_authenticated(self):
         return self.authenticated
 
+    def is_anonymous(self):
+        return False
+
     def is_active(self):
         return self.user_enabled
 

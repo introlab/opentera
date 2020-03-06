@@ -1,4 +1,4 @@
-from flask import jsonify, session
+from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse, fields
 from modules.LoginModule.LoginModule import user_http_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -28,6 +28,14 @@ class Login(Resource):
         # Redis key is handled in LoginModule
         servername = self.module.config.server_config['hostname']
         port = self.module.config.server_config['port']
+        if 'X_EXTERNALHOST' in request.headers:
+            if ':' in request.headers['X_EXTERNALHOST']:
+                servername, port = request.headers['X_EXTERNALHOST'].split(':', 1)
+            else:
+                servername = request.headers['X_EXTERNALHOST']
+
+        if 'X_EXTERNALPORT' in request.headers:
+            port = request.headers['X_EXTERNALPORT']
 
         # Get user token key from redis
         from modules.Globals import TeraServerConstants
@@ -36,6 +44,9 @@ class Login(Resource):
         # Get token for user
         from libtera.db.models.TeraUser import TeraUser
         user_token = TeraUser.get_token_for_user(session['_user_id'], token_key)
+
+        print('Login - setting key with expiration in 60s', session['_id'], session['_user_id'])
+        self.module.redisSet(session['_id'], session['_user_id'], ex=60)
 
         # Return reply as json object
         reply = {"websocket_url": "wss://" + servername + ":" + str(port) + "/wss/user?id=" + session['_id'],

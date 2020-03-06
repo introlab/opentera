@@ -17,5 +17,10 @@ class TwistedModuleWebSocketServerFactory(WebSocketServerFactory):
         """
         print("buildProtocol for : ", addr, self.protocol)
         p = self.protocol(config=self.config)
+
+        # Avoid serving web page if connexion is not a websocket
+        # Will return status code 426 Upgrade Required
+        p.webStatus = False
+
         p.factory = self
         return p

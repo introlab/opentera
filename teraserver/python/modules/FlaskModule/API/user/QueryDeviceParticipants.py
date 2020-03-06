@@ -4,6 +4,8 @@ from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+from libtera.db.models.TeraParticipant import TeraParticipant
+from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -127,6 +129,14 @@ class QueryDeviceParticipants(Resource):
                 json_device_part['id_device_participant'] = device_part.id_device_site
             else:
                 json_device_part['id_device_participant'] = 0
+
+            # Check if participant is part of the device projects
+            part = TeraParticipant.get_participant_by_id(json_device_part['id_participant'])
+            if not TeraDeviceProject.get_device_project_id_for_device_and_project(
+                    device_id=json_device_part['id_device'],
+                    project_id=part.id_project):
+                return gettext('Appareil non-assigné au projet du participant'), 403
+
 
             # Do the update!
             if json_device_part['id_device_participant'] > 0:

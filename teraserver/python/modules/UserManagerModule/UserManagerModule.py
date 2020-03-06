@@ -4,6 +4,7 @@ from messages.python.RPCMessage_pb2 import RPCMessage
 from messages.python.CreateSession_pb2 import CreateSession
 from messages.python.UserEvent_pb2 import UserEvent
 from messages.python.ParticipantEvent_pb2 import ParticipantEvent
+from messages.python.DeviceEvent_pb2 import DeviceEvent
 from modules.BaseModule import BaseModule, ModuleNames, create_module_topic_from_name
 from google.protobuf.any_pb2 import Any
 import datetime
@@ -46,6 +47,25 @@ class OnlineParticipantRegistry:
         return self.participant_list
 
 
+# TODO Should be moved somewhere else?
+class OnlineDeviceRegistry:
+    def __init__(self):
+        self.device_list = list()
+
+    def device_online(self, uuid):
+        print('device_online: ', uuid)
+        if not self.device_list.__contains__(uuid):
+            self.device_list.append(uuid)
+
+    def device_offline(self, uuid):
+        print('device_offline', uuid)
+        if self.device_list.__contains__(uuid):
+            self.device_list.remove(uuid)
+
+    def online_devices(self):
+        return self.device_list
+
+
 class UserManagerModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
@@ -54,7 +74,9 @@ class UserManagerModule(BaseModule):
         # Create user registry
         self.user_registry = OnlineUserRegistry()
         self.participant_registry = OnlineParticipantRegistry()
+        self.device_registry = OnlineDeviceRegistry()
         self.send_participant_event = True
+        self.send_device_event = True
 
     def __del__(self):
         pass
@@ -71,6 +93,10 @@ class UserManagerModule(BaseModule):
     def online_participants_rpc_callback(self, *args, **kwargs):
         print('online_participants_rpc_callback', args, kwargs)
         return self.participant_registry.online_participants()
+
+    def online_devices_rpc_callback(self, *args, **kwargs):
+        print('online_devices_rpc_callback', args, kwargs)
+        return self.device_registry.online_devices()
 
     def setup_module_pubsub(self):
         pass
@@ -109,6 +135,23 @@ class UserManagerModule(BaseModule):
                         dest='websocket.participant.' + participant_event.participant_uuid)
                     any_message = Any()
                     any_message.Pack(participant_event)
+                    tera_message.data.extend([any_message])
+                    self.publish(tera_message.head.dest, tera_message.SerializeToString())
+
+            # Test for DeviceEvent
+            device_event = DeviceEvent()
+            if any_msg.Unpack(device_event):
+                if device_event.type == device_event.DEVICE_CONNECTED:
+                    self.handle_device_connected(tera_message.head, device_event)
+                elif device_event.type == device_event.DEVICE_DISCONNECTED:
+                    self.handle_device_disconnected(tera_message.head, device_event)
+
+                # Send back event to participant...
+                if self.send_device_event:
+                    tera_message = self.create_tera_message(
+                        dest='websocket.device.' + device_event.device_uuid)
+                    any_message = Any()
+                    any_message.Pack(device_event)
                     tera_message.data.extend([any_message])
                     self.publish(tera_message.head.dest, tera_message.SerializeToString())
 
@@ -168,7 +211,30 @@ class UserManagerModule(BaseModule):
 
             self.publish(tera_message.head.dest, tera_message.SerializeToString())
 
+    def handle_device_connected(self, header, device_event: DeviceEvent):
+        self.device_registry.device_online(device_event.device_uuid)
 
+        for user_uuid in self.user_registry.online_users():
+            # TODO Check for permissions...
+            # Send to everyone?
+            tera_message = self.create_tera_message(dest='websocket.user.' + user_uuid)
 
+            any_message = Any()
+            any_message.Pack(device_event)
+            tera_message.data.extend([any_message])
 
+            self.publish(tera_message.head.dest, tera_message.SerializeToString())
 
+    def handle_device_disconnected(self, header, device_event: DeviceEvent):
+        self.device_registry.device_offline(device_event.device_uuid)
+
+        for user_uuid in self.user_registry.online_users():
+            # TODO Check for permissions...
+            # Send to everyone?
+            tera_message = self.create_tera_message(dest='websocket.user.' + user_uuid)
+
+            any_message = Any()
+            any_message.Pack(device_event)
+            tera_message.data.extend([any_message])
+
+            self.publish(tera_message.head.dest, tera_message.SerializeToString())

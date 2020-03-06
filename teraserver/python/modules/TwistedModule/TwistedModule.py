@@ -7,7 +7,7 @@ from libtera.ConfigManager import ConfigManager
 from .TwistedModuleWebSocketServerFactory import TwistedModuleWebSocketServerFactory
 from .TeraWebSocketServerUserProtocol import TeraWebSocketServerUserProtocol
 from .TeraWebSocketServerParticipantProtocol import TeraWebSocketServerParticipantProtocol
-
+from .TeraWebSocketServerDeviceProtocol import TeraWebSocketServerDeviceProtocol
 
 # WebSockets
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
@@ -18,7 +18,8 @@ from twisted.internet import reactor, ssl
 from twisted.python.threadpool import ThreadPool
 from twisted.web.http import HTTPChannel
 from twisted.web.server import Site
-from twisted.web.static import File, Data
+from twisted.web.static import File
+from twisted.web import resource
 from twisted.web.wsgi import WSGIResource
 from twisted.python import log
 from OpenSSL import SSL
@@ -29,7 +30,10 @@ import os
 class MyHTTPChannel(HTTPChannel):
     def allHeadersReceived(self):
         # Verify if we have a client with a certificate...
-        cert = self.transport.getPeerCertificate()
+        # cert = self.transport.getPeerCertificate()
+        cert = getattr(self.transport, "getPeerCertificate", None)
+        if cert:
+            cert = self.transport.getPeerCertificate()
 
         # Current request
         req = self.requests[-1]
@@ -89,6 +93,14 @@ class TwistedModule(BaseModule):
         wss_participant_factory.protocol = TeraWebSocketServerParticipantProtocol
         wss_participant_resource = WebSocketResource(wss_participant_factory)
 
+        # DEVICES
+        wss_device_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % (self.config.server_config['hostname'],
+                                                          self.config.server_config['port']),
+                                                          redis_config=self.config.redis_config)
+
+        wss_device_factory.protocol = TeraWebSocketServerDeviceProtocol
+        wss_device_resource = WebSocketResource(wss_device_factory)
+
         # create a Twisted Web WSGI resource for our Flask server
         wsgi_resource = WSGIResource(reactor, reactor.getThreadPool(), flask_app)
 
@@ -103,10 +115,12 @@ class TwistedModule(BaseModule):
         # the path "/wss" served by our WebSocket stuff
         # root_resource = WSGIRootResource(wsgi_resource, {b'wss': wss_resource})
 
-        # TODO do better?
-        wss_root = Data("", "text/plain")
+        # Avoid using the wss resource at root level
+        wss_root = resource.ForbiddenResource()
+
         wss_root.putChild(b'user', wss_user_resource)
         wss_root.putChild(b'participant', wss_participant_resource)
+        wss_root.putChild(b'device', wss_device_resource)
 
         # Establish root resource
         root_resource = WSGIRootResource(wsgi_resource, {b'assets': static_resource, b'wss': wss_root})
@@ -138,7 +152,10 @@ class TwistedModule(BaseModule):
         ctx.load_verify_locations(self.config.server_config['ssl_path'] + '/'
                                   + self.config.server_config['ca_certificate'])
 
-        reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
+        if self.config.server_config['use_ssl']:
+            reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
+        else:
+            reactor.listenTCP(self.config.server_config['port'], site)
 
     def __del__(self):
         pass

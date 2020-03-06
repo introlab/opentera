@@ -23,8 +23,8 @@ class TeraDevice(db.Model, BaseModel):
                                                             ondelete='set null'), nullable=True)
     device_token = db.Column(db.String, nullable=False, unique=True)
     device_certificate = db.Column(db.String, nullable=True)
-    device_enabled = db.Column(db.Boolean, nullable=False)
-    device_onlineable = db.Column(db.Boolean, nullable=False)
+    device_enabled = db.Column(db.Boolean, nullable=False, default=False)
+    device_onlineable = db.Column(db.Boolean, nullable=False, default=False)
     device_optional = db.Column(db.Boolean, nullable=False, default=False)
     device_config = db.Column(db.String, nullable=True)
     device_infos = db.Column(db.String, nullable=True)
@@ -38,6 +38,8 @@ class TeraDevice(db.Model, BaseModel):
                                           back_populates="participant_devices")
     device_subtype = db.relationship('TeraDeviceSubType')
 
+    authenticated = False
+
     def __init__(self):
         self.secret = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerDeviceTokenKey)
         if self.secret is None:
@@ -48,16 +50,31 @@ class TeraDevice(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields += ['device_projects', 'device_participants',  'device_token', 'device_certificate', 'secret',
+        ignore_fields += ['device_projects', 'device_participants', 'device_certificate', 'secret',
                           'device_subtype']
 
         if minimal:
             ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_config', 'device_notes',
-                              'device_lastonline', 'device_infos']
+                              'device_lastonline', 'device_infos',  'device_token']
 
         device_json = super().to_json(ignore_fields=ignore_fields)
 
         return device_json
+
+    def is_authenticated(self):
+        return self.authenticated
+
+    def is_anonymous(self):
+        return False
+
+    def is_active(self):
+        return self.device_enabled
+
+    def get_id(self):
+        return self.device_uuid
+
+    def is_login_enabled(self):
+        return self.device_onlineable
 
     def create_token(self):
         # Creating token with user info
@@ -92,7 +109,7 @@ class TeraDevice(db.Model, BaseModel):
 
                 # Update last online
                 device.update_last_online()
-
+                device.authenticated = True
                 return device
             else:
                 return None

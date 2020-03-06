@@ -2,6 +2,7 @@ import uuid
 from services.BureauActif.Globals import config_man
 from requests import Response
 
+
 class TeraClient:
 
     def __init__(self, u_uuid: uuid, token: str):
@@ -67,7 +68,6 @@ class TeraClient:
                     return project['project_role']
 
         return 'Undefined'
-
 
     def __repr__(self):
         return '<TeraClient - UUID: ' + self.__user_uuid + ', Token: ' + self.__user_token + '>'

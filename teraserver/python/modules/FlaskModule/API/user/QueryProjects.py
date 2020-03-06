@@ -77,6 +77,8 @@ class QueryProjects(Resource):
                     project_json = project.to_json(minimal=True)
                     project_json['project_participant_group_count'] = \
                         len(TeraParticipantGroup.get_participant_group_for_project(project.id_project))
+                    project_json['project_participant_count'] = len(user_access.query_participants_for_project(
+                        project.id_project))
                     projects_list.append(project_json)
 
             return jsonify(projects_list)

@@ -4,7 +4,7 @@ from services.BureauActif.ConfigManager import ConfigManager
 from modules.Globals import TeraServerConstants
 from libtera.redis.RedisClient import RedisClient
 import services.BureauActif.Globals as Globals
-
+from sqlalchemy.exc import OperationalError
 
 if __name__ == '__main__':
 
@@ -22,8 +22,13 @@ if __name__ == '__main__':
         'port': config_man.db_config['port']
     }
 
-    # Global redis client
+    try:
+        Globals.db_man.open(POSTGRES, True)
+    except OperationalError:
+        print("Unable to connect to database - please check settings in config file!")
+        quit()
 
+    # Global redis client
     Globals.redis_client = RedisClient(config_man.redis_config)
     Globals.api_user_token_key = Globals.redis_client.redisGet(TeraServerConstants.RedisVar_UserTokenAPIKey)
 

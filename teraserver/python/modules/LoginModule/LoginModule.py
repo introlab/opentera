@@ -119,9 +119,8 @@ class LoginModule(BaseModule):
             current_user.update_last_online()
 
             login_user(current_user, remember=True)
-            print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
-
-            self.redisSet(session['_id'], session['_user_id'], ex=60)
+            # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
+            # self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
         return False
 
@@ -143,7 +142,6 @@ class LoginModule(BaseModule):
             if current_user:
                 current_user.update_last_online()
                 login_user(current_user, remember=True)
-                # TODO: Set user online in Redis??
                 return True
 
         return False
@@ -155,13 +153,12 @@ class LoginModule(BaseModule):
 
             _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_username(username)
 
-            print('participant_verify_password, found user: ', current_participant)
+            print('participant_verify_password, found participant: ', current_participant)
             current_participant.update_last_online()
 
             login_user(current_participant, remember=True)
-            print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
-
-            self.redisSet(session['_id'], session['_user_id'], ex=60)
+            # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
+            # self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
         return False
 
@@ -177,83 +174,17 @@ class LoginModule(BaseModule):
         if current_participant:
             current_participant.update_last_online()
             login_user(current_participant, remember=True)
-            # TODO: Set user online in Redis??
             return True
 
         return False
-
-    @staticmethod
-    def token_required(f):
-        """
-        Use this decorator for token in url as param.
-        Acceptable for devices and participants.
-        """
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            # Parse args
-            parser = reqparse.RequestParser()
-            parser.add_argument('token', type=str, help='Token', required=True)
-
-            args = parser.parse_args(strict=False)
-
-            # Verify token.
-            if 'token' in args:
-                # Load participant from DB
-                _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(args['token'])
-
-                if current_participant and current_participant.participant_enabled:
-                    # Returns the function if authenticated with token
-                    return f(*args, **kwargs)
-
-                # Load device from DB
-                _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(args['token'])
-
-                if current_device and current_device.device_enabled:
-                    # Returns the function if authenticated with token
-                    return f(*args, **kwargs)
-
-            # Any other case, do not call function
-            return 'Forbidden', 403
-
-        return decorated
-
-    @staticmethod
-    def certificate_required(f):
-        """
-        Use this decorator if UUID is stored in a client certificate.
-        Acceptable for devices and participants.
-        """
-        @wraps(f)
-        def decorated(*args, **kwargs):
-
-            # Headers are modified in TwistedModule to add certificate information if available.
-            # We are interested in the content of two fields : X-Device-Uuid, X-Participant-Uuid
-
-            if request.headers.__contains__('X-Device-Uuid'):
-                # Load device from DB
-                _request_ctx_stack.top.current_device = TeraDevice.get_device_by_uuid(
-                    request.headers['X-Device-Uuid'])
-                if current_device and current_device.device_enabled:
-                    return f(*args, **kwargs)
-
-            elif request.headers.__contains__('X-Participant-Uuid'):
-                # Load participant from DB
-                _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_uuid(
-                    request.headers['X-Participant-Uuid'])
-                if current_participant and current_participant.participant_enabled:
-                    return f(*args, **kwargs)
-
-            # Any other case, do not call function
-            return 'Forbidden', 403
-
-        return decorated
 
     @staticmethod
     def token_or_certificate_required(f):
         """
         Use this decorator if UUID is stored in a client certificate or token in url params.
         Acceptable for devices and participants.
-        TODO - Avoid duplication of implementations from token_required, certificate_required.
+
+        TODO : To be removed? Old way of using tokens in params, kept for compatibility.
         """
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -269,6 +200,7 @@ class LoginModule(BaseModule):
 
                 # Device must be found and enabled
                 if current_device and current_device.device_enabled:
+                    login_user(current_device, remember=True)
                     return f(*args, **kwargs)
 
             elif request.headers.__contains__('X-Participant-Uuid'):
@@ -277,22 +209,51 @@ class LoginModule(BaseModule):
                     request.headers['X-Participant-Uuid'])
 
                 if current_participant and current_participant.participant_enabled:
+                    login_user(current_participant, remember=True)
                     return f(*args, **kwargs)
 
             # Then verify tokens...
+            # Verify token in auth headers (priority over token in params)
+            if 'Authorization' in request.headers:
+                try:
+                    # Default whitespace as separator, 1 split max
+                    scheme, token = request.headers['Authorization'].split(None, 1)
+                except ValueError:
+                    # malformed Authorization header
+                    return 'Forbidden', 403
+
+                # Verify scheme and token
+                if scheme == 'OpenTera':
+                    # Load participant from DB
+                    _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token)
+
+                    if current_participant and current_participant.participant_enabled:
+                        # Returns the function if authenticated with token
+                        login_user(current_participant, remember=True)
+                        return f(*args, **kwargs)
+
+                    # Load device from DB
+                    _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(token)
+
+                    # Device must be found and enabled
+                    if current_device and current_device.device_enabled:
+                        # Returns the function if authenticated with token
+                        login_user(current_device, remember=True)
+                        return f(*args, **kwargs)
 
             # Parse args
             parser = reqparse.RequestParser()
             parser.add_argument('token', type=str, help='Token', required=False)
             token_args = parser.parse_args(strict=False)
 
-            # Verify token.
+            # Verify token in params
             if 'token' in token_args:
                 # Load participant from DB
                 _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_args['token'])
 
                 if current_participant and current_participant.participant_enabled:
                     # Returns the function if authenticated with token
+                    login_user(current_participant, remember=True)
                     return f(*args, **kwargs)
 
                 # Load device from DB
@@ -301,6 +262,7 @@ class LoginModule(BaseModule):
                 # Device must be found and enabled
                 if current_device and current_device.device_enabled:
                     # Returns the function if authenticated with token
+                    login_user(current_device, remember=True)
                     return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.
