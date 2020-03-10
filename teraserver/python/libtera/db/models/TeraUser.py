@@ -124,11 +124,11 @@ class TeraUser(db.Model, BaseModel):
         return user
 
     @classmethod
-    def update(cls, id_user, values={}):
+    def update(cls, id_user: int, values: dict):
         # Remove the password field is present and if empty
         if 'user_password' in values:
             if values['user_password'] == '':
-                values.pop('user_password')
+                del values['user_password']
             else:
                 values['user_password'] = TeraUser.encrypt_password(values['user_password'])
 

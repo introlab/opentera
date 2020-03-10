@@ -100,8 +100,9 @@ class DBManagerTeraUserAccess:
         if self.user.user_superadmin:
             return TeraDevice.query.all()
 
-        site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
-        return TeraDevice.query.filter(TeraDevice.id_site.in_(site_id_list)).all()
+        proj_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
+        query = TeraDevice.query.join(TeraDeviceProject).filter(TeraDeviceProject.id_project.in_(proj_id_list))
+        return query.all()
 
     def get_accessible_devices_ids(self, admin_only=False):
         devices = []

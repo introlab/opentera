@@ -206,7 +206,7 @@ class TeraParticipant(db.Model, BaseModel):
         # Remove the password field is present and if empty
         if 'participant_password' in values:
             if values['participant_password'] == '':
-                values.pop('participant_password')
+                del values['participant_password']
             else:
                 values['participant_password'] = TeraParticipant.encrypt_password(values['participant_password'])
         super().update(update_id, values)

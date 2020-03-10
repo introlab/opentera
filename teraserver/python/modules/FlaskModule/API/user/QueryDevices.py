@@ -142,14 +142,14 @@ class QueryDevices(Resource):
     @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update devices. id_device must be set to "0" to create a new device. Only '
-                         'superadmins can create new devices.',
+                         'superadmins can create new devices, site admin can update and project admin can modify config'
+                         ' and notes.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified device',
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
                         500: 'Internal error occured when saving device'})
     def post(self):
         # parser = post_parser
-
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
@@ -158,6 +158,7 @@ class QueryDevices(Resource):
         # Validate if we have an id
         if 'id_device' not in json_device:
             return '', 400
+
         # New devices can only be added by super admins
         if json_device['id_device'] == 0:
             if not current_user.user_superadmin:
@@ -166,6 +167,23 @@ class QueryDevices(Resource):
             # Check if current user can modify the posted device
             if json_device['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
                 return '', 403
+
+        # Check if the user if a site admin of the projects, otherwise limit what can be updated
+        current_device = TeraDevice.get_device_by_id(json_device['id_device'])
+        is_site_admin = False
+        for project in current_device.device_projects:
+            if user_access.get_site_role(project.device_project_project.project_site.id_site) == 'admin':
+                is_site_admin = True
+                break
+
+        # User is not site admin - strip everything that can't be modified by a project admin
+        if not is_site_admin:
+            allowed_fields = ['id_device', 'device_config', 'device_notes']
+            json_device2 = {}
+            for field in allowed_fields:
+                if field in json_device:
+                    json_device2[field] = json_device[field]
+            json_device = json_device2
 
         # Do the update!
         if json_device['id_device'] > 0:

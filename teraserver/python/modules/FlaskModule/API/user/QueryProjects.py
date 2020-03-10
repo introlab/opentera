@@ -45,8 +45,6 @@ class QueryProjects(Resource):
         projects = []
         # If we have no arguments, return all accessible projects
         # queried_user = current_user
-        if not any(args.values()):
-            projects = user_access.get_accessible_projects()
 
         if args['id']:
             args['id_project'] = args['id']
@@ -64,6 +62,8 @@ class QueryProjects(Resource):
         elif args['id_site']:
             # If we have a site id, query for projects of that site
             projects = user_access.query_projects_for_site(site_id=args['id_site'])
+        else:
+            projects = user_access.get_accessible_projects()
 
         try:
             projects_list = []
