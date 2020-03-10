@@ -34,8 +34,8 @@ class TeraDeviceForm:
         section.add_item(TeraFormItem("id_device_subtype", gettext("Sous-type appareil"), "array", item_required=False,
                                       item_condition=TeraFormItemCondition("device_type", "=", "changed",
                                                                            "/api/user/devicesubtypes?id_device_type=")))
-        section.add_item(TeraFormItem("device_token", gettext("Jeton d'accès"), "hidden",
-                                      item_options={"readonly": True}))
+        section.add_item(TeraFormItem("device_token", gettext("Jeton d'accès"), "label",
+                                      item_options={"readonly": False}))
         section.add_item(TeraFormItem("device_certificate", gettext("Certificat"), "hidden",
                                       item_options={"readonly": True}))
         section.add_item(TeraFormItem("device_enabled", gettext("Activé?"), "boolean", item_required=True))
