@@ -163,14 +163,30 @@ class FlaskModule(BaseModule):
         from .API.device.DeviceRegister import DeviceRegister
         from .API.device.DeviceQuerySessions import DeviceQuerySessions
         from .API.device.DeviceQuerySessionEvents import DeviceQuerySessionEvents
+        from .API.device.DeviceQueryDevices import DeviceQueryDevices
+        from .API.device.DeviceQueryAssets import DeviceQueryAssets
 
         # Resources
+        # TODO remove legacy endpoint 'device_login'
         device_api_ns.add_resource(DeviceLogin, '/device_login', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceLogin, '/login', resource_class_kwargs=kwargs)
+
+        # TODO remove legacy endpoint 'device_logout'
         device_api_ns.add_resource(DeviceLogout, '/device_logout', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceLogout, '/logout', resource_class_kwargs=kwargs)
+
+        # TODO remove legacy endpoint 'device_upload'
         device_api_ns.add_resource(DeviceUpload, '/device_upload', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceUpload, '/upload', resource_class_kwargs=kwargs)
+
+        # TODO remove legacy endpoint 'device_register'
         device_api_ns.add_resource(DeviceRegister, '/device_register', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceRegister, '/register', resource_class_kwargs=kwargs)
+
         device_api_ns.add_resource(DeviceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceQuerySessionEvents, '/sessionevents', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQueryDevices, '/devices', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQueryAssets, '/assets', resource_class_kwargs=kwargs)
         api.add_namespace(device_api_ns)
 
     def init_participant_api(self):

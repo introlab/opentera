@@ -58,3 +58,10 @@ class DBManagerTeraDeviceAccess:
             types.append(my_type.id_session_type)
         return types
 
+    def get_accessible_assets(self, id_asset=None):
+        from libtera.db.models.TeraAsset import TeraAsset
+        query = TeraAsset.query.filter(TeraAsset.id_device == self.device.id_device)
+        if id_asset:
+            query = query.filter(TeraAsset.id_asset == id_asset)
+
+        return query.all()
