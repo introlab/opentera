@@ -85,9 +85,9 @@ class TeraUser(db.Model, BaseModel):
     def encrypt_password(password):
         return bcrypt.hash(password)
 
-    @staticmethod
-    def is_anonymous():
-        return False
+    # @staticmethod
+    # def is_anonymous():
+    #     return False
 
     @staticmethod
     def verify_password(username, password):

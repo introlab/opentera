@@ -15,7 +15,8 @@ get_parser = api.parser()
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all associated projects'
                         )
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all associated devices')
-get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ids only)')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
+                                                          '(ids only)')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('device_project', type=str, location='json',
