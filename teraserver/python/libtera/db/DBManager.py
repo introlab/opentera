@@ -117,6 +117,10 @@ class DBManager:
             TeraSession.create_defaults()
             TeraDeviceData.create_defaults(config.server_config['upload_path'])
             TeraSessionEvent.create_defaults()
+            # TeraAsset.create_defaults()
+
+        if TeraAsset.get_count() == 0:
+            print('No assets - creating defaults')
             TeraAsset.create_defaults()
 
     def open(self, db_infos, echo=False):
