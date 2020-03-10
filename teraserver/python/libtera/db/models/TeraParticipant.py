@@ -69,7 +69,8 @@ class TeraParticipant(db.Model, BaseModel):
                               'participant_token', 'participant_sessions', 'participant_password',
                               'participant_project'])
         if minimal:
-            ignore_fields.extend([])
+            ignore_fields.extend(['participant_uuid', 'participant_username', 'participant_lastonline',
+                                  'participant_login_enabled'])
 
         return super().to_json(ignore_fields=ignore_fields)
 

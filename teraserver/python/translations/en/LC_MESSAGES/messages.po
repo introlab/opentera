@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-02-27 11:29-0500\n"
+"POT-Creation-Date: 2020-03-09 14:38-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.6.0\n"
 
 #: libtera/forms/TeraDeviceForm.py:25
 msgid "Paramètres"
@@ -388,7 +388,7 @@ msgstr ""
 msgid "Permettre l'accès via le web"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:64
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:66
 #: modules/FlaskModule/API/user/QueryDeviceProjects.py:54
 #: modules/FlaskModule/API/user/QueryDeviceSites.py:52
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:53
@@ -396,8 +396,8 @@ msgstr ""
 msgid "Arguments manquants"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:115
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:184
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:122
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:191
 #: modules/FlaskModule/API/user/QueryDeviceProjects.py:105
 #: modules/FlaskModule/API/user/QueryDeviceProjects.py:165
 #: modules/FlaskModule/API/user/QueryDeviceSites.py:103
@@ -407,18 +407,18 @@ msgstr ""
 msgid "Accès refusé"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:131
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:138
 msgid "Appareil non-assigné au projet du participant"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:180
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:187
 #: modules/FlaskModule/API/user/QueryDeviceProjects.py:160
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:157
 #: modules/FlaskModule/API/user/QuerySessionTypeProject.py:156
 msgid "Non-trouvé"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:192
+#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:199
 #: modules/FlaskModule/API/user/QueryDeviceProjects.py:183
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:168
 #: modules/FlaskModule/API/user/QuerySessionTypeProject.py:167
@@ -448,15 +448,15 @@ msgstr ""
 msgid "Vous n'avez pas acces a au moins un participant de la seance."
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:164
+#: modules/FlaskModule/API/user/QueryUsers.py:167
 msgid "Password required"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:166
+#: modules/FlaskModule/API/user/QueryUsers.py:169
 msgid "Invalid password"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:170
+#: modules/FlaskModule/API/user/QueryUsers.py:173
 msgid "Username unavailable."
 msgstr ""
 
