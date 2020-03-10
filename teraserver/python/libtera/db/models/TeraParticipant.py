@@ -92,9 +92,9 @@ class TeraParticipant(db.Model, BaseModel):
     def encrypt_password(password):
         return bcrypt.hash(password)
 
-    @staticmethod
-    def is_anonymous():
-        return False
+    # @staticmethod
+    # def is_anonymous():
+    #     return False
 
     @staticmethod
     def verify_password(username, password):
@@ -202,10 +202,20 @@ class TeraParticipant(db.Model, BaseModel):
         if 'participant_username' in values:
             if not TeraParticipant.is_participant_username_available(values['participant_username']):
                 raise NameError('Participant username already in use.')
+
+        # Remove the password field is present and if empty
+        if 'participant_password' in values:
+            if values['participant_password'] == '':
+                values.pop('participant_password')
+            else:
+                values['participant_password'] = TeraParticipant.encrypt_password(values['participant_password'])
         super().update(update_id, values)
 
     @classmethod
     def insert(cls, participant):
+        # Encrypts password
+        participant.participant_password = TeraParticipant.encrypt_password(participant.participant_password)
+
         participant.participant_lastonline = None
         participant.participant_uuid = str(uuid.uuid4())
         participant.create_token()
