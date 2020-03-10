@@ -266,7 +266,7 @@ class DBManagerTeraUserAccess:
     def query_devices_for_site(self, site_id: int, device_type_id: int):
         devices = []
         if site_id in self.get_accessible_sites_ids():
-            query = TeraDevice.query.join(TeraDeviceProject).join(TeraProject.project_site) \
+            query = TeraDevice.query.join(TeraDeviceProject).join(TeraProject) \
                 .filter(TeraProject.id_site == site_id) \
                 .order_by(TeraDevice.id_device.asc())
             if device_type_id:
