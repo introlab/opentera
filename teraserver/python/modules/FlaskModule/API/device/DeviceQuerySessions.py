@@ -3,11 +3,22 @@ from flask_restplus import Resource, reqparse, inputs
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.DBManager import DBManager
-from modules.LoginModule.LoginModule import LoginModule, current_device
+from modules.LoginModule.LoginModule import LoginModule
 from sqlalchemy import exc
 from flask_babel import gettext
 from sqlalchemy.exc import InvalidRequestError
 from modules.FlaskModule.FlaskModule import device_api_ns as api
+from libtera.db.models.TeraDevice import TeraDevice
+
+
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('token', type=str, help='Secret Token')
+get_parser.add_argument('id_session', type=int, help='Session ID')
+# get_parser.add_argument('id_participant', type=int, help='Participant ID')
+get_parser.add_argument('list', type=inputs.boolean, help='List all sessions')
+
+post_parser = api.parser()
 
 
 class DeviceQuerySessions(Resource):
@@ -17,26 +28,28 @@ class DeviceQuerySessions(Resource):
         self.module = flaskModule
 
     @LoginModule.token_or_certificate_required
+    @api.expect(get_parser)
+    @api.doc(description='Get session',
+             responses={200: 'Success',
+                        400: 'Required parameter is missing',
+                        500: 'Internal server error',
+                        501: 'Not implemented',
+                        403: 'Logged device doesn\'t have permission to access the requested data'})
     def get(self):
-        device_access = DBManager.deviceAccess(current_device)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_session', type=int, help='id_session')
-        # parser.add_argument('id_participant', type=int)
-        # parser.add_argument('list', type=inputs.boolean)
-        #
-        args = parser.parse_args()
-        #
-        sessions = []
+        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
+        device_access = DBManager.deviceAccess(current_device)
+        args = get_parser.parse_args()
+
+        # Get all sessions
+        sessions = device_access.get_accessible_sessions()
+
         # Can't query sessions, unless we have a parameter!
         if not any(args.values()):
-            return '', 500
-        # elif args['id_participant']:
-        #     if args['id_participant'] in user_access.get_accessible_participants_ids():
-        #         sessions = TeraSession.get_sessions_for_participant(args['id_participant'])
+            return '', 400
+
         elif args['id_session']:
             sessions = device_access.query_session(session_id=args['id_session'])
-
         try:
             sessions_list = []
             for ses in sessions:
@@ -47,13 +60,14 @@ class DeviceQuerySessions(Resource):
                     session_json = ses.to_json(minimal=True)
                     sessions_list.append(session_json)
 
-            return jsonify(sessions_list)
+            return sessions_list
 
         except InvalidRequestError:
             return '', 500
 
     @LoginModule.token_or_certificate_required
     def post(self):
+        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
         parser = reqparse.RequestParser()
         parser.add_argument('session', type=str, location='json', help='Session to create / update',
                             required=True)

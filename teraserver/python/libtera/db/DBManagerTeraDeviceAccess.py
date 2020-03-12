@@ -26,6 +26,10 @@ class DBManagerTeraDeviceAccess:
                     return sessions
         return sessions
 
+    def get_accessible_sessions(self):
+        query = TeraSession.query.filter(TeraSession.id_creator_device == self.device.id_device)
+        return query.all()
+
     def get_accessible_participants(self, admin_only=False):
         return self.device.device_participants
 

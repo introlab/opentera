@@ -11,7 +11,7 @@ class ParticipantLogoutTest(unittest.TestCase):
     login_endpoint = '/api/participant/login'
 
     def _make_url(self, hostname, port, endpoint):
-        return 'http://' + hostname + ':' + str(port) + endpoint
+        return 'https://' + hostname + ':' + str(port) + endpoint
 
     def _http_auth(self, username, password):
         url = self._make_url(self.host, self.port, self.login_endpoint)

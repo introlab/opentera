@@ -57,7 +57,7 @@ class DeviceLogin(Resource):
 
         # Reply accessible sessions type ids
         session_types = device_access.get_accessible_session_types()
-        response['session_types_info'] = list()
+        response['participants_info'] = list()
 
         for st in session_types:
             response['session_types_info'].append(st.to_json(minimal=True))

@@ -9,7 +9,7 @@ from libtera.db.models.TeraAsset import TeraAsset
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('token', type=str, help='Secret Token')
-get_parser.add_argument('id_asset', type=int, help='Asset it to query')
+get_parser.add_argument('id_asset', type=int, help='Asset it to query', default=None)
 post_parser = api.parser()
 
 
@@ -34,7 +34,7 @@ class DeviceQueryAssets(Resource):
         device_access = db_man.deviceAccess(device)
 
         # TODO id_asset args
-        assets = device_access.get_accessible_assets()
+        assets = device_access.get_accessible_assets(id_asset=args['id_asset'])
 
         # Create response
         response = {'device_assets': []}

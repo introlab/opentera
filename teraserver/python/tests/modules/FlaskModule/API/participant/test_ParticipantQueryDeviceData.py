@@ -27,7 +27,7 @@ class ParticipantQueryDeviceDataTest(unittest.TestCase):
         return json_auth['participant_token']
 
     def _make_url(self, hostname, port, endpoint):
-        return 'http://' + hostname + ':' + str(port) + endpoint
+        return 'https://' + hostname + ':' + str(port) + endpoint
 
     def _request_with_http_auth(self, username, password, payload=None):
         if payload is None:

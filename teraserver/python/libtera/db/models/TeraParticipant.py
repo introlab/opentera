@@ -115,6 +115,8 @@ class TeraParticipant(db.Model, BaseModel):
             participant.authenticated = True
             return participant
 
+        return None
+
     @staticmethod
     def get_participant_by_token(token):
         participant = TeraParticipant.query.filter_by(participant_token=token).first()
