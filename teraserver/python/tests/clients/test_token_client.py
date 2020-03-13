@@ -96,7 +96,7 @@ class TokenClientTest(unittest.TestCase):
         # A Simple get method
         d = agent.request(
             b'POST',
-            b'http://localhost:4040/api/device/device_register',
+            b'https://localhost:4040/api/device/device_register',
             Headers({'User-Agent': ['Twisted Web Client Example'],
                      'Content-Type': ['application/json']}),
             body)
@@ -142,7 +142,7 @@ class TokenClientTest(unittest.TestCase):
 
         d = self.agent.request(
             b'GET',
-            b'http://localhost:4040/api/device/device_login',
+            b'https://localhost:4040/api/device/device_login',
             Headers({'User-Agent': ['Twisted Web Client Example'],
                      'Authorization': ['OpenTera ' + token]}),
             None)
@@ -190,7 +190,7 @@ class TokenClientTest(unittest.TestCase):
 
         d = self.agent.request(
             b'GET',
-            b'http://localhost:4040/api/device/device_login' + b'?token=' + token.encode('utf-8'),
+            b'https://localhost:4040/api/device/device_login' + b'?token=' + token.encode('utf-8'),
             Headers({'User-Agent': ['Twisted Web Client Example']}),
             None)
 
@@ -259,7 +259,7 @@ class TokenClientTest(unittest.TestCase):
 
         d = self.agent.request(
             b'POST',
-            b'http://localhost:4040/api/device/sessions' + b'?token=' + token.encode('utf-8'),
+            b'https://localhost:4040/api/device/sessions' + b'?token=' + token.encode('utf-8'),
             Headers({'User-Agent': ['Twisted Web Client Example'],
                      'Content-Type': ['application/json']}),
             body)
@@ -315,7 +315,7 @@ class TokenClientTest(unittest.TestCase):
 
         d = self.agent.request(
             b'POST',
-            b'http://localhost:4040/api/device/device_upload' + b'?token=' + token.encode('utf-8'),
+            b'https://localhost:4040/api/device/device_upload' + b'?token=' + token.encode('utf-8'),
             Headers({'User-Agent': ['Twisted Web Client Example'],
                      'Content-Type': ['multipart/form-data; boundary={}'.format(producer.boundary.decode('utf-8'))]
                      }),

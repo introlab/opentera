@@ -68,7 +68,7 @@ class DeviceRegister(Resource):
 
     def get(self):
         print(request)
-        return '', 200
+        return '', 403
 
     def post(self):
         print(request)
@@ -111,6 +111,10 @@ class DeviceRegister(Resource):
                 #     return 'Error processing request', 400
 
         elif request.content_type == 'application/json':
+
+            if 'device_info' not in request.json:
+                return 'Invalid content type', 400
+
             device_info = request.json['device_info']
 
             # Check if we have device name
