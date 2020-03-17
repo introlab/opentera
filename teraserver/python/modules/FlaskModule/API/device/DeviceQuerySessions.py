@@ -106,7 +106,7 @@ class DeviceQuerySessions(Resource):
             return '', 500
 
     @LoginModule.token_or_certificate_required
-    @api.expect(session_schema, validate=True)
+    # @api.expect(session_schema, validate=True)
     @api.doc(description='Update/Create session',
              responses={200: 'Success',
                         400: 'Required parameter is missing',
@@ -128,6 +128,10 @@ class DeviceQuerySessions(Resource):
 
         # Validate if we have an id
         if 'id_session' not in json_session:
+            return '', 400
+
+        # Validate if we have an id
+        if 'id_session_type' not in json_session:
             return '', 400
 
         # Validate that we have session participants for new sessions
