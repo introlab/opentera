@@ -2,7 +2,7 @@ import unittest
 import os
 from requests import get, post
 import json
-
+from datetime import datetime
 
 class DeviceQuerySessions(unittest.TestCase):
 
@@ -13,7 +13,7 @@ class DeviceQuerySessions(unittest.TestCase):
     device_query_session_endpoint = '/api/device/sessions'
     device_query_session_events_endpoint = '/api/device/sessionevents'
     user_device_endpoint = '/api/user/devices'
-    all_devices = None
+    all_devices = []
 
     def setUp(self):
         # Use admin account to get device information (and tokens)
@@ -82,15 +82,23 @@ class DeviceQuerySessions(unittest.TestCase):
 
                 self.assertEqual(session_response.status_code, 400)
 
-                # Valid session
-                session = {'session': {'id_session': 0,
-                                       'session_participants': participants_id_list,
-                                       'id_session_type': 2}}
+                if len(device_info['session_types_info']) > 0:
+                    # Valid session
+                    # Take first session type or none
+                    session_type = device_info['session_types_info'][0]
+                    session = {'session': {'id_session': 0,
+                                           'session_participants': participants_id_list,
+                                           'id_session_type': session_type['id_session_type'],
+                                           'session_name': 'TEST',
+                                           'session_status': 0,
+                                           'session_start_datetime': str(datetime.now())}}
 
-                session_response = self._token_auth_query_sessions_post(token=device['device_token'],
-                                                                        session_info=session)
-                print(session_response.text)
-                self.assertEqual(session_response.status_code, 200)
+                    session_response = self._token_auth_query_sessions_post(token=device['device_token'],
+                                                                            session_info=session)
+                    print(session_response.text)
+                    self.assertEqual(session_response.status_code, 200)
+                else:
+                    pass
             else:
                 login_response = self._token_auth(device['device_token'])
                 self.assertEqual(login_response.status_code, 403)

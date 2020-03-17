@@ -40,9 +40,19 @@ session_schema = api.schema_model('session', {
                 },
                 'id_session_type': {
                     'type': 'integer'
+                },
+                'session_name': {
+                    'type': 'string'
+                },
+                'session_status': {
+                    'type': 'integer'
+                },
+                'session_start_datetime': {
+                    'type': 'string'
                 }
             },
-            'required': ['id_session', 'session_participants', 'id_session_type']
+            'required': ['id_session', 'session_participants',
+                         'id_session_type', 'session_name', 'session_status', 'session_start_datetime']
         },
 
     },
