@@ -1,6 +1,6 @@
 import unittest
 import os
-from requests import get
+from requests import get, post
 import json
 
 
@@ -22,13 +22,6 @@ class DeviceQuerySessions(unittest.TestCase):
         self.all_devices = json.loads(response.text)
         self.assertGreater(len(self.all_devices), 0)
 
-        # Populate sessions for all devices
-        for device in self.all_devices:
-            response_sessions = self._token_auth_query_sessions(device['device_token'])
-            self.assertEqual(response_sessions.status_code, 200)
-            device['sessions'] = json.loads(response_sessions.text)
-            print(device['sessions'])
-
     def tearDown(self):
         pass
 
@@ -49,11 +42,55 @@ class DeviceQuerySessions(unittest.TestCase):
         request_headers = {'Authorization': 'OpenTera ' + token}
         return get(url=url, verify=False, headers=request_headers)
 
-    def _token_auth_query_sessions(self, token):
+    def _token_auth_query_sessions_get(self, token):
         url = self._make_url(self.host, self.port, self.device_query_session_endpoint) + '?list=true'
         request_headers = {'Authorization': 'OpenTera ' + token}
         return get(url=url, verify=False, headers=request_headers)
 
+    def _token_auth_query_sessions_post(self, token, session_info: dict = None):
+        url = self._make_url(self.host, self.port, self.device_query_session_endpoint)
+        request_headers = {'Authorization': 'OpenTera ' + token}
+        return post(url=url, verify=False, json=session_info, headers=request_headers)
+
     def test_device_query_sessions_get(self):
-        # TODO
-        pass
+        # Populate sessions for all devices
+        for device in self.all_devices:
+            if device['device_enabled']:
+                response_sessions = self._token_auth_query_sessions_get(device['device_token'])
+                self.assertEqual(response_sessions.status_code, 200)
+                device['sessions'] = json.loads(response_sessions.text)
+            else:
+                response_sessions = self._token_auth_query_sessions_get(device['device_token'])
+                self.assertEqual(response_sessions.status_code, 403)
+
+    def test_device_query_sessions_post(self):
+        # Populate sessions for all devices
+        for device in self.all_devices:
+            if device['device_enabled']:
+                login_response = self._token_auth(device['device_token'])
+                self.assertEqual(login_response.status_code, 200)
+                device_info = login_response.json()
+                # Get all participant ids
+                participants_id_list = [participant['participant_uuid']
+                                        for participant in device_info['participants_info']]
+
+                # Invalid session
+                session = {'session': {'id_session': 0, 'session_participants': participants_id_list}}
+
+                session_response = self._token_auth_query_sessions_post(token=device['device_token'],
+                                                                        session_info=session)
+
+                self.assertEqual(session_response.status_code, 400)
+
+                # Valid session
+                session = {'session': {'id_session': 0,
+                                       'session_participants': participants_id_list,
+                                       'id_session_type': 2}}
+
+                session_response = self._token_auth_query_sessions_post(token=device['device_token'],
+                                                                        session_info=session)
+                print(session_response.text)
+                self.assertEqual(session_response.status_code, 200)
+            else:
+                login_response = self._token_auth(device['device_token'])
+                self.assertEqual(login_response.status_code, 403)

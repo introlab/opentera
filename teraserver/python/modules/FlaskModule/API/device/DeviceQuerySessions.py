@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse, inputs
+from flask_restplus import Resource, reqparse, inputs, fields
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.DBManager import DBManager
@@ -19,6 +19,36 @@ get_parser.add_argument('id_session', type=int, help='Session ID')
 get_parser.add_argument('list', type=inputs.boolean, help='List all sessions')
 
 post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
+post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
+
+session_schema = api.schema_model('session', {
+    'properties': {
+        'session': {
+            'type': 'object',
+            'properties': {
+                'id_session': {
+                    'type': 'integer'
+                },
+                'session_participants': {
+                    'type': 'array',
+                    'uniqueItems': True,
+                    'contains': {
+                        'type': 'string',
+                        'format': 'uuid'
+                    }
+                },
+                'id_session_type': {
+                    'type': 'integer'
+                }
+            },
+            'required': ['id_session', 'session_participants', 'id_session_type']
+        },
+
+    },
+    'type': 'object',
+    'required': ['session']
+})
 
 
 class DeviceQuerySessions(Resource):
@@ -39,7 +69,7 @@ class DeviceQuerySessions(Resource):
 
         current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
         device_access = DBManager.deviceAccess(current_device)
-        args = get_parser.parse_args()
+        args = get_parser.parse_args(strict=True)
 
         # Get all sessions
         sessions = device_access.get_accessible_sessions()
@@ -66,11 +96,17 @@ class DeviceQuerySessions(Resource):
             return '', 500
 
     @LoginModule.token_or_certificate_required
+    @api.expect(session_schema, validate=True)
+    @api.doc(description='Update/Create session',
+             responses={200: 'Success',
+                        400: 'Required parameter is missing',
+                        500: 'Internal server error',
+                        501: 'Not implemented',
+                        403: 'Logged device doesn\'t have permission to access the requested data'})
     def post(self):
         current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
-        parser = reqparse.RequestParser()
-        parser.add_argument('session', type=str, location='json', help='Session to create / update',
-                            required=True)
+
+        args = post_parser.parse_args()
 
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:

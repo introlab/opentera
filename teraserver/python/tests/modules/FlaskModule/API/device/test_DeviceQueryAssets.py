@@ -48,11 +48,16 @@ class DeviceQueryAssetsTest(unittest.TestCase):
 
     def test_query_assets_get(self):
         for device in self.all_devices:
-            response = self._token_auth_query_assets(device['device_token'])
-            self.assertEqual(response.status_code, 200)
-            assets = json.loads(response.text)
-            self.assertTrue(assets.__contains__('device_assets'))
-            for asset in assets['device_assets']:
-                print(asset)
-                # TODO Validate Asset JSON
+            if device['device_enabled']:
+                response = self._token_auth_query_assets(device['device_token'])
+                self.assertEqual(response.status_code, 200)
+                assets = json.loads(response.text)
+                self.assertTrue(assets.__contains__('device_assets'))
+                for asset in assets['device_assets']:
+                    print(asset)
+                    # TODO Validate Asset JSON
+            else:
+                # Device not enabled should return access denied
+                response = self._token_auth_query_assets(device['device_token'])
+                self.assertEqual(response.status_code, 403)
 

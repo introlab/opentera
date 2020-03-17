@@ -7,8 +7,6 @@ from libtera.db.models.TeraDevice import TeraDevice
 
 # Parser definition(s)
 get_parser = api.parser()
-
-
 get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
