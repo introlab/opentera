@@ -48,16 +48,28 @@ class TeraUserTest(unittest.TestCase):
 
         device = TeraDevice.get_device_by_id(1)
         access = DBManagerTeraDeviceAccess(device)
-        participant = TeraParticipant.get_participant_by_id(1)
+        participant1 = TeraParticipant.get_participant_by_id(1)
+        participant2 = TeraParticipant.get_participant_by_id(2)
 
         session_types = access.get_accessible_session_types()
 
         session.session_name = 'TEST'
         session.session_creator_device = device
-        session.session_participants.append(participant)
+        session.session_participants.append(participant1)
+        session.session_participants.append(participant2)
         session.session_start_datetime = datetime.now()
         session.session_status = TeraSessionStatus.STATUS_NOTSTARTED.value
 
         if len(session_types) > 0:
             session.id_session_type = session_types[0].id_session_type
             TeraSession.insert(session)
+
+    def test_Session_from_json(self):
+        pass
+        #
+        # session = {'session': {'id_session': 0,
+        #                        'session_participants': participants_id_list,
+        #                        'id_session_type': session_type['id_session_type'],
+        #                        'session_name': 'TEST',
+        #                        'session_status': 0,
+        #                        'session_start_datetime': str(datetime.now())}}
