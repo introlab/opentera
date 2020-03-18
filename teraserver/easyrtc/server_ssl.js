@@ -11,7 +11,7 @@ if (process.argv[2])
     myport = process.argv[2];
 
 if (process.argv[3])
-        mykey = process.argv[3];
+    mykey = process.argv[3];
 
 
 // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.

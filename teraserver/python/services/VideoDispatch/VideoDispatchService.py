@@ -1,5 +1,6 @@
 from services.VideoDispatch.FlaskModule import FlaskModule
 from services.VideoDispatch.TwistedModule import TwistedModule
+from services.VideoDispatch.WebRTCModule import WebRTCModule
 from services.VideoDispatch.ConfigManager import ConfigManager
 from modules.Globals import TeraServerConstants
 from libtera.redis.RedisClient import RedisClient
@@ -39,6 +40,9 @@ if __name__ == '__main__':
 
     # Main Twisted module
     twisted_module = TwistedModule(config_man)
+
+    # Main WebRTC module
+    webrtc_module = WebRTCModule(config_man)
 
     # Run reactor
     twisted_module.run()

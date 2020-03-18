@@ -31,7 +31,7 @@ from modules.TwistedModule.TwistedModule import TwistedModule
 from libtera.ConfigManager import ConfigManager
 from modules.Globals import db_man, TeraServerConstants
 from modules.UserManagerModule.UserManagerModule import UserManagerModule
-from modules.WebRTCModule.WebRTCModule import WebRTCModule
+
 
 import os
 
@@ -161,9 +161,6 @@ if __name__ == '__main__':
 
     user_manager_module = UserManagerModule(config_man)
 
-    # WebRTCModule
-    webrtc_module = WebRTCModule(config_man)
-    
     # This is blocking, running event loop
     twisted_module.run()
 
