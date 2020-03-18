@@ -72,7 +72,7 @@ function loginReply(response, status, request){
         setCookie("VideoDispatchToken", response["user_token"], 30);
 
 		// Redirect to location
-		window.location.replace("/index");
+		window.location.replace("index");
 	}else{
 		//clearInterval(timerId);
 		console.log("loginReply: " + response);

@@ -110,8 +110,8 @@ class TwistedModule(BaseModule):
             os.path.abspath(self.config.server_config['ssl_path']),
             self.config.server_config['ca_certificate']))
 
-        reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
-        # reactor.listenTCP(self.config.server_config['port'], site)
+        # reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
+        reactor.listenTCP(self.config.server_config['port'], site)
 
     def __del__(self):
         pass

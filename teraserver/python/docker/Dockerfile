@@ -7,7 +7,7 @@ FROM ubuntu:18.04
 
 # Install build dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-	postgresql redis-server build-essential cmake python3.6 git \
+	postgresql redis-server build-essential cmake python3.6 git python3-babel \
         python3-pip sudo vim libprotobuf-dev cmake protobuf-compiler locales
 
 # Set system locale
