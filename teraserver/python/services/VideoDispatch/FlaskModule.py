@@ -107,14 +107,16 @@ class FlaskModule(BaseModule):
     def init_views(self):
         from .Views.Index import Index
         from .Views.Login import Login
+        from .Views.Dashboard import Dashboard
 
         # Default arguments
         args = []
         kwargs = {'flaskModule': self}
 
         # Will create a function that calls the __index__ method with args, kwargs
-        flask_app.add_url_rule('/index', view_func=Index.as_view('index', *args, **kwargs))
+        flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
         flask_app.add_url_rule('/login', view_func=Login.as_view('login', *args, **kwargs))
+        flask_app.add_url_rule('/dashboard', view_func=Dashboard.as_view('dashboard', *args, **kwargs))
 
 
 @flask_app.after_request

@@ -4,15 +4,12 @@ from services.VideoDispatch.AccessManager import AccessManager, current_client
 
 
 class Index(MethodView):
-    # Decorators everywhere?
-    # decorators = [auth.login_required]
-
     def __init__(self, *args, **kwargs):
         print('Index.__init__', args, kwargs)
         self.flaskModule = kwargs.get('flaskModule', None)
         print(self.flaskModule)
 
-    @AccessManager.token_required
+
     def get(self):
         # print('get')
         # print(request.cookies['VideoDispatchToken'])
@@ -31,8 +28,7 @@ class Index(MethodView):
         # print(current_client.get_role_for_site(1))
         # print(current_client.get_role_for_project(1))
 
-        return render_template('index.html', hostname=hostname, port=port,
-                               backend_hostname=backend_hostname, backend_port=backend_port)
+        return render_template('index.html')
 
     def post(self):
         print('post')
