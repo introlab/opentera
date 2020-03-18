@@ -1,4 +1,4 @@
-from libtera.ConfigManager import ConfigManager
+from .ConfigManager import ConfigManager
 from messages.python.CreateSession_pb2 import CreateSession
 from modules.BaseModule import BaseModule, ModuleNames
 
@@ -6,19 +6,34 @@ import os
 import subprocess
 
 
+class ActiveSession:
+    def test(self):
+        pass
+
+
 class WebRTCModule(BaseModule):
 
     def __init__(self, config: ConfigManager):
-        BaseModule.__init__(self, ModuleNames.WEBRTC_MODULE_NAME.value, config)
+        BaseModule.__init__(self, "VideoDispatchService.WebRTCModule", config)
         self.processList = []
 
     def __del__(self):
-        self.unsubscribe_pattern_with_callback("webrtc.*", self.webrtc_message_callback_deprecated)
+        # self.unsubscribe_pattern_with_callback("webrtc.*", self.webrtc_message_callback_deprecated)
+        pass
 
     def setup_module_pubsub(self):
         # Additional subscribe
         # TODO change those messages to use complete protobuf messaging system
-        self.subscribe_pattern_with_callback("webrtc.*", self.webrtc_message_callback_deprecated)
+        # self.subscribe_pattern_with_callback("webrtc.*", self.webrtc_message_callback_deprecated)
+        pass
+
+    def setup_rpc_interface(self):
+        self.rpc_api['create_session'] = {'args': [],
+                                          'returns': 'dict',
+                                          'callback': self.create_webrtc_session}
+
+    def create_webrtc_session(self):
+        pass
 
     def notify_module_messages(self, pattern, channel, message):
         """

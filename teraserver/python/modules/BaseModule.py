@@ -11,7 +11,6 @@ import datetime
 @unique
 class ModuleNames(Enum):
     FLASK_MODULE_NAME = str("TeraServer.FlaskModule")
-    WEBRTC_MODULE_NAME = str("TeraServer.WebRTCModule")
     TWISTED_MODULE_NAME = str("TeraServer.TwistedModule")
     LOGIN_MODULE_NAME = str("TeraServer.LoginModule")
     USER_MANAGER_MODULE_NAME = str("TeraServer.UserManagerModule")
