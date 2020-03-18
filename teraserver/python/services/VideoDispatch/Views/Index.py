@@ -9,7 +9,6 @@ class Index(MethodView):
         self.flaskModule = kwargs.get('flaskModule', None)
         print(self.flaskModule)
 
-
     def get(self):
         # print('get')
         # print(request.cookies['VideoDispatchToken'])
@@ -31,5 +30,9 @@ class Index(MethodView):
         return render_template('index.html')
 
     def post(self):
-        print('post')
-        pass
+        if 'name' in request.form and 'email' in request.form:
+            name = request.form['name']
+            email = request.form['email']
+            return 'Merci ' + name + '. Nous allons vous envoyer une invitation au courriel:' + email, 200
+        else:
+            return 'Invaild', 400

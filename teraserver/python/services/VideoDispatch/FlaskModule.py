@@ -114,7 +114,7 @@ class FlaskModule(BaseModule):
         kwargs = {'flaskModule': self}
 
         # Will create a function that calls the __index__ method with args, kwargs
-        flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
+        flask_app.add_url_rule('/home', view_func=Index.as_view('index', *args, **kwargs))
         flask_app.add_url_rule('/login', view_func=Login.as_view('login', *args, **kwargs))
         flask_app.add_url_rule('/dashboard', view_func=Dashboard.as_view('dashboard', *args, **kwargs))
 
