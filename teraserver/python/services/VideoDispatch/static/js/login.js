@@ -40,7 +40,7 @@ function doLogin(backend_url, backend_port){
 		// Send AJAX POST query
 		$.ajax({
           type: "GET",
-          url: 'https://' + backend_url + ':' + backend_port + '/api/user/login',
+          url: 'http://' + backend_url + ':' + backend_port + '/api/user/login',
           success: loginReply,
           beforeSend: function (xhr) {
             xhr.setRequestHeader('Authorization', 'Basic ' + btoa($('#name').val() + ':' + $('#password').val()));
