@@ -15,19 +15,21 @@ if __name__ == '__main__':
 
     # DATABASE CONFIG AND OPENING
     #############################
-    POSTGRES = {
-        'user': config_man.db_config['username'],
-        'pw': config_man.db_config['password'],
-        'db': config_man.db_config['name'],
-        'host': config_man.db_config['url'],
-        'port': config_man.db_config['port']
-    }
+    # UNUSED FOR NOW
 
-    try:
-        Globals.db_man.open(POSTGRES, True)
-    except OperationalError:
-        print("Unable to connect to database - please check settings in config file!")
-        quit()
+    # POSTGRES = {
+    #     'user': config_man.db_config['username'],
+    #     'pw': config_man.db_config['password'],
+    #     'db': config_man.db_config['name'],
+    #     'host': config_man.db_config['url'],
+    #     'port': config_man.db_config['port']
+    # }
+    #
+    # try:
+    #     Globals.db_man.open(POSTGRES, True)
+    # except OperationalError:
+    #     print("Unable to connect to database - please check settings in config file!")
+    #     quit()
 
     # Global redis client
     Globals.redis_client = RedisClient(config_man.redis_config)

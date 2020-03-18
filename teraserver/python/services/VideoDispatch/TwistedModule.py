@@ -86,29 +86,29 @@ class TwistedModule(BaseModule):
         # List of available CA clients certificates
         # TODO READ OTHER CERTIFICATES FROM FILE/DB...
         # caCerts=[cert.original]
-        caCerts = []
-
-        # Use verify = True to verify certificates
-        self.ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
-                                                  requireCertificate=False,
-                                                  enableSessions=False)
-
-        ctx = self.ssl_factory.getContext()
-        res1 = ctx.use_privatekey_file(os.path.join(
-            os.path.abspath(self.config.server_config['ssl_path']),
-            self.config.server_config['site_private_key']))
-
-        res2 = ctx.use_certificate_file(os.path.join(
-            os.path.abspath(self.config.server_config['ssl_path']),
-            self.config.server_config['site_certificate']))
-
-        # Certificate verification callback
-        ctx.set_verify(SSL.VERIFY_NONE, self.verifyCallback)
-
-        # With self-signed certs we have to explicitely tell the server to trust certificates
-        ctx.load_verify_locations(os.path.join(
-            os.path.abspath(self.config.server_config['ssl_path']),
-            self.config.server_config['ca_certificate']))
+        # caCerts = []
+        #
+        # # Use verify = True to verify certificates
+        # self.ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
+        #                                           requireCertificate=False,
+        #                                           enableSessions=False)
+        #
+        # ctx = self.ssl_factory.getContext()
+        # res1 = ctx.use_privatekey_file(os.path.join(
+        #     os.path.abspath(self.config.server_config['ssl_path']),
+        #     self.config.server_config['site_private_key']))
+        #
+        # res2 = ctx.use_certificate_file(os.path.join(
+        #     os.path.abspath(self.config.server_config['ssl_path']),
+        #     self.config.server_config['site_certificate']))
+        #
+        # # Certificate verification callback
+        # ctx.set_verify(SSL.VERIFY_NONE, self.verifyCallback)
+        #
+        # # With self-signed certs we have to explicitely tell the server to trust certificates
+        # ctx.load_verify_locations(os.path.join(
+        #     os.path.abspath(self.config.server_config['ssl_path']),
+        #     self.config.server_config['ca_certificate']))
 
         # reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
         reactor.listenTCP(self.config.server_config['port'], site)
