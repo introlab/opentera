@@ -25,6 +25,7 @@ class ServiceQueryParticipants(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
+        print('hello')
         return 'Not implemented', 501
 
     @LoginModule.service_token_or_certificate_required
@@ -36,4 +37,5 @@ class ServiceQueryParticipants(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def post(self):
+        print('hello')
         return 'Not Implemented', 501

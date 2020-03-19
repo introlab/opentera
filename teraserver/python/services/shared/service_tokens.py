@@ -2,10 +2,11 @@ import jwt
 import redis
 import time
 from modules.Globals import TeraServerConstants
+from requests import get
 
 
 def service_generate_token(redis_client: redis.Redis, service_info: dict):
-    if 'service_uuid' in service_info:
+    if 'ServiceUUID' in service_info:
         # Use redis key to generate token
         # Creating token with service info
         # TODO ADD MORE FIELDS?
