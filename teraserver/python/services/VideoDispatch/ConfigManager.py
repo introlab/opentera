@@ -39,12 +39,11 @@ class ConfigManager:
         if self.validate_backend_config(config_json['Backend']):
             self.backend_config = config_json["Backend"]
 
-
     @staticmethod
     def validate_server_config(config):
         rval = True
 
-        required_fields = ['name', 'port', 'ssl_path', 'hostname',
+        required_fields = ['name', 'ServiceUUID', 'port', 'ssl_path', 'hostname',
                            'site_certificate', 'site_private_key', 'ca_certificate', 'ca_private_key']
         for field in required_fields:
             if field not in config:

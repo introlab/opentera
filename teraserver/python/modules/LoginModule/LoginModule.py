@@ -191,8 +191,6 @@ class LoginModule(BaseModule):
         """
         Use this decorator if UUID is stored in a client certificate or token in url params.
         Acceptable for devices and participants.
-
-        TODO : To be removed? Old way of using tokens in params, kept for compatibility.
         """
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -283,8 +281,6 @@ class LoginModule(BaseModule):
         """
         Use this decorator if UUID is stored in a client certificate or token in url params.
         Acceptable for services
-
-        TODO : To be removed? Old way of using tokens in params, kept for compatibility.
         """
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -312,7 +308,7 @@ class LoginModule(BaseModule):
 
                     try:
                         token_dict = jwt.decode(token,
-                                                LoginModule.redis_client.redisGet(
+                                                LoginModule.redis_client.get(
                                                     TeraServerConstants.RedisVar_ServiceTokenAPIKey),
                                                 algorithms='HS256')
                         if 'service_uuid' in token_dict:
@@ -330,7 +326,7 @@ class LoginModule(BaseModule):
             if token_args['token']:
                 try:
                     token_dict = jwt.decode(token_args['token'],
-                                            LoginModule.redis_client.redisGet(
+                                            LoginModule.redis_client.get(
                                                 TeraServerConstants.RedisVar_ServiceTokenAPIKey),
                                             algorithms='HS256')
                     if 'service_uuid' in token_dict:
