@@ -5,9 +5,7 @@ from services.VideoDispatch.AccessManager import AccessManager, current_client
 
 class Index(MethodView):
     def __init__(self, *args, **kwargs):
-        print('Index.__init__', args, kwargs)
         self.flaskModule = kwargs.get('flaskModule', None)
-        print(self.flaskModule)
 
     def get(self):
         # print('get')

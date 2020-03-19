@@ -38,7 +38,7 @@ class AccessManager:
                 token_dict = jwt.decode(token_value, api_user_token_key)
             except jwt.exceptions.InvalidSignatureError as e:
                 print(e)
-                return redirect("login")
+                return redirect("videodispatch/login")
 
             if token_dict['user_uuid']:
                 _request_ctx_stack.top.current_client = TeraClient(token_dict['user_uuid'], token_value, )

@@ -6,9 +6,7 @@ from services.VideoDispatch.AccessManager import AccessManager
 class Dashboard(MethodView):
 
     def __init__(self, *args, **kwargs):
-        print('Dashboard.__init__', args, kwargs)
         self.flaskModule = kwargs.get('flaskModule', None)
-        print(self.flaskModule)
 
     @AccessManager.token_required
     def get(self):
