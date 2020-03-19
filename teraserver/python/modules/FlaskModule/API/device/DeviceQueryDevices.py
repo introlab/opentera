@@ -18,7 +18,7 @@ class DeviceQueryDevices(Resource):
         Resource.__init__(self, _api)
         self.module = flaskModule
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)
     @api.doc(description='Return device information.',
              responses={200: 'Success',

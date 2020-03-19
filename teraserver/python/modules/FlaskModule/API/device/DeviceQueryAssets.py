@@ -19,7 +19,7 @@ class DeviceQueryAssets(Resource):
         Resource.__init__(self, _api)
         self.module = flaskModule
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)
     @api.doc(description='Get device assets',
              responses={200: 'Success',
@@ -45,7 +45,7 @@ class DeviceQueryAssets(Resource):
 
         return response
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     @api.expect(post_parser)
     @api.doc(description='Login device with Token.',
              responses={200: 'Success',

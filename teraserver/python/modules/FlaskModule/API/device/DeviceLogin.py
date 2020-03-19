@@ -18,7 +18,7 @@ class DeviceLogin(Resource):
         Resource.__init__(self, _api)
         self.parser = reqparse.RequestParser()
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)
     @api.doc(description='Login device with Token.',
              responses={200: 'Success',

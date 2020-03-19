@@ -24,7 +24,7 @@ class DeviceQuerySessionEvents(Resource):
         Resource.__init__(self, _api)
         self.module = flaskModule
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)
     @api.doc(description='Get session events',
              responses={200: 'Success',
@@ -56,7 +56,7 @@ class DeviceQuerySessionEvents(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('session_event', type=str, location='json', help='Event to create / update',
@@ -109,6 +109,6 @@ class DeviceQuerySessionEvents(Resource):
 
         return jsonify([update_event.to_json()])
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     def delete(self):
         return '', 403

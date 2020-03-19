@@ -33,6 +33,7 @@ api = Api(flask_app,
 user_api_ns = api.namespace('api/user', description='API for user calls')
 device_api_ns = api.namespace('api/device', description='API for device calls')
 participant_api_ns = api.namespace('api/participant', description='API for participant calls')
+service_api_ns = api.namespace('api/service', descriptino='API for service calls')
 
 
 @babel.localeselector
@@ -81,6 +82,7 @@ class FlaskModule(BaseModule):
         self.init_user_api()
         self.init_device_api()
         self.init_participant_api()
+        self.init_service_api()
 
         # Init Views
         self.init_views()
@@ -209,6 +211,17 @@ class FlaskModule(BaseModule):
         participant_api_ns.add_resource(ParticipantQuerySessions, '/sessions', resource_class_kwargs=kwargs)
 
         api.add_namespace(participant_api_ns)
+
+    def init_service_api(self):
+        # Default arguments
+        kwargs = {'flaskModule': self}
+
+        # Services
+        from .API.service.ServiceQueryParticipants import ServiceQueryParticipants
+        service_api_ns.add_resource(ServiceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
+
+        # Add namespace
+        api.add_namespace(service_api_ns)
 
     def init_views(self):
         from .Views.User import User

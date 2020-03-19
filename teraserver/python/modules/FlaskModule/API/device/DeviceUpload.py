@@ -28,13 +28,13 @@ class DeviceUpload(Resource):
         Resource.__init__(self, _api)
         self.module = flaskModule
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     def get(self):
         print(request)
         print('current_device', current_device)
         return '', 200
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     def post(self):
         print(request)
         print('current_device', current_device)

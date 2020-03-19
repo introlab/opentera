@@ -12,7 +12,7 @@ class DeviceLogout(Resource):
         Resource.__init__(self, _api)
         self.parser = reqparse.RequestParser()
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     def get(self):
         return "Forbidden", 403
 

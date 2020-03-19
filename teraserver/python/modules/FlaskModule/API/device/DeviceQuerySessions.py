@@ -67,7 +67,7 @@ class DeviceQuerySessions(Resource):
         Resource.__init__(self, _api)
         self.module = flaskModule
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)
     @api.doc(description='Get session',
              responses={200: 'Success',
@@ -105,7 +105,7 @@ class DeviceQuerySessions(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     # @api.expect(session_schema, validate=True)
     @api.doc(description='Update/Create session',
              responses={200: 'Success',
@@ -188,6 +188,6 @@ class DeviceQuerySessions(Resource):
 
         return jsonify(update_session.to_json())
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     def delete(self):
         return '', 403

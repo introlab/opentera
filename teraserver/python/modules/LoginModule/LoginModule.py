@@ -12,6 +12,7 @@ from libtera.db.models.TeraDevice import TeraDevice
 
 from libtera.ConfigManager import ConfigManager
 import datetime
+import redis
 
 from flask import current_app, request, jsonify, _request_ctx_stack
 from werkzeug.local import LocalProxy
@@ -42,7 +43,14 @@ participant_multi_auth = MultiAuth(participant_http_auth, participant_token_auth
 
 class LoginModule(BaseModule):
 
+    redis_client = None
+
     def __init__(self, config: ConfigManager):
+
+        # Update Global Redis Client
+        LoginModule.redis_client = redis.Redis(host=config.redis_config['hostname'],
+                                               port=config.redis_config['port'],
+                                               db=config.redis_config['db'])
 
         BaseModule.__init__(self, ModuleNames.LOGIN_MODULE_NAME.value, config)
 
@@ -179,7 +187,7 @@ class LoginModule(BaseModule):
         return False
 
     @staticmethod
-    def token_or_certificate_required(f):
+    def device_token_or_certificate_required(f):
         """
         Use this decorator if UUID is stored in a client certificate or token in url params.
         Acceptable for devices and participants.
@@ -270,3 +278,68 @@ class LoginModule(BaseModule):
 
         return decorated
 
+    @staticmethod
+    def service_token_or_certificate_required(f):
+        """
+        Use this decorator if UUID is stored in a client certificate or token in url params.
+        Acceptable for services
+
+        TODO : To be removed? Old way of using tokens in params, kept for compatibility.
+        """
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            import jwt
+            # Since certificates are more secure than tokens, we will test for them first
+            # Headers are modified in TwistedModule to add certificate information if available.
+            # We are interested in the content of field : X-Service-Uuid,
+            if request.headers.__contains__('X-Service-Uuid'):
+                # TODO Load service from DB ?
+                # TODO validate service UUID
+                return f(*args, **kwargs)
+
+            # Then verify tokens...
+            # Verify token in auth headers (priority over token in params)
+            if 'Authorization' in request.headers:
+                try:
+                    # Default whitespace as separator, 1 split max
+                    scheme, token = request.headers['Authorization'].split(None, 1)
+                except ValueError:
+                    # malformed Authorization header
+                    return 'Forbidden', 403
+
+                # Verify scheme and token
+                if scheme == 'OpenTera':
+
+                    try:
+                        token_dict = jwt.decode(token,
+                                                LoginModule.redis_client.redisGet(
+                                                    TeraServerConstants.RedisVar_ServiceTokenAPIKey),
+                                                algorithms='HS256')
+                        if 'service_uuid' in token_dict:
+                            # TODO VERIFY IF SERVICE IS OK.
+                            return f(*args, **kwargs)
+                    except jwt.exceptions.InvalidSignatureError as e:
+                        return 'Forbidden', 403
+
+            # Parse args
+            parser = reqparse.RequestParser()
+            parser.add_argument('token', type=str, help='Token', required=False)
+            token_args = parser.parse_args(strict=False)
+
+            # Verify token in params
+            if token_args['token']:
+                try:
+                    token_dict = jwt.decode(token_args['token'],
+                                            LoginModule.redis_client.redisGet(
+                                                TeraServerConstants.RedisVar_ServiceTokenAPIKey),
+                                            algorithms='HS256')
+                    if 'service_uuid' in token_dict:
+                        # TODO VERIFY IF SERVICE IS OK.
+                        return f(*args, **kwargs)
+                except jwt.exceptions.InvalidSignatureError as e:
+                    return 'Forbidden', 403
+
+            # Any other case, do not call function since no valid auth found.
+            return 'Forbidden', 403
+
+        return decorated

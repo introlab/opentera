@@ -76,7 +76,11 @@ def verify_file_upload_directory(config: ConfigManager, create=True):
 def init_shared_variables(config):
     # Create user token
     from libtera.db.models.TeraServerSettings import TeraServerSettings
+
+    # Dynamic key for users, updated at every restart (for now)
+    # Server should rotate key every hour, day?
     user_token_key = TeraServerSettings.generate_token_key(32)
+    service_token_key = TeraServerSettings.generate_token_key(32)
 
     # Create redis client
     import redis
@@ -85,9 +89,16 @@ def init_shared_variables(config):
 
     # Set API Token Keys
     from modules.Globals import TeraServerConstants
+    # Set USER
     redis_client.set(TeraServerConstants.RedisVar_UserTokenAPIKey, user_token_key)
+
+    # Set SERVICE
+    redis_client.set(TeraServerConstants.RedisVar_ServiceTokenAPIKey, service_token_key)
+
+    # Set DEVICE
     redis_client.set(TeraServerConstants.RedisVar_DeviceTokenAPIKey,
                      TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerDeviceTokenKey))
+    # Set PARTICIPANT
     redis_client.set(TeraServerConstants.RedisVar_ParticipantTokenAPIKey,
                      TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerParticipantTokenKey))
 
