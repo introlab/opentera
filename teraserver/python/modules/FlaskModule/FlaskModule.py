@@ -1,4 +1,4 @@
-from flask import Flask, request, g
+from flask import Flask, request, g, url_for
 from flask_session import Session
 from flask_restplus import Api
 from libtera.ConfigManager import ConfigManager
@@ -24,10 +24,23 @@ authorizations = {
         'name': 'OpenTera'
     }
 }
-api = Api(flask_app,
-          version='1.0.0', title='OpenTeraServer API',
-          description='TeraServer API Documentation', doc='/doc',
-          authorizations=authorizations)
+
+
+# Simple fix for API documentation used with reverse proxy
+class CustomAPI(Api):
+    @property
+    def specs_url(self):
+        '''
+        The Swagger specifications absolute url (ie. `swagger.json`)
+
+        :rtype: str
+        '''
+        return url_for(self.endpoint('specs'), _external=False)
+
+
+api = CustomAPI(flask_app, version='1.0.0', title='OpenTeraServer API',
+                description='TeraServer API Documentation', doc='/doc',
+                authorizations=authorizations)
 
 # Namespaces
 user_api_ns = api.namespace('api/user', description='API for user calls')
@@ -72,6 +85,7 @@ class FlaskModule(BaseModule):
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
         flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
+        flask_app.config.update({'SWAGGER_BASEPATH': '/doc'})
 
         # Not sure.
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
