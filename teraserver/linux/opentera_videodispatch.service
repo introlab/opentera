@@ -6,8 +6,8 @@ After=network-online.target
 User=letd2801
 Group=letd2801
 Environment=PYTHONPATH=/home/letd2801/work/opentera.git/teraserver/python
-ExecStart=/home/letd2801/work/opentera.git/teraserver/python/env/python-3.6/bin/python3 /home/letd2801/work/opentera.git/teraserver/python/TeraServer.py
-WorkingDirectory=/home/letd2801/work/opentera.git/teraserver/python
+ExecStart=/home/letd2801/work/opentera.git/teraserver/python/env/python-3.6/bin/python3 /home/letd2801/work/opentera.git/teraserver/python/services/VideoDispatch/VideoDispatchService.py 
+WorkingDirectory=/home/letd2801/work/opentera.git/teraserver/python/services/VideoDispatch
 StandardOutput=syslog+console
 StandardError=syslog+console
 Restart=always
