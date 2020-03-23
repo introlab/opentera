@@ -65,12 +65,12 @@ class TeraParticipant(db.Model, BaseModel):
 
     def to_json(self, ignore_fields=[], minimal=False):
 
-        ignore_fields.extend(['authenticated', 'participant_participant_group', 'participant_devices',
-                              'participant_token', 'participant_sessions', 'participant_password',
-                              'participant_project'])
+        ignore_fields.extend(['authenticated', 'participant_devices',
+                              'participant_sessions', 'participant_password',
+                              'participant_project', 'participant_participant_group'])
         if minimal:
             ignore_fields.extend(['participant_uuid', 'participant_username', 'participant_lastonline',
-                                  'participant_login_enabled'])
+                                  'participant_login_enabled', 'participant_token'])
 
         return super().to_json(ignore_fields=ignore_fields)
 

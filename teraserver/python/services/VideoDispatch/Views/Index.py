@@ -46,8 +46,18 @@ class Index(MethodView):
             # This is a synchronous call
             url = "http://" + backend_hostname + ':' + str(backend_port) + '/api/service/participants'
             request_headers = {'Authorization': 'OpenTera ' + self.service_token}
-            response = post(url=url, verify=False, headers=request_headers)
-            print(response)
-            return 'Merci ' + name + '. Nous allons vous envoyer une invitation au courriel:' + email, 200
+
+            participant_info = {'participant': {'id_participant': 0,  # Will create a new participant
+                                                'id_project': 1,  # Hard coded for now
+                                                'participant_name': request.form['name'],
+                                                'participant_email': request.form['email']}}
+
+            response = post(url=url, verify=False, headers=request_headers, json=participant_info)
+            if response.status_code == 200:
+                # TODO SEND EMAIL!
+                return 'Merci ' + name + '. Nous allons vous envoyer une invitation au courriel:' + email, 200
+            else:
+                return 'Invalid', 500
+
         else:
-            return 'Invaild', 400
+            return 'Invalid', 400

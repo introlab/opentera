@@ -128,7 +128,7 @@ class FlaskModule(BaseModule):
         kwargs = {'flaskModule': self}
 
         # Will create a function that calls the __index__ method with args, kwargs
-        flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
+        flask_app.add_url_rule('/index', view_func=Index.as_view('index', *args, **kwargs))
         flask_app.add_url_rule('/login', view_func=Login.as_view('login', *args, **kwargs))
         flask_app.add_url_rule('/dashboard', view_func=Dashboard.as_view('dashboard', *args, **kwargs))
         flask_app.add_url_rule('/dashboard_main', view_func=DashboardMain.as_view('dashboard_main', *args, **kwargs))
@@ -141,3 +141,4 @@ def apply_caching(response):
     response.headers["Access-Control-Allow-Headers"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "*"
     return response
+
