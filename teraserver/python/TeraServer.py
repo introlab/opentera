@@ -29,7 +29,7 @@ from modules.FlaskModule.FlaskModule import FlaskModule
 from modules.TwistedModule.TwistedModule import TwistedModule
 
 from libtera.ConfigManager import ConfigManager
-from modules.Globals import db_man, TeraServerConstants
+from modules.Globals import db_man
 from modules.UserManagerModule.UserManagerModule import UserManagerModule
 
 
@@ -88,18 +88,18 @@ def init_shared_variables(config):
                                db=config.redis_config['db'])
 
     # Set API Token Keys
-    from modules.Globals import TeraServerConstants
+    from modules.RedisVars import RedisVars
     # Set USER
-    redis_client.set(TeraServerConstants.RedisVar_UserTokenAPIKey, user_token_key)
+    redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, user_token_key)
 
     # Set SERVICE
-    redis_client.set(TeraServerConstants.RedisVar_ServiceTokenAPIKey, service_token_key)
+    redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, service_token_key)
 
     # Set DEVICE
-    redis_client.set(TeraServerConstants.RedisVar_DeviceTokenAPIKey,
+    redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey,
                      TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerDeviceTokenKey))
     # Set PARTICIPANT
-    redis_client.set(TeraServerConstants.RedisVar_ParticipantTokenAPIKey,
+    redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey,
                      TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerParticipantTokenKey))
 
 

@@ -38,8 +38,8 @@ class Login(Resource):
             port = request.headers['X_EXTERNALPORT']
 
         # Get user token key from redis
-        from modules.Globals import TeraServerConstants
-        token_key = self.module.redisGet(TeraServerConstants.RedisVar_UserTokenAPIKey)
+        from modules.RedisVars import RedisVars
+        token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
 
         # Get token for user
         from libtera.db.models.TeraUser import TeraUser

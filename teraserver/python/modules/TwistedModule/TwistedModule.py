@@ -31,8 +31,8 @@ class MyHTTPChannel(HTTPChannel):
     def allHeadersReceived(self):
         # Verify if we have a client with a certificate...
         # cert = self.transport.getPeerCertificate()
-        cert = getattr(self.transport, "getPeerCertificate", None)
-        if cert:
+        cert = None
+        if getattr(self.transport, "getPeerCertificate", None):
             cert = self.transport.getPeerCertificate()
 
         # Current request

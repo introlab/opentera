@@ -2,7 +2,7 @@ from services.VideoDispatch.FlaskModule import FlaskModule
 from services.VideoDispatch.TwistedModule import TwistedModule
 from services.VideoDispatch.WebRTCModule import WebRTCModule
 from services.VideoDispatch.ConfigManager import ConfigManager
-from modules.Globals import TeraServerConstants
+from modules.RedisVars import RedisVars
 from libtera.redis.RedisClient import RedisClient
 import services.VideoDispatch.Globals as Globals
 from sqlalchemy.exc import OperationalError
@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     # Global redis client
     Globals.redis_client = RedisClient(config_man.redis_config)
-    Globals.api_user_token_key = Globals.redis_client.redisGet(TeraServerConstants.RedisVar_UserTokenAPIKey)
+    Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
 
     # Main Flask module
     flask_module = FlaskModule(config_man)

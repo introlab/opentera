@@ -4,7 +4,7 @@ from flask import session, jsonify
 
 from modules.FlaskModule.FlaskModule import flask_app
 from modules.BaseModule import BaseModule, ModuleNames
-from modules.Globals import TeraServerConstants
+from modules.RedisVars import RedisVars
 
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraParticipant import TeraParticipant
@@ -138,7 +138,7 @@ class LoginModule(BaseModule):
         """
         import jwt
         try:
-            token_dict = jwt.decode(token_value, self.redisGet(TeraServerConstants.RedisVar_UserTokenAPIKey),
+            token_dict = jwt.decode(token_value, self.redisGet(RedisVars.RedisVar_UserTokenAPIKey),
                                     algorithms='HS256')
         except jwt.exceptions.InvalidSignatureError as e:
             print(e)
@@ -309,7 +309,7 @@ class LoginModule(BaseModule):
                     try:
                         token_dict = jwt.decode(token,
                                                 LoginModule.redis_client.get(
-                                                    TeraServerConstants.RedisVar_ServiceTokenAPIKey),
+                                                    RedisVars.RedisVar_ServiceTokenAPIKey),
                                                 algorithms='HS256')
                         if 'service_uuid' in token_dict:
                             # TODO VERIFY IF SERVICE IS OK.
@@ -327,7 +327,7 @@ class LoginModule(BaseModule):
                 try:
                     token_dict = jwt.decode(token_args['token'],
                                             LoginModule.redis_client.get(
-                                                TeraServerConstants.RedisVar_ServiceTokenAPIKey),
+                                                RedisVars.RedisVar_ServiceTokenAPIKey),
                                             algorithms='HS256')
                     if 'service_uuid' in token_dict:
                         # TODO VERIFY IF SERVICE IS OK.
