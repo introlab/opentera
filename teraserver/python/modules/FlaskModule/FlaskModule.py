@@ -18,10 +18,12 @@ authorizations = {
         'type': 'basic',
         'in': 'header'
     },
-    'Token Authentification': {
+    'Token Authentication': {
         'type': 'apiKey',
         'in': 'header',
-        'name': 'OpenTera'
+        'name': 'Authorization',
+        'default': 'OpenTera',
+        'bearerFormat': 'JWT'
     }
 }
 
@@ -85,7 +87,6 @@ class FlaskModule(BaseModule):
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
         flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
-        flask_app.config.update({'SWAGGER_BASEPATH': '/doc'})
 
         # Not sure.
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})

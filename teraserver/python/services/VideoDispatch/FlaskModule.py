@@ -1,4 +1,4 @@
-from flask import Flask, request, g
+from flask import Flask, request, g, url_for
 from flask_session import Session
 from flask_restplus import Api
 from .ConfigManager import ConfigManager
@@ -26,7 +26,20 @@ authorizations = {
     }
 }
 
-api = Api(flask_app,
+
+# Simple fix for API documentation used with reverse proxy
+class CustomAPI(Api):
+    @property
+    def specs_url(self):
+        '''
+        The Swagger specifications absolute url (ie. `swagger.json`)
+
+        :rtype: str
+        '''
+        return url_for(self.endpoint('specs'), _external=False)
+
+
+api = CustomAPI(flask_app,
           version='1.0.0', title='VideoDispatchService API',
           description='VideoDispatchService API Documentation', doc='/doc',
           authorizations=authorizations)
