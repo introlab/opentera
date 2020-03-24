@@ -39,6 +39,13 @@ class CustomAPI(Api):
         '''
         return url_for(self.endpoint('specs'), _external=False)
 
+    def _register_doc(self, app_or_blueprint):
+        if self._add_specs and self._doc:
+            # Register documentation before root if enabled
+            app_or_blueprint.add_url_rule(self._doc, 'doc', self.render_doc)
+        # This is a hack to avoid a rule on /
+        # app_or_blueprint.add_url_rule(self.prefix or '/', 'root', self.render_root)
+
 
 api = CustomAPI(flask_app, version='1.0.0', title='OpenTeraServer API',
                 description='TeraServer API Documentation', doc='/doc',
