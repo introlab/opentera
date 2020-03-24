@@ -36,7 +36,35 @@ class CustomAPI(Api):
 
         :rtype: str
         '''
-        return url_for(self.endpoint('specs'), _external=False)
+
+        if 'X-Script-Name' in request.headers:
+            return request.headers['X-Script-Name'] + url_for(self.endpoint('specs'), _external=False)
+        else:
+            return url_for(self.endpoint('specs'), _external=False)
+
+    @property
+    def base_url(self):
+        '''
+        The API base absolute url
+
+        :rtype: str
+        '''
+        if 'X-Script-Name' in request.headers:
+            return request.headers['X-Script-Name'] + url_for(self.endpoint('root'), _external=True)
+        else:
+            return url_for(self.endpoint('root'), _external=True)
+
+    @property
+    def base_path(self):
+        '''
+        The API path
+
+        :rtype: str
+        '''
+        if 'X-Script-Name' in request.headers:
+            return request.headers['X-Script-Name'] + url_for(self.endpoint('root'), _external=False)
+        else:
+            return url_for(self.endpoint('root'), _external=False)
 
 
 api = CustomAPI(flask_app, version='1.0.0', title='VideoDispatchService API',
