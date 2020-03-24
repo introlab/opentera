@@ -7,7 +7,7 @@ from flask_babel import Babel
 from modules.BaseModule import BaseModule
 
 
-flask_app = Flask("VideoDispatchService", instance_relative_config=True)
+flask_app = Flask("VideoDispatchService")
 
 # Translations
 babel = Babel(flask_app)
@@ -38,11 +38,17 @@ class CustomAPI(Api):
         '''
         return url_for(self.endpoint('specs'), _external=False)
 
+    def _register_doc(self, app_or_blueprint):
+        if self._add_specs and self._doc:
+            # Register documentation before root if enabled
+            app_or_blueprint.add_url_rule(self._doc, 'doc', self.render_doc)
+        # This is a hack to avoid a rule on /
+        # app_or_blueprint.add_url_rule(self.prefix or '/', 'root', self.render_root)
 
-api = CustomAPI(flask_app,
-          version='1.0.0', title='VideoDispatchService API',
-          description='VideoDispatchService API Documentation', doc='/doc',
-          authorizations=authorizations)
+
+api = CustomAPI(flask_app, version='1.0.0', title='VideoDispatchService API',
+                description='VideoDispatchService API Documentation', doc='/doc',
+                authorizations=authorizations)
 
 # Namespaces
 default_api_ns = api.namespace('api', description='default API')
@@ -128,7 +134,7 @@ class FlaskModule(BaseModule):
         kwargs = {'flaskModule': self}
 
         # Will create a function that calls the __index__ method with args, kwargs
-        flask_app.add_url_rule('/index', view_func=Index.as_view('index', *args, **kwargs))
+        flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
         flask_app.add_url_rule('/login', view_func=Login.as_view('login', *args, **kwargs))
         flask_app.add_url_rule('/dashboard', view_func=Dashboard.as_view('dashboard', *args, **kwargs))
         flask_app.add_url_rule('/dashboard_main', view_func=DashboardMain.as_view('dashboard_main', *args, **kwargs))
