@@ -1,6 +1,5 @@
 from flask.views import MethodView
 from flask import render_template, request
-from flask_restplus import reqparse
 from services.VideoDispatch.AccessManager import AccessManager
 
 
@@ -12,10 +11,6 @@ class Dashboard(MethodView):
     @AccessManager.token_required
     def get(self):
         # print('get')
-        # print
-        parser = reqparse.RequestParser()
-        parser.add_argument('websocket_url', type=str)
-        args = parser.parse_args()
 
         hostname = self.flaskModule.config.server_config['hostname']
         port = self.flaskModule.config.server_config['port']

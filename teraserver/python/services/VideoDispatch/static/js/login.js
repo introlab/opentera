@@ -72,10 +72,10 @@ function loginReply(response, status, request){
         setCookie("VideoDispatchToken", response["user_token"], 30);
 
         // Get websocket url
-        var websocket_url = response["websocket_url"];
+        sessionStorage.setItem("websocket_url", response["websocket_url"]);
 
   		// Redirect to location
-		window.location.replace("dashboard?websocket='" + websocket_url +"'");
+		window.location.replace("dashboard");
 	}else{
 		//clearInterval(timerId);
 		console.log("loginReply: " + response);

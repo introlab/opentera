@@ -40,3 +40,12 @@ function getRequestSuccess(response, status, request){
 function getRequestError(event, status){
     console.log("getRequestError: " + status.status + " : " + status.responseText);
 }
+
+function webSocketConnect(){
+    console.log(sessionStorage.getItem("websocket_url"));
+
+    //TODO : Connect websocket
+
+    sessionStorage.removeItem("websocket_url");
+
+}
