@@ -16,6 +16,7 @@ class AccessManager:
     def token_required(f):
         @wraps(f)
         def decorated(*args, **kwargs):
+
             # Check if we have a token in the request itself
             parser = reqparse.RequestParser()
             parser.add_argument('token', type=str, help='Token', required=False)
@@ -30,7 +31,7 @@ class AccessManager:
 
             # If we don't have any token, refuse access and redirect to login
             if token_value is None:
-                return redirect("login")
+                return redirect("/videodispatch/login")
 
             # Verify token from redis
             import jwt
@@ -38,7 +39,7 @@ class AccessManager:
                 token_dict = jwt.decode(token_value, api_user_token_key)
             except jwt.exceptions.InvalidSignatureError as e:
                 print(e)
-                return redirect("videodispatch/login")
+                return redirect("/videodispatch/login")
 
             if token_dict['user_uuid']:
                 _request_ctx_stack.top.current_client = TeraClient(token_dict['user_uuid'], token_value, )
@@ -62,6 +63,6 @@ class AccessManager:
             #     return f(*args, **kwargs)
 
             # Any other case, do not call function
-            return redirect("login")
+            return redirect("/videodispatch/login")
 
         return decorated

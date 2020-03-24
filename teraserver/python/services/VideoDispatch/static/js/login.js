@@ -71,8 +71,11 @@ function loginReply(response, status, request){
 		// Set cookie with the access token for 30 minutes
         setCookie("VideoDispatchToken", response["user_token"], 30);
 
-		// Redirect to location
-		window.location.replace("dashboard");
+        // Get websocket url
+        var websocket_url = response["websocket_url"];
+
+  		// Redirect to location
+		window.location.replace("dashboard?websocket='" + websocket_url +"'");
 	}else{
 		//clearInterval(timerId);
 		console.log("loginReply: " + response);
