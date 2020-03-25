@@ -1,6 +1,7 @@
 from services.VideoDispatch.FlaskModule import FlaskModule
 from services.VideoDispatch.TwistedModule import TwistedModule
 from services.VideoDispatch.WebRTCModule import WebRTCModule
+from services.VideoDispatch.OnlineUsersModule import OnlineUsersModule
 from services.VideoDispatch.ConfigManager import ConfigManager
 from modules.RedisVars import RedisVars
 from libtera.redis.RedisClient import RedisClient
@@ -34,6 +35,9 @@ if __name__ == '__main__':
     # Global redis client
     Globals.redis_client = RedisClient(config_man.redis_config)
     Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
+
+    # OnlineUsers Module
+    online_users_module = OnlineUsersModule(config_man)
 
     # Main Flask module
     flask_module = FlaskModule(config_man)

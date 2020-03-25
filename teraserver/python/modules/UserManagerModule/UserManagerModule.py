@@ -68,6 +68,10 @@ class OnlineDeviceRegistry:
 
 class UserManagerModule(BaseModule):
 
+    @staticmethod
+    def event_topic_name():
+        return create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME) + '.events'
+
     def __init__(self, config: ConfigManager):
         BaseModule.__init__(self, ModuleNames.USER_MANAGER_MODULE_NAME.value, config)
 
@@ -83,8 +87,12 @@ class UserManagerModule(BaseModule):
 
     def setup_rpc_interface(self):
         self.rpc_api['online_users'] = {'args': [], 'returns': 'list', 'callback': self.online_users_rpc_callback}
+
         self.rpc_api['online_participants'] = {'args': [], 'returns': 'list',
                                                'callback': self.online_participants_rpc_callback}
+
+        self.rpc_api['online_devices'] = {'args': [], 'returns': 'list',
+                                          'callback': self.online_devices_rpc_callback}
 
     def online_users_rpc_callback(self, *args, **kwargs):
         print('online_users_rpc_callback', args, kwargs)
@@ -155,86 +163,75 @@ class UserManagerModule(BaseModule):
                     tera_message.data.extend([any_message])
                     self.publish(tera_message.head.dest, tera_message.SerializeToString())
 
+    def _send_event_message(self, event, dest: str):
+        tera_message = self.create_tera_message(dest=dest)
+        any_message = Any()
+        any_message.Pack(event)
+        tera_message.data.extend([any_message])
+        self.publish(tera_message.head.dest, tera_message.SerializeToString())
+
     def handle_user_connected(self, header, user_event: UserEvent):
         self.user_registry.user_online(user_event.user_uuid)
 
+        # Send message to event topic
+        self._send_event_message(user_event, UserManagerModule.event_topic_name())
+
+        # Send message to users?
         for user_uuid in self.user_registry.online_users():
             # TODO Check for permissions...
-            # Send to everyone?
-            tera_message = self.create_tera_message(dest='websocket.user.' + user_uuid)
-
-            any_message = Any()
-            any_message.Pack(user_event)
-            tera_message.data.extend([any_message])
-
-            self.publish(tera_message.head.dest, tera_message.SerializeToString())
+            self._send_event_message(user_event, 'websocket.user.' + user_uuid)
 
     def handle_user_disconnected(self, header, user_event: UserEvent):
         self.user_registry.user_offline(user_event.user_uuid)
 
+        # Send message to event topic
+        self._send_event_message(user_event, UserManagerModule.event_topic_name())
+
         for user_uuid in self.user_registry.online_users():
             # TODO Check for permissions...
             # Send to everyone?
-            tera_message = self.create_tera_message(dest='websocket.user.' + user_uuid)
-
-            any_message = Any()
-            any_message.Pack(user_event)
-            tera_message.data.extend([any_message])
-
-            self.publish(tera_message.head.dest, tera_message.SerializeToString())
+            self._send_event_message(user_event, 'websocket.user.' + user_uuid)
 
     def handle_participant_connected(self, header, participant_event: ParticipantEvent):
         self.participant_registry.participant_online(participant_event.participant_uuid)
 
+        # Send message to event topic
+        self._send_event_message(participant_event, UserManagerModule.event_topic_name())
+
         for user_uuid in self.user_registry.online_users():
             # TODO Check for permissions...
             # Send to everyone?
-            tera_message = self.create_tera_message(dest='websocket.user.' + user_uuid)
-
-            any_message = Any()
-            any_message.Pack(participant_event)
-            tera_message.data.extend([any_message])
-
-            self.publish(tera_message.head.dest, tera_message.SerializeToString())
+            self._send_event_message(participant_event, 'websocket.user.' + user_uuid)
 
     def handle_participant_disconnected(self, header, participant_event: ParticipantEvent):
         self.participant_registry.participant_offline(participant_event.user_uuid)
 
+        # Send message to event topic
+        self._send_event_message(participant_event, UserManagerModule.event_topic_name())
+
         for user_uuid in self.user_registry.online_users():
             # TODO Check for permissions...
             # Send to everyone?
-            tera_message = self.create_tera_message(dest='websocket.user.' + user_uuid)
-
-            any_message = Any()
-            any_message.Pack(participant_event)
-            tera_message.data.extend([any_message])
-
-            self.publish(tera_message.head.dest, tera_message.SerializeToString())
+            self._send_event_message(participant_event, 'websocket.user.' + user_uuid)
 
     def handle_device_connected(self, header, device_event: DeviceEvent):
         self.device_registry.device_online(device_event.device_uuid)
 
+        # Send message to event topic
+        self._send_event_message(device_event, UserManagerModule.event_topic_name())
+
         for user_uuid in self.user_registry.online_users():
             # TODO Check for permissions...
             # Send to everyone?
-            tera_message = self.create_tera_message(dest='websocket.user.' + user_uuid)
-
-            any_message = Any()
-            any_message.Pack(device_event)
-            tera_message.data.extend([any_message])
-
-            self.publish(tera_message.head.dest, tera_message.SerializeToString())
+            self._send_event_message(device_event, 'websocket.user.' + user_uuid)
 
     def handle_device_disconnected(self, header, device_event: DeviceEvent):
         self.device_registry.device_offline(device_event.device_uuid)
 
+        # Send message to event topic
+        self._send_event_message(device_event, UserManagerModule.event_topic_name())
+
         for user_uuid in self.user_registry.online_users():
             # TODO Check for permissions...
             # Send to everyone?
-            tera_message = self.create_tera_message(dest='websocket.user.' + user_uuid)
-
-            any_message = Any()
-            any_message.Pack(device_event)
-            tera_message.data.extend([any_message])
-
-            self.publish(tera_message.head.dest, tera_message.SerializeToString())
+            self._send_event_message(device_event, 'websocket.user.' + user_uuid)
