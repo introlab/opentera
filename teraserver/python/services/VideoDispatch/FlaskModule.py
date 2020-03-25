@@ -139,10 +139,10 @@ class FlaskModule(BaseModule):
         # Default arguments
         kwargs = {'flaskModule': self}
 
-        # from .API.Upload import Upload
+        from .API.QuerySessionDispatch import QuerySessionDispatch
 
         # Resources
-        # default_api_ns.add_resource(Upload, '/upload', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QuerySessionDispatch, '/sessiondispatch', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from .Views.Index import Index
