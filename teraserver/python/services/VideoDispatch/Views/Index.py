@@ -55,7 +55,31 @@ class Index(MethodView):
             response = post(url=url, verify=False, headers=request_headers, json=participant_info)
             if response.status_code == 200:
                 # TODO SEND EMAIL!
-                return 'Merci ' + name + '. Nous allons vous envoyer une invitation au courriel:' + email, 200
+                server_participant_info = response.json()
+
+                # default values
+                hostname = self.flaskModule.config.server_config['hostname']
+                port = self.flaskModule.config.server_config['port']
+                scheme = 'https'
+                path = '/login'
+
+                if 'X-Externalhost' in request.headers:
+                    hostname = request.headers['X-Externalhost']
+
+                if 'X-Externalport' in request.headers:
+                    port = request.headers['X-Externalport']
+
+                if 'X-Scheme' in request.headers:
+                    scheme = request.headers['X-Scheme']
+
+                if 'X-Script-Name' in request.headers:
+                    path = request.headers['X-Script-Name'] + path
+
+                url = scheme + '://' + hostname + ':' + port + path + '?participant_token=' + \
+                      server_participant_info['participant_token']
+
+                # Render template with participant information and link
+                return render_template('index_participant_info.html', info=server_participant_info, participant_url=url)
             else:
                 return 'Invalid', 500
 
