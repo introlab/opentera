@@ -35,7 +35,7 @@ function ws_Error(error){
 function ws_Closed(){
 	document.getElementById("imgStatus").src="./static/images/red_button.png";
 
-	console.error("Websocket closed.");
+	console.log("Websocket closed.");
 
 	// TODO: Manage reconnect, since the first URL will not be valid anymore...
 	// Must make a new "login" request?

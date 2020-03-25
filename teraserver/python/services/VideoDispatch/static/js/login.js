@@ -95,8 +95,19 @@ function loginError(event, status){
 	//$("#loginform :input").prop("disabled", false);
 }
 
-function doLogout(){
+function doLogout(backend_url, backend_port){
     // Important: OpenTera.js must be included for this to work.
-    doGetRequest()
+    doGetRequest(backend_url, backend_port, '/api/user/logout', logoutSuccess, logoutError);
+}
 
+function logoutSuccess(response, status, request){
+    // Clear cookie
+    deleteCookie("VideoDispatchToken");
+
+    // Redirect to login page
+    window.location.replace("login");
+}
+
+function logoutError(event, status){
+    console.log("logoutError: " + status.status + " : " + status.responseText);
 }

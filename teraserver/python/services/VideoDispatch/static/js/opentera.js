@@ -21,12 +21,22 @@ function getCookie(cname) {
     return "";
 }
 
-function doGetRequest(request_url, request_port, request_path){
+function deleteCookie(cname){
+    document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+function doGetRequest(request_url, request_port, request_path, success_response, error_response){
+    if (success_response === undefined){
+        success_response = getRequestSuccess;
+    }
+    if (error_response === undefined){
+        error_response = getRequestError;
+    }
     $.ajax({
           type: "GET",
           url: 'https://' + request_url + ':' + request_port + request_path ,
-          success: getRequestSuccess,
-          error: getRequestError,
+          success: success_response,
+          error: error_response,
           beforeSend: function (xhr) {
             xhr.setRequestHeader('Authorization', 'OpenTera ' + getCookie('VideoDispatchToken'));
             }
