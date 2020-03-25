@@ -95,3 +95,8 @@ function loginError(event, status){
 	//$("#loginform :input").prop("disabled", false);
 }
 
+function doLogout(){
+    // Important: OpenTera.js must be included for this to work.
+    doGetRequest()
+
+}
