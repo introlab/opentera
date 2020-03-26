@@ -1,6 +1,7 @@
 import uuid
 from services.VideoDispatch.Globals import config_man
 from requests import Response
+from flask import request
 
 
 class TeraParticipantClient:
@@ -9,10 +10,21 @@ class TeraParticipantClient:
         self.__participant_uuid = u_uuid
         self.__participant_token = token
 
-        self.__backend_url = 'https://' + config_man.backend_config["hostname"] + ':' + \
-                             str(config_man.backend_config["port"])
-        import os
+        # A little trick here to get the right URL for the server if we are using a proxy
+        backend_hostname = config_man.backend_config["hostname"]
+        backend_port = str(config_man.backend_config["port"])
 
+        if 'X-Externalhost' in request.headers:
+            backend_hostname = request.headers['X-Externalhost']
+
+        if 'X-Externalport' in request.headers:
+            backend_port = request.headers['X-Externalport']
+
+        self.__backend_url = 'https://' + backend_hostname + ':' + backend_port
+
+        import os
+        
+        # TODO Certificates should be from proxy?
         self.__backend_cacert = os.path.join(config_man.server_config["ssl_path"],
                                              config_man.server_config["site_certificate"])
 
