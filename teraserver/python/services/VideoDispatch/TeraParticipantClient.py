@@ -23,7 +23,7 @@ class TeraParticipantClient:
         self.__backend_url = 'https://' + backend_hostname + ':' + backend_port
 
         import os
-        
+
         # TODO Certificates should be from proxy?
         self.__backend_cacert = os.path.join(config_man.server_config["ssl_path"],
                                              config_man.server_config["site_certificate"])
@@ -46,7 +46,7 @@ class TeraParticipantClient:
 
     def do_get_request_to_backend(self, path: str) -> Response:
         from requests import get
-        request_headers = {'Authorization': 'OpenTera ' + self.__partipant_token}
+        request_headers = {'Authorization': 'OpenTera ' + self.__participant_token}
         # TODO: remove verify=False and check certificate
         backend_response = get(url=self.__backend_url + path, headers=request_headers, verify=False)
         return backend_response
