@@ -29,7 +29,7 @@ class TeraParticipantForm:
         section.add_item(TeraFormItem("participant_enabled", gettext("Participant actif"), "boolean", True,
                                       item_default=True))
         section.add_item(TeraFormItem("participant_token", gettext("Jeton Participant"), "label", False,
-                                      item_options={"readonly": True}))
+                                      item_options={"readonly": False}))
         section.add_item(TeraFormItem("participant_login_enabled", gettext("Peut se connecter?"), "boolean", True,
                                       item_default=False))
         section.add_item(TeraFormItem("participant_username", gettext("Identification connexion"), "text", True,

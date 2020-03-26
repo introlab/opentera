@@ -63,7 +63,9 @@ class TeraParticipant(db.Model, BaseModel):
         self.participant_lastonline = datetime.datetime.now()
         db.session.commit()
 
-    def to_json(self, ignore_fields=[], minimal=False):
+    def to_json(self, ignore_fields=None, minimal=False):
+        if ignore_fields is None:
+            ignore_fields = []
 
         ignore_fields.extend(['authenticated', 'participant_devices',
                               'participant_sessions', 'participant_password',
