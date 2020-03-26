@@ -59,6 +59,48 @@ function doLogin(backend_url, backend_port){
 
 }
 
+function doParticipantLogin(backend_url, backend_port){
+    timeout++;
+	if (timerId == -1){
+		$.ajaxSetup({
+		  global: true
+		});
+		$(document).ajaxError(loginParticipantError);
+
+		// Start login result connect timer
+		timerId = setInterval(doParticipantLogin, 1000);
+		timeout=0;
+	}
+
+	if (timeout < 10){
+
+		// Send AJAX POST query
+		$.ajax({
+          type: "GET",
+          url: 'https://' + backend_url + ':' + backend_port + '/api/participant/login',
+          success: function(response, status, request){
+                clearInterval(timerId);
+                timerId=-1;
+                // Get websocket url
+                sessionStorage.setItem("websocket_url", response["websocket_url"]);
+
+                // Connect websocket
+                webSocketConnect();
+            },
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader('Authorization', 'OpenTera ' + getCookie('VideoDispatchTokenParticipant'));
+            }
+        });
+		//$.post('https://' + $('#name').val() + ':' + $('#password').val() + '@localhost:4040/api/user/login', $('#loginform').serialize(), loginReply);
+
+		// Disable form
+		//$("#loginform :input").prop("disabled", true);
+	}else{
+		clearInterval(timerId);
+		timerId=-1;
+	}
+}
+
 function loginReply(response, status, request){
 	// request.statusCode().status // Status code
 
@@ -88,11 +130,17 @@ function loginReply(response, status, request){
 function loginError(event, status){
 	clearInterval(timerId);
 	timerId=-1;
-	console.log("loginError: " + status.status + " : " + status.responseText);
+	console.log("loginError: " + status.status + " : " + status.responseText + " / " + status.statusText);
 	$('#txtmessage').css('color','red');
 	$('#txtmessage').text(status.responseText);
 	$('#messages').css('display','block');
 	//$("#loginform :input").prop("disabled", false);
+}
+
+function loginParticipantError(event, status){
+	clearInterval(timerId);
+	timerId=-1;
+	console.log("loginError: " + status.status + " : " + status.responseText + " / " + status.statusText);
 }
 
 function doLogout(backend_url, backend_port){

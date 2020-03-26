@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restplus import Resource, reqparse, fields
-from modules.LoginModule.LoginModule import participant_http_auth, current_participant
+from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 
 
@@ -22,7 +22,8 @@ class ParticipantLogin(Resource):
         self.module = flaskModule
         Resource.__init__(self, _api)
 
-    @participant_http_auth.login_required
+    # @participant_http_auth.login_required
+    @participant_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Participant login with HTTPAuth',
              responses={200: 'Success - Login succeeded',

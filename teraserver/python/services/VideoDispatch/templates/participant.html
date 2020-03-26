@@ -3,12 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <title>Participant</title>
+
+    <script src="./static/js/opentera.js"></script>
+      <script src="./static/js/jquery-3.3.1.min.js"></script>
+      <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
+      <link href="./static/css/solid.min.css" rel="stylesheet" />
+      <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
+      <link rel="stylesheet" href="./static/css/main_style.css" />
+
+      <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+      <script src="./static/js/jquery-3.3.1.min.js"></script>
+
 </head>
 <body>
-Bienvenue !
-<br>
-Participant Name: {{participant_name}}
-<br>
-Participant Email: {{participant_email}}
+<h2> Vous avez la position #2 dans la file d'attente.</h2>
+<div class="container-fluid" id="mainContainer">
+
+		<div id="selfView" title="Vidéo locale" width="100%" style="overflow: hidden;">
+
+			<div id="navButtons" class="overlay">
+				<div class="overlay-top-center" style="padding-left:20px">
+					<div>
+						<select id="videoSelect" onchange="updateVideoSource();event.stopPropagation();"
+                                onclick="event.stopPropagation();">
+						</select>
+					</div>
+				  </div>
+			</div>
+			<video playsinline="true" autoplay="true" id="selfVideo" muted="muted" volume="1" micEnabled="false"
+                   class="easyrtcMirror"/>
+		  </div>
+		</div>
 </body>
 </html>
