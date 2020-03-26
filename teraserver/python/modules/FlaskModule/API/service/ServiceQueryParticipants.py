@@ -98,12 +98,8 @@ class ServiceQueryParticipants(Resource):
             participant.participant_enabled = True
             participant.participant_login_enabled = True
             participant.participant_lastonline = datetime.now()
-            # TODO No group?
-            participant.participant_participant_group = \
-                TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
             # Generate token
             participant.create_token()
-
             db.session.add(participant)
             db.session.commit()
         else:
@@ -114,11 +110,6 @@ class ServiceQueryParticipants(Resource):
             participant.participant_enabled = True
             participant.participant_login_enabled = True
             participant.participant_lastonline = datetime.now()
-
-            # TODO No group?
-            participant.participant_participant_group = \
-                TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
-
             # Re-Generate token
             participant.create_token()
             db.session.add(participant)
