@@ -1,6 +1,6 @@
 from flask.views import MethodView
 from flask import render_template, request
-from services.VideoDispatch.AccessManager import AccessManager
+from services.VideoDispatch.AccessManager import AccessManager, current_user_client
 
 
 class DashboardMain(MethodView):
@@ -12,6 +12,11 @@ class DashboardMain(MethodView):
     def get(self):
         # print('get')
         # print(request.cookies['VideoDispatchToken'])
+
+        # This could happen if a participant tries to reach that page
+        # TODO: Make a specific decorator in AccessManager
+        if not current_user_client:
+            return 'Access Denied', 403
 
         hostname = self.flaskModule.config.server_config['hostname']
         port = self.flaskModule.config.server_config['port']

@@ -45,7 +45,7 @@ function ws_Closed(){
 	*/
 
 	// Redirect to login for now...
-	window.location.replace("login");
+	// window.location.replace("login");
 
 }
 

@@ -6,7 +6,8 @@ redis_client = None
 api_user_token_key = None
 api_participant_token_key = None
 
-TokenCookieName = 'VideoDispatchToken'
+UserTokenCookieName = 'VideoDispatchToken'
+ParticipantTokenCookieName = 'VideoDispatchTokenParticipant'
 config_man = ConfigManager()
 
 # Database manager

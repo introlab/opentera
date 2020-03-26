@@ -1,5 +1,6 @@
 from flask.views import MethodView
 from flask import render_template, request, redirect
+from services.VideoDispatch.Globals import ParticipantTokenCookieName
 
 
 class Login(MethodView):
@@ -10,16 +11,23 @@ class Login(MethodView):
         self.flaskModule = kwargs.get('flaskModule', None)
 
     def get(self):
-        # Set variables for template
+        # Participant login
         if 'participant_token' in request.args:
             # Create cookie
-            path = '/participant'
+            # path = '/participant'
+            path = '/dashboard'
 
             if 'X-Script-Name' in request.headers:
                 path = request.headers['X-Script-Name'] + path
 
             # redirect to  participant dashboard, will verify login information..
-            return redirect(path + '?participant_token=' + request.args['participant_token'])
+            # response = redirect(path + '?participant_token=' + request.args['participant_token'])
+            response = redirect(path)
+
+            # Set cookie
+            response.set_cookie(ParticipantTokenCookieName, request.args['participant_token'], 30)
+
+            return response
         else:
             hostname = self.flaskModule.config.server_config['hostname']
             port = self.flaskModule.config.server_config['port']

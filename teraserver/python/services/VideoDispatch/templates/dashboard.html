@@ -44,7 +44,7 @@
 			<label id="displayname">{{ user_fullname }}</label>
 		</div>
 	</div>
-	<iframe id="mainview" src="dashboard_main" style="position:absolute;top:50px;left:0;width:100%;height:calc(100% - 50px);border:0;" allow="camera; microphone;">Frames not supported in this browser!</iframe>
+	<iframe id="mainview" src={% if is_participant %}"participant"{% else %}"dashboard_main"{% endif %} style="position:absolute;top:50px;left:0;width:100%;height:calc(100% - 50px);border:0;" allow="camera; microphone;">Frames not supported in this browser!</iframe>
     </body>
 </html>
 

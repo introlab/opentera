@@ -3,7 +3,8 @@ from functools import wraps
 from flask import _request_ctx_stack, request, redirect
 from flask_restplus import reqparse
 
-from services.VideoDispatch.Globals import api_user_token_key, api_participant_token_key, TokenCookieName
+from services.VideoDispatch.Globals import api_user_token_key, api_participant_token_key, UserTokenCookieName, \
+    ParticipantTokenCookieName
 from services.VideoDispatch.TeraUserClient import TeraUserClient
 from services.VideoDispatch.TeraParticipantClient import TeraParticipantClient
 
@@ -32,9 +33,15 @@ class AccessManager:
             # Parse arguments
             request_args = parser.parse_args(strict=False)
 
-            if request_args['participant_token']:
+            if request_args['participant_token'] or ParticipantTokenCookieName in request.cookies:
+
                 # Handle participant tokens
                 token_value = request_args['participant_token']
+
+                # If not, check if we have a token in the cookies
+                if token_value is None:
+                    if ParticipantTokenCookieName in request.cookies:
+                        token_value = request.cookies[ParticipantTokenCookieName]
 
                 # Verify token from redis
                 import jwt
@@ -57,8 +64,8 @@ class AccessManager:
 
                 # If not, check if we have a token in the cookies
                 if token_value is None:
-                    if TokenCookieName in request.cookies:
-                        token_value = request.cookies[TokenCookieName]
+                    if UserTokenCookieName in request.cookies:
+                        token_value = request.cookies[UserTokenCookieName]
 
                 # If we don't have any token, refuse access and redirect to login
                 if token_value is None:
