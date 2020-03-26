@@ -23,9 +23,9 @@ class DashboardMain(MethodView):
         if 'X_EXTERNALPORT' in request.headers:
             backend_port = request.headers['X_EXTERNALPORT'];
 
-        # current_client.do_get_request_to_backend('/api/user/users?user_uuid=' + current_client.user_uuid)
-        # print(current_client.get_role_for_site(1))
-        # print(current_client.get_role_for_project(1))
+        # current_user_client.do_get_request_to_backend('/api/user/users?user_uuid=' + current_user_client.user_uuid)
+        # print(current_user_client.get_role_for_site(1))
+        # print(current_user_client.get_role_for_project(1))
 
         return render_template('main.html', hostname=hostname, port=port,
                                backend_hostname=backend_hostname, backend_port=backend_port)

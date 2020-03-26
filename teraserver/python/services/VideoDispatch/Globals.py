@@ -4,6 +4,7 @@ from services.VideoDispatch.ConfigManager import ConfigManager
 
 redis_client = None
 api_user_token_key = None
+api_participant_token_key = None
 
 TokenCookieName = 'VideoDispatchToken'
 config_man = ConfigManager()

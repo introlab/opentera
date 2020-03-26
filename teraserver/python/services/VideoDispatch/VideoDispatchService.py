@@ -35,6 +35,7 @@ if __name__ == '__main__':
     # Global redis client
     Globals.redis_client = RedisClient(config_man.redis_config)
     Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
+    Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
 
     # OnlineUsers Module
     online_users_module = OnlineUsersModule(config_man)

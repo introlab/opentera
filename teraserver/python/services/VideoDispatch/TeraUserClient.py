@@ -3,7 +3,7 @@ from services.VideoDispatch.Globals import config_man
 from requests import Response
 
 
-class TeraClient:
+class TeraUserClient:
 
     def __init__(self, u_uuid: uuid, token: str):
         self.__user_uuid = u_uuid
@@ -36,7 +36,7 @@ class TeraClient:
         from requests import get
         request_headers = {'Authorization': 'OpenTera ' + self.__user_token}
         # TODO: remove verify=False and check certificate
-        backend_response = get(url=self.__backend_url + path, headers=request_headers, verify=self.__backend_cacert)
+        backend_response = get(url=self.__backend_url + path, headers=request_headers, verify=False)
         return backend_response
 
     def get_role_for_site(self, id_site: int):
@@ -70,4 +70,4 @@ class TeraClient:
         return 'Undefined'
 
     def __repr__(self):
-        return '<TeraClient - UUID: ' + self.__user_uuid + ', Token: ' + self.__user_token + '>'
+        return '<TeraUserClient - UUID: ' + self.__user_uuid + ', Token: ' + self.__user_token + '>'
