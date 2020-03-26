@@ -15,7 +15,7 @@ post_parser = api.parser()
 
 participant_schema = api.schema_model('participant', {
     'properties': {
-        'session': {
+        'participant': {
             'type': 'object',
             'properties': {
                 'id_participant': {
@@ -31,7 +31,7 @@ participant_schema = api.schema_model('participant', {
                     'type': 'string'
                 }
             },
-            'required': ['id_participant', 'id_site', 'id_project', 'participant_email', 'participant_name']
+            'required': ['id_participant', 'id_project', 'participant_email', 'participant_name']
         },
 
     },

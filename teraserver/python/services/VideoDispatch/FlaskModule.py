@@ -152,6 +152,7 @@ class FlaskModule(BaseModule):
         from .Views.Dashboard import Dashboard
         from .Views.DashboardMain import DashboardMain
         from .Views.Admin import Admin
+        from .Views.Participant import Participant
 
         # Default arguments
         args = []
@@ -163,6 +164,7 @@ class FlaskModule(BaseModule):
         flask_app.add_url_rule('/dashboard', view_func=Dashboard.as_view('dashboard', *args, **kwargs))
         flask_app.add_url_rule('/dashboard_main', view_func=DashboardMain.as_view('dashboard_main', *args, **kwargs))
         flask_app.add_url_rule('/admin', view_func=Admin.as_view('admin', *args, **kwargs))
+        flask_app.add_url_rule('/participant', view_func=Participant.as_view('participant', *args, **kwargs))
 
 
 @flask_app.after_request

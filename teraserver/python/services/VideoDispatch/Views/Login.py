@@ -13,13 +13,13 @@ class Login(MethodView):
         # Set variables for template
         if 'participant_token' in request.args:
             # Create cookie
-            path = '/dashboard'
+            path = '/participant'
 
             if 'X-Script-Name' in request.headers:
                 path = request.headers['X-Script-Name'] + path
 
-            # redirect to dashboard
-            return redirect(path)
+            # redirect to  participant dashboard, will verify login information..
+            return redirect(path + '?participant_token=' + request.args['participant_token'])
         else:
             hostname = self.flaskModule.config.server_config['hostname']
             port = self.flaskModule.config.server_config['port']
