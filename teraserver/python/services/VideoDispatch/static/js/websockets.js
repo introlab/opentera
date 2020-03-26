@@ -44,6 +44,9 @@ function ws_Closed(){
 	WebSocketConnect();
 	*/
 
+	// Redirect to login for now...
+	window.location.replace("login");
+
 }
 
 function ws_MessageReceived(evt){
