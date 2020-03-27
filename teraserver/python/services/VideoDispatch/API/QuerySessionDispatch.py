@@ -26,7 +26,10 @@ class QuerySessionDispatch(Resource):
                         501: 'Not implemented',
                         403: 'Logged device doesn\'t have permission to access the requested data'})
     def get(self):
-        return 'Not Implemented', 501
+        # TODO: Get real URL to connect to
+        reply = {'participant_name': 'Participant Test', 'session_url': 'https://localhost:40075/videodispatch/session?'
+                                                                        'id=1234'}
+        return reply
 
     @AccessManager.token_required
     @api.expect(post_parser)

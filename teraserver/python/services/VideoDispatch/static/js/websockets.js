@@ -6,6 +6,12 @@ function webSocketConnect(){
 	if ("WebSocket" in window) {
 	   if (socketUrl == "")
 	        socketUrl = sessionStorage.getItem("websocket_url");
+
+	   if (!socketUrl){
+            console.error('No websocket url - redirecting to login.')
+            window.location.replace("login");
+            return;
+	   }
 	   console.log("Opening websocket at " + socketUrl);
 	   ws = new WebSocket(socketUrl);
 
@@ -45,7 +51,7 @@ function ws_Closed(){
 	*/
 
 	// Redirect to login for now...
-	// window.location.replace("login");
+	window.location.replace("login");
 
 }
 

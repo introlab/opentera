@@ -25,16 +25,20 @@ function deleteCookie(cname){
     document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 }
 
-function doGetRequest(request_url, request_port, request_path, success_response, error_response){
+function doGetRequest(request_url, request_port, request_path, success_response, error_response, scheme){
     if (success_response === undefined){
         success_response = getRequestSuccess;
     }
     if (error_response === undefined){
         error_response = getRequestError;
     }
+    if (scheme === undefined){
+        scheme = 'https';
+    }
+
     $.ajax({
           type: "GET",
-          url: 'https://' + request_url + ':' + request_port + request_path ,
+          url: scheme + '://' + request_url + ':' + request_port + request_path ,
           success: success_response,
           error: error_response,
           beforeSend: function (xhr) {
@@ -48,7 +52,7 @@ function getRequestSuccess(response, status, request){
 }
 
 function getRequestError(event, status){
-    console.log("getRequestError: " + status.status + " : " + status.responseText);
+    console.log("getRequestError: " + event.status + " : " + event.responseText);
 }
 
 function hideElement(id){
