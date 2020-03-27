@@ -1,4 +1,4 @@
-from .ConfigManager import ConfigManager
+from services.VideoDispatch.ConfigManager import ConfigManager
 from messages.python.CreateSession_pb2 import CreateSession
 from modules.BaseModule import BaseModule, ModuleNames
 
@@ -33,7 +33,10 @@ class WebRTCModule(BaseModule):
                                           'callback': self.create_webrtc_session}
 
     def create_webrtc_session(self):
-        pass
+        print('Should create WebRTC session')
+
+        # Return empty dict
+        return {}
 
     def notify_module_messages(self, pattern, channel, message):
         """
@@ -86,3 +89,62 @@ class WebRTCModule(BaseModule):
         print('started process', process)
 
 
+if __name__ == '__main__':
+    # Mini test
+    from services.VideoDispatch.Globals import config_man
+    from twisted.internet import reactor, task
+    import services.VideoDispatch.Globals as Globals
+    from modules.RedisVars import RedisVars
+    from libtera.redis.RedisClient import RedisClient
+    from twisted.python import log
+    import sys
+
+    # Used for redis events...
+    log.startLogging(sys.stdout)
+
+    # Load configuration
+    config_man.load_config('VideoDispatchService.ini')
+
+    # Init global variables
+    Globals.redis_client = RedisClient(config_man.redis_config)
+    Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
+    Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
+
+    # Create module
+    module = WebRTCModule(config_man)
+
+    def callback_later():
+        # Create session message
+        from messages.python.CreateSession_pb2 import CreateSession
+        from messages.python.RPCMessage_pb2 import RPCMessage
+        from libtera.redis.RedisClient import RedisClient
+        from libtera.redis.AsyncRedisSubscribeWait import AsyncRedisSubscribeWait
+        from datetime import datetime
+
+        print('Calling RPC')
+
+        def answer_callback(pattern, channel, data):
+            print('answer_callback')
+
+        def subscribed_callback(*args):
+            # Publish request
+            message = RPCMessage()
+            message.method = 'create_session'
+            message.timestamp = datetime.now().timestamp()
+            message.id = 1
+            message.reply_to = my_name
+
+            nb = Globals.redis_client.publish('module.' + module.get_name() + '.rpc', message.SerializeToString())
+
+        # Using RPC API
+        # This needs to be an unique name
+        my_name = 'rpc_test'
+        req = AsyncRedisSubscribeWait(my_name, Globals.redis_client)
+        ret = req.listen(None)
+
+        req.wait()
+        # ret.addCallback(subscribed_callback)
+
+    # Deferred to call function in 5 secs.
+    d = task.deferLater(reactor, 5.0, callback_later)
+    reactor.run()
