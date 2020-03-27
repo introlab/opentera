@@ -17,12 +17,13 @@ class RedisClient:
         print('Init RedisClient', self, config)
         self.protocol = None
         self.callbacks_dict = dict()
-        # self.redisConfig = config
 
         # Fill config
         if config is None:
             print('RedisClient - Warning, using default redis configuration')
             config = {'hostname': 'localhost', 'port': 6379, 'db': 0}
+
+        self.redisConfig = config
 
         # Redis client (synchronous)
         self.redis = redis.Redis(host=config['hostname'], port=config['port'], db=config['db'])
@@ -31,6 +32,9 @@ class RedisClient:
         self.conn = reactor.connectTCP(config['hostname'], config['port'],
                                        RedisProtocolFactory(parent=self, protocol=redisProtocol))
         print(self.conn)
+
+    def getConfig(self):
+        return self.redisConfig
 
     def redisConnectionMade(self):
         print('********************* RedisClient connectionMade')

@@ -98,6 +98,7 @@ if __name__ == '__main__':
     from libtera.redis.RedisClient import RedisClient
     from twisted.python import log
     import sys
+    from twisted.internet import defer
 
     # Used for redis events...
     log.startLogging(sys.stdout)
@@ -113,6 +114,7 @@ if __name__ == '__main__':
     # Create module
     module = WebRTCModule(config_man)
 
+    @defer.inlineCallbacks
     def callback_later():
         # Create session message
         from messages.python.CreateSession_pb2 import CreateSession
@@ -122,27 +124,24 @@ if __name__ == '__main__':
         from datetime import datetime
 
         print('Calling RPC')
-
-        def answer_callback(pattern, channel, data):
-            print('answer_callback')
-
-        def subscribed_callback(*args):
-            # Publish request
-            message = RPCMessage()
-            message.method = 'create_session'
-            message.timestamp = datetime.now().timestamp()
-            message.id = 1
-            message.reply_to = my_name
-
-            nb = Globals.redis_client.publish('module.' + module.get_name() + '.rpc', message.SerializeToString())
-
         # Using RPC API
         # This needs to be an unique name
         my_name = 'rpc_test'
         req = AsyncRedisSubscribeWait(my_name, Globals.redis_client)
-        ret = req.listen(None)
+        ret = yield req.listen()
 
-        req.wait()
+        # Publish request
+        message = RPCMessage()
+        message.method = 'create_session'
+        message.timestamp = datetime.now().timestamp()
+        message.id = 1
+        message.reply_to = my_name
+
+        nb = Globals.redis_client.publish('module.' + module.get_name() + '.rpc', message.SerializeToString())
+
+        ret = yield req.wait()
+
+        print(ret)
         # ret.addCallback(subscribed_callback)
 
     # Deferred to call function in 5 secs.

@@ -7,6 +7,7 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.redis.AsyncRedisSubscribeWait import AsyncRedisSubscribeWait
 from modules.BaseModule import ModuleNames
 from messages.python.RPCMessage_pb2 import RPCMessage, Value
+from twisted.internet import defer
 import datetime
 
 
@@ -26,31 +27,11 @@ class QueryOnlineUsers(Resource):
         my_args = {}
 
         try:
-
             # This needs to be an unique name
             my_name = 'module.' + self.flaskModule.module_name + '.OnlineUsers.' + session['_user_id']
-
             req = AsyncRedisSubscribeWait(my_name, self.flaskModule)
-            req.listen()
-
-            # Publish request
-            message = RPCMessage()
-            message.method = 'online_users'
-            message.timestamp = datetime.datetime.now().timestamp()
-            message.id = 1
-            message.reply_to = my_name
-
-            self.flaskModule.publish('module.' + ModuleNames.USER_MANAGER_MODULE_NAME.value + '.rpc',
-                                     message.SerializeToString())
-
-            # Wait for answer, no timeout
-            (pattern, channel, data) = req.wait()
-
-            req.stop()
-
-            print('event received', pattern, channel, data)
-
-            return jsonify(data)
+            val = req.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
+            return jsonify(val)
         except InvalidRequestError:
             return '', 500
 
