@@ -50,3 +50,11 @@ function getRequestSuccess(response, status, request){
 function getRequestError(event, status){
     console.log("getRequestError: " + status.status + " : " + status.responseText);
 }
+
+function hideElement(id){
+	document.getElementById(id).style.display = "none";
+}
+
+function showElement(id){
+	document.getElementById(id).style.display = "inline";
+}
