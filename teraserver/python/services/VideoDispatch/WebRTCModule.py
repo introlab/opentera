@@ -114,34 +114,22 @@ if __name__ == '__main__':
     # Create module
     module = WebRTCModule(config_man)
 
-    @defer.inlineCallbacks
+
     def callback_later():
         # Create session message
         from messages.python.CreateSession_pb2 import CreateSession
         from messages.python.RPCMessage_pb2 import RPCMessage
         from libtera.redis.RedisClient import RedisClient
-        from libtera.redis.AsyncRedisSubscribeWait import AsyncRedisSubscribeWait
+        from libtera.redis.RedisRPCClient import RedisRPCClient
         from datetime import datetime
 
         print('Calling RPC')
         # Using RPC API
-        # This needs to be an unique name
-        my_name = 'rpc_test'
-        req = AsyncRedisSubscribeWait(my_name, Globals.redis_client)
-        ret = yield req.listen()
+        rpc = RedisRPCClient(config_man.redis_config)
 
-        # Publish request
-        message = RPCMessage()
-        message.method = 'create_session'
-        message.timestamp = datetime.now().timestamp()
-        message.id = 1
-        message.reply_to = my_name
+        result = rpc.call('VideoDispatchService.WebRTCModule', 'create_session')
 
-        nb = Globals.redis_client.publish('module.' + module.get_name() + '.rpc', message.SerializeToString())
-
-        ret = yield req.wait()
-
-        print(ret)
+        print(result)
         # ret.addCallback(subscribed_callback)
 
     # Deferred to call function in 5 secs.

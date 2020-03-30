@@ -4,7 +4,7 @@ from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
-from libtera.redis.AsyncRedisSubscribeWait import AsyncRedisSubscribeWait
+from libtera.redis.RedisRPCClient import RedisRPCClient
 from modules.BaseModule import ModuleNames
 from messages.python.RPCMessage_pb2 import RPCMessage, Value
 from twisted.internet import defer
@@ -27,10 +27,8 @@ class QueryOnlineUsers(Resource):
         my_args = {}
 
         try:
-            # This needs to be an unique name
-            my_name = 'module.' + self.flaskModule.module_name + '.OnlineUsers.' + session['_user_id']
-            req = AsyncRedisSubscribeWait(my_name, self.flaskModule)
-            val = req.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
+            rpc = RedisRPCClient(self.flaskModule.config.redis_config)
+            val = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
             return jsonify(val)
         except InvalidRequestError:
             return '', 500
