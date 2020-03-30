@@ -117,17 +117,24 @@ if __name__ == '__main__':
         from libtera.redis.RedisRPCClient import RedisRPCClient
         from datetime import datetime
 
-        print('Calling RPC')
+        print('Calling module')
+
+        return module.create_webrtc_session('test')
+
         # Using RPC API
-        rpc = RedisRPCClient(config_man.redis_config)
+        # rpc = RedisRPCClient(config_man.redis_config)
 
-        result = rpc.call('VideoDispatchService.WebRTCModule', 'create_session', 'test')
+        # result = rpc.call('VideoDispatchService.WebRTCModule', 'create_session', 'test')
 
-        print(result)
-        return result
-        # ret.addCallback(subscribed_callback)
+        # print(result)
+        # return result
+
 
     # Deferred to call function in 5 secs.
-    d = threads.deferToThread(rpc_call)
+    # d = threads.deferToThread(rpc_call)
+    # d.addCallback(result_callback)
+
+    d = task.deferLater(reactor, 3.5,  rpc_call)
     d.addCallback(result_callback)
+
     reactor.run()

@@ -1,7 +1,7 @@
 from flask.views import MethodView
 from flask import render_template, request, redirect
 from services.VideoDispatch.Globals import ParticipantTokenCookieName
-
+import threading
 
 class Login(MethodView):
     # Decorators everywhere?
@@ -11,6 +11,12 @@ class Login(MethodView):
         self.flaskModule = kwargs.get('flaskModule', None)
 
     def get(self):
+
+        # print('Login from thread', threading.current_thread())
+        # from libtera.redis.RedisRPCClient import RedisRPCClient
+        # rpc = RedisRPCClient(self.flaskModule.config.redis_config)
+        # result = rpc.call('VideoDispatchService.WebRTCModule', 'create_session', 'test')
+
         # Participant login
         if 'participant_token' in request.args:
             # Create cookie

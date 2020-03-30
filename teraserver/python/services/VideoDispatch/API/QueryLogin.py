@@ -5,6 +5,7 @@ from flask_babel import gettext
 from sqlalchemy.exc import InvalidRequestError
 from services.VideoDispatch.FlaskModule import default_api_ns as api
 from services.VideoDispatch.AccessManager import AccessManager
+import threading
 
 # Parser definition(s)
 get_parser = api.parser()

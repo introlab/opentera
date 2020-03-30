@@ -38,18 +38,18 @@ if __name__ == '__main__':
     Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
 
     # OnlineUsers Module
-    online_users_module = OnlineUsersModule(config_man)
+    Globals.OnlineUsers_module = OnlineUsersModule(config_man)
 
     # Main Flask module
-    flask_module = FlaskModule(config_man)
+    Globals.Flask_module = FlaskModule(config_man)
 
     # Main Twisted module
-    twisted_module = TwistedModule(config_man)
+    Globals.Twisted_module = TwistedModule(config_man)
 
     # Main WebRTC module
-    webrtc_module = WebRTCModule(config_man)
+    Globals.WebRTC_module = WebRTCModule(config_man)
 
     # Run reactor
-    twisted_module.run()
+    Globals.Twisted_module.run()
 
     print('VideoDispatchService - done!')
