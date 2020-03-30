@@ -11,10 +11,10 @@
       <script src="./static/js/jquery-3.3.1.min.js"></script>
       <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
       <link href="./static/css/solid.min.css" rel="stylesheet" />
-      <!--<link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />-->
+      <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
       <link rel="stylesheet" href="./static/css/main_style.css" />
 
-      <!--<script src="./static/bootstrap/js/bootstrap.min.js"></script>-->
+      <script src="./static/bootstrap/js/bootstrap.min.js"></script>
       <script src="./static/js/jquery-3.3.1.min.js"></script>
 
 	   <!-- Server informations -->
@@ -46,6 +46,7 @@
 		</div>
 	</div>
 	<iframe id="mainview" src={% if is_participant %}"participant"{% else %}"dashboard_main"{% endif %} style="position:absolute;top:50px;left:0;width:100%;height:calc(100% - 50px);border:0;" allow="camera; microphone;">Frames not supported in this browser!</iframe>
+   {% include "footer.html" %}
     </body>
 </html>
 

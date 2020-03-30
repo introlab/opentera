@@ -1,31 +1,8 @@
 @charset "utf-8";
-
-
-[class*="fontawesome-"]:before {
-  font-family: 'FontAwesome', sans-serif;
-}
-
 body {
   background: black;
   color: #606468;
-  font: 87.5%/1.5em 'Open Sans', sans-serif;
-  margin: 0;
 }
-
-input {
-  border: none;
-  font-family: 'Open Sans', Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.5em;
-  padding: 0;
-  -webkit-appearance: none;
-}
-
-p {
-  line-height: 1.5em;
-}
-
-after { clear: both; }
 
 #login {
   margin: 50px auto auto auto;
@@ -41,6 +18,7 @@ after { clear: both; }
   background: #282e33;
   border-top: 3px solid #434a52;
   border-bottom: 3px solid #434a52;
+  box-sizing: unset;
 }
 
 #login form span {

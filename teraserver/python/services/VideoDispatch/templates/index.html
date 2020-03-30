@@ -1,8 +1,15 @@
 <!DOCTYPE html>
 <html>
    <head>
-      <script src="./static/js/opentera.js"></script>
-      <script src="./static/js/jquery-3.3.1.min.js"></script>
+         <link href="./static/images/favicon.ico" rel="icon" type="image/x-icon" />
+         <link href="./static/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+         <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
+         <link rel="stylesheet" href="./static/css/main_style.css" />
+
+         <script src="./static/js/opentera.js"></script>
+         <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+         <script src="./static/js/jquery-3.3.1.min.js"></script>
+    </head>
    </head>
    <body >
       <h1>Bonjour enregistrez vos coordonnées.</h1>
@@ -18,9 +25,9 @@
       <div id="messages" style="display:none;">
          <label id="txtmessage">Prêt à se connecter!</label>
      </div>
-
-
     </div>
+
+   {% include "footer.html" %}
 
    </body>
 </html>
