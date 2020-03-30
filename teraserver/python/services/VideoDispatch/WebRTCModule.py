@@ -32,7 +32,7 @@ class WebRTCModule(BaseModule):
                                           'returns': 'dict',
                                           'callback': self.create_webrtc_session}
 
-    def create_webrtc_session(self):
+    def create_webrtc_session(self, *args, **kwargs):
         print('Should create WebRTC session')
 
         # Return empty dict
@@ -127,7 +127,8 @@ if __name__ == '__main__':
         # Using RPC API
         rpc = RedisRPCClient(config_man.redis_config)
 
-        result = rpc.call('VideoDispatchService.WebRTCModule', 'create_session')
+        result = rpc.call('VideoDispatchService.WebRTCModule', 'create_session',
+                          bool(True), int(5), float(3.0), b'bytes', str('rien'))
 
         print(result)
         # ret.addCallback(subscribed_callback)

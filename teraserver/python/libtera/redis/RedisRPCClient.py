@@ -28,7 +28,34 @@ class RedisRPCClient:
 
         topic = 'module.' + module_name + '.rpc'
 
-        # TODO args
+        # Iterate through args
+        rpc_args = []
+        for arg in args:
+            if isinstance(arg, bool):
+                val = Value()
+                val.bool_value = arg
+                rpc_args.append(val)
+            elif isinstance(arg, float):
+                val = Value()
+                val.double_value = arg
+                rpc_args.append(val)
+            elif isinstance(arg, int):
+                val = Value()
+                val.int_value = arg
+                rpc_args.append(val)
+            elif isinstance(arg, str):
+                val = Value()
+                val.string_value = arg
+                rpc_args.append(val)
+            elif isinstance(arg, bytes):
+                val = Value()
+                val.bytes_value = arg
+                rpc_args.append(val)
+            else:
+                print('Invalid arg:', arg)
+
+        # Set args
+        message.args.extend(rpc_args)
 
         # Will answer on the replay_to field
         p.subscribe(message.reply_to)
