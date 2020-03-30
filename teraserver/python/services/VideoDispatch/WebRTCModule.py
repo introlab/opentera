@@ -28,15 +28,24 @@ class WebRTCModule(BaseModule):
         pass
 
     def setup_rpc_interface(self):
-        self.rpc_api['create_session'] = {'args': [],
+        self.rpc_api['create_session'] = {'args': ['str:room_name'],
                                           'returns': 'dict',
                                           'callback': self.create_webrtc_session}
 
-    def create_webrtc_session(self, *args, **kwargs):
-        print('Should create WebRTC session')
+    def create_webrtc_session(self, room_name, *args, **kwargs):
+        print('Should create WebRTC session with name:', room_name)
 
-        # Return empty dict
-        return {}
+        # For now just launch test
+        port = 8080
+        key = room_name
+
+        url = 'https://' + self.config.webrtc_config['hostname'] + ':' + str(port) + '/teraplus?key=' + key
+
+        if self.launch_node(port=port, key=key):
+            # Return empty dict
+            return {'url': url}
+        else:
+            return {'error': 'Not launched.'}
 
     def notify_module_messages(self, pattern, channel, message):
         """
@@ -45,48 +54,27 @@ class WebRTCModule(BaseModule):
         print('WebRTCModule - Received message ', pattern, channel, message)
         pass
 
-    def create_session(self, message: CreateSession):
-
-        print('create_session', message)
-
-        # For now just launch test
-        port = 8080
-        key = "test"
-
-        url = 'https://'+self.config.webrtc_config['hostname'] + ':' + str(port) + '/teraplus?key=' + key
-        self.launch_node(port=port, key=key)
-        self.publish(message.reply_to, url)
-
-    def webrtc_message_callback_deprecated(self, pattern, channel, message):
-        print('WebRTCModule message received', pattern, channel, message)
-        parts = channel.split('.')
-        if len(parts) == 2 and 'webrtc' in parts[0]:
-            # Verify command
-            if 'create_session' in parts[1]:
-                len_message = len(message)
-                protobuf_message = CreateSession()
-                protobuf_message.ParseFromString(message.encode('utf-8'))
-                print('got protobuf_message: ', protobuf_message)
-
-                """
-                got protobuf_message:  source: "UserManagerModule"
-                2019-04-02 15:27:40-0400 [-] command: "create_session"
-                2019-04-02 15:27:40-0400 [-] reply_to: "server.f9ee231b-8fce-43c2-8075-a9c6f90368fe.create_session"
-                """
-                self.create_session(protobuf_message)
-                # self.publish(protobuf_message.reply_to, 'should send back webrtc server info')
-
-    def launch_node(self, port=8080, key="test"):
-        command = [self.config.webrtc_config['executable'],
-                   self.config.webrtc_config['script'], str(port), str(key)]
+    def launch_node(self, port, key):
+        executable_args = [self.config.webrtc_config['executable'],
+                           self.config.webrtc_config['command'],
+                           str(port),
+                           str(key)]
 
         # stdout=os.subprocess.PIPE, stderr=os.subprocess.PIPE)
-        process = subprocess.Popen(command, cwd=os.path.realpath(self.config.webrtc_config['working_directory']))
+        try:
+            process = subprocess.Popen(executable_args,
+                                     cwd=os.path.realpath(self.config.webrtc_config['working_directory']),
+                                     shell=True)
 
-        # One more process
-        self.processList.append({'process': process, 'port': port, 'key': key})
+            # One more process
+            self.processList.append({'process': process, 'port': port, 'key': key})
 
-        print('started process', process)
+            print('started process', process)
+            return True
+        except OSError as e:
+            print('error!', e)
+
+        return False
 
 
 if __name__ == '__main__':
@@ -127,8 +115,7 @@ if __name__ == '__main__':
         # Using RPC API
         rpc = RedisRPCClient(config_man.redis_config)
 
-        result = rpc.call('VideoDispatchService.WebRTCModule', 'create_session',
-                          bool(True), int(5), float(3.0), b'bytes', str('rien'))
+        result = rpc.call('VideoDispatchService.WebRTCModule', 'create_session', 'test')
 
         print(result)
         # ret.addCallback(subscribed_callback)
