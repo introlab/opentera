@@ -4,6 +4,7 @@ from modules.BaseModule import BaseModule, ModuleNames
 
 import os
 import subprocess
+import threading
 
 
 class ActiveSession:
@@ -80,7 +81,7 @@ class WebRTCModule(BaseModule):
 if __name__ == '__main__':
     # Mini test
     from services.VideoDispatch.Globals import config_man
-    from twisted.internet import reactor, task
+    from twisted.internet import reactor, task, threads
     import services.VideoDispatch.Globals as Globals
     from modules.RedisVars import RedisVars
     from libtera.redis.RedisClient import RedisClient
@@ -102,8 +103,13 @@ if __name__ == '__main__':
     # Create module
     module = WebRTCModule(config_man)
 
+    def result_callback(result):
+        print(result)
 
-    def callback_later():
+
+    def rpc_call():
+
+        print('current thread', threading.current_thread())
         # Create session message
         from messages.python.CreateSession_pb2 import CreateSession
         from messages.python.RPCMessage_pb2 import RPCMessage
@@ -118,9 +124,10 @@ if __name__ == '__main__':
         result = rpc.call('VideoDispatchService.WebRTCModule', 'create_session', 'test')
 
         print(result)
+        return result
         # ret.addCallback(subscribed_callback)
 
     # Deferred to call function in 5 secs.
-    d = task.deferLater(reactor, 5.0, callback_later)
-    reactor.suggestThreadPoolSize(30)
+    d = threads.deferToThread(rpc_call)
+    d.addCallback(result_callback)
     reactor.run()
