@@ -122,4 +122,5 @@ if __name__ == '__main__':
 
     # Deferred to call function in 5 secs.
     d = task.deferLater(reactor, 5.0, callback_later)
+    reactor.suggestThreadPoolSize(30)
     reactor.run()
