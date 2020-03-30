@@ -1,3 +1,17 @@
+
+function validateInput(inputId){
+	var rval = ($(inputId).val() != "");
+	if (!rval){
+		$(inputId).css('background-color','#e05c5c');
+		$(inputId).css('color','black');
+	}else{
+		$(inputId).css('background-color','');
+		$(inputId).css('color','');
+	}
+
+	return rval;
+}
+
 function setCookie(cname, cvalue, exminutes) {
   var d = new Date();
   d.setTime(d.getTime() + (exminutes*60*1000));

@@ -1,19 +1,6 @@
 var timerId = -1;
 var timeout = 0;
 
-function validateInput(inputId){
-	var rval = ($(inputId).val() != "");
-	if (!rval){
-		$(inputId).css('background-color','#e05c5c');
-		$(inputId).css('color','black');
-	}else{
-		$(inputId).css('background-color','');
-		$(inputId).css('color','');
-	}
-
-	return rval;
-}
-
 function doLogin(backend_url, backend_port){
 	timeout++;
 	if (timerId == -1){
