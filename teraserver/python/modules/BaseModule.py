@@ -83,7 +83,8 @@ class BaseModule(RedisClient):
         pass
 
     def notify_module_rpc(self, pattern, channel, message):
-        print('BaseModule - Received rpc', self, pattern, channel, message)
+        import threading
+        print('BaseModule - Received rpc', self, pattern, channel, message, ' thread:', threading.current_thread())
 
         try:
             # Look for a RPCMessage
@@ -117,7 +118,8 @@ class BaseModule(RedisClient):
                 self.publish(rpc_message.reply_to, json_data)
 
         except:
-            print('Error calling rpc method', message)
+            import sys
+            print('Error calling rpc method', message, sys.exc_info())
             my_dict = {'method': rpc_message.method,
                        'id': rpc_message.id,
                        'pattern': pattern,

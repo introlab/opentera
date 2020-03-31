@@ -118,7 +118,7 @@ class OnlineUsersModule(BaseModule):
     def setup_rpc_interface(self):
         self.rpc_api['participant_dispatch'] = {'args': [], 'returns': 'dict', 'callback': self.participant_dispatch}
 
-    def participant_dispatch(self):
+    def participant_dispatch(self, *args):
         result = {}
         participant = self.dispatch.dispatch_next_participant()
 
@@ -129,9 +129,9 @@ class OnlineUsersModule(BaseModule):
 
         # Fill result
         if participant:
-            result['participant_uuid'] = participant.uuid
-            result['participant_session_start'] = participant.info['session_start']
-            result['participant_timestamp'] = participant.info['timestamp']
+            result['participant_uuid'] = str(participant.uuid)
+            result['participant_session_start'] = str(participant.info['session_start'])
+            result['participant_timestamp'] = str(participant.timestamp)
 
         return result
 
