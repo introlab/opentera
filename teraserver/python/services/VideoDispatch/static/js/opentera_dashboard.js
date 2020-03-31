@@ -42,6 +42,9 @@ function statusSuccess(response, status, request){
          document.getElementById('btnConnect').disabled = (response['online_count'] === 0);
     }else{
         if (response['rank'] !== undefined){
+            if (response['rank'] < 1){
+                response['rank'] = 1000;
+            }
             document.getElementById('lblRank').innerHTML = response['rank'];
         }
     }

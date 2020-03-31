@@ -3,6 +3,7 @@ from flask import render_template, request, redirect
 from services.VideoDispatch.Globals import ParticipantTokenCookieName
 import threading
 
+
 class Login(MethodView):
     # Decorators everywhere?
     # decorators = [auth.login_required]
@@ -31,7 +32,7 @@ class Login(MethodView):
             response = redirect(path)
 
             # Set cookie
-            response.set_cookie(ParticipantTokenCookieName, request.args['participant_token'], 30)
+            response.set_cookie(ParticipantTokenCookieName, request.args['participant_token'], 30*60*1000)
 
             return response
         else:

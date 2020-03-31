@@ -56,9 +56,18 @@ function doGetRequest(request_url, request_port, request_path, success_response,
           success: success_response,
           error: error_response,
           beforeSend: function (xhr) {
-            xhr.setRequestHeader('Authorization', 'OpenTera ' + getCookie('VideoDispatchToken'));
+            if (getCookie('VideoDispatchToken'))
+                xhr.setRequestHeader('Authorization', 'OpenTera ' + getCookie('VideoDispatchToken'));
+            else if (getCookie('VideoDispatchTokenParticipant'))
+                xhr.setRequestHeader('Authorization', 'OpenTera ' + getCookie('VideoDispatchTokenParticipant'));
             }
         });
+
+     // Refresh cookies
+     if (getCookie('VideoDispatchToken'))
+        setCookie('VideoDispatchToken', getCookie('VideoDispatchToken', 30));
+     if (getCookie('VideoDispatchTokenParticipant'))
+        setCookie('VideoDispatchTokenParticipant', getCookie('VideoDispatchTokenParticipant', 30));
 }
 
 function getRequestSuccess(response, status, request){
