@@ -40,7 +40,7 @@ class WebRTCModule(BaseModule):
         port = 8080
         key = room_name
 
-        url = 'https://' + self.config.webrtc_config['hostname'] + ':' + str(port) + '/teraplus?key=' + key
+        url = 'https://' + self.config.webrtc_config['hostname'] + ':' + '40075' + '/teraplus/teraplus?key=' + key
 
         if self.launch_node(port=port, key=key):
             # Return empty dict
