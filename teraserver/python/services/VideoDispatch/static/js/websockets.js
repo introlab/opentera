@@ -58,4 +58,13 @@ function ws_Closed(){
 function ws_MessageReceived(evt){
 	var received_msg = evt.data;
     console.log("Websocket message: " + received_msg);
+
+    var json_msg = JSON.parse(received_msg);
+
+    var msg_type = json_msg.data[0]["@type"];
+
+    if (msg_type == "type.googleapis.com/opentera.protobuf.JoinSessionEvent"){
+        // Join video session event - redirect to session url
+        document.getElementById('mainview').src = json_msg.data[0]["sessionUrl"];
+    }
 }

@@ -68,6 +68,7 @@ function doParticipantLogin(backend_url, backend_port){
           success: function(response, status, request){
                 clearInterval(timerId);
                 timerId=-1;
+
                 // Get websocket url
                 sessionStorage.setItem("websocket_url", response["websocket_url"]);
 
