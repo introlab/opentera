@@ -79,6 +79,15 @@ class ParticipantDispatch:
                 self.done.append(participant_state)
                 break
 
+    def online_count(self):
+        return len(self.online)
+
+    def in_session_count(self):
+        return len(self.in_session)
+
+    def done_count(self):
+        return len(self.done)
+
     def dispatch_next_participant(self):
         if not self.online:
             return None
@@ -91,8 +100,8 @@ class ParticipantDispatch:
         current_participant_state.info['session_start'] = datetime.now()
         # Append to in_session list
         self.in_session.append(current_participant_state)
-        # Return uuid
-        return current_participant_state.uuid
+        # Return state
+        return current_participant_state
 
 
 class OnlineUsersModule(BaseModule):
@@ -105,6 +114,26 @@ class OnlineUsersModule(BaseModule):
         # Additional subscribe
         self.subscribe_pattern_with_callback('module.TeraServer.UserManagerModule.messages.events',
                                              self.notify_user_manager_event)
+
+    def setup_rpc_interface(self):
+        self.rpc_api['participant_dispatch'] = {'args': [], 'returns': 'dict', 'callback': self.participant_dispatch}
+
+    def participant_dispatch(self):
+        result = {}
+        participant = self.dispatch.dispatch_next_participant()
+
+        # Service statistics
+        result['online_count'] = self.dispatch.online_count()
+        result['in_session_count'] = self.dispatch.in_session_count()
+        result['done_count'] = self.dispatch.done_count()
+
+        # Fill result
+        if participant:
+            result['participant_uuid'] = participant.uuid
+            result['participant_session_start'] = participant.info['session_start']
+            result['participant_timestamp'] = participant.info['timestamp']
+
+        return result
 
     def notify_user_manager_event(self, pattern, channel, message):
         """
@@ -163,6 +192,6 @@ if __name__ == '__main__':
 
     test = dispatch.dispatch_next_participant()
 
-    dispatch.participant_offline(test)
+    dispatch.participant_offline(test.uuid)
 
     print('done!')

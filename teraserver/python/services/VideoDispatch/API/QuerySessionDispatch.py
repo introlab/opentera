@@ -5,6 +5,7 @@ from flask_babel import gettext
 from sqlalchemy.exc import InvalidRequestError
 from services.VideoDispatch.FlaskModule import default_api_ns as api
 from services.VideoDispatch.AccessManager import AccessManager
+from libtera.redis.RedisRPCClient import RedisRPCClient
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -26,6 +27,11 @@ class QuerySessionDispatch(Resource):
                         501: 'Not implemented',
                         403: 'Logged device doesn\'t have permission to access the requested data'})
     def get(self):
+
+        client = RedisRPCClient(self.module.config.redis_config)
+
+        result = client.call('VideoDispatchService.OnlineUsersModule', 'participant_dispatch')
+
         # TODO: Get real URL to connect to
         reply = {'participant_name': 'Participant Test', 'session_url': 'https://localhost:40075/videodispatch/session?'
                                                                         'id=1234'}
