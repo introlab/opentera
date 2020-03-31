@@ -34,10 +34,26 @@ class QuerySessionDispatch(Resource):
 
         if not result:
             print('Error!')
+            return 'Internal server error', 500
+
+        reply = {}
+
+        if 'participant_uuid' in result:
+            from uuid import uuid4
+            session_name = str(uuid4())
+            print('creating a session ')
+            result = client.call('VideoDispatchService.WebRTCModule', 'create_session', session_name)
+            print(result)
+
+            if result:
+                reply['participant_name'] = 'Anonymous'
+                reply['session_url'] = result['url']
+
+                # Invite participant via websocket
 
         # TODO: Get real URL to connect to
-        reply = {'participant_name': 'Participant Test', 'session_url': 'https://localhost:40075/videodispatch/session?'
-                                                                        'id=1234'}
+        # reply = {'participant_name': 'Participant Test',
+        # 'session_url': 'https://localhost:40075/videodispatch/session?id=1234'}
         return reply
 
     @AccessManager.token_required
