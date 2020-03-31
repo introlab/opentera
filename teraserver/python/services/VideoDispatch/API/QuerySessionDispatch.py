@@ -6,6 +6,8 @@ from sqlalchemy.exc import InvalidRequestError
 from services.VideoDispatch.FlaskModule import default_api_ns as api
 from services.VideoDispatch.AccessManager import AccessManager
 from libtera.redis.RedisRPCClient import RedisRPCClient
+from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
+from google.protobuf.any_pb2 import Any
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -39,21 +41,25 @@ class QuerySessionDispatch(Resource):
         reply = {}
 
         if 'participant_uuid' in result:
+            participant_uuid = result['participant_uuid']
             from uuid import uuid4
             session_name = str(uuid4())
-            print('creating a session ')
             result = client.call('VideoDispatchService.WebRTCModule', 'create_session', session_name)
-            print(result)
-
             if result:
                 reply['participant_name'] = 'Anonymous'
                 reply['session_url'] = result['url']
 
                 # Invite participant via websocket
+                topic = 'websocket.participant.' + participant_uuid
+                event = JoinSessionEvent()
+                event.session_url = result['url']
 
-        # TODO: Get real URL to connect to
-        # reply = {'participant_name': 'Participant Test',
-        # 'session_url': 'https://localhost:40075/videodispatch/session?id=1234'}
+                message = self.module.create_tera_message(dest=topic)
+                any_message = Any()
+                any_message.Pack(event)
+                message.data.extend([any_message])
+                self.module.publish(message.head.dest, message.SerializeToString())
+
         return reply
 
     @AccessManager.token_required
