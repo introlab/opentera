@@ -44,6 +44,11 @@ class WebRTCModule(BaseModule):
 
         if self.launch_node(port=port, key=key):
             # Return empty dict
+
+            # Sleep 2 secs
+            import time
+            time.sleep(3)
+
             return {'url': url}
         else:
             return {'error': 'Not launched.'}
