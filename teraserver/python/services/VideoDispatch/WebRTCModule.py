@@ -64,8 +64,8 @@ class WebRTCModule(BaseModule):
         # stdout=os.subprocess.PIPE, stderr=os.subprocess.PIPE)
         try:
             process = subprocess.Popen(executable_args,
-                                     cwd=os.path.realpath(self.config.webrtc_config['working_directory']),
-                                     shell=True)
+                                       cwd=os.path.realpath(self.config.webrtc_config['working_directory']),
+                                       shell=False)
 
             # One more process
             self.processList.append({'process': process, 'port': port, 'key': key})

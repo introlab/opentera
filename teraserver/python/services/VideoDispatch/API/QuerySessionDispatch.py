@@ -30,7 +30,7 @@ class QuerySessionDispatch(Resource):
 
         client = RedisRPCClient(self.module.config.redis_config)
 
-        result = client.call('VideoDispatchService.OnlineUsersModule', 'participant_dispatch')
+        result = client.call('VideoDispatchService.OnlineUsersModule', 'participant_dispatch', True)
 
         if not result:
             print('Error!')

@@ -103,6 +103,13 @@ class ParticipantDispatch:
         # Return state
         return current_participant_state
 
+    def get_participant_rank(self, participant_uuid) -> int:
+        for rank, participant in enumerate(self.online):
+            if participant.uuid == participant_uuid:
+                return rank+1
+
+        return -1
+
 
 class OnlineUsersModule(BaseModule):
 
@@ -116,11 +123,18 @@ class OnlineUsersModule(BaseModule):
                                              self.notify_user_manager_event)
 
     def setup_rpc_interface(self):
-        self.rpc_api['participant_dispatch'] = {'args': [], 'returns': 'dict', 'callback': self.participant_dispatch}
+        self.rpc_api['participant_dispatch'] = {'args': [bool],
+                                                'returns': 'dict',
+                                                'callback': self.participant_dispatch}
+        self.rpc_api['participant_rank'] = {'args': [str],
+                                            'returns': 'dict',
+                                            'callback': self.participant_rank}
 
-    def participant_dispatch(self, *args):
+    def participant_dispatch(self, take_participant=False):
         result = {}
-        participant = self.dispatch.dispatch_next_participant()
+        participant = None
+        if take_participant:
+            participant = self.dispatch.dispatch_next_participant()
 
         # Service statistics
         result['online_count'] = self.dispatch.online_count()
@@ -134,6 +148,9 @@ class OnlineUsersModule(BaseModule):
             result['participant_timestamp'] = str(participant.timestamp)
 
         return result
+
+    def participant_rank(self, participant_uuid):
+        return self.dispatch.get_participant_rank(participant_uuid=participant_uuid)
 
     def notify_user_manager_event(self, pattern, channel, message):
         """
