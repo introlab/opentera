@@ -32,6 +32,9 @@ class QuerySessionDispatch(Resource):
 
         result = client.call('VideoDispatchService.OnlineUsersModule', 'participant_dispatch')
 
+        if not result:
+            print('Error!')
+
         # TODO: Get real URL to connect to
         reply = {'participant_name': 'Participant Test', 'session_url': 'https://localhost:40075/videodispatch/session?'
                                                                         'id=1234'}
