@@ -1,10 +1,11 @@
 // Load required modules
 var https   = require("https");     // https server core module
+var http = require("http");         // http server core module
 var fs      = require("fs");        // file system core module
 var express = require("express");   // web framework external module
 var io      = require("socket.io"); // web socket external module
 var easyrtc = require("easyrtc");   // EasyRTC external module
-var myport = 40051;
+var myport = 8080;
 var mykey = "";
 
 if (process.argv[2])
@@ -33,12 +34,17 @@ httpApp.use('/teraplus', function(req, res){
 
 
 // Start Express https server on port 8443
+/*
 var webServer = https.createServer(
 {
     key:  fs.readFileSync("ssl/privkey.pem"),
     cert: fs.readFileSync("ssl/cert.pem")
 },
 httpApp).listen(myport);
+*/
+
+var webServer = http.createServer(httpApp).listen(myport);
+
 
 // Start Socket.io so it attaches itself to Express server
 var socketServer = io.listen(webServer, {"log level":1});
