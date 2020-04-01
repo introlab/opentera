@@ -38,6 +38,11 @@ function initSystem(){
 	var urlParams = new URLSearchParams(window.location.search);
 	isWeb = (urlParams.get('source') == 'web');
 	
+	//easyrtc.setSocketUrl('https://localhost:40075/teraplus/8080/teraplus', null);
+	//var host = window.location.host
+	easyrtc.setSocketUrl(window.location.origin, {path: "/websocket/8080"});
+	//easyrtc.setSocketUrl("/patate", null)
+
 	if (!isWeb){
 		// Include files
 		//include("qrc:///qtwebchannel/qwebchannel.js");
