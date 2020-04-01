@@ -1,11 +1,17 @@
 ﻿    <!DOCTYPE html>
     <html>
       <head>
-        <title>TeraPlus</title>
+        <title>TeraPlus:<%= teraplus_port %></title>
 		<link rel="stylesheet" href="css/jquery-ui.css">
+		<script>
+		function getTeraPlusPort() {
+			return "<%= teraplus_port %>"
+		}
+		</script>
 		<script src="external/jquery/jquery.js"></script>
 		<script src="js/jquery-ui.js"></script>
 		<!--<script src="js/jquery.layout.js"></script>-->
+	
 		
         <link rel="stylesheet" type="text/css" href="easyrtc/easyrtc.css" />
 		<link rel="stylesheet" type="text/css" href="css/teraplus.css" /> 
@@ -14,7 +20,7 @@
 		<!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="js/socket.io.js"></script>
         <script type="text/javascript" src="easyrtc/easyrtc.js"></script>
-		<script type="text/javascript" src="js/teraplus.js"></script>
+		<script type="text/javascript" src="js/teraplus.js" teraplus_port="<%= teraplus_port %>"></script>
         <script type="text/javascript" src="easyrtc/labs/easyrtc_rates.js"></script>
 		  <script>
 		  $( function() {

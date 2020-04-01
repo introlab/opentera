@@ -38,10 +38,10 @@ function initSystem(){
 	var urlParams = new URLSearchParams(window.location.search);
 	isWeb = (urlParams.get('source') == 'web');
 	
-	//easyrtc.setSocketUrl('https://localhost:40075/teraplus/8080/teraplus', null);
-	//var host = window.location.host
-	easyrtc.setSocketUrl(window.location.origin, {path: "/websocket/8080"});
-	//easyrtc.setSocketUrl("/patate", null)
+	// This function is rendered in the main html document
+	var port = getTeraPlusPort();
+	var websocket_path =  "/websocket/" + port
+	easyrtc.setSocketUrl(window.location.origin, {path: websocket_path});
 
 	if (!isWeb){
 		// Include files

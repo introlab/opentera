@@ -5,6 +5,8 @@ var fs      = require("fs");        // file system core module
 var express = require("express");   // web framework external module
 var io      = require("socket.io"); // web socket external module
 var easyrtc = require("easyrtc");   // EasyRTC external module
+var ejs = require("ejs");
+
 var myport = 8080;
 var mykey = "";
 
@@ -17,14 +19,17 @@ if (process.argv[3])
 
 // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
 var httpApp = express();
+httpApp.engine('html', require('ejs').renderFile)
 httpApp.use(express.static(__dirname + "/static/"));
-
+httpApp.set('view engine', 'html');
+httpApp.set('views', __dirname + '/protected');
 
 httpApp.use('/teraplus', function(req, res){
         //res.send('key: ' + req.query.key);
         if (req.query.key == mykey || mykey == ""){
                 // Authorized
-                res.sendFile('/index.html',{ root: __dirname + "/protected/"});
+                res.render('index.html', {teraplus_port: myport})
+                //res.render('/index.html',{ root: __dirname + "/protected/"});
         }else{
                 // Not authorized
                 res.sendFile('/denied.html',{ root: __dirname + "/static/"});
