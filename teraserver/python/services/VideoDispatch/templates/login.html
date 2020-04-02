@@ -17,7 +17,9 @@
         <script src="./static/bootstrap/js/bootstrap.min.js"></script>
 
     </head>
-    <body onload="sessionStorage.clear();">
+    <body onload="sessionStorage.clear();
+    deleteCookie('VideoDispatchToken');
+    deleteCookie('VideoDispatchTokenParticipant');">
       <!--<div class="container">
       Hostname : {{ hostname }} <br>
       Port : {{ port }} <br>

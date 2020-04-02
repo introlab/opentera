@@ -143,12 +143,11 @@ function doLogout(backend_url, backend_port){
 }
 
 function logoutSuccess(response, status, request){
-    // Clear cookie
-    deleteCookie("VideoDispatchToken");
-    deleteCookie("VideoDispatchTokenParticipant");
-
     // Redirect to login page
-    window.location.replace("login");
+    if (sessionStorage.getItem("is_participant") == "false")
+        window.location.replace("login");
+    else
+        window.location.replace("participant_endpoint");
 }
 
 function logoutError(event, status){

@@ -51,7 +51,7 @@ function ws_Closed(){
 	*/
 
 	// Redirect to login for now...
-	window.location.replace("login");
+	//window.location.replace("login");
 
 }
 
@@ -77,6 +77,6 @@ function ws_MessageReceived(evt){
     // Stop session
     if (msg_type == "type.googleapis.com/opentera.protobuf.StopSessionEvent"){
         showElement('btnLogout');
-        top.mainview.src = 'participant';
+        window.location.replace("participant_endpoint");
     }
 }
