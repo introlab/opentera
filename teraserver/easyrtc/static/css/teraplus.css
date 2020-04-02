@@ -174,7 +174,7 @@
 			line-height: 24px;
 			z-index: 3;
 			font-size:14pt;
-			pointer-events: none;
+			//pointer-events: none;
 		}
 		
 		.minivideo {
