@@ -56,9 +56,9 @@ function doGetRequest(request_url, request_port, request_path, success_response,
           success: success_response,
           error: error_response,
           beforeSend: function (xhr) {
-            if (getCookie('VideoDispatchToken'))
+            if (sessionStorage.getItem("is_participant") === false)
                 xhr.setRequestHeader('Authorization', 'OpenTera ' + getCookie('VideoDispatchToken'));
-            else if (getCookie('VideoDispatchTokenParticipant'))
+            else
                 xhr.setRequestHeader('Authorization', 'OpenTera ' + getCookie('VideoDispatchTokenParticipant'));
             }
         });
