@@ -1,6 +1,9 @@
 var service_hostname;
 var service_port;
 
+var current_session_key;
+var current_session_url;
+
 function init_dashboard(serv_hostname, serv_port){
     service_hostname = serv_hostname;
     service_port = serv_port;
@@ -16,7 +19,17 @@ function connectSuccess(response, status, request){
     if (response['session_url'] !== undefined){
         console.log("Starting videoconferencing session with " + response['participant_name'] + " at " +
         response['session_url']);
-        window.location.replace(response['session_url']);
+        current_session_key = response['session_key'];
+        current_session_url = response['session_url'];
+        window.parent.document.getElementById('btnLogout').style.display="none";
+        window.parent.document.getElementById('btnStopSession').style.display="inline";;
+
+        //window.location.replace(response['session_url']);
+        window.parent.document.getElementById('mainview').contentWindow.document.getElementById("lblParticipantName").innerHTML = response['participant_name'];
+        window.parent.document.getElementById('mainview').contentWindow.document.getElementById("dialogWait").style.display="inline";
+
+        testCurrentSessionUrlValid();
+
     }else{
         console.log('No participant waiting!');
     }
@@ -27,13 +40,37 @@ function connectError(event, status){
 
 }
 
+
+var sessionUrlTries = 0;
+function testCurrentSessionUrlValid(){
+    var request = new XMLHttpRequest();
+    request.open('GET', current_session_url, true);
+    request.onreadystatechange = function(){
+        if (request.readyState === 4){
+            if (request.status === 404) {
+                // Not started yet... try again...
+                sessionUrlTries++;
+                if (sessionUrlTries >= 5){
+                    hideMainViewElement("dialogWait");
+                    alert("Error - Can't start session!");
+                }
+            }
+            if (request.status == 200){
+                sessionUrlTries = 0;
+                window.location.replace(current_session_url);
+            }
+        }
+    };
+    request.send();
+}
+
 function updateStatus(){
-    console.log("Updating status...");
+    //console.log("Updating status...");
     doGetRequest(service_hostname, service_port, '/videodispatch/api/videodispatch/status', statusSuccess);
 }
 
 function statusSuccess(response, status, request){
-    // console.log(response);
+    //console.log(response);
     if (response['online_count'] !== undefined){
         document.getElementById('lblOnlineCount').innerHTML = response['online_count'];
         document.getElementById('lblInSessionCount').innerHTML = response['in_session_count'];
@@ -43,9 +80,38 @@ function statusSuccess(response, status, request){
     }else{
         if (response['rank'] !== undefined){
             if (response['rank'] < 1){
-                response['rank'] = 1000;
+                hideElement('cardRank');
+            }else{
+                document.getElementById('cardRank').style.display="block";
             }
             document.getElementById('lblRank').innerHTML = response['rank'];
         }
     }
+}
+
+function doStopCurrentSession(){
+    if (current_session_key !== undefined){
+        doGetRequest(service_hostname, service_port, '/videodispatch/api/videodispatch/sessionmanage?session_key=' +
+        current_session_key + "&session_stop=true", sessionStopSuccess);
+    }else{
+        console.error('No session to stop!');
+    }
+}
+
+function sessionStopSuccess(response, status, request){
+    if (status == 200){
+        window.parent.document.getElementById('btnLogout').style.display="inline";
+        window.parent.document.getElementById('btnStopSession').style.display="none";
+        current_session_key = undefined;
+        current_session_url = undefined;
+        window.location.replace('dashboard_main');
+    }
+}
+
+function hideMainViewElement(element_id){
+    document.getElementById('mainview').contentWindow.document.getElementById(element_id).style.display='none';
+}
+
+function showMainViewElement(element_id){
+    document.getElementById('mainview').contentWindow.document.getElementById(element_id).style.display='inline';
 }

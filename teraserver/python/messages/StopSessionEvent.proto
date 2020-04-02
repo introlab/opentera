@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package opentera.protobuf;
+
+message StopSessionEvent {
+    string session_key = 1;
+}

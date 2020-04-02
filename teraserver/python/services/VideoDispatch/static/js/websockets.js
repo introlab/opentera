@@ -63,8 +63,20 @@ function ws_MessageReceived(evt){
 
     var msg_type = json_msg.data[0]["@type"];
 
+    // Join session
     if (msg_type == "type.googleapis.com/opentera.protobuf.JoinSessionEvent"){
+        hideElement('btnLogout');
         // Join video session event - redirect to session url
         document.getElementById('mainview').src = json_msg.data[0]["sessionUrl"];
+
     }
+
+    // Stop session
+    if (msg_type == "type.googleapis.com/opentera.protobuf.StopSessionEvent"){
+        showElement('btnLogout');
+
+        document.getElementById('mainview').src = "participant";
+    }
+
+
 }

@@ -142,11 +142,13 @@ class FlaskModule(BaseModule):
         from .API.QuerySessionDispatch import QuerySessionDispatch
         from .API.QueryLogin import QueryLogin
         from .API.QueryStatus import QueryStatus
+        from .API.QuerySessionManage import QuerySessionManage
 
         # Resources
         default_api_ns.add_resource(QuerySessionDispatch, '/sessiondispatch', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryLogin, '/login', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryStatus, '/status', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QuerySessionManage, '/sessionmanage', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from .Views.Index import Index

@@ -38,10 +38,26 @@
        </div>
 
        <div class="card mt-3 align-items-center" style="background-color: black;">
-           <button id="btnConnect" onclick="connectToNextParticipant();" class="bg-info w-75" style="height: 60px;">Prendre le prochain appel</button>
+           <button id="btnConnect" onclick="connectToNextParticipant();" class="bg-info w-75" style="height: 60px;" disabled>Prendre le prochain appel</button>
 
        </div>
        </center>
+
+       <div class="modal" tabindex="-1" role="dialog" id="dialogWait" >
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Connexion en cours...</h5>
+              </div>
+              <div class="modal-body">
+                <p>Vous serez bientôt en communication avec <label id="lblParticipantName"> ??? </label>.</p>
+              </div>
+              <div class="modal-footer">
+
+              </div>
+            </div>
+          </div>
+        </div>
        <!--<div class="col-4">
            Dernières personnes vues<br/>
 
