@@ -166,10 +166,15 @@ class OnlineUsersModule(BaseModule):
             # Unused for now
             user_event = UserEvent()
             if any_msg.Unpack(user_event):
+                from services.VideoDispatch.Globals import WebRTC_module
                 if user_event.type == user_event.USER_CONNECTED:
-                    pass
+                    # Closes sessions
+                    if WebRTC_module.terminate_webrtc_session_with_owner_uuid(user_event.user_uuid):
+                        print('OnlineUsersModule closing pending session for user_uuid:', user_event.user_uuid)
                 elif user_event.type == user_event.USER_DISCONNECTED:
-                    pass
+                    # Closes sessions
+                    if WebRTC_module.terminate_webrtc_session_with_owner_uuid(user_event.user_uuid):
+                        print('OnlineUsersModule closing pending session for user_uuid:', user_event.user_uuid)
 
             # Test for ParticipantEvent
             # We want to know if a participant is connected or disconnected

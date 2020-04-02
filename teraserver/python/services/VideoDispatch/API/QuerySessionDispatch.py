@@ -50,7 +50,7 @@ class QuerySessionDispatch(Resource):
             from uuid import uuid4
             session_name = str(uuid4())
             result = client.call('VideoDispatchService.WebRTCModule', 'create_session', session_name, owner_uuid)
-            if result:
+            if result and not result.__contains__('error'):
                 reply['participant_name'] = 'Anonymous'
                 reply['participant_uuid'] = participant_uuid
                 reply['session_url'] = result['url']
@@ -68,6 +68,8 @@ class QuerySessionDispatch(Resource):
                 any_message.Pack(event)
                 message.data.extend([any_message])
                 self.module.publish(message.head.dest, message.SerializeToString())
+            else:
+                reply['error'] = 'Unable to create session'
 
         return reply
 

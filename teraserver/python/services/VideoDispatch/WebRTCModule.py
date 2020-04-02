@@ -13,6 +13,10 @@ class WebRTCModule(BaseModule):
     def __init__(self, config: ConfigManager):
         BaseModule.__init__(self, "VideoDispatchService.WebRTCModule", config)
         self.processList = []
+        self.max_sessions = self.config.webrtc_config['max_sessions']
+        self.base_port = self.config.webrtc_config['local_base_port']
+        self.available_ports = [port for port in range(self.base_port, self.base_port + self.max_sessions)]
+        self.used_ports = []
 
     def __del__(self):
         # self.unsubscribe_pattern_with_callback("webrtc.*", self.webrtc_message_callback_deprecated)
@@ -30,20 +34,69 @@ class WebRTCModule(BaseModule):
                                           'callback': self.create_webrtc_session}
 
     def create_webrtc_session(self, room_name, owner_uuid, *args, **kwargs):
-        print('Should create WebRTC session with name:', room_name)
-        # For now just launch test
-        port = 8080
+
+        # make sure we kill sessions already started with this owner_uuid or room name
+        self.terminate_webrtc_session_with_owner_uuid(owner_uuid)
+        self.terminate_webrtc_session_with_room_name(room_name)
+
+        # Get next available port
+        port = self.get_available_port()
         key = room_name
 
-        url = 'https://' + self.config.webrtc_config['hostname'] + ':' \
-              + str(self.config.webrtc_config['external_port']) \
-              + '/teraplus/' + str(port) + '/teraplus?key=' + key
+        print('WebRTCModule - Should create WebRTC session with name:', room_name, port, key)
 
-        if self.launch_node(port=port, key=key, owner=owner_uuid):
-            # Return url
-            return {'url': url, 'key': key, 'port': port, 'owner': owner_uuid}
+        if port:
+            url = 'https://' + self.config.webrtc_config['hostname'] + ':' \
+                  + str(self.config.webrtc_config['external_port']) \
+                  + '/teraplus/' + str(port) + '/teraplus?key=' + key
+
+            if self.launch_node(port=port, key=key, owner=owner_uuid):
+                # Return url
+                return {'url': url, 'key': key, 'port': port, 'owner': owner_uuid}
+            else:
+                return {'error': 'Process not launched.'}
         else:
-            return {'error': 'Not launched.'}
+            return {'error': 'No available port left.'}
+
+    def terminate_webrtc_session_with_room_name(self, room_name):
+        for process_dict in self.processList:
+            if process_dict['key'] == room_name:
+                # Terminate process
+                process_dict['process'].kill()
+                # Wait for process return
+                process_dict['process'].wait()
+
+                # Remove from process list
+                self.processList.remove(process_dict)
+
+                # Remove from used ports
+                self.used_ports.remove(process_dict['port'])
+
+                # Add to available ports
+                self.available_ports.append(process_dict['port'])
+
+                return True
+        return False
+
+    def terminate_webrtc_session_with_owner_uuid(self, owner_uuid):
+        for process_dict in self.processList:
+            if process_dict['owner'] == owner_uuid:
+                # Terminate process
+                process_dict['process'].kill()
+                # Wait for process return
+                process_dict['process'].wait()
+
+                # Remove from process list
+                self.processList.remove(process_dict)
+
+                # Remove from used ports
+                self.used_ports.remove(process_dict['port'])
+
+                # Add to available ports
+                self.available_ports.append(process_dict['port'])
+
+                return True
+        return False
 
     def notify_module_messages(self, pattern, channel, message):
         """
@@ -51,6 +104,15 @@ class WebRTCModule(BaseModule):
         """
         print('WebRTCModule - Received message ', pattern, channel, message)
         pass
+
+    def get_available_port(self):
+        if not self.available_ports:
+            return None
+
+        # Pop first
+        port = self.available_ports.pop(0)
+        self.used_ports.append(port)
+        return port
 
     def launch_node(self, port, key, owner):
         executable_args = [self.config.webrtc_config['executable'],
@@ -61,77 +123,16 @@ class WebRTCModule(BaseModule):
         # stdout=os.subprocess.PIPE, stderr=os.subprocess.PIPE)
         try:
             process = subprocess.Popen(executable_args,
-                                     cwd=os.path.realpath(self.config.webrtc_config['working_directory']),
-                                     shell=(sys.platform == 'win32'))
+                                       cwd=os.path.realpath(self.config.webrtc_config['working_directory']),
+                                       shell=(sys.platform == 'win32'))
 
             # One more process
             self.processList.append({'process': process, 'port': port, 'key': key, 'owner': owner})
 
-            print('started process', process)
+            print('WebRTCModule - started process', process)
             return True
         except OSError as e:
-            print('error!', e)
+            print('WebRTCModule - error starting process:', e)
 
         return False
 
-
-if __name__ == '__main__':
-    # Mini test
-    from services.VideoDispatch.Globals import config_man
-    from twisted.internet import reactor, task, threads
-    import services.VideoDispatch.Globals as Globals
-    from modules.RedisVars import RedisVars
-    from libtera.redis.RedisClient import RedisClient
-    from twisted.python import log
-    import sys
-    from twisted.internet import defer
-
-    # Used for redis events...
-    log.startLogging(sys.stdout)
-
-    # Load configuration
-    config_man.load_config('VideoDispatchService.ini')
-
-    # Init global variables
-    Globals.redis_client = RedisClient(config_man.redis_config)
-    Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
-    Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
-
-    # Create module
-    module = WebRTCModule(config_man)
-
-    def result_callback(result):
-        print(result)
-
-
-    def rpc_call():
-
-        print('current thread', threading.current_thread())
-        # Create session message
-        from messages.python.CreateSession_pb2 import CreateSession
-        from messages.python.RPCMessage_pb2 import RPCMessage
-        from libtera.redis.RedisClient import RedisClient
-        from libtera.redis.RedisRPCClient import RedisRPCClient
-        from datetime import datetime
-
-        print('Calling module')
-
-        return module.create_webrtc_session('test')
-
-        # Using RPC API
-        # rpc = RedisRPCClient(config_man.redis_config)
-
-        # result = rpc.call('VideoDispatchService.WebRTCModule', 'create_session', 'test')
-
-        # print(result)
-        # return result
-
-
-    # Deferred to call function in 5 secs.
-    # d = threads.deferToThread(rpc_call)
-    # d.addCallback(result_callback)
-
-    d = task.deferLater(reactor, 3.5,  rpc_call)
-    d.addCallback(result_callback)
-
-    reactor.run()
