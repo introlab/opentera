@@ -47,6 +47,21 @@ class QuerySessionDispatch(Resource):
 
         if 'participant_uuid' in result:
             participant_uuid = result['participant_uuid']
+
+            participant_name = 'Anonymous'
+
+            try:
+                # Get participant information
+                response = current_user_client.do_get_request_to_backend('/api/user/participants?participant_uuid='
+                                                                         + participant_uuid)
+
+                if response.status_code == 200:
+                    participant_info = response.json()
+                    if len(participant_info) > 0 and 'participant_name' in participant_info[0]:
+                        participant_name = participant_info[0]['participant_name']
+            except:
+                pass
+
             from uuid import uuid4
             session_name = str(uuid4())
             result = client.call('VideoDispatchService.WebRTCModule',
@@ -56,7 +71,7 @@ class QuerySessionDispatch(Resource):
                                  participant_uuid)
 
             if result and not result.__contains__('error'):
-                reply['participant_name'] = 'Anonymous'
+                reply['participant_name'] = participant_name
                 reply['participant_uuid'] = participant_uuid
                 reply['session_url'] = result['url']
                 reply['session_key'] = result['key']
