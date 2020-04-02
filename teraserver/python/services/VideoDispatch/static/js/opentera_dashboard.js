@@ -59,7 +59,7 @@ function testCurrentSessionUrlValid(){
                 }
             }else{
                 sessionUrlTries = 0;
-                if (sessionStorage.getItem("is_participant") === false)
+                if (sessionStorage.getItem("is_participant") == "false")
                     window.location.replace(current_session_url);
                 else
                     document.getElementById('mainview').src = current_session_url;
