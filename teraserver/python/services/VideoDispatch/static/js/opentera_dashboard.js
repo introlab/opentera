@@ -43,21 +43,26 @@ function connectError(event, status){
 
 var sessionUrlTries = 0;
 function testCurrentSessionUrlValid(){
+    //console.log("testCurrentSessionUrlValid");
     var request = new XMLHttpRequest();
     request.open('GET', current_session_url, true);
     request.onreadystatechange = function(){
         if (request.readyState === 4){
-            if (request.status === 404) {
+            if (request.status != 200) {
                 // Not started yet... try again...
                 sessionUrlTries++;
-                if (sessionUrlTries >= 5){
-                    hideMainViewElement("dialogWait");
+                if (sessionUrlTries >= 12){
+                    window.parent.document.getElementById('mainview').contentWindow.document.getElementById("dialogWait").style.display="none";
                     alert("Error - Can't start session!");
+                }else{
+                    setTimeout(testCurrentSessionUrlValid, 250);
                 }
-            }
-            if (request.status == 200){
+            }else{
                 sessionUrlTries = 0;
-                window.location.replace(current_session_url);
+                if (sessionStorage.getItem("is_participant") === false)
+                    window.location.replace(current_session_url);
+                else
+                    document.getElementById('mainview').src = current_session_url;
             }
         }
     };
@@ -95,6 +100,8 @@ function doStopCurrentSession(){
         current_session_key + "&session_stop=true", sessionStopSuccess);
     }else{
         console.error('No session to stop!');
+        window.parent.document.getElementById('btnLogout').style.display="inline";
+        window.parent.document.getElementById('btnStopSession').style.display="none";
     }
 }
 

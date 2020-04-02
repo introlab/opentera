@@ -72,6 +72,9 @@ function doParticipantLogin(backend_url, backend_port){
                 // Get websocket url
                 sessionStorage.setItem("websocket_url", response["websocket_url"]);
 
+                // Set flag to indicate participant login
+                sessionStorage.setItem("is_participant", true);
+
                 // Connect websocket
                 webSocketConnect();
             },
@@ -103,6 +106,9 @@ function loginReply(response, status, request){
 
         // Get websocket url
         sessionStorage.setItem("websocket_url", response["websocket_url"]);
+
+        // Set flag to indicate participant login
+        sessionStorage.setItem("is_participant", false);
 
   		// Redirect to location
 		window.location.replace("dashboard");

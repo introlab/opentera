@@ -170,8 +170,8 @@ function connect() {
 
 	if (!isWeb){
 		// Include files
-		include("qrc:///qtwebchannel/qwebchannel.js");
-		connectWebSockets();
+		//include("qrc:///qtwebchannel/qwebchannel.js");
+		//connectWebSockets();
 	}
 	
 	

@@ -7,6 +7,7 @@
        <script src="./static/js/opentera.js"></script> <!-- Always include first -->
 	   <script src="./static/js/websockets.js"></script>
 	   <script src="./static/js/login.js"></script>
+	   <script src="./static/js/opentera_dashboard.js"></script>
 
       <script src="./static/js/jquery-3.3.1.min.js"></script>
       <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
@@ -32,7 +33,7 @@
 			<img id="imgLogo" src="./static/images/teraplus.png" height="50px"/>
 		</div>
 		<div style="display:block;position:absolute;top:10px;right:0px;padding-right:12.5px;">
-			<button id="btnStopSession" onclick="doStopCurrentSession();" style="display:none;">Terminer la séance</button>
+			<button id="btnStopSession" onclick="doStopCurrentSession();" style="display:none;" class="bg-primary">Terminer la séance</button>
 			<button id="btnLogout" onclick="doLogout(backend_hostname, backend_port);">Déconnexion</button>
 			<img id="imgStatus" src="./static/images/grey_button.png" width="24px" style="transform: translateY(30%);" />
 			<!--<label id="socketUrl" style="display:none;">
