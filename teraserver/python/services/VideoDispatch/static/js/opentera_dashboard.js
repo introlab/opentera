@@ -7,6 +7,9 @@ var current_session_url;
 function init_dashboard(serv_hostname, serv_port){
     service_hostname = serv_hostname;
     service_port = serv_port;
+}
+
+function startStatusUpdates(){
     setInterval(updateStatus, 5000);
     updateStatus();
 }
@@ -22,7 +25,8 @@ function connectSuccess(response, status, request){
         current_session_key = response['session_key'];
         current_session_url = response['session_url'];
         window.parent.document.getElementById('btnLogout').style.display="none";
-        window.parent.document.getElementById('btnStopSession').style.display="inline";;
+        window.parent.document.getElementById('btnStopSession').style.display="inline";
+        window.parent.document.getElementById('btnStopSession').name = response['session_key'];
 
         //window.location.replace(response['session_url']);
         window.parent.document.getElementById('mainview').contentWindow.document.getElementById("lblParticipantName").innerHTML = response['participant_name'];
@@ -94,10 +98,13 @@ function statusSuccess(response, status, request){
     }
 }
 
-function doStopCurrentSession(){
-    if (current_session_key !== undefined){
+function doStopCurrentSession(session_key){
+    if (session_key === undefined)
+        session_key = current_session_key;
+
+    if (session_key !== undefined){
         doGetRequest(service_hostname, service_port, '/videodispatch/api/videodispatch/sessionmanage?session_key=' +
-        current_session_key + "&session_stop=true", sessionStopSuccess);
+        session_key + "&session_stop=true", sessionStopSuccess);
     }else{
         console.error('No session to stop!');
         window.parent.document.getElementById('btnLogout').style.display="inline";

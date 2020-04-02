@@ -26,14 +26,14 @@
 			var backend_port = {{ backend_port }};
 	   </script>
    </head>
-   <body onload = "{% if is_participant %}doParticipantLogin(backend_hostname, backend_port);
+   <body onload = "init_dashboard('{{ backend_hostname }}', {{ backend_port }});{% if is_participant %}doParticipantLogin(backend_hostname, backend_port);
    {% else %}webSocketConnect();{% endif %}">
 	<div id="communicator" style="position:absolute;top:0;left:0;width:100%;height:50px;border:0;">
 		<div align="left" style="display:block;position:absolute;">
 			<img id="imgLogo" src="./static/images/teraplus.png" height="50px"/>
 		</div>
 		<div style="display:block;position:absolute;top:10px;right:0px;padding-right:12.5px;">
-			<button id="btnStopSession" onclick="doStopCurrentSession();" style="display:none;" class="bg-primary">Terminer la séance</button>
+			<button id="btnStopSession" name="none" onclick="doStopCurrentSession(this.name);" style="display:none;" class="bg-primary">Terminer la séance</button>
 			<button id="btnLogout" onclick="doLogout(backend_hostname, backend_port);">Déconnexion</button>
 			<img id="imgStatus" src="./static/images/grey_button.png" width="24px" style="transform: translateY(30%);" />
 			<!--<label id="socketUrl" style="display:none;">
