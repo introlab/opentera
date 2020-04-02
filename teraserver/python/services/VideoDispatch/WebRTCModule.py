@@ -116,15 +116,14 @@ class WebRTCModule(BaseModule):
 
     def launch_node(self, port, key, owner):
         executable_args = [self.config.webrtc_config['executable'],
-                           self.config.webrtc_config['command'],
+                           self.config.webrtc_config['script'],
                            str(port),
                            str(key)]
 
         # stdout=os.subprocess.PIPE, stderr=os.subprocess.PIPE)
         try:
             process = subprocess.Popen(executable_args,
-                                       cwd=os.path.realpath(self.config.webrtc_config['working_directory']),
-                                       shell=(sys.platform == 'win32'))
+                                       cwd=os.path.realpath(self.config.webrtc_config['working_directory']))
 
             # One more process
             self.processList.append({'process': process, 'port': port, 'key': key, 'owner': owner})

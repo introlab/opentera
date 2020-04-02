@@ -5,8 +5,8 @@
   "description": "EasyRTC Server for OpenTera",
   "private": true,
   "scripts": {
-    "start": "node server_ssl.js",
-    "start_nginx_test": "node server_ssl.js 8080 ca8cc0c5-216f-4fc8-a13b-a664cdee364d"
+    "start": "node server.js",
+    "start_nginx_test": "node server.js 8080 ca8cc0c5-216f-4fc8-a13b-a664cdee364d"
   },
   "dependencies": {
     "easyrtc": "git+https://github.com/priologic/easyrtc.git",

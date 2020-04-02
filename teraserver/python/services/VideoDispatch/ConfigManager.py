@@ -92,7 +92,7 @@ class ConfigManager:
     @staticmethod
     def validate_webrtc_config(config):
         rval = True
-        required_fields = ['hostname', 'working_directory', 'executable', 'script']
+        required_fields = ['hostname', 'working_directory', 'executable', 'script', 'arguments']
         for field in required_fields:
             if field not in config:
                 print('ERROR: Backend Config - missing field ' + field)
