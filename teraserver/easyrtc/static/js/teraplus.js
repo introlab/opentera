@@ -67,6 +67,7 @@ function initSystem(){
 	
 }
 
+
 function include(filename)
 {
    var head = document.getElementsByTagName('head')[0];
@@ -119,7 +120,7 @@ function connect() {
 	
 	//easyrtc.setSdpFilters(localFilter, remoteFilter);
 
-	//Pre-connect Event listeners	
+	//Pre-connect Event listeners
 	easyrtc.setRoomOccupantListener(updateRoomUsers);
 	//easyrtc.setIceCandidateFilter(iceCandidateFilter);
 	easyrtc.setRoomEntryListener(function(entry, roomName) {
@@ -128,7 +129,7 @@ function connect() {
 	
 	easyrtc.setStreamAcceptor(newStreamStarted);
 	easyrtc.setOnStreamClosed(streamDisconnected);
-    	easyrtc.setPeerListener(dataReception);
+	easyrtc.setPeerListener(dataReception);
 			
 	//Post-connect Event listeners	
 	//easyrtc.setOnHangup(streamDisconnected);
@@ -165,7 +166,13 @@ function connect() {
 	});
 */
 	connected = true;
-	updateVideoSource(true);			
+	updateVideoSource(true);
+
+	if (!isWeb){
+		// Include files
+		include("qrc:///qtwebchannel/qwebchannel.js");
+		connectWebSockets();
+	}
 	
 	
  }
@@ -331,7 +338,7 @@ function fillDefaultSourceList(){
 	console.log("fillDefaultSourceList()");
 	videoSources.length=0;
 	audioSources.length=0;
-	
+
 	// Main video source selector
 	var select = document.getElementById('videoSelect');
 	select.options.length = 0;
@@ -399,9 +406,11 @@ function fillDefaultSourceList(){
 		});
 
 		if (currentMiniVideoSourceIndex==-1 && currentMiniAudioSourceIndex==-1){
+			//console.log("No secondary video for now.");
 			hideElement("imgAddVid2");
 			hideElement("miniMicStatus");
 		}else{
+			//console.log("Has secondary video source.");
 			showElement("imgAddVid2");
 		}
 	})
@@ -413,7 +422,8 @@ function fillDefaultSourceList(){
 }
 
 function fillVideoSourceList(list){
-	console.log("fillVideoSourceList()");
+	console.log("fillVideoSourceList() - Test");
+	console.log(list);
 
 	videoSources.length=0;
 	var select = document.getElementById('videoSelect');
@@ -443,7 +453,7 @@ function fillVideoSourceList(list){
 function fillAudioSourceList(list){
 	audioSources.length=0;
 	console.log("fillAudioSourceList()");
-	//console.log(list);
+	console.log(list);
 	
 	var select = document.getElementById('audioSelect');
 	select.options.length = 0;
@@ -520,9 +530,13 @@ function updateVideoSource(force=false){
 			easyrtc.closeLocalMediaStream();
 			easyrtc.initMediaSource(
 			function(stream){
-				easyrtc.setVideoObjectSrc(document.getElementById("selfVideo"), stream);
-				console.log("Connecting to session...");
-				easyrtc.connect("TeraPlus", loginSuccess, loginFailure);
+				if (stream.active){
+					easyrtc.setVideoObjectSrc(document.getElementById("selfVideo"), stream);
+					console.log("Connecting to session...");
+					easyrtc.connect("TeraPlus", loginSuccess, loginFailure);
+				}else{
+					console.log("Got local stream - waiting for it to become active...");
+				}
 			},
 			function(errorCode, errorText){
              console.error (errorCode + " - " +  errorText);
@@ -539,9 +553,11 @@ function updateVideoSource(force=false){
 	select = document.getElementById('videoSelect2');
 	audioSelect = document.getElementById('audioSelect2');
 	if (select.selectedIndex==0 && audioSelect.selectedIndex==0){
+		//console.log("updateVideoSource: No secondary video for now.");
 		hideElement("imgAddVid2");
 		hideElement("miniMicStatus");
 	}else{
+		//console.log("updateVideoSource: Has secondary video source.");
 		if (!isElementVisible("imgRemoveVid2"))
 			showElement("imgAddVid2");
 	}
@@ -580,12 +596,14 @@ function addLocalSource2(index){
 
 	if (index != 0){
 		// Send request to remote
-		easyrtc.sendDataWS( easyids[index], 'addVideo', request, function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});	
+		if (easyrtc.webSocketConnected){
+			easyrtc.sendDataWS( easyids[index], 'addVideo', request, function(ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if( ackMesg.msgType === 'error' ) {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
 		
 		// Change displayed icon
 		hideElement(getAddVideoIconId(index));
@@ -657,12 +675,14 @@ function addLocalSource2(index){
 function removeLocalSource2(index){
 	if (index != 0){
 		// Send request to remote
-		easyrtc.sendDataWS( easyids[index], 'removeVideo', request, function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});	
+		if (easyrtc.webSocketConnected){
+			easyrtc.sendDataWS( easyids[index], 'removeVideo', request, function(ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if( ackMesg.msgType === 'error' ) {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
 		return;
 	}
 
@@ -679,10 +699,13 @@ function removeLocalSource2(index){
 	updateVideoSource(true);
 	
 	hideElement("selfVideo2");
-	if (currentMiniVideoSourceIndex == -1 && currentMiniAudioSourceIndex == -1)
+	if (currentMiniVideoSourceIndex == -1 && currentMiniAudioSourceIndex == -1){
+		console.log("removeLocalSource2: Hiding secondary source indicator.");
 		hideElement("imgAddVid2");
-	else
+	}else{
+		console.log("removeLocalSource2: Showing secondary source indicator.");
 		showElement("imgAddVid2");
+	}
 	hideElement("imgRemoveVid2");
 	hideElement("swapBtn");
 	hideElement("miniMicStatus");
@@ -823,11 +846,11 @@ function selectSecondSources(source){
 	}
 	
 	if (sources.audio != "" || sources.video != ""){
-		hideElement("imgAddVid2");
-		hideElement("miniMicStatus");
+		showElement("imgAddVid2");
 		localCapabilities.video2 = true;
 	}else{
-		showElement("imgAddVid2");
+		hideElement("imgAddVid2");
+		hideElement("miniMicStatus");
 		localCapabilities.video2 = false;
 	}
 	
@@ -1047,12 +1070,14 @@ function sendContactInfo(easyrtcid_target){
 		console.log(localContact.uuid + " - " + localContact.name);
 		//send contact information to other users
 		//localContact.easyid = easyids[0];
-        easyrtc.sendDataWS( easyrtcid_target, 'contactInfo', localContact, function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});
+		if (easyrtc.webSocketConnected){
+			easyrtc.sendDataWS( easyrtcid_target, 'contactInfo', localContact, function(ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if( ackMesg.msgType === 'error' ) {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
 }
  
 function selectLargeView(id){
@@ -1109,7 +1134,7 @@ function newStreamStarted(callerEasyrtcid, stream, streamname){
 	resetVideosPos();
 		
 	//if ($.isNumeric(stream)){
-	if(stream.getVideoTracks().length == 0){
+	/*if(stream.getVideoTracks().length == 0){
 		// Audio only - show icons on correct "parent", if needed
 		console.log("newStreamStarted, received only audio track");
 		for (var i=1; i<5; i++){
@@ -1121,20 +1146,26 @@ function newStreamStarted(callerEasyrtcid, stream, streamname){
 			}
 		}
 		return;
-	}
+	}*/
 	
 	// Check if already have a stream with that name from that source
+	var slot = -1;
 	if (streamname=="default"){
 		for (var i=1; i<4; i++){
 			if (easyids[i] == callerEasyrtcid){
 				console.error("Stream default already present for that source. Ignoring.");
-				return;
+				//slot = i;
+				break;
 			}
 		}
 	}
 
 	// Find first empty slot
-	var slot = findFirstEmptyVideoSlot(); //stream+1
+	if (slot==-1)
+		slot = findFirstEmptyVideoSlot(); //stream+1
+	else{
+		// Stream was already there...
+	}
 
 	console.log ("Assigning slot " + slot);
 	if (slot>=0){
@@ -1189,13 +1220,15 @@ function newStreamStarted(callerEasyrtcid, stream, streamname){
 		broadcastlocalCapabilities();
 	
 		request = {"easyid": easyids[0], "micro":micEnabled, "micro2":mic2Enabled, "speaker":spkEnabled};
-					
-		easyrtc.sendDataWS(callerEasyrtcid, 'updateStatus', request, function(ackMesg) {
+
+		if (easyrtc.webSocketConnected){
+			easyrtc.sendDataWS(callerEasyrtcid, 'updateStatus', request, function(ackMesg) {
 				//console.error("ackMsg:",ackMesg);
 				if( ackMesg.msgType === 'error' ) {
 					console.error(ackMesg.msgData.errorText);
 				}
 			});
+		}
 		
 		// Add second video, if present
 		if (isElementVisible("selfVideo2")){
@@ -1364,11 +1397,11 @@ var video = document.querySelector("#selfVideo");
 function initLocalVideo(){
 	//video = document.querySelector(tag);
 				 
-	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+	/*navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 	 
 	if (navigator.getUserMedia) {       
 		navigator.getUserMedia({video: true, audio: true}, handleVideo, videoError);
-	}
+	}*/
 }
 
 function handleVideo(stream) {
@@ -1531,21 +1564,25 @@ function muteMicro(index, subindex){
 			easyrtc.enableMicrophone(new_state, "miniVideo");
 		
 		//console.log(request);
-		easyrtc.sendDataWS({"targetRoom":"default"}, 'updateStatus', request, function(ackMesg) {
+		if (easyrtc.webSocketConnected) {
+			easyrtc.sendDataWS({"targetRoom": "default"}, 'updateStatus', request, function (ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if (ackMesg.msgType === 'error') {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
+	}else{
+		// Request mute to someone else
+		request = {"subindex": subindex};
+		if (easyrtc.webSocketConnected){
+			easyrtc.sendDataWS( easyids[index], 'muteMicro', request, function(ackMesg) {
 				//console.error("ackMsg:",ackMesg);
 				if( ackMesg.msgType === 'error' ) {
 					console.error(ackMesg.msgData.errorText);
 				}
 			});
-	}else{
-		// Request mute to someone else
-		request = {"subindex": subindex};
-		easyrtc.sendDataWS( easyids[index], 'muteMicro', request, function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});	
+		}
 	}
 }
 
@@ -1599,22 +1636,25 @@ function muteSpeaker(index){
 			request = {"easyid": easyids[index], "speaker":"false"};
 			video.volume = "0";
 		}
-			
-		
-		easyrtc.sendDataWS({"targetRoom":"default"}, 'updateStatus', request, function(ackMesg) {
+
+		if (easyrtc.webSocketConnected){
+			easyrtc.sendDataWS({"targetRoom":"default"}, 'updateStatus', request, function(ackMesg) {
 				//console.error("ackMsg:",ackMesg);
 				if( ackMesg.msgType === 'error' ) {
 					console.error(ackMesg.msgData.errorText);
 				}
 			});
+		}
 	}else{
 		// Request mute to someone else
-		easyrtc.sendDataWS( easyids[index], 'muteSpeaker', "", function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});	
+		if (easyrtc.webSocketConnected) {
+			easyrtc.sendDataWS(easyids[index], 'muteSpeaker', "", function (ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if (ackMesg.msgType === 'error') {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
 	}
 	
 }
@@ -1807,27 +1847,36 @@ function setCapabilities(easyid, video2){
 
 function broadcastlocalPTZCapabilities(){
 		request = localPTZCapabilities;
-		if (localPTZCapabilities.uuid != 0 || !teraConnected)
+		if (localPTZCapabilities.uuid != 0 || !teraConnected){
 			console.log("Broadcasting PTZ capabilities " + localPTZCapabilities.uuid + " = " + localPTZCapabilities.zoom + " " + localPTZCapabilities.presets + " " + localPTZCapabilities.settings);
-		else
+			if (easyrtc.webSocketConnected)
+				easyrtc.sendDataWS({"targetRoom":"default"}, 'updatePTZCapabilities', request, function(ackMesg) {
+					//console.error("ackMsg:",ackMesg);
+					if( ackMesg.msgType === 'error' ) {
+						console.error(ackMesg.msgData.errorText);
+					}
+				});
+			else{
+				console.log("Didn't broadcast: not connected yet!");
+			}
+
+		}else
 			console.error("PREVENTED PTZ capabilities broadcasting : uuid = 0!");
-		easyrtc.sendDataWS({"targetRoom":"default"}, 'updatePTZCapabilities', request, function(ackMesg) {
-				//console.error("ackMsg:",ackMesg);
-				if( ackMesg.msgType === 'error' ) {
-					console.error(ackMesg.msgData.errorText);
-				}
-			});
+
+
 }
 
 function broadcastlocalCapabilities(){
 		request = localCapabilities;
-		
-		easyrtc.sendDataWS({"targetRoom":"default"}, 'updateCapabilities', request, function(ackMesg) {
+
+		if (easyrtc.webSocketConnected){
+			easyrtc.sendDataWS({"targetRoom":"default"}, 'updateCapabilities', request, function(ackMesg) {
 				//console.error("ackMsg:",ackMesg);
 				if( ackMesg.msgType === 'error' ) {
 					console.error(ackMesg.msgData.errorText);
 				}
 			});
+		}
 }
 
 
@@ -1835,6 +1884,45 @@ function displaySensorMute(uuid, show){
 }
 
 function getVideoCoords(event, index){
+	
+	var video = document.getElementById(getVideoId(index));
+	var offsets = video.getBoundingClientRect();
+	
+	var video_dims = calculateContainsWindow(video);
+	var real_video_width = (video.clientWidth * video_dims.destinationWidthPercentage);
+	var bar_width = (video.clientWidth - real_video_width) / 2;
+	
+	var real_video_height = (video.clientHeight * video_dims.destinationHeightPercentage);
+	var bar_height = (video.clientHeight - real_video_height) / 2;
+	
+	//alert("x=" + (event.clientX - offsets.left) + " y=" + (event.clientY - offsets.top) + " w=" + video.clientWidth + " h=" + video.clientHeight);
+	if (index==0){
+		if (teraConnected){
+			console.log("Local PTZ request");
+			//SharedObject.imageClicked(localContact.uuid, video.clientWidth - (event.clientX - offsets.left), event.clientY - offsets.top, video.clientWidth, video.clientHeight);
+			SharedObject.imageClicked(localContact.uuid, (event.clientX - bar_width), event.clientY - bar_height, real_video_width, real_video_height);
+			// Uncomment next line if using mirror image!
+			//SharedObject.imageClicked(localContact.uuid, (event.clientX - offsets.left), event.clientY - offsets.top, video.clientWidth, video.clientHeight);
+		}
+	}else{
+		// Send message to the other client
+		console.log("PTZ request to :", easyids[index]);
+		//send contact information to other users
+		//request = {"x":event.clientX - offsets.left, "y": event.clientY - offsets.top, "w":video.clientWidth, "h": video.clientHeight};
+		request = {"x": event.clientX - bar_width - offsets.left, "y": event.clientY - bar_height, "w": real_video_width, "h": real_video_height};
+		if (easyrtc.webSocketConnected){
+			easyrtc.sendDataWS( easyids[index], 'PTZRequest', request, function(ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if( ackMesg.msgType === 'error' ) {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
+		
+	}
+}
+
+/*function getVideoCoords(event, index){
 	var video = document.getElementById(getVideoId(index));
 	var offsets = video.getBoundingClientRect();
 	//alert("x=" + (event.clientX - offsets.left) + " y=" + (event.clientY - offsets.top) + " w=" + video.clientWidth + " h=" + video.clientHeight);
@@ -1848,14 +1936,118 @@ function getVideoCoords(event, index){
 		//console.error("PTZ request to :", easyids[index]);
 		//send contact information to other users
 		request = {"x":event.clientX - offsets.left, "y": event.clientY - offsets.top, "w":video.clientWidth, "h": video.clientHeight};
-        easyrtc.sendDataWS( easyids[index], 'PTZRequest', request, function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});
+		if (easyrtc.webSocketConnected){
+			easyrtc.sendDataWS( easyids[index], 'PTZRequest', request, function(ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if( ackMesg.msgType === 'error' ) {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
 		
 	}
+}
+
+function getVideoCoords(event, videoId){
+	var video = document.getElementById(videoId);
+	
+	var video_dims = calculateContainsWindow(video);
+	var real_video_width = (video.clientWidth * video_dims.destinationWidthPercentage);
+	var bar_width = (video.clientWidth - real_video_width) / 2;
+	
+	var real_video_height = (video.clientHeight * video_dims.destinationHeightPercentage);
+	var bar_height = (video.clientHeight - real_video_height) / 2;
+	
+	//SharedObject.imageClicked(localContact.uuid, video.clientWidth - (event.clientX - video.offsetLeft), event.clientY - video.offsetTop, video.clientWidth, video.clientHeight);
+	SharedObject.imageClicked(localContact.uuid, event.clientX - bar_width, event.clientY - bar_height, real_video_width, real_video_height);
+}*/
+
+function calculateContainsWindow(image) {
+	
+	var imageComputedStyle = window.getComputedStyle(image);
+	var imageObjectFit = imageComputedStyle.getPropertyValue("object-fit");
+	var coordinates = {};
+	var imagePositions = imageComputedStyle.getPropertyValue("object-position").split(" ");
+	var naturalWidth = image.naturalWidth;
+	var naturalHeight= image.naturalHeight;
+	if( image.tagName === "VIDEO" ) {
+		naturalWidth= image.videoWidth;
+		naturalHeight= image.videoHeight;
+	}
+	var horizontalPercentage = parseInt(imagePositions[0]) / 100;
+	var verticalPercentage = parseInt(imagePositions[1]) / 100;
+	var naturalRatio = naturalWidth / naturalHeight;
+	var visibleRatio = image.clientWidth / image.clientHeight;
+	if (imageObjectFit === "none")
+	{
+	  coordinates.sourceWidth = image.clientWidth;
+	  coordinates.sourceHeight = image.clientHeight;
+	  coordinates.sourceX = (naturalWidth - image.clientWidth) * horizontalPercentage;
+	  coordinates.sourceY = (naturalHeight - image.clientHeight) * verticalPercentage;
+	  coordinates.destinationWidthPercentage = 1;
+	  coordinates.destinationHeightPercentage = 1;
+	  coordinates.destinationXPercentage = 0;
+	  coordinates.destinationYPercentage = 0;
+	}
+	else if (imageObjectFit === "contain" || imageObjectFit === "scale-down")
+	{
+	  // TODO: handle the "scale-down" appropriately, once its meaning will be clear
+	  coordinates.sourceWidth = naturalWidth;
+	  coordinates.sourceHeight = naturalHeight;
+	  coordinates.sourceX = 0;
+	  coordinates.sourceY = 0;
+	  if (naturalRatio > visibleRatio)
+	  {
+		coordinates.destinationWidthPercentage = 1;
+		coordinates.destinationHeightPercentage = (naturalHeight / image.clientHeight) / (naturalWidth / image.clientWidth);
+		coordinates.destinationXPercentage = 0;
+		coordinates.destinationYPercentage = (1 - coordinates.destinationHeightPercentage) * verticalPercentage;
+	  }
+	  else
+	  {
+		coordinates.destinationWidthPercentage = (naturalWidth / image.clientWidth) / (naturalHeight / image.clientHeight);
+		coordinates.destinationHeightPercentage = 1;
+		coordinates.destinationXPercentage = (1 - coordinates.destinationWidthPercentage) * horizontalPercentage;
+		coordinates.destinationYPercentage = 0;
+	  }
+	}
+	else if (imageObjectFit === "cover")
+	{
+	  if (naturalRatio > visibleRatio)
+	  {
+		coordinates.sourceWidth = naturalHeight * visibleRatio;
+		coordinates.sourceHeight = naturalHeight;
+		coordinates.sourceX = (naturalWidth - coordinates.sourceWidth) * horizontalPercentage;
+		coordinates.sourceY = 0;
+	  }
+	  else
+	  {
+		coordinates.sourceWidth = naturalWidth;
+		coordinates.sourceHeight = naturalWidth / visibleRatio;
+		coordinates.sourceX = 0;
+		coordinates.sourceY = (naturalHeight - coordinates.sourceHeight) * verticalPercentage;
+	  }
+	  coordinates.destinationWidthPercentage = 1;
+	  coordinates.destinationHeightPercentage = 1;
+	  coordinates.destinationXPercentage = 0;
+	  coordinates.destinationYPercentage = 0;
+	}
+	else
+	{
+	  if (imageObjectFit !== "fill")
+	  {
+		console.error("unexpected 'object-fit' attribute with value '" + imageObjectFit + "' relative to");
+	  }
+	  coordinates.sourceWidth = naturalWidth;
+	  coordinates.sourceHeight = naturalHeight;
+	  coordinates.sourceX = 0;
+	  coordinates.sourceY = 0;
+	  coordinates.destinationWidthPercentage = 1;
+	  coordinates.destinationHeightPercentage = 1;
+	  coordinates.destinationXPercentage = 0;
+	  coordinates.destinationYPercentage = 0;
+	}
+	return coordinates;
 }
 
 function manageMouseWheel(event, index){
@@ -1878,12 +2070,14 @@ function zoomIn(index){
 			SharedObject.zoomInClicked(localContact.uuid);
 	}else{
 		request = {"value":"in"};
-        easyrtc.sendDataWS( easyids[index], 'ZoomRequest', request, function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});
+		if (easyrtc.webSocketConnected) {
+			easyrtc.sendDataWS(easyids[index], 'ZoomRequest', request, function (ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if (ackMesg.msgType === 'error') {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
 		
 	}
 	resetInactiveTimer();
@@ -1895,12 +2089,14 @@ function zoomOut(index){
 			SharedObject.zoomOutClicked(localContact.uuid);
 	}else{
 		request = {"value":"out"};
-        easyrtc.sendDataWS( easyids[index], 'ZoomRequest', request, function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});
+		if (easyrtc.webSocketConnected) {
+			easyrtc.sendDataWS(easyids[index], 'ZoomRequest', request, function (ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if (ackMesg.msgType === 'error') {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
 		
 	}
 	resetInactiveTimer();
@@ -1912,13 +2108,14 @@ function zoomMin(index){
 			SharedObject.zoomMinClicked(localContact.uuid);
 	}else{
 		request = {"value":"min"};
-        easyrtc.sendDataWS( easyids[index], 'ZoomRequest', request, function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});
-		
+		if (easyrtc.webSocketConnected) {
+			easyrtc.sendDataWS(easyids[index], 'ZoomRequest', request, function (ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if (ackMesg.msgType === 'error') {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
 	}
 }
 
@@ -1928,13 +2125,14 @@ function zoomMax(index){
 			SharedObject.zoomMaxClicked(localContact.uuid);
 	}else{
 		request = {"value":"max"};
-        easyrtc.sendDataWS( easyids[index], 'ZoomRequest', request, function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});
-		
+		if (easyrtc.webSocketConnected) {
+			easyrtc.sendDataWS(easyids[index], 'ZoomRequest', request, function (ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if (ackMesg.msgType === 'error') {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
 	}
 }
 
@@ -1952,12 +2150,14 @@ function gotoPreset(event, index, preset){
 		if (event.shiftKey && event.ctrlKey)
 			set = "true";
 		request = {"preset":preset, "set":set};
-        easyrtc.sendDataWS( easyids[index], 'PresetRequest', request, function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});
+		if (easyrtc.webSocketConnected) {
+			easyrtc.sendDataWS(easyids[index], 'PresetRequest', request, function (ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if (ackMesg.msgType === 'error') {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
 		
 	}
 }
@@ -1968,12 +2168,14 @@ function camSettings(index){
 			SharedObject.camSettingsClicked(uuids[index]);
 	}else{
 		request = "";
-        easyrtc.sendDataWS(easyids[index], 'CamSettingsRequest', request, function(ackMesg) {
-			//console.error("ackMsg:",ackMesg);
-     		if( ackMesg.msgType === 'error' ) {
-         		console.error(ackMesg.msgData.errorText);
-     		}
-		});
+		if (easyrtc.webSocketConnected) {
+			easyrtc.sendDataWS(easyids[index], 'CamSettingsRequest', request, function (ackMesg) {
+				//console.error("ackMsg:",ackMesg);
+				if (ackMesg.msgType === 'error') {
+					console.error(ackMesg.msgData.errorText);
+				}
+			});
+		}
 		
 	}
 }
@@ -1988,12 +2190,14 @@ function forwardData(data)
 		for (var i=0; i<5; i++){
 			if (uuids[i] == settings.uuid){
 				console.log("Forwarding to " + easyids[i]);
-				easyrtc.sendDataWS( easyids[i], 'DataForwarding', data, function(ackMesg) {
-					//console.error("ackMsg:",ackMesg);
-					if( ackMesg.msgType === 'error' ) {
-						console.error(ackMesg.msgData.errorText);
-					}
-				});
+				if (easyrtc.webSocketConnected) {
+					easyrtc.sendDataWS(easyids[i], 'DataForwarding', data, function (ackMesg) {
+						//console.error("ackMsg:",ackMesg);
+						if (ackMesg.msgType === 'error') {
+							console.error(ackMesg.msgData.errorText);
+						}
+					});
+				}
 				break;
 			}
 		}
@@ -2003,3 +2207,4 @@ function forwardData(data)
 	
 	
 }
+
