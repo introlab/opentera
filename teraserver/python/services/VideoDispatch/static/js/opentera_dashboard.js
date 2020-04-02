@@ -113,12 +113,12 @@ function doStopCurrentSession(session_key){
 }
 
 function sessionStopSuccess(response, status, request){
-    if (status == 200){
+    if (response == 200){
         window.parent.document.getElementById('btnLogout').style.display="inline";
         window.parent.document.getElementById('btnStopSession').style.display="none";
         current_session_key = undefined;
         current_session_url = undefined;
-        window.location.replace('dashboard_main');
+        top.mainview.src = 'dashboard_main';
     }
 }
 

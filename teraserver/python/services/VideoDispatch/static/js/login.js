@@ -145,6 +145,7 @@ function doLogout(backend_url, backend_port){
 function logoutSuccess(response, status, request){
     // Clear cookie
     deleteCookie("VideoDispatchToken");
+    deleteCookie("VideoDispatchTokenParticipant");
 
     // Redirect to login page
     window.location.replace("login");

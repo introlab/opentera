@@ -48,21 +48,18 @@ class QuerySessionManage(Resource):
                 print('Error!')
                 return 'Internal server error', 500
 
-            reply = {}
-
             # Emit websocket message to stop session
-            if 'participant_uuid' in result:
-                participant_uuid = result['participant_uuid']
+            if 'participants' in result:
+                for participant_uuid in result['participants']:
+                    topic = 'websocket.participant.' + participant_uuid
+                    event = StopSessionEvent()
+                    event.session_key = args['session_key']
 
-                topic = 'websocket.participant.' + participant_uuid
-                event = StopSessionEvent()
-                event.session_key = args['session_key']
-
-                message = self.module.create_tera_message(dest=topic)
-                any_message = Any()
-                any_message.Pack(event)
-                message.data.extend([any_message])
-                self.module.publish(message.head.dest, message.SerializeToString())
+                    message = self.module.create_tera_message(dest=topic)
+                    any_message = Any()
+                    any_message.Pack(event)
+                    message.data.extend([any_message])
+                    self.module.publish(message.head.dest, message.SerializeToString())
 
         return 200
 

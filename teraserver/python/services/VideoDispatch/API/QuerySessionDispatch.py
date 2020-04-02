@@ -49,7 +49,12 @@ class QuerySessionDispatch(Resource):
             participant_uuid = result['participant_uuid']
             from uuid import uuid4
             session_name = str(uuid4())
-            result = client.call('VideoDispatchService.WebRTCModule', 'create_session', session_name, owner_uuid)
+            result = client.call('VideoDispatchService.WebRTCModule',
+                                 'create_session',
+                                 session_name,
+                                 owner_uuid,
+                                 participant_uuid)
+
             if result and not result.__contains__('error'):
                 reply['participant_name'] = 'Anonymous'
                 reply['participant_uuid'] = participant_uuid
