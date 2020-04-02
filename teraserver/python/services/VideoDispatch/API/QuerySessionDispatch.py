@@ -4,7 +4,7 @@ from sqlalchemy import exc
 from flask_babel import gettext
 from sqlalchemy.exc import InvalidRequestError
 from services.VideoDispatch.FlaskModule import default_api_ns as api
-from services.VideoDispatch.AccessManager import AccessManager
+from services.VideoDispatch.AccessManager import AccessManager, current_user_client
 from libtera.redis.RedisRPCClient import RedisRPCClient
 from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
 from google.protobuf.any_pb2 import Any
@@ -34,6 +34,11 @@ class QuerySessionDispatch(Resource):
 
         result = client.call('VideoDispatchService.OnlineUsersModule', 'participant_dispatch', True)
 
+        # Who asked for the session?
+        owner_uuid = None
+        if current_user_client:
+            owner_uuid = current_user_client.user_uuid
+
         if not result:
             print('Error!')
             return 'Internal server error', 500
@@ -44,10 +49,14 @@ class QuerySessionDispatch(Resource):
             participant_uuid = result['participant_uuid']
             from uuid import uuid4
             session_name = str(uuid4())
-            result = client.call('VideoDispatchService.WebRTCModule', 'create_session', session_name)
+            result = client.call('VideoDispatchService.WebRTCModule', 'create_session', session_name, owner_uuid)
             if result:
                 reply['participant_name'] = 'Anonymous'
+                reply['participant_uuid'] = participant_uuid
                 reply['session_url'] = result['url']
+                reply['session_key'] = result['key']
+                reply['session_port'] = result['port']
+                reply['owner_uuid'] = owner_uuid
 
                 # Invite participant via websocket
                 topic = 'websocket.participant.' + participant_uuid

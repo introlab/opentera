@@ -25,11 +25,11 @@ class WebRTCModule(BaseModule):
         pass
 
     def setup_rpc_interface(self):
-        self.rpc_api['create_session'] = {'args': ['str:room_name'],
+        self.rpc_api['create_session'] = {'args': ['str:room_name', 'str:owner_uuid'],
                                           'returns': 'dict',
                                           'callback': self.create_webrtc_session}
 
-    def create_webrtc_session(self, room_name, *args, **kwargs):
+    def create_webrtc_session(self, room_name, owner_uuid, *args, **kwargs):
         print('Should create WebRTC session with name:', room_name)
         # For now just launch test
         port = 8080
@@ -39,9 +39,9 @@ class WebRTCModule(BaseModule):
               + str(self.config.webrtc_config['external_port']) \
               + '/teraplus/' + str(port) + '/teraplus?key=' + key
 
-        if self.launch_node(port=port, key=key):
+        if self.launch_node(port=port, key=key, owner=owner_uuid):
             # Return url
-            return {'url': url}
+            return {'url': url, 'key': key, 'port': port, 'owner': owner_uuid}
         else:
             return {'error': 'Not launched.'}
 
@@ -52,7 +52,7 @@ class WebRTCModule(BaseModule):
         print('WebRTCModule - Received message ', pattern, channel, message)
         pass
 
-    def launch_node(self, port, key):
+    def launch_node(self, port, key, owner):
         executable_args = [self.config.webrtc_config['executable'],
                            self.config.webrtc_config['command'],
                            str(port),
@@ -65,7 +65,7 @@ class WebRTCModule(BaseModule):
                                      shell=(sys.platform == 'win32'))
 
             # One more process
-            self.processList.append({'process': process, 'port': port, 'key': key})
+            self.processList.append({'process': process, 'port': port, 'key': key, 'owner': owner})
 
             print('started process', process)
             return True
