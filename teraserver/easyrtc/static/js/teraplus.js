@@ -3,7 +3,8 @@ var needToCallOtherUsers;
 var largeViewId = "#selfView";
 var smallViewIds = ["#remoteView1","#remoteView2","#remoteView3","#remoteView4"];
 
-var localContact = {'easyid':0, 'name':'Unknown' + Math.floor(Math.random()*100),'uuid':'00000000-0000-0000-0000-000000000000'};
+//var localContact = {'easyid':0, 'name':'Unknown' + Math.floor(Math.random()*100),'uuid':'00000000-0000-0000-0000-000000000000'};
+var localContact = {'easyid':0, 'name':'','uuid':'00000000-0000-0000-0000-000000000000'};
 var remoteContacts = []; // Used to store informations about everyone that has connected (contactinfos)
 
 var localPTZCapabilities = {'uuid':0, 'zoom':false,'presets':false,'settings':false};
