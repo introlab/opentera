@@ -7,10 +7,6 @@ import subprocess
 import threading
 import sys
 
-class ActiveSession:
-    def test(self):
-        pass
-
 
 class WebRTCModule(BaseModule):
 
@@ -35,20 +31,16 @@ class WebRTCModule(BaseModule):
 
     def create_webrtc_session(self, room_name, *args, **kwargs):
         print('Should create WebRTC session with name:', room_name)
-
         # For now just launch test
         port = 8080
         key = room_name
 
-        url = 'https://' + self.config.webrtc_config['hostname'] + ':' + '40075' + '/teraplus/teraplus?key=' + key
+        url = 'https://' + self.config.webrtc_config['hostname'] + ':' \
+              + str(self.config.webrtc_config['external_port']) \
+              + '/teraplus/' + str(port) + '/teraplus?key=' + key
 
         if self.launch_node(port=port, key=key):
-            # Return empty dict
-
-            # Sleep 2 secs
-            import time
-            time.sleep(3)
-
+            # Return url
             return {'url': url}
         else:
             return {'error': 'Not launched.'}
