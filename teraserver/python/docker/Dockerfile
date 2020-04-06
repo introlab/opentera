@@ -76,16 +76,11 @@ ENV VIDEODISPATCH_CONFIG_PATH /opentera/teraserver/python/services/VideoDispatch
 
 # Create nginx logs directory
 RUN mkdir -p config/logs
-
 # Set Python path
 ENV PYTHONPATH /opentera/teraserver/python
 
 # Run the required services and python script
-CMD nginx -c /opentera/teraserver/python/config/nginx.conf -p /opentera/teraserver/python/config/ && \
-service postgresql start && service redis-server start && bash
-# /bin/systemctl redis-server.service start && bash # &&\
-# /bin/systemctl opentera.service start &&\
-# /bin/systemctl opentera_videodispatch.service start
+CMD nginx -c /opentera/teraserver/python/config/nginx.conf -p /opentera/teraserver/python/config/ && ./start_docker.sh
 
 
 
