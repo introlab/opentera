@@ -4,7 +4,7 @@ var http = require("http");         // http server core module
 var fs      = require("fs");        // file system core module
 var express = require("express");   // web framework external module
 var io      = require("socket.io"); // web socket external module
-var easyrtc = require("easyrtc");   // EasyRTC external module
+var easyrtc = require("open-easyrtc");   // EasyRTC external module
 var ejs = require("ejs");
 
 var myport = 8080;
@@ -88,7 +88,7 @@ var appIceServers = [
 easyrtc.setOption("appIceServers", appIceServers);
 easyrtc.setOption("logLevel", "debug");
 easyrtc.setOption("demosEnable", true);
-easyrtc.setOption("updateCheckEnable",false);
+//easyrtc.setOption("updateCheckEnable",false);
 
 
 // Start EasyRTC server
