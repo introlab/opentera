@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse, fields, inputs
+from flask_restx import Resource, reqparse, fields, inputs
 from modules.LoginModule.LoginModule import LoginModule
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant

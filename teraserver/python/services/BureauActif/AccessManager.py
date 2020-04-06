@@ -1,7 +1,7 @@
 from werkzeug.local import LocalProxy
 from functools import wraps
 from flask import _request_ctx_stack, request, redirect
-from flask_restplus import reqparse
+from flask_restx import reqparse
 
 from services.BureauActif.Globals import api_user_token_key, TokenCookieName
 from services.BureauActif.TeraClient import TeraClient

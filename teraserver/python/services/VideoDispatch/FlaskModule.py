@@ -1,6 +1,6 @@
 from flask import Flask, request, g, url_for
 from flask_session import Session
-from flask_restplus import Api
+from flask_restx import Api
 from .ConfigManager import ConfigManager
 from flask_babel import Babel
 

@@ -1,4 +1,4 @@
-from flask_restplus import Resource, reqparse
+from flask_restx import Resource, reqparse
 
 from modules.FlaskModule.Views.Upload import ALLOWED_EXTENSIONS
 from modules.LoginModule.LoginModule import LoginModule, current_device

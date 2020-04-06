@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse, inputs, fields
+from flask_restx import Resource, reqparse, inputs, fields
 from sqlalchemy import exc
 from flask_babel import gettext
 from sqlalchemy.exc import InvalidRequestError

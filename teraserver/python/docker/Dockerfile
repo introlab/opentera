@@ -7,8 +7,8 @@ FROM ubuntu:18.04
 
 # Install build dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-	postgresql redis-server build-essential cmake python3.6 git python3-babel \
-        python3-pip sudo vim libprotobuf-dev cmake protobuf-compiler locales wget nginx
+	postgresql redis-server build-essential cmake git sudo vim libprotobuf-dev \
+	cmake protobuf-compiler locales wget curl nginx
 
 # Set system locale
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
@@ -43,12 +43,22 @@ WORKDIR /root
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN bash ~/Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
 
+# Install latest npm / nodejs
+RUN curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh
+RUN bash ~/nodesource_setup.sh
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
+
+
 # Build environment
 WORKDIR /opentera/teraserver
 RUN ["/bin/bash", "-c", "cmake ."]
 RUN ["/bin/bash", "-c", "make python-all"]
 
 ENV PYTHON3_EXEC /opentera/teraserver/python/env/python-3.6/bin/python3
+
+# Install nodejs package
+WORKDIR /opentera/teraserver/easyrtc
+RUN npm install
 
 # Final working directory
 WORKDIR /opentera/teraserver/python
@@ -60,14 +70,23 @@ RUN ["/bin/bash", "-c", "ls -l certificates/"]
 # Private and public mapping
 EXPOSE 40075/tcp
 
-VOLUME /opentera
-
 # env with a default value
 ENV OPENTERA_CONFIG_PATH /opentera/teraserver/python/config/TeraServerConfig.ini
 ENV VIDEODISPATCH_CONFIG_PATH /opentera/teraserver/python/services/VideoDispatch/VideoDispatchService.ini
 
+# Create nginx logs directory
+RUN mkdir -p config/logs
+
+# Set Python path
+ENV PYTHONPATH /opentera/teraserver/python
+
 # Run the required services and python script
-CMD ls -l && ./start_docker.sh
+CMD nginx -c /opentera/teraserver/python/config/nginx.conf -p /opentera/teraserver/python/config/ && \
+service postgresql start && service redis-server start && bash
+# /bin/systemctl redis-server.service start && bash # &&\
+# /bin/systemctl opentera.service start &&\
+# /bin/systemctl opentera_videodispatch.service start
+
 
 
 

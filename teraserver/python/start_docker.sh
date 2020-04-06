@@ -5,4 +5,7 @@ redis-server &
 echo "Sleeping 5 secs."
 sleep 5
 echo "Starting TeraServer"
-python3.6 ./TeraServer.py
+$PYTHON3_EXEC ./TeraServer.py &
+sleep 5
+echo "Starting VideoDispatchServer"
+$PYTHON3_EXEC services/VideoDispatch/VideoDispatchService.py

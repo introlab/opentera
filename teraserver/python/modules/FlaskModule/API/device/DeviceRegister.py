@@ -1,4 +1,4 @@
-from flask_restplus import Resource, reqparse
+from flask_restx import Resource, reqparse
 from flask import jsonify
 from flask import request
 import base64

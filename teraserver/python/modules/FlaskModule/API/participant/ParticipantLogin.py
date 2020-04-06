@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse, fields
+from flask_restx import Resource, reqparse, fields
 from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 

@@ -16,7 +16,7 @@ import redis
 
 from flask import current_app, request, jsonify, _request_ctx_stack
 from werkzeug.local import LocalProxy
-from flask_restplus import Resource, reqparse
+from flask_restx import Resource, reqparse
 from functools import wraps
 
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth

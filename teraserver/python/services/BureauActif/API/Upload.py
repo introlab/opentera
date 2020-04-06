@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse, fields
+from flask_restx import Resource, reqparse, fields
 
 #TODO Update API
 from services.BureauActif.FlaskModule import default_api_ns as api

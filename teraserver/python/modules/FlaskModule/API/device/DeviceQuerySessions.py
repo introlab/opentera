@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse, inputs, fields
+from flask_restx import Resource, reqparse, inputs, fields
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.DBManager import DBManager
