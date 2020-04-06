@@ -43,9 +43,9 @@ OpenTera is based or uses the following Open Source Technologies :
 * Simon Brière, ing. M.Sc.A., CDRV, Université de Sherbrooke (@sbriere)
 
 # Sponsors
-![IntRoLab](teraserver/python/ervices/VideoDispatch/static/images/logos/IntRoLab.png)
-![Estrad](teraserver/python/ervices/VideoDispatch/static/images/logos/Estrad.png)
-![3IT](teraserver/python/ervices/VideoDispatch/static/images/logos/3IT.png)
-![CDRV](teraserver/python/ervices/VideoDispatch/static/images/logos/logo_CDRV.png)
-![AgeWell](teraserver/python/ervices/VideoDispatch/static/images/logos/AgeWell.png)
-![INTER](teraserver/python/ervices/VideoDispatch/static/images/logos/INTER.png)
+<img src="teraserver/python/services/VideoDispatch/static/images/logos/IntRoLab.png" width="200">
+<img src="teraserver/python/services/VideoDispatch/static/images/logos/Estrad.png" width="200">
+<img src="teraserver/python/services/VideoDispatch/static/images/logos/3IT.png" width="200">
+<img src="teraserver/python/services/VideoDispatch/static/images/logos/logo_CDRV.png" width="200">
+<img src="teraserver/python/services/VideoDispatch/static/images/logos/AgeWell.png" width="200">
+<img src="teraserver/python/services/VideoDispatch/static/images/logos/INTER.png" width="200">
