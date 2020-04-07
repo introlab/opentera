@@ -1,0 +1,362 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						5
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "python",
+					"childIndexes" : 
+					[
+						2,
+						3,
+						4
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "python",
+					"targetIndexes" : 
+					[
+						21,
+						25
+					]
+				},
+				{
+					"build" : "python/env",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "python/env",
+					"targetIndexes" : 
+					[
+						22,
+						24
+					]
+				},
+				{
+					"build" : "python/messages",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "python/messages",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						23
+					]
+				},
+				{
+					"build" : "python/docker",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "python/docker",
+					"targetIndexes" : 
+					[
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19
+					]
+				},
+				{
+					"build" : "easyrtc",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "easyrtc",
+					"targetIndexes" : 
+					[
+						20
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"name" : "TeraServer",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						21,
+						22,
+						23,
+						24,
+						25
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 3,
+					"id" : "CreateSession.proto.target::@091e3210acecd05aaf65",
+					"jsonFile" : "target-CreateSession.proto.target-Debug-9fe7b049ef6fc59945d3.json",
+					"name" : "CreateSession.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "DeviceEvent.proto.target::@091e3210acecd05aaf65",
+					"jsonFile" : "target-DeviceEvent.proto.target-Debug-8d2258ffb447187d8e77.json",
+					"name" : "DeviceEvent.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "ParticipantEvent.proto.target::@091e3210acecd05aaf65",
+					"jsonFile" : "target-ParticipantEvent.proto.target-Debug-b2c06819b75d471e3bc3.json",
+					"name" : "ParticipantEvent.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "RPCMessage.proto.target::@091e3210acecd05aaf65",
+					"jsonFile" : "target-RPCMessage.proto.target-Debug-0cea0439962469967607.json",
+					"name" : "RPCMessage.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "Result.proto.target::@091e3210acecd05aaf65",
+					"jsonFile" : "target-Result.proto.target-Debug-7a57f3b4afad2039772d.json",
+					"name" : "Result.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "ServerCommand.proto.target::@091e3210acecd05aaf65",
+					"jsonFile" : "target-ServerCommand.proto.target-Debug-db6a9372cd18ff6af594.json",
+					"name" : "ServerCommand.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "TeraMessage.proto.target::@091e3210acecd05aaf65",
+					"jsonFile" : "target-TeraMessage.proto.target-Debug-f9187920bd1da6fb1c7f.json",
+					"name" : "TeraMessage.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "UserEvent.proto.target::@091e3210acecd05aaf65",
+					"jsonFile" : "target-UserEvent.proto.target-Debug-885e30489ebca6a89f04.json",
+					"name" : "UserEvent.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker-Dockerfile::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker-Dockerfile-Debug-3377b833387149e4754f.json",
+					"name" : "docker-Dockerfile",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker-all::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker-all-Debug-3be80282518878657416.json",
+					"name" : "docker-all",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker-messages::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker-messages-Debug-a9b12c002ee5486acc3b.json",
+					"name" : "docker-messages",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker-translations::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker-translations-Debug-ae74a0be71b288e99631.json",
+					"name" : "docker-translations",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker_CreateSession.proto.target::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker_CreateSession.proto.target-Debug-55db7024897e78c34278.json",
+					"name" : "docker_CreateSession.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker_DeviceEvent.proto.target::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker_DeviceEvent.proto.target-Debug-13526fab553f8bfd4e24.json",
+					"name" : "docker_DeviceEvent.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker_ParticipantEvent.proto.target::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker_ParticipantEvent.proto.target-Debug-2a6e61711d447a156e83.json",
+					"name" : "docker_ParticipantEvent.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker_RPCMessage.proto.target::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker_RPCMessage.proto.target-Debug-85b86eca90e8455a88ef.json",
+					"name" : "docker_RPCMessage.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker_Result.proto.target::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker_Result.proto.target-Debug-75d5afd6b5a3e136cc26.json",
+					"name" : "docker_Result.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker_ServerCommand.proto.target::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker_ServerCommand.proto.target-Debug-7c306d446181bd73e9b5.json",
+					"name" : "docker_ServerCommand.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker_TeraMessage.proto.target::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker_TeraMessage.proto.target-Debug-fd8dc102706a18569e80.json",
+					"name" : "docker_TeraMessage.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "docker_UserEvent.proto.target::@d8ff7117a5ff69072ea1",
+					"jsonFile" : "target-docker_UserEvent.proto.target-Debug-0a09d903fae302f8b178.json",
+					"name" : "docker_UserEvent.proto.target",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "easyrtc_install::@48009719c16dd168e71b",
+					"jsonFile" : "target-easyrtc_install-Debug-bc9c78da22b7ae605e33.json",
+					"name" : "easyrtc_install",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "python-all::@e1ac5446165bc0cf31e4",
+					"jsonFile" : "target-python-all-Debug-1c836e1325d01f222c59.json",
+					"name" : "python-all",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "python-env::@8128fb91c7b885181ea4",
+					"jsonFile" : "target-python-env-Debug-e60b9c0a12f56ddabdbc.json",
+					"name" : "python-env",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "python-messages::@091e3210acecd05aaf65",
+					"jsonFile" : "target-python-messages-Debug-3affa118b285bc9ddea9.json",
+					"name" : "python-messages",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "python-requirements::@8128fb91c7b885181ea4",
+					"jsonFile" : "target-python-requirements-Debug-72d9f53f58586ef07290.json",
+					"name" : "python-requirements",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "python_translations::@e1ac5446165bc0cf31e4",
+					"jsonFile" : "target-python_translations-Debug-fbb3b38260437287009c.json",
+					"name" : "python_translations",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug",
+		"source" : "E:/Documents/GitHub/opentera/teraserver"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 0
+	}
+}

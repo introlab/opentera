@@ -1,0 +1,72 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target"
+		],
+		"files" : 
+		[
+			"python/messages/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 40,
+				"parent" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"id" : "python-env::@8128fb91c7b885181ea4"
+		}
+	],
+	"id" : "ParticipantEvent.proto.target::@091e3210acecd05aaf65",
+	"name" : "ParticipantEvent.proto.target",
+	"paths" : 
+	{
+		"build" : "python/messages",
+		"source" : "python/messages"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"isGenerated" : true,
+			"path" : "E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/messages/CMakeFiles/ParticipantEvent.proto.target",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/messages/CMakeFiles/ParticipantEvent.proto.target.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}
