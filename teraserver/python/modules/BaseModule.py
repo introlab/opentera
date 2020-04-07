@@ -44,7 +44,7 @@ class BaseModule(RedisClient):
         return self.module_name
 
     def redisConnectionMade(self):
-        print('BaseModule.connectionMade')
+        print('*************************** BaseModule.connectionMade', self.module_name)
 
         # Build RPC interface
         self.setup_rpc_interface()
@@ -60,10 +60,17 @@ class BaseModule(RedisClient):
 
     def build_interface(self):
         # TeraMessage Interface
-        self.subscribe_pattern_with_callback("module." + self.module_name + ".messages", self.notify_module_messages)
+        def messages_subscribed_callback(*args):
+            print('messages_subscribed_callback for ', self.module_name)
+
+        ret1 = self.subscribe_pattern_with_callback('module.' + self.module_name + '.messages', self.notify_module_messages)
+        ret1.addCallback(messages_subscribed_callback)
 
         # RPC messages
-        self.subscribe_pattern_with_callback("module." + self.module_name + ".rpc", self.notify_module_rpc)
+        def rpc_subscribed_callback(*args):
+            print('rpc_subscribed_callback for ', self.module_name)
+        ret2 = self.subscribe_pattern_with_callback('module.' + self.module_name + '.rpc', self.notify_module_rpc)
+        ret2.addCallback(rpc_subscribed_callback)
 
     def setup_rpc_interface(self):
         pass
@@ -76,7 +83,8 @@ class BaseModule(RedisClient):
         pass
 
     def notify_module_rpc(self, pattern, channel, message):
-        print('BaseModule - Received rpc', self, pattern, channel, message)
+        import threading
+        print('BaseModule - Received rpc', self, pattern, channel, message, ' thread:', threading.current_thread())
 
         try:
             # Look for a RPCMessage
@@ -110,7 +118,8 @@ class BaseModule(RedisClient):
                 self.publish(rpc_message.reply_to, json_data)
 
         except:
-            print('Error calling rpc method', message)
+            import sys
+            print('Error calling rpc method', message, sys.exc_info())
             my_dict = {'method': rpc_message.method,
                        'id': rpc_message.id,
                        'pattern': pattern,

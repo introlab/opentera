@@ -10,5 +10,9 @@ UserTokenCookieName = 'VideoDispatchToken'
 ParticipantTokenCookieName = 'VideoDispatchTokenParticipant'
 config_man = ConfigManager()
 
-# Database manager
-# db_man = DBManager()
+# Global modules
+# TODO can we do better ?
+Flask_module = None
+Twisted_module = None
+WebRTC_module = None
+OnlineUsers_module = None

@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse
+from flask_restx import Resource, reqparse
 from modules.LoginModule.LoginModule import LoginModule
 from modules.Globals import db_man
 from modules.FlaskModule.FlaskModule import device_api_ns as api

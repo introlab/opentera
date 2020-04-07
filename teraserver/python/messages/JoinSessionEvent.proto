@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package opentera.protobuf;
+
+message JoinSessionEvent {
+    string session_url = 1;
+}

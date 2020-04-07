@@ -1,19 +1,6 @@
 var timerId = -1;
 var timeout = 0;
 
-function validateInput(inputId){
-	var rval = ($(inputId).val() != "");
-	if (!rval){
-		$(inputId).css('background-color','#e05c5c');
-		$(inputId).css('color','black');
-	}else{
-		$(inputId).css('background-color','');
-		$(inputId).css('color','');
-	}
-
-	return rval;
-}
-
 function doLogin(backend_url, backend_port){
 	timeout++;
 	if (timerId == -1){
@@ -81,8 +68,12 @@ function doParticipantLogin(backend_url, backend_port){
           success: function(response, status, request){
                 clearInterval(timerId);
                 timerId=-1;
+
                 // Get websocket url
                 sessionStorage.setItem("websocket_url", response["websocket_url"]);
+
+                // Set flag to indicate participant login
+                sessionStorage.setItem("is_participant", true);
 
                 // Connect websocket
                 webSocketConnect();
@@ -115,6 +106,9 @@ function loginReply(response, status, request){
 
         // Get websocket url
         sessionStorage.setItem("websocket_url", response["websocket_url"]);
+
+        // Set flag to indicate participant login
+        sessionStorage.setItem("is_participant", false);
 
   		// Redirect to location
 		window.location.replace("dashboard");
@@ -149,11 +143,11 @@ function doLogout(backend_url, backend_port){
 }
 
 function logoutSuccess(response, status, request){
-    // Clear cookie
-    deleteCookie("VideoDispatchToken");
-
     // Redirect to login page
-    window.location.replace("login");
+    if (sessionStorage.getItem("is_participant") == "false")
+        window.location.replace("login");
+    else
+        window.location.replace("participant_endpoint");
 }
 
 function logoutError(event, status){

@@ -1,5 +1,5 @@
 from flask import session
-from flask_restplus import Resource
+from flask_restx import Resource
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser

@@ -7,6 +7,7 @@ class ConfigManager:
     db_config = {}      # name, url, port, username, password
     redis_config = {}
     backend_config = {}
+    webrtc_config = {}
 
     def __init__(self):
         pass
@@ -38,6 +39,9 @@ class ConfigManager:
 
         if self.validate_backend_config(config_json['Backend']):
             self.backend_config = config_json["Backend"]
+
+        if self.validate_webrtc_config(config_json['WebRTC']):
+            self.webrtc_config = config_json['WebRTC']
 
     @staticmethod
     def validate_server_config(config):
@@ -78,7 +82,17 @@ class ConfigManager:
     @staticmethod
     def validate_backend_config(config):
         rval = True
-        required_fields = ['hostname', 'port', 'secure_key']
+        required_fields = ['hostname', 'port']
+        for field in required_fields:
+            if field not in config:
+                print('ERROR: Backend Config - missing field ' + field)
+                rval = False
+        return True
+
+    @staticmethod
+    def validate_webrtc_config(config):
+        rval = True
+        required_fields = ['hostname', 'working_directory', 'executable', 'script', 'arguments']
         for field in required_fields:
             if field not in config:
                 print('ERROR: Backend Config - missing field ' + field)

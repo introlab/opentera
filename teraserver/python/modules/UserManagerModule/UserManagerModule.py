@@ -198,17 +198,19 @@ class UserManagerModule(BaseModule):
         # Send message to event topic
         self._send_event_message(participant_event, UserManagerModule.event_topic_name())
 
+        # Not sure we need to do this
         for user_uuid in self.user_registry.online_users():
             # TODO Check for permissions...
             # Send to everyone?
             self._send_event_message(participant_event, 'websocket.user.' + user_uuid)
 
     def handle_participant_disconnected(self, header, participant_event: ParticipantEvent):
-        self.participant_registry.participant_offline(participant_event.user_uuid)
+        self.participant_registry.participant_offline(participant_event.participant_uuid)
 
         # Send message to event topic
         self._send_event_message(participant_event, UserManagerModule.event_topic_name())
 
+        # Not sure we need to do this
         for user_uuid in self.user_registry.online_users():
             # TODO Check for permissions...
             # Send to everyone?

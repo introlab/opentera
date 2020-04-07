@@ -17,23 +17,27 @@ class RedisClient:
         print('Init RedisClient', self, config)
         self.protocol = None
         self.callbacks_dict = dict()
-        # self.redisConfig = config
 
         # Fill config
         if config is None:
             print('RedisClient - Warning, using default redis configuration')
             config = {'hostname': 'localhost', 'port': 6379, 'db': 0}
 
+        self.redisConfig = config
+
         # Redis client (synchronous)
         self.redis = redis.Redis(host=config['hostname'], port=config['port'], db=config['db'])
 
         # Redis client (async)
-        conn = reactor.connectTCP(config['hostname'], config['port'],
-                                  RedisProtocolFactory(parent=self, protocol=redisProtocol))
-        print(conn)
+        self.conn = reactor.connectTCP(config['hostname'], config['port'],
+                                       RedisProtocolFactory(parent=self, protocol=redisProtocol))
+        print(self.conn)
+
+    def getConfig(self):
+        return self.redisConfig
 
     def redisConnectionMade(self):
-        print('RedisClient connectionMade')
+        print('********************* RedisClient connectionMade')
         pass
 
     def redisMessageReceived(self, pattern, channel, message):
@@ -66,26 +70,27 @@ class RedisClient:
             return defer.Deferred()
 
     def publish(self, topic, message):
-        self.redis.publish(topic, message)
+        return self.redis.publish(topic, message)
 
     def redisGet(self, key):
         return self.redis.get(key)
 
     def redisSet(self, key, value, ex=None):
-        self.redis.set(key, value, ex=ex)
+        return self.redis.set(key, value, ex=ex)
 
     def redisDelete(self, key):
-        self.redis.delete(key)
+        return self.redis.delete(key)
 
     def subscribe_pattern_with_callback(self, pattern, function):
         print(self, 'subscribe_pattern_with_callback', pattern, function)
         self.callbacks_dict[pattern] = function
-        self.subscribe(pattern)
+        return self.subscribe(pattern)
 
     def unsubscribe_pattern_with_callback(self, pattern, function):
         print(self, 'unsubscribe_pattern_with_callback', pattern, function)
-        self.unsubscribe(pattern)
+        ret = self.unsubscribe(pattern)
         del self.callbacks_dict[pattern]
+        return ret
 
 
 # Debug

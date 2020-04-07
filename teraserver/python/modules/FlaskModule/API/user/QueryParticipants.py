@@ -1,5 +1,5 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse, inputs
+from flask_restx import Resource, reqparse, inputs
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.LoginModule.LoginModule import user_multi_auth
 from libtera.db.models.TeraUser import TeraUser
@@ -14,6 +14,7 @@ get_parser = api.parser()
 get_parser.add_argument('id_participant', type=int, help='ID of the participant to query')
 get_parser.add_argument('id', type=int, help='Alias for "id_participant"')
 get_parser.add_argument('username', type=str, help='Username of the participant to query')
+get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the participant to query')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all participants')
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all participants')
 get_parser.add_argument('id_group', type=int, help='ID of the participant groups from which to get all participants')
@@ -64,6 +65,11 @@ class QueryParticipants(Resource):
                 participants = [TeraParticipant.get_participant_by_id(args['id_participant'])]
         elif args['username'] is not None:
             participants = [TeraParticipant.get_participant_by_username(args['username'])]
+        elif args['participant_uuid'] is not None:
+            participant = TeraParticipant.get_participant_by_uuid(args['participant_uuid'])
+            if participant:
+                if participant.id_participant in user_access.get_accessible_participants_ids():
+                    participants = [participant]
         elif args['id_site']:
             participants = user_access.query_participants_for_site(args['id_site'])
         elif args['id_project']:

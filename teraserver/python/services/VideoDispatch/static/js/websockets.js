@@ -51,11 +51,32 @@ function ws_Closed(){
 	*/
 
 	// Redirect to login for now...
-	window.location.replace("login");
+	//window.location.replace("login");
 
 }
 
 function ws_MessageReceived(evt){
 	var received_msg = evt.data;
     console.log("Websocket message: " + received_msg);
+
+    var json_msg = JSON.parse(received_msg);
+
+    var msg_type = json_msg.data[0]["@type"];
+
+    // Join session
+    if (msg_type == "type.googleapis.com/opentera.protobuf.JoinSessionEvent"){
+        hideElement('btnLogout');
+        // Join video session event - redirect to session url
+        //document.getElementById('mainview').src = json_msg.data[0]["sessionUrl"];
+        window.parent.document.getElementById('mainview').contentWindow.document.getElementById("dialogWait").style.display="inline";
+        current_session_url = json_msg.data[0]["sessionUrl"];
+        testCurrentSessionUrlValid();
+
+    }
+
+    // Stop session
+    if (msg_type == "type.googleapis.com/opentera.protobuf.StopSessionEvent"){
+        showElement('btnLogout');
+        window.location.replace("participant_endpoint");
+    }
 }

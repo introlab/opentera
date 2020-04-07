@@ -15,7 +15,7 @@
       <!--<link rel="stylesheet" href="./static/css/main_style.css" />-->
 
    </head>
-   <body onload = "" style="background-color: black;">
+   <body onload = "init_dashboard('{{ backend_hostname }}', {{ backend_port }});startStatusUpdates();" style="background-color: black;">
    <div class="container-fluid">
 	<!--<div class="row">
         <div class="col-3">Site:</div>
@@ -23,14 +23,41 @@
         <div class="col-3">Projet:</div>
         <div class="col-3"><select id="cmbProjects"></select></div>
     </div>-->
+       <center>
+       <div class="row w-50 align-items-center">
+           <div class="card bg-primary mt-3 text-white text-center col-3 mr-2">
+               <label id="lblOnlineCount">0</label> personne(s) en attente.
+           </div>
 
-       <div class="card bg-secondary mt-3 text-white text-center">
-           Il y a 5 personnes en attente.<br/>
+           <div class="card bg-warning mt-3 text-black text-center col-3 mr-2">
+               <label id="lblInSessionCount">0</label> personne(s) en séance.
+           </div>
+           <div class="card bg-success mt-3 text-white text-center col-3">
+               <label id="lblDoneCount">0</label> personne(s) vues.
+           </div>
        </div>
-       <div class="card mt-3">
-           <button id="btnConnect" onclick="connectToNextParticipant('{{ backend_hostname }}', {{ backend_port }});" class="bg-primary" style="height: 60px;">Prendre le prochain appel</button>
+
+       <div class="card mt-3 align-items-center" style="background-color: black;">
+           <button id="btnConnect" onclick="connectToNextParticipant();" class="bg-info w-75" style="height: 60px;" disabled>Prendre le prochain appel</button>
 
        </div>
+       </center>
+
+       <div class="modal" tabindex="-1" role="dialog" id="dialogWait" >
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Connexion en cours...</h5>
+              </div>
+              <div class="modal-body">
+                <p>Vous serez bientôt en communication avec <label id="lblParticipantName"> ??? </label>.</p>
+              </div>
+              <div class="modal-footer">
+
+              </div>
+            </div>
+          </div>
+        </div>
        <!--<div class="col-4">
            Dernières personnes vues<br/>
 

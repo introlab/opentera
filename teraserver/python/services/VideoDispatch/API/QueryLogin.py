@@ -1,10 +1,11 @@
 from flask import jsonify, session, request
-from flask_restplus import Resource, reqparse, inputs, fields
+from flask_restx import Resource, reqparse, inputs, fields
 from sqlalchemy import exc
 from flask_babel import gettext
 from sqlalchemy.exc import InvalidRequestError
 from services.VideoDispatch.FlaskModule import default_api_ns as api
 from services.VideoDispatch.AccessManager import AccessManager
+import threading
 
 # Parser definition(s)
 get_parser = api.parser()

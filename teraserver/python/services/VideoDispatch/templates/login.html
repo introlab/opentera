@@ -7,13 +7,19 @@
         <link href="./static/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
         <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
 		<link href="./static/css/solid.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="./static/css/main_style.css" />
         <link rel="stylesheet" href="./static/css/login_style.css" />
 
          <script src="./static/js/opentera.js"></script>
          <script src="./static/js/login.js"></script>
-         <script src="./static/js/jquery-3.3.1.min.js"></script>
+        <script src="./static/js/jquery-3.3.1.min.js"></script>
+        <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+
     </head>
-    <body onload="">
+    <body onload="sessionStorage.clear();
+    deleteCookie('VideoDispatchToken');
+    deleteCookie('VideoDispatchTokenParticipant');">
       <!--<div class="container">
       Hostname : {{ hostname }} <br>
       Port : {{ port }} <br>
@@ -38,6 +44,8 @@
 		<div id="messages" style="display:none;">
 			<center><label id="txtmessage">Prêt à se connecter!</label></center>
 		</div>
+
+    {% include "footer.html" %}
     </body>
 </html>
 

@@ -1,6 +1,6 @@
 from flask import Flask, request, g, url_for
 from flask_session import Session
-from flask_restplus import Api
+from flask_restx import Api
 from .ConfigManager import ConfigManager
 from flask_babel import Babel
 
@@ -141,10 +141,14 @@ class FlaskModule(BaseModule):
 
         from .API.QuerySessionDispatch import QuerySessionDispatch
         from .API.QueryLogin import QueryLogin
+        from .API.QueryStatus import QueryStatus
+        from .API.QuerySessionManage import QuerySessionManage
 
         # Resources
         default_api_ns.add_resource(QuerySessionDispatch, '/sessiondispatch', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryLogin, '/login', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryStatus, '/status', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QuerySessionManage, '/sessionmanage', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from .Views.Index import Index
@@ -153,6 +157,7 @@ class FlaskModule(BaseModule):
         from .Views.DashboardMain import DashboardMain
         from .Views.Admin import Admin
         from .Views.Participant import Participant
+        from .Views.ParticipantEndpoint import ParticipantEndpoint
 
         # Default arguments
         args = []
@@ -165,6 +170,8 @@ class FlaskModule(BaseModule):
         flask_app.add_url_rule('/dashboard_main', view_func=DashboardMain.as_view('dashboard_main', *args, **kwargs))
         flask_app.add_url_rule('/admin', view_func=Admin.as_view('admin', *args, **kwargs))
         flask_app.add_url_rule('/participant', view_func=Participant.as_view('participant', *args, **kwargs))
+        flask_app.add_url_rule('/participant_endpoint', view_func=ParticipantEndpoint.as_view('participant_endpoint',
+                                                                                              *args, **kwargs))
 
 
 @flask_app.after_request

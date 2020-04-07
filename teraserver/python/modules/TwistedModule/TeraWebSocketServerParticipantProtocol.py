@@ -11,6 +11,9 @@ from modules.BaseModule import ModuleNames, create_module_topic_from_name
 # Messages
 from messages.python.TeraMessage_pb2 import TeraMessage
 from messages.python.ParticipantEvent_pb2 import ParticipantEvent
+from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
+from messages.python.StopSessionEvent_pb2 import StopSessionEvent
+
 from google.protobuf.any_pb2 import Any
 import datetime
 from google.protobuf.json_format import MessageToJson
