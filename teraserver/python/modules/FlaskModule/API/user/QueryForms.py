@@ -1,6 +1,7 @@
 from flask import jsonify, session
-from flask_restful import Resource, reqparse
-from modules.Globals import auth
+from flask_restx import Resource, reqparse
+from modules.LoginModule.LoginModule import user_multi_auth
+from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.DBManager import DBManager
 
 from libtera.db.models.TeraUser import TeraUser
@@ -13,20 +14,27 @@ from libtera.forms.TeraParticipantGroupForm import TeraParticipantGroupForm
 from libtera.forms.TeraParticipantForm import TeraParticipantForm
 from libtera.forms.TeraSessionTypeForm import TeraSessionTypeForm
 from libtera.forms.TeraSessionForm import TeraSessionForm
+from libtera.forms.TeraDeviceSubTypeForm import TeraDeviceSubTypeForm
 
 
 class QueryForms(Resource):
 
-    def __init__(self, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self)
+    def __init__(self, _api, *args, **kwargs):
+        self.module = kwargs.get('flaskModule', None)
+        Resource.__init__(self, _api, *args, **kwargs)
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('type', type=str, help='Definition type required', required=True)
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.doc(description='Get json description of standard input form for the specified data type.',
+             responses={200: 'Success',
+                        500: 'Unknown or unsupported data type'})
+    @api.param(name='type', type='string', description='Data type of the required form. Currently, the following data '
+                                                       'types are supported: \n user_profile\nuser\nsite\ndevice\n'
+                                                       'project\ngroup\nparticipant\nsession_type\nsession')
     def get(self):
         args = self.parser.parse_args(strict=True)
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         if args['type'] == 'user_profile':
@@ -55,5 +63,8 @@ class QueryForms(Resource):
 
         if args['type'] == 'session':
             return jsonify(TeraSessionForm.get_session_form(user_access=user_access))
+
+        if args['type'] == 'device_subtype':
+            return jsonify(TeraDeviceSubTypeForm.get_device_subtype_form(user_access=user_access))
 
         return 'Unknown definition type: ' + args['type'], 500

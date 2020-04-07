@@ -4,20 +4,22 @@ from flask import session, jsonify
 
 from modules.FlaskModule.FlaskModule import flask_app
 from modules.BaseModule import BaseModule, ModuleNames
+from modules.RedisVars import RedisVars
 
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraDevice import TeraDevice
 
-from modules.Globals import auth
-
 from libtera.ConfigManager import ConfigManager
 import datetime
+import redis
 
 from flask import current_app, request, jsonify, _request_ctx_stack
 from werkzeug.local import LocalProxy
-from flask_restful import Resource, reqparse
+from flask_restx import Resource, reqparse
 from functools import wraps
+
+from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
 
 # Current participant identity, stacked
 current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant', None))
@@ -25,10 +27,30 @@ current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'curren
 # Current device identity, stacked
 current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_device', None))
 
+# Current user identity, stacked
+current_user = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_user', None))
+
+# Authentication schemes for users
+user_http_auth = HTTPBasicAuth(realm='user')
+user_token_auth = HTTPTokenAuth("OpenTera")
+user_multi_auth = MultiAuth(user_http_auth, user_token_auth)
+
+# Authentication schemes for participant
+participant_http_auth = HTTPBasicAuth(realm='participant')
+participant_token_auth = HTTPTokenAuth("OpenTera")
+participant_multi_auth = MultiAuth(participant_http_auth, participant_token_auth)
+
 
 class LoginModule(BaseModule):
 
+    redis_client = None
+
     def __init__(self, config: ConfigManager):
+
+        # Update Global Redis Client
+        LoginModule.redis_client = redis.Redis(host=config.redis_config['hostname'],
+                                               port=config.redis_config['port'],
+                                               db=config.redis_config['db'])
 
         BaseModule.__init__(self, ModuleNames.LOGIN_MODULE_NAME.value, config)
 
@@ -63,88 +85,113 @@ class LoginModule(BaseModule):
         # Setup user loader function
         self.login_manager.user_loader(self.load_user)
 
-        # Setup verify password function
-        auth.verify_password(self.verify_password)
+        # Setup verify password function for users
+        user_http_auth.verify_password(self.user_verify_password)
+        user_token_auth.verify_token(self.user_verify_token)
+
+        # Setup verify password function for participants
+        participant_http_auth.verify_password(self.participant_verify_password)
+        participant_token_auth.verify_token(self.participant_verify_token)
 
     def load_user(self, user_id):
-        print('LoginModule - load_user', user_id)
-        return TeraUser.get_user_by_uuid(user_id)
+        print('LoginModule - load_user', self, user_id)
 
-    def verify_password(self, username, password):
-        print('LoginModule - Verifying password for ', username)
+        # Depending if we have a user or a participant online, return the right object.
+        # Here current_user or current_participant are already invalid
+        # Need to fetch them from database
+
+        user = TeraUser.get_user_by_uuid(user_id)
+        participant = TeraParticipant.get_participant_by_uuid(user_id)
+
+        if participant and user:
+            print('ERROR uuid exists for user and participant!')
+            # TODO throw exception?
+            return None
+
+        if user:
+            return user
+
+        if participant:
+            return participant
+
+        return None
+
+    def user_verify_password(self, username, password):
+        print('LoginModule - user_verify_password ', username)
 
         if TeraUser.verify_password(username=username, password=password):
-            registered_user = TeraUser.get_user_by_username(username)
-            print('Found user: ', registered_user)
-            registered_user.update_last_online()
 
-            login_user(registered_user, remember=True)
-            print('Setting key with expiration in 60s', session['_id'], session['user_id'])
+            _request_ctx_stack.top.current_user = TeraUser.get_user_by_username(username)
 
-            self.redisSet(session['_id'], session['user_id'], ex=60)
+            print('user_verify_password, found user: ', current_user)
+            current_user.update_last_online()
+
+            login_user(current_user, remember=True)
+            # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
+            # self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
         return False
 
-    @staticmethod
-    def token_required(f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            # Parse args
-            parser = reqparse.RequestParser()
-            parser.add_argument('token', type=str, help='Token', required=True)
+    def user_verify_token(self, token_value):
+        """
+        Tokens key is dynamic and stored in a redis variable for users.
+        """
+        import jwt
+        try:
+            token_dict = jwt.decode(token_value, self.redisGet(RedisVars.RedisVar_UserTokenAPIKey),
+                                    algorithms='HS256')
+        except jwt.exceptions.InvalidSignatureError as e:
+            print(e)
+            return False
 
-            args = parser.parse_args(strict=False)
+        if token_dict['user_uuid']:
+            _request_ctx_stack.top.current_user = TeraUser.get_user_by_uuid(token_dict['user_uuid'])
+            # TODO: Validate if user is also online?
+            if current_user:
+                current_user.update_last_online()
+                login_user(current_user, remember=True)
+                return True
 
-            # Verify token.
-            if 'token' in args:
-                # Load participant from DB
-                _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(args['token'])
+        return False
 
-                if current_participant and current_participant.participant_enabled:
-                    # Returns the function if authenticated with token
-                    return f(*args, **kwargs)
+    def participant_verify_password(self, username, password):
+        print('LoginModule - participant_verify_password for ', username)
 
-                # Load device from DB
-                _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(args['token'])
+        if TeraParticipant.verify_password(username=username, password=password):
 
-                if current_device and current_device.device_enabled:
-                    # Returns the function if authenticated with token
-                    return f(*args, **kwargs)
+            _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_username(username)
 
-            # Any other case, do not call function
-            return 'Forbidden', 403
+            print('participant_verify_password, found participant: ', current_participant)
+            current_participant.update_last_online()
 
-        return decorated
+            login_user(current_participant, remember=True)
+            # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
+            # self.redisSet(session['_id'], session['_user_id'], ex=60)
+            return True
+        return False
 
-    @staticmethod
-    def certificate_required(f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
+    def participant_verify_token(self, token_value):
+        """
+        Tokens for participants are stored in the DB.
+        """
+        print('LoginModule - participant_verify_token for ', token_value, self)
 
-            # Headers are modified in TwistedModule to add certificate information if available.
-            # We are interested in the content of two fields : X-Device-Uuid, X-Participant-Uuid
+        # TeraParticipant verifies if the participant is active and login is enabled
+        _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_value)
 
-            if request.headers.__contains__('X-Device-Uuid'):
-                # Load device from DB
-                _request_ctx_stack.top.current_device = TeraDevice.get_device_by_uuid(
-                    request.headers['X-Device-Uuid'])
-                if current_device and current_device.device_enabled:
-                    return f(*args, **kwargs)
+        if current_participant:
+            current_participant.update_last_online()
+            login_user(current_participant, remember=True)
+            return True
 
-            elif request.headers.__contains__('X-Participant-Uuid'):
-                # Load participant from DB
-                _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_uuid(
-                    request.headers['X-Participant-Uuid'])
-                if current_participant and current_participant.participant_enabled:
-                    return f(*args, **kwargs)
-
-            # Any other case, do not call function
-            return 'Forbidden', 403
-
-        return decorated
+        return False
 
     @staticmethod
-    def token_or_certificate_required(f):
+    def device_token_or_certificate_required(f):
+        """
+        Use this decorator if UUID is stored in a client certificate or token in url params.
+        Acceptable for devices and participants.
+        """
         @wraps(f)
         def decorated(*args, **kwargs):
 
@@ -159,6 +206,7 @@ class LoginModule(BaseModule):
 
                 # Device must be found and enabled
                 if current_device and current_device.device_enabled:
+                    login_user(current_device, remember=True)
                     return f(*args, **kwargs)
 
             elif request.headers.__contains__('X-Participant-Uuid'):
@@ -167,22 +215,51 @@ class LoginModule(BaseModule):
                     request.headers['X-Participant-Uuid'])
 
                 if current_participant and current_participant.participant_enabled:
+                    login_user(current_participant, remember=True)
                     return f(*args, **kwargs)
 
             # Then verify tokens...
+            # Verify token in auth headers (priority over token in params)
+            if 'Authorization' in request.headers:
+                try:
+                    # Default whitespace as separator, 1 split max
+                    scheme, token = request.headers['Authorization'].split(None, 1)
+                except ValueError:
+                    # malformed Authorization header
+                    return 'Forbidden', 403
+
+                # Verify scheme and token
+                if scheme == 'OpenTera':
+                    # Load participant from DB
+                    _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token)
+
+                    if current_participant and current_participant.participant_enabled:
+                        # Returns the function if authenticated with token
+                        login_user(current_participant, remember=True)
+                        return f(*args, **kwargs)
+
+                    # Load device from DB
+                    _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(token)
+
+                    # Device must be found and enabled
+                    if current_device and current_device.device_enabled:
+                        # Returns the function if authenticated with token
+                        login_user(current_device, remember=True)
+                        return f(*args, **kwargs)
 
             # Parse args
             parser = reqparse.RequestParser()
             parser.add_argument('token', type=str, help='Token', required=False)
             token_args = parser.parse_args(strict=False)
 
-            # Verify token.
+            # Verify token in params
             if 'token' in token_args:
                 # Load participant from DB
                 _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_args['token'])
 
                 if current_participant and current_participant.participant_enabled:
                     # Returns the function if authenticated with token
+                    login_user(current_participant, remember=True)
                     return f(*args, **kwargs)
 
                 # Load device from DB
@@ -191,7 +268,72 @@ class LoginModule(BaseModule):
                 # Device must be found and enabled
                 if current_device and current_device.device_enabled:
                     # Returns the function if authenticated with token
+                    login_user(current_device, remember=True)
                     return f(*args, **kwargs)
+
+            # Any other case, do not call function since no valid auth found.
+            return 'Forbidden', 403
+
+        return decorated
+
+    @staticmethod
+    def service_token_or_certificate_required(f):
+        """
+        Use this decorator if UUID is stored in a client certificate or token in url params.
+        Acceptable for services
+        """
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            import jwt
+            # Since certificates are more secure than tokens, we will test for them first
+            # Headers are modified in TwistedModule to add certificate information if available.
+            # We are interested in the content of field : X-Service-Uuid,
+            if request.headers.__contains__('X-Service-Uuid'):
+                # TODO Load service from DB ?
+                # TODO validate service UUID
+                return f(*args, **kwargs)
+
+            # Then verify tokens...
+            # Verify token in auth headers (priority over token in params)
+            if 'Authorization' in request.headers:
+                try:
+                    # Default whitespace as separator, 1 split max
+                    scheme, token = request.headers['Authorization'].split(None, 1)
+                except ValueError:
+                    # malformed Authorization header
+                    return 'Forbidden', 403
+
+                # Verify scheme and token
+                if scheme == 'OpenTera':
+
+                    try:
+                        token_dict = jwt.decode(token,
+                                                LoginModule.redis_client.get(
+                                                    RedisVars.RedisVar_ServiceTokenAPIKey),
+                                                algorithms='HS256')
+                        if 'service_uuid' in token_dict:
+                            # TODO VERIFY IF SERVICE IS OK.
+                            return f(*args, **kwargs)
+                    except jwt.exceptions.InvalidSignatureError as e:
+                        return 'Forbidden', 403
+
+            # Parse args
+            parser = reqparse.RequestParser()
+            parser.add_argument('token', type=str, help='Token', required=False)
+            token_args = parser.parse_args(strict=False)
+
+            # Verify token in params
+            if token_args['token']:
+                try:
+                    token_dict = jwt.decode(token_args['token'],
+                                            LoginModule.redis_client.get(
+                                                RedisVars.RedisVar_ServiceTokenAPIKey),
+                                            algorithms='HS256')
+                    if 'service_uuid' in token_dict:
+                        # TODO VERIFY IF SERVICE IS OK.
+                        return f(*args, **kwargs)
+                except jwt.exceptions.InvalidSignatureError as e:
+                    return 'Forbidden', 403
 
             # Any other case, do not call function since no valid auth found.
             return 'Forbidden', 403

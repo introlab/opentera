@@ -1,0 +1,11 @@
+swagger: "2.0"
+info:
+  description: "OpenTera API documentation"
+  version: "1.0.0"
+  title: "OpenTera API documentation"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+
+schemes:
+- "https"

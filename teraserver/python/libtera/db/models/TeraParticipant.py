@@ -1,30 +1,45 @@
 from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
+from libtera.db.models.TeraServerSettings import TeraServerSettings
 
 import uuid
 import jwt
 import time
 import datetime
+from passlib.hash import bcrypt
 
 
 class TeraParticipant(db.Model, BaseModel):
-    secret = 'TeraParticipant'
     __tablename__ = 't_participants'
     id_participant = db.Column(db.Integer, db.Sequence('id_participant_sequence'), primary_key=True, autoincrement=True)
     participant_uuid = db.Column(db.String(36), nullable=False, unique=True)
     participant_name = db.Column(db.String, nullable=False)
+    participant_username = db.Column(db.String(50), nullable=True)
+    participant_email = db.Column(db.String, nullable=True)
+    participant_password = db.Column(db.String, nullable=True)
     participant_token = db.Column(db.String, nullable=False, unique=True)
     participant_lastonline = db.Column(db.TIMESTAMP, nullable=True)
     participant_enabled = db.Column(db.Boolean, nullable=False, default=True)
+    participant_login_enabled = db.Column(db.Boolean, nullable=False, default=False)
     id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group',
-                                                               ondelete='cascade'),
-                                     nullable=False)
-    participant_devices = db.relationship("TeraDeviceParticipant")
+                                                               ondelete='cascade'), nullable=True)
+
+    id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
+
+    participant_devices = db.relationship("TeraDevice", secondary="t_devices_participants",
+                                          back_populates="device_participants")
 
     participant_sessions = db.relationship("TeraSession", secondary="t_sessions_participants",
                                            back_populates="session_participants")
 
-    participant_participant_group = db.relationship('TeraParticipantGroup')
+    participant_participant_group = db.relationship("TeraParticipantGroup")
+
+    participant_project = db.relationship("TeraProject")
+
+    authenticated = False
+
+    def __init__(self):
+        pass
 
     def __str__(self):
         return '<TeraParticipant ' + str(self.participant_name) + ' >'
@@ -36,12 +51,11 @@ class TeraParticipant(db.Model, BaseModel):
         # Creating token with user info
         payload = {
             'iat': int(time.time()),
-            'participant_uuid': self.participant_uuid,
-            'participant_name': self.participant_name
+            'participant_uuid': self.participant_uuid
         }
 
-        # TODO key should be secret ?
-        self.participant_token = jwt.encode(payload, TeraParticipant.secret, 'HS256').decode('utf-8')
+        self.participant_token = jwt.encode(payload, TeraServerSettings.get_server_setting_value(
+            TeraServerSettings.ServerParticipantTokenKey), algorithm='HS256').decode('utf-8')
 
         return self.participant_token
 
@@ -49,30 +63,73 @@ class TeraParticipant(db.Model, BaseModel):
         self.participant_lastonline = datetime.datetime.now()
         db.session.commit()
 
-    def to_json(self, ignore_fields=[], minimal=False):
+    def to_json(self, ignore_fields=None, minimal=False):
+        if ignore_fields is None:
+            ignore_fields = []
 
-        ignore_fields.extend(['participant_participant_group', 'participant_devices',
-                              'participant_token', 'participant_sessions', 'secret'])
+        ignore_fields.extend(['authenticated', 'participant_devices',
+                              'participant_sessions', 'participant_password',
+                              'participant_project', 'participant_participant_group'])
         if minimal:
-            ignore_fields.extend([])
+            ignore_fields.extend(['participant_uuid', 'participant_username', 'participant_lastonline',
+                                  'participant_login_enabled', 'participant_token'])
 
         return super().to_json(ignore_fields=ignore_fields)
+
+    def is_authenticated(self):
+        return self.authenticated
+
+    def is_anonymous(self):
+        return False
+
+    def is_active(self):
+        return self.participant_enabled
+
+    def is_login_enabled(self):
+        return self.participant_login_enabled
+
+    def get_id(self):
+        return self.participant_uuid
+
+    @staticmethod
+    def encrypt_password(password):
+        return bcrypt.hash(password)
+
+    # @staticmethod
+    # def is_anonymous():
+    #     return False
+
+    @staticmethod
+    def verify_password(username, password):
+        # Query User with that username
+        participant = TeraParticipant.get_participant_by_username(username)
+        if participant is None:
+            print('TeraParticipant: verify_password - participant ' + username + ' not found.')
+            return None
+
+        # Check if enabled
+        if not TeraParticipant.participant_enabled or not TeraParticipant.participant_login_enabled:
+            print('TeraUser: verify_password - user ' + username + ' is inactive or login is disabled.')
+            return None
+
+        # Check password
+        if bcrypt.verify(password, participant.participant_password):
+            participant.authenticated = True
+            return participant
+
+        return None
 
     @staticmethod
     def get_participant_by_token(token):
         participant = TeraParticipant.query.filter_by(participant_token=token).first()
 
-        if participant:
+        if participant and TeraParticipant.participant_enabled and TeraParticipant.participant_login_enabled:
             # Validate token
-            data = jwt.decode(token.encode('utf-8'), TeraParticipant.secret, 'HS256')
+            data = jwt.decode(token.encode('utf-8'), TeraServerSettings.get_server_setting_value(
+                TeraServerSettings.ServerParticipantTokenKey), algorithms='HS256')
 
-            if data['participant_uuid'] == participant.participant_uuid \
-                    and data['participant_name'] == participant.participant_name:
-
-                # Update last online
-                # TOCHECK: Should it be really here???
-                participant.update_last_online()
-
+            if data['participant_uuid'] == participant.participant_uuid:
+                participant.authenticated = True
                 return participant
             else:
                 return None
@@ -84,10 +141,17 @@ class TeraParticipant(db.Model, BaseModel):
         participant = TeraParticipant.query.filter_by(participant_uuid=p_uuid).first()
 
         if participant:
-            participant.update_last_online()
             return participant
 
         return None
+
+    @staticmethod
+    def get_participant_by_username(username):
+        return TeraParticipant.query.filter_by(participant_username=username).first()
+
+    @staticmethod
+    def get_participant_by_email(email: str):
+        return TeraParticipant.query.filter_by(participant_email=email).first()
 
     @staticmethod
     def get_participant_by_name(name):
@@ -98,34 +162,71 @@ class TeraParticipant(db.Model, BaseModel):
         return TeraParticipant.query.filter_by(id_participant=part_id).first()
 
     @staticmethod
+    def is_participant_username_available(username: str) -> bool:
+        # No username = always available
+        if username is None or username == '':
+            return True
+
+        return TeraParticipant.query.filter_by(participant_username=username).first() is None
+
+    @staticmethod
     def create_defaults():
+        from libtera.db.models.TeraProject import TeraProject
+        project1 = TeraProject.get_project_by_projectname('Default Project #1')
+
         participant1 = TeraParticipant()
-        participant1.participant_name = 'Test Participant #1'
+        participant1.participant_name = 'Participant #1'
+        participant1.participant_enabled = True
         participant1.participant_uuid = str(uuid.uuid4())
         participant1.participant_participant_group = \
             TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
+        participant1.participant_project = project1
 
-        token1 = participant1.create_token()
-        print('token1 ', token1)
+        participant1.create_token()
+        participant1.participant_username = 'participant1'
+        participant1.participant_password = TeraParticipant.encrypt_password('opentera')
+        participant1.participant_login_enabled = True
+
         db.session.add(participant1)
 
         participant2 = TeraParticipant()
-        participant2.participant_name = 'Test Participant #2'
+        participant2.participant_name = 'Participant #2'
+        participant2.participant_enabled = True
         participant2.participant_uuid = str(uuid.uuid4())
-        participant2.participant_participant_group = \
-            TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group B')
+        participant2.participant_participant_group = None
+        participant2.participant_project = project1
 
-        token2 = participant2.create_token()
-        print('token2 ', token2)
+        participant2.create_token()
         db.session.add(participant2)
 
         db.session.commit()
 
     @classmethod
+    def update(cls, update_id: int, values: dict):
+        # Check if username is available
+        if 'participant_username' in values:
+            if not TeraParticipant.is_participant_username_available(values['participant_username']):
+                raise NameError('Participant username already in use.')
+
+        # Remove the password field is present and if empty
+        if 'participant_password' in values:
+            if values['participant_password'] == '':
+                del values['participant_password']
+            else:
+                values['participant_password'] = TeraParticipant.encrypt_password(values['participant_password'])
+        super().update(update_id, values)
+
+    @classmethod
     def insert(cls, participant):
+        # Encrypts password
+        participant.participant_password = TeraParticipant.encrypt_password(participant.participant_password)
+
         participant.participant_lastonline = None
         participant.participant_uuid = str(uuid.uuid4())
         participant.create_token()
+        # Check if username is available
+        if not TeraParticipant.is_participant_username_available(participant.participant_username):
+            raise NameError('Participant username already in use.')
         super().insert(participant)
 
     @classmethod

@@ -1,32 +1,64 @@
 from flask import jsonify, session, request
-from flask_restful import Resource, reqparse
-from modules.Globals import auth
+from flask_restx import Resource, reqparse, fields, inputs
+from modules.LoginModule.LoginModule import user_multi_auth
+from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+from libtera.db.models.TeraParticipant import TeraParticipant
+from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from flask_babel import gettext
 
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all associated participants'
+                        )
+get_parser.add_argument('id_participant', type=int, help='ID of the participant from which to request all associated '
+                                                         'devices')
+get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all devices and associated '
+                                                  'participants')
+get_parser.add_argument('id_device_type', type=int, help='ID of device type from which to get all devices and '
+                                                         'associated participants')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ids only)')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('device_participant', type=str, location='json',
+                         help='Device participant to create / update', required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='Specific device-participant association ID to delete. Be careful: this'
+                                                ' is not the device or the participant ID, but the ID of the '
+                                                'association itself!', required=True)
+
+
+model = api.model('QueryDeviceParticipants', {
+    'participant_name': fields.String,
+    'device_name': fields.String,
+    'user_token': fields.String
+})
+
+
 class QueryDeviceParticipants(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get devices that are related to a participant. Only one "ID" parameter required and supported'
+                         ' at once.',
+             responses={200: 'Success - returns list of devices - participants association',
+                        400: 'Required parameter is missing (must have at least one id)',
+                        500: 'Error occured when loading devices for participant'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_device', type=int, help='id_device')
-        parser.add_argument('id_participant', type=int, help='id_participant')
-        parser.add_argument('id_site', type=int, help='id_site')
-        parser.add_argument('list', type=bool)
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         device_part = []
         # If we have no arguments, return error
@@ -38,8 +70,12 @@ class QueryDeviceParticipants(Resource):
                 device_part = TeraDeviceParticipant.query_participants_for_device(device_id=args['id_device'])
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
-                device_part = TeraDeviceParticipant.query_devices_for_participant(
-                    participant_id=args['id_participant'])
+                if args['id_device_type']:
+                    device_part = user_access.query_device_participants_by_type(id_device_type=args['id_device_type'],
+                                                                                participant_id=args['id_participant'])
+                else:
+                    device_part = TeraDeviceParticipant.query_devices_for_participant(
+                        participant_id=args['id_participant'])
         elif args['id_site']:
             # Get devices and participants for that specific site
             device_part = user_access.query_device_participants_for_site(site_id=args['id_site'])
@@ -51,20 +87,23 @@ class QueryDeviceParticipants(Resource):
                 if args['list'] is None:
                     json_dp['participant_name'] = dp.device_participant_participant.participant_name
                     json_dp['device_name'] = dp.device_participant_device.device_name
+                    json_dp['device_participant_device'] = dp.device_participant_device.to_json()
                 device_part_list.append(json_dp)
 
             return jsonify(device_part_list)
 
         except InvalidRequestError:
-            return '', 400
+            return '', 500
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create/update devices associated with a participant.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t modify device association',
+                        400: 'Badly formed JSON or missing fields(id_participant or id_device) in the JSON body',
+                        500: 'Internal error occured when saving device association'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('device_participant', type=str, location='json',
-                            help='Device participant to create / update', required=True)
-
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -90,6 +129,14 @@ class QueryDeviceParticipants(Resource):
                 json_device_part['id_device_participant'] = device_part.id_device_site
             else:
                 json_device_part['id_device_participant'] = 0
+
+            # Check if participant is part of the device projects
+            part = TeraParticipant.get_participant_by_id(json_device_part['id_participant'])
+            if not TeraDeviceProject.get_device_project_id_for_device_and_project(
+                    device_id=json_device_part['id_device'],
+                    project_id=part.id_project):
+                return gettext('Appareil non-assigné au projet du participant'), 403
+
 
             # Do the update!
             if json_device_part['id_device_participant'] > 0:
@@ -120,11 +167,15 @@ class QueryDeviceParticipants(Resource):
 
         return jsonify(update_device_part)
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific device-participant association.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete device association',
+                        500: 'Device-participant association not found or database error.'})
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        parser = delete_parser
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()

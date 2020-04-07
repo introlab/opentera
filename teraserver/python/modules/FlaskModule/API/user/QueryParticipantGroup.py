@@ -1,29 +1,45 @@
 from flask import jsonify, session, request
-from flask_restful import Resource, reqparse
-from modules.Globals import auth
+from flask_restx import Resource, reqparse, inputs
+from modules.LoginModule.LoginModule import user_multi_auth
+from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_group', type=int, help='ID of the participant group to query'
+                        )
+get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all participant groups')
+get_parser.add_argument('id', type=int, help='Alias for "id_group"')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('group', type=str, location='json', help='Participant group to create / update', required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='Participant Group ID to delete', required=True)
+
 
 class QueryParticipantGroup(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get participant groups information. Only one of the ID parameter is supported at once. '
+                         'If no ID is specified, returns all accessible groups for the logged user',
+             responses={200: 'Success - returns list of participant groups',
+                        500: 'Database error'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_group', type=int)
-        parser.add_argument('id_project', type=int)
-        parser.add_argument('list', type=bool)
-        parser.add_argument('id', type=int)
+        parser = get_parser
 
         args = parser.parse_args()
 
@@ -57,12 +73,18 @@ class QueryParticipantGroup(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create / update participant groups. id_participant_group must be set to "0" to create a new '
+                         'group. A group can be created/modified if the user has admin rights to the project.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t create/update the specified device',
+                        400: 'Badly formed JSON or missing fields(id_participant_group or id_project) in the JSON body',
+                        500: 'Internal error occured when saving device'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('group', type=str, location='json', help='Group to create / update', required=True)
+        # parser = post_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'group' not in request.json:
@@ -106,11 +128,15 @@ class QueryParticipantGroup(Resource):
 
         return jsonify([update_group.to_json()])
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific participant group',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete participant group (only project admin can delete)',
+                        500: 'Database error.'})
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        parser = delete_parser
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()

@@ -1,6 +1,7 @@
 from flask import jsonify, session, request
-from flask_restful import Resource, reqparse
-from modules.Globals import auth
+from flask_restx import Resource, reqparse, inputs
+from modules.FlaskModule.FlaskModule import user_api_ns as api
+from modules.LoginModule.LoginModule import user_multi_auth
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraSession import TeraSession
@@ -8,29 +9,47 @@ from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_participant', type=int, help='ID of the participant to query')
+get_parser.add_argument('id', type=int, help='Alias for "id_participant"')
+get_parser.add_argument('username', type=str, help='Username of the participant to query')
+get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the participant to query')
+get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all participants')
+get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all participants')
+get_parser.add_argument('id_group', type=int, help='ID of the participant groups from which to get all participants')
+get_parser.add_argument('id_session', type=int, help='ID of the session from which to get all participants')
+get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all participants associated')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('full', type=inputs.boolean, help='Flag that expands the returned data to include all '
+                                                          'information')
+get_parser.add_argument('no_group', type=inputs.boolean,
+                        help='Flag that limits the returned data with only participants without a group')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('participant', type=str, location='json', help='Participant to create / update', required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='Participant ID to delete', required=True)
+
 
 class QueryParticipants(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get participants information. Only one of the ID parameter is supported and required at once',
+             responses={200: 'Success - returns list of participants',
+                        400: 'No parameters specified at least one id must be used',
+                        500: 'Database error'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_participant', type=int, help='id_participant')
-        parser.add_argument('id', type=int)
-        parser.add_argument('id_kit', type=int)
-        parser.add_argument('id_site', type=int, help='id site')
-        parser.add_argument('id_group', type=int)
-        parser.add_argument('id_session', type=int)
-        parser.add_argument('id_device', type=int)
-        parser.add_argument('list', type=bool)
-        # parser.add_argument('participant_uuid', type=str, help='participant_uuid')
-        # parser.add_argument('participant_name', type=str, help='participant_name')
+        parser = get_parser
 
         args = parser.parse_args()
 
@@ -44,10 +63,17 @@ class QueryParticipants(Resource):
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
                 participants = [TeraParticipant.get_participant_by_id(args['id_participant'])]
-        elif args['id_kit']:
-            participants = user_access.query_participants_for_kit(args['id_kit'])
+        elif args['username'] is not None:
+            participants = [TeraParticipant.get_participant_by_username(args['username'])]
+        elif args['participant_uuid'] is not None:
+            participant = TeraParticipant.get_participant_by_uuid(args['participant_uuid'])
+            if participant:
+                if participant.id_participant in user_access.get_accessible_participants_ids():
+                    participants = [participant]
         elif args['id_site']:
             participants = user_access.query_participants_for_site(args['id_site'])
+        elif args['id_project']:
+            participants = user_access.query_participants_for_project(args['id_project'])
         elif args['id_group']:
             participants = user_access.query_participants_for_group(args['id_group'])
         elif args['id_device']:
@@ -61,46 +87,60 @@ class QueryParticipants(Resource):
                     participants.append(part)
 
         try:
-            participant_list = []
-            for participant in participants:
-                if args['list'] is None:
-                    participant_json = participant.to_json()
-                    if args['id_kit']:
-                        # Adds kit information to participant
-                        participant_json['id_kit'] = args['id_kit']
-                    if args['id_participant']:
-                        # Adds project information to participant
-                        participant_json['id_project'] = participant.participant_participant_group.id_project
-                        # Adds site information do participant
-                        participant_json['id_site'] = participant.participant_participant_group.\
-                            participant_group_project.id_site
-                    if args['id_group']:
-                        # Adds last session information to participant
-                        participant_sessions = TeraSession.get_sessions_for_participant(
-                            part_id=participant.id_participant)
-                        if participant_sessions:
-                            participant_json['participant_lastsession'] = \
-                                participant_sessions[-1].session_start_datetime.isoformat()
+            if participants:
+                participant_list = []
+                for participant in participants:
+                    if participant is not None:
+                        # No group flag
+                        if args['no_group'] is not None:
+                            if participant.id_participant_group is not None:
+                                continue
+                        # List
+                        if args['list'] is None:
+                            participant_json = participant.to_json()
+                            if args['id_participant']:
+                                # Adds project information to participant
+                                # participant_json['id_project'] = participant.participant_project.id_project
+                                # Adds site information do participant
+                                participant_json['id_site'] = participant.participant_project.id_site
+                            if args['id_group'] or args['id_participant']:
+                                # Adds last session information to participant
+                                participant_sessions = TeraSession.get_sessions_for_participant(
+                                    part_id=participant.id_participant)
+                                if participant_sessions:
+                                    participant_json['participant_lastsession'] = \
+                                        participant_sessions[-1].session_start_datetime.isoformat()
+                                else:
+                                    participant_json['participant_lastsession'] = None
+
+                            if args['full'] is not None:
+                                if participant.id_participant_group is not None:
+                                    participant_json['participant_participant_group'] = participant.participant_participant_group.to_json()
+                                participant_json['participant_project'] = participant.participant_project.to_json()
+                            participant_list.append(participant_json)
                         else:
-                            participant_json['participant_lastsession'] = None
+                            participant_json = participant.to_json(minimal=True)
+                            participant_list.append(participant_json)
 
-                    participant_list.append(participant_json)
-                else:
-                    participant_json = participant.to_json(minimal=True)
-                    participant_list.append(participant_json)
-
-            return jsonify(participant_list)
+                return jsonify(participant_list)
 
         except InvalidRequestError:
             return '', 500
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create / update participants. id_participant must be set to "0" to create a new '
+                         'participant. A participant can be created/modified if the user has admin rights to the '
+                         'project.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t create/update the specified device',
+                        400: 'Badly formed JSON or missing fields(id_participant or id_project/id_group [only one of '
+                             'them]) in the JSON body, or mismatch between id_project and participant group project',
+                        500: 'Internal error when saving device'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('participant', type=str, location='json', help='Partiicpant to create / update',
-                            required=True)
+        parser = post_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'participant' not in request.json:
@@ -109,23 +149,53 @@ class QueryParticipants(Resource):
         json_participant = request.json['participant']
 
         # Validate if we have an id
-        if 'id_participant' not in json_participant or 'id_participant_group' not in json_participant:
+        if 'id_participant' not in json_participant or ('id_project' not in json_participant
+                                                        and 'id_participant_group' not in json_participant):
             return '', 400
 
-        # Check if current user can modify the posted group
         # User can modify or add a group if it has admin access to that project
-        if json_participant['id_participant_group'] not in user_access.get_accessible_groups_ids(admin_only=True):
-            return '', 403
+        if 'id_project' in json_participant:
+            if json_participant['id_project'] > 0 and \
+                    json_participant['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True):
+                return 'No admin access to project', 403
+
+        # Check if current user can modify the posted group
+        if 'id_participant_group' in json_participant:
+            if json_participant['id_participant_group'] > 0 and \
+                    json_participant['id_participant_group'] not in \
+                    user_access.get_accessible_groups_ids(admin_only=True):
+                return 'No admin access to group', 403
+
+        # If we have both an id_group and an id_project, make sure that the id_project in the group matches
+        if 'id_project' in json_participant and 'id_participant_group' in json_participant:
+            if json_participant['id_participant_group'] > 0:
+                from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
+                participant_group = TeraParticipantGroup.get_participant_group_by_id(
+                    json_participant['id_participant_group'])
+                if participant_group is None:
+                    return 'Participant group not found.', 500
+                if participant_group.id_project != json_participant['id_project'] \
+                        and json_participant['id_project'] > 0:
+                    return 'Mismatch between id_project and group\'s project', 400
+                # Force id_project to group project.
+                json_participant['id_project'] = participant_group.id_project
+
+        # If participant group = 0, set it to none
+        if 'id_participant_group' in json_participant:
+            if json_participant['id_participant_group'] == 0:
+                json_participant['id_participant_group'] = None
 
         # Do the update!
         if json_participant['id_participant'] > 0:
             # Already existing
             try:
                 TeraParticipant.update(json_participant['id_participant'], json_participant)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return e.args, 500
+            except NameError as e:
+                return e.args, 500
         else:
             # New
             try:
@@ -134,21 +204,30 @@ class QueryParticipants(Resource):
                 TeraParticipant.insert(new_part)
                 # Update ID for further use
                 json_participant['id_participant'] = new_part.id_participant
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return e.args, 500
+            except NameError as e:
+                return e.args, 500
 
         # TODO: Publish update to everyone who is subscribed to sites update...
         update_participant = TeraParticipant.get_participant_by_id(json_participant['id_participant'])
+        update_participant_json = update_participant.to_json()
+        # update_participant_json['id_site'] = update_participant.participant_project.id_site
 
-        return jsonify([update_participant.to_json()])
+        return jsonify([update_participant_json])
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific participant',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete participant (only project admin can delete)',
+                        500: 'Database error.'})
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        parser = delete_parser
+
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()
@@ -158,7 +237,7 @@ class QueryParticipants(Resource):
         # Only project admins can delete a participant
         part = TeraParticipant.get_participant_by_id(id_todel)
 
-        if user_access.get_project_role(part.participant_participant_group.id_project) != 'admin':
+        if user_access.get_project_role(part.participant_project.id_project) != 'admin':
             return '', 403
 
         # If we are here, we are allowed to delete. Do so.
@@ -170,4 +249,3 @@ class QueryParticipants(Resource):
             return 'Database error', 500
 
         return '', 200
-

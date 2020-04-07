@@ -1,6 +1,7 @@
 from flask import jsonify, session, request
-from flask_restful import Resource, reqparse
-from modules.Globals import auth
+from flask_restx import Resource, reqparse, inputs
+from modules.LoginModule.LoginModule import user_multi_auth
+from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from libtera.db.models.TeraUser import TeraUser
@@ -8,31 +9,42 @@ from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.DBManager import DBManager
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_project', type=int, help='ID of the project to query')
+get_parser.add_argument('id', type=int, help='Alias for "id_project"')
+get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all projects')
+get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get all projects that are accessible')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('project', type=str, location='json', help='Project to create / update', required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='Project ID to delete', required=True)
+
 
 class QueryProjects(Resource):
 
-    def __init__(self, flaskModule = None):
-        Resource.__init__(self)
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get projects information. Only one of the ID parameter is supported and required at once',
+             responses={200: 'Success - returns list of participants',
+                        500: 'Database error'})
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_project', type=int, help='id_project')
-        parser.add_argument('id', type=int)
-        parser.add_argument('id_site', type=int, help='id_site')
-        parser.add_argument('user_uuid', type=str, help='user_uuid')
-        parser.add_argument('list', type=bool, help='Request list')
+        parser = get_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         args = parser.parse_args()
 
         projects = []
         # If we have no arguments, return all accessible projects
         # queried_user = current_user
-        if not any(args.values()):
-            projects = user_access.get_accessible_projects()
 
         if args['id']:
             args['id_project'] = args['id']
@@ -50,6 +62,8 @@ class QueryProjects(Resource):
         elif args['id_site']:
             # If we have a site id, query for projects of that site
             projects = user_access.query_projects_for_site(site_id=args['id_site'])
+        else:
+            projects = user_access.get_accessible_projects()
 
         try:
             projects_list = []
@@ -63,18 +77,27 @@ class QueryProjects(Resource):
                     project_json = project.to_json(minimal=True)
                     project_json['project_participant_group_count'] = \
                         len(TeraParticipantGroup.get_participant_group_for_project(project.id_project))
+                    project_json['project_participant_count'] = len(user_access.query_participants_for_project(
+                        project.id_project))
                     projects_list.append(project_json)
 
             return jsonify(projects_list)
         except InvalidRequestError:
             return '', 500
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create / update projects. id_project must be set to "0" to create a new '
+                         'project. A project can be created/modified if the user has admin rights to the '
+                         'related site.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t create/update the specified project',
+                        400: 'Badly formed JSON or missing fields(id_site or id_project) in the JSON body',
+                        500: 'Internal error occured when saving project'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('project', type=str, location='json', help='Project to create / update', required=True)
+        # parser = post_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_project = request.json['project']
@@ -84,10 +107,10 @@ class QueryProjects(Resource):
             return '', 400
 
         # Check if current user can modify the posted kit
-        # User can modify or add a kit if it is the site admin of that kit
-        if json_project['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True) and \
-                json_project['id_project'] > 0:
-            return '', 403
+        # User can modify or add a project if it is the project admin of that kit
+        # if json_project['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True) and \
+        #         json_project['id_project'] > 0:
+        #     return '', 403
 
         # Only site admins can create new projects
         if json_project['id_project'] == 0 and \
@@ -121,11 +144,15 @@ class QueryProjects(Resource):
 
         return jsonify([update_project.to_json()])
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific project',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete project (only site admin can delete)',
+                        500: 'Database error.'})
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        parser = delete_parser
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()

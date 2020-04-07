@@ -1,8 +1,5 @@
 from autobahn.twisted.websocket import WebSocketServerFactory
 
-# Same directory
-from .TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
-
 
 # Factory wrapper, using redis configuration
 class TwistedModuleWebSocketServerFactory(WebSocketServerFactory):
@@ -18,6 +15,12 @@ class TwistedModuleWebSocketServerFactory(WebSocketServerFactory):
         :param addr:
         :return:
         """
-        p = TeraWebSocketServerProtocol(config=self.config)
+        print("buildProtocol for : ", addr, self.protocol)
+        p = self.protocol(config=self.config)
+
+        # Avoid serving web page if connexion is not a websocket
+        # Will return status code 426 Upgrade Required
+        p.webStatus = False
+
         p.factory = self
         return p

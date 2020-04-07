@@ -1,10 +1,15 @@
 ﻿    <!DOCTYPE html>
     <html>
       <head>
-        <title>TeraPlus</title>
+        <title>TeraPlus:<%= teraplus_port %></title>
 		<link rel="stylesheet" href="css/jquery-ui.css">
 		<script src="external/jquery/jquery.js"></script>
 		<script src="js/jquery-ui.js"></script>
+		<script>
+		function getTeraPlusPort() {
+			return "<%= teraplus_port %>"
+		}
+		</script>
 		<!--<script src="js/jquery.layout.js"></script>-->
 		
         <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
@@ -12,10 +17,10 @@
 		<link rel="stylesheet" type="text/css" href="css/dialog-polyfill.css" />
 		
 		<!-- Assumes global locations for socket.io.js and easyrtc.js -->
-        <script src="/socket.io/socket.io.js"></script>
-        <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
-	<script type="text/javascript" src="js/teraplus.js"></script>
-        <script type="text/javascript" src="/easyrtc/labs/easyrtc_rates.js"></script>
+        <script src="js/socket.io.js"></script>
+        <script type="text/javascript" src="easyrtc/easyrtc.js"></script>
+		<script type="text/javascript" src="js/teraplus.js" teraplus_port="<%= teraplus_port %>"></script>
+        <script type="text/javascript" src="easyrtc/labs/easyrtc_rates.js"></script>
 		  <script>
 		  $( function() {
 			
@@ -80,7 +85,7 @@
 		   
 		  </script>
 
-      </head>
+	  </head>
       <body onload='initSystem();' onresize='resetVideosPos(); /*setTitle(0,"Vidéo Locale");*/' style="background-color:black; overflow: hidden;">
       
 			<!--<script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>-->
@@ -104,7 +109,7 @@
 			
 		<!--<div class="ui-layout-center" >-->
 		<div id="selfView" title="Vidéo locale" onmousemove="resetInactiveTimer();openButtons('navButtons');openButtons('enlargeButton');" onmouseleave="closeButtons('navButtons');closeButtons('enlargeButton');return false;"  style="overflow: hidden;">
-				<div class="titre">
+				<div class="titre" onclick="getVideoCoords(event,0);">
 					<label id="videoLabel" class="titre" style="color:white;background-color: rgba(0,140,0,0.5);">Vidéo locale</label>
 					<div id="statusAudio" class="overlay-top-left" >
 						<input id="config" type="image" alt="image" src="images/config.png" height=22 onclick="configDlg.dialog('open');closeButtons('navButtons');event.stopPropagation();" />

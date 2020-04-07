@@ -1,4 +1,4 @@
-from flask_restful import Resource, reqparse
+from flask_restx import Resource, reqparse
 from flask import jsonify
 from flask import request
 import base64
@@ -12,7 +12,7 @@ from libtera.db.Base import db
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraSessionType import TeraSessionType
-
+from modules.FlaskModule.FlaskModule import device_api_ns as api
 import uuid
 
 
@@ -23,8 +23,8 @@ class DeviceRegister(Resource):
     Administrators will need to put the device in a site and enable it before use.
     """
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
+    def __init__(self, _api, flaskModule=None):
+        Resource.__init__(self, _api)
         self.module = flaskModule
 
         self.ca_info = dict()
@@ -68,7 +68,7 @@ class DeviceRegister(Resource):
 
     def get(self):
         print(request)
-        return '', 200
+        return '', 403
 
     def post(self):
         print(request)
@@ -111,6 +111,10 @@ class DeviceRegister(Resource):
                 #     return 'Error processing request', 400
 
         elif request.content_type == 'application/json':
+
+            if 'device_info' not in request.json:
+                return 'Invalid content type', 400
+
             device_info = request.json['device_info']
 
             # Check if we have device name

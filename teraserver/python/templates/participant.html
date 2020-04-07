@@ -32,16 +32,14 @@
          var ellog = null;
          window.onload = function() {
             ellog = document.getElementById('log');
-            var wsuri = "wss://localhost:4040/wss?token={{ token }}"
-/*
-            if (window.location.protocol === "file:") {
-               wsuri = httpGet("https://127.0.0.1:4040/api/login")
-            } else {
-               wsuri = httpGet("https://" + window.location.hostname + ":4040/api/login")
-            }
+            var wsuri;
+
+
+            wsuri = httpGet("https://" + window.location.hostname + ":{{port}}/api/participant/login")
+
 
             wsuri = JSON.parse(wsuri)['websocket_url']
-*/
+
             if ("WebSocket" in window) {
                sock = new WebSocket(wsuri);
             } else if ("MozWebSocket" in window) {
@@ -78,7 +76,7 @@
       </script>
    </head>
    <body>
-      <h1>Participant WebSocket Echo Test</h1>
+      <h1>OpenTera PARTICIPANT WebSocket Test</h1>
       <noscript>You must enable JavaScript</noscript>
       <form>
          <p>Message: <input id="message" type="text" size="50" maxlength="50" value="Hello, world!"></p>

@@ -1,0 +1,19 @@
+[Unit]
+Description=OpenTeraVideoDispatchServer
+After=network-online.target
+
+[Service]
+User=letd2801
+Group=letd2801
+Environment=PYTHONPATH=/home/letd2801/work/opentera.git/teraserver/python
+ExecStart=/home/letd2801/work/opentera.git/teraserver/python/env/python-3.6/bin/python3 /home/letd2801/work/opentera.git/teraserver/python/services/VideoDispatch/VideoDispatchService.py 
+WorkingDirectory=/home/letd2801/work/opentera.git/teraserver/python/services/VideoDispatch
+StandardOutput=syslog+console
+StandardError=syslog+console
+Restart=always
+RestartSec=10s
+KillMode=process
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

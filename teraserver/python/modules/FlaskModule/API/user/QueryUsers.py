@@ -1,7 +1,8 @@
 from flask import jsonify, session, request
-from flask_restful import Resource, reqparse
+from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
-from modules.Globals import auth
+from modules.LoginModule.LoginModule import user_multi_auth
+from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
@@ -9,37 +10,57 @@ from flask_babel import gettext
 from libtera.db.DBManager import DBManager
 from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_user', type=int, help='ID of the user to query')
+get_parser.add_argument('user_uuid', type=str, help='User UUID to query')
+get_parser.add_argument('username', type=str, help='Username of the user to query')
+get_parser.add_argument('self', type=inputs.boolean, help='Query information about the currently logged user')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
+                                                          '(ID, name, enabled)')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='User ID to delete', required=True)
+
 
 class QueryUsers(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get user information. If no id specified, returns all accessible users',
+             responses={200: 'Success',
+                        500: 'Database error'})
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('user_uuid', type=str, help='uuid')
-        parser.add_argument('id_user', type=int, help='User ID')
-        parser.add_argument('list', type=bool, help='Request user list (ID, name, enabled)')
+        parser = get_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         args = parser.parse_args()
 
         user_access = DBManager.userAccess(current_user)
 
         users = []
-        # If we have no arguments, return all accessible users
-        if not any(args.values()):
-            users = user_access.get_accessible_users()
 
         # If we have a user_uuid, query for that user if accessible
         if args['user_uuid']:
             if args['user_uuid'] in user_access.get_accessible_users_uuids():
                 users.append(TeraUser.get_user_by_uuid(args['user_uuid']))
-        if args['id_user']:
+        elif args['id_user']:
             if args['id_user'] in user_access.get_accessible_users_ids():
                 users.append(current_user.get_user_by_id(args['id_user']))
+        elif args['self'] is not None:
+            users.append(current_user)
+        elif args['username'] is not None:
+            users.append(current_user.get_user_by_username(args['username']))
+        else:
+            # If we have no arguments, return all accessible users
+            users = user_access.get_accessible_users()
 
         # If we have a id_project, query for users of that project, if accessible
         # TODO
@@ -85,12 +106,22 @@ class QueryUsers(Resource):
         # except InvalidRequestError:
         #     return '', 500
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create / update user. id_user must be set to "0" to create a new user. User can be modified '
+                         'if: current user is super admin or user is part of a project which the current user is admin.'
+                         ' Promoting a user to super admin is restricted to super admins.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t create/update the specified user',
+                        400: 'Badly formed JSON or missing field(id_user or missing password when new user) in the '
+                             'JSON body',
+                        409: 'Username is already taken',
+                        500: 'Internal error when saving user'})
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
 
         user_access = DBManager.userAccess(current_user)
 
@@ -147,7 +178,7 @@ class QueryUsers(Resource):
                 new_user.from_json(json_user)
                 TeraUser.insert(new_user)
                 # Update ID User for further use
-                json_user['id_user'] = new_user.id_user;
+                json_user['id_user'] = new_user.id_user
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -182,11 +213,16 @@ class QueryUsers(Resource):
 
         return jsonify([update_user.to_json()])
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific user',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete user (only super admin can delete)',
+                        500: 'Database error.'})
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, help='ID to delete', required=True)
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         # userAccess = DBManager.userAccess(current_user)
 
         args = parser.parse_args()

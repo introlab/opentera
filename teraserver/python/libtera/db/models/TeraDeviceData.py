@@ -59,7 +59,9 @@ class TeraDeviceData(db.Model, BaseModel):
         import os
 
         # Clear all files in upload path
-        rmtree(upload_path)
+        if os.path.exists(upload_path):
+            rmtree(upload_path)
+
         os.mkdir(upload_path)
 
         base_session = TeraSession.get_session_by_name('Séance #1')

@@ -106,6 +106,54 @@ class TokenClientTest(unittest.TestCase):
         return registration_info
 
     @defer.inlineCallbacks
+    def _handle_device_login_with_bearer_token(self, token=None):
+
+        class LoginResponseReader(Protocol):
+            def __init__(self, finished):
+                self.finished = finished
+
+            def dataReceived(self, bytes):
+                # We should have our new certificate, json format
+                result = json.loads(bytes.decode('utf-8'))
+                print('dataReceived', result)
+                # Call deferred callback...
+                self.finished.callback(result)
+
+            def connectionLost(self, reason):
+                # print('Finished receiving body:', reason)
+                # reactor.stop()
+                # self.finished.callback(None)
+                pass
+
+        def gotResponse(response):
+            # Reading response
+            finished = defer.Deferred()
+            response.deliverBody(LoginResponseReader(finished))
+            return finished
+
+        def noResponse(failure):
+            failure.trap(ResponseFailed)
+            print(failure.value.reasons[0].getTraceback())
+            reactor.stop()
+
+        # agent = Agent(reactor, x509ClientTest.WithCertificatePolicy())
+        self.assertIsNotNone(self.agent)
+        self.assertIsNotNone(token)
+
+        d = self.agent.request(
+            b'GET',
+            b'https://localhost:4040/api/device/device_login',
+            Headers({'User-Agent': ['Twisted Web Client Example'],
+                     'Authorization': ['OpenTera ' + token]}),
+            None)
+
+        d.addCallbacks(gotResponse, noResponse)
+        val = yield d
+
+        print('after _handle_device_login')
+        return val
+
+    @defer.inlineCallbacks
     def _handle_device_login(self, token=None):
 
         class LoginResponseReader(Protocol):
@@ -280,7 +328,7 @@ class TokenClientTest(unittest.TestCase):
         return val
 
     # STEP 1 : REGISTER DEVICE AND GET A CERTIFICATE
-    def test_https_device_registration(self):
+    def test_http_device_registration(self):
         self._handle_device_registration()
         reactor.run()
 
@@ -294,7 +342,7 @@ class TokenClientTest(unittest.TestCase):
             self.assertTrue(False)
 
     # STEP 3 : LOGIN WITH TOKEN
-    def test_https_device_login(self):
+    def test_http_device_login(self):
         token = self.getToken()
         print(token)
 
@@ -314,8 +362,29 @@ class TokenClientTest(unittest.TestCase):
         d.addCallback(login_callback, self)
         reactor.run()
 
+    # STEP 3.1: LOGIN WITH BEARER TOKEN
+    def test_http_device_login_with_bearer_token(self):
+        token = self.getToken()
+        print(token)
+
+        def login_callback(result, myself: TokenClientTest):
+            print('login_callback', result, myself)
+
+            # Test result
+            myself.assertIsNotNone(result)
+
+            # Job done!
+            reactor.stop()
+
+        # Create the ssl agent
+        self.agent = Agent(reactor, TokenClientTest.NoCertificatePolicy())
+
+        d = self._handle_device_login_with_bearer_token(token)
+        d.addCallback(login_callback, self)
+        reactor.run()
+
     # STEP 4 : Login and create session ...
-    def test_https_device_create_session(self):
+    def test_http_device_create_session(self):
         token = self.getToken()
         print(token)
 
@@ -346,7 +415,7 @@ class TokenClientTest(unittest.TestCase):
 
     # STEP 5 : Upload a file
     # Device must be manually enabled first...
-    def test_https_device_upload(self):
+    def test_http_device_upload(self):
 
         token = self.getToken()
         print(token)

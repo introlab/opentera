@@ -1,38 +1,49 @@
 from flask import jsonify, session, request
-from flask_restful import Resource, reqparse
-from modules.Globals import auth
+from flask_restx import Resource, reqparse
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent
-from modules.LoginModule.LoginModule import LoginModule, current_device
+from modules.LoginModule.LoginModule import LoginModule
 from libtera.db.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
+from modules.FlaskModule.FlaskModule import device_api_ns as api
+from libtera.db.models.TeraDevice import TeraDevice
+
+
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('token', type=str, help='Secret Token')
+get_parser.add_argument('id_session', type=int, help='Session ID', required=True)
+
+post_parser = api.parser()
 
 
 class DeviceQuerySessionEvents(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
+    def __init__(self, _api, flaskModule=None):
+        Resource.__init__(self, _api)
         self.module = flaskModule
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
+    @api.expect(get_parser)
+    @api.doc(description='Get session events',
+             responses={200: 'Success',
+                        500: 'Required parameter is missing',
+                        501: 'Not implemented',
+                        403: 'Logged device doesn\'t have permission to access the requested data'})
     def get(self):
+
+        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
         device_access = DBManager.deviceAccess(current_device)
-
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_session', type=int, help='id_session')
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         sessions_events = []
-        # Can't query sessions event, unless we have a parameter - id_session
-        if not any(args.values()):
-            return '', 500
-        elif args['id_session']:
-            parent_session = device_access.query_session(args['id_session'])
-            if not parent_session:
-                return '', 403
-            sessions_events = TeraSessionEvent.get_events_for_session(args['id_session'])
+
+        parent_session = device_access.query_session(args['id_session'])
+        if not parent_session:
+            return '', 403
+
+        sessions_events = TeraSessionEvent.get_events_for_session(args['id_session'])
 
         try:
             events_list = []
@@ -45,7 +56,7 @@ class DeviceQuerySessionEvents(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('session_event', type=str, location='json', help='Event to create / update',
@@ -98,6 +109,6 @@ class DeviceQuerySessionEvents(Resource):
 
         return jsonify([update_event.to_json()])
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     def delete(self):
         return '', 403

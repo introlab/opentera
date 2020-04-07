@@ -31,7 +31,7 @@ from modules.TwistedModule.TwistedModule import TwistedModule
 from libtera.ConfigManager import ConfigManager
 from modules.Globals import db_man
 from modules.UserManagerModule.UserManagerModule import UserManagerModule
-from modules.WebRTCModule.WebRTCModule import WebRTCModule
+
 
 import os
 
@@ -71,6 +71,36 @@ def verify_file_upload_directory(config: ConfigManager, create=True):
         else:
             return None
     return file_upload_path
+
+
+def init_shared_variables(config):
+    # Create user token
+    from libtera.db.models.TeraServerSettings import TeraServerSettings
+
+    # Dynamic key for users, updated at every restart (for now)
+    # Server should rotate key every hour, day?
+    user_token_key = TeraServerSettings.generate_token_key(32)
+    service_token_key = TeraServerSettings.generate_token_key(32)
+
+    # Create redis client
+    import redis
+    redis_client = redis.Redis(host=config.redis_config['hostname'], port=config.redis_config['port'],
+                               db=config.redis_config['db'])
+
+    # Set API Token Keys
+    from modules.RedisVars import RedisVars
+    # Set USER
+    redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, user_token_key)
+
+    # Set SERVICE
+    redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, service_token_key)
+
+    # Set DEVICE
+    redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey,
+                     TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerDeviceTokenKey))
+    # Set PARTICIPANT
+    redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey,
+                     TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerParticipantTokenKey))
 
 
 if __name__ == '__main__':
@@ -126,21 +156,22 @@ if __name__ == '__main__':
     # Create default values, if required
     db_man.create_defaults(config=config_man)
 
+    # Create Redis variables shared with services
+    init_shared_variables(config=config_man)
+
     # Main Flask module
     flask_module = FlaskModule(config_man)
 
-    # LOGIN MANAGER
-    ###############
+    # LOGIN MANAGER, must be initialized after Flask
+    #################################################
     login_module = LoginModule(config_man)
 
-    # Twisted will run flask
+    # Twisted will run flask, must be initialized after Flask
+    #########################################################
     twisted_module = TwistedModule(config_man)
 
     user_manager_module = UserManagerModule(config_man)
 
-    # WebRTCModule
-    webrtc_module = WebRTCModule(config_man)
-    
     # This is blocking, running event loop
     twisted_module.run()
 

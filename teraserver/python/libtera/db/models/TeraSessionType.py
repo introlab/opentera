@@ -1,6 +1,7 @@
 from libtera.db.Base import db, BaseModel
 from enum import Enum, unique
 
+
 class TeraSessionType(db.Model, BaseModel):
     @unique
     class SessionCategoryEnum(Enum):
@@ -34,7 +35,7 @@ class TeraSessionType(db.Model, BaseModel):
         ignore_fields.extend(['session_type_projects', 'session_type_devices_types', 'SessionCategoryEnum'])
         if minimal:
             ignore_fields.extend(['session_type_prefix', 'session_type_online', 'session_type_multiusers',
-                                  'session_type_profile'])
+                                  'session_type_profile', 'session_type_color'])
         rval = super().to_json(ignore_fields=ignore_fields)
         return rval
 

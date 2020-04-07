@@ -1,8 +1,11 @@
-from flask_restful import Resource, reqparse
+from flask_restx import Resource, reqparse
+
+from modules.FlaskModule.Views.Upload import ALLOWED_EXTENSIONS
 from modules.LoginModule.LoginModule import LoginModule, current_device
 from flask import request, redirect, flash
 from werkzeug.utils import secure_filename
 from modules.FlaskModule.FlaskModule import flask_app
+from modules.FlaskModule.FlaskModule import device_api_ns as api
 
 from libtera.db.models.TeraDeviceData import TeraDeviceData
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent
@@ -21,17 +24,17 @@ def allowed_file(filename):
 
 class DeviceUpload(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
+    def __init__(self, _api, flaskModule=None):
+        Resource.__init__(self, _api)
         self.module = flaskModule
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     def get(self):
         print(request)
         print('current_device', current_device)
         return '', 200
 
-    @LoginModule.token_or_certificate_required
+    @LoginModule.device_token_or_certificate_required
     def post(self):
         print(request)
         print('current_device', current_device)

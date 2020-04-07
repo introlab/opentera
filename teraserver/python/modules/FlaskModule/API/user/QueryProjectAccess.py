@@ -1,25 +1,41 @@
 from flask import jsonify, session, request
-from flask_restful import Resource, reqparse
+from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
-from modules.Globals import auth
+from modules.LoginModule.LoginModule import user_multi_auth
+from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.DBManager import DBManager
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all projects roles')
+get_parser.add_argument('id_project', type=int, help='ID of the project from which to request all users roles')
+get_parser.add_argument('admins', type=inputs.boolean,
+                        help='Flag to limit to projects from which the user is an admin or '
+                             'users in project that have the admin role')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('project_access', type=str, location='json',
+                         help='Project access to create / update', required=True)
+
 
 class QueryProjectAccess(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get user roles for projects. Only one ID parameter required and supported at once.',
+             responses={200: 'Success - returns list of users roles in projects',
+                        400: 'Required parameter is missing (must have at least one id)',
+                        500: 'Error occured when loading project roles'})
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_user', type=int, help='User ID')
-        parser.add_argument('id_project', type=int, help='Site ID')
+        parser = get_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         args = parser.parse_args()
 
@@ -33,12 +49,13 @@ class QueryProjectAccess(Resource):
             user_id = args['id_user']
 
             if user_id in user_access.get_accessible_users_ids():
-                access = user_access.query_project_access_for_user(user_id=user_id)
+                access = user_access.query_project_access_for_user(user_id=user_id,
+                                                                   admin_only=args['admins'] is not None)
 
         # Query access for project id
         if args['id_project']:
             project_id = args['id_project']
-            access = user_access.query_access_for_project(project_id=project_id)
+            access = user_access.query_access_for_project(project_id=project_id, admin_only=args['admins'] is not None)
 
         if access is not None:
             access_list = []
@@ -49,13 +66,17 @@ class QueryProjectAccess(Resource):
 
         return 'Unknown error', 500
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create/update project access for an user.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t modify this project or user access (project admin access required)',
+                        400: 'Badly formed JSON or missing fields(id_user or id_project) in the JSON body',
+                        500: 'Database error'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('project_access', type=str, location='json', help='Project access to create / update',
-                            required=True)
+        parser = post_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_projects = request.json['project_access']
@@ -90,8 +111,7 @@ class QueryProjectAccess(Resource):
 
         return jsonify(json_rval)
 
-    @auth.login_required
-    def delete(self):
-
-        return '', 501
-
+    # @user_multi_auth.login_required
+    # def delete(self):
+    #
+    #     return '', 501

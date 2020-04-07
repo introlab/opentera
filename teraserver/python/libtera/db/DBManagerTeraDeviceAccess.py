@@ -20,11 +20,15 @@ class DBManagerTeraDeviceAccess:
     def query_session(self, session_id: int):
         sessions = []
         for part in self.device.device_participants:
-            for ses in part.device_participant_participant.participant_sessions:
+            for ses in part.participant_sessions:
                 if ses.id_session == session_id:
                     sessions = [TeraSession.get_session_by_id(session_id)]
                     return sessions
         return sessions
+
+    def get_accessible_sessions(self):
+        query = TeraSession.query.filter(TeraSession.id_creator_device == self.device.id_device)
+        return query.all()
 
     def get_accessible_participants(self, admin_only=False):
         return self.device.device_participants
@@ -44,7 +48,7 @@ class DBManagerTeraDeviceAccess:
         project_list = []
         # Fetch all projects for all participants
         for part in participants:
-            project_list.append(part.device_participant_participant.participant_participant_group.id_project)
+            project_list.append(part.id_project)
 
         session_types = TeraSessionType.query.join(TeraSessionType.session_type_projects).join(
             TeraSessionType.session_type_devices_types).filter(TeraProject.id_project.in_(project_list))\
@@ -58,3 +62,10 @@ class DBManagerTeraDeviceAccess:
             types.append(my_type.id_session_type)
         return types
 
+    def get_accessible_assets(self, id_asset=None):
+        from libtera.db.models.TeraAsset import TeraAsset
+        query = TeraAsset.query.filter(TeraAsset.id_device == self.device.id_device)
+        if id_asset:
+            query = query.filter(TeraAsset.id_asset == id_asset)
+
+        return query.all()

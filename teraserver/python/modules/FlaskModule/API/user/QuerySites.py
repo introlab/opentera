@@ -1,28 +1,42 @@
 from flask import jsonify, session, request
-from flask_restful import Resource, reqparse
+from flask_restx import Resource, reqparse
 from sqlalchemy import exc
-from modules.Globals import auth
+from modules.LoginModule.LoginModule import user_multi_auth
+from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.DBManager import DBManager
 
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('id_site', type=int, help='ID of the site to query')
+get_parser.add_argument('id', type=int, help='Alias for "id_site"')
+get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all related sites')
+get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get all sites that are accessible')
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument('site', type=str, location='json', help='Site to create / update', required=True)
+
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='Site ID to delete', required=True)
+
 
 class QuerySites(Resource):
 
-    def __init__(self, flaskModule=None):
-        Resource.__init__(self)
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(get_parser)
+    @api.doc(description='Get site information. Only one of the ID parameter is supported and required at once',
+             responses={200: 'Success - returns list of sites',
+                        500: 'Database error'})
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id_site', type=int, help='id_site', required=False)
-        parser.add_argument('id', type=int, help='id_site', required=False)
-        parser.add_argument('id_device', type=int, help='ID Device')
-        parser.add_argument('user_uuid', type=str, help='uuid')
+        parser = get_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         args = parser.parse_args()
 
@@ -66,12 +80,20 @@ class QuerySites(Resource):
         except InvalidRequestError:
             return '', 500
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(post_parser)
+    @api.doc(description='Create / update site. id_site must be set to "0" to create a new '
+                         'site. A site can be created/modified if the user has admin rights to the site itself or is'
+                         'superadmin.',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t create/update the specified site',
+                        400: 'Badly formed JSON or missing field(id_site) in the JSON body',
+                        500: 'Internal error when saving site'})
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('site', type=str, location='json', help='Site to create / update', required=True)
 
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_site = request.json['site']
@@ -112,11 +134,16 @@ class QuerySites(Resource):
 
         return jsonify([update_site.to_json()])
 
-    @auth.login_required
+    @user_multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific site',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete site (only super admin can delete)',
+                        500: 'Database error.'})
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
-        current_user = TeraUser.get_user_by_uuid(session['user_id'])
+        parser = delete_parser
+
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
 
         args = parser.parse_args()
         id_todel = args['id']

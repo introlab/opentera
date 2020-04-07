@@ -7,28 +7,25 @@ psycopg2-binary
 python-oauth2
 flask
 flask-sqlalchemy
-flask-oauthlib
 flask-login
+flask-login-multi
 flask-httpauth
 flask-socketio
 flask-session
-flask-restful
+flask-restx
 flask-security
 flask-babel
 flask-migrate
+flask-swagger-ui
 # flask-jwt
 redis
 txredisapi
-eventlet
-gevent
-gevent-websocket
 passlib
 bcrypt
 wtforms
 PyInstaller
 pyopenssl
 service_identity
-jsonrpcclient
 # jwt
 PyJWT
 pypiwin32; sys_platform == 'win32'

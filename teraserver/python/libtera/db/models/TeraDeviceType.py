@@ -9,12 +9,13 @@ class TeraDeviceType(db.Model, BaseModel):
         VIDEOCONFERENCE = 1
         ROBOT = 2
         SENSOR = 3
+        BUREAU_ACTIF = 4
 
         def describe(self):
             return self.name, self.value
 
     __tablename__ = 't_devices_types'
-    id_device_type = db.Column(db.Integer, db.Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
+    id_device_type = db.Column(db.Integer, db.Sequence('id_device_type_sequence'), primary_key=True, autoincrement=True)
     device_type_name = db.Column(db.String, nullable=False)
 
     device_type_session_types = db.relationship("TeraSessionTypeDeviceType")
@@ -45,5 +46,7 @@ class TeraDeviceType(db.Model, BaseModel):
             name = 'Capteur'
         if self.id_device_type == TeraDeviceType.DeviceTypeEnum.ROBOT.value:
             name = 'Robot'
+        if self.id_device_type == TeraDeviceType.DeviceTypeEnum.BUREAU_ACTIF.value:
+            name = 'Bureau Actif'
         return name
 
