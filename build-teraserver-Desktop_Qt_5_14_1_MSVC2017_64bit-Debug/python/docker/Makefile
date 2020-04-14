@@ -179,25 +179,6 @@ docker-translations\fast:
 .PHONY : docker-translations\fast
 
 # Convenience name for target.
-python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule:
-	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
-	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule
-	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker
-.PHONY : python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule
-
-# Convenience name for target.
-docker_ServerCommand.proto.target: python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule
-
-.PHONY : docker_ServerCommand.proto.target
-
-# fast build rule for target.
-docker_ServerCommand.proto.target\fast:
-	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
-	$(MAKE) -f python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build
-	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker
-.PHONY : docker_ServerCommand.proto.target\fast
-
-# Convenience name for target.
 python\docker\CMakeFiles\docker_CreateSession.proto.target.dir\rule:
 	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
 	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_CreateSession.proto.target.dir\rule
@@ -236,6 +217,25 @@ docker_DeviceEvent.proto.target\fast:
 .PHONY : docker_DeviceEvent.proto.target\fast
 
 # Convenience name for target.
+python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\rule:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\rule
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker
+.PHONY : python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\rule
+
+# Convenience name for target.
+docker_JoinSessionEvent.proto.target: python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\rule
+
+.PHONY : docker_JoinSessionEvent.proto.target
+
+# fast build rule for target.
+docker_JoinSessionEvent.proto.target\fast:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\build
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker
+.PHONY : docker_JoinSessionEvent.proto.target\fast
+
+# Convenience name for target.
 python\docker\CMakeFiles\docker_RPCMessage.proto.target.dir\rule:
 	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
 	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_RPCMessage.proto.target.dir\rule
@@ -272,6 +272,44 @@ docker_Result.proto.target\fast:
 	$(MAKE) -f python\docker\CMakeFiles\docker_Result.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_Result.proto.target.dir\build
 	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker
 .PHONY : docker_Result.proto.target\fast
+
+# Convenience name for target.
+python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker
+.PHONY : python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule
+
+# Convenience name for target.
+docker_ServerCommand.proto.target: python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule
+
+.PHONY : docker_ServerCommand.proto.target
+
+# fast build rule for target.
+docker_ServerCommand.proto.target\fast:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker
+.PHONY : docker_ServerCommand.proto.target\fast
+
+# Convenience name for target.
+python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\rule:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\rule
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker
+.PHONY : python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\rule
+
+# Convenience name for target.
+docker_StopSessionEvent.proto.target: python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\rule
+
+.PHONY : docker_StopSessionEvent.proto.target
+
+# fast build rule for target.
+docker_StopSessionEvent.proto.target\fast:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\build
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker
+.PHONY : docker_StopSessionEvent.proto.target\fast
 
 # Convenience name for target.
 python\docker\CMakeFiles\docker_TeraMessage.proto.target.dir\rule:
@@ -363,10 +401,12 @@ help:
 	@echo ... docker-translations
 	@echo ... docker_CreateSession.proto.target
 	@echo ... docker_DeviceEvent.proto.target
+	@echo ... docker_JoinSessionEvent.proto.target
 	@echo ... docker_ParticipantEvent.proto.target
 	@echo ... docker_RPCMessage.proto.target
 	@echo ... docker_Result.proto.target
 	@echo ... docker_ServerCommand.proto.target
+	@echo ... docker_StopSessionEvent.proto.target
 	@echo ... docker_TeraMessage.proto.target
 	@echo ... docker_UserEvent.proto.target
 .PHONY : help

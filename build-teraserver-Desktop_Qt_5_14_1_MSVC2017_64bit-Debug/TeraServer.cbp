@@ -87,6 +87,16 @@
 					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="JoinSessionEvent.proto.target">
+				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/messages"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 JoinSessionEvent.proto.target"/>
+					<CompileFile command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
+					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="DeviceEvent.proto.target">
 				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/messages"/>
 				<Option type="4"/>
@@ -97,21 +107,21 @@
 					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="ParticipantEvent.proto.target">
-				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/messages"/>
-				<Option type="4"/>
-				<MakeCommands>
-					<Build command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 ParticipantEvent.proto.target"/>
-					<CompileFile command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
-					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
-				</MakeCommands>
-			</Target>
 			<Target title="TeraMessage.proto.target">
 				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/messages"/>
 				<Option type="4"/>
 				<MakeCommands>
 					<Build command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 TeraMessage.proto.target"/>
+					<CompileFile command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
+					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ParticipantEvent.proto.target">
+				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/messages"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 ParticipantEvent.proto.target"/>
 					<CompileFile command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
 					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
@@ -157,6 +167,16 @@
 					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="StopSessionEvent.proto.target">
+				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/messages"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 StopSessionEvent.proto.target"/>
+					<CompileFile command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
+					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="UserEvent.proto.target">
 				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/messages"/>
 				<Option type="4"/>
@@ -197,16 +217,6 @@
 					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="docker_ServerCommand.proto.target">
-				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/docker"/>
-				<Option type="4"/>
-				<MakeCommands>
-					<Build command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 docker_ServerCommand.proto.target"/>
-					<CompileFile command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>
-					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>
-				</MakeCommands>
-			</Target>
 			<Target title="docker_CreateSession.proto.target">
 				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/docker"/>
 				<Option type="4"/>
@@ -227,6 +237,16 @@
 					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="docker_JoinSessionEvent.proto.target">
+				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/docker"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 docker_JoinSessionEvent.proto.target"/>
+					<CompileFile command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>
+					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="docker_RPCMessage.proto.target">
 				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/docker"/>
 				<Option type="4"/>
@@ -242,6 +262,26 @@
 				<Option type="4"/>
 				<MakeCommands>
 					<Build command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 docker_Result.proto.target"/>
+					<CompileFile command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>
+					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="docker_ServerCommand.proto.target">
+				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/docker"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 docker_ServerCommand.proto.target"/>
+					<CompileFile command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>
+					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="docker_StopSessionEvent.proto.target">
+				<Option working_dir="E:/Documents/GitHub/opentera/build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug/python/docker"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 docker_StopSessionEvent.proto.target"/>
 					<CompileFile command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>
 					<DistClean command="jom /NOLOGO /f E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\docker\Makefile VERBOSE=1 clean"/>

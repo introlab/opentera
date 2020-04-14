@@ -79,7 +79,7 @@ class ConfigManager:
     @staticmethod
     def validate_backend_config(config):
         rval = True
-        required_fields = ['hostname', 'port', 'secure_key']
+        required_fields = ['hostname', 'port']
         for field in required_fields:
             if field not in config:
                 print('ERROR: Backend Config - missing field ' + field)

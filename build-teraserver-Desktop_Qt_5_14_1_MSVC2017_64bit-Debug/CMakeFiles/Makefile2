@@ -132,11 +132,13 @@ python\docker\preinstall:
 python\docker\clean: python\docker\CMakeFiles\docker-Dockerfile.dir\clean
 python\docker\clean: python\docker\CMakeFiles\docker_ParticipantEvent.proto.target.dir\clean
 python\docker\clean: python\docker\CMakeFiles\docker-translations.dir\clean
-python\docker\clean: python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\clean
 python\docker\clean: python\docker\CMakeFiles\docker_CreateSession.proto.target.dir\clean
 python\docker\clean: python\docker\CMakeFiles\docker_DeviceEvent.proto.target.dir\clean
+python\docker\clean: python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\clean
 python\docker\clean: python\docker\CMakeFiles\docker_RPCMessage.proto.target.dir\clean
 python\docker\clean: python\docker\CMakeFiles\docker_Result.proto.target.dir\clean
+python\docker\clean: python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\clean
+python\docker\clean: python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\clean
 python\docker\clean: python\docker\CMakeFiles\docker_TeraMessage.proto.target.dir\clean
 python\docker\clean: python\docker\CMakeFiles\docker_UserEvent.proto.target.dir\clean
 python\docker\clean: python\docker\CMakeFiles\docker-messages.dir\clean
@@ -178,13 +180,15 @@ python\messages\preinstall:
 
 # Recursive "clean" directory target.
 python\messages\clean: python\messages\CMakeFiles\CreateSession.proto.target.dir\clean
+python\messages\clean: python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\clean
 python\messages\clean: python\messages\CMakeFiles\DeviceEvent.proto.target.dir\clean
-python\messages\clean: python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\clean
 python\messages\clean: python\messages\CMakeFiles\TeraMessage.proto.target.dir\clean
+python\messages\clean: python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\clean
 python\messages\clean: python\messages\CMakeFiles\python-messages.dir\clean
 python\messages\clean: python\messages\CMakeFiles\RPCMessage.proto.target.dir\clean
 python\messages\clean: python\messages\CMakeFiles\ServerCommand.proto.target.dir\clean
 python\messages\clean: python\messages\CMakeFiles\Result.proto.target.dir\clean
+python\messages\clean: python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\clean
 python\messages\clean: python\messages\CMakeFiles\UserEvent.proto.target.dir\clean
 
 .PHONY : python\messages\clean
@@ -327,6 +331,33 @@ python\messages\CMakeFiles\CreateSession.proto.target.dir\clean:
 .PHONY : python\messages\CMakeFiles\CreateSession.proto.target.dir\clean
 
 #=============================================================================
+# Target rules for target python/messages/CMakeFiles/JoinSessionEvent.proto.target.dir
+
+# All Build rule for target.
+python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\all: python\env\CMakeFiles\python-env.dir\all
+	$(MAKE) -f python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\depend
+	$(MAKE) -f python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles --progress-num= "Built target JoinSessionEvent.proto.target"
+.PHONY : python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\all
+
+# Build rule for subdir invocation for target.
+python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 1
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\all
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
+.PHONY : python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\rule
+
+# Convenience name for target.
+JoinSessionEvent.proto.target: python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\rule
+
+.PHONY : JoinSessionEvent.proto.target
+
+# clean rule for target.
+python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\clean:
+	$(MAKE) -f python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\clean
+.PHONY : python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\clean
+
+#=============================================================================
 # Target rules for target python/messages/CMakeFiles/DeviceEvent.proto.target.dir
 
 # All Build rule for target.
@@ -352,33 +383,6 @@ DeviceEvent.proto.target: python\messages\CMakeFiles\DeviceEvent.proto.target.di
 python\messages\CMakeFiles\DeviceEvent.proto.target.dir\clean:
 	$(MAKE) -f python\messages\CMakeFiles\DeviceEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\DeviceEvent.proto.target.dir\clean
 .PHONY : python\messages\CMakeFiles\DeviceEvent.proto.target.dir\clean
-
-#=============================================================================
-# Target rules for target python/messages/CMakeFiles/ParticipantEvent.proto.target.dir
-
-# All Build rule for target.
-python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\all: python\env\CMakeFiles\python-env.dir\all
-	$(MAKE) -f python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\depend
-	$(MAKE) -f python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles --progress-num= "Built target ParticipantEvent.proto.target"
-.PHONY : python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\all
-
-# Build rule for subdir invocation for target.
-python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 1
-	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\all
-	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
-.PHONY : python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule
-
-# Convenience name for target.
-ParticipantEvent.proto.target: python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule
-
-.PHONY : ParticipantEvent.proto.target
-
-# clean rule for target.
-python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\clean:
-	$(MAKE) -f python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\clean
-.PHONY : python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\clean
 
 #=============================================================================
 # Target rules for target python/messages/CMakeFiles/TeraMessage.proto.target.dir
@@ -408,18 +412,47 @@ python\messages\CMakeFiles\TeraMessage.proto.target.dir\clean:
 .PHONY : python\messages\CMakeFiles\TeraMessage.proto.target.dir\clean
 
 #=============================================================================
+# Target rules for target python/messages/CMakeFiles/ParticipantEvent.proto.target.dir
+
+# All Build rule for target.
+python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\all: python\env\CMakeFiles\python-env.dir\all
+	$(MAKE) -f python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\depend
+	$(MAKE) -f python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles --progress-num= "Built target ParticipantEvent.proto.target"
+.PHONY : python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\all
+
+# Build rule for subdir invocation for target.
+python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 1
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\all
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
+.PHONY : python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule
+
+# Convenience name for target.
+ParticipantEvent.proto.target: python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule
+
+.PHONY : ParticipantEvent.proto.target
+
+# clean rule for target.
+python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\clean:
+	$(MAKE) -f python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\clean
+.PHONY : python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\clean
+
+#=============================================================================
 # Target rules for target python/messages/CMakeFiles/python-messages.dir
 
 # All Build rule for target.
-python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\CreateSession.proto.target.dir\all
 python\messages\CMakeFiles\python-messages.dir\all: python\env\CMakeFiles\python-env.dir\all
+python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\CreateSession.proto.target.dir\all
+python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\all
 python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\DeviceEvent.proto.target.dir\all
-python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\all
 python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\TeraMessage.proto.target.dir\all
-python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\RPCMessage.proto.target.dir\all
-python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\UserEvent.proto.target.dir\all
-python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\Result.proto.target.dir\all
+python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\all
 python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\ServerCommand.proto.target.dir\all
+python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\RPCMessage.proto.target.dir\all
+python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\Result.proto.target.dir\all
+python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\all
+python\messages\CMakeFiles\python-messages.dir\all: python\messages\CMakeFiles\UserEvent.proto.target.dir\all
 	$(MAKE) -f python\messages\CMakeFiles\python-messages.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\python-messages.dir\depend
 	$(MAKE) -f python\messages\CMakeFiles\python-messages.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\python-messages.dir\build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles --progress-num= "Built target python-messages"
@@ -522,6 +555,33 @@ Result.proto.target: python\messages\CMakeFiles\Result.proto.target.dir\rule
 python\messages\CMakeFiles\Result.proto.target.dir\clean:
 	$(MAKE) -f python\messages\CMakeFiles\Result.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\Result.proto.target.dir\clean
 .PHONY : python\messages\CMakeFiles\Result.proto.target.dir\clean
+
+#=============================================================================
+# Target rules for target python/messages/CMakeFiles/StopSessionEvent.proto.target.dir
+
+# All Build rule for target.
+python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\all: python\env\CMakeFiles\python-env.dir\all
+	$(MAKE) -f python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\depend
+	$(MAKE) -f python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles --progress-num= "Built target StopSessionEvent.proto.target"
+.PHONY : python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\all
+
+# Build rule for subdir invocation for target.
+python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 1
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\all
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
+.PHONY : python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\rule
+
+# Convenience name for target.
+StopSessionEvent.proto.target: python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\rule
+
+.PHONY : StopSessionEvent.proto.target
+
+# clean rule for target.
+python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\clean:
+	$(MAKE) -f python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\clean
+.PHONY : python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\clean
 
 #=============================================================================
 # Target rules for target python/messages/CMakeFiles/UserEvent.proto.target.dir
@@ -632,33 +692,6 @@ python\docker\CMakeFiles\docker-translations.dir\clean:
 .PHONY : python\docker\CMakeFiles\docker-translations.dir\clean
 
 #=============================================================================
-# Target rules for target python/docker/CMakeFiles/docker_ServerCommand.proto.target.dir
-
-# All Build rule for target.
-python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\all:
-	$(MAKE) -f python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\depend
-	$(MAKE) -f python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles --progress-num= "Built target docker_ServerCommand.proto.target"
-.PHONY : python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\all
-
-# Build rule for subdir invocation for target.
-python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
-	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\all
-	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
-.PHONY : python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule
-
-# Convenience name for target.
-docker_ServerCommand.proto.target: python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule
-
-.PHONY : docker_ServerCommand.proto.target
-
-# clean rule for target.
-python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\clean:
-	$(MAKE) -f python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\clean
-.PHONY : python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\clean
-
-#=============================================================================
 # Target rules for target python/docker/CMakeFiles/docker_CreateSession.proto.target.dir
 
 # All Build rule for target.
@@ -713,6 +746,33 @@ python\docker\CMakeFiles\docker_DeviceEvent.proto.target.dir\clean:
 .PHONY : python\docker\CMakeFiles\docker_DeviceEvent.proto.target.dir\clean
 
 #=============================================================================
+# Target rules for target python/docker/CMakeFiles/docker_JoinSessionEvent.proto.target.dir
+
+# All Build rule for target.
+python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\all:
+	$(MAKE) -f python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\depend
+	$(MAKE) -f python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles --progress-num= "Built target docker_JoinSessionEvent.proto.target"
+.PHONY : python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\all
+
+# Build rule for subdir invocation for target.
+python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\all
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
+.PHONY : python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\rule
+
+# Convenience name for target.
+docker_JoinSessionEvent.proto.target: python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\rule
+
+.PHONY : docker_JoinSessionEvent.proto.target
+
+# clean rule for target.
+python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\clean:
+	$(MAKE) -f python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\clean
+.PHONY : python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\clean
+
+#=============================================================================
 # Target rules for target python/docker/CMakeFiles/docker_RPCMessage.proto.target.dir
 
 # All Build rule for target.
@@ -765,6 +825,60 @@ docker_Result.proto.target: python\docker\CMakeFiles\docker_Result.proto.target.
 python\docker\CMakeFiles\docker_Result.proto.target.dir\clean:
 	$(MAKE) -f python\docker\CMakeFiles\docker_Result.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_Result.proto.target.dir\clean
 .PHONY : python\docker\CMakeFiles\docker_Result.proto.target.dir\clean
+
+#=============================================================================
+# Target rules for target python/docker/CMakeFiles/docker_ServerCommand.proto.target.dir
+
+# All Build rule for target.
+python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\all:
+	$(MAKE) -f python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\depend
+	$(MAKE) -f python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles --progress-num= "Built target docker_ServerCommand.proto.target"
+.PHONY : python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\all
+
+# Build rule for subdir invocation for target.
+python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\all
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
+.PHONY : python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule
+
+# Convenience name for target.
+docker_ServerCommand.proto.target: python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\rule
+
+.PHONY : docker_ServerCommand.proto.target
+
+# clean rule for target.
+python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\clean:
+	$(MAKE) -f python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\clean
+.PHONY : python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\clean
+
+#=============================================================================
+# Target rules for target python/docker/CMakeFiles/docker_StopSessionEvent.proto.target.dir
+
+# All Build rule for target.
+python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\all:
+	$(MAKE) -f python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\depend
+	$(MAKE) -f python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles --progress-num= "Built target docker_StopSessionEvent.proto.target"
+.PHONY : python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\all
+
+# Build rule for subdir invocation for target.
+python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\all
+	$(CMAKE_COMMAND) -E cmake_progress_start E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles 0
+.PHONY : python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\rule
+
+# Convenience name for target.
+docker_StopSessionEvent.proto.target: python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\rule
+
+.PHONY : docker_StopSessionEvent.proto.target
+
+# clean rule for target.
+python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\clean:
+	$(MAKE) -f python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\clean
+.PHONY : python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\clean
 
 #=============================================================================
 # Target rules for target python/docker/CMakeFiles/docker_TeraMessage.proto.target.dir
@@ -824,14 +938,16 @@ python\docker\CMakeFiles\docker_UserEvent.proto.target.dir\clean:
 # Target rules for target python/docker/CMakeFiles/docker-messages.dir
 
 # All Build rule for target.
-python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\all
+python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_DeviceEvent.proto.target.dir\all
+python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\all
 python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_CreateSession.proto.target.dir\all
 python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_RPCMessage.proto.target.dir\all
 python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_Result.proto.target.dir\all
-python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_DeviceEvent.proto.target.dir\all
-python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_TeraMessage.proto.target.dir\all
 python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_ParticipantEvent.proto.target.dir\all
 python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_UserEvent.proto.target.dir\all
+python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\all
+python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_TeraMessage.proto.target.dir\all
+python\docker\CMakeFiles\docker-messages.dir\all: python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\all
 	$(MAKE) -f python\docker\CMakeFiles\docker-messages.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker-messages.dir\depend
 	$(MAKE) -f python\docker\CMakeFiles\docker-messages.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker-messages.dir\build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\CMakeFiles --progress-num= "Built target docker-messages"
@@ -858,8 +974,8 @@ python\docker\CMakeFiles\docker-messages.dir\clean:
 # Target rules for target python/docker/CMakeFiles/docker-all.dir
 
 # All Build rule for target.
-python\docker\CMakeFiles\docker-all.dir\all: python\docker\CMakeFiles\docker-translations.dir\all
 python\docker\CMakeFiles\docker-all.dir\all: python\docker\CMakeFiles\docker-Dockerfile.dir\all
+python\docker\CMakeFiles\docker-all.dir\all: python\docker\CMakeFiles\docker-translations.dir\all
 python\docker\CMakeFiles\docker-all.dir\all: python\docker\CMakeFiles\docker-messages.dir\all
 	$(MAKE) -f python\docker\CMakeFiles\docker-all.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker-all.dir\depend
 	$(MAKE) -f python\docker\CMakeFiles\docker-all.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker-all.dir\build

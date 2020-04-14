@@ -1,6 +1,7 @@
 from flask import Flask, request, g
 from flask_session import Session
 from flask_restx import Api
+
 from .ConfigManager import ConfigManager
 from flask_babel import Babel
 
@@ -100,9 +101,13 @@ class FlaskModule(BaseModule):
         kwargs = {'flaskModule': self}
 
         from .API.Upload import Upload
+        from .API.QueryCalendarData import QueryCalendarData
+        from .API.QueryTimelineData import QueryTimelineData
 
         # Resources
         default_api_ns.add_resource(Upload, '/upload', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryCalendarData, '/calendardata', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryTimelineData, '/timelinedata', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from .Views.Index import Index

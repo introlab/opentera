@@ -141,6 +141,25 @@ CreateSession.proto.target\fast:
 .PHONY : CreateSession.proto.target\fast
 
 # Convenience name for target.
+python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\rule:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\rule
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages
+.PHONY : python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\rule
+
+# Convenience name for target.
+JoinSessionEvent.proto.target: python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\rule
+
+.PHONY : JoinSessionEvent.proto.target
+
+# fast build rule for target.
+JoinSessionEvent.proto.target\fast:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\build
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages
+.PHONY : JoinSessionEvent.proto.target\fast
+
+# Convenience name for target.
 python\messages\CMakeFiles\DeviceEvent.proto.target.dir\rule:
 	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
 	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\DeviceEvent.proto.target.dir\rule
@@ -160,25 +179,6 @@ DeviceEvent.proto.target\fast:
 .PHONY : DeviceEvent.proto.target\fast
 
 # Convenience name for target.
-python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule:
-	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
-	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule
-	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages
-.PHONY : python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule
-
-# Convenience name for target.
-ParticipantEvent.proto.target: python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule
-
-.PHONY : ParticipantEvent.proto.target
-
-# fast build rule for target.
-ParticipantEvent.proto.target\fast:
-	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
-	$(MAKE) -f python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build
-	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages
-.PHONY : ParticipantEvent.proto.target\fast
-
-# Convenience name for target.
 python\messages\CMakeFiles\TeraMessage.proto.target.dir\rule:
 	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
 	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\TeraMessage.proto.target.dir\rule
@@ -196,6 +196,25 @@ TeraMessage.proto.target\fast:
 	$(MAKE) -f python\messages\CMakeFiles\TeraMessage.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\TeraMessage.proto.target.dir\build
 	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages
 .PHONY : TeraMessage.proto.target\fast
+
+# Convenience name for target.
+python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages
+.PHONY : python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule
+
+# Convenience name for target.
+ParticipantEvent.proto.target: python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\rule
+
+.PHONY : ParticipantEvent.proto.target
+
+# fast build rule for target.
+ParticipantEvent.proto.target\fast:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages
+.PHONY : ParticipantEvent.proto.target\fast
 
 # Convenience name for target.
 python\messages\CMakeFiles\python-messages.dir\rule:
@@ -274,6 +293,25 @@ Result.proto.target\fast:
 .PHONY : Result.proto.target\fast
 
 # Convenience name for target.
+python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\rule:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\rule
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages
+.PHONY : python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\rule
+
+# Convenience name for target.
+StopSessionEvent.proto.target: python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\rule
+
+.PHONY : StopSessionEvent.proto.target
+
+# fast build rule for target.
+StopSessionEvent.proto.target\fast:
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
+	$(MAKE) -f python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\build
+	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug\python\messages
+.PHONY : StopSessionEvent.proto.target\fast
+
+# Convenience name for target.
 python\messages\CMakeFiles\UserEvent.proto.target.dir\rule:
 	cd E:\Documents\GitHub\opentera\build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
 	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\UserEvent.proto.target.dir\rule
@@ -302,10 +340,12 @@ help:
 	@echo ... rebuild_cache
 	@echo ... CreateSession.proto.target
 	@echo ... DeviceEvent.proto.target
+	@echo ... JoinSessionEvent.proto.target
 	@echo ... ParticipantEvent.proto.target
 	@echo ... RPCMessage.proto.target
 	@echo ... Result.proto.target
 	@echo ... ServerCommand.proto.target
+	@echo ... StopSessionEvent.proto.target
 	@echo ... TeraMessage.proto.target
 	@echo ... UserEvent.proto.target
 	@echo ... python-messages

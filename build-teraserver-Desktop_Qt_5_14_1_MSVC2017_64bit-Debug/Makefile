@@ -177,6 +177,19 @@ CreateSession.proto.target\fast:
 .PHONY : CreateSession.proto.target\fast
 
 #=============================================================================
+# Target rules for targets named JoinSessionEvent.proto.target
+
+# Build rule for target.
+JoinSessionEvent.proto.target: cmake_check_build_system
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) JoinSessionEvent.proto.target
+.PHONY : JoinSessionEvent.proto.target
+
+# fast build rule for target.
+JoinSessionEvent.proto.target\fast:
+	$(MAKE) -f python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\JoinSessionEvent.proto.target.dir\build
+.PHONY : JoinSessionEvent.proto.target\fast
+
+#=============================================================================
 # Target rules for targets named DeviceEvent.proto.target
 
 # Build rule for target.
@@ -190,19 +203,6 @@ DeviceEvent.proto.target\fast:
 .PHONY : DeviceEvent.proto.target\fast
 
 #=============================================================================
-# Target rules for targets named ParticipantEvent.proto.target
-
-# Build rule for target.
-ParticipantEvent.proto.target: cmake_check_build_system
-	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) ParticipantEvent.proto.target
-.PHONY : ParticipantEvent.proto.target
-
-# fast build rule for target.
-ParticipantEvent.proto.target\fast:
-	$(MAKE) -f python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build
-.PHONY : ParticipantEvent.proto.target\fast
-
-#=============================================================================
 # Target rules for targets named TeraMessage.proto.target
 
 # Build rule for target.
@@ -214,6 +214,19 @@ TeraMessage.proto.target: cmake_check_build_system
 TeraMessage.proto.target\fast:
 	$(MAKE) -f python\messages\CMakeFiles\TeraMessage.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\TeraMessage.proto.target.dir\build
 .PHONY : TeraMessage.proto.target\fast
+
+#=============================================================================
+# Target rules for targets named ParticipantEvent.proto.target
+
+# Build rule for target.
+ParticipantEvent.proto.target: cmake_check_build_system
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) ParticipantEvent.proto.target
+.PHONY : ParticipantEvent.proto.target
+
+# fast build rule for target.
+ParticipantEvent.proto.target\fast:
+	$(MAKE) -f python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\ParticipantEvent.proto.target.dir\build
+.PHONY : ParticipantEvent.proto.target\fast
 
 #=============================================================================
 # Target rules for targets named python-messages
@@ -268,6 +281,19 @@ Result.proto.target\fast:
 .PHONY : Result.proto.target\fast
 
 #=============================================================================
+# Target rules for targets named StopSessionEvent.proto.target
+
+# Build rule for target.
+StopSessionEvent.proto.target: cmake_check_build_system
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) StopSessionEvent.proto.target
+.PHONY : StopSessionEvent.proto.target
+
+# fast build rule for target.
+StopSessionEvent.proto.target\fast:
+	$(MAKE) -f python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\messages\CMakeFiles\StopSessionEvent.proto.target.dir\build
+.PHONY : StopSessionEvent.proto.target\fast
+
+#=============================================================================
 # Target rules for targets named UserEvent.proto.target
 
 # Build rule for target.
@@ -320,19 +346,6 @@ docker-translations\fast:
 .PHONY : docker-translations\fast
 
 #=============================================================================
-# Target rules for targets named docker_ServerCommand.proto.target
-
-# Build rule for target.
-docker_ServerCommand.proto.target: cmake_check_build_system
-	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) docker_ServerCommand.proto.target
-.PHONY : docker_ServerCommand.proto.target
-
-# fast build rule for target.
-docker_ServerCommand.proto.target\fast:
-	$(MAKE) -f python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build
-.PHONY : docker_ServerCommand.proto.target\fast
-
-#=============================================================================
 # Target rules for targets named docker_CreateSession.proto.target
 
 # Build rule for target.
@@ -359,6 +372,19 @@ docker_DeviceEvent.proto.target\fast:
 .PHONY : docker_DeviceEvent.proto.target\fast
 
 #=============================================================================
+# Target rules for targets named docker_JoinSessionEvent.proto.target
+
+# Build rule for target.
+docker_JoinSessionEvent.proto.target: cmake_check_build_system
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) docker_JoinSessionEvent.proto.target
+.PHONY : docker_JoinSessionEvent.proto.target
+
+# fast build rule for target.
+docker_JoinSessionEvent.proto.target\fast:
+	$(MAKE) -f python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_JoinSessionEvent.proto.target.dir\build
+.PHONY : docker_JoinSessionEvent.proto.target\fast
+
+#=============================================================================
 # Target rules for targets named docker_RPCMessage.proto.target
 
 # Build rule for target.
@@ -383,6 +409,32 @@ docker_Result.proto.target: cmake_check_build_system
 docker_Result.proto.target\fast:
 	$(MAKE) -f python\docker\CMakeFiles\docker_Result.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_Result.proto.target.dir\build
 .PHONY : docker_Result.proto.target\fast
+
+#=============================================================================
+# Target rules for targets named docker_ServerCommand.proto.target
+
+# Build rule for target.
+docker_ServerCommand.proto.target: cmake_check_build_system
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) docker_ServerCommand.proto.target
+.PHONY : docker_ServerCommand.proto.target
+
+# fast build rule for target.
+docker_ServerCommand.proto.target\fast:
+	$(MAKE) -f python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_ServerCommand.proto.target.dir\build
+.PHONY : docker_ServerCommand.proto.target\fast
+
+#=============================================================================
+# Target rules for targets named docker_StopSessionEvent.proto.target
+
+# Build rule for target.
+docker_StopSessionEvent.proto.target: cmake_check_build_system
+	$(MAKE) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) docker_StopSessionEvent.proto.target
+.PHONY : docker_StopSessionEvent.proto.target
+
+# fast build rule for target.
+docker_StopSessionEvent.proto.target\fast:
+	$(MAKE) -f python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\build.make /nologo -$(MAKEFLAGS) python\docker\CMakeFiles\docker_StopSessionEvent.proto.target.dir\build
+.PHONY : docker_StopSessionEvent.proto.target\fast
 
 #=============================================================================
 # Target rules for targets named docker_TeraMessage.proto.target
@@ -459,10 +511,12 @@ help:
 	@echo ... rebuild_cache
 	@echo ... CreateSession.proto.target
 	@echo ... DeviceEvent.proto.target
+	@echo ... JoinSessionEvent.proto.target
 	@echo ... ParticipantEvent.proto.target
 	@echo ... RPCMessage.proto.target
 	@echo ... Result.proto.target
 	@echo ... ServerCommand.proto.target
+	@echo ... StopSessionEvent.proto.target
 	@echo ... TeraMessage.proto.target
 	@echo ... UserEvent.proto.target
 	@echo ... docker-Dockerfile
@@ -471,10 +525,12 @@ help:
 	@echo ... docker-translations
 	@echo ... docker_CreateSession.proto.target
 	@echo ... docker_DeviceEvent.proto.target
+	@echo ... docker_JoinSessionEvent.proto.target
 	@echo ... docker_ParticipantEvent.proto.target
 	@echo ... docker_RPCMessage.proto.target
 	@echo ... docker_Result.proto.target
 	@echo ... docker_ServerCommand.proto.target
+	@echo ... docker_StopSessionEvent.proto.target
 	@echo ... docker_TeraMessage.proto.target
 	@echo ... docker_UserEvent.proto.target
 	@echo ... easyrtc_install
