@@ -31,9 +31,9 @@ class QueryTimelineData(Resource):
         data = []
         if not args['date']:
             today = datetime.datetime.now()
-            # TODO get data for present month
+            # TODO get data for presend day - 6 days ?
         elif args['date']:
             today = datetime.datetime.now()
-            # TODO get data for the specified month
+            # TODO get data for the specified date + 6 days
 
         return today.isoformat(), 200
