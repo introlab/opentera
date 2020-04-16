@@ -30,147 +30,148 @@ class QueryCalendarData(Resource):
         args = parser.parse_args()
         calendar_data = [
             {
-                "date": (datetime.datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d"),
-                "seating": {
-                    "remaining": 0.5,
-                    "done": 5.5
+                'date': (datetime.datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d'),
+                'seating': {
+                    'remaining': 0.5,
+                    'done': 5.5
                 },
-                "standing": {
-                    "remaining": 3.00,
-                    "done": 0.5
+                'standing': {
+                    'remaining': 3.00,
+                    'done': 0.5
                 },
-                "positionChanges": {
-                    "remaining": 8,
-                    "done": 6
+                'positionChanges': {
+                    'remaining': 8,
+                    'done': 6
                 }
             }, {
-                "date": (datetime.datetime.today() - timedelta(days=2)).strftime("%Y-%m-%d"),
-                "seating": {
-                    "remaining": 0.5,
-                    "done": 4.5
+                'date': (datetime.datetime.today() - timedelta(days=2)).strftime('%Y-%m-%d'),
+                'seating': {
+                    'remaining': 0.5,
+                    'done': 4.5
                 },
-                "standing": {
-                    "remaining": 1.5,
-                    "done": 1.5
+                'standing': {
+                    'remaining': 1.5,
+                    'done': 1.5
                 },
-                "positionChanges": {
-                    "remaining": 5,
-                    "done": 9
+                'positionChanges': {
+                    'remaining': 5,
+                    'done': 9
                 }
             }, {
-                "date": (datetime.datetime.today() - timedelta(days=5)).strftime("%Y-%m-%d"),
-                "seating": {
-                    "remaining": 1.5,
-                    "done": 4.5
+                'date': (datetime.datetime.today() - timedelta(days=5)).strftime('%Y-%m-%d'),
+                'seating': {
+                    'remaining': 1.5,
+                    'done': 4.5
                 },
-                "standing": {
-                    "remaining": 1.00,
-                    "done": 2.5
+                'standing': {
+                    'remaining': 1.00,
+                    'done': 2.5
                 },
-                "positionChanges": {
-                    "remaining": 5,
-                    "done": 9
+                'positionChanges': {
+                    'remaining': 5,
+                    'done': 9
                 }
             }, {
-                "date": (datetime.datetime.today() - timedelta(days=6)).strftime("%Y-%m-%d"),
-                "seating": {
-                    "remaining": 0,
-                    "done": 3.5
+                'date': (datetime.datetime.today() - timedelta(days=6)).strftime('%Y-%m-%d'),
+                'seating': {
+                    'remaining': 0,
+                    'done': 3.5
                 },
-                "standing": {
-                    "remaining": 0,
-                    "done": 3.5
+                'standing': {
+                    'remaining': 0,
+                    'done': 3.5
                 },
-                "positionChanges": {
-                    "remaining": 0,
-                    "done": 14
+                'positionChanges': {
+                    'remaining': 0,
+                    'done': 14
                 }
             }, {
-                "date": (datetime.datetime.today() - timedelta(days=7)).strftime("%Y-%m-%d"),
-                "seating": {
-                    "remaining": 0.5,
-                    "done": 5.5
+                'date': (datetime.datetime.today() - timedelta(days=7)).strftime('%Y-%m-%d'),
+                'seating': {
+                    'remaining': 0.5,
+                    'done': 5.5
                 },
-                "standing": {
-                    "remaining": 3.00,
-                    "done": 0.5
+                'standing': {
+                    'remaining': 3.00,
+                    'done': 0.5
                 },
-                "positionChanges": {
-                    "remaining": 7,
-                    "done": 7
+                'positionChanges': {
+                    'remaining': 7,
+                    'done': 7
                 }
             }, {
-                "date": (datetime.datetime.today() - timedelta(days=8)).strftime("%Y-%m-%d"),
-                "seating": {
-                    "remaining": 1.5,
-                    "done": 4.5
+                'date': (datetime.datetime.today() - timedelta(days=8)).strftime('%Y-%m-%d'),
+                'seating': {
+                    'remaining': 1.5,
+                    'done': 4.5
                 },
-                "standing": {
-                    "remaining": 2.5,
-                    "done": 1.0
+                'standing': {
+                    'remaining': 2.5,
+                    'done': 1.0
                 },
-                "positionChanges": {
-                    "remaining": 8,
-                    "done": 6
+                'positionChanges': {
+                    'remaining': 8,
+                    'done': 6
                 }
             }, {
-                "date": (datetime.datetime.today() - timedelta(days=11)).strftime("%Y-%m-%d"),
-                "seating": {
-                    "remaining": 1.0,
-                    "done": 2.5
+                'date': (datetime.datetime.today() - timedelta(days=11)).strftime('%Y-%m-%d'),
+                'seating': {
+                    'remaining': 1.0,
+                    'done': 2.5
                 },
-                "standing": {
-                    "remaining": 2.00,
-                    "done": 1
+                'standing': {
+                    'remaining': 2.00,
+                    'done': 1
                 },
-                "positionChanges": {
-                    "remaining": 6,
-                    "done": 8
+                'positionChanges': {
+                    'remaining': 6,
+                    'done': 8
                 }
             }, {
-                "date": (datetime.datetime.today() - timedelta(days=12)).strftime("%Y-%m-%d"),
-                "seating": {
-                    "remaining": 0.5,
-                    "done": 3.0
+                'date': (datetime.datetime.today() - timedelta(days=12)).strftime('%Y-%m-%d'),
+                'seating': {
+                    'remaining': 0.5,
+                    'done': 3.0
                 },
-                "standing": {
-                    "remaining": 1.00,
-                    "done": 2.5
+                'standing': {
+                    'remaining': 1.00,
+                    'done': 2.5
                 },
-                "positionChanges": {
-                    "remaining": 4,
-                    "done": 10
+                'positionChanges': {
+                    'remaining': 4,
+                    'done': 10
                 }
             }, {
-                "date": (datetime.datetime.today() - timedelta(days=13)).strftime("%Y-%m-%d"),
-                "seating": {
-                    "remaining": 0,
-                    "done": 6.5
+                'date': (datetime.datetime.today() - timedelta(days=13)).strftime('%Y-%m-%d'),
+                'seating': {
+                    'remaining': 0,
+                    'done': 6.5
                 },
-                "standing": {
-                    "remaining": 3,
-                    "done": 0.5
+                'standing': {
+                    'remaining': 3,
+                    'done': 0.5
                 },
-                "positionChanges": {
-                    "remaining": 11,
-                    "done": 1
+                'positionChanges': {
+                    'remaining': 11,
+                    'done': 1
                 }
             }, {
-                "date": (datetime.datetime.today() - timedelta(days=14)).strftime("%Y-%m-%d"),
-                "seating": {
-                    "remaining": 1.5,
-                    "done": 4.5
+                'date': (datetime.datetime.today() - timedelta(days=14)).strftime('%Y-%m-%d'),
+                'seating': {
+                    'remaining': 1.5,
+                    'done': 4.5
                 },
-                "standing": {
-                    "remaining": 2.5,
-                    "done": 1.0
+                'standing': {
+                    'remaining': 2.5,
+                    'done': 1.0
                 },
-                "positionChanges": {
-                    "remaining": 8,
-                    "done": 6
+                'positionChanges': {
+                    'remaining': 8,
+                    'done': 6
                 }
             }
         ]
+
         data = []
         if not args['date']:
             return 'Missing date argument', 400
