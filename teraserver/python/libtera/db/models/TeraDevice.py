@@ -61,6 +61,14 @@ class TeraDevice(db.Model, BaseModel):
 
         return device_json
 
+    def from_json(self, json):
+        super().from_json(json)
+
+        # Manage device subtype
+        if type(self.device_subtype) is dict:
+            self.id_device_subtype = self.device_subtype['id_device_subtype']
+            self.device_subtype = None
+
     def is_authenticated(self):
         return self.authenticated
 

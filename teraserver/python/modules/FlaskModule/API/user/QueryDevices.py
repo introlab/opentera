@@ -168,22 +168,22 @@ class QueryDevices(Resource):
             if json_device['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
                 return '', 403
 
-        # Check if the user if a site admin of the projects, otherwise limit what can be updated
-        current_device = TeraDevice.get_device_by_id(json_device['id_device'])
-        is_site_admin = False
-        for project in current_device.device_projects:
-            if user_access.get_site_role(project.device_project_project.project_site.id_site) == 'admin':
-                is_site_admin = True
-                break
+            # Check if the user if a site admin of the projects, otherwise limit what can be updated
+            current_device = TeraDevice.get_device_by_id(json_device['id_device'])
+            is_site_admin = False
+            for project in current_device.device_projects:
+                if user_access.get_site_role(project.device_project_project.project_site.id_site) == 'admin':
+                    is_site_admin = True
+                    break
 
-        # User is not site admin - strip everything that can't be modified by a project admin
-        if not is_site_admin:
-            allowed_fields = ['id_device', 'device_config', 'device_notes']
-            json_device2 = {}
-            for field in allowed_fields:
-                if field in json_device:
-                    json_device2[field] = json_device[field]
-            json_device = json_device2
+            # User is not site admin - strip everything that can't be modified by a project admin
+            if not is_site_admin:
+                allowed_fields = ['id_device', 'device_config', 'device_notes']
+                json_device2 = {}
+                for field in allowed_fields:
+                    if field in json_device:
+                        json_device2[field] = json_device[field]
+                json_device = json_device2
 
         # Do the update!
         if json_device['id_device'] > 0:
