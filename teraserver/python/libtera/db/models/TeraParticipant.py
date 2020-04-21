@@ -219,7 +219,8 @@ class TeraParticipant(db.Model, BaseModel):
     @classmethod
     def insert(cls, participant):
         # Encrypts password
-        participant.participant_password = TeraParticipant.encrypt_password(participant.participant_password)
+        if participant.participant_password:
+            participant.participant_password = TeraParticipant.encrypt_password(participant.participant_password)
 
         participant.participant_lastonline = None
         participant.participant_uuid = str(uuid.uuid4())

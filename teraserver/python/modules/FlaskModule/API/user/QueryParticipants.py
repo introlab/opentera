@@ -20,6 +20,7 @@ get_parser.add_argument('id_project', type=int, help='ID of the project from whi
 get_parser.add_argument('id_group', type=int, help='ID of the participant groups from which to get all participants')
 get_parser.add_argument('id_session', type=int, help='ID of the session from which to get all participants')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all participants associated')
+get_parser.add_argument('name', type=str, help='Name of the participant to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('full', type=inputs.boolean, help='Flag that expands the returned data to include all '
                                                           'information')
@@ -85,6 +86,11 @@ class QueryParticipants(Resource):
             for part in part_session.session_participants:
                 if part.id_participant in accessibles_parts:
                     participants.append(part)
+        elif args['name']:
+            participants = [TeraParticipant.get_participant_by_name(args['name'])]
+            for participant in participants:
+                if participant.id_participant not in user_access.get_accessible_participants_ids():
+                    participants = []
 
         try:
             if participants:

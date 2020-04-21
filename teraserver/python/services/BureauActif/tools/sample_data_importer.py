@@ -1,5 +1,5 @@
 import sys
-from requests import get, post
+from requests import get, post, delete
 import json
 from datetime import datetime
 
@@ -8,7 +8,8 @@ from services.BureauActif.tools.sample_data_loader import load_data_from_path
 
 class Config:
     hostname = 'localhost'
-    port = 4040
+    port = 40075
+    servicename = '/bureau'
 
     # User endpoints
     user_login_endpoint = '/api/user/login'
@@ -58,6 +59,19 @@ def create_site(config: Config, name):
     return {}
 
 
+def get_site(config: Config, name: str):
+    url = _make_url(config.hostname, config.port, config.user_site_endpoint)
+    params = {'name': name}
+    try:
+        response = get(url=url, params=params, verify=False, auth=(config.username, config.password))
+    except:
+        return {}
+
+    if response.status_code == 200 and response.json():
+        return response.json().pop()
+    return {}
+
+
 def create_project(config: Config, name: str, site_id: int):
 
     url = _make_url(config.hostname, config.port, config.user_project_endpoint)
@@ -72,6 +86,19 @@ def create_project(config: Config, name: str, site_id: int):
         return {}
 
     if response.status_code == 200:
+        return response.json().pop()
+    return {}
+
+
+def get_project(config: Config, name: str):
+    url = _make_url(config.hostname, config.port, config.user_project_endpoint)
+    params = {'name': name}
+    try:
+        response = get(url=url, params=params, verify=False, auth=(config.username, config.password))
+    except:
+        return {}
+
+    if response.status_code == 200 and response.json():
         return response.json().pop()
     return {}
 
@@ -95,6 +122,32 @@ def create_participant(config: Config, name: str, id_project: int):
     return {}
 
 
+def get_participant(config: Config, name: str):
+    url = _make_url(config.hostname, config.port, config.user_participant_endpoint)
+    params = {'name': name}
+    try:
+        response = get(url=url, params=params, verify=False, auth=(config.username, config.password))
+    except:
+        return {}
+
+    if response.status_code == 200 and response.json():
+        return response.json().pop()
+    return {}
+
+def delete_participant(config: Config, id: int):
+    url = _make_url(config.hostname, config.port, config.user_participant_endpoint)
+    params = {'id': id}
+    try:
+        response = delete(url=url, params=params, verify=False, auth=(config.username, config.password))
+    except:
+        return {}
+
+    if response.status_code == 200 and response.json():
+        return response.json().pop()
+    return {}
+
+
+
 def create_device(config: Config, name: str):
     url = _make_url(config.hostname, config.port, config.user_device_endpoint)
     try:
@@ -105,6 +158,19 @@ def create_device(config: Config, name: str):
         return {}
 
     if response.status_code == 200:
+        return response.json().pop()
+    return {}
+
+
+def get_device(config: Config, name: str):
+    url = _make_url(config.hostname, config.port, config.user_device_endpoint)
+    params = {'name': name}
+    try:
+        response = get(url=url, params=params, verify=False, auth=(config.username, config.password))
+    except:
+        return {}
+
+    if response.status_code == 200 and response.json():
         return response.json().pop()
     return {}
 
@@ -194,24 +260,46 @@ def create_session_data(config: Config, token: str, filename: str, data, id_sess
 
 if __name__ == '__main__':
 
-    config = Config()
+    base_config = Config()
+    data_path = '/DATA/Data/CloudStation_Sync/Workspace/Travail/Data/Rasp8'
 
     # Get data from files
-    result = load_data_from_path('C:\Data\Rasp8')
+    result = load_data_from_path(data_path)
 
     # Login admin
-    admin_info = login_user(config)
+    admin_info = login_user(base_config)
 
     # create_participant(config1, 'PartBA_1')
-    site_info = create_site(config, 'Bureau Actif Site ' + str(datetime.now()))
-    project_info = create_project(config, 'Projet Bureau Actif', site_info['id_site'])
-    # TODO get session types from server, hardcoded to 2 = SENSOR_DATA
-    project_session_type_info = add_session_type_project(config, project_info['id_project'], 2)
+    site_info = get_site(base_config, 'Bureau Actif Tests')
 
-    participant_info = create_participant(config, 'MyParticipant', project_info['id_project'])
-    device_info = create_device(config, 'MonBureau')
-    device_project_info = add_device_project(config, project_info['id_project'], device_info['id_device'])
-    device_participant_info = add_device_participant(config, participant_info['id_participant'],
+    if not site_info:
+        site_info = create_site(base_config, 'Bureau Actif Tests')
+
+    project_info = get_project(base_config, 'Donnees Tests')
+
+    if not project_info:
+        project_info = create_project(base_config, 'Donnees Tests', site_info['id_site'])
+        # TODO get session types from server, hardcoded to 2 = SENSOR_DATA
+        project_session_type_info = add_session_type_project(base_config, project_info['id_project'], 2)
+
+    import os
+    participant_name = os.path.split(data_path)[-1]
+    participant_info = get_participant(base_config, participant_name)
+
+    if participant_info:
+        # Delete that participant - we always start fresh!
+        delete_participant(base_config, participant_info['id_participant'])
+
+    participant_info = create_participant(base_config, participant_name, project_info['id_project'])
+
+    device_name = 'Bureau - ' + participant_name
+    device_info = get_device(base_config, device_name)
+
+    if not device_info:
+        device_info = create_device(base_config, device_name)
+        device_project_info = add_device_project(base_config, project_info['id_project'], device_info['id_device'])
+
+    device_participant_info = add_device_participant(base_config, participant_info['id_participant'],
                                                      device_info['id_device'])
 
     # Config from results, remove from dict
@@ -219,7 +307,6 @@ if __name__ == '__main__':
     del result['config']
 
     for key in result:
-        # TODO get session types from server, hardcoded to 2 = SENSOR_DATA
         print('Processing: ', key)
 
         # Put config in each datasets
@@ -232,12 +319,12 @@ if __name__ == '__main__':
         device_data = json.dumps(result[key])
 
         # Create session
-        device_session_info = create_device_session(config,
+        device_session_info = create_device_session(base_config,
                                                     device_info['device_token'], 'Session-' + key, device_date,
                                                     [participant_info['participant_uuid']], 2)
 
         # Send data
-        create_session_data(config, device_info['device_token'], key + '.json', device_data.encode('utf-8'),
+        create_session_data(base_config, device_info['device_token'], key + '.json', device_data.encode('utf-8'),
                             device_session_info['id_session'], device_date)
 
 

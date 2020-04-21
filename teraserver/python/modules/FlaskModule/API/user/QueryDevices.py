@@ -15,6 +15,7 @@ get_parser.add_argument('id_site', type=int, help='ID of the site from which to 
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all associated devices')
 get_parser.add_argument('device_type', type=int, help='ID of device type from which to get all devices. Can be '
                                                       'combined with id_site or id_project.')
+get_parser.add_argument('name', type=str, help='Name of the device to query')
 get_parser.add_argument('available', type=inputs.boolean, help='Flag that indicates if only available (devices not '
                                                                'associated to a participant) should be returned')
 get_parser.add_argument('participants', type=inputs.boolean, help='Flag that indicates if associated participant(s) '
@@ -55,7 +56,8 @@ class QueryDevices(Resource):
 
         devices = []
         # If we have no arguments, return all accessible devices
-        if not args['id_device'] and not args['id_site'] and not args['device_type'] and not args['id_project']:
+        if not args['id_device'] and not args['id_site'] and not args['device_type'] and not args['id_project'] and \
+                not args['name']:
             devices = user_access.get_accessible_devices()
         elif args['id_device']:
             devices = [user_access.query_device_by_id(device_id=args['id_device'])]
@@ -66,6 +68,11 @@ class QueryDevices(Resource):
             devices = user_access.query_devices_for_project(args['id_project'], args['device_type'])
         elif args['device_type']:
             devices = user_access.query_devices_by_type(args['device_type'])
+        elif args['name']:
+            devices = [TeraDevice.get_device_by_name(args['name'])]
+            for device in devices:
+                if device.id_device not in user_access.get_accessible_devices_ids():
+                    devices = []
 
         # if args['available'] is not None:
         #     if args['available']:
