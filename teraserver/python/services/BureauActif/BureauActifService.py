@@ -28,6 +28,8 @@ if __name__ == '__main__':
         print("Unable to connect to database - please check settings in config file!")
         quit()
 
+    Globals.db_man.create_defaults(config_man)
+
     # Global redis client
     Globals.redis_client = RedisClient(config_man.redis_config)
     Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)

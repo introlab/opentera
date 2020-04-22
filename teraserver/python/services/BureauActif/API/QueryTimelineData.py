@@ -293,7 +293,7 @@ class QueryTimelineData(Resource):
         if not args['date']:
             return 'Missing date argument', 400
         elif args['date']:
-            date = datetime.datetime.strptime(args['date'], '%Y-%m-%d').date()
+            date = datetime.datetime.strptime(args['date'], '%d-%m-%Y').date()
             # TODO get data for the specified date + 6 days
 
         return timeline_data, 200
