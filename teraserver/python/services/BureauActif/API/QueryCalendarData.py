@@ -3,7 +3,10 @@ from datetime import timedelta
 
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, fields
+from sqlalchemy.exc import InvalidRequestError
 from services.BureauActif.FlaskModule import default_api_ns as api
+
+from services.BureauActif.libbureauactif.db.DBManager import DBManager
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -25,6 +28,7 @@ class QueryCalendarData(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
+        calendar_access = DBManager.calendarAccess()
         parser = get_parser
 
         args = parser.parse_args()
@@ -172,11 +176,31 @@ class QueryCalendarData(Resource):
             }
         ]
 
-        data = []
+        calendar_days = []
         if not args['date']:
             return 'Missing date argument', 400
         elif args['date']:
-            date = datetime.datetime.strptime(args['date'], '%Y-%m-%d').date()
-            # TODO get data for the specified month
+            date = datetime.datetime.strptime(args['date'], '%d-%m-%Y').date()
+            calendar_days = calendar_access.query_calendar_day_by_month(date)
 
-        return calendar_data, 200
+        try:
+            calendar_days_list = []
+            for day in calendar_days:
+                if day is not None:
+                    day_json = day.to_json()
+
+                    seating = calendar_access.query_calendar_data(day.id_calendar_day, 1)
+                    day_json['seating'] = seating.to_json()
+
+                    standing = calendar_access.query_calendar_data(day.id_calendar_day, 2)
+                    day_json['standing'] = standing.to_json()
+
+                    position_changes = calendar_access.query_calendar_data(day.id_calendar_day, 3)
+                    day_json['position_changes'] = position_changes.to_json()
+
+                    calendar_days_list.append(day_json)
+
+            return jsonify(calendar_days_list)
+
+        except InvalidRequestError:
+            return '', 500
