@@ -1,6 +1,6 @@
 from flask.views import MethodView
 from flask import render_template, request
-from services.BureauActif.AccessManager import AccessManager, current_client
+from services.BureauActif.AccessManager import AccessManager, current_user_client
 
 
 class Index(MethodView):

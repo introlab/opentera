@@ -1,12 +1,11 @@
 import uuid
-from services.VideoDispatch.Globals import config_man
 from flask import request
 from requests import Response
 
 
 class TeraUserClient:
 
-    def __init__(self, u_uuid: uuid, token: str):
+    def __init__(self, u_uuid: uuid, token: str, config_man):
         self.__user_uuid = u_uuid
         self.__user_token = token
 
