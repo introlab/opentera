@@ -185,15 +185,16 @@ class QueryCalendarData(Resource):
 
         try:
             calendar_days_list = []
-            for day in calendar_days:
-                if day is not None:
-                    day_json = day.to_json()
+            if calendar_days is not None:
+                for day in calendar_days:
+                    if day is not None:
+                        day_json = day.to_json()
 
-                    day_json['seating'] = day.seating.to_json()
-                    day_json['standing'] = day.standing.to_json()
-                    day_json['positionChanges'] = day.positionChanges.to_json()
+                        day_json['seating'] = day.seating.to_json()
+                        day_json['standing'] = day.standing.to_json()
+                        day_json['positionChanges'] = day.positionChanges.to_json()
 
-                    calendar_days_list.append(day_json)
+                        calendar_days_list.append(day_json)
 
             return jsonify(calendar_days_list)
 
