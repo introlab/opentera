@@ -40,9 +40,10 @@ def parse_data_file(fullpath):
     lines = []
 
     date = 'invalid'
+    filename = os.path.split(fullpath)[1]
 
-    if '_' in fullpath and '.dat' in fullpath:
-        date = fullpath.split('_')[1].split('.dat')[0]
+    if '_' in filename and '.dat' in filename:
+        date = filename.split('_')[1].split('.dat')[0]
         try:
             with open(fullpath) as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter='\t')

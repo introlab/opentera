@@ -33,6 +33,8 @@ if __name__ == '__main__':
     # Global redis client
     Globals.redis_client = RedisClient(config_man.redis_config)
     Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
+    Globals.api_device_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
+    Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
 
     # Main Flask module
     flask_module = FlaskModule(config_man)

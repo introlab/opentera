@@ -61,6 +61,14 @@ class TeraDevice(db.Model, BaseModel):
 
         return device_json
 
+    def from_json(self, json):
+        super().from_json(json)
+
+        # Manage device subtype
+        if type(self.device_subtype) is dict:
+            self.id_device_subtype = self.device_subtype['id_device_subtype']
+            self.device_subtype = None
+
     def is_authenticated(self):
         return self.authenticated
 
@@ -198,10 +206,23 @@ class TeraDevice(db.Model, BaseModel):
         # Clear last online field
         device.device_lastonline = None
 
+        # Check for device subtype
+        if device.id_device_subtype == 0:
+            device.id_device_subtype = None
+
         # Create token
         device.create_token()
 
         super().insert(device)
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        # Check for device subtype
+        if 'id_device_subtype' in values:
+            if values['id_device_subtype'] == 0:
+                values['id_device_subtype'] = None
+
+        super().update(update_id=update_id, values=values)
 
     @classmethod
     def delete(cls, id_todel):

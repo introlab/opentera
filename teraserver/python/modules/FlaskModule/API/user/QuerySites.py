@@ -14,6 +14,7 @@ get_parser.add_argument('id_site', type=int, help='ID of the site to query')
 get_parser.add_argument('id', type=int, help='Alias for "id_site"')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all related sites')
 get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get all sites that are accessible')
+get_parser.add_argument('name', type=str, help='Site name to query')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('site', type=str, location='json', help='Site to create / update', required=True)
@@ -63,6 +64,12 @@ class QuerySites(Resource):
                 sites = [TeraSite.get_site_by_id(site_id=args['id_site'])]
         elif args['id_device']:
             sites = user_access.query_sites_for_device(args['id_device'])
+        elif args['name']:
+            sites = [TeraSite.get_site_by_sitename(sitename=args['name'])]
+            for site in sites:
+                if site.id_site not in user_access.get_accessible_sites_ids():
+                    # Current user doesn't have access to the requested site
+                    sites = None
 
         if sites is None:
             sites = []
