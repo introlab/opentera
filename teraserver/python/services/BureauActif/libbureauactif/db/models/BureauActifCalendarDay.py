@@ -10,6 +10,20 @@ class BureauActifCalendarDay(db.Model, BaseModel):
                                 autoincrement=True)
     date = db.Column(db.TIMESTAMP, nullable=False)
 
+    seating = db.relationship("BureauActifCalendarData",
+                              primaryjoin="and_(BureauActifCalendarDay.id_calendar_day==BureauActifCalendarData"
+                                          ".id_calendar_day, BureauActifCalendarData.id_calendar_data_type==1)",
+                              uselist=False)
+    standing = db.relationship("BureauActifCalendarData",
+                               primaryjoin="and_(BureauActifCalendarDay.id_calendar_day==BureauActifCalendarData"
+                                           ".id_calendar_day, BureauActifCalendarData.id_calendar_data_type==2)",
+                               uselist=False)
+    positionChanges = db.relationship("BureauActifCalendarData",
+                                      primaryjoin="and_(BureauActifCalendarDay.id_calendar_day"
+                                                  "==BureauActifCalendarData.id_calendar_day, "
+                                                  "BureauActifCalendarData.id_calendar_data_type==3)",
+                                      uselist=False)
+
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
@@ -17,15 +31,11 @@ class BureauActifCalendarDay(db.Model, BaseModel):
         return super().to_json(ignore_fields=ignore_fields)
 
     @staticmethod
-    def get_calendar_day_by_month(month, year):
-        num_days = calendar.monthrange(year, month)[1]
-        start_date = datetime.date(year, month, 1)
-        end_date = datetime.date(year, month, num_days)
-
-        day = BureauActifCalendarDay.query.filter(BureauActifCalendarDay.date >= start_date,
-                                                  BureauActifCalendarDay.date <= end_date).all()
-        if day:
-            return day
+    def get_calendar_day_by_month(start_date, end_date):
+        days = BureauActifCalendarDay.query.filter(BureauActifCalendarDay.date >= start_date,
+                                                   BureauActifCalendarDay.date <= end_date).all()
+        if days:
+            return days
 
         return None
 

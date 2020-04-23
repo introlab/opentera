@@ -1,6 +1,7 @@
 from services.BureauActif.libbureauactif.db.models.BureauActifCalendarDay import BureauActifCalendarDay
 from services.BureauActif.libbureauactif.db.models.BureauActifCalendarData import BureauActifCalendarData
 import datetime
+import calendar
 
 
 class DBManagerBureauActifCalendarAccess:
@@ -8,7 +9,12 @@ class DBManagerBureauActifCalendarAccess:
     def query_calendar_day_by_month(self, date: datetime):
         month = date.month
         year = date.year
-        calendar_days = BureauActifCalendarDay.get_calendar_day_by_month(month, year)
+
+        num_days = calendar.monthrange(year, month)[1]
+        start_date = datetime.date(year, month, 1)
+        end_date = datetime.date(year, month, num_days)
+
+        calendar_days = BureauActifCalendarDay.get_calendar_day_by_month(start_date, end_date)
 
         return calendar_days
 

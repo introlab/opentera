@@ -6,9 +6,9 @@ from services.BureauActif.libbureauactif.db.Base import db
 from services.BureauActif.libbureauactif.db.models import *
 
 from .models.BureauActifData import BureauActifData
-from .models.BureauActifTimelineData import BureauActifTimelineData
-from .models.BureauActifTimelineDayData import BureauActifTimelineDayData
-from .models.BureauActifTimelineDataType import BureauActifTimelineDataType
+from .models.BureauActifTimelineDay import BureauActifTimelineDay
+from .models.BureauActifTimelineDayEntry import BureauActifTimelineDayEntry
+from .models.BureauActifTimelineEntryType import BureauActifTimelineEntryType
 from .models.BureauActifCalendarDay import BureauActifCalendarDay
 from .models.BureauActifCalendarData import BureauActifCalendarData
 from .models.BureauActifCalendarDataType import BureauActifCalendarDataType
@@ -18,6 +18,7 @@ from services.BureauActif.ConfigManager import ConfigManager
 from services.BureauActif.FlaskModule import flask_app
 
 from .DBManagerBureauActifCalendarAccess import DBManagerBureauActifCalendarAccess
+from .DBManagerBureauActifTimelineAccess import DBManagerBureauActifTimelineAccess
 
 # Alembic
 from alembic.config import Config
@@ -42,14 +43,19 @@ class DBManager:
         access = DBManagerBureauActifCalendarAccess()
         return access
 
+    @staticmethod
+    def timelineAccess():
+        access = DBManagerBureauActifTimelineAccess()
+        return access
+
     def create_defaults(self, config: ConfigManager):
         BureauActifData.create_defaults()
         BureauActifCalendarDataType.create_defaults()
         BureauActifCalendarDay.create_defaults()
         BureauActifCalendarData.create_defaults()
-        BureauActifTimelineDataType.create_defaults()
-        BureauActifTimelineData.create_defaults()
-        BureauActifTimelineDayData.create_defaults()
+        BureauActifTimelineEntryType.create_defaults()
+        BureauActifTimelineDay.create_defaults()
+        BureauActifTimelineDayEntry.create_defaults()
 
     def open(self, db_infos, echo=False):
         self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos

@@ -2,7 +2,11 @@ import datetime
 
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, fields
+from sqlalchemy.exc import InvalidRequestError
+
 from services.BureauActif.FlaskModule import default_api_ns as api
+
+from services.BureauActif.libbureauactif.db.DBManager import DBManager
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -24,6 +28,7 @@ class QueryTimelineData(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
+        timeline_access = DBManager.timelineAccess()
         parser = get_parser
 
         args = parser.parse_args()
@@ -289,11 +294,29 @@ class QueryTimelineData(Resource):
             }
         ]
 
-        data = []
+        timeline_days = []
         if not args['date']:
             return 'Missing date argument', 400
         elif args['date']:
             date = datetime.datetime.strptime(args['date'], '%d-%m-%Y').date()
-            # TODO get data for the specified date + 6 days
+            timeline_days = timeline_access.query_timeline_days(date)
 
-        return timeline_data, 200
+        try:
+            timeline_days_list = []
+            for day in timeline_days:
+                if day is not None:
+                    day_json = day.to_json()
+
+                    if day.series is not None:
+                        entries = []
+                        for entry in day.series:
+                            entry_json = entry.to_json()
+                            entries.append(entry_json)
+                        day_json['series'] = entries
+
+                    timeline_days_list.append(day_json)
+
+            return jsonify(timeline_days_list)
+
+        except InvalidRequestError:
+            return '', 500
