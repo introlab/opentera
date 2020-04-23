@@ -303,18 +303,19 @@ class QueryTimelineData(Resource):
 
         try:
             timeline_days_list = []
-            for day in timeline_days:
-                if day is not None:
-                    day_json = day.to_json()
+            if timeline_days is not None:
+                for day in timeline_days:
+                    if day is not None:
+                        day_json = day.to_json()
 
-                    if day.series is not None:
-                        entries = []
-                        for entry in day.series:
-                            entry_json = entry.to_json()
-                            entries.append(entry_json)
-                        day_json['series'] = entries
+                        if day.series is not None:
+                            entries = []
+                            for entry in day.series:
+                                entry_json = entry.to_json()
+                                entries.append(entry_json)
+                            day_json['series'] = entries
 
-                    timeline_days_list.append(day_json)
+                        timeline_days_list.append(day_json)
 
             return jsonify(timeline_days_list)
 
