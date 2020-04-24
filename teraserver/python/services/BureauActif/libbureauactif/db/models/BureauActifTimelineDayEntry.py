@@ -11,8 +11,9 @@ class BureauActifTimelineDayEntry(db.Model, BaseModel):
     id_timeline_day = db.Column(db.Integer, db.ForeignKey('ba_timeline_day.id_timeline_day', ondelete='cascade'),
                                 nullable=True)
     id_timeline_entry_type = db.Column(db.Integer,
-                                      db.ForeignKey('ba_timeline_entry_type.id_timeline_entry_type', ondelete='cascade'),
-                                      nullable=True)
+                                       db.ForeignKey('ba_timeline_entry_type.id_timeline_entry_type',
+                                                     ondelete='cascade'),
+                                       nullable=True)
     value = db.Column(db.Float, nullable=False)
 
     # timeline_data_type = db.relationship("BureauActifTimelineEntryType")

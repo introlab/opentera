@@ -20,25 +20,26 @@ class BureauActifTimelineDay(db.Model, BaseModel):
 
     @staticmethod
     def get_timeline_data(start_date, end_date):
-        data = BureauActifTimelineDay.query.filter(BureauActifTimelineDay.name >= start_date,
-                                                   BureauActifTimelineDay.name <= end_date).all()
-        if data:
-            return data
+        print(start_date, end_date)
+        days = BureauActifTimelineDay.query.filter(BureauActifTimelineDay.name.between(start_date, end_date)).all()
+
+        if days:
+            return days
 
         return None
 
     @staticmethod
     def create_defaults():
         timeline_data = BureauActifTimelineDay()
-        timeline_data.name = datetime.datetime.strptime('02-03-2020', '%d-%m-%Y').date()
+        timeline_data.name = datetime.datetime.strptime('23-03-2020', '%d-%m-%Y').date()
         db.session.add(timeline_data)
 
         timeline_data2 = BureauActifTimelineDay()
-        timeline_data2.name = datetime.datetime.strptime('03-03-2020', '%d-%m-%Y').date()
+        timeline_data2.name = datetime.datetime.strptime('24-03-2020', '%d-%m-%Y').date()
         db.session.add(timeline_data2)
 
         timeline_data3 = BureauActifTimelineDay()
-        timeline_data3.name = datetime.datetime.strptime('04-03-2020', '%d-%m-%Y').date()
+        timeline_data3.name = datetime.datetime.strptime('25-03-2020', '%d-%m-%Y').date()
         db.session.add(timeline_data3)
 
         db.session.commit()

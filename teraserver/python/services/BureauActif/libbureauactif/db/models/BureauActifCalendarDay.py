@@ -32,8 +32,8 @@ class BureauActifCalendarDay(db.Model, BaseModel):
 
     @staticmethod
     def get_calendar_day_by_month(start_date, end_date):
-        days = BureauActifCalendarDay.query.filter(BureauActifCalendarDay.date >= start_date,
-                                                   BureauActifCalendarDay.date <= end_date).all()
+        days = BureauActifCalendarDay.query.filter(BureauActifCalendarDay.date.between(start_date, end_date)).all()
+
         if days:
             return days
 

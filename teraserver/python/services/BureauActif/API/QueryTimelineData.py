@@ -312,6 +312,8 @@ class QueryTimelineData(Resource):
                             entries = []
                             for entry in day.series:
                                 entry_json = entry.to_json()
+                                entry_type = timeline_access.query_timeline_type_by_id(entry.id_timeline_entry_type)
+                                entry_json['name'] = entry_type.name
                                 entries.append(entry_json)
                             day_json['series'] = entries
 

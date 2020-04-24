@@ -2,7 +2,7 @@ import datetime
 from datetime import timedelta
 
 from services.BureauActif.libbureauactif.db.models.BureauActifTimelineDay import BureauActifTimelineDay
-from services.BureauActif.libbureauactif.db.models.BureauActifTimelineDayEntry import BureauActifTimelineDayEntry
+from services.BureauActif.libbureauactif.db.models.BureauActifTimelineEntryType import BureauActifTimelineEntryType
 
 
 class DBManagerBureauActifTimelineAccess:
@@ -13,6 +13,6 @@ class DBManagerBureauActifTimelineAccess:
 
         return days
 
-    def query_timeline_entries(self, timeline_day_id: int):
-        data = BureauActifTimelineDayEntry.get_timeline_day_entries(timeline_day_id)
-        return data
+    def query_timeline_type_by_id(self, type_id: int):
+        entry_type = BureauActifTimelineEntryType.get_timeline_type_by_id(type_id)
+        return entry_type
