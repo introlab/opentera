@@ -51,6 +51,16 @@ class TeraDeviceClient:
         backend_response = get(url=self.__backend_url + path, headers=request_headers, verify=False)
         return backend_response
 
+    def can_access_session(self, id_session: int) -> bool:
+        response = self.do_get_request_to_backend('/api/device/sessions?id_session=' + str(id_session))
+        return response.status_code == 200
+
+    def get_device_infos(self) -> dict:
+        response = self.do_get_request_to_backend('/api/device/devices')
+        if response.status_code == 200:
+            return response.json()
+        return {}
+
     def __repr__(self):
         return '<TeraDeviceClient - UUID: ' + self.__device_token \
                + ', Token: ' + self.__device_token + '>'

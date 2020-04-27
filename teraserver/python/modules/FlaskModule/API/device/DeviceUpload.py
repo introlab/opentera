@@ -36,8 +36,8 @@ class DeviceUpload(Resource):
 
     @LoginModule.device_token_or_certificate_required
     def post(self):
-        print(request)
-        print('current_device', current_device)
+        # print(request)
+        # print('current_device', current_device)
 
         if request.content_type == 'application/octet-stream':
             if 'X-Id-Session' not in request.headers:
