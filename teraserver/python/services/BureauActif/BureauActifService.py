@@ -1,4 +1,4 @@
-from services.BureauActif.FlaskModule import FlaskModule
+from services.BureauActif.FlaskModule import FlaskModule, flask_app
 from services.BureauActif.TwistedModule import TwistedModule
 from services.BureauActif.ConfigManager import ConfigManager
 from modules.RedisVars import RedisVars
@@ -28,7 +28,8 @@ if __name__ == '__main__':
         print("Unable to connect to database - please check settings in config file!")
         quit()
 
-    Globals.db_man.create_defaults(config_man)
+    with flask_app.app_context():
+        Globals.db_man.create_defaults(config_man)
 
     # Global redis client
     Globals.redis_client = RedisClient(config_man.redis_config)
