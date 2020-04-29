@@ -49,13 +49,34 @@ class DBManager:
         return access
 
     def create_defaults(self, config: ConfigManager):
-        BureauActifData.create_defaults()
-        BureauActifCalendarDataType.create_defaults()
-        BureauActifCalendarDay.create_defaults()
-        BureauActifCalendarData.create_defaults()
-        BureauActifTimelineEntryType.create_defaults()
-        BureauActifTimelineDay.create_defaults()
-        BureauActifTimelineDayEntry.create_defaults()
+
+        if BureauActifData.get_count() == 0:
+            print('No data - creating defaults')
+            BureauActifData.create_defaults()
+
+        if BureauActifCalendarDataType.get_count() == 0:
+            print('No calendar data type - creating defaults')
+            BureauActifCalendarDataType.create_defaults()
+
+        if BureauActifCalendarDay.get_count() == 0:
+            print('No calendar day - creating defaults')
+            BureauActifCalendarDay.create_defaults()
+
+        if BureauActifCalendarData.get_count() == 0:
+            print('No calendar data - creating defaults')
+            BureauActifCalendarData.create_defaults()
+
+        if BureauActifTimelineEntryType.get_count() == 0:
+            print('No timeline entry type - creating defaults')
+            BureauActifTimelineEntryType.create_defaults()
+
+        if BureauActifTimelineDay.get_count() == 0:
+            print('No timeline day - creating defaults')
+            BureauActifTimelineDay.create_defaults()
+
+        if BureauActifTimelineDayEntry.get_count() == 0:
+            print('No timeline day entry - creating defaults')
+            BureauActifTimelineDayEntry.create_defaults()
 
     def open(self, db_infos, echo=False):
         self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
