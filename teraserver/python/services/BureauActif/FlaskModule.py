@@ -72,7 +72,7 @@ class FlaskModule(BaseModule):
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
-        # flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
+        flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
 
         # Not sure.
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
@@ -100,12 +100,12 @@ class FlaskModule(BaseModule):
         # Default arguments
         kwargs = {'flaskModule': self}
 
-        from .API.Upload import Upload
+        from .API.QueryRawData import QueryRawData
         from .API.QueryCalendarData import QueryCalendarData
         from .API.QueryTimelineData import QueryTimelineData
 
         # Resources
-        default_api_ns.add_resource(Upload, '/upload', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryRawData, '/rawdata', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryCalendarData, '/calendardata', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryTimelineData, '/timelinedata', resource_class_kwargs=kwargs)
 
