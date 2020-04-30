@@ -39,7 +39,6 @@ class ConfigManager:
         if self.validate_backend_config(config_json['Backend']):
             self.backend_config = config_json["Backend"]
 
-
     @staticmethod
     def validate_server_config(config):
         rval = True

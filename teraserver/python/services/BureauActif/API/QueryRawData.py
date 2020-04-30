@@ -11,6 +11,7 @@ from services.BureauActif.FlaskModule import default_api_ns as api, flask_app
 from services.BureauActif.libbureauactif.db.Base import db
 
 from services.BureauActif.libbureauactif.db.models.BureauActifData import BureauActifData
+from services.shared.service_tokens import service_generate_token
 
 
 # Parser definition(s)
@@ -92,6 +93,8 @@ class QueryRawData(Resource):
             fo.close()
 
             # TODO: Send new asset to OpenTera
+            service_token = service_generate_token(self.module.redis, self.module.config.server_config)
+            print(service_token)
 
             # TODO: Process data
             # Data is in raw_data and stored in the "t_data" table.

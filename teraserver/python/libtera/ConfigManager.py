@@ -6,7 +6,6 @@ class ConfigManager:
     server_config = {}  # name, port, ssl_path
     db_config = {}      # name, url, port, username, password
     redis_config = {}
-    service_config = {}
 
     def __init__(self):
         pass
@@ -33,14 +32,10 @@ class ConfigManager:
         if self.validate_redis_config(config_json['Redis']):
             self.redis_config = config_json["Redis"]
 
-        for service in config_json['Services']:
-            if self.validate_service_config(service, config_json['Services'][service]):
-                self.service_config[service] = config_json['Services'][service]
-
     def create_defaults(self):
         # Server fake config
-        server_required_fields = ['name', 'port', 'use_ssl', 'ssl_path', 'hostname',
-                           'site_certificate', 'site_private_key', 'ca_certificate', 'ca_private_key', 'upload_path']
+        server_required_fields = ['name', 'port', 'use_ssl', 'ssl_path', 'hostname', 'site_certificate',
+                                  'site_private_key', 'ca_certificate', 'ca_private_key', 'upload_path']
         for field in server_required_fields:
             self.server_config[field] = ''
         self.server_config['upload_path'] = 'uploads'

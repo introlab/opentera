@@ -24,6 +24,7 @@ from libtera.db.models.TeraServerSettings import TeraServerSettings
 from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent
 from libtera.db.models.TeraAsset import TeraAsset
+from libtera.db.models.TeraService import TeraService
 
 from libtera.ConfigManager import ConfigManager
 
@@ -79,6 +80,10 @@ class DBManager:
         if TeraProject.get_count() == 0:
             print("No projects - creating defaults")
             TeraProject.create_defaults()
+
+        if TeraService.get_count() == 0:
+            print("No services - creating defaults")
+            TeraService.create_defaults()
 
         if TeraParticipantGroup.get_count() == 0:
             print("No participant groups - creating defaults")

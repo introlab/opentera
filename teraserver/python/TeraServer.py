@@ -29,7 +29,9 @@ from modules.FlaskModule.FlaskModule import FlaskModule
 from modules.TwistedModule.TwistedModule import TwistedModule
 
 from libtera.ConfigManager import ConfigManager
-from modules.Globals import db_man
+from libtera.redis.RedisClient import RedisClient
+import modules.Globals as Globals
+
 from modules.UserManagerModule.UserManagerModule import UserManagerModule
 
 
@@ -84,6 +86,7 @@ def init_shared_variables(config):
 
     # Create redis client
     import redis
+    # TODO: Manage redis password
     redis_client = redis.Redis(host=config.redis_config['hostname'], port=config.redis_config['port'],
                                db=config.redis_config['db'])
 
@@ -96,11 +99,33 @@ def init_shared_variables(config):
     redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, service_token_key)
 
     # Set DEVICE
-    redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey,
-                     TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerDeviceTokenKey))
+    redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey, TeraServerSettings.get_server_setting_value(
+        TeraServerSettings.ServerDeviceTokenKey))
+
     # Set PARTICIPANT
-    redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey,
-                     TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerParticipantTokenKey))
+    redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, TeraServerSettings.get_server_setting_value(
+                                      TeraServerSettings.ServerParticipantTokenKey))
+
+
+def init_services(config: ConfigManager):
+    print('Initializing services...')
+
+    from libtera.db.models.TeraService import TeraService
+    from modules.RedisVars import RedisVars
+    import json
+    # Create redis client
+    import redis
+    # TODO: Manage redis password
+    redis_client = redis.Redis(host=config.redis_config['hostname'], port=config.redis_config['port'],
+                               db=config.redis_config['db'])
+
+    services = TeraService.query.all()
+    for service in services:
+        if service.service_enabled:
+            print('Activating service: ' + service.service_key)
+            redis_client.set(RedisVars.RedisVar_ServicePrefixKey + service.service_key, json.dumps(service.to_json()))
+        else:
+            print('Skipping disabled service: ' + service.service_key)
 
 
 if __name__ == '__main__':
@@ -148,16 +173,19 @@ if __name__ == '__main__':
     }
 
     try:
-        db_man.open(POSTGRES, True)
+        Globals.db_man.open(POSTGRES, True)
     except OperationalError:
         print("Unable to connect to database - please check settings in config file!")
         quit()
 
     # Create default values, if required
-    db_man.create_defaults(config=config_man)
+    Globals.db_man.create_defaults(config=config_man)
 
     # Create Redis variables shared with services
     init_shared_variables(config=config_man)
+
+    # Initialize enabled services
+    init_services(config=config_man)
 
     # Main Flask module
     flask_module = FlaskModule(config_man)

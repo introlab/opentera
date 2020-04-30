@@ -5,4 +5,6 @@ class RedisVars:
     RedisVar_ParticipantTokenAPIKey = "ParticipantTokenAPIKey"
     RedisVar_ServiceTokenAPIKey = "ServiceTokenAPIKey"
 
+    RedisVar_ServicePrefixKey = "Service_"
+
 

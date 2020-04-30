@@ -55,6 +55,23 @@ if __name__ == '__main__':
     Globals.api_device_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
     Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
 
+    # Get service UUID
+    service_info = Globals.redis_client.redisGet(RedisVars.RedisVar_ServicePrefixKey + config_man.server_config['name'])
+    import sys
+    if service_info is None:
+        sys.stderr.write('Error: Unable to get service info from OpenTera Server - is the server running and config '
+                         'correctly set in this service?')
+        exit(1)
+    import json
+    service_info = json.loads(service_info)
+    if 'service_uuid' not in service_info:
+        sys.stderr.write('OpenTera Server didn\'t return a valid service UUID - aborting.')
+        exit(1)
+
+    config_man.server_config['ServiceUUID'] = service_info['service_uuid']
+
+    # TODO: Set port from service config from server?
+
     # Main Flask module
     flask_module = FlaskModule(config_man)
 
