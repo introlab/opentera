@@ -1,11 +1,22 @@
 from flask_sqlalchemy import SQLAlchemy
 import inspect
 import datetime
+# import uuid
+import time
 
 db = SQLAlchemy()
 
 
 class BaseModel:
+
+    version_id = db.Column(db.BigInteger, nullable=False, default=time.time()*1000)
+
+    # Using timestamp as version tracker - multiplying by 1000 to keep ms part without using floats (which seems to
+    # cause problems with the mapper)
+    __mapper_args__ = {
+        'version_id_col': version_id,
+        'version_id_generator': lambda version: time.time()*1000  # uuid.uuid4().hex
+    }
 
     def to_json(self, ignore_fields=None):
         if ignore_fields is None:
@@ -13,7 +24,7 @@ class BaseModel:
         pr = {}
         for name in dir(self):
             if not name.startswith('__') and not name.startswith('_') and not name.startswith('query') and \
-                    not name.startswith('metadata') and name not in ignore_fields:
+                    not name.startswith('metadata') and name != 'version_id' and name not in ignore_fields:
                 value = getattr(self, name)
                 if not inspect.ismethod(value) and not inspect.isfunction(value):
                     if isinstance(value, datetime.datetime):
