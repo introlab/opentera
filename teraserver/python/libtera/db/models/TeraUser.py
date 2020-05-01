@@ -42,16 +42,16 @@ class TeraUser(db.Model, BaseModel):
         return rval
 
     def get_token(self, token_key: str):
-        return TeraUser.get_token_for_user(self.user_uuid, token_key)
-
-    @staticmethod
-    def get_token_for_user(user_uuid: uuid, token_key: str):
         import time
         import jwt
         # Creating token with user info
         payload = {
             'iat': int(time.time()),
-            'user_uuid': user_uuid
+            'exp': int(time.time()) + 3600,
+            'iss': 'TeraServer',
+            'user_uuid': self.user_uuid,
+            'id_user': self.id_user,
+            'user_fullname': self.get_fullname()
         }
 
         return jwt.encode(payload, token_key, algorithm='HS256').decode('utf-8')

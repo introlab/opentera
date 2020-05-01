@@ -53,7 +53,7 @@ class AccessManager:
 
                 if token_dict['participant_uuid']:
                     _request_ctx_stack.top.current_participant_client = \
-                        TeraParticipantClient(token_dict['participant_uuid'], token_value, config_man)
+                        TeraParticipantClient(token_dict, token_value, config_man)
                     return f(*args, **kwargs)
 
                 # Default, not authorized
@@ -80,8 +80,7 @@ class AccessManager:
                     return redirect(login_path)
 
                 if token_dict['user_uuid']:
-                    _request_ctx_stack.top.current_user_client = TeraUserClient(token_dict['user_uuid'], token_value,
-                                                                                config_man)
+                    _request_ctx_stack.top.current_user_client = TeraUserClient(token_dict, token_value, config_man)
                     return f(*args, **kwargs)
 
                 # Any other case, do not call function

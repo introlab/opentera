@@ -1,9 +1,6 @@
 from libtera.db.Base import db, BaseModel
 
 import uuid
-import jwt
-import time
-import datetime
 
 
 class TeraService(db.Model, BaseModel):
@@ -18,6 +15,8 @@ class TeraService(db.Model, BaseModel):
     service_clientendpoint = db.Column(db.String, nullable=False)
     service_enabled = db.Column(db.Boolean, nullable=False, default=False)
 
+    service_roles = db.relationship('TeraServiceRole')
+
     def __init__(self):
         pass
 
@@ -31,7 +30,7 @@ class TeraService(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend([])
+        ignore_fields.extend(['service_roles'])
 
         if minimal:
             ignore_fields.extend([])
@@ -90,18 +89,4 @@ class TeraService(db.Model, BaseModel):
     def insert(cls, service):
         service.service_uuid = str(uuid.uuid4())
         super().insert(service)
-
-        # TODO: Update service in redis config
-
-    @classmethod
-    def delete(cls, id_todel):
-        super().delete(id_todel)
-
-        # TODO: Update service in redis config
-
-    @classmethod
-    def update(cls, update_id: int, values: dict):
-        super().update(update_id=update_id, values=values)
-
-        # TODO: Update service in redis config
 

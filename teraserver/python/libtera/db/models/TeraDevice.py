@@ -87,10 +87,9 @@ class TeraDevice(db.Model, BaseModel):
     def create_token(self):
         # Creating token with user info
         payload = {
-            'iat': int(time.time()),
+            'iss': 'TeraServer',
             'device_uuid': self.device_uuid,
-            'device_name': self.device_name,
-            'device_type': self.device_type
+            'id_device': self.id_device
         }
 
         self.device_token = jwt.encode(payload, TeraServerSettings.get_server_setting_value(

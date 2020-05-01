@@ -47,9 +47,9 @@ class AccessManager:
                 # Verify scheme and token
                 if scheme == 'OpenTera':
                     token = atoken
-            else:
+            if token is None:
                 #################
-                # TOKEN PARAMETER
+                # TOKEN PARAMETER ?
                 parser = reqparse.RequestParser()
                 parser.add_argument('token', type=str, help='Device, participant or user token', required=False)
 
@@ -59,11 +59,11 @@ class AccessManager:
                 # Verify token in params
                 if 'token' in request_args:
                     token = request_args['token']
-                else:
-                    ###############
-                    # COOKIE TOKEN
-                    if TokenCookieName in request.cookies:
-                        token = request.cookies[TokenCookieName]
+            if token is None:
+                ###############
+                # COOKIE TOKEN
+                if TokenCookieName in request.cookies:
+                    token = request.cookies[TokenCookieName]
 
             #########################
             # Verify token from redis
@@ -77,7 +77,7 @@ class AccessManager:
                 pass
             else:
                 # User token
-                _request_ctx_stack.top.current_user_client = TeraUserClient(token_dict['user_uuid'], token, config_man)
+                _request_ctx_stack.top.current_user_client = TeraUserClient(token_dict, token, config_man)
                 _request_ctx_stack.top.current_login_type = LoginType.USER_LOGIN
                 return f(*args, **kwargs)
 
@@ -89,8 +89,7 @@ class AccessManager:
                 pass
             else:
                 # Device token
-                _request_ctx_stack.top.current_device_client = TeraDeviceClient(token_dict['device_uuid'], token,
-                                                                                config_man)
+                _request_ctx_stack.top.current_device_client = TeraDeviceClient(token_dict, token, config_man)
                 _request_ctx_stack.top.current_login_type = LoginType.DEVICE_LOGIN
                 return f(*args, **kwargs)
 
@@ -102,8 +101,7 @@ class AccessManager:
                 pass
             else:
                 # Participant token
-                _request_ctx_stack.top.current_user_client = TeraParticipantClient(token_dict['participant_uuid'],
-                                                                                   token, config_man)
+                _request_ctx_stack.top.current_participant_client = TeraParticipantClient(token_dict, token, config_man)
                 _request_ctx_stack.top.current_login_type = LoginType.PARTICIPANT_LOGIN
                 return f(*args, **kwargs)
 

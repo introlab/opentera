@@ -6,8 +6,9 @@ from flask import request
 
 class TeraParticipantClient:
 
-    def __init__(self, u_uuid: uuid, token: str, config_man):
-        self.__participant_uuid = u_uuid
+    def __init__(self, token_dict: dict, token: str, config_man):
+        self.__participant_uuid = token_dict['participant_uuid']
+        self.__id_participant = token_dict['id_participant']
         self.__participant_token = token
 
         # A little trick here to get the right URL for the server if we are using a proxy
@@ -37,12 +38,26 @@ class TeraParticipantClient:
         self.__participant_uuid = u_uuid
 
     @property
+    def id_participant(self):
+        return self.__id_participant
+
+    @id_participant.setter
+    def id_participant(self, id_p: int):
+        self.__id_participant = id_p
+
+    @property
     def participant_token(self):
         return self.__participant_token
 
     @participant_token.setter
     def participant_token(self, token: str):
         self.__participant_token = token
+
+    def get_participant_infos(self) -> dict:
+        response = self.do_get_request_to_backend('/api/participants/participants')
+        if response.status_code == 200:
+            return response.json()
+        return {}
 
     def do_get_request_to_backend(self, path: str) -> Response:
         from requests import get

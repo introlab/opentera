@@ -6,8 +6,9 @@ from flask import request
 
 class TeraDeviceClient:
 
-    def __init__(self, u_uuid: uuid, token: str, config_man):
-        self.__device_uuid = u_uuid
+    def __init__(self, token_dict: dict, token: str, config_man):
+        self.__device_uuid = token_dict['device_uuid']
+        self.__id_device = token_dict['id_device']
         self.__device_token = token
 
         # A little trick here to get the right URL for the server if we are using a proxy
@@ -35,6 +36,14 @@ class TeraDeviceClient:
     @device_uuid.setter
     def device_uuid(self, u_uuid: uuid):
         self.__device_uuid = u_uuid
+
+    @property
+    def id_device(self):
+        return self.__id_device
+
+    @id_device.setter
+    def id_device(self, id_dev: int):
+        self.__id_device = id_dev
 
     @property
     def device_token(self):

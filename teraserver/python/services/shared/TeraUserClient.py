@@ -5,8 +5,10 @@ from requests import Response
 
 class TeraUserClient:
 
-    def __init__(self, u_uuid: uuid, token: str, config_man):
-        self.__user_uuid = u_uuid
+    def __init__(self, token_dict: dict, token: str, config_man):
+        self.__user_uuid = token_dict['user_uuid']
+        self.__id_user = token_dict['id_user']
+        self.__user_fullname = token_dict['user_fullname']
         self.__user_token = token
 
         # A little trick here to get the right URL for the server if we are using a proxy
@@ -34,6 +36,22 @@ class TeraUserClient:
     @user_uuid.setter
     def user_uuid(self, u_uuid: uuid):
         self.__user_uuid = u_uuid
+
+    @property
+    def id_user(self):
+        return self.__id_user
+
+    @id_user.setter
+    def id_user(self, id_user: int):
+        self.__id_user = id_user
+
+    @property
+    def user_fullname(self):
+        return self.__user_fullname
+
+    @user_fullname.setter
+    def user_fullname(self, name: str):
+        self.__user_fullname = name
 
     @property
     def user_token(self):

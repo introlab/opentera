@@ -17,7 +17,7 @@ class TeraParticipant(db.Model, BaseModel):
     participant_username = db.Column(db.String(50), nullable=True)
     participant_email = db.Column(db.String, nullable=True)
     participant_password = db.Column(db.String, nullable=True)
-    participant_token = db.Column(db.String, nullable=False, unique=True)
+    participant_token = db.Column(db.String, nullable=True, unique=True)
     participant_lastonline = db.Column(db.TIMESTAMP, nullable=True)
     participant_enabled = db.Column(db.Boolean, nullable=False, default=True)
     participant_login_enabled = db.Column(db.Boolean, nullable=False, default=False)
@@ -50,8 +50,9 @@ class TeraParticipant(db.Model, BaseModel):
     def create_token(self):
         # Creating token with user info
         payload = {
-            'iat': int(time.time()),
-            'participant_uuid': self.participant_uuid
+            'iss': 'TeraServer',
+            'participant_uuid': self.participant_uuid,
+            'id_participant': self.id_participant
         }
 
         self.participant_token = jwt.encode(payload, TeraServerSettings.get_server_setting_value(
@@ -182,7 +183,7 @@ class TeraParticipant(db.Model, BaseModel):
             TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
         participant1.participant_project = project1
 
-        participant1.create_token()
+        # participant1.create_token()
         participant1.participant_username = 'participant1'
         participant1.participant_password = TeraParticipant.encrypt_password('opentera')
         participant1.participant_login_enabled = True
@@ -196,9 +197,14 @@ class TeraParticipant(db.Model, BaseModel):
         participant2.participant_participant_group = None
         participant2.participant_project = project1
 
-        participant2.create_token()
+        # participant2.create_token()
         db.session.add(participant2)
 
+        db.session.commit()
+
+        # Create token with added participants, since we need to have the id_participant field set
+        participant1.create_token()
+        participant2.create_token()
         db.session.commit()
 
     @classmethod
@@ -224,11 +230,15 @@ class TeraParticipant(db.Model, BaseModel):
 
         participant.participant_lastonline = None
         participant.participant_uuid = str(uuid.uuid4())
-        participant.create_token()
+        # participant.create_token()
         # Check if username is available
         if not TeraParticipant.is_participant_username_available(participant.participant_username):
             raise NameError('Participant username already in use.')
         super().insert(participant)
+
+        # Token must be created after being inserted, since we need to have a valid ID participant into it
+        participant.create_token()
+        db.session.commit()
 
     @classmethod
     def delete(cls, id_todel: int):
