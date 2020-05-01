@@ -21,7 +21,7 @@ class TeraDevice(db.Model, BaseModel):
                             nullable=False)
     id_device_subtype = db.Column(db.Integer, db.ForeignKey('t_devices_subtypes.id_device_subtype',
                                                             ondelete='set null'), nullable=True)
-    device_token = db.Column(db.String, nullable=False, unique=True)
+    device_token = db.Column(db.String, nullable=True, unique=True)
     device_certificate = db.Column(db.String, nullable=True)
     device_enabled = db.Column(db.Boolean, nullable=False, default=False)
     device_onlineable = db.Column(db.Boolean, nullable=False, default=False)
@@ -165,7 +165,7 @@ class TeraDevice(db.Model, BaseModel):
         # Forcing uuid for tests
         device.device_uuid = 'b707e0b2-e649-47e7-a938-2b949c423f73'  # str(uuid.uuid4())
         device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
-        device.create_token()
+        # device.create_token()
         device.device_enabled = True
         device.device_onlineable = True
         # device.device_site = TeraSite.get_site_by_sitename('Default Site')
@@ -176,7 +176,7 @@ class TeraDevice(db.Model, BaseModel):
         device2.device_name = 'Kit Télé #1'
         device2.device_uuid = str(uuid.uuid4())
         device2.device_type = TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value
-        device2.create_token()
+        # device2.create_token()
         device2.device_enabled = True
         device2.device_onlineable = True
         # device2.device_sites = [TeraSite.get_site_by_sitename('Default Site')]
@@ -188,12 +188,19 @@ class TeraDevice(db.Model, BaseModel):
         device3.device_name = 'Robot A'
         device3.device_uuid = str(uuid.uuid4())
         device3.device_type = TeraDeviceType.DeviceTypeEnum.ROBOT.value
-        device3.create_token()
+        # device3.create_token()
         device3.device_enabled = True
         device3.device_onlineable = True
         # device3.device_sites = [TeraSite.get_site_by_sitename('Default Site')]
         # device3.device_participants = [TeraParticipant.get_participant_by_id(2)]
         db.session.add(device3)
+
+        db.session.commit()
+
+        # Must create token after devices are created since token contains id_device!
+        device.create_token()
+        device2.create_token()
+        device3.create_token()
 
         db.session.commit()
 
@@ -209,10 +216,10 @@ class TeraDevice(db.Model, BaseModel):
         if device.id_device_subtype == 0:
             device.id_device_subtype = None
 
+        super().insert(device)
         # Create token
         device.create_token()
-
-        super().insert(device)
+        db.session.commit()
 
     @classmethod
     def update(cls, update_id: int, values: dict):
