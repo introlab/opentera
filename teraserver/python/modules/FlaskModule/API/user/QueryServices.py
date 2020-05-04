@@ -92,7 +92,7 @@ class QueryServices(Resource):
             return '', 403
 
         # Using request.json instead of parser, since parser messes up the json!
-        json_service = request.json['service']
+        json_service = request.json['service_project']
 
         # Validate if we have an id
         if 'id_service' not in json_service:

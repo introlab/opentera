@@ -20,12 +20,15 @@ class Config:
     user_device_project_endpoint = '/api/user/deviceprojects'
     user_device_participant_endpoint = '/api/user/deviceparticipants'
     user_session_type_project = '/api/user/sessiontypeprojects'
+    user_service_project = '/api/user/serviceprojects'
 
     # Device endpoints
     device_login_endpoint = '/api/device/login'
     device_session_endpoint = '/api/device/sessions'
     # device_session_data_endpoint = '/api/device/device_upload'
     device_session_data_endpoint = '/api/rawdata'
+
+    service_info_endpoint = '/api/serviceinfos'
 
     # Super secure.
     username = 'admin'
@@ -76,8 +79,11 @@ def get_site(config: Config, name: str):
         print(e)
         return {}
 
-    if response.status_code == 200 and response.json():
-        return response.json().pop()
+    if response.status_code == 200:
+        if response.json():
+            return response.json().pop()
+        else:
+            return None
     import inspect
     print('Error in ' + inspect.currentframe().f_code.co_name + ': Code=' + str(response.status_code) + ', Message=' +
           response.content.decode())
@@ -115,8 +121,11 @@ def get_project(config: Config, name: str):
         print(e)
         return {}
 
-    if response.status_code == 200 and response.json():
-        return response.json().pop()
+    if response.status_code == 200:
+        if response.json():
+            return response.json().pop()
+        else:
+            return None
     import inspect
     print('Error in ' + inspect.currentframe().f_code.co_name + ': Code=' + str(response.status_code) + ', Message=' +
           response.content.decode())
@@ -155,8 +164,11 @@ def get_participant(config: Config, name: str):
         print(e)
         return {}
 
-    if response.status_code == 200 and response.json():
-        return response.json().pop()
+    if response.status_code == 200:
+        if response.json():
+            return response.json().pop()
+        else:
+            return None
     import inspect
     print('Error in ' + inspect.currentframe().f_code.co_name + ': Code=' + str(response.status_code) + ', Message=' +
           response.content.decode())
@@ -209,8 +221,11 @@ def get_device(config: Config, name: str):
         print(e)
         return {}
 
-    if response.status_code == 200 and response.json():
-        return response.json().pop()
+    if response.status_code == 200:
+        if response.json():
+            return response.json().pop()
+        else:
+            return None
     import inspect
     print('Error in ' + inspect.currentframe().f_code.co_name + ': Code=' + str(response.status_code) + ', Message=' +
           response.content.decode())
@@ -293,6 +308,24 @@ def add_session_type_project(config: Config, id_project: int, id_session_type: i
     return {}
 
 
+def add_service_to_project(config: Config, id_project: int, s_uuid: str):
+
+    url = _make_url(config.hostname, config.port, config.user_service_project)
+    try:
+        service_project_dict = {'service_project': {'id_project': id_project, 'service_uuid': s_uuid}}
+        response = post(url=url, json=service_project_dict, verify=False, auth=(config.username, config.password))
+    except Exception as e:
+        print(e)
+        return {}
+
+    if response.status_code == 200:
+        return response.json().pop()
+    import inspect
+    print('Error in ' + inspect.currentframe().f_code.co_name + ': Code=' + str(response.status_code) + ', Message=' +
+          response.content.decode())
+    return {}
+
+
 def create_session_data(config: Config, token: str, filename: str, data, id_session: int,
                         date: datetime = datetime.now()):
     url = _make_url(config.hostname, config.port, config.servicename + '/' + config.device_session_data_endpoint) + \
@@ -321,6 +354,24 @@ def create_session_data(config: Config, token: str, filename: str, data, id_sess
     return {}
 
 
+def get_bureau_actif_service_uuid(config: Config, token: str) -> str:
+    url = _make_url(config.hostname, config.port, config.servicename + '/' + config.service_info_endpoint)
+    params = {'token': token}
+    try:
+        response = get(url=url, params=params, verify=False)
+    except Exception as e:
+        print(e)
+        return ''
+
+    if response.status_code == 200 and response.json():
+        service_infos = response.json()
+        return service_infos['service_uuid']
+    import inspect
+    print('Error in ' + inspect.currentframe().f_code.co_name + ': Code=' + str(response.status_code) + ', Message=' +
+          response.content.decode())
+    return ''
+
+
 if __name__ == '__main__':
 
     base_config = Config()
@@ -336,6 +387,9 @@ if __name__ == '__main__':
     # Login admin
     admin_info = login_user(base_config)
 
+    # Bureau Actif service uuid
+    service_uuid = get_bureau_actif_service_uuid(base_config, admin_info['user_token'])
+
     # create_participant(config1, 'PartBA_1')
     site_info = get_site(base_config, 'Bureau Actif Tests')
 
@@ -348,6 +402,7 @@ if __name__ == '__main__':
         project_info = create_project(base_config, 'Donnees Tests', site_info['id_site'])
         # TODO get session types from server, hardcoded to 2 = SENSOR_DATA
         project_session_type_info = add_session_type_project(base_config, project_info['id_project'], 2)
+        add_service_to_project(base_config, project_info['id_project'], service_uuid)
 
     import os
     participant_name = os.path.split(data_path)[-1]

@@ -104,12 +104,14 @@ class FlaskModule(BaseModule):
         from .API.QueryCalendarData import QueryCalendarData
         from .API.QueryTimelineData import QueryTimelineData
         from .API.QueryLoginType import QueryLoginType
+        from .API.QueryServiceInfos import QueryServiceInfos
 
         # Resources
         default_api_ns.add_resource(QueryRawData, '/rawdata', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryCalendarData, '/calendardata', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryTimelineData, '/timelinedata', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryLoginType, '/me', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryServiceInfos, '/serviceinfos', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from .Views.Index import Index

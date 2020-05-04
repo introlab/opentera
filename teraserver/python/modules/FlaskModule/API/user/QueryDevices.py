@@ -71,6 +71,9 @@ class QueryDevices(Resource):
         elif args['name']:
             devices = [TeraDevice.get_device_by_name(args['name'])]
             for device in devices:
+                if device is None and len(devices) == 1:
+                    devices = []
+                    break
                 if device.id_device not in user_access.get_accessible_devices_ids():
                     devices = []
 

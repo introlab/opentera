@@ -5,6 +5,7 @@ from modules.RedisVars import RedisVars
 from libtera.redis.RedisClient import RedisClient
 import services.BureauActif.Globals as Globals
 from sqlalchemy.exc import OperationalError
+from services.shared.ServiceOpenTera import ServiceOpenTera
 
 import os
 
@@ -69,6 +70,12 @@ if __name__ == '__main__':
         exit(1)
 
     config_man.server_config['ServiceUUID'] = service_info['service_uuid']
+
+    # Creates communication interface with OpenTera
+    Globals.service_opentera = ServiceOpenTera(backend_hostname=config_man.backend_config['hostname'],
+                                               backend_port=config_man.backend_config['port'],
+                                               redis_client=Globals.redis_client,
+                                               service_uuid=service_info['service_uuid'])
 
     # TODO: Set port from service config from server?
 

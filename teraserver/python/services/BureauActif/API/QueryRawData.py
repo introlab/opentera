@@ -9,9 +9,8 @@ from werkzeug.utils import secure_filename
 from services.BureauActif.AccessManager import AccessManager, current_login_type, current_device_client, LoginType
 from services.BureauActif.FlaskModule import default_api_ns as api, flask_app
 from services.BureauActif.libbureauactif.db.Base import db
-
+from services.BureauActif.Globals import service_opentera
 from services.BureauActif.libbureauactif.db.models.BureauActifData import BureauActifData
-from services.shared.service_tokens import service_generate_token
 
 
 # Parser definition(s)
@@ -92,9 +91,17 @@ class QueryRawData(Resource):
             fo.write(request.data)
             fo.close()
 
-            # TODO: Send new asset to OpenTera
-            service_token = service_generate_token(self.module.redis, self.module.config.server_config)
-            print(service_token)
+            # Send new asset to OpenTera
+            json_asset = {'asset': {'id_asset': 0,  # Will create a new asset
+                                    'id_session': id_session,
+                                    'id_device': id_device,
+                                    'asset_name': filename,
+                                    'asset_type': 2  # Hard coded for now as RAW_DATA
+                                    }}
+            post_result = service_opentera.post_to_opentera(api_url='/api/service/assets', json_data=json_asset)
+            if post_result.status_code != 200:
+                print('Error sending asset to OpenTera: : Code=' + str(post_result.status_code) + ', Message=' +
+                      post_result.content.decode())
 
             # TODO: Process data
             # Data is in raw_data and stored in the "t_data" table.

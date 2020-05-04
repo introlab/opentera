@@ -89,6 +89,9 @@ class QueryParticipants(Resource):
         elif args['name']:
             participants = [TeraParticipant.get_participant_by_name(args['name'])]
             for participant in participants:
+                if not participant and len(participants) == 1:
+                    participants = []
+                    break
                 if participant.id_participant not in user_access.get_accessible_participants_ids():
                     participants = []
 

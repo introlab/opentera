@@ -86,3 +86,10 @@ class TeraAsset(db.Model, BaseModel):
     @staticmethod
     def get_assets_for_service(service_uuid: str):
         return TeraAsset.query.filter_by(service_uuid=service_uuid).all()
+
+    @classmethod
+    def insert(cls, asset):
+        # Generate UUID
+        asset.asset_uuid = str(uuid.uuid4())
+
+        super().insert(asset)

@@ -9,6 +9,7 @@ from modules.RedisVars import RedisVars
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraDevice import TeraDevice
+from libtera.db.models.TeraService import TeraService
 
 from libtera.ConfigManager import ConfigManager
 import datetime
@@ -29,6 +30,9 @@ current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_dev
 
 # Current user identity, stacked
 current_user = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_user', None))
+
+# Current service identity, stacked
+current_service = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_service', None))
 
 # Authentication schemes for users
 user_http_auth = HTTPBasicAuth(realm='user')
@@ -288,12 +292,12 @@ class LoginModule(BaseModule):
             # Since certificates are more secure than tokens, we will test for them first
             # Headers are modified in TwistedModule to add certificate information if available.
             # We are interested in the content of field : X-Service-Uuid,
-            if request.headers.__contains__('X-Service-Uuid'):
-                # TODO Load service from DB ?
-                # TODO validate service UUID
-                return f(*args, **kwargs)
+            # if request.headers.__contains__('X-Service-Uuid'):
+            #     # Validate service from database
+            #     return f(*args, **kwargs)
 
             # Then verify tokens...
+            service_uuid = None
             # Verify token in auth headers (priority over token in params)
             if 'Authorization' in request.headers:
                 try:
@@ -312,28 +316,34 @@ class LoginModule(BaseModule):
                                                     RedisVars.RedisVar_ServiceTokenAPIKey),
                                                 algorithms='HS256')
                         if 'service_uuid' in token_dict:
-                            # TODO VERIFY IF SERVICE IS OK.
-                            return f(*args, **kwargs)
+                            service_uuid = token_dict['service_uuid']
                     except jwt.exceptions.InvalidSignatureError as e:
                         return 'Forbidden', 403
 
             # Parse args
-            parser = reqparse.RequestParser()
-            parser.add_argument('token', type=str, help='Token', required=False)
-            token_args = parser.parse_args(strict=False)
+            if not service_uuid:
+                parser = reqparse.RequestParser()
+                parser.add_argument('token', type=str, help='Token', required=False)
+                token_args = parser.parse_args(strict=False)
 
-            # Verify token in params
-            if token_args['token']:
-                try:
-                    token_dict = jwt.decode(token_args['token'],
-                                            LoginModule.redis_client.get(
-                                                RedisVars.RedisVar_ServiceTokenAPIKey),
-                                            algorithms='HS256')
-                    if 'service_uuid' in token_dict:
-                        # TODO VERIFY IF SERVICE IS OK.
-                        return f(*args, **kwargs)
-                except jwt.exceptions.InvalidSignatureError as e:
-                    return 'Forbidden', 403
+                # Verify token in params
+                if token_args['token']:
+                    try:
+                        token_dict = jwt.decode(token_args['token'],
+                                                LoginModule.redis_client.get(
+                                                    RedisVars.RedisVar_ServiceTokenAPIKey),
+                                                algorithms='HS256')
+                        if 'service_uuid' in token_dict:
+                            service_uuid = token_dict['service_uuid']
+                    except jwt.exceptions.InvalidSignatureError as e:
+                        return 'Forbidden', 403
+
+            if service_uuid:
+                # Check if service is allowed to connect
+                service = TeraService.get_service_by_uuid(service_uuid)
+                if service and service.service_enabled:
+                    _request_ctx_stack.top.current_service = service
+                    return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.
             return 'Forbidden', 403

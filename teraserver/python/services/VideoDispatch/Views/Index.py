@@ -1,16 +1,18 @@
 from flask.views import MethodView
 from flask import render_template, request
-from services.VideoDispatch.AccessManager import AccessManager, current_user_client
-from services.shared.service_tokens import service_generate_token
-from requests import get, post
-import json
+from services.shared.ServiceOpenTera import ServiceOpenTera
+from services.VideoDispatch.Globals import redis_client
 
 
 class Index(MethodView):
     def __init__(self, *args, **kwargs):
         self.flaskModule = kwargs.get('flaskModule', None)
         # Generate service token once
-        self.service_token = service_generate_token(self.flaskModule.redis, self.flaskModule.config.server_config)
+        # self.service_token = service_generate_token(self.flaskModule.redis, self.flaskModule.config.server_config)
+        self.service_opentera = ServiceOpenTera(self.flaskModule.config.backend_config['hostname'],
+                                                self.flaskModule.config.backend_config['port'],
+                                                self.flaskModule.config.server_config['ServiceUUID'],
+                                                redis_client)
 
     def get(self):
         # print('get')
@@ -50,15 +52,17 @@ class Index(MethodView):
 
                 # Call OpenTera server to create a participant
                 # This is a synchronous call
-                url = "http://" + backend_hostname + ':' + str(backend_port) + '/api/service/participants'
-                request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+                # url = "http://" + backend_hostname + ':' + str(backend_port) + '/api/service/participants'
+                # request_headers = {'Authorization': 'OpenTera ' + self.service_token}
 
                 participant_info = {'participant': {'id_participant': 0,  # Will create a new participant
                                                     'id_project': 1,  # Hard coded for now
                                                     'participant_name': request.form['name'],
                                                     'participant_email': request.form['email']}}
 
-                response = post(url=url, verify=False, headers=request_headers, json=participant_info)
+                # response = post(url=url, verify=False, headers=request_headers, json=participant_info)
+                response = self.service_opentera.post_to_opentera(api_url='/api/service/participants',
+                                                                  json_data=participant_info)
                 if response.status_code == 200:
                     # TODO SEND EMAIL!
                     server_participant_info = response.json()

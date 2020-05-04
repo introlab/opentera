@@ -67,6 +67,9 @@ class QueryProjects(Resource):
         elif args['name']:
             projects = [TeraProject.get_project_by_projectname(projectname=args['name'])]
             for project in projects:
+                if project is None and len(projects) == 1:
+                    projects = []
+                    break
                 if project.id_project not in user_access.get_accessible_projects_ids():
                     # Current user doesn't have access to the requested project
                     projects = []

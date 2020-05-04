@@ -36,6 +36,7 @@ from modules.FlaskModule.FlaskModule import flask_app
 from .DBManagerTeraUserAccess import DBManagerTeraUserAccess
 from .DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
 from .DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
+from .DBManagerTeraServiceAccess import DBManagerTeraServiceAccess
 
 # Alembic
 from alembic.config import Config
@@ -68,6 +69,11 @@ class DBManager:
     @staticmethod
     def participantAccess(participant: TeraParticipant):
         access = DBManagerTeraParticipantAccess(participant=participant)
+        return access
+
+    @staticmethod
+    def serviceAccess(service: TeraService):
+        access = DBManagerTeraServiceAccess(service = service)
         return access
 
     def create_defaults(self, config: ConfigManager):

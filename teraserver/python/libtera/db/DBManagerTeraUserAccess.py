@@ -96,6 +96,14 @@ class DBManagerTeraUserAccess:
                         project_list.append(project)
         return project_list
 
+    def get_accessible_projects_ids(self, admin_only=False):
+        projects = []
+
+        for project in self.get_accessible_projects(admin_only=admin_only):
+            projects.append(project.id_project)
+
+        return projects
+
     def get_accessible_devices(self, admin_only=False):
         if self.user.user_superadmin:
             return TeraDevice.query.all()
@@ -167,14 +175,6 @@ class DBManagerTeraUserAccess:
             groups.append(group.id_participant_group)
 
         return groups
-
-    def get_accessible_projects_ids(self, admin_only=False):
-        projects = []
-
-        for project in self.get_accessible_projects(admin_only=admin_only):
-            projects.append(project.id_project)
-
-        return projects
 
     def get_accessible_sites(self, admin_only=False):
         if self.user.user_superadmin:
@@ -536,3 +536,18 @@ class DBManagerTeraUserAccess:
             .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None))\
             .filter(TeraAsset.asset_service_uuid == uuid_service).all()
 
+    def query_projects_for_service(self, service_id: int):
+        from libtera.db.models.TeraServiceProject import TeraServiceProject
+        projects_ids = self.get_accessible_projects_ids()
+
+        projects = TeraServiceProject.query.filter(TeraServiceProject.id_project.in_(projects_ids)) \
+            .filter_by(id_service=service_id).all()
+        return projects
+
+    def query_services_for_project(self, project_id: int):
+        from libtera.db.models.TeraServiceProject import TeraServiceProject
+        services_ids = self.get_accessible_services_ids()
+
+        services = TeraServiceProject.query.filter(TeraServiceProject.id_service.in_(services_ids)) \
+            .filter_by(id_project=project_id).all()
+        return services

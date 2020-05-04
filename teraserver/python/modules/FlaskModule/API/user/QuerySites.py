@@ -67,6 +67,10 @@ class QuerySites(Resource):
         elif args['name']:
             sites = [TeraSite.get_site_by_sitename(sitename=args['name'])]
             for site in sites:
+                if site is None and len(sites) == 1:
+                    sites = None
+                    break
+
                 if site.id_site not in user_access.get_accessible_sites_ids():
                     # Current user doesn't have access to the requested site
                     sites = None
