@@ -227,6 +227,31 @@ class DBManagerTeraUserAccess:
 
         return ses_ids
 
+    def get_accessible_services(self, admin_only=False):
+        from libtera.db.models.TeraService import TeraService
+        from libtera.db.models.TeraServiceProjectRole import TeraServiceProjectRole
+        from libtera.db.models.TeraServiceRole import TeraServiceRole
+
+        if self.user.user_superadmin:
+            return TeraService.query.all()
+
+        accessible_projects_ids = self.get_accessible_projects_ids()
+        query = TeraService.query.join(TeraServiceProjectRole).filter(
+            TeraServiceProjectRole.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
+
+        if admin_only:
+            query = query.join(TeraServiceRole).filter(TeraServiceRole.service_role_name == 'admin')
+
+        return query.all()
+
+    def get_accessible_services_ids(self, admin_only=False):
+        services_ids = []
+
+        for service in self.get_accessible_services(admin_only=admin_only):
+            services_ids.append(service.id_service)
+
+        return services_ids
+
     def get_projects_roles(self):
         projects_roles = {}
         project_list = self.get_accessible_projects()
@@ -510,3 +535,4 @@ class DBManagerTeraUserAccess:
         return TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids))\
             .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None))\
             .filter(TeraAsset.asset_service_uuid == uuid_service).all()
+

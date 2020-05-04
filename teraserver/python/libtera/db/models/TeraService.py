@@ -47,7 +47,7 @@ class TeraService(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_participant_by_uuid(p_uuid):
+    def get_service_by_uuid(p_uuid: str):
         service = TeraService.query.filter_by(service_uuid=p_uuid).first()
 
         if service:
@@ -56,8 +56,12 @@ class TeraService(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_service_by_name(name):
+    def get_service_by_name(name: str):
         return TeraService.query.filter_by(service_name=name).first()
+
+    @staticmethod
+    def get_service_by_id(s_id: int):
+        return TeraService.query.filter_by(id_service=s_id).first()
 
     @staticmethod
     def create_defaults():
