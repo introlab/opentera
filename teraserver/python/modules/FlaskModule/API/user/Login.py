@@ -44,6 +44,8 @@ class Login(Resource):
         # Get token for user
         from libtera.db.models.TeraUser import TeraUser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
+        current_user.update_last_online()
+
         user_token = current_user.get_token(token_key)
 
         print('Login - setting key with expiration in 60s', session['_id'], session['_user_id'])

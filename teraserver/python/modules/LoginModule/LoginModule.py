@@ -130,7 +130,7 @@ class LoginModule(BaseModule):
             _request_ctx_stack.top.current_user = TeraUser.get_user_by_username(username)
 
             print('user_verify_password, found user: ', current_user)
-            current_user.update_last_online()
+            # current_user.update_last_online()
 
             login_user(current_user, remember=True)
             # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
@@ -154,7 +154,7 @@ class LoginModule(BaseModule):
             _request_ctx_stack.top.current_user = TeraUser.get_user_by_uuid(token_dict['user_uuid'])
             # TODO: Validate if user is also online?
             if current_user:
-                current_user.update_last_online()
+                # current_user.update_last_online()
                 login_user(current_user, remember=True)
                 return True
 
@@ -168,7 +168,7 @@ class LoginModule(BaseModule):
             _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_username(username)
 
             print('participant_verify_password, found participant: ', current_participant)
-            current_participant.update_last_online()
+            # current_participant.update_last_online()
 
             login_user(current_participant, remember=True)
 
@@ -190,7 +190,7 @@ class LoginModule(BaseModule):
         _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_value)
 
         if current_participant:
-            current_participant.update_last_online()
+            # current_participant.update_last_online()
             login_user(current_participant, remember=True)
             return True
 
@@ -213,7 +213,7 @@ class LoginModule(BaseModule):
         if current_participant:
             # Flag that participant has full API access
             current_participant.fullAccess = True
-            current_participant.update_last_online()
+            # current_participant.update_last_online()
             login_user(current_participant, remember=True)
             return True
 

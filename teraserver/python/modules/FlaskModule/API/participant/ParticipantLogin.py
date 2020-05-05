@@ -34,6 +34,7 @@ class ParticipantLogin(Resource):
     @api.marshal_with(model, mask=None)
     def get(self):
         if current_participant:
+            current_participant.update_last_online()
             session.permanent = True
 
             # Redis key is handled in LoginModule
@@ -55,6 +56,7 @@ class ParticipantLogin(Resource):
             # Return reply as json object
             reply = {"websocket_url": "wss://" + servername + ":"
                                       + str(port) + "/wss/participant?id=" + session['_id'],
+                     "participant_name": current_participant.participant_name,
                      "participant_uuid": session['_user_id']}
 
             # Set token according to API access (http auth is full access, token is not)
