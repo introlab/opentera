@@ -70,40 +70,37 @@ class DeviceQuerySessions(Resource):
     @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)
     @api.doc(description='Get session',
-             responses={200: 'Success',
-                        400: 'Required parameter is missing',
-                        500: 'Internal server error',
-                        501: 'Not implemented',
-                        403: 'Logged device doesn\'t have permission to access the requested data'})
+             responses={403: 'Forbidden for security reasons.'})
     def get(self):
 
-        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
-        device_access = DBManager.deviceAccess(current_device)
-        args = get_parser.parse_args(strict=True)
-
-        # Get all sessions
-        sessions = device_access.get_accessible_sessions()
-
-        # Can't query sessions, unless we have a parameter!
-        if not any(args.values()):
-            return '', 400
-
-        elif args['id_session']:
-            sessions = device_access.query_session(session_id=args['id_session'])
-        try:
-            sessions_list = []
-            for ses in sessions:
-                if args['list'] is None:
-                    session_json = ses.to_json()
-                    sessions_list.append(session_json)
-                else:
-                    session_json = ses.to_json(minimal=True)
-                    sessions_list.append(session_json)
-
-            return sessions_list
-
-        except InvalidRequestError:
-            return '', 500
+        # current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
+        # device_access = DBManager.deviceAccess(current_device)
+        # args = get_parser.parse_args(strict=True)
+        #
+        # # Get all sessions
+        # sessions = device_access.get_accessible_sessions()
+        #
+        # # Can't query sessions, unless we have a parameter!
+        # if not any(args.values()):
+        #     return '', 400
+        #
+        # elif args['id_session']:
+        #     sessions = device_access.query_session(session_id=args['id_session'])
+        # try:
+        #     sessions_list = []
+        #     for ses in sessions:
+        #         if args['list'] is None:
+        #             session_json = ses.to_json()
+        #             sessions_list.append(session_json)
+        #         else:
+        #             session_json = ses.to_json(minimal=True)
+        #             sessions_list.append(session_json)
+        #
+        #     return sessions_list
+        #
+        # except InvalidRequestError:
+        #     return '', 500
+        return '', 403
 
     @LoginModule.device_token_or_certificate_required
     # @api.expect(session_schema, validate=True)

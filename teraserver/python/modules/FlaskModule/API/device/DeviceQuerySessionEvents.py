@@ -27,34 +27,32 @@ class DeviceQuerySessionEvents(Resource):
     @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)
     @api.doc(description='Get session events',
-             responses={200: 'Success',
-                        500: 'Required parameter is missing',
-                        501: 'Not implemented',
-                        403: 'Logged device doesn\'t have permission to access the requested data'})
+             responses={403: 'Forbidden for security reasons.'})
     def get(self):
 
-        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
-        device_access = DBManager.deviceAccess(current_device)
-        args = get_parser.parse_args()
-
-        sessions_events = []
-
-        parent_session = device_access.query_session(args['id_session'])
-        if not parent_session:
-            return '', 403
-
-        sessions_events = TeraSessionEvent.get_events_for_session(args['id_session'])
-
-        try:
-            events_list = []
-            for event in sessions_events:
-                event_json = event.to_json(minimal=False)
-                events_list.append(event_json)
-
-            return jsonify(events_list)
-
-        except InvalidRequestError:
-            return '', 500
+        # current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
+        # device_access = DBManager.deviceAccess(current_device)
+        # args = get_parser.parse_args()
+        #
+        # sessions_events = []
+        #
+        # parent_session = device_access.query_session(args['id_session'])
+        # if not parent_session:
+        #     return '', 403
+        #
+        # sessions_events = TeraSessionEvent.get_events_for_session(args['id_session'])
+        #
+        # try:
+        #     events_list = []
+        #     for event in sessions_events:
+        #         event_json = event.to_json(minimal=False)
+        #         events_list.append(event_json)
+        #
+        #     return jsonify(events_list)
+        #
+        # except InvalidRequestError:
+        #     return '', 500
+        return '', 403
 
     @LoginModule.device_token_or_certificate_required
     def post(self):

@@ -53,8 +53,9 @@ class DeviceLogin(Resource):
         response['participants_info'] = list()
 
         for participant in participants:
-            # Needs to be false for AppleWatch App to work...
-            response['participants_info'].append(participant.to_json(minimal=False))
+            participant_info = {'participant_name': participant.participant_name,
+                                'participant_uuid': participant.participant_uuid}
+            response['participants_info'].append(participant_info)
 
         # Reply accessible sessions type ids
         session_types = device_access.get_accessible_session_types()
