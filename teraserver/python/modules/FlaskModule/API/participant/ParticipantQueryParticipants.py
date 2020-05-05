@@ -20,7 +20,7 @@ class ParticipantQueryParticipants(Resource):
         self.module = flaskModule
         Resource.__init__(self, _api)
 
-    @participant_multi_auth.login_required
+    @participant_multi_auth.login_required(role='full')
     @api.expect(get_parser)
     @api.doc(description='Return participant information.',
              responses={200: 'Success',
@@ -39,7 +39,7 @@ class ParticipantQueryParticipants(Resource):
 
         return current_participant.to_json(minimal=minimal)
 
-    @participant_multi_auth.login_required
+    @participant_multi_auth.login_required(role='full')
     @api.expect(post_parser)
     @api.doc(description='To be documented '
                          'To be documented',

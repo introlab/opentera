@@ -37,6 +37,7 @@ class TeraParticipant(db.Model, BaseModel):
     participant_project = db.relationship("TeraProject")
 
     authenticated = False
+    fullAccess = False
 
     def __init__(self):
         pass
@@ -46,6 +47,21 @@ class TeraParticipant(db.Model, BaseModel):
 
     def __repr__(self):
         return self.__str__()
+
+    def dynamic_token(self, token_key: str):
+        import time
+        import jwt
+        # Creating token with participant info
+        payload = {
+            'iat': int(time.time()),
+            'exp': int(time.time()) + 3600,
+            'iss': 'TeraServer',
+            'participant_uuid': self.participant_uuid,
+            'id_participant': self.id_participant,
+            'user_fullname': self.participant_name
+        }
+
+        return jwt.encode(payload, token_key, algorithm='HS256').decode('utf-8')
 
     def create_token(self):
         # Creating token with user info

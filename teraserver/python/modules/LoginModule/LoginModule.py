@@ -96,6 +96,8 @@ class LoginModule(BaseModule):
         # Setup verify password function for participants
         participant_http_auth.verify_password(self.participant_verify_password)
         participant_token_auth.verify_token(self.participant_verify_token)
+        participant_http_auth.get_user_roles(self.participant_get_user_roles)
+        participant_token_auth.get_user_roles(self.participant_get_user_roles)
 
     def load_user(self, user_id):
         print('LoginModule - load_user', self, user_id)
@@ -169,6 +171,10 @@ class LoginModule(BaseModule):
             current_participant.update_last_online()
 
             login_user(current_participant, remember=True)
+
+            # Flag that participant has full API access
+            current_participant.fullAccess = True
+
             # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
             # self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
@@ -188,7 +194,48 @@ class LoginModule(BaseModule):
             login_user(current_participant, remember=True)
             return True
 
+        # Second attempt, validate dynamic token
+        """
+            Tokens key is dynamic and stored in a redis variable for participants.
+        """
+        import jwt
+        try:
+            token_dict = jwt.decode(token_value, self.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey),
+                                    algorithms='HS256')
+        except jwt.exceptions.InvalidSignatureError as e:
+            print(e)
+            return False
+
+        if token_dict['participant_uuid']:
+            _request_ctx_stack.top.current_participant = \
+                TeraParticipant.get_participant_by_uuid(token_dict['participant_uuid'])
+
+        if current_participant:
+            # Flag that participant has full API access
+            current_participant.fullAccess = True
+            current_participant.update_last_online()
+            login_user(current_participant, remember=True)
+            return True
+
         return False
+
+    def participant_get_user_roles(self, user):
+        # Verify if we have a token auth
+        if 'token' in user and current_participant:
+            if user['token'] == current_participant.participant_token:
+                # Using only "access" token, will give limited access
+                return ['limited']
+            else:
+                # Dynamic token used, need an http login first
+                # Token verification is done previously
+                return ['full', 'limited']
+
+        # login with username and password will give full access
+        if 'username' in user and 'password' in user and current_participant:
+            return ['full', 'limited']
+
+        # This should not happen, return no roles
+        return []
 
     @staticmethod
     def device_token_or_certificate_required(f):

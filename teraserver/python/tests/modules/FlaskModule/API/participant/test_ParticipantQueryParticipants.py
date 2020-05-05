@@ -7,7 +7,7 @@ import json
 class ParticipantQueryParticipantsTest(unittest.TestCase):
 
     host = 'localhost'
-    port = 4040
+    port = 40075
     login_endpoint = '/api/participant/login'
     participants_endpoint = '/api/participant/participants'
 

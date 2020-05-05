@@ -82,6 +82,7 @@ def init_shared_variables(config):
     # Dynamic key for users, updated at every restart (for now)
     # Server should rotate key every hour, day?
     user_token_key = TeraServerSettings.generate_token_key(32)
+    participant_token_key = TeraServerSettings.generate_token_key(32)
     service_token_key = TeraServerSettings.generate_token_key(32)
 
     # Create redis client
@@ -103,8 +104,9 @@ def init_shared_variables(config):
         TeraServerSettings.ServerDeviceTokenKey))
 
     # Set PARTICIPANT
-    redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, TeraServerSettings.get_server_setting_value(
-                                      TeraServerSettings.ServerParticipantTokenKey))
+    redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, participant_token_key)
+    # redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, TeraServerSettings.get_server_setting_value(
+    #                                  TeraServerSettings.ServerParticipantTokenKey))
 
 
 def init_services(config: ConfigManager):

@@ -7,7 +7,7 @@ import json
 class ParticipantLoginTest(unittest.TestCase):
 
     host = 'localhost'
-    port = 4040
+    port = 40075
     login_endpoint = '/api/participant/login'
 
     def setUp(self):
@@ -56,11 +56,11 @@ class ParticipantLoginTest(unittest.TestCase):
         json_data = httpauth_response.json()
         self.assertGreater(len(json_data), 0)
 
-        # Try to login with token, should not work since we accept only http basic auth only on this endpoint
+        # Try to login with token
         token = json_data['participant_token']
         self.assertGreater(len(token), 0)
         tokenauth_response = self._token_auth(token)
-        self.assertEqual(tokenauth_response.status_code, 401)
+        self.assertEqual(tokenauth_response.status_code, 200)
 
 
 

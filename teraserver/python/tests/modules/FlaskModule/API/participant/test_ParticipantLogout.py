@@ -6,7 +6,7 @@ import json
 
 class ParticipantLogoutTest(unittest.TestCase):
     host = 'localhost'
-    port = 4040
+    port = 40075
     logout_endpoint = '/api/participant/logout'
     login_endpoint = '/api/participant/login'
 
