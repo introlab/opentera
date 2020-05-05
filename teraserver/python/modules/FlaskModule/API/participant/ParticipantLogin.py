@@ -34,6 +34,7 @@ class ParticipantLogin(Resource):
     @api.marshal_with(model, mask=None)
     def get(self):
         if current_participant:
+            current_participant.update_last_online()
             session.permanent = True
 
             # Redis key is handled in LoginModule
