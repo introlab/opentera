@@ -30,6 +30,16 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
         self.assertTrue(json_auth.__contains__('participant_token'))
         return json_auth['participant_token']
 
+    def _get_base_token_with_login_http_auth(self, username, password):
+        url = self._make_url(self.host, self.port, self.login_endpoint)
+        auth_response = get(url=url, verify=False, auth=(username, password))
+        # HTTP AUTH REQUIRED TO GET TOKEN
+        self.assertEqual(auth_response.status_code, 200)
+        self.assertEqual(auth_response.headers['Content-Type'], 'application/json')
+        json_auth = auth_response.json()
+        self.assertTrue(json_auth.__contains__('base_token'))
+        return json_auth['base_token']
+
     def _request_with_http_auth(self, username, password, payload=None):
         if payload is None:
             payload = {}
@@ -66,9 +76,17 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
 
         for data_item in json_data:
             self.assertGreater(len(data_item), 0)
-            self.assertTrue(data_item.__contains__('id_creator_device'))
+            if data_item['id_creator_device']:
+                self.assertTrue(data_item.__contains__('session_creator_device'))
+
             self.assertTrue(data_item.__contains__('id_creator_participant'))
+            if data_item['id_creator_participant']:
+                self.assertTrue(data_item.__contains__('session_creator_participant'))
+
             self.assertTrue(data_item.__contains__('id_creator_user'))
+            if data_item['id_creator_user']:
+                self.assertTrue(data_item.__contains__('session_creator_user'))
+
             self.assertTrue(data_item.__contains__('id_session'))
             self.assertTrue(data_item.__contains__('id_session_type'))
             self.assertTrue(data_item.__contains__('session_comments'))
@@ -77,7 +95,6 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
             self.assertTrue(data_item.__contains__('session_start_datetime'))
             self.assertTrue(data_item.__contains__('session_status'))
             self.assertTrue(data_item.__contains__('session_participants_ids'))
-            self.assertTrue(data_item.__contains__('session_creator_user'))
             self.assertTrue(data_item.__contains__('session_has_device_data'))
 
     def test_query_token_auth_no_params(self):
@@ -93,8 +110,17 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
         for data_item in json_data:
             self.assertGreater(len(data_item), 0)
             self.assertTrue(data_item.__contains__('id_creator_device'))
+            if data_item['id_creator_device']:
+                self.assertTrue(data_item.__contains__('session_creator_device'))
+
             self.assertTrue(data_item.__contains__('id_creator_participant'))
+            if data_item['id_creator_participant']:
+                self.assertTrue(data_item.__contains__('session_creator_participant'))
+
             self.assertTrue(data_item.__contains__('id_creator_user'))
+            if data_item['id_creator_user']:
+                self.assertTrue(data_item.__contains__('session_creator_user'))
+
             self.assertTrue(data_item.__contains__('id_session'))
             self.assertTrue(data_item.__contains__('id_session_type'))
             self.assertTrue(data_item.__contains__('session_comments'))
@@ -103,5 +129,10 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
             self.assertTrue(data_item.__contains__('session_start_datetime'))
             self.assertTrue(data_item.__contains__('session_status'))
             self.assertTrue(data_item.__contains__('session_participants_ids'))
-            self.assertTrue(data_item.__contains__('session_creator_user'))
             self.assertTrue(data_item.__contains__('session_has_device_data'))
+
+    def test_query_base_token(self):
+        token = self._get_base_token_with_login_http_auth('participant1', 'opentera')
+        response = self._request_with_token_auth(token)
+        # Should not be allowed
+        self.assertEqual(response.status_code, 403)

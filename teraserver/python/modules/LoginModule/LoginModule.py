@@ -146,7 +146,7 @@ class LoginModule(BaseModule):
         try:
             token_dict = jwt.decode(token_value, self.redisGet(RedisVars.RedisVar_UserTokenAPIKey),
                                     algorithms='HS256')
-        except jwt.exceptions.InvalidSignatureError as e:
+        except jwt.exceptions.PyJWTError as e:
             print(e)
             return False
 
@@ -202,7 +202,7 @@ class LoginModule(BaseModule):
         try:
             token_dict = jwt.decode(token_value, self.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey),
                                     algorithms='HS256')
-        except jwt.exceptions.InvalidSignatureError as e:
+        except jwt.exceptions.PyJWTError as e:
             print(e)
             return False
 
@@ -277,7 +277,7 @@ class LoginModule(BaseModule):
                     scheme, token = request.headers['Authorization'].split(None, 1)
                 except ValueError:
                     # malformed Authorization header
-                    return 'Forbidden', 403
+                    return 'Invalid token', 401
 
                 # Verify scheme and token
                 if scheme == 'OpenTera':
@@ -323,7 +323,7 @@ class LoginModule(BaseModule):
                     return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.
-            return 'Forbidden', 403
+            return 'Unauthorized', 401
 
         return decorated
 
@@ -352,7 +352,7 @@ class LoginModule(BaseModule):
                     scheme, token = request.headers['Authorization'].split(None, 1)
                 except ValueError:
                     # malformed Authorization header
-                    return 'Forbidden', 403
+                    return 'Invalid Token', 401
 
                 # Verify scheme and token
                 if scheme == 'OpenTera':
@@ -364,8 +364,8 @@ class LoginModule(BaseModule):
                                                 algorithms='HS256')
                         if 'service_uuid' in token_dict:
                             service_uuid = token_dict['service_uuid']
-                    except jwt.exceptions.InvalidSignatureError as e:
-                        return 'Forbidden', 403
+                    except jwt.exceptions.PyJWTError as e:
+                        return 'Unauthorized', 401
 
             # Parse args
             if not service_uuid:
@@ -382,8 +382,8 @@ class LoginModule(BaseModule):
                                                 algorithms='HS256')
                         if 'service_uuid' in token_dict:
                             service_uuid = token_dict['service_uuid']
-                    except jwt.exceptions.InvalidSignatureError as e:
-                        return 'Forbidden', 403
+                    except jwt.exceptions.PyJWTError as e:
+                        return 'Unauthorized', 401
 
             if service_uuid:
                 # Check if service is allowed to connect
@@ -393,6 +393,6 @@ class LoginModule(BaseModule):
                     return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.
-            return 'Forbidden', 403
+            return 'Unauthorized', 401
 
         return decorated

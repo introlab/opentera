@@ -26,6 +26,16 @@ class ParticipantQueryDeviceDataTest(unittest.TestCase):
         self.assertTrue(json_auth.__contains__('participant_token'))
         return json_auth['participant_token']
 
+    def _get_base_token_with_login_http_auth(self, username, password):
+        url = self._make_url(self.host, self.port, self.login_endpoint)
+        auth_response = get(url=url, verify=False, auth=(username, password))
+        # HTTP AUTH REQUIRED TO GET TOKEN
+        self.assertEqual(auth_response.status_code, 200)
+        self.assertEqual(auth_response.headers['Content-Type'], 'application/json')
+        json_auth = auth_response.json()
+        self.assertTrue(json_auth.__contains__('base_token'))
+        return json_auth['base_token']
+
     def _make_url(self, hostname, port, endpoint):
         return 'https://' + hostname + ':' + str(port) + endpoint
 
@@ -169,4 +179,12 @@ class ParticipantQueryDeviceDataTest(unittest.TestCase):
         json_data = response.json()
         for item in json_data:
             self.assertEqual(id_device_data, item['id_device_data'])
+
+    def test_query_base_token(self):
+        token = self._get_base_token_with_login_http_auth('participant1', 'opentera')
+        response = self._request_with_token_auth(token)
+        # Should not be allowed
+        self.assertEqual(response.status_code, 403)
+
+
 
