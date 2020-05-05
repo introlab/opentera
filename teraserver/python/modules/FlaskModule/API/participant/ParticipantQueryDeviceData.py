@@ -30,7 +30,7 @@ class ParticipantQueryDeviceData(Resource):
         self.module = flaskModule
         Resource.__init__(self, _api)
 
-    @participant_multi_auth.login_required
+    @participant_multi_auth.login_required(role='full')
     @api.expect(get_parser)
     @api.doc(description='Get device data information. Optionaly download the data.',
              responses={200: 'Success',
@@ -93,7 +93,7 @@ class ParticipantQueryDeviceData(Resource):
                 return send_file(src_dir + '/' + str(device_data_list[0].devicedata_uuid), as_attachment=True,
                                  attachment_filename=filename)
 
-    @participant_multi_auth.login_required
+    @participant_multi_auth.login_required(role='full')
     @api.expect(post_parser)
     @api.doc(description='To be documented '
                          'To be documented',

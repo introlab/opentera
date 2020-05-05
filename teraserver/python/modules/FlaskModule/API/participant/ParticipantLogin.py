@@ -2,6 +2,7 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, fields
 from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
+from modules.RedisVars import RedisVars
 
 
 # Parser definition(s)
@@ -23,7 +24,7 @@ class ParticipantLogin(Resource):
         Resource.__init__(self, _api)
 
     # @participant_http_auth.login_required
-    @participant_multi_auth.login_required
+    @participant_multi_auth.login_required(role='limited')
     @api.expect(get_parser)
     @api.doc(description='Participant login with HTTPAuth',
              responses={200: 'Success - Login succeeded',
@@ -54,8 +55,14 @@ class ParticipantLogin(Resource):
             # Return reply as json object
             reply = {"websocket_url": "wss://" + servername + ":"
                                       + str(port) + "/wss/participant?id=" + session['_id'],
-                     "participant_uuid": session['_user_id'],
-                     "participant_token": current_participant.participant_token}
+                     "participant_uuid": session['_user_id']}
+
+            # Set token according to API access (http auth is full access, token is not)
+            if current_participant.fullAccess:
+                token_key = self.module.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
+                reply['participant_token'] = current_participant.dynamic_token(token_key)
+            else:
+                reply['participant_token'] = current_participant.participant_token
 
             return reply
         else:

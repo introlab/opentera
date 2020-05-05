@@ -6,7 +6,7 @@ import json
 
 class ParticipantQueryDeviceDataTest(unittest.TestCase):
     host = 'localhost'
-    port = 4040
+    port = 40075
     login_endpoint = '/api/participant/login'
     data_endpoint = '/api/participant/data'
 
