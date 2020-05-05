@@ -66,7 +66,7 @@ class ParticipantLogin(Resource):
                 reply['participant_token'] = current_participant.dynamic_token(token_key)
                 reply['base_token'] = current_participant.participant_token
             else:
-                reply['participant_token'] = current_participant.participant_token
+                reply['base_token'] = current_participant.participant_token
 
             return reply
         else:
