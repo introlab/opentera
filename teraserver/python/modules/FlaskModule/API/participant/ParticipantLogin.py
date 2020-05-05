@@ -55,6 +55,7 @@ class ParticipantLogin(Resource):
             reply = {"websocket_url": "wss://" + servername + ":"
                                       + str(port) + "/wss/participant?id=" + session['_id'],
                      "participant_uuid": session['_user_id'],
+                     "participant_name": current_participant.participant_name,
                      "participant_token": current_participant.participant_token}
 
             return reply
