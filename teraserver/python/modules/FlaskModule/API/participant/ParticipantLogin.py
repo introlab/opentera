@@ -61,6 +61,7 @@ class ParticipantLogin(Resource):
             if current_participant.fullAccess:
                 token_key = self.module.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
                 reply['participant_token'] = current_participant.dynamic_token(token_key)
+                reply['base_token'] = current_participant.participant_token
             else:
                 reply['participant_token'] = current_participant.participant_token
 
