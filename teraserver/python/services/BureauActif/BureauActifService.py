@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     # Load configuration
     from services.BureauActif.Globals import config_man
-    config_man.load_config('BureauActifService.ini')
+    config_man.load_config('BureauActifService.json')
 
     # Verify file upload path, create if does not exist
     verify_file_upload_directory(config_man, True)

@@ -111,7 +111,7 @@ class TwistedModule(BaseModule):
         #     self.config.server_config['ca_certificate']))
 
         # reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
-        reactor.listenTCP(self.config.server_config['port'], site)
+        reactor.listenTCP(self.config.service_config['port'], site)
 
     def __del__(self):
         pass

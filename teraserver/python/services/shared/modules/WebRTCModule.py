@@ -1,4 +1,4 @@
-from services.VideoDispatch.ConfigManager import ConfigManager
+from services.shared.ServiceConfigManager import ServiceConfigManager
 from messages.python.CreateSession_pb2 import CreateSession
 from modules.BaseModule import BaseModule, ModuleNames
 
@@ -10,8 +10,8 @@ import sys
 
 class WebRTCModule(BaseModule):
 
-    def __init__(self, config: ConfigManager):
-        BaseModule.__init__(self, "VideoDispatchService.WebRTCModule", config)
+    def __init__(self, config: ServiceConfigManager):
+        BaseModule.__init__(self, config.service_config['name'] + '.WebRTCModule', config)
         self.processList = []
         self.max_sessions = self.config.webrtc_config['max_sessions']
         self.base_port = self.config.webrtc_config['local_base_port']
@@ -52,7 +52,7 @@ class WebRTCModule(BaseModule):
         port = self.get_available_port()
         key = room_name
 
-        print('WebRTCModule - Should create WebRTC session with name:', room_name, port, key)
+        print(self.module_name + ' - Should create WebRTC session with name:', room_name, port, key)
 
         if port:
             url = 'https://' + self.config.webrtc_config['hostname'] + ':' \
@@ -120,7 +120,7 @@ class WebRTCModule(BaseModule):
         """
         We have received a published message from redis
         """
-        print('WebRTCModule - Received message ', pattern, channel, message)
+        print(self.module_name + ' - Received message ', pattern, channel, message)
         pass
 
     def get_available_port(self):
@@ -150,10 +150,10 @@ class WebRTCModule(BaseModule):
                                      'owner': owner,
                                      'participants': participants})
 
-            print('WebRTCModule - started process', process)
+            print(self.module_name + ' - started process', process)
             return True
         except OSError as e:
-            print('WebRTCModule - error starting process:', e)
+            print(self.module_name + ' - error starting process:', e)
 
         return False
 

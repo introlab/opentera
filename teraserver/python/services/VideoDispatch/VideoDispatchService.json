@@ -1,5 +1,5 @@
 {
-	"Server": {
+	"Service": {
 		"name": "VideoDispatch",
 		"hostname": "localhost",
 		"port": 4060,

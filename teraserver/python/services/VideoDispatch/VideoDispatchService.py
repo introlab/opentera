@@ -1,6 +1,6 @@
 from services.VideoDispatch.FlaskModule import FlaskModule
 from services.VideoDispatch.TwistedModule import TwistedModule
-from services.VideoDispatch.WebRTCModule import WebRTCModule
+from services.shared.modules.WebRTCModule import WebRTCModule
 from services.VideoDispatch.OnlineUsersModule import OnlineUsersModule
 from services.VideoDispatch.ConfigManager import ConfigManager
 from modules.RedisVars import RedisVars
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     if os.environ.__contains__('VIDEODISPATCH_CONFIG_PATH'):
         config_file = str(os.environ['VIDEODISPATCH_CONFIG_PATH'])
     else:
-        config_file = application_path + os.sep + 'VideoDispatchService.ini'
+        config_file = application_path + os.sep + 'VideoDispatchService.json'
 
     print("Opening config file: ", config_file)
 
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
 
     # Get service UUID
-    service_info = Globals.redis_client.redisGet(RedisVars.RedisVar_ServicePrefixKey + config_man.server_config['name'])
+    service_info = Globals.redis_client.redisGet(RedisVars.RedisVar_ServicePrefixKey + config_man.service_config['name'])
     import sys
 
     if service_info is None:
@@ -75,7 +75,7 @@ if __name__ == '__main__':
         sys.stderr.write('OpenTera Server didn\'t return a valid service UUID - aborting.')
         exit(1)
 
-    config_man.server_config['ServiceUUID'] = service_info['service_uuid']
+    config_man.service_config['ServiceUUID'] = service_info['service_uuid']
 
     # OnlineUsers Module
     Globals.OnlineUsers_module = OnlineUsersModule(config_man)

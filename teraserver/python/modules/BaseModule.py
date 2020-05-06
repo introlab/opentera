@@ -25,7 +25,7 @@ class BaseModule(RedisClient):
         BaseModule will handle basic registration of topics and events.
 
     """
-    def __init__(self, module_name, config: ConfigManager):
+    def __init__(self, module_name, config):
 
         # Set module name
         # TODO verify module name to be unique
