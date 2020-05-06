@@ -82,4 +82,3 @@ class ParticipantLoginTest(unittest.TestCase):
         self.assertTrue('participant_token' in json_data)
         self.assertGreater(len(json_data['base_token']), 0)
         self.assertIsNone(json_data['participant_token'])
-

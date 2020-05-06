@@ -96,8 +96,8 @@ class LoginModule(BaseModule):
         # Setup verify password function for participants
         participant_http_auth.verify_password(self.participant_verify_password)
         participant_token_auth.verify_token(self.participant_verify_token)
-        participant_http_auth.get_user_roles(self.participant_get_user_roles)
-        participant_token_auth.get_user_roles(self.participant_get_user_roles)
+        participant_http_auth.get_user_roles(self.participant_get_user_roles_http)
+        participant_token_auth.get_user_roles(self.participant_get_user_roles_token)
 
     def load_user(self, user_id):
         print('LoginModule - load_user', self, user_id)
@@ -150,7 +150,14 @@ class LoginModule(BaseModule):
             print(e)
             return False
 
-        if token_dict['user_uuid']:
+        if token_dict['user_uuid'] and token_dict['exp']:
+            # First verify expiration date
+            expiration_date = datetime.datetime.fromtimestamp(token_dict['exp'])
+
+            # Expiration date in the past?
+            if expiration_date < datetime.datetime.now():
+                return False
+
             _request_ctx_stack.top.current_user = TeraUser.get_user_by_uuid(token_dict['user_uuid'])
             # TODO: Validate if user is also online?
             if current_user:
@@ -206,7 +213,15 @@ class LoginModule(BaseModule):
             print(e)
             return False
 
-        if token_dict['participant_uuid']:
+        if token_dict['participant_uuid'] and token_dict['exp']:
+
+            # First verify expiration date
+            expiration_date = datetime.datetime.fromtimestamp(token_dict['exp'])
+
+            # Expiration date in the past?
+            if expiration_date < datetime.datetime.now():
+                return False
+
             _request_ctx_stack.top.current_participant = \
                 TeraParticipant.get_participant_by_uuid(token_dict['participant_uuid'])
 
@@ -219,7 +234,15 @@ class LoginModule(BaseModule):
 
         return False
 
-    def participant_get_user_roles(self, user):
+    def participant_get_user_roles_http(self, user):
+        # login with username and password will give full access
+        if 'username' in user and 'password' in user and current_participant:
+            return ['full', 'limited']
+
+        # This should not happen, return no role
+        return []
+
+    def participant_get_user_roles_token(self, user):
         # Verify if we have a token auth
         if 'token' in user and current_participant:
             if user['token'] == current_participant.participant_token:
@@ -230,11 +253,7 @@ class LoginModule(BaseModule):
                 # Token verification is done previously
                 return ['full', 'limited']
 
-        # login with username and password will give full access
-        if 'username' in user and 'password' in user and current_participant:
-            return ['full', 'limited']
-
-        # This should not happen, return no roles
+        # This should not happen, return no role
         return []
 
     @staticmethod

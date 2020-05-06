@@ -48,13 +48,14 @@ class TeraParticipant(db.Model, BaseModel):
     def __repr__(self):
         return self.__str__()
 
-    def dynamic_token(self, token_key: str):
+    def dynamic_token(self, token_key: str, expiration=3600):
         import time
         import jwt
         # Creating token with participant info
+        now = time.time()
         payload = {
-            'iat': int(time.time()),
-            'exp': int(time.time()) + 3600,
+            'iat': int(now),
+            'exp': int(now) + expiration,
             'iss': 'TeraServer',
             'participant_uuid': self.participant_uuid,
             'id_participant': self.id_participant,
