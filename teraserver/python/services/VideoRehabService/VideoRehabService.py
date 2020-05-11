@@ -23,6 +23,14 @@ if __name__ == '__main__':
     if not config_man.load_config('VideoRehabService.json'):
         print('Invalid config')
 
+    # Global redis client
+    # Globals.redis_client = RedisClient(config_man.redis_config)
+    # Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
+    # Globals.api_device_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
+    # Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
+
+
+
     # Create the service app
     application = service.Application(config_man.service_config['name'])
 

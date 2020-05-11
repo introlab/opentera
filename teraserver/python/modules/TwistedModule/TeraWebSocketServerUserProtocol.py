@@ -13,6 +13,7 @@ from messages.python.TeraMessage_pb2 import TeraMessage
 from messages.python.UserEvent_pb2 import UserEvent
 from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
 from messages.python.StopSessionEvent_pb2 import StopSessionEvent
+from messages.python.UserRegisterToEvent_pb2 import UserRegisterToEvent
 
 from google.protobuf.any_pb2 import Any
 import datetime
@@ -65,12 +66,23 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
         # Parse JSON (protobuf content)
         try:
             message = Parse(msg, TeraMessage)
+            # Test if we have a register message
+            for any_msg in message.data:
+                register_event = UserRegisterToEvent()
+                if any_msg.Unpack(register_event):
+                    print('******* register event', register_event)
+                    if register_event.event_type == UserRegisterToEvent.USER_CONNECTED:
+                        print('Registering to USER_CONNECTED')
+
+                    # Done, do not forward
+                    return
+
             self.publish(message.head.dest, message)
         except ParseError:
             print('TeraWebSocketServerUserProtocol - TeraMessage parse error...')
 
         # Echo for debug
-        self.sendMessage(msg, binary)
+        # self.sendMessage(msg, binary)
 
     def redisMessageReceived(self, pattern, channel, message):
         print('TeraWebSocketServerUserProtocol redis message received', pattern, channel, message)

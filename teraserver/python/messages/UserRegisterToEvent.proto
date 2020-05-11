@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package opentera.protobuf;
+
+message UserRegisterToEvent {
+
+    enum EventType
+    {
+        //USER_EVENTS
+        USER_CONNECTED = 0;
+        USER_DISCONNECTED = 1;
+        USER_DELETED = 2;
+        USER_ADDED = 3;
+        USER_UPDATED = 4;
+
+        //PARTICIPANT_EVENTS
+        PARTICIPANT_CONNECTED = 5;
+        PARTICIPANT_DISCONNECTED = 6;
+        PARTICIPANT_DELETED = 7;
+        PARTICIPANT_ADDED = 8;
+        PARTICIPANT_UPDATED = 9;
+
+        //PARTICIPANT_EVENTS
+        DEVICE_CONNECTED = 10;
+        DEVICE_DISCONNECTED = 11;
+        DEVICE_DELETED = 12;
+        DEVICE_ADDED = 13;
+        DEVICE_UPDATED = 14;
+    }
+
+    enum Action
+    {
+        REGISTER = 0;
+        UNREGISTER = 1;
+    }
+
+    EventType event_type = 1;
+    Action action = 2;
+
+}
