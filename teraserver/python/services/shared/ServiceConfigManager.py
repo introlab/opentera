@@ -84,8 +84,7 @@ class ServiceConfig:
     def validate_service_config(self, config):
 
         if 'Service' in config:
-            required_fields = ['name', 'port', 'ssl_path', 'hostname',
-                               'site_certificate', 'site_private_key', 'ca_certificate', 'ca_private_key']
+            required_fields = ['name', 'port', 'hostname']
             for field in required_fields:
                 if field not in config['Service']:
                     print('ERROR: Service Config - missing field ' + field)
@@ -107,20 +106,21 @@ class ServiceConfigManager(ServiceConfig, RedisConfig, BackendConfig):
             config_file = open(filename, mode='rt', encoding='utf8')
 
         except IOError:
-            print("Error loading file: " + filename)
-            return
+            print("Error opening file: " + filename)
+            return False
 
-        raw_text = config_file.read()
+        try:
+            # Read json from file
+            config_json = json.load(config_file)
+        except json.JSONDecodeError as e:
+            print('Error reading file : ', filename, e)
+            return False
+
         config_file.close()
-
-        # Strip UTF8 BOM, if needed
-        if not raw_text.startswith('{'):
-            raw_text = raw_text[1:]
-        config_json = json.loads(raw_text)
 
         # call validate config
         # this function needs to be overloaded if you derive from ServiceConfigManager
-        self.validate_config(config_json)
+        return self.validate_config(config_json)
 
     def validate_config(self, config_json):
 

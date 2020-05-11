@@ -1,20 +1,12 @@
 {
 	"Service": {
-		"name": "VideoDispatch",
+		"name": "VideoRehabService",
 		"hostname": "localhost",
-		"port": 4060
+		"port": 4070
 	},
 	"Backend": {
 		"hostname": "localhost",
 		"port": 4040
-	},
-	"Database": {
-		"db_type": "QPSQL",
-		"name": "videodispatch",
-		"url": "localhost",
-		"port": 5432,
-		"username": "videodispatch",
-		"password": "videodispatch"
 	},
 	"Redis": {
 	    "hostname": "localhost",
