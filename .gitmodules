@@ -1,0 +1,3 @@
+[submodule "teraserver/python/messages"]
+	path = teraserver/python/messages
+	url = https://github.com/introlab/opentera_messages.git
