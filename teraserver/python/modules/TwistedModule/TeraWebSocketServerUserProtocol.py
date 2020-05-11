@@ -31,6 +31,7 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
         RedisClient.__init__(self, config=config)
         WebSocketServerProtocol.__init__(self)
         self.user = None
+        self.registered_events = []
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
@@ -54,6 +55,10 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
             self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
 
+            # Register only once to events from modules, will be filtered after
+            self.subscribe(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME) + '.events')
+
+    @defer.inlineCallbacks
     def onMessage(self, msg, binary):
         # Handle websocket communication
         # TODO use protobuf ?
@@ -73,8 +78,18 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
                     print('******* register event', register_event)
                     if register_event.event_type == UserRegisterToEvent.USER_CONNECTED:
                         print('Registering to USER_CONNECTED')
+                        if register_event.action == UserRegisterToEvent.REGISTER:
+                            self.registered_events.append(register_event.event_type)
+                            # TODO Subscribe with redis
+                            # For now registered automatically when websocket is connected
 
-                    # Done, do not forward
+                        elif register_event.action == UserRegisterToEvent.UNREGISTER:
+                            self.registered_events.remove(register_event.event_type)
+                            # TODO Unsubscribe with redis
+                            # For now do not unregister, fill filter events
+
+                    # Done, do not forward UserRegisterToEvent
+                    # TODO, We assume here that there is no other message in the the message.data structure
                     return
 
             self.publish(message.head.dest, message)
@@ -94,6 +109,10 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
                 tera_message.ParseFromString(message.encode('utf-8'))
             elif isinstance(message, bytes):
                 tera_message.ParseFromString(message)
+
+            # We need to verify if we are registered to this type of message
+            
+
 
             # Test message to JSON
             json = MessageToJson(tera_message, including_default_value_fields=True)
