@@ -32,3 +32,4 @@ pypiwin32; sys_platform == 'win32'
 pylzma
 bz2file
 python-slugify
+websocket_client

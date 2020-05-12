@@ -14,6 +14,7 @@ from messages.python.UserEvent_pb2 import UserEvent
 from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
 from messages.python.StopSessionEvent_pb2 import StopSessionEvent
 from messages.python.UserRegisterToEvent_pb2 import UserRegisterToEvent
+from messages.python.Result_pb2 import Result
 
 from google.protobuf.any_pb2 import Any
 import datetime
@@ -31,7 +32,7 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
         RedisClient.__init__(self, config=config)
         WebSocketServerProtocol.__init__(self)
         self.user = None
-        self.registered_events = []
+        self.registered_events = set()  # Collection of unique elements
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
@@ -66,35 +67,51 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
         if binary:
             # Decode protobuf before parsing
-            pass
+            return
 
-        # Parse JSON (protobuf content)
         try:
-            message = Parse(msg, TeraMessage)
-            # Test if we have a register message
-            for any_msg in message.data:
-                register_event = UserRegisterToEvent()
-                if any_msg.Unpack(register_event):
-                    print('******* register event', register_event)
-                    if register_event.event_type == UserRegisterToEvent.USER_CONNECTED:
-                        print('Registering to USER_CONNECTED')
-                        if register_event.action == UserRegisterToEvent.REGISTER:
-                            self.registered_events.append(register_event.event_type)
-                            # TODO Subscribe with redis
-                            # For now registered automatically when websocket is connected
+            # Parse JSON (protobuf content)
+            message = Parse(msg, TeraMessage())
 
-                        elif register_event.action == UserRegisterToEvent.UNREGISTER:
+            # Verify if the message if for us (register message)
+            if message.head.dest == self.answer_topic():
+                # Test if we have a register message
+                for any_msg in message.data:
+                    register_event = UserRegisterToEvent()
+                    result = Result()
+                    if any_msg.Unpack(register_event):
+                        if register_event.action == UserRegisterToEvent.ACTION_REGISTER:
+                            self.registered_events.add(register_event.event_type)
+                            result.type = Result.RESULT_OK
+                            result.code = 0
+                            result.message = 'Registered to :' + str(register_event)
+
+                        elif register_event.action == UserRegisterToEvent.ACTION_UNREGISTER:
                             self.registered_events.remove(register_event.event_type)
-                            # TODO Unsubscribe with redis
-                            # For now do not unregister, fill filter events
+                            result.type = Result.RESULT_OK
+                            result.code = 0
+                            result.message = 'Unregistered to :' + str(register_event)
+                        else:
+                            print('Unknown action: ', register_event.action)
+                            result.type = Result.RESULT_ERROR
+                            result.code = -1
+                            result.message = 'Unknown event type : ' + str(register_event)
 
-                    # Done, do not forward UserRegisterToEvent
-                    # TODO, We assume here that there is no other message in the the message.data structure
-                    return
+                        # Done, do not forward UserRegisterToEvent
+                        answer = self.create_tera_message(dest=message.head.source)
 
-            self.publish(message.head.dest, message)
-        except ParseError:
-            print('TeraWebSocketServerUserProtocol - TeraMessage parse error...')
+                        any_message = Any()
+                        any_message.Pack(result)
+                        answer.data.extend([any_message])
+                        json_data = MessageToJson(answer, including_default_value_fields=True)
+
+                        # Send to websocket (in byte form)
+                        self.sendMessage(json_data.encode('utf-8'), False)
+            else:
+                # Message not for us
+                self.publish(message.head.dest, message)
+        except ParseError as e:
+            print('TeraWebSocketServerUserProtocol - TeraMessage parse error...', e)
 
         # Echo for debug
         # self.sendMessage(msg, binary)
@@ -111,7 +128,11 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
                 tera_message.ParseFromString(message)
 
             # We need to verify if we are registered to this type of message
-            
+            # And if user has access to IT
+            from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
+            access = DBManagerTeraUserAccess(self.user)
+
+            # TODO test access depending of event
 
 
             # Test message to JSON
