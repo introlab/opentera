@@ -2,7 +2,7 @@ from libtera.db.Base import db, BaseModel
 
 
 class TeraServiceProjectRole(db.Model, BaseModel):
-    __tablename__ = 't_services_users_roles'
+    __tablename__ = 't_services_project_roles'
     id_service_project_role = db.Column(db.Integer, db.Sequence('id_service_project_role_sequence'), primary_key=True,
                                         autoincrement=True)
     id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
@@ -11,7 +11,8 @@ class TeraServiceProjectRole(db.Model, BaseModel):
     id_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device', ondelete='cascade'), nullable=True)
     id_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant', ondelete='cascade'),
                                nullable=True)
-    id_service_role = db.Column(db.Integer, db.ForeignKey('t_services_roles', ondelete='cascade'), nullable=False)
+    id_service_role = db.Column(db.Integer, db.ForeignKey('t_services_roles.id_service_role', ondelete='cascade'),
+                                nullable=False)
 
     service_project_role_service = db.relationship("TeraService")
     service_project_role_project = db.relationship("TeraProject")
