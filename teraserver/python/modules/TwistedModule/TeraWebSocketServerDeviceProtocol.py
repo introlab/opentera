@@ -5,14 +5,11 @@ from autobahn.websocket.types import ConnectionRequest, ConnectionResponse, Conn
 # OpenTera
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.redis.RedisClient import RedisClient
-from modules.BaseModule import ModuleNames, create_module_topic_from_name
+from modules.BaseModule import ModuleNames, create_module_message_topic_from_name
 
 
 # Messages
-from messages.python.TeraMessage_pb2 import TeraMessage
-from messages.python.DeviceEvent_pb2 import DeviceEvent
-from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
-from google.protobuf.any_pb2 import Any
+import messages.python as messages
 import datetime
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.json_format import Parse, ParseError
@@ -37,17 +34,18 @@ class TeraWebSocketServerDeviceProtocol(RedisClient, WebSocketServerProtocol):
         ret = yield self.subscribe(self.answer_topic())
 
         if self.device:
-            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            device_connected = DeviceEvent()
+            tera_message = self.create_tera_message(
+                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            device_connected = messages.DeviceEvent()
             device_connected.device_uuid = str(self.device.device_uuid)
-            device_connected.type = DeviceEvent.DEVICE_CONNECTED
+            device_connected.type = messages.DeviceEvent.DEVICE_CONNECTED
             # Need to use Any container
-            any_message = Any()
+            any_message = messages.Any()
             any_message.Pack(device_connected)
             tera_message.data.extend([any_message])
 
             # Publish to login module (bytes)
-            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+            self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
 
     def onMessage(self, msg, binary):
@@ -61,7 +59,7 @@ class TeraWebSocketServerDeviceProtocol(RedisClient, WebSocketServerProtocol):
 
         # Parse JSON (protobuf content)
         try:
-            message = Parse(msg, TeraMessage)
+            message = Parse(msg, messages.TeraMessage())
             self.publish(message.head.dest, message)
         except ParseError:
             print('TeraWebSocketServerDeviceProtocol - TeraMessage parse error...')
@@ -74,7 +72,7 @@ class TeraWebSocketServerDeviceProtocol(RedisClient, WebSocketServerProtocol):
 
         # Forward as JSON to websocket
         try:
-            tera_message = TeraMessage()
+            tera_message = messages.TeraMessage()
             if isinstance(message, str):
                 tera_message.ParseFromString(message.encode('utf-8'))
             elif isinstance(message, bytes):
@@ -131,18 +129,19 @@ class TeraWebSocketServerDeviceProtocol(RedisClient, WebSocketServerProtocol):
     def onClose(self, wasClean, code, reason):
         if self.device:
             # Advertise that device leaved
-            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            device_disconnected = DeviceEvent()
+            tera_message = self.create_tera_message(
+                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            device_disconnected = messages.DeviceEvent()
             device_disconnected.device_uuid = str(self.device.device_uuid)
-            device_disconnected.type = DeviceEvent.DEVICE_DISCONNECTED
+            device_disconnected.type = messages.DeviceEvent.DEVICE_DISCONNECTED
 
             # Need to use Any container
-            any_message = Any()
+            any_message = messages.Any()
             any_message.Pack(device_disconnected)
             tera_message.data.extend([any_message])
 
             # Publish to login module (bytes)
-            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+            self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
 
         print('TeraWebSocketServerDeviceProtocol - onClose', self, wasClean, code, reason)
@@ -157,7 +156,7 @@ class TeraWebSocketServerDeviceProtocol(RedisClient, WebSocketServerProtocol):
         return ""
 
     def create_tera_message(self, dest='', seq=0):
-        tera_message = TeraMessage()
+        tera_message = messages.TeraMessage()
         tera_message.head.version = 1
         tera_message.head.time = datetime.datetime.now().timestamp()
         tera_message.head.seq = seq

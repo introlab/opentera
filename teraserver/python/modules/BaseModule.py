@@ -1,8 +1,8 @@
 from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
 from enum import Enum, unique
-from messages.python.TeraMessage_pb2 import TeraMessage
-from messages.python.RPCMessage_pb2 import RPCMessage
+import messages.python as messages
+
 
 import json
 import datetime
@@ -16,8 +16,12 @@ class ModuleNames(Enum):
     USER_MANAGER_MODULE_NAME = str("TeraServer.UserManagerModule")
 
 
-def create_module_topic_from_name(name: ModuleNames):
+def create_module_message_topic_from_name(name: ModuleNames):
     return 'module.' + name.value + '.messages'
+
+
+def create_module_event_topic_from_name(name: ModuleNames):
+    return 'module.' + name.value + '.events'
 
 
 class BaseModule(RedisClient):
@@ -42,6 +46,16 @@ class BaseModule(RedisClient):
 
     def get_name(self):
         return self.module_name
+
+    def event_topic_name(self):
+        return 'module.' + self.module_name + '.events'
+
+    def send_event_message(self, event, topic: str):
+        message = self.create_event_message(topic)
+        any_message = messages.Any()
+        any_message.Pack(event)
+        message.events.extend([any_message])
+        self.publish(message.header.topic, message.SerializeToString())
 
     def redisConnectionMade(self):
         print('*************************** BaseModule.connectionMade', self.module_name)
@@ -88,7 +102,7 @@ class BaseModule(RedisClient):
 
         try:
             # Look for a RPCMessage
-            rpc_message = RPCMessage()
+            rpc_message = messages.RPCMessage()
             rpc_message.ParseFromString(message)
 
             if self.rpc_api.__contains__(rpc_message.method):
@@ -132,8 +146,7 @@ class BaseModule(RedisClient):
             self.publish(rpc_message.reply_to, json_data)
 
     def create_tera_message(self, dest='', seq=0):
-
-        tera_message = TeraMessage()
+        tera_message = messages.TeraMessage()
         tera_message.head.version = 1
         tera_message.head.time = datetime.datetime.now().timestamp()
         tera_message.head.seq = seq
@@ -141,5 +154,14 @@ class BaseModule(RedisClient):
         tera_message.head.dest = dest
         return tera_message
 
+    def create_event_message(self, topic):
+        event_message = messages.TeraEvent()
+        event_message.header.version = 1
+        event_message.header.time = datetime.datetime.now().timestamp()
+        event_message.header.topic = topic
+        return event_message
+
     def source_name(self):
         return "module." + self.module_name + ".messages"
+
+

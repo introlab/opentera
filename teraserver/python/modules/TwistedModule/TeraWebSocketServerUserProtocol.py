@@ -5,18 +5,11 @@ from autobahn.websocket.types import ConnectionRequest, ConnectionResponse, Conn
 # OpenTera
 from libtera.db.models.TeraUser import TeraUser
 from libtera.redis.RedisClient import RedisClient
-from modules.BaseModule import ModuleNames, create_module_topic_from_name
+from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 
 
 # Messages
-from messages.python.TeraMessage_pb2 import TeraMessage
-from messages.python.UserEvent_pb2 import UserEvent
-from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
-from messages.python.StopSessionEvent_pb2 import StopSessionEvent
-from messages.python.UserRegisterToEvent_pb2 import UserRegisterToEvent
-from messages.python.Result_pb2 import Result
-
-from google.protobuf.any_pb2 import Any
+import messages.python as messages
 import datetime
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.json_format import Parse, ParseError
@@ -39,27 +32,32 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
         print('TeraWebSocketServerUserProtocol redisConnectionMade (redis)')
 
         # This will wait until subscribe result is available...
+        # Subscribe to messages to the websocket
+        # TODO, Still useful?
         ret = yield self.subscribe(self.answer_topic())
+        print(ret)
 
         if self.user:
             # Advertise that we have a new user
-            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            user_connected = UserEvent()
+            tera_message = self.create_tera_message(
+                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            user_connected = messages.UserEvent()
             user_connected.user_uuid = str(self.user.user_uuid)
-            user_connected.type = UserEvent.USER_CONNECTED
+            user_connected.type = messages.UserEvent.USER_CONNECTED
             # Need to use Any container
-            any_message = Any()
+            any_message = messages.Any()
             any_message.Pack(user_connected)
             tera_message.data.extend([any_message])
 
-            # Publish to login module (bytes)
-            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+            # Publish to UserManager module (bytes)
+            self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
 
+            # This will wait until subscribe result is available...
             # Register only once to events from modules, will be filtered after
-            self.subscribe(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME) + '.events')
+            ret = yield self.subscribe(create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            print(ret)
 
-    @defer.inlineCallbacks
     def onMessage(self, msg, binary):
         # Handle websocket communication
         # TODO use protobuf ?
@@ -71,36 +69,36 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
         try:
             # Parse JSON (protobuf content)
-            message = Parse(msg, TeraMessage())
+            message = Parse(msg, messages.TeraMessage())
 
             # Verify if the message if for us (register message)
             if message.head.dest == self.answer_topic():
                 # Test if we have a register message
                 for any_msg in message.data:
-                    register_event = UserRegisterToEvent()
-                    result = Result()
+                    register_event = messages.UserRegisterToEvent()
+                    result = messages.Result()
                     if any_msg.Unpack(register_event):
-                        if register_event.action == UserRegisterToEvent.ACTION_REGISTER:
+                        if register_event.action == messages.UserRegisterToEvent.ACTION_REGISTER:
                             self.registered_events.add(register_event.event_type)
-                            result.type = Result.RESULT_OK
+                            result.type = messages.Result.RESULT_OK
                             result.code = 0
                             result.message = 'Registered to :' + str(register_event)
 
-                        elif register_event.action == UserRegisterToEvent.ACTION_UNREGISTER:
+                        elif register_event.action == messages.UserRegisterToEvent.ACTION_UNREGISTER:
                             self.registered_events.remove(register_event.event_type)
-                            result.type = Result.RESULT_OK
+                            result.type = messages.Result.RESULT_OK
                             result.code = 0
                             result.message = 'Unregistered to :' + str(register_event)
                         else:
                             print('Unknown action: ', register_event.action)
-                            result.type = Result.RESULT_ERROR
+                            result.type = messages.Result.RESULT_ERROR
                             result.code = -1
                             result.message = 'Unknown event type : ' + str(register_event)
 
                         # Done, do not forward UserRegisterToEvent
                         answer = self.create_tera_message(dest=message.head.source)
 
-                        any_message = Any()
+                        any_message = messages.Any()
                         any_message.Pack(result)
                         answer.data.extend([any_message])
                         json_data = MessageToJson(answer, including_default_value_fields=True)
@@ -109,7 +107,9 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
                         self.sendMessage(json_data.encode('utf-8'), False)
             else:
                 # Message not for us
-                self.publish(message.head.dest, message)
+                # NOT sure we should forward messages to anything...
+                # self.publish(message.head.dest, message)
+                pass
         except ParseError as e:
             print('TeraWebSocketServerUserProtocol - TeraMessage parse error...', e)
 
@@ -121,11 +121,11 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
         # Forward as JSON to websocket
         try:
-            tera_message = TeraMessage()
+            event_message = messages.TeraEvent()
             if isinstance(message, str):
-                tera_message.ParseFromString(message.encode('utf-8'))
+                ret = event_message.ParseFromString(message.encode('utf-8'))
             elif isinstance(message, bytes):
-                tera_message.ParseFromString(message)
+                ret = event_message.ParseFromString(message)
 
             # We need to verify if we are registered to this type of message
             # And if user has access to IT
@@ -134,18 +134,16 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
             # TODO test access depending of event
 
-
             # Test message to JSON
-            json = MessageToJson(tera_message, including_default_value_fields=True)
+            json = MessageToJson(event_message, including_default_value_fields=True)
 
             # Send to websocket (in binary form)
             self.sendMessage(json.encode('utf-8'), False)
 
         except DecodeError:
             print('TeraWebSocketServerUserProtocol - DecodeError ', pattern, channel, message)
-            self.sendMessage(message.encode('utf-8'), False)
-        except:
-            print('TeraWebSocketServerUserProtocol - Failure in redisMessageReceived')
+        except ParseError as e:
+            print('TeraWebSocketServerUserProtocol - Failure in redisMessageReceived', e)
 
     def onConnect(self, request):
         """
@@ -184,22 +182,32 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
         # Moved handling code in redisConnectionMade...
         # because it always occurs after onOpen...
 
+    @defer.inlineCallbacks
     def onClose(self, wasClean, code, reason):
         if self.user:
             # Advertise that user disconnected
-            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            user_disconnected = UserEvent()
+            tera_message = self.create_tera_message(
+                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            user_disconnected = messages.UserEvent()
             user_disconnected.user_uuid = str(self.user.user_uuid)
-            user_disconnected.type = UserEvent.USER_DISCONNECTED
+            user_disconnected.type = messages.UserEvent.USER_DISCONNECTED
 
             # Need to use Any container
-            any_message = Any()
+            any_message = messages.Any()
             any_message.Pack(user_disconnected)
             tera_message.data.extend([any_message])
 
             # Publish to login module (bytes)
-            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+            self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
+
+            # Unsubscribe to events
+            ret = yield self.unsubscribe(create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            print(ret)
+
+        # Unsubscribe to messages
+        ret = yield self.unsubscribe(self.answer_topic())
+        print(ret)
 
         print('onClose', self, wasClean, code, reason)
 
@@ -212,7 +220,7 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
     def create_tera_message(self, dest='', seq=0):
 
-        tera_message = TeraMessage()
+        tera_message = messages.TeraMessage()
         tera_message.head.version = 1
         tera_message.head.time = datetime.datetime.now().timestamp()
         tera_message.head.seq = seq

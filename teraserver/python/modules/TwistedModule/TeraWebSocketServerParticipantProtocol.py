@@ -5,14 +5,10 @@ from autobahn.websocket.types import ConnectionRequest, ConnectionResponse, Conn
 # OpenTera
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.redis.RedisClient import RedisClient
-from modules.BaseModule import ModuleNames, create_module_topic_from_name
-
+from modules.BaseModule import ModuleNames, create_module_message_topic_from_name
 
 # Messages
-from messages.python.TeraMessage_pb2 import TeraMessage
-from messages.python.ParticipantEvent_pb2 import ParticipantEvent
-from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
-from messages.python.StopSessionEvent_pb2 import StopSessionEvent
+import messages.python as messages
 
 from google.protobuf.any_pb2 import Any
 import datetime
@@ -39,17 +35,18 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
         ret = yield self.subscribe(self.answer_topic())
 
         if self.participant:
-            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            participant_connected = ParticipantEvent()
+            tera_message = self.create_tera_message(
+                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            participant_connected = messages.ParticipantEvent()
             participant_connected.participant_uuid = str(self.participant.participant_uuid)
-            participant_connected.type = ParticipantEvent.PARTICIPANT_CONNECTED
+            participant_connected.type = messages.ParticipantEvent.PARTICIPANT_CONNECTED
             # Need to use Any container
             any_message = Any()
             any_message.Pack(participant_connected)
             tera_message.data.extend([any_message])
 
             # Publish to login module (bytes)
-            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+            self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
 
     def onMessage(self, msg, binary):
@@ -63,7 +60,7 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
 
         # Parse JSON (protobuf content)
         try:
-            message = Parse(msg, TeraMessage)
+            message = Parse(msg, messages.TeraMessage())
             self.publish(message.head.dest, message)
         except ParseError:
             print('TeraWebSocketServerParticipantProtocol - TeraMessage parse error...')
@@ -76,7 +73,7 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
 
         # Forward as JSON to websocket
         try:
-            tera_message = TeraMessage()
+            tera_message = messages.TeraMessage()
             if isinstance(message, str):
                 tera_message.ParseFromString(message.encode('utf-8'))
             elif isinstance(message, bytes):
@@ -145,10 +142,11 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
     def onClose(self, wasClean, code, reason):
         if self.participant:
             # Advertise that participant leaved
-            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            participant_disconnected = ParticipantEvent()
+            tera_message = self.create_tera_message(
+                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            participant_disconnected = messages.ParticipantEvent()
             participant_disconnected.participant_uuid = str(self.participant.participant_uuid)
-            participant_disconnected.type = ParticipantEvent.PARTICIPANT_DISCONNECTED
+            participant_disconnected.type = messages.ParticipantEvent.PARTICIPANT_DISCONNECTED
 
             # Need to use Any container
             any_message = Any()
@@ -156,7 +154,7 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
             tera_message.data.extend([any_message])
 
             # Publish to login module (bytes)
-            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+            self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
 
         print('TeraWebSocketServerParticipantProtocol - onClose', self, wasClean, code, reason)
@@ -171,7 +169,7 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
         return ""
 
     def create_tera_message(self, dest='', seq=0):
-        tera_message = TeraMessage()
+        tera_message = messages.TeraMessage()
         tera_message.head.version = 1
         tera_message.head.time = datetime.datetime.now().timestamp()
         tera_message.head.seq = seq

@@ -65,8 +65,10 @@ class WebSocketUserClient(unittest.TestCase):
         json_data = MessageToJson(message, including_default_value_fields=True)
         ret = self.ws.send(json_data)
 
+        # Wait for answer
+        val = self.ws.recv()
 
-
+        return val
 
     def setUp(self):
         # Using siteadmin default user information
@@ -89,6 +91,8 @@ class WebSocketUserClient(unittest.TestCase):
         # Test register event
         self._register_event(UserRegisterToEvent.ACTION_REGISTER, UserRegisterToEvent.EVENT_USER_CONNECTED)
 
+        ret2 = self.ws.recv()
+        print(ret2)
 
 
 

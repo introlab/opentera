@@ -5,7 +5,7 @@ from messages.python.CreateSession_pb2 import CreateSession
 from messages.python.UserEvent_pb2 import UserEvent
 from messages.python.ParticipantEvent_pb2 import ParticipantEvent
 from messages.python.DeviceEvent_pb2 import DeviceEvent
-from modules.BaseModule import BaseModule, ModuleNames, create_module_topic_from_name
+from modules.BaseModule import BaseModule, ModuleNames
 from google.protobuf.any_pb2 import Any
 import datetime
 
@@ -67,10 +67,6 @@ class OnlineDeviceRegistry:
 
 
 class UserManagerModule(BaseModule):
-
-    @staticmethod
-    def event_topic_name():
-        return create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME) + '.events'
 
     def __init__(self, config: ConfigManager):
         BaseModule.__init__(self, ModuleNames.USER_MANAGER_MODULE_NAME.value, config)
@@ -137,15 +133,6 @@ class UserManagerModule(BaseModule):
                 elif participant_event.type == participant_event.PARTICIPANT_DISCONNECTED:
                     self.handle_participant_disconnected(tera_message.head, participant_event)
 
-                # Send back event to participant...
-                if self.send_participant_event:
-                    tera_message = self.create_tera_message(
-                        dest='websocket.participant.' + participant_event.participant_uuid)
-                    any_message = Any()
-                    any_message.Pack(participant_event)
-                    tera_message.data.extend([any_message])
-                    self.publish(tera_message.head.dest, tera_message.SerializeToString())
-
             # Test for DeviceEvent
             device_event = DeviceEvent()
             if any_msg.Unpack(device_event):
@@ -154,86 +141,38 @@ class UserManagerModule(BaseModule):
                 elif device_event.type == device_event.DEVICE_DISCONNECTED:
                     self.handle_device_disconnected(tera_message.head, device_event)
 
-                # Send back event to participant...
-                if self.send_device_event:
-                    tera_message = self.create_tera_message(
-                        dest='websocket.device.' + device_event.device_uuid)
-                    any_message = Any()
-                    any_message.Pack(device_event)
-                    tera_message.data.extend([any_message])
-                    self.publish(tera_message.head.dest, tera_message.SerializeToString())
-
-    def _send_event_message(self, event, dest: str):
-        tera_message = self.create_tera_message(dest=dest)
-        any_message = Any()
-        any_message.Pack(event)
-        tera_message.data.extend([any_message])
-        self.publish(tera_message.head.dest, tera_message.SerializeToString())
-
     def handle_user_connected(self, header, user_event: UserEvent):
         self.user_registry.user_online(user_event.user_uuid)
 
         # Send message to event topic
-        self._send_event_message(user_event, UserManagerModule.event_topic_name())
-
-        # Send message to users?
-        for user_uuid in self.user_registry.online_users():
-            # TODO Check for permissions...
-            self._send_event_message(user_event, 'websocket.user.' + user_uuid)
+        self.send_event_message(user_event, self.event_topic_name())
 
     def handle_user_disconnected(self, header, user_event: UserEvent):
         self.user_registry.user_offline(user_event.user_uuid)
 
         # Send message to event topic
-        self._send_event_message(user_event, UserManagerModule.event_topic_name())
-
-        for user_uuid in self.user_registry.online_users():
-            # TODO Check for permissions...
-            # Send to everyone?
-            self._send_event_message(user_event, 'websocket.user.' + user_uuid)
+        self.send_event_message(user_event, self.event_topic_name())
 
     def handle_participant_connected(self, header, participant_event: ParticipantEvent):
         self.participant_registry.participant_online(participant_event.participant_uuid)
 
         # Send message to event topic
-        self._send_event_message(participant_event, UserManagerModule.event_topic_name())
-
-        # Not sure we need to do this
-        for user_uuid in self.user_registry.online_users():
-            # TODO Check for permissions...
-            # Send to everyone?
-            self._send_event_message(participant_event, 'websocket.user.' + user_uuid)
+        self.send_event_message(participant_event, self.event_topic_name())
 
     def handle_participant_disconnected(self, header, participant_event: ParticipantEvent):
         self.participant_registry.participant_offline(participant_event.participant_uuid)
 
         # Send message to event topic
-        self._send_event_message(participant_event, UserManagerModule.event_topic_name())
-
-        # Not sure we need to do this
-        for user_uuid in self.user_registry.online_users():
-            # TODO Check for permissions...
-            # Send to everyone?
-            self._send_event_message(participant_event, 'websocket.user.' + user_uuid)
+        self.send_event_message(participant_event, self.event_topic_name())
 
     def handle_device_connected(self, header, device_event: DeviceEvent):
         self.device_registry.device_online(device_event.device_uuid)
 
         # Send message to event topic
-        self._send_event_message(device_event, UserManagerModule.event_topic_name())
-
-        for user_uuid in self.user_registry.online_users():
-            # TODO Check for permissions...
-            # Send to everyone?
-            self._send_event_message(device_event, 'websocket.user.' + user_uuid)
+        self.send_event_message(device_event, self.event_topic_name())
 
     def handle_device_disconnected(self, header, device_event: DeviceEvent):
         self.device_registry.device_offline(device_event.device_uuid)
 
         # Send message to event topic
-        self._send_event_message(device_event, UserManagerModule.event_topic_name())
-
-        for user_uuid in self.user_registry.online_users():
-            # TODO Check for permissions...
-            # Send to everyone?
-            self._send_event_message(device_event, 'websocket.user.' + user_uuid)
+        self.send_event_message(device_event, self.event_topic_name())
