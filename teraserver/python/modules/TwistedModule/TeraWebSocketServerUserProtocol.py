@@ -11,7 +11,7 @@ from modules.BaseModule import ModuleNames, create_module_message_topic_from_nam
 # Messages
 import messages.python as messages
 import datetime
-from google.protobuf.json_format import MessageToJson
+from google.protobuf.json_format import MessageToJson, MessageToDict
 from google.protobuf.json_format import Parse, ParseError
 from google.protobuf.message import DecodeError
 
@@ -157,8 +157,10 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
             access = DBManagerTeraUserAccess(self.user)
 
             # TODO test access depending of event
+            # any_message = messages.TeraAnyMessage()
+            # any_message.message.Pack(event_message)
 
-            # Test message to JSON
+            # Test message to JSON string
             json = MessageToJson(event_message, including_default_value_fields=True)
 
             # Send to websocket (not in binary form)
