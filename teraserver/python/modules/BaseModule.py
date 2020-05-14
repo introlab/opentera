@@ -73,7 +73,7 @@ class BaseModule(RedisClient):
         pass
 
     def build_interface(self):
-        # TeraMessage Interface
+        # TeraModuleMessage Interface
         def messages_subscribed_callback(*args):
             print('messages_subscribed_callback for ', self.module_name)
 
@@ -146,7 +146,7 @@ class BaseModule(RedisClient):
             self.publish(rpc_message.reply_to, json_data)
 
     def create_tera_message(self, dest='', seq=0):
-        tera_message = messages.TeraMessage()
+        tera_message = messages.TeraModuleMessage()
         tera_message.head.version = 1
         tera_message.head.time = datetime.datetime.now().timestamp()
         tera_message.head.seq = seq

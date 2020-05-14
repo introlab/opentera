@@ -1,6 +1,6 @@
 from modules.BaseModule import BaseModule, ModuleNames
 from services.VideoDispatch.ConfigManager import ConfigManager
-from messages.python.TeraMessage_pb2 import TeraMessage
+from messages.python.TeraModuleMessage_pb2 import TeraModuleMessage
 from messages.python.UserEvent_pb2 import UserEvent
 from messages.python.ParticipantEvent_pb2 import ParticipantEvent
 from messages.python.DeviceEvent_pb2 import DeviceEvent
@@ -157,7 +157,7 @@ class OnlineUsersModule(BaseModule):
         We have received a published message from redis
         """
         print('VideoDispatchService.OnlineUsersModule - notify_user_manager_event', pattern, channel, message)
-        tera_message = TeraMessage()
+        tera_message = TeraModuleMessage()
         tera_message.ParseFromString(message)
 
         # We have a repeated Any field look for message type

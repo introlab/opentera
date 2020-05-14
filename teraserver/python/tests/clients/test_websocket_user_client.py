@@ -5,7 +5,7 @@ import json
 import websocket
 import ssl
 from messages.python.UserRegisterToEvent_pb2 import UserRegisterToEvent
-from messages.python.TeraMessage_pb2 import TeraMessage
+from messages.python.TeraModuleMessage_pb2 import TeraModuleMessage
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.json_format import Parse, ParseError
 from google.protobuf.any_pb2 import Any
@@ -42,7 +42,7 @@ class WebSocketUserClient(unittest.TestCase):
         return json_data
 
     def _create_tera_message(self, dest='websocket', seq=0):
-        tera_message = TeraMessage()
+        tera_message = TeraModuleMessage()
         tera_message.head.version = 1
         tera_message.head.time = datetime.datetime.now().timestamp()
         tera_message.head.seq = seq

@@ -1,5 +1,5 @@
 from libtera.ConfigManager import ConfigManager
-from messages.python.TeraMessage_pb2 import TeraMessage
+from messages.python.TeraModuleMessage_pb2 import TeraModuleMessage
 from messages.python.RPCMessage_pb2 import RPCMessage
 from messages.python.CreateSession_pb2 import CreateSession
 from messages.python.UserEvent_pb2 import UserEvent
@@ -111,7 +111,7 @@ class UserManagerModule(BaseModule):
         """
         print('UserManagerModule - Received message ', pattern, channel, message)
 
-        tera_message = TeraMessage()
+        tera_message = TeraModuleMessage()
         tera_message.ParseFromString(message)
         # tera_message.ParseFromString(message.encode('utf-8'))
 

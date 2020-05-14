@@ -59,10 +59,10 @@ class TeraWebSocketServerDeviceProtocol(RedisClient, WebSocketServerProtocol):
 
         # Parse JSON (protobuf content)
         try:
-            message = Parse(msg, messages.TeraMessage())
+            message = Parse(msg, messages.TeraModuleMessage())
             self.publish(message.head.dest, message)
         except ParseError:
-            print('TeraWebSocketServerDeviceProtocol - TeraMessage parse error...')
+            print('TeraWebSocketServerDeviceProtocol - TeraModuleMessage parse error...')
 
         # Echo for debug
         self.sendMessage(msg, binary)
@@ -72,7 +72,7 @@ class TeraWebSocketServerDeviceProtocol(RedisClient, WebSocketServerProtocol):
 
         # Forward as JSON to websocket
         try:
-            tera_message = messages.TeraMessage()
+            tera_message = messages.TeraModuleMessage()
             if isinstance(message, str):
                 tera_message.ParseFromString(message.encode('utf-8'))
             elif isinstance(message, bytes):
@@ -156,7 +156,7 @@ class TeraWebSocketServerDeviceProtocol(RedisClient, WebSocketServerProtocol):
         return ""
 
     def create_tera_message(self, dest='', seq=0):
-        tera_message = messages.TeraMessage()
+        tera_message = messages.TeraModuleMessage()
         tera_message.head.version = 1
         tera_message.head.time = datetime.datetime.now().timestamp()
         tera_message.head.seq = seq
