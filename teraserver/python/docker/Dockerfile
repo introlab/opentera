@@ -18,8 +18,8 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 # Clone repository
-ARG CACHE_DATE=2020-04-06
-RUN git clone -b dev https://github.com/introlab/opentera.git
+ARG CACHE_DATE=2020-05-13
+RUN git clone --recurse-submodules -b dev https://github.com/introlab/opentera.git
 
 #Create dbs and users
 RUN service postgresql start &&\

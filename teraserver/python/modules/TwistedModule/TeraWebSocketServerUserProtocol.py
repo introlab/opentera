@@ -34,7 +34,8 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
         # This will wait until subscribe result is available...
         # Subscribe to messages to the websocket
         # TODO, Still useful?
-        ret = yield self.subscribe(self.answer_topic())
+        # ret = yield self.subscribe(self.answer_topic())
+        ret = yield self.subscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
         print(ret)
 
         if self.user:
@@ -55,7 +56,9 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
             # This will wait until subscribe result is available...
             # Register only once to events from modules, will be filtered after
-            ret = yield self.subscribe(create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            # ret = yield self.subscribe(create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+                ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
             print(ret)
 
     def onMessage(self, msg, binary):
@@ -116,9 +119,30 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
         # Echo for debug
         # self.sendMessage(msg, binary)
 
-    def redisMessageReceived(self, pattern, channel, message):
-        print('TeraWebSocketServerUserProtocol redis message received', pattern, channel, message)
+    def redis_tera_message_received(self, pattern, channel, message):
+        print('redis_tera_message_received', pattern, channel, message)
 
+        # Forward as JSON to websocket
+        try:
+            tera_message = messages.TeraMessage()
+            if isinstance(message, str):
+                ret = tera_message.ParseFromString(message.encode('utf-8'))
+            elif isinstance(message, bytes):
+                ret = tera_message.ParseFromString(message)
+
+            # Converting to JSON
+            json = MessageToJson(tera_message, including_default_value_fields=True)
+
+            # Send to websocket (not in binary form)
+            self.sendMessage(json.encode('utf-8'), False)
+
+        except DecodeError as d:
+            print('TeraWebSocketServerUserProtocol - DecodeError ', pattern, channel, message, d)
+        except ParseError as e:
+            print('TeraWebSocketServerUserProtocol - Failure in redisMessageReceived', e)
+
+    def redis_event_message_received(self, pattern, channel, message):
+        print('redis_event_message_received', pattern, channel, message)
         # Forward as JSON to websocket
         try:
             event_message = messages.TeraEvent()
@@ -137,11 +161,11 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
             # Test message to JSON
             json = MessageToJson(event_message, including_default_value_fields=True)
 
-            # Send to websocket (in binary form)
+            # Send to websocket (not in binary form)
             self.sendMessage(json.encode('utf-8'), False)
 
-        except DecodeError:
-            print('TeraWebSocketServerUserProtocol - DecodeError ', pattern, channel, message)
+        except DecodeError as d:
+            print('TeraWebSocketServerUserProtocol - DecodeError ', pattern, channel, message, d)
         except ParseError as e:
             print('TeraWebSocketServerUserProtocol - Failure in redisMessageReceived', e)
 
@@ -202,11 +226,15 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
                          tera_message.SerializeToString())
 
             # Unsubscribe to events
-            ret = yield self.unsubscribe(create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            # ret = yield self.unsubscribe(create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            ret = yield self.unsubscribe_pattern_with_callback(
+                create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+                self.redis_event_message_received)
             print(ret)
 
         # Unsubscribe to messages
-        ret = yield self.unsubscribe(self.answer_topic())
+        # ret = yield self.unsubscribe(self.answer_topic())
+        ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
         print(ret)
 
         print('onClose', self, wasClean, code, reason)
