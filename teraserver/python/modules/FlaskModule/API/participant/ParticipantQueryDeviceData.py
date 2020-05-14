@@ -1,10 +1,9 @@
-from flask import jsonify, session, send_file
-from flask_restx import Resource, reqparse, fields, inputs
+from flask import session, send_file
+from flask_restx import Resource, inputs
 from modules.LoginModule.LoginModule import participant_multi_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 import zipfile
 from io import BytesIO
 from slugify import slugify

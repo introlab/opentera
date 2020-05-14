@@ -7,8 +7,7 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from flask_babel import gettext
-from libtera.db.DBManager import DBManager
-from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
+from modules.DatabaseModule.DBManager import DBManager
 
 # Parser definition(s)
 get_parser = api.parser()

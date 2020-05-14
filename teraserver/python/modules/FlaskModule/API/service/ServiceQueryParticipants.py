@@ -1,10 +1,9 @@
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse, fields, inputs
+from flask import request
+from flask_restx import Resource
 from modules.LoginModule.LoginModule import LoginModule
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
-from libtera.db.DBManager import DBManager, db
+from modules.DatabaseModule.DBManager import db
 import uuid
 from datetime import datetime
 

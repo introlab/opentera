@@ -1,6 +1,6 @@
 # WebSockets
 from autobahn.twisted.websocket import WebSocketServerProtocol
-from autobahn.websocket.types import ConnectionRequest, ConnectionResponse, ConnectionDeny
+from autobahn.websocket.types import ConnectionDeny
 
 # OpenTera
 from libtera.db.models.TeraUser import TeraUser
@@ -11,7 +11,7 @@ from modules.BaseModule import ModuleNames, create_module_message_topic_from_nam
 # Messages
 import messages.python as messages
 import datetime
-from google.protobuf.json_format import MessageToJson, MessageToDict
+from google.protobuf.json_format import MessageToJson
 from google.protobuf.json_format import Parse, ParseError
 from google.protobuf.message import DecodeError
 
@@ -59,6 +59,9 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
             # ret = yield self.subscribe(create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
             ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
+            print(ret)
+            ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+                ModuleNames.DATABASE_MODULE_NAME), self.redis_event_message_received)
             print(ret)
 
     def onMessage(self, msg, binary):
@@ -161,7 +164,7 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
             # We need to verify if we are registered to this type of message
             # And if user has access to IT
-            from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
+            from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
             access = DBManagerTeraUserAccess(self.user)
 
             # TODO test access depending of event

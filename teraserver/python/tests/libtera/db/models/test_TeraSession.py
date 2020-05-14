@@ -1,17 +1,9 @@
 import unittest
-from libtera.db.DBManager import DBManager
-from libtera.db.models.TeraUser import TeraUser
+from modules.DatabaseModule.DBManager import DBManager
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraSession import TeraSession, TeraSessionStatus
-from libtera.db.models.TeraProject import TeraProject
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
-from libtera.db.Base import db
-import uuid
 import os
-from passlib.hash import bcrypt
 from libtera.ConfigManager import ConfigManager
 
 
@@ -42,7 +34,7 @@ class TeraUserTest(unittest.TestCase):
 
     def test_Session_new(self):
         from datetime import datetime
-        from libtera.db.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
+        from modules.DatabaseModule.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
 
         session = TeraSession()
 

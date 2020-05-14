@@ -1,10 +1,11 @@
+from flask_sqlalchemy import event
 from libtera.db.Base import db
+import messages.python as messages
 
 # Must include all Database objects here to be properly initialized and created if needed
-
+from modules.BaseModule import BaseModule, ModuleNames, create_module_event_topic_from_name
 
 # All at once to make sure all files ar registered.
-from libtera.db.models import *
 
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
@@ -33,17 +34,17 @@ from libtera.ConfigManager import ConfigManager
 from modules.FlaskModule.FlaskModule import flask_app
 
 # User access with roles
-from .DBManagerTeraUserAccess import DBManagerTeraUserAccess
-from .DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
-from .DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
-from .DBManagerTeraServiceAccess import DBManagerTeraServiceAccess
+from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
+from modules.DatabaseModule.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
+from modules.DatabaseModule.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
+from modules.DatabaseModule.DBManagerTeraServiceAccess import DBManagerTeraServiceAccess
 
 # Alembic
 from alembic.config import Config
 from alembic import command
 
 
-class DBManager:
+class DBManager (BaseModule):
     """db_infos = {
         'user': '',
         'pw': '',
@@ -53,7 +54,9 @@ class DBManager:
         'type': ''
     }"""
 
-    def __init__(self):
+    def __init__(self, config: ConfigManager):
+        BaseModule.__init__(self, ModuleNames.DATABASE_MODULE_NAME.value, config)
+
         self.db_uri = None
 
     @staticmethod
@@ -144,8 +147,9 @@ class DBManager:
             print('No assets - creating defaults')
             TeraAsset.create_defaults()
 
-    def open(self, db_infos, echo=False):
-        self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
+    def open(self, echo=False):
+        # self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
+        self.db_uri = 'postgresql://%(username)s:%(password)s@%(url)s:%(port)s/%(name)s' % self.config.db_config
 
         flask_app.config.update({
             'SQLALCHEMY_DATABASE_URI': self.db_uri,
@@ -231,3 +235,64 @@ class DBManager:
 
         # Stamp database
         command.stamp(config, revision, sql, tag)
+
+
+@event.listens_for(db.session, 'after_flush')
+def receive_after_flush(session, flush_context):
+    from modules.Globals import db_man
+    events = list()
+
+    # Updated objects
+    for obj in session.dirty:
+        if isinstance(obj, TeraUser):
+            new_event = messages.UserEvent()
+            new_event.user_uuid = str(obj.user_uuid)
+            new_event.type = messages.UserEvent.USER_UPDATED
+            events.append(new_event)
+
+    # Inserted objects
+    for obj in session.new:
+        if isinstance(obj, TeraUser):
+            new_event = messages.UserEvent()
+            new_event.user_uuid = str(obj.user_uuid)
+            new_event.type = messages.UserEvent.USER_ADDED
+            events.append(new_event)
+
+    # Deleted objects
+    for obj in session.deleted:
+        if isinstance(obj, TeraUser):
+            new_event = messages.UserEvent()
+            new_event.user_uuid = str(obj.user_uuid)
+            new_event.type = messages.UserEvent.USER_DELETED
+            events.append(new_event)
+
+    # Create event message
+    if len(events) > 0:
+        tera_message = db_man.create_event_message(
+            create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME))
+        any_events = list()
+        for db_event in events:
+            any_message = messages.Any()
+            any_message.Pack(db_event)
+            tera_message.events.append(any_message)
+        db_man.publish(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
+                       tera_message.SerializeToString())
+
+
+# @event.listens_for(TeraUser, 'after_update')
+# def user_updated(mapper, connection, target):
+#     from modules.Globals import db_man
+#     # Publish event message
+#     # Advertise that we have a new user
+#     tera_message = db_man.create_event_message(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME))
+#     user_event = messages.UserEvent()
+#     user_event.user_uuid = str(target.user_uuid)
+#     user_event.type = messages.UserEvent.USER_UPDATED
+#     # Need to use Any container
+#     any_message = messages.Any()
+#     any_message.Pack(user_event)
+#     tera_message.events.extend([any_message])
+#
+#     # Publish
+#     db_man.publish(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
+#                    tera_message.SerializeToString())

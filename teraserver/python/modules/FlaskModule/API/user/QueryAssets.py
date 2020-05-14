@@ -6,7 +6,7 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraAsset import TeraAsset
 
 from sqlalchemy import exc
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 
 # Parser definition(s)
 get_parser = api.parser()

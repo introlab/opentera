@@ -1,8 +1,6 @@
 from libtera.forms.TeraForm import *
-from libtera.db.models.TeraDeviceType import TeraDeviceType
-from libtera.db.models.TeraDeviceSubType import TeraDeviceSubType
 
-from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
+from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 from flask_babel import gettext
 
 

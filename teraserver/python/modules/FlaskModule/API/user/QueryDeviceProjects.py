@@ -5,7 +5,7 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from flask_babel import gettext
@@ -84,7 +84,6 @@ class QueryDeviceProjects(Resource):
                         400: 'Badly formed JSON or missing fields(id_project or id_device) in the JSON body',
                         500: 'Internal error occured when saving device association'})
     def post(self):
-        from libtera.db.models.TeraProject import TeraProject
         # parser = post_parser
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])

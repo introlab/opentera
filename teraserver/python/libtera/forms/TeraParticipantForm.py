@@ -1,6 +1,6 @@
 from libtera.forms.TeraForm import *
 from flask_babel import gettext
-from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
+from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 
 
 class TeraParticipantForm:

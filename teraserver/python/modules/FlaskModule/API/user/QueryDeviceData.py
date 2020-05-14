@@ -1,13 +1,11 @@
-from flask import jsonify, session, request, send_file #send_from_directory
-from flask_restx import Resource, reqparse, inputs, fields
+from flask import jsonify, session, send_file #send_from_directory
+from flask_restx import Resource, inputs
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from modules.FlaskModule.FlaskModule import flask_app
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceData import TeraDeviceData
-from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 import zipfile
 from io import BytesIO
 from slugify import slugify

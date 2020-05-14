@@ -178,7 +178,7 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_sites(self, admin_only=False):
         if self.user.user_superadmin:
-            site_list = TeraSite.query.all()
+            site_list = TeraSite.query.order_by(TeraSite.site_name.asc()).all()
         else:
             site_list = []
             for site_access in self.user.user_sites_access:

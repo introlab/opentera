@@ -1,10 +1,8 @@
 import unittest
 import os
 
-from libtera.db.Base import db
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 
-from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 from libtera.db.models.TeraUser import TeraUser
 from libtera.ConfigManager import ConfigManager
 

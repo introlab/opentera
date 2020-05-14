@@ -2,7 +2,7 @@ from flask import jsonify, session
 from flask_restx import Resource, reqparse
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 
 from libtera.db.models.TeraUser import TeraUser
 

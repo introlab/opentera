@@ -33,6 +33,7 @@ from libtera.redis.RedisClient import RedisClient
 import modules.Globals as Globals
 
 from modules.UserManagerModule.UserManagerModule import UserManagerModule
+from modules.DatabaseModule.DBManager import DBManager
 
 
 import os
@@ -166,16 +167,17 @@ if __name__ == '__main__':
 
     # DATABASE CONFIG AND OPENING
     #############################
-    POSTGRES = {
-        'user': config_man.db_config['username'],
-        'pw': config_man.db_config['password'],
-        'db': config_man.db_config['name'],
-        'host': config_man.db_config['url'],
-        'port': config_man.db_config['port']
-    }
+    # POSTGRES = {
+    #     'user': config_man.db_config['username'],
+    #     'pw': config_man.db_config['password'],
+    #     'db': config_man.db_config['name'],
+    #     'host': config_man.db_config['url'],
+    #     'port': config_man.db_config['port']
+    # }
+    Globals.db_man = DBManager(config_man)
 
     try:
-        Globals.db_man.open(POSTGRES, True)
+        Globals.db_man.open(True)
     except OperationalError:
         print("Unable to connect to database - please check settings in config file!")
         quit()

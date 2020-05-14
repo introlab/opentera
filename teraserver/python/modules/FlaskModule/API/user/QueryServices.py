@@ -6,7 +6,7 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraService import TeraService
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 
 # Parser definition(s)
 get_parser = api.parser()

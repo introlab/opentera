@@ -1,12 +1,10 @@
 from flask import jsonify, session, request
-from flask_restx import Resource, reqparse, inputs, fields
+from flask_restx import Resource, inputs
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule
 from sqlalchemy import exc
-from flask_babel import gettext
-from sqlalchemy.exc import InvalidRequestError
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from libtera.db.models.TeraDevice import TeraDevice
 

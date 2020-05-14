@@ -1,4 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, event
 import inspect
 import datetime
 # import uuid
@@ -107,3 +107,6 @@ class BaseModel:
                 pass
 
         return query.all()
+
+
+

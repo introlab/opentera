@@ -1,14 +1,10 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse
-from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent
 from modules.LoginModule.LoginModule import LoginModule
-from libtera.db.DBManager import DBManager
-from sqlalchemy.exc import InvalidRequestError
+from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy import exc
 from modules.FlaskModule.FlaskModule import device_api_ns as api
-from libtera.db.models.TeraDevice import TeraDevice
-
 
 # Parser definition(s)
 get_parser = api.parser()

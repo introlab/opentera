@@ -6,7 +6,7 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraDeviceProject import TeraDeviceProject
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from flask_babel import gettext

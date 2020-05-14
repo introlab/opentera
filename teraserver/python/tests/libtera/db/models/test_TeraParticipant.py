@@ -1,18 +1,11 @@
 import unittest
-from libtera.db.Base import db
-from libtera.db.DBManager import DBManager
-from libtera.db.models.TeraUser import TeraUser
+from modules.DatabaseModule.DBManager import DBManager
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
-from libtera.db.models.TeraSite import TeraSite
-from libtera.db.models.TeraProject import TeraProject
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.Base import db
 from libtera.ConfigManager import ConfigManager
 import uuid
 import os
-from passlib.hash import bcrypt
 
 
 class TeraParticipantTest(unittest.TestCase):

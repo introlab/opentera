@@ -1,15 +1,14 @@
-from flask_restx import Resource, reqparse
+from flask_restx import Resource
 
 from modules.FlaskModule.Views.Upload import ALLOWED_EXTENSIONS
 from modules.LoginModule.LoginModule import LoginModule, current_device
-from flask import request, redirect, flash
+from flask import request
 from werkzeug.utils import secure_filename
 from modules.FlaskModule.FlaskModule import flask_app
-from modules.FlaskModule.FlaskModule import device_api_ns as api
 
 from libtera.db.models.TeraDeviceData import TeraDeviceData
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 from libtera.db.Base import db
 
 import datetime
