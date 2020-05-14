@@ -104,7 +104,11 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
                         any_message = messages.Any()
                         any_message.Pack(result)
                         answer.data.extend([any_message])
-                        json_data = MessageToJson(answer, including_default_value_fields=True)
+
+                        tera_message = messages.TeraMessage()
+                        tera_message.message.Pack(answer)
+
+                        json_data = MessageToJson(tera_message, including_default_value_fields=True)
 
                         # Send to websocket (in byte form)
                         self.sendMessage(json_data.encode('utf-8'), False)
@@ -124,11 +128,15 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
         # Forward as JSON to websocket
         try:
-            tera_message = messages.TeraModuleMessage()
+            tera_module_message = messages.TeraModuleMessage()
             if isinstance(message, str):
-                ret = tera_message.ParseFromString(message.encode('utf-8'))
+                ret = tera_module_message.ParseFromString(message.encode('utf-8'))
             elif isinstance(message, bytes):
-                ret = tera_message.ParseFromString(message)
+                ret = tera_module_message.ParseFromString(message)
+
+            # Conversion to generic message
+            tera_message = messages.TeraMessage()
+            tera_message.message.Pack(tera_module_message)
 
             # Converting to JSON
             json = MessageToJson(tera_message, including_default_value_fields=True)
@@ -157,11 +165,11 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
             access = DBManagerTeraUserAccess(self.user)
 
             # TODO test access depending of event
-            # any_message = messages.TeraAnyMessage()
-            # any_message.message.Pack(event_message)
+            tera_message = messages.TeraMessage()
+            tera_message.message.Pack(event_message)
 
             # Test message to JSON string
-            json = MessageToJson(event_message, including_default_value_fields=True)
+            json = MessageToJson(tera_message, including_default_value_fields=True)
 
             # Send to websocket (not in binary form)
             self.sendMessage(json.encode('utf-8'), False)
