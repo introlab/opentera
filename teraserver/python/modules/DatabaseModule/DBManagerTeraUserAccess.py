@@ -112,6 +112,13 @@ class DBManagerTeraUserAccess:
         query = TeraDevice.query.join(TeraDeviceProject).filter(TeraDeviceProject.id_project.in_(proj_id_list))
         return query.all()
 
+    def get_accessible_devices_uuids(self, admin_only=False):
+        devices = []
+
+        for device in self.get_accessible_devices(admin_only=admin_only):
+            devices.append(device.device_uuid)
+        return devices
+
     def get_accessible_devices_ids(self, admin_only=False):
         devices = []
 
@@ -155,6 +162,13 @@ class DBManagerTeraUserAccess:
         participant_list.extend(TeraParticipant.query.filter(TeraParticipant.id_project.in_(project_id_list)))
 
         return participant_list
+
+    def get_accessible_participants_uuids(self, admin_only=False):
+        participants = self.get_accessible_participants(admin_only)
+        uuids = []
+        for participant in participants:
+            uuids.append(participant.participant_uuid)
+        return uuids
 
     def get_accessible_participants_ids(self, admin_only=False):
         parts = []

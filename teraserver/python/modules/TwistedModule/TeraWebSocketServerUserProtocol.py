@@ -169,7 +169,7 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
             if self.event_manager:
                 # Filter events
                 filtered_event_message = self.event_manager.filter_events(event_message)
-                
+
                 # Send if we still have events to send
                 if filtered_event_message.events:
                     tera_message = messages.TeraMessage()
