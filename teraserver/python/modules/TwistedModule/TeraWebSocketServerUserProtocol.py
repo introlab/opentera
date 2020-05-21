@@ -18,6 +18,9 @@ from google.protobuf.message import DecodeError
 # Twisted
 from twisted.internet import defer
 
+# Event manager
+from modules.UserEventManager import UserEventManager
+
 
 class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
 
@@ -25,6 +28,7 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
         RedisClient.__init__(self, config=config)
         WebSocketServerProtocol.__init__(self)
         self.user = None
+        self.event_manager = None
         self.registered_events = set()  # Collection of unique elements
 
     @defer.inlineCallbacks
@@ -162,20 +166,20 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
             elif isinstance(message, bytes):
                 ret = event_message.ParseFromString(message)
 
-            # We need to verify if we are registered to this type of message
-            # And if user has access to IT
-            from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
-            access = DBManagerTeraUserAccess(self.user)
+            if self.event_manager:
+                # Filter events
+                filtered_event_message = self.event_manager.filter_events(event_message)
+                
+                # Send if we still have events to send
+                if filtered_event_message.events:
+                    tera_message = messages.TeraMessage()
+                    tera_message.message.Pack(filtered_event_message)
 
-            # TODO test access depending of event
-            tera_message = messages.TeraMessage()
-            tera_message.message.Pack(event_message)
+                    # Test message to JSON string
+                    json = MessageToJson(tera_message, including_default_value_fields=True)
 
-            # Test message to JSON string
-            json = MessageToJson(tera_message, including_default_value_fields=True)
-
-            # Send to websocket (not in binary form)
-            self.sendMessage(json.encode('utf-8'), False)
+                    # Send to websocket (not in binary form)
+                    self.sendMessage(json.encode('utf-8'), False)
 
         except DecodeError as d:
             print('TeraWebSocketServerUserProtocol - DecodeError ', pattern, channel, message, d)
@@ -207,6 +211,10 @@ class TeraWebSocketServerUserProtocol(RedisClient, WebSocketServerProtocol):
                     # Remove key
                     print('TeraWebSocketServerUserProtocol - OK! removing key')
                     self.redisDelete(my_id[0])
+
+                    # Create event manager
+                    self.event_manager = UserEventManager(self.user)
+
                     return
 
         # if we get here we need to close the websocket, auth failed.
