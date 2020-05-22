@@ -26,6 +26,8 @@ class TeraParticipantForm:
         section.add_item(TeraFormItem("participant_uuid", gettext("UUID Participant"), "hidden", True))
         section.add_item(TeraFormItem("participant_name", gettext("Nom Participant"), "text", True))
         section.add_item(TeraFormItem("participant_email", gettext("Courriel Participant"), "text", False))
+        section.add_item(TeraFormItem("id_participant_group", gettext("Groupe"), "array", False,
+                                      item_values=groups_list))
         section.add_item(TeraFormItem("participant_enabled", gettext("Participant actif"), "boolean", True,
                                       item_default=True))
         section.add_item(TeraFormItem("participant_token", gettext("Jeton Participant"), "label", False,
@@ -39,7 +41,7 @@ class TeraParticipantForm:
                          item_condition=TeraFormItemCondition("participant_login_enabled", "=", True)))
         section.add_item(TeraFormItem("participant_lastonline", gettext("Dernière connexion"), "label",
                                       item_options={"readonly": True}))
-        section.add_item(TeraFormItem("id_participant_group", gettext("Groupe"), "array", False,
-                                      item_values=groups_list))
+        section.add_item(TeraFormItem("participant_lastsession", gettext("Dernière séance"), "label",
+                                      item_options={"readonly": True}))
 
         return form.to_dict()

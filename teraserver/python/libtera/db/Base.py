@@ -72,7 +72,8 @@ class BaseModel:
     @classmethod
     def update(cls, update_id: int, values: dict):
         values = cls.clean_values(values)
-        cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).update(values)
+        update_obj = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first() # .update(values)
+        update_obj.from_json(values)
         db.session.commit()
 
     @classmethod
@@ -86,7 +87,8 @@ class BaseModel:
 
     @classmethod
     def delete(cls, id_todel):
-        cls.query.filter(getattr(cls, cls.get_primary_key_name()) == id_todel).delete()
+        delete_obj = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
+        db.session.delete(delete_obj)
         db.session.commit()
 
     @classmethod

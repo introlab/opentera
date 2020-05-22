@@ -328,7 +328,13 @@ class DBManagerTeraUserAccess:
         accessibles_devices = self.get_accessible_devices_ids()
         devices = TeraDevice.query.filter_by(device_type=id_type_device).filter(TeraDevice
                                                                                 .id_device.in_(accessibles_devices))\
-            .order_by(TeraDevice.id_device.asc()).all()
+            .order_by(TeraDevice.device_name.asc()).all()
+        return devices
+
+    def query_devices_by_subtype(self, id_device_subtype: int):
+        accessibles_devices = self.get_accessible_devices_ids()
+        devices = TeraDevice.query.filter_by(id_device_subtype=id_device_subtype).filter(
+            TeraDevice.id_device.in_(accessibles_devices)).order_by(TeraDevice.device_name.asc()).all()
         return devices
 
     # def query_devices_by_type_by_site(self, id_type_device: int, site_id: int):
