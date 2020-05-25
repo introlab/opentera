@@ -55,6 +55,7 @@ class DBManager (BaseModule):
     }"""
 
     def __init__(self, config: ConfigManager):
+
         BaseModule.__init__(self, ModuleNames.DATABASE_MODULE_NAME.value, config)
 
         self.db_uri = None
@@ -240,43 +241,45 @@ class DBManager (BaseModule):
 @event.listens_for(db.session, 'after_flush')
 def receive_after_flush(session, flush_context):
     from modules.Globals import db_man
-    events = list()
 
-    # Updated objects
-    for obj in session.dirty:
-        if isinstance(obj, TeraUser):
-            new_event = messages.UserEvent()
-            new_event.user_uuid = str(obj.user_uuid)
-            new_event.type = messages.UserEvent.USER_UPDATED
-            events.append(new_event)
+    if db_man:
+        events = list()
 
-    # Inserted objects
-    for obj in session.new:
-        if isinstance(obj, TeraUser):
-            new_event = messages.UserEvent()
-            new_event.user_uuid = str(obj.user_uuid)
-            new_event.type = messages.UserEvent.USER_ADDED
-            events.append(new_event)
+        # Updated objects
+        for obj in session.dirty:
+            if isinstance(obj, TeraUser):
+                new_event = messages.UserEvent()
+                new_event.user_uuid = str(obj.user_uuid)
+                new_event.type = messages.UserEvent.USER_UPDATED
+                events.append(new_event)
 
-    # Deleted objects
-    for obj in session.deleted:
-        if isinstance(obj, TeraUser):
-            new_event = messages.UserEvent()
-            new_event.user_uuid = str(obj.user_uuid)
-            new_event.type = messages.UserEvent.USER_DELETED
-            events.append(new_event)
+        # Inserted objects
+        for obj in session.new:
+            if isinstance(obj, TeraUser):
+                new_event = messages.UserEvent()
+                new_event.user_uuid = str(obj.user_uuid)
+                new_event.type = messages.UserEvent.USER_ADDED
+                events.append(new_event)
 
-    # Create event message
-    if len(events) > 0:
-        tera_message = db_man.create_event_message(
-            create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME))
-        any_events = list()
-        for db_event in events:
-            any_message = messages.Any()
-            any_message.Pack(db_event)
-            tera_message.events.append(any_message)
-        db_man.publish(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
-                       tera_message.SerializeToString())
+        # Deleted objects
+        for obj in session.deleted:
+            if isinstance(obj, TeraUser):
+                new_event = messages.UserEvent()
+                new_event.user_uuid = str(obj.user_uuid)
+                new_event.type = messages.UserEvent.USER_DELETED
+                events.append(new_event)
+
+        # Create event message
+        if len(events) > 0:
+            tera_message = db_man.create_event_message(
+                create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME))
+            any_events = list()
+            for db_event in events:
+                any_message = messages.Any()
+                any_message.Pack(db_event)
+                tera_message.events.append(any_message)
+            db_man.publish(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
+                           tera_message.SerializeToString())
 
 
 # @event.listens_for(TeraUser, 'after_update')

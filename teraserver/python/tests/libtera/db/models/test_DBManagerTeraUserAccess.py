@@ -15,21 +15,20 @@ class DBManagerTeraUserAccessTest(unittest.TestCase):
         'filename': filename
     }
 
-    db_man = DBManager()
-
-    admin_user = None
-    test_user = None
-
-    config = ConfigManager()
-
     def setUp(self):
         if os.path.isfile(self.filename):
             print('removing database')
             os.remove(self.filename)
 
-        self.db_man.open_local(self.SQLITE)
+        self.admin_user = None
+        self.test_user = None
 
+        self.config = ConfigManager()
         self.config.create_defaults()
+
+        self.db_man = DBManager(self.config)
+
+        self.db_man.open_local(self.SQLITE)
 
         # Creating default users / tests.
         self.db_man.create_defaults(self.config)

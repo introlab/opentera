@@ -3,10 +3,7 @@ from autobahn.twisted.websocket import WebSocketServerProtocol
 from autobahn.websocket.types import ConnectionDeny
 
 # OpenTera
-from libtera.db.models.TeraUser import TeraUser
 from libtera.redis.RedisClient import RedisClient
-from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
-
 
 # Messages
 import messages.python as messages
@@ -17,9 +14,6 @@ from google.protobuf.message import DecodeError
 
 # Twisted
 from twisted.internet import defer
-
-# Event manager
-from modules.UserEventManager import UserEventManager
 
 
 class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
