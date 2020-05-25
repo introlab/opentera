@@ -1,5 +1,6 @@
 
 from libtera.db.models.TeraUser import TeraUser
+from libtera.db.models.TeraUserGroup import TeraUserGroup
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraParticipant import TeraParticipant
@@ -41,10 +42,37 @@ class DBManagerTeraUserAccess:
                         users.append(user)
             # You are always available to yourself!
             if self.user not in users:
-                users.append(self)
+                users.append(self.user)
 
         # TODO Sort by username
         return users
+
+    def get_accessible_users_groups_ids(self, admin_only=False):
+        users_groups = self.get_accessible_users_groups(admin_only=admin_only)
+        users_groups_ids = [ug.id_user_group for ug in users_groups]
+        return users_groups_ids
+
+    def get_accessible_users_groups(self, admin_only=False):
+        users_groups = []
+        if self.user.user_superadmin:
+            users_groups = TeraUserGroup.query.all()
+        else:
+            # Gets user group that have access to site and projects
+            projects_access = TeraProjectAccess.get_projects_access_for_user_group(self.user.id_user_group)
+            sites_access = TeraSiteAccess.get_sites_access_for_user_group(self.user.id_user_group)
+
+            for project_access in projects_access:
+                if not admin_only or (admin_only and project_access.project_access_role == 'admin'):
+                    if project_access.project_access_user_group not in users_groups:
+                        users_groups.append(project_access.project_access_user_group)
+
+            for site_access in sites_access:
+                if not admin_only or (admin_only and site_access.site_access_role == 'admin'):
+                    if site_access.site_access_user_group not in users_groups:
+                        users_groups.append(site_access.site_access_user_group)
+
+        # TODO Sort by user group names
+        return users_groups
 
     def get_accessible_users_uuids(self, admin_only=False):
         users = self.get_accessible_users(admin_only=admin_only)
@@ -59,7 +87,7 @@ class DBManagerTeraUserAccess:
             # SuperAdmin is always admin.
             return 'admin'
 
-        role = TeraProjectAccess.query.filter_by(id_user=self.user.id_user, id_project=project_id).first()
+        role = TeraProjectAccess.query.filter_by(id_user_group=self.user.id_user_group, id_project=project_id).first()
 
         role_name = ''
 
@@ -89,7 +117,7 @@ class DBManagerTeraUserAccess:
                             project_list.append(project)
 
             # Add specific projects
-            for project_access in self.user.user_projects_access:
+            for project_access in self.user.user_user_group.user_group_projects_access:
                 project = project_access.project_access_project
                 if project not in project_list:
                     if not admin_only or (admin_only and self.get_project_role(project.id_project) == 'admin'):
@@ -195,9 +223,16 @@ class DBManagerTeraUserAccess:
             site_list = TeraSite.query.order_by(TeraSite.site_name.asc()).all()
         else:
             site_list = []
-            for site_access in self.user.user_sites_access:
+            for site_access in self.user.user_user_group.user_group_sites_access:
                 if not admin_only or (admin_only and site_access.site_access_role == 'admin'):
                     site_list.append(site_access.site_access_site)
+            # Also get sites from which we don't have a specific role, but that we have at least a project access into
+            # it
+            for project_access in self.user.user_user_group.user_group_projects_access:
+                if project_access.project_access_project.project_site not in site_list:
+                    site_list.append(TeraSiteAccess.build_user_access_object(
+                        site_id=project_access.project_access_project.project_site.id_site,
+                        user_group_id=self.user.id_user_group, role='user'))
 
         return site_list
 
@@ -288,11 +323,18 @@ class DBManagerTeraUserAccess:
             # SuperAdmin is always admin.
             return 'admin'
 
-        role = TeraSiteAccess.query.filter_by(id_user=self.user.id_user, id_site=site_id).first()
+        role = TeraSiteAccess.query.filter_by(id_user_group=self.user.id_user_group, id_site=site_id).first()
         if role is not None:
             role_name = role.site_access_role
         else:
+            # By default, if we have an access to any project in that site, we are a "user" of that site
             role_name = None
+            project_access = TeraProjectAccess.get_projects_access_for_user_group(self.user.id_user_group)
+            for pa in project_access:
+                if pa.project_access_project.id_site == site_id:
+                    role_name = 'user'
+                    break
+
         return role_name
 
     def query_device_by_id(self, device_id: int):
@@ -336,14 +378,6 @@ class DBManagerTeraUserAccess:
         devices = TeraDevice.query.filter_by(id_device_subtype=id_device_subtype).filter(
             TeraDevice.id_device.in_(accessibles_devices)).order_by(TeraDevice.device_name.asc()).all()
         return devices
-
-    # def query_devices_by_type_by_site(self, id_type_device: int, site_id: int):
-    #     devices = []
-    #     if site_id in self.get_accessible_sites_ids():
-    #         devices = TeraDevice.query.join(TeraDeviceProject).join(TeraProject.project_site)\
-    #             .filter(TeraProject.id_site == site_id, TeraDevice.device_type == id_type_device)\
-    #             .order_by(TeraDevice.id_device.asc()).all()
-    #     return devices
 
     def query_sites_for_device(self, device_id: int):
         sites = []
@@ -393,77 +427,120 @@ class DBManagerTeraUserAccess:
             .order_by(TeraParticipant.id_participant.asc()).all()
         return participants
 
+    # def query_users_access_for_site(self, site_id: int, admin_only=False):
+    #     users = self.get_accessible_users()
+    #     users_access = []
+    #     for user in users:
+    #         if user.user_superadmin:
+    #             # Super admin access = admin in all site
+    #             access = TeraSiteAccess.build_superadmin_access_object(site_id=site_id,
+    #                                                                    user_group_id=user.id_user_group)
+    #         else:
+    #             access = TeraSiteAccess.get_specific_site_access(id_user_group=user.id_user_group, id_site=site_id)
+    #         if not admin_only or (admin_only and access.site_access_role == 'admin'):
+    #             users_access.append(access)
+    #     return users_access
+
     def query_access_for_site(self, site_id: int, admin_only=False):
-        users = self.get_accessible_users()
-        users_ids = []
-        super_admins = []
-        for user in users:
-            if user.id_user not in users_ids:
-                users_ids.append(user.id_user)
-            if user.user_superadmin:
-                # Super admin access = admin in all site
-                super_admin = TeraSiteAccess.build_superadmin_access_object(site_id=site_id, user_id=user.id_user)
-                super_admins.append(super_admin)
+        users_groups_ids = self.get_accessible_users_groups_ids()
 
         if not admin_only:
-            access = TeraSiteAccess.query.filter_by(id_site=site_id).filter(TeraSiteAccess.id_user.in_(users_ids)).all()
+            access = TeraSiteAccess.query.filter_by(id_site=site_id).filter(
+                TeraSiteAccess.id_user_group.in_(users_groups_ids)).all()
         else:
-            access = TeraSiteAccess.query.filter_by(id_site=site_id, site_access_role='admin')\
-                .filter(TeraSiteAccess.id_user.in_(users_ids)).all()
+            access = TeraSiteAccess.query.filter_by(id_site=site_id, site_access_role='admin').filter(
+                TeraSiteAccess.id_user_group.in_(users_groups_ids)).all()
 
-        # Add super admins to list, if needed
-        for super_access in super_admins:
-            if not any(x.id_user == super_access.id_user for x in access):
-                access.append(super_access)
+        # Check for accessible projects also ('user' role in related site), if not only looking for admin role
+        if not admin_only:
+            project_access = TeraProjectAccess.query.filter(TeraProjectAccess.id_user_group.in_(users_groups_ids)).all()
+            if site_id in list(set([pa.project_access_project.id_site for pa in project_access])):
+                # We have at least a project access related to that site
+                for pa in project_access:
+                    if pa.id_user_group not in [sa.id_user_group for sa in access]:
+                        # User group not already there - add it
+                        access.append(TeraSiteAccess.build_user_access_object(site_id=site_id,
+                                                                              user_group_id=pa.id_user_group,
+                                                                              role='user'))
 
         return access
+
+    # def query_users_access_for_project(self, project_id: int, admin_only=False):
+    #     users = self.get_accessible_users()
+    #     users_access = []
+    #     for user in users:
+    #         if user.user_superadmin:
+    #             # Super admin access = admin in all site
+    #             access = TeraProjectAccess.build_superadmin_access_object(project_id=project_id,
+    #                                                                       user_group_id=user.id_user_group)
+    #         else:
+    #             access = TeraProjectAccess.get_specific_site_access(id_user_group=user.id_user_group,
+    #                                                                 id_project=project_id)
+    #         if not admin_only or (admin_only and access.project_access_role == 'admin'):
+    #             users_access.append(access)
+    #     return users_access
 
     def query_access_for_project(self, project_id: int, admin_only=False):
-        users = self.get_accessible_users()
-        users_ids = []
-        super_admins = []
-
-        proj = TeraProject.get_project_by_id(project_id)
-        site_id = proj.id_site
-
-        for user in users:
-            if user.id_user not in users_ids:
-                users_ids.append(user.id_user)
-            user_access = DBManagerTeraUserAccess(user=user)
-            if user.user_superadmin or user_access.get_site_role(site_id=site_id) == 'admin':
-                # Super admin access or site admin = admin in this site
-                super_admin = TeraProjectAccess.build_superadmin_access_object(project_id=project_id,
-                                                                               user_id=user.id_user)
-                super_admins.append(super_admin)
+        users_groups_ids = self.get_accessible_users_groups_ids()
 
         if not admin_only:
-            access = TeraProjectAccess.query.filter_by(id_project=project_id)\
-                .filter(TeraProjectAccess.id_user.in_(users_ids)).all()
+            access = TeraProjectAccess.query.filter_by(id_project=project_id).filter(
+                TeraProjectAccess.id_user_group.in_(users_groups_ids)).all()
         else:
-            access = TeraProjectAccess.query.filter_by(id_project=project_id, project_access_role='admin') \
-                .filter(TeraProjectAccess.id_user.in_(users_ids)).all()
-
-        # Add super admins to list, if needed
-        for super_access in super_admins:
-            if not any(x.id_user == super_access.id_user for x in access):
-                access.append(super_access)
+            access = TeraProjectAccess.query.filter_by(id_project=project_id, site_access_role='admin').filter(
+                TeraProjectAccess.id_user_group.in_(users_groups_ids)).all()
 
         return access
+    #
+    # def query_access_for_project(self, project_id: int, admin_only=False):
+    #     users = self.get_accessible_users()
+    #     users_ids = []
+    #     super_admins = []
+    #
+    #     proj = TeraProject.get_project_by_id(project_id)
+    #     site_id = proj.id_site
+    #
+    #     for user in users:
+    #         if user.id_user not in users_ids:
+    #             users_ids.append(user.id_user)
+    #         user_access = DBManagerTeraUserAccess(user=user)
+    #         if user.user_superadmin or user_access.get_site_role(site_id=site_id) == 'admin':
+    #             # Super admin access or site admin = admin in this site
+    #             super_admin = TeraProjectAccess.build_superadmin_access_object(project_id=project_id,
+    #                                                                            user_id=user.id_user)
+    #             super_admins.append(super_admin)
+    #
+    #     if not admin_only:
+    #         access = TeraProjectAccess.query.filter_by(id_project=project_id)\
+    #             .filter(TeraProjectAccess.id_user.in_(users_ids)).all()
+    #     else:
+    #         access = TeraProjectAccess.query.filter_by(id_project=project_id, project_access_role='admin') \
+    #             .filter(TeraProjectAccess.id_user.in_(users_ids)).all()
+    #
+    #     # Add super admins to list, if needed
+    #     for super_access in super_admins:
+    #         if not any(x.id_user == super_access.id_user for x in access):
+    #             access.append(super_access)
+    #
+    #     return access
 
     def query_site_access_for_user(self, user_id: int, admin_only=False):
         from libtera.db.models.TeraUser import TeraUser
         user = TeraUser.get_user_by_id(user_id)
         if not user.user_superadmin:
             if not admin_only:
-                access = TeraSiteAccess.query.filter_by(id_user=user_id).all()
+                access = TeraSiteAccess.query.filter_by(id_user_group=user.id_user_group).all()
             else:
-                access = TeraSiteAccess.query.filter_by(id_user=user_id, site_access_role='admin').all()
+                access = TeraSiteAccess.query.filter_by(id_user_group=user.id_user_group, site_access_role='admin')\
+                    .all()
         else:
             # User is super admin, set roles to admin for all accessible sites
             sites = self.get_accessible_sites()
             access = []
             for site in sites:
-                access.append(TeraSiteAccess.build_superadmin_access_object(site_id=site.id_site, user_id=user_id))
+                access.append(TeraSiteAccess.build_user_access_object(site_id=site.id_site,
+                                                                      user_group_id=user.id_user_group,
+                                                                      role='admin'))
 
         return access
 
@@ -472,16 +549,18 @@ class DBManagerTeraUserAccess:
         user = TeraUser.get_user_by_id(user_id)
         if not user.user_superadmin:
             if not admin_only:
-                access = TeraProjectAccess.query.filter_by(id_user=user_id).all()
+                access = TeraProjectAccess.query.filter_by(id_user_group=user.id_user_group).all()
             else:
-                access = TeraProjectAccess.query.filter_by(id_user=user_id, project_access_role='admin').all()
+                access = TeraProjectAccess.query.filter_by(id_user_group=user.id_user_group,
+                                                           project_access_role='admin').all()
         else:
             # User is super admin, set roles to admin for all accessible projects
             projects = self.get_accessible_projects()
             access = []
             for project in projects:
-                access.append(TeraProjectAccess.build_superadmin_access_object(project_id=project.id_project,
-                                                                               user_id=user_id))
+                access.append(TeraProjectAccess.build_user_access_object(project_id=project.id_project,
+                                                                         user_group_id=user.id_user_group,
+                                                                         role='admin'))
 
         return access
 

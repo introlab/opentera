@@ -72,7 +72,7 @@ class BaseModel:
     @classmethod
     def update(cls, update_id: int, values: dict):
         values = cls.clean_values(values)
-        update_obj = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first() # .update(values)
+        update_obj = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
         update_obj.from_json(values)
         db.session.commit()
 

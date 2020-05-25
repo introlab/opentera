@@ -1,12 +1,19 @@
 from libtera.forms.TeraForm import *
 from flask_babel import gettext
+from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 
 
 class TeraUserForm:
 
     @staticmethod
-    def get_user_form():
+    def get_user_form(user_access: DBManagerTeraUserAccess):
         form = TeraForm("user")
+
+        # Building lists
+        user_groups = user_access.get_accessible_users_groups()
+        user_groups_list = []
+        for ug in user_groups:
+            user_groups_list.append(TeraFormValue(value_id=ug.id_user_group, value=ug.user_group_name))
 
         # Sections
         section = TeraFormSection("informations", gettext("Informations"))
@@ -21,6 +28,8 @@ class TeraUserForm:
         section.add_item(TeraFormItem("user_firstname", gettext("Prénom"), "text", True))
         section.add_item(TeraFormItem("user_lastname", gettext("Nom"), "text", True))
         section.add_item(TeraFormItem("user_email", gettext("Courriel"), "text"))
+        section.add_item(TeraFormItem("id_user_group", gettext("Groupe Utilisateur"), "array", False,
+                                      item_values=user_groups_list))
         section.add_item(
             TeraFormItem("user_password", gettext("Mot de passe"), "password", item_options={"confirm": True}))
         section.add_item(TeraFormItem("user_superadmin", gettext("Super administrateur"), "boolean", True))

@@ -41,7 +41,7 @@ class QueryForms(Resource):
             return jsonify(TeraUserForm.get_user_profile_form())
 
         if args['type'] == 'user':
-            return jsonify(TeraUserForm.get_user_form())
+            return jsonify(TeraUserForm.get_user_form(user_access=user_access))
 
         if args['type'] == 'site':
             return jsonify(TeraSiteForm.get_site_form())
