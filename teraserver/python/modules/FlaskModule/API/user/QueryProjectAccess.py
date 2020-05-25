@@ -10,7 +10,7 @@ from modules.DatabaseModule.DBManager import DBManager
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all projects roles')
-get_parser.add_argument('id_project', type=int, help='ID of the project from which to request all users roles')
+get_parser.add_argument('id_project', type=int, help='ID of the project from which to request all users groups roles')
 get_parser.add_argument('admins', type=inputs.boolean,
                         help='Flag to limit to projects from which the user is an admin or '
                              'users in project that have the admin role')
@@ -64,14 +64,15 @@ class QueryProjectAccess(Resource):
                     access_list.append(proj_access.to_json())
             return jsonify(access_list)
 
-        return 'Unknown error', 500
+        # No access, but still fine
+        return [], 200
 
     @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create/update project access for an user.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify this project or user access (project admin access required)',
-                        400: 'Badly formed JSON or missing fields(id_user or id_project) in the JSON body',
+                        400: 'Badly formed JSON or missing fields(id_user_group or id_project) in the JSON body',
                         500: 'Database error'})
     def post(self):
         parser = post_parser
@@ -87,8 +88,8 @@ class QueryProjectAccess(Resource):
         # Validate if we have everything needed
         json_rval = []
         for json_project in json_projects:
-            if 'id_user' not in json_project:
-                return 'Missing id_user', 400
+            if 'id_user_group' not in json_project:
+                return 'Missing id_user_group', 400
             if 'id_project' not in json_project:
                 return 'Missing id_project', 400
 
@@ -98,7 +99,8 @@ class QueryProjectAccess(Resource):
 
             # Do the update!
             try:
-                access = TeraProjectAccess.update_project_access(json_project['id_user'], json_project['id_project'],
+                access = TeraProjectAccess.update_project_access(json_project['id_user_group'],
+                                                                 json_project['id_project'],
                                                                  json_project['project_access_role'])
             except exc.SQLAlchemyError:
                 import sys

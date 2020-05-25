@@ -10,9 +10,9 @@ from modules.DatabaseModule.DBManager import DBManager
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all site roles')
-get_parser.add_argument('id_site', type=int, help='ID of the site from which to request all users roles')
+get_parser.add_argument('id_site', type=int, help='ID of the site from which to request all user groups roles')
 get_parser.add_argument('admins', type=inputs.boolean, help='Flag to limit to sites from which the user is an admin or '
-                                                  'users in site that have the admin role')
+                                                            'users in site that have the admin role')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('site_access', type=str, location='json', help='Site access to create / update', required=True)
@@ -27,9 +27,9 @@ class QuerySiteAccess(Resource):
     @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get user roles for sites. Only one  parameter required and supported at once.',
-             responses={200: 'Success - returns list of users roles in projects',
+             responses={200: 'Success - returns list of users roles in sites',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error occured when loading project roles'})
+                        500: 'Error occured when loading sites roles'})
     def get(self):
         parser = get_parser
 
@@ -61,11 +61,12 @@ class QuerySiteAccess(Resource):
                     access_list.append(site_access.to_json())
             return jsonify(access_list)
 
-        return 'Unknown error', 500
+        # No access, but still fine
+        return [], 200
 
     @user_multi_auth.login_required
     @api.expect(post_parser)
-    @api.doc(description='Create/update site access for an user.',
+    @api.doc(description='Create/update site access for a user group.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify this site or user access (site admin access required)',
                         400: 'Badly formed JSON or missing fields(id_user or id_site) in the JSON body',
@@ -84,8 +85,8 @@ class QuerySiteAccess(Resource):
         # Validate if we have everything needed
         json_rval = []
         for json_site in json_sites:
-            if 'id_user' not in json_site:
-                return 'Missing id_user', 400
+            if 'id_user_group' not in json_site:
+                return 'Missing id_user_group', 400
             if 'id_site' not in json_site:
                 return 'Missing id_site', 400
 
@@ -95,7 +96,7 @@ class QuerySiteAccess(Resource):
 
             # Do the update!
             try:
-                access = TeraSiteAccess.update_site_access(json_site['id_user'], json_site['id_site'],
+                access = TeraSiteAccess.update_site_access(json_site['id_user_group'], json_site['id_site'],
                                                            json_site['site_access_role'])
             except exc.SQLAlchemyError:
                 import sys

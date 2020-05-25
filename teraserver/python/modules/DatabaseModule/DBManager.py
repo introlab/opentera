@@ -28,6 +28,7 @@ from libtera.db.models.TeraAsset import TeraAsset
 from libtera.db.models.TeraService import TeraService
 from libtera.db.models.TeraServiceRole import TeraServiceRole
 from libtera.db.models.TeraServiceProject import TeraServiceProject
+from libtera.db.models.TeraUserGroup import TeraUserGroup
 
 from libtera.ConfigManager import ConfigManager
 
@@ -108,6 +109,10 @@ class DBManager (BaseModule):
         if TeraParticipantGroup.get_count() == 0:
             print("No participant groups - creating defaults")
             TeraParticipantGroup.create_defaults()
+
+        if TeraUserGroup.get_count() == 0:
+            print("No user groups - creating defaults")
+            TeraUserGroup.create_defaults()
 
         if TeraParticipant.get_count() == 0:
             print("No participant - creating defaults")
