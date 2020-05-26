@@ -95,20 +95,21 @@ class BaseModel:
     def query_with_filters(cls, filters=None):
         if filters is None:
             filters = dict()
-        # return cls.query.filter_by(**filters).all()
 
-        query = cls.query
+        return cls.query.filter_by(**filters).all()
 
-        # Direct elements from that model
-        for filter_item in filters:
-            if filter_item.key() in dir(cls) and filter_item is not None:
-                # Filter item is a direct property
-                query = query.filter_by(**filter_item)
-            else:
-                # Check for joined models
-                pass
-
-        return query.all()
+        # query = cls.query
+        #
+        # # Direct elements from that model
+        # for filter_item in filters:
+        #     if filter_item in dir(cls) and filter_item is not None:
+        #         # Filter item is a direct property
+        #         query = query.filter_by(**filter_item)
+        #     else:
+        #         # Check for joined models
+        #         pass
+        #
+        # return query.all()
 
 
 

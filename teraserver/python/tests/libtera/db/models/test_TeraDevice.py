@@ -7,7 +7,7 @@ from libtera.ConfigManager import ConfigManager
 
 class TeraDeviceTest(unittest.TestCase):
 
-    filename = 'TeraDeviceTest.db'
+    filename = os.path.join(os.path.dirname(__file__), 'TeraDeviceTest.db')
 
     SQLITE = {
         'filename': filename

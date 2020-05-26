@@ -9,7 +9,7 @@ from libtera.ConfigManager import ConfigManager
 
 class DBManagerTeraUserAccessTest(unittest.TestCase):
 
-    filename = 'DBManagerTeraUserAccessTest.db'
+    filename = os.path.join(os.path.dirname(__file__), 'DBManagerTeraUserAccessTest.db')
 
     SQLITE = {
         'filename': filename

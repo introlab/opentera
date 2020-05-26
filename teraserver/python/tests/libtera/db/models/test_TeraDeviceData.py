@@ -3,11 +3,12 @@ from modules.DatabaseModule.DBManager import DBManager
 from libtera.db.models.TeraDeviceData import TeraDeviceData
 import os
 from libtera.ConfigManager import ConfigManager
+from sqlalchemy.exc import InvalidRequestError
 
 
 class TeraDeviceDataTest(unittest.TestCase):
 
-    filename = 'TeraDeviceDataTest.db'
+    filename = os.path.join(os.path.dirname(__file__), 'TeraDeviceDataTest.db')
 
     SQLITE = {
         'filename': filename
@@ -31,12 +32,21 @@ class TeraDeviceDataTest(unittest.TestCase):
         pass
 
     def test_query_filters(self):
-        filters = {'id_device': 1,
-                   'id_session': 1,
-                   'id_device_data': 1}
-
-        val = TeraDeviceData.query_with_filters(filters)
+        # A particular device
+        val = TeraDeviceData.query_with_filters({'id_device': 1, 'id_session': 1, 'id_device_data': 1})
         self.assertEqual(len(val), 1)
 
+        # All devices
+        val = TeraDeviceData.query_with_filters(None)
+        self.assertEqual(len(val), 2)
 
+        # A non existing device
+        val = TeraDeviceData.query_with_filters({'id_device': 5, 'id_session': 1, 'id_device_data': 1})
+        self.assertEqual(len(val), 0)
+
+        # A non existing field will throw an exception
+        def should_raise_exception():
+            TeraDeviceData.query_with_filters({'id_device_invalid': 1, 'id_session': 1, 'id_device_data': 1})
+
+        self.assertRaises(InvalidRequestError, should_raise_exception)
 
