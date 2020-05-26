@@ -7,7 +7,7 @@ import os
 from libtera.ConfigManager import ConfigManager
 
 
-class TeraUserTest(unittest.TestCase):
+class TeraSessionTest(unittest.TestCase):
 
     filename = os.path.join(os.path.dirname(__file__), 'TeraSessionTest.db')
 
@@ -28,6 +28,10 @@ class TeraUserTest(unittest.TestCase):
 
         # Creating default users / tests.
         self.db_man.create_defaults(self.config)
+
+    def tearDown(self):
+        from libtera.db.Base import db
+        print('tear down')
 
     def test_Session_new(self):
         from datetime import datetime
