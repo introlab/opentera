@@ -33,3 +33,4 @@ pylzma
 bz2file
 python-slugify
 websocket_client
+pytest

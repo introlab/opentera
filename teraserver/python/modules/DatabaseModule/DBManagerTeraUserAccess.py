@@ -230,9 +230,7 @@ class DBManagerTeraUserAccess:
             # it
             for project_access in self.user.user_user_group.user_group_projects_access:
                 if project_access.project_access_project.project_site not in site_list:
-                    site_list.append(TeraSiteAccess.build_user_access_object(
-                        site_id=project_access.project_access_project.project_site.id_site,
-                        user_group_id=self.user.id_user_group, role='user'))
+                    site_list.append(project_access.project_access_project.project_site)
 
         return site_list
 
