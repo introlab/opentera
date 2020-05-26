@@ -62,7 +62,8 @@ class TeraDeviceData(db.Model, BaseModel):
         if os.path.exists(upload_path):
             rmtree(upload_path)
 
-        os.mkdir(upload_path)
+        if not os.path.exists(upload_path):
+             os.mkdir(upload_path)
 
         base_session = TeraSession.get_session_by_name('Séance #1')
         base_device = TeraDevice.get_device_by_name('Apple Watch #W05P1')

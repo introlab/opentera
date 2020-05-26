@@ -29,6 +29,10 @@ class TeraSessionTest(unittest.TestCase):
         # Creating default users / tests.
         self.db_man.create_defaults(self.config)
 
+    def tearDown(self):
+        from libtera.db.Base import db
+        print('tear down')
+
     def test_Session_new(self):
         from datetime import datetime
         from modules.DatabaseModule.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
