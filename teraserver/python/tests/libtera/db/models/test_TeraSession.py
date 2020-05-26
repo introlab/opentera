@@ -7,7 +7,7 @@ import os
 from libtera.ConfigManager import ConfigManager
 
 
-class TeraUserTest(unittest.TestCase):
+class TeraSessionTest(unittest.TestCase):
 
     filename = os.path.join(os.path.dirname(__file__), 'TeraSessionTest.db')
 
