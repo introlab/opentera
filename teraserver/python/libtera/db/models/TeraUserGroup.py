@@ -8,17 +8,46 @@ class TeraUserGroup(db.Model, BaseModel):
 
     user_group_sites_access = db.relationship('TeraSiteAccess', cascade="all,delete")
     user_group_projects_access = db.relationship("TeraProjectAccess", cascade="all,delete")
-    user_group_users = db.relationship("TeraUser", cascade="all,delete")
+    user_group_users = db.relationship("TeraUser", secondary="t_users_users_groups", back_populates="user_user_groups")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['user_group_users'])
+        ignore_fields.extend(['user_group_users', 'user_group_sites_access', 'user_group_projects_access'])
         if minimal:
-            ignore_fields.extend(['user_group_sites_access', 'user_group_projects_access'])
+            ignore_fields.extend([])
         rval = super().to_json(ignore_fields=ignore_fields)
 
         return rval
+
+    def get_projects_roles(self) -> dict:
+        projects_roles = {}
+
+        # Projects
+        for project_access in self.user_group_projects_access:
+            current_project_role = project_access.project_access_role
+            projects_roles[project_access.project_access_project] = current_project_role
+
+        # Sites - if we are admin in a site, we are automatically admin in all its project
+        for site_access in self.user_group_sites_access:
+            if site_access.site_access_role == 'admin':
+                for project in site_access.site_access_site.site_projects:
+                    projects_roles[project] = 'admin'
+
+        return projects_roles
+
+    def get_sites_roles(self) -> dict:
+        sites_roles = {}
+        # Sites
+        for site_access in self.user_group_sites_access:
+            sites_roles[site_access.site_access_site] = site_access.site_access_role
+
+        # Projects - each project's site also provides a "user" access for that site
+        for project_access in self.user_group_projects_access:
+            if project_access.project_access_project.project_site not in sites_roles:
+                sites_roles[project_access.project_access_project.project_site] = 'user'
+
+        return sites_roles
 
     @staticmethod
     def get_user_group_by_group_name(name: str):

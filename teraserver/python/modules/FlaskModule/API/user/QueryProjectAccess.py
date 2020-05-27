@@ -10,6 +10,7 @@ from modules.DatabaseModule.DBManager import DBManager
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all projects roles')
+get_parser.add_argument('id_user_group', type=int, help='ID of the user group from which to request all projects roles')
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to request all users groups roles')
 get_parser.add_argument('admins', type=inputs.boolean,
                         help='Flag to limit to projects from which the user is an admin or '
@@ -52,16 +53,25 @@ class QueryProjectAccess(Resource):
                 access = user_access.query_project_access_for_user(user_id=user_id,
                                                                    admin_only=args['admins'] is not None)
 
+        # Query access for user group
+        if args['id_user_group']:
+            if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
+                from libtera.db.models.TeraUserGroup import TeraUserGroup
+                user_group = TeraUserGroup.get_user_group_by_id(args['id_user_group'])
+                access = user_group.get_projects_roles()
+
         # Query access for project id
         if args['id_project']:
             project_id = args['id_project']
-            access = user_access.query_access_for_project(project_id=project_id, admin_only=args['admins'] is not None)
+            access = user_access.query_access_for_project(project_id=project_id,
+                                                           admin_only=args['admins'] is not None)
 
         if access is not None:
             access_list = []
-            for proj_access in access:
-                if proj_access is not None:
-                    access_list.append(proj_access.to_json())
+            for project, project_role in access.items():
+                proj_access_json = project.to_json(ignore_fields=['id_site', 'site_name'])
+                proj_access_json['project_role'] = project_role
+                access_list.append(proj_access_json)
             return jsonify(access_list)
 
         # No access, but still fine

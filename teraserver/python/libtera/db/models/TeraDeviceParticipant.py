@@ -48,7 +48,6 @@ class TeraDeviceParticipant(db.Model, BaseModel):
         db.session.add(dev_participant)
 
         db.session.commit()
-        pass
 
     @staticmethod
     def get_device_participant_by_id(device_participant_id: int):

@@ -10,6 +10,7 @@ from modules.DatabaseModule.DBManager import DBManager
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all site roles')
+get_parser.add_argument('id_user_group', type=int, help='ID of the user group from which to request all site roles')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to request all user groups roles')
 get_parser.add_argument('admins', type=inputs.boolean, help='Flag to limit to sites from which the user is an admin or '
                                                             'users in site that have the admin role')
@@ -49,6 +50,13 @@ class QuerySiteAccess(Resource):
             if user_id in user_access.get_accessible_users_ids():
                 access = user_access.query_site_access_for_user(user_id=user_id, admin_only=args['admins'] is not None)
 
+        # Query access for user group
+        if args['id_user_group']:
+            if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
+                from libtera.db.models.TeraUserGroup import TeraUserGroup
+                user_group = TeraUserGroup.get_user_group_by_id(args['id_user_group'])
+                access = user_group.get_sites_roles()
+
         # Query access for site id
         if args['id_site']:
             site_id = args['id_site']
@@ -56,9 +64,10 @@ class QuerySiteAccess(Resource):
 
         if access is not None:
             access_list = []
-            for site_access in access:
-                if site_access is not None:
-                    access_list.append(site_access.to_json())
+            for site, site_role in access.items():
+                site_access_json = site.to_json()
+                site_access_json['site_role'] = site_role
+                access_list.append(site_access_json)
             return jsonify(access_list)
 
         # No access, but still fine

@@ -29,6 +29,7 @@ from libtera.db.models.TeraService import TeraService
 from libtera.db.models.TeraServiceRole import TeraServiceRole
 from libtera.db.models.TeraServiceProject import TeraServiceProject
 from libtera.db.models.TeraUserGroup import TeraUserGroup
+from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
 
 from libtera.ConfigManager import ConfigManager
 
@@ -121,6 +122,7 @@ class DBManager (BaseModule):
         if TeraUser.get_count() == 0:
             print('No users - creating defaults')
             TeraUser.create_defaults()
+            TeraUserUserGroup.create_defaults()
 
         if TeraDeviceType.get_count() == 0:
             print('No device types - creating defaults')
@@ -168,7 +170,7 @@ class DBManager (BaseModule):
         db.app = flask_app
 
         # Init tables
-        db.drop_all()
+        # db.drop_all()
         db.create_all()
 
         # Apply any database upgrade, if needed
