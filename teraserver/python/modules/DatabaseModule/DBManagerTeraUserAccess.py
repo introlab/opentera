@@ -83,7 +83,11 @@ class DBManagerTeraUserAccess:
         return users_ids
 
     def get_project_role(self, project_id: int):
-        return self.query_access_for_project(project_id=project_id)[0]
+        projects_roles = self.user.get_projects_roles()
+        role = [role for project, role in projects_roles.items() if project.id_project == project_id]
+        if len(role) == 1:
+            return role[0]
+        return None
 
         # role_name = None
         # project_roles = self.user.get_projects_roles()
@@ -318,7 +322,11 @@ class DBManagerTeraUserAccess:
         return services_ids
 
     def get_site_role(self, site_id: int):
-        return self.query_access_for_site(site_id=site_id)[0]
+        sites_roles = self.user.get_sites_roles()
+        role = [role for site, role in sites_roles.items() if site.id_site == site_id]
+        if len(role) == 1:
+            return role[0]
+        return None
         # role_name = None
         # site_roles = self.user.get_sites_roles()
         # for site in site_roles:
