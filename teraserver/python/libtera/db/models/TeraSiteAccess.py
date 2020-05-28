@@ -91,5 +91,9 @@ class TeraSiteAccess(db.Model, BaseModel):
         return TeraSiteAccess.query.filter_by(id_site=id_site).all()
 
     @staticmethod
+    def get_site_access_by_id(site_access_id: int):
+        return TeraSiteAccess.query.filter_by(id_site_access=site_access_id).first()
+
+    @staticmethod
     def create_defaults():
         pass

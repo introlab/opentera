@@ -91,5 +91,9 @@ class TeraProjectAccess(db.Model, BaseModel):
         return TeraProjectAccess.query.filter_by(id_project=project_id).all()
 
     @staticmethod
+    def get_project_access_by_id(project_access_id: int):
+        return TeraProjectAccess.query.filter_by(id_project_access=project_access_id).first()
+
+    @staticmethod
     def create_defaults():
         pass

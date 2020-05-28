@@ -20,6 +20,9 @@ post_parser = reqparse.RequestParser()
 post_parser.add_argument('project_access', type=str, location='json',
                          help='Project access to create / update', required=True)
 
+delete_parser = reqparse.RequestParser()
+delete_parser.add_argument('id', type=int, help='Project Access ID to delete', required=True)
+
 
 class QueryProjectAccess(Resource):
 
@@ -123,7 +126,36 @@ class QueryProjectAccess(Resource):
 
         return jsonify(json_rval)
 
-    # @user_multi_auth.login_required
-    # def delete(self):
-    #
-    #     return '', 501
+    @user_multi_auth.login_required
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific project access',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete project access(only user who is admin in that project can '
+                             'remove it)',
+                        500: 'Database error.'})
+    def delete(self):
+        parser = delete_parser
+
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
+        user_access = DBManager.userAccess(current_user)
+
+        args = parser.parse_args()
+        id_todel = args['id']
+
+        project_access = TeraProjectAccess.get_project_access_by_id(id_todel)
+        if not project_access:
+            return 'No project access to delete.', 500
+
+        # Check if current user can delete
+        if user_access.get_project_role(project_access.id_project) != 'admin':
+            return '', 403
+
+        # If we are here, we are allowed to delete. Do so.
+        try:
+            TeraProjectAccess.delete(id_todel=id_todel)
+        except exc.SQLAlchemyError:
+            import sys
+            print(sys.exc_info())
+            return 'Database error', 500
+
+        return '', 200
