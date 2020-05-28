@@ -122,6 +122,7 @@ class FlaskModule(BaseModule):
         from .API.user.Login import Login
         from .API.user.Logout import Logout
         from .API.user.QueryUsers import QueryUsers
+        from .API.user.QueryUserGroups import QueryUserGroups
         from .API.user.QueryForms import QueryForms
         from .API.user.QueryOnlineUsers import QueryOnlineUsers
         from .API.user.QuerySites import QuerySites
@@ -150,6 +151,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(Logout, '/logout', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QuerySites, '/sites', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryUsers, '/users', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryUserGroups, '/usergroups', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryForms, '/forms', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryOnlineUsers, '/online', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryProjects, '/projects', resource_class_kwargs=kwargs)

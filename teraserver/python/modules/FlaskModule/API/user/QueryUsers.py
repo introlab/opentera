@@ -117,9 +117,6 @@ class QueryUsers(Resource):
                         409: 'Username is already taken',
                         500: 'Internal error when saving user'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
-
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
 
         user_access = DBManager.userAccess(current_user)
@@ -140,16 +137,6 @@ class QueryUsers(Resource):
         if not current_user.user_superadmin and json_user['user_superadmin']:
             # Remove field
             json_user.pop('user_superadmin')
-
-        # Check if we have site access to handle separately
-        json_sites = None
-        if 'sites' in json_user:
-            json_sites = json_user.pop('sites')
-
-        # Check if we have project access to handle separately
-        json_projects = None
-        if 'projects' in json_user:
-            json_projects = json_user.pop('projects')
 
         # Do the update!
         if json_user['id_user'] > 0:
@@ -183,30 +170,6 @@ class QueryUsers(Resource):
                 print(sys.exc_info())
                 return '', 500
 
-        if json_sites:
-            for site in json_sites:
-                # Check if current user is admin of that site
-                if user_access.get_site_role(site=site) == 'admin':
-                    try:
-                        TeraSiteAccess.update_site_access(json_user['id_user'], site['id_site'], site['site_role'])
-                    except exc.SQLAlchemyError:
-                        import sys
-                        print(sys.exc_info())
-                        return '', 500
-
-        if json_projects:
-            for project in json_projects:
-                # Check if current user is admin of that site
-                if user_access.get_project_role(project=project) == 'admin':
-                    try:
-                        TeraProjectAccess.update_project_access(id_user=json_user['id_user'],
-                                                                id_project=project['id_project'],
-                                                                rolename=project['project_role'])
-                    except exc.SQLAlchemyError:
-                        import sys
-                        print(sys.exc_info())
-                        return '', 500
-
         # TODO: Publish update to everyone who is subscribed to users update...
         update_user = TeraUser.get_user_by_id(json_user['id_user'])
 
@@ -219,8 +182,7 @@ class QueryUsers(Resource):
                         403: 'Logged user can\'t delete user (only super admin can delete)',
                         500: 'Database error.'})
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
+        parser = delete_parser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         # userAccess = DBManager.userAccess(current_user)
 
@@ -228,7 +190,6 @@ class QueryUsers(Resource):
         id_todel = args['id']
 
         # Check if current user can delete
-        # Only superadmin can delete users from here
         if not current_user.user_superadmin:
             return '', 403
 
