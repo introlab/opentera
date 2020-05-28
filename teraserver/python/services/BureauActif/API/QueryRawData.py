@@ -50,8 +50,9 @@ class QueryRawData(Resource):
             creation_date = datetime.datetime.strptime(request.headers['X-Filedate'], '%Y-%m-%d %H:%M:%S')
 
             # Check if device is allowed to access the specified session
-            if not current_device_client.can_access_session(id_session):
-                return 'Session not available', 404
+            # TODO - right now, this API was disabled for security reasons
+            # if not current_device_client.can_access_session(id_session):
+            #     return 'Session not available', 404
 
             # Get participants for that session
             device_info = current_device_client.get_device_infos()
@@ -71,13 +72,13 @@ class QueryRawData(Resource):
                 return 'Unable to decode raw data', 400
 
             # Only considers the first participant in the list for now
-            id_participant = device_info['participants_info'][0]['id_participant']
+            participant_uuid = device_info['participants_info'][0]['participant_uuid']
 
             # Create file entry in database
             file_db_entry = BureauActifData()
             file_db_entry.id_device = id_device
             file_db_entry.id_session = id_session
-            file_db_entry.id_participant = id_participant
+            file_db_entry.data_participant_uuid = participant_uuid
             file_db_entry.data_original_filename = filename
             file_db_entry.data_name = filename
             file_db_entry.data_saved_date = creation_date

@@ -12,7 +12,7 @@ class BureauActifData(db.Model, BaseModel):
     id_data = db.Column(db.Integer, db.Sequence('id_data_sequence'), primary_key=True, autoincrement=True)
     id_session = db.Column(db.Integer, nullable=False)
     id_device = db.Column(db.Integer, nullable=False)
-    id_participant = db.Column(db.Integer, nullable=False)
+    data_participant_uuid = db.Column(db.String(36), nullable=False)
     data_name = db.Column(db.String, nullable=True)
     data_original_filename = db.Column(db.String, nullable=False)
     data_saved_date = db.Column(db.TIMESTAMP, nullable=False)
@@ -43,8 +43,8 @@ class BureauActifData(db.Model, BaseModel):
         return BureauActifData.query.filter_by(id_session=session_id).all()
 
     @staticmethod
-    def get_data_for_participant(part_id: int):
-        return BureauActifData.query.filter_by(id_participant=part_id).all()
+    def get_data_for_participant(part_uuid: str):
+        return BureauActifData.query.filter_by(data_participant_uuid=part_uuid).all()
 
     def delete(self):
         # file_path = flask_app.config['UPLOAD_FOLDER']
