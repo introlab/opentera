@@ -61,7 +61,7 @@ class QueryUserGroups(Resource):
                 if group is not None:
                     user_groups_list.append(group.to_json(minimal=args['list']))
             return jsonify(user_groups_list)
-        return '', 500
+        return [], 200
 
     @user_multi_auth.login_required
     @api.expect(post_parser)

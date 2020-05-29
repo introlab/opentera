@@ -15,6 +15,7 @@ get_parser.add_argument('id_project', type=int, help='ID of the project from whi
 get_parser.add_argument('admins', type=inputs.boolean,
                         help='Flag to limit to projects from which the user is an admin or '
                              'users in project that have the admin role')
+get_parser.add_argument('with_sites', type=inputs.boolean, help='Include sites information for each project.')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('project_access', type=str, location='json',
@@ -72,7 +73,10 @@ class QueryProjectAccess(Resource):
         if access is not None:
             access_list = []
             for project, project_role in access.items():
-                proj_access_json = project.to_json(ignore_fields=['id_site', 'site_name'])
+                filters = []
+                if not args['with_sites']:
+                    filters = ['id_site', 'site_name']
+                proj_access_json = project.to_json(ignore_fields=filters)
                 proj_access_json['project_role'] = project_role
                 access_list.append(proj_access_json)
             return jsonify(access_list)

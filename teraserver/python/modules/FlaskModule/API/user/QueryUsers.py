@@ -17,6 +17,8 @@ get_parser.add_argument('username', type=str, help='Username of the user to quer
 get_parser.add_argument('self', type=inputs.boolean, help='Query information about the currently logged user')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ID, name, enabled)')
+get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Include usergroups information for each user. '
+                                                                     'Can\'t be combined with "list" argument.')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
@@ -61,9 +63,6 @@ class QueryUsers(Resource):
             # If we have no arguments, return all accessible users
             users = user_access.get_accessible_users()
 
-        # If we have a id_project, query for users of that project, if accessible
-        # TODO
-
         if users:
             users_list = []
             for user in users:
@@ -89,7 +88,12 @@ class QueryUsers(Resource):
                                 proj_json['project_role'] = user_access.get_project_role(project.id_project)
                                 proj_list.append(proj_json)
                             user_json['projects'] = proj_list
-
+                        if args['with_usergroups']:
+                            # Append user groups
+                            user_groups_list = []
+                            for user_group in user.user_user_groups:
+                                user_groups_list.append(user_group.to_json(minimal=True))
+                            user_json['user_groups'] = user_groups_list
                         users_list.append(user_json)
                     else:
                         users_list.append(user.to_json(minimal=True))
