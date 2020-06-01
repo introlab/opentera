@@ -77,3 +77,14 @@ class TeraUserUserGroup(db.Model, BaseModel):
     @staticmethod
     def query_user_user_group_for_user_user_group(user_id: int, user_group_id: int):
         return TeraUserUserGroup.query.filter_by(id_user=user_id, id_user_group=user_group_id).first()
+
+    @staticmethod
+    def insert_user_user_group(id_user_group: int, id_user: int):
+        new_uug = TeraUserUserGroup()
+        new_uug.id_user_group = id_user_group
+        new_uug.id_user = id_user
+
+        db.session.add(new_uug)
+        db.session.commit()
+
+        return new_uug

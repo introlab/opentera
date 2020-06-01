@@ -4,8 +4,7 @@ from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
+from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
 
@@ -21,7 +20,9 @@ get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Include us
                                                                      'Can\'t be combined with "list" argument.')
 
 post_parser = reqparse.RequestParser()
-post_parser.add_argument('user', type=str, location='json', help='User to create / update', required=True)
+post_parser.add_argument('user', type=str, location='json', help='User to create / update. If structure has a field '
+                                                                 '"user_groups", also update user groups for that user',
+                         required=True)
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='User ID to delete', required=True)
@@ -142,7 +143,21 @@ class QueryUsers(Resource):
             # Remove field
             json_user.pop('user_superadmin')
 
-        # Do the update!
+        # Manage user groups
+        user_user_groups = []
+        user_user_groups_ids = []
+        update_user_groups = False
+        if 'user_groups' in json_user:
+            user_user_groups = json_user.pop('user_groups')
+            # Check if the current user can modified each of the user groups - current user must be admin in one of
+            # those groups to allow modification.
+            user_user_groups_ids = [group['id_user_group'] for group in user_user_groups]
+            if len(set(user_user_groups_ids).intersection(user_access.get_accessible_users_groups_ids(
+                    admin_only=True))) != len(user_user_groups):
+                return gettext('No access for at a least one user group in the list'), 403
+            update_user_groups = True
+
+        # Do the update for user
         if json_user['id_user'] > 0:
             # Already existing user
             try:
@@ -174,10 +189,29 @@ class QueryUsers(Resource):
                 print(sys.exc_info())
                 return '', 500
 
-        # TODO: Publish update to everyone who is subscribed to users update...
         update_user = TeraUser.get_user_by_id(json_user['id_user'])
 
-        return jsonify([update_user.to_json()])
+        # Update user groups, if needed
+        if update_user_groups:
+            # Check if there's some user groups for the updated user that we need to delete
+            id_groups_to_delete = set([group.id_user_group for group in update_user.user_user_groups])\
+                .difference(user_user_groups_ids)
+
+            for id_to_del in id_groups_to_delete:
+                uug_to_del = TeraUserUserGroup.query_user_user_group_for_user_user_group(user_id=update_user.id_user,
+                                                                                         user_group_id=id_to_del)
+                TeraUserUserGroup.delete(id_todel=uug_to_del.id_user_user_group)
+
+            # Update / insert user groups
+            for user_group in user_user_groups:
+                if not TeraUserUserGroup.query_user_user_group_for_user_user_group(user_id=update_user.id_user,
+                                                                                   user_group_id=
+                                                                                   user_group['id_user_group']):
+                    # Group not already associated - associates!
+                    TeraUserUserGroup.insert_user_user_group(id_user_group=user_group['id_user_group'],
+                                                             id_user=update_user.id_user)
+
+        return [update_user.to_json()]
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)
