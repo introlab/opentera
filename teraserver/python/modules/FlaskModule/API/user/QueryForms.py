@@ -15,6 +15,7 @@ from libtera.forms.TeraParticipantForm import TeraParticipantForm
 from libtera.forms.TeraSessionTypeForm import TeraSessionTypeForm
 from libtera.forms.TeraSessionForm import TeraSessionForm
 from libtera.forms.TeraDeviceSubTypeForm import TeraDeviceSubTypeForm
+from libtera.forms.TeraUserGroupForm import TeraUserGroupForm
 
 
 class QueryForms(Resource):
@@ -66,5 +67,8 @@ class QueryForms(Resource):
 
         if args['type'] == 'device_subtype':
             return jsonify(TeraDeviceSubTypeForm.get_device_subtype_form(user_access=user_access))
+
+        if args['type'] == 'user_group':
+            return TeraUserGroupForm.get_user_group_form(user_access=user_access)
 
         return 'Unknown definition type: ' + args['type'], 500

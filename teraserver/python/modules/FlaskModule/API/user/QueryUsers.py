@@ -11,6 +11,7 @@ from modules.DatabaseModule.DBManager import DBManager
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user to query')
+get_parser.add_argument('id_user_group', type=int, help='ID of the user group to get all users from')
 get_parser.add_argument('user_uuid', type=str, help='User UUID to query')
 get_parser.add_argument('username', type=str, help='Username of the user to query')
 get_parser.add_argument('self', type=inputs.boolean, help='Query information about the currently logged user')
@@ -60,6 +61,10 @@ class QueryUsers(Resource):
             users.append(current_user)
         elif args['username'] is not None:
             users.append(current_user.get_user_by_username(args['username']))
+        elif args['id_user_group']:
+            if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
+                users = [user.user_user_group_user for user in user_access.query_users_for_usergroup(
+                    args['id_user_group'])]
         else:
             # If we have no arguments, return all accessible users
             users = user_access.get_accessible_users()
@@ -101,7 +106,7 @@ class QueryUsers(Resource):
                         users_list.append(user.to_json(minimal=True))
             return jsonify(users_list)
 
-        return '', 500
+        return [], 200
         # try:
         #     users = TeraUser.query_data(my_args)
         #     users_list = []
