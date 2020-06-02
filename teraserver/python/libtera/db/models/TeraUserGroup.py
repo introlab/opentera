@@ -40,12 +40,13 @@ class TeraUserGroup(db.Model, BaseModel):
         sites_roles = {}
         # Sites
         for site_access in self.user_group_sites_access:
-            sites_roles[site_access.site_access_site] = site_access.site_access_role
+            sites_roles[site_access.site_access_site] = {'site_role': site_access.site_access_role, 'inherited': False}
 
         # Projects - each project's site also provides a "user" access for that site
         for project_access in self.user_group_projects_access:
             if project_access.project_access_project.project_site not in sites_roles:
-                sites_roles[project_access.project_access_project.project_site] = 'user'
+                sites_roles[project_access.project_access_project.project_site] = {'site_role': 'user',
+                                                                                   'inherited': True}
 
         return sites_roles
 

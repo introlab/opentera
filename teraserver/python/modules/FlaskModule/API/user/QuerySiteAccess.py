@@ -12,8 +12,12 @@ get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all site roles')
 get_parser.add_argument('id_user_group', type=int, help='ID of the user group from which to request all site roles')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to request all user groups roles')
-get_parser.add_argument('admins', type=inputs.boolean, help='Flag to limit to sites from which the user is an admin or '
-                                                            'users in site that have the admin role')
+get_parser.add_argument('admins', type=inputs.boolean, help='Flag to limit to sites from which the user group is an '
+                                                            'admin or users in site that have the admin role')
+get_parser.add_argument('by_users', type=inputs.boolean, help='If specified, returns roles by users instead of by user'
+                                                              'groups')
+get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with id_site. Also return user groups that '
+                                                                   'don\'t have any access to the site')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('site_access', type=str, location='json', help='Site access to create / update', required=True)
@@ -63,15 +67,30 @@ class QuerySiteAccess(Resource):
         # Query access for site id
         if args['id_site']:
             site_id = args['id_site']
-            access = user_access.query_access_for_site(site_id=site_id, admin_only=args['admins'] is not None)
+            access = user_access.query_access_for_site(site_id=site_id, admin_only=args['admins'] is not None,
+                                                       include_empty_groups=args['with_usergroups'])
 
         if access is not None:
             access_list = []
-            for site, site_role in access.items():
-                site_access_json = site.to_json()
-                site_access_json['site_role'] = site_role
-                access_list.append(site_access_json)
-            return jsonify(access_list)
+            if not args['by_users']:
+                for site, site_role in access.items():
+                    site_access_json = site.to_json()
+                    if site_role:
+                        site_access_json['site_access_role'] = site_role['site_role']
+                        if site_role['inherited']:
+                            site_access_json['site_access_inherited'] = True
+                    else:
+                        site_access_json['site_access_role'] = None
+                    access_list.append(site_access_json)
+            else:
+                # Find users of each user group
+                for site, site_role in access.items():
+                    for user in user_access.query_users_for_usergroup(site.id_user_group):
+                        site_access_json = {'id_user': user.id_user,
+                                            'user_name': user.user_user_group_user.get_fullname(),
+                                            'site_access_role': site_role['site_role']}
+                        access_list.append(site_access_json)
+            return access_list
 
         # No access, but still fine
         return [], 200

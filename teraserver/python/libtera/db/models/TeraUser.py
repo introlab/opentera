@@ -104,7 +104,7 @@ class TeraUser(db.Model, BaseModel):
                     sites_roles[site] = site_role
                 else:
                     # Site present - check if we have an "admin" role to overwrite an "user" role
-                    if site_role == 'admin':
+                    if site_role['site_role'] == 'admin':
                         sites_roles[site] = site_role
 
         return sites_roles
