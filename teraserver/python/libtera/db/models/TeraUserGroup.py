@@ -25,14 +25,14 @@ class TeraUserGroup(db.Model, BaseModel):
 
         # Projects
         for project_access in self.user_group_projects_access:
-            current_project_role = project_access.project_access_role
-            projects_roles[project_access.project_access_project] = current_project_role
+            projects_roles[project_access.project_access_project] = {'project_role': project_access.project_access_role,
+                                                                     'inherited': False}
 
         # Sites - if we are admin in a site, we are automatically admin in all its project
         for site_access in self.user_group_sites_access:
             if site_access.site_access_role == 'admin':
                 for project in site_access.site_access_site.site_projects:
-                    projects_roles[project] = 'admin'
+                    projects_roles[project] = {'project_role': 'admin', 'inherited': True}
 
         return projects_roles
 

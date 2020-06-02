@@ -86,7 +86,8 @@ class QueryUsers(Resource):
                             proj_list = []
                             for project in projects:
                                 proj_json = project.to_json()
-                                proj_json['project_role'] = user_access.get_project_role(project.id_project)
+                                proj_json['project_role'] = \
+                                    user_access.get_project_role(project.id_project)
                                 proj_list.append(proj_json)
                             user_json['projects'] = proj_list
                         if args['with_usergroups']:

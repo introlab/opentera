@@ -90,9 +90,9 @@ class TeraUser(db.Model, BaseModel):
 
         if self.user_superadmin:
             # Super admin - admin role in all sites
-            sites = TeraSite.query.all();
+            sites = TeraSite.query.all()
             for site in sites:
-                sites_roles[site] = 'admin'
+                sites_roles[site] = {'site_role': 'admin', 'inherited': True}
             return sites_roles
 
         # Browse all user groups to get roles for those sites
@@ -114,9 +114,9 @@ class TeraUser(db.Model, BaseModel):
 
         if self.user_superadmin:
             # Super admin - admin role in all projects
-            projects = TeraProject.query.all();
+            projects = TeraProject.query.all()
             for project in projects:
-                projects_roles[project] = 'admin'
+                projects_roles[project] = {'project_role': 'admin', 'inherited': True}
             return projects_roles
 
         # Browse all user groups to get roles for those projects
@@ -128,7 +128,7 @@ class TeraUser(db.Model, BaseModel):
                     projects_roles[project] = project_role
                 else:
                     # Project present - check if we have an "admin" role to overwrite an "user" role
-                    if project_role == 'admin':
+                    if project_role['project_role'] == 'admin':
                         projects_roles[project] = project_role
 
         return projects_roles

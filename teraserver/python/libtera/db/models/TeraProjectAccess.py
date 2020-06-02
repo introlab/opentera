@@ -79,7 +79,7 @@ class TeraProjectAccess(db.Model, BaseModel):
 
     @staticmethod
     def get_specific_project_access(id_user_group: int, id_project: int):
-        access = TeraProjectAccess.query.filter_by(id_user=id_user_group, id_project=id_project).first()
+        access = TeraProjectAccess.query.filter_by(id_user_group=id_user_group, id_project=id_project).first()
         return access
 
     @staticmethod

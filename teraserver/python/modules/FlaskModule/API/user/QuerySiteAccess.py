@@ -17,7 +17,7 @@ get_parser.add_argument('admins', type=inputs.boolean, help='Flag to limit to si
 get_parser.add_argument('by_users', type=inputs.boolean, help='If specified, returns roles by users instead of by user'
                                                               'groups')
 get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with id_site. Also return user groups that '
-                                                                   'don\'t have any access to the site')
+                                                                     'don\'t have any access to the site')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('site_access', type=str, location='json', help='Site access to create / update', required=True)

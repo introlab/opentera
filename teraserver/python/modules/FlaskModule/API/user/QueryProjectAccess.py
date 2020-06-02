@@ -16,6 +16,10 @@ get_parser.add_argument('admins', type=inputs.boolean,
                         help='Flag to limit to projects from which the user is an admin or '
                              'users in project that have the admin role')
 get_parser.add_argument('with_sites', type=inputs.boolean, help='Include sites information for each project.')
+get_parser.add_argument('by_users', type=inputs.boolean, help='If specified, returns roles by users instead of by user'
+                                                              'groups')
+get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with id_project. Also return user groups '
+                                                                     'that don\'t have any access to the project')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('project_access', type=str, location='json',
@@ -68,18 +72,34 @@ class QueryProjectAccess(Resource):
         if args['id_project']:
             project_id = args['id_project']
             access = user_access.query_access_for_project(project_id=project_id,
-                                                           admin_only=args['admins'] is not None)
+                                                          admin_only=args['admins'] is not None,
+                                                          include_empty_groups=args['with_usergroups'])
 
         if access is not None:
             access_list = []
-            for project, project_role in access.items():
-                filters = []
-                if not args['with_sites']:
-                    filters = ['id_site', 'site_name']
-                proj_access_json = project.to_json(ignore_fields=filters)
-                proj_access_json['project_role'] = project_role
-                access_list.append(proj_access_json)
-            return jsonify(access_list)
+            if not args['by_users']:
+                for project, project_role in access.items():
+                    filters = []
+                    if not args['with_sites']:
+                        filters = ['id_site', 'site_name']
+                    proj_access_json = project.to_json(ignore_fields=filters)
+                    if project_role:
+                        proj_access_json['project_access_role'] = project_role['project_role']
+                        if project_role['inherited']:
+                            proj_access_json['project_access_inherited'] = True
+                    else:
+                        proj_access_json['project_access_role'] = None
+                    access_list.append(proj_access_json)
+            else:
+                # Find users of each user group
+                for project, project_role in access.items():
+                    for user in user_access.query_users_for_usergroup(project.id_user_group):
+                        proj_access_json = {'id_user': user.id_user,
+                                            'user_name': user.user_user_group_user.get_fullname(),
+                                            'project_access_role': project_role['project_role']}
+                        access_list.append(proj_access_json)
+
+            return access_list
 
         # No access, but still fine
         return [], 200
@@ -124,7 +144,6 @@ class QueryProjectAccess(Resource):
                 print(sys.exc_info())
                 return '', 500
 
-            # TODO: Publish update to everyone who is subscribed to site access update...
             if access:
                 json_rval.append(access.to_json())
 
