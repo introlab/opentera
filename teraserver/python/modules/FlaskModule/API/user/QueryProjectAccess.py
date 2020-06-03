@@ -20,6 +20,8 @@ get_parser.add_argument('by_users', type=inputs.boolean, help='If specified, ret
                                                               'groups')
 get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with id_project. Also return user groups '
                                                                      'that don\'t have any access to the project')
+get_parser.add_argument('with_projects', type=inputs.boolean, help='Used with id_user_group. Also return projects that '
+                                                                   'don\'t have any access with that user group')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('project_access', type=str, location='json',
@@ -59,20 +61,22 @@ class QueryProjectAccess(Resource):
 
             if user_id in user_access.get_accessible_users_ids():
                 access = user_access.query_project_access_for_user(user_id=user_id,
-                                                                   admin_only=args['admins'] is not None)
+                                                                   admin_only=args['admins'])
 
         # Query access for user group
         if args['id_user_group']:
             if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
-                from libtera.db.models.TeraUserGroup import TeraUserGroup
-                user_group = TeraUserGroup.get_user_group_by_id(args['id_user_group'])
-                access = user_group.get_projects_roles()
+                access = user_access.query_project_access_for_user_group(user_group_id=args['id_user_group'],
+                                                                         admin_only=args['admins'],
+                                                                         include_projects_without_access=
+                                                                         args['with_projects']
+                                                                         )
 
         # Query access for project id
         if args['id_project']:
             project_id = args['id_project']
             access = user_access.query_access_for_project(project_id=project_id,
-                                                          admin_only=args['admins'] is not None,
+                                                          admin_only=args['admins'],
                                                           include_empty_groups=args['with_usergroups'])
 
         if access is not None:

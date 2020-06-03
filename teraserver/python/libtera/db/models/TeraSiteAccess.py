@@ -53,8 +53,7 @@ class TeraSiteAccess(db.Model, BaseModel):
             if rolename == '':
                 # No role anymore - delete it from the database
                 db.session.delete(access)
-                db.session.commit()
-                return None
+                access = None
             else:
                 access.site_access_role = rolename
 

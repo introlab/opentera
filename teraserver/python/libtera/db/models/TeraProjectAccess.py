@@ -55,6 +55,7 @@ class TeraProjectAccess(db.Model, BaseModel):
             if rolename == '':
                 # No role anymore - delete it from the database
                 db.session.delete(access)
+                access = None
             else:
                 access.project_access_role = rolename
 

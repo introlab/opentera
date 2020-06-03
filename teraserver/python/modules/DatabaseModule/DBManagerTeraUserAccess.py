@@ -462,6 +462,10 @@ class DBManagerTeraUserAccess:
             # Remove not admin roles
             site_roles = {key: value for key, value in site_roles.items() if value['site_role'] == 'admin'}
 
+        # Filter only accessible sites for the current user
+        accessible_sites = self.get_accessible_sites(admin_only=admin_only)
+        site_roles = {site: site_roles[site] for site in set(site_roles).intersection(accessible_sites)}
+
         return site_roles
 
     def query_project_access_for_user(self, user_id: int, admin_only=False):
@@ -473,7 +477,53 @@ class DBManagerTeraUserAccess:
             # Remove not admin roles
             project_roles = {key: value for key, value in project_roles.items() if value['project_role'] == 'admin'}
 
+        # Filter only accessible projects for the current user
+        accessible_projects = self.get_accessible_projects(admin_only=admin_only)
+        project_roles = {project: project_roles[project] for project in
+                         set(project_roles).intersection(accessible_projects)}
+
         return project_roles
+
+    def query_project_access_for_user_group(self, user_group_id: int, admin_only=False,
+                                            include_projects_without_access=False):
+        from libtera.db.models.TeraUserGroup import TeraUserGroup
+        user_group = TeraUserGroup.get_user_group_by_id(group_id=user_group_id)
+        project_roles = user_group.get_projects_roles()
+        if admin_only:
+            # Remove not admin roles
+            project_roles = {key: value for key, value in project_roles.items() if value['project_role'] == 'admin'}
+
+        # Filter only accessible projects for the current user
+        accessible_projects = self.get_accessible_projects(admin_only=admin_only)
+        project_roles = {project: project_roles[project] for project in
+                         set(project_roles).intersection(accessible_projects)}
+
+        if include_projects_without_access:
+            projects_without_access = set(accessible_projects).difference(project_roles)
+            for project in projects_without_access:
+                project_roles[project] = None
+
+        return project_roles
+
+    def query_site_access_for_user_group(self, user_group_id: int, admin_only=False,
+                                         include_sites_without_access=False):
+        from libtera.db.models.TeraUserGroup import TeraUserGroup
+        user_group = TeraUserGroup.get_user_group_by_id(group_id=user_group_id)
+        site_roles = user_group.get_sites_roles()
+        if admin_only:
+            # Remove not admin roles
+            site_roles = {key: value for key, value in site_roles.items() if value['site_role'] == 'admin'}
+
+        # Filter only accessible sites for the current user
+        accessible_sites = self.get_accessible_sites(admin_only=admin_only)
+        site_roles = {site: site_roles[site] for site in set(site_roles).intersection(accessible_sites)}
+
+        if include_sites_without_access:
+            sites_without_access = set(accessible_sites).difference(site_roles)
+            for site in sites_without_access:
+                site_roles[site] = None
+
+        return site_roles
 
     def query_participants_for_device(self, device_id: int):
         from libtera.db.models.TeraParticipant import TeraParticipant

@@ -18,6 +18,8 @@ get_parser.add_argument('by_users', type=inputs.boolean, help='If specified, ret
                                                               'groups')
 get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with id_site. Also return user groups that '
                                                                      'don\'t have any access to the site')
+get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_user_group. Also return sites that don\'t'
+                                                                ' have any access with that user group')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('site_access', type=str, location='json', help='Site access to create / update', required=True)
@@ -60,9 +62,9 @@ class QuerySiteAccess(Resource):
         # Query access for user group
         if args['id_user_group']:
             if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
-                from libtera.db.models.TeraUserGroup import TeraUserGroup
-                user_group = TeraUserGroup.get_user_group_by_id(args['id_user_group'])
-                access = user_group.get_sites_roles()
+                access = user_access.query_site_access_for_user_group(user_group_id=args['id_user_group'],
+                                                                      admin_only=args['admins'],
+                                                                      include_sites_without_access=args['with_sites'])
 
         # Query access for site id
         if args['id_site']:
