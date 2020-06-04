@@ -68,3 +68,10 @@ class TeraServiceProject(db.Model, BaseModel):
         db.session.add(service_project)
 
         db.session.commit()
+
+    @staticmethod
+    def delete_with_ids(service_id: int, project_id: int):
+        delete_obj = TeraServiceProject.query.filter_by(id_service=service_id, id_project=project_id).first()
+        if delete_obj:
+            db.session.delete(delete_obj)
+            db.session.commit()

@@ -88,8 +88,9 @@ class BaseModel:
     @classmethod
     def delete(cls, id_todel):
         delete_obj = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
-        db.session.delete(delete_obj)
-        db.session.commit()
+        if delete_obj:
+            db.session.delete(delete_obj)
+            db.session.commit()
 
     @classmethod
     def query_with_filters(cls, filters=None):

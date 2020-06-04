@@ -13,9 +13,6 @@ class TeraProjectAccess(db.Model, BaseModel):
     project_access_project = db.relationship('TeraProject')
     project_access_user_group = db.relationship('TeraUserGroup')
 
-    def __init__(self):
-        self.project_access_inherited = False
-
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
@@ -28,19 +25,6 @@ class TeraProjectAccess(db.Model, BaseModel):
         else:
             rval['user_group_name'] = None
         return rval
-
-    @staticmethod
-    def build_user_access_object(project_id: int, user_group_id: int, role: str):
-        from libtera.db.models.TeraProject import TeraProject
-        from libtera.db.models.TeraUserGroup import TeraUserGroup
-        user_access = TeraProjectAccess()
-        user_access.id_user_group = user_group_id
-        user_access.id_project = project_id
-        user_access.project_access_role = role
-        user_access.project_access_inherited = True
-        user_access.project_access_user_group = TeraUserGroup.get_user_group_by_id(user_group_id)
-        user_access.project_access_project = TeraProject.get_project_by_id(project_id)
-        return user_access
 
     @staticmethod
     def update_project_access(id_user_group: int, id_project: int, rolename: str):

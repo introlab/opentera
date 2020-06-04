@@ -36,6 +36,10 @@ class TeraServiceRole(db.Model, BaseModel):
         return TeraServiceRole.query.filter_by(id_service=service_id).all()
 
     @staticmethod
+    def get_service_role_by_id(role_id: int):
+        return TeraServiceRole.query.filter_by(id_service_role=role_id).first()
+
+    @staticmethod
     def create_defaults():
         from libtera.db.models.TeraService import TeraService
 

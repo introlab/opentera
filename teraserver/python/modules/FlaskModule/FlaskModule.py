@@ -145,6 +145,7 @@ class FlaskModule(BaseModule):
         from .API.user.QueryAssets import QueryAssets
         from .API.user.QueryServices import QueryServices
         from .API.user.QueryServiceProjects import QueryServiceProjects
+        from .API.user.QueryServiceProjectRoles import QueryServiceProjectRoles
 
         # Resources
         user_api_ns.add_resource(Login, '/login', resource_class_kwargs=kwargs)
@@ -173,6 +174,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(QueryAssets, '/assets', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryServices, '/services', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(QueryServiceProjects, '/serviceprojects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(QueryServiceProjectRoles, '/serviceprojectroles', resource_class_kwargs=kwargs)
         api.add_namespace(user_api_ns)
 
     def init_device_api(self):

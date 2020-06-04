@@ -18,7 +18,7 @@ class TeraProject(db.Model, BaseModel):
         rval = super().to_json(ignore_fields=ignore_fields)
 
         # Add sitename
-        if 'site_name' not in ignore_fields:
+        if 'site_name' not in ignore_fields and not minimal:
             rval['site_name'] = self.project_site.site_name
 
         return rval

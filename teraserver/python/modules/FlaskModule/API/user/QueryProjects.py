@@ -14,10 +14,10 @@ get_parser = api.parser()
 get_parser.add_argument('id_project', type=int, help='ID of the project to query')
 get_parser.add_argument('id', type=int, help='Alias for "id_project"')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all projects')
+get_parser.add_argument('id_service', type=int, help='ID of the service from which to get all projects')
 get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get all projects that are accessible')
 get_parser.add_argument('name', type=str, help='Project to query by name')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
-
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('project', type=str, location='json', help='Project to create / update', required=True)
@@ -73,6 +73,9 @@ class QueryProjects(Resource):
                 if project.id_project not in user_access.get_accessible_projects_ids():
                     # Current user doesn't have access to the requested project
                     projects = []
+        elif args['id_service']:
+            projects = [project.service_project_project
+                        for project in user_access.query_projects_for_service(args['id_service'])]
         else:
             projects = user_access.get_accessible_projects()
 

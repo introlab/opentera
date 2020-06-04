@@ -6,6 +6,7 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraService import TeraService
+from libtera.db.models.TeraServiceRole import TeraServiceRole
 from modules.DatabaseModule.DBManager import DBManager
 
 # Parser definition(s)
@@ -61,13 +62,17 @@ class QueryServices(Resource):
             service = TeraService.get_service_by_key(args['key'])
             if service and service.id_service in user_access.get_accessible_services_ids():
                 services = [service]
+        else:
+            # No arguments - return all acceessible services
+            services = user_access.get_accessible_services()
 
         try:
             services_list = []
 
             for service in services:
-                service_json = service.to_json()
+                service_json = service.to_json(minimal=args['list'])
                 services_list.append(service_json)
+
             return jsonify(services_list)
 
         except InvalidRequestError:
@@ -76,7 +81,8 @@ class QueryServices(Resource):
     @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update services. id_service must be set to "0" to create a new '
-                         'service. A service can be created/modified only by super-admins.',
+                         'service. A service can be created/modified only by super-admins. If data contains "roles", '
+                         'also update the roles with the list.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified service',
                         400: 'Badly formed JSON or missing fields(id_service) in the JSON body',
@@ -92,11 +98,16 @@ class QueryServices(Resource):
             return '', 403
 
         # Using request.json instead of parser, since parser messes up the json!
-        json_service = request.json['service_project']
+        json_service = request.json['service']
 
         # Validate if we have an id
         if 'id_service' not in json_service:
             return '', 400
+
+        # Manage service roles
+        service_roles = []
+        if 'roles' in json_service:
+            service_roles = json_service.pop('roles')
 
         # Do the update!
         if json_service['id_service'] > 0:
@@ -120,10 +131,34 @@ class QueryServices(Resource):
                 print(sys.exc_info())
                 return '', 500
 
-        # TODO: Publish update to everyone who is subscribed to sites update...
         update_service = TeraService.get_service_by_id(json_service['id_service'])
 
-        return jsonify([update_service.to_json()])
+        # Service roles
+        if len(service_roles) > 0:
+            # Check if there's some roles for the updated service that we need to delete
+            roles_ids = [role['id_service_role'] for role in service_roles]
+            id_roles_to_delete = set([role.id_service_role for role in update_service.service_roles]) \
+                .difference(roles_ids)
+
+            for id_to_del in id_roles_to_delete:
+                TeraServiceRole.delete(id_todel=id_to_del)
+
+            # Update / insert roles
+            for role in service_roles:
+                if role['id_service_role'] == 0:
+                    # New role
+                    new_role = TeraServiceRole()
+                    new_role.from_json(json=role)
+                    new_role.id_service = update_service.id_service
+                    TeraServiceRole.insert(new_role)
+                else:
+                    # Update role
+                    current_role = TeraServiceRole.get_service_role_by_id(role['id_service_role'])
+                    if current_role.service_role_name != role['service_role_name']:
+                        # OK, name was modified, update...
+                        TeraServiceRole.update(role['id_service_role'], role)
+
+        return [update_service.to_json()]
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)

@@ -120,7 +120,8 @@ class QueryUsers(Resource):
     @api.expect(post_parser)
     @api.doc(description='Create / update user. id_user must be set to "0" to create a new user. User can be modified '
                          'if: current user is super admin or user is part of a project which the current user is admin.'
-                         ' Promoting a user to super admin is restricted to super admins.',
+                         ' Promoting a user to super admin is restricted to super admins. If data contains "user_groups'
+                         '", also set user groups for that user.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified user',
                         400: 'Badly formed JSON or missing field(id_user or missing password when new user) in the '

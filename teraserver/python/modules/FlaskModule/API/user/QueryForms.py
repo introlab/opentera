@@ -16,6 +16,7 @@ from libtera.forms.TeraSessionTypeForm import TeraSessionTypeForm
 from libtera.forms.TeraSessionForm import TeraSessionForm
 from libtera.forms.TeraDeviceSubTypeForm import TeraDeviceSubTypeForm
 from libtera.forms.TeraUserGroupForm import TeraUserGroupForm
+from libtera.forms.TeraServiceForm import TeraServiceForm
 
 
 class QueryForms(Resource):
@@ -70,5 +71,8 @@ class QueryForms(Resource):
 
         if args['type'] == 'user_group':
             return TeraUserGroupForm.get_user_group_form(user_access=user_access)
+
+        if args['type'] == 'service':
+            return TeraServiceForm.get_service_form(user_access=user_access)
 
         return 'Unknown definition type: ' + args['type'], 500

@@ -35,7 +35,15 @@ class TeraService(db.Model, BaseModel):
         if minimal:
             ignore_fields.extend([])
 
-        return super().to_json(ignore_fields=ignore_fields)
+        json_service = super().to_json(ignore_fields=ignore_fields)
+        if not minimal:
+            # Add roles for that service
+            roles = []
+            for role in self.service_roles:
+                roles.append(role.to_json())
+            json_service['service_roles'] = roles
+
+        return json_service
 
     @staticmethod
     def get_service_by_key(key: str):

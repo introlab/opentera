@@ -12,9 +12,6 @@ class TeraSiteAccess(db.Model, BaseModel):
     site_access_site = db.relationship('TeraSite')
     site_access_user_group = db.relationship('TeraUserGroup')
 
-    def __init__(self):
-        self.site_access_inherited = False
-
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
@@ -27,19 +24,6 @@ class TeraSiteAccess(db.Model, BaseModel):
         else:
             rval['user_group_name'] = None
         return rval
-
-    @staticmethod
-    def build_user_access_object(site_id: int, user_group_id: int, role: str):
-        from libtera.db.models.TeraSite import TeraSite
-        from libtera.db.models.TeraUserGroup import TeraUserGroup
-        user_access = TeraSiteAccess()
-        user_access.id_user_group = user_group_id
-        user_access.id_site = site_id
-        user_access.site_access_role = role
-        user_access.site_access_inherited = True
-        user_access.site_access_user_group = TeraUserGroup.get_user_group_by_id(user_group_id)
-        user_access.site_access_site = TeraSite.get_site_by_id(site_id)
-        return user_access
 
     @staticmethod
     def update_site_access(id_user_group: int, id_site: int, rolename: str):
