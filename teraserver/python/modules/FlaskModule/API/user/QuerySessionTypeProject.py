@@ -4,6 +4,7 @@ from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from libtera.db.models.TeraSessionType import TeraSessionType
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -13,7 +14,8 @@ from flask_babel import gettext
 get_parser = api.parser()
 get_parser.add_argument('id_project', type=int, help='Project ID to query associated session types from')
 get_parser.add_argument('id_session_type', type=int, help='Session type ID to query associated projects from')
-get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ids only)')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
+                                                          '(ids only)')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('session_type_project', type=str, location='json',
@@ -87,6 +89,9 @@ class QuerySessionTypeProject(Resource):
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
+        if 'session_type_project' not in request.json:
+            return '', 400
+
         json_stps = request.json['session_type_project']
         if not isinstance(json_stps, list):
             json_stps = [json_stps]
@@ -108,6 +113,17 @@ class QuerySessionTypeProject(Resource):
                 json_stp['id_session_type_project'] = stp.id_session_type_project
             else:
                 json_stp['id_session_type_project'] = 0
+
+            # Check if we try to change the associated project
+            if 'id_project' in json_stp:
+                # Check if we have a service type session type
+                session_type = TeraSessionType.get_session_type_by_id(json_stp['id_session_type'])
+
+                # Get services for that project
+                if session_type.session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE and \
+                        session_type.id_session not in user_access.query_services_for_project(json_stp['id_project']):
+                    return gettext('Trying to associate a session type of type "service" with a service not associated '
+                                   'to that project'), 400
 
             # Do the update!
             if json_stp['id_session_type_project'] > 0:

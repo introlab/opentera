@@ -30,8 +30,8 @@ class TeraSessionTypeProject(db.Model, BaseModel):
 
         video_session = TeraSessionType.get_session_type_by_prefix('VIDEO')
         sensor_session = TeraSessionType.get_session_type_by_prefix('SENSOR')
-        vsensor_session = TeraSessionType.get_session_type_by_prefix('STREAM')
-        robot_session = TeraSessionType.get_session_type_by_prefix('ROBOT')
+        data_session = TeraSessionType.get_session_type_by_prefix('DATA')
+        exerc_session = TeraSessionType.get_session_type_by_prefix('EXERC')
 
         project = TeraProject.get_project_by_projectname('Default Project #1')
 
@@ -46,12 +46,12 @@ class TeraSessionTypeProject(db.Model, BaseModel):
         db.session.add(stp)
 
         stp = TeraSessionTypeProject()
-        stp.session_type_project_session_type = vsensor_session
+        stp.session_type_project_session_type = data_session
         stp.session_type_project_project = project
         db.session.add(stp)
 
         stp = TeraSessionTypeProject()
-        stp.session_type_project_session_type = robot_session
+        stp.session_type_project_session_type = exerc_session
         stp.session_type_project_project = project
         db.session.add(stp)
 

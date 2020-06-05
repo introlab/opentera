@@ -95,6 +95,32 @@ class QuerySessionTypes(Resource):
                 and json_session_type['id_session_type'] > 0:
             return '', 403
 
+        # Check if we have a session type of type "service" and, if there's changes in the id_service, it won't break
+        # any project association
+        session_type_category = None
+        if 'session_type_category' in json_session_type:
+            session_type_category = json_session_type['session_type_category']
+
+        session_type = None
+        if json_session_type['id_session_type'] > 0 and not session_type_category:
+            session_type = TeraSessionType.get_session_type_by_id(json_session_type['id_session_type'])
+            session_type_category = session_type.session_type_category
+
+        if session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE:
+            # Check if we have a service id associated
+            current_service_id = None
+            if 'id_service' not in json_session_type:
+                # Get service id directly from the request
+                current_service_id = json_session_type['id_service']
+            else:
+                # Get service id from the exiting session type
+                if session_type:
+                    current_service_id = session_type.id_service
+            if not current_service_id:
+                return gettext('Missing id_service for session type of type service'), 400
+
+
+
         # Do the update!
         if json_session_type['id_session_type'] > 0:
             # Already existing

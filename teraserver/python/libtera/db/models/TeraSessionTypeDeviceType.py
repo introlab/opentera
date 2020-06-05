@@ -30,8 +30,8 @@ class TeraSessionTypeDeviceType(db.Model, BaseModel):
 
         video_session = TeraSessionType.get_session_type_by_prefix('VIDEO')
         sensor_session = TeraSessionType.get_session_type_by_prefix('SENSOR')
-        vsensor_session = TeraSessionType.get_session_type_by_prefix('STREAM')
-        robot_session = TeraSessionType.get_session_type_by_prefix('ROBOT')
+        data_session = TeraSessionType.get_session_type_by_prefix('DATA')
+        exer_session = TeraSessionType.get_session_type_by_prefix('EXERC')
 
         devices = TeraSessionTypeDeviceType()
         devices.session_type_device_session_type = video_session
@@ -52,18 +52,18 @@ class TeraSessionTypeDeviceType(db.Model, BaseModel):
         db.session.add(devices)
 
         devices = TeraSessionTypeDeviceType()
-        devices.session_type_device_session_type = vsensor_session
+        devices.session_type_device_session_type = data_session
         devices.session_type_device_device_type = TeraDeviceType.get_device_type(
             int(TeraDeviceType.DeviceTypeEnum.SENSOR.value))
         db.session.add(devices)
         devices = TeraSessionTypeDeviceType()
-        devices.session_type_device_session_type = vsensor_session
+        devices.session_type_device_session_type = exer_session
         devices.session_type_device_device_type = TeraDeviceType.get_device_type(
             int(TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value))
         db.session.add(devices)
 
         devices = TeraSessionTypeDeviceType()
-        devices.session_type_device_session_type = robot_session
+        devices.session_type_device_session_type = video_session
         devices.session_type_device_device_type = TeraDeviceType.get_device_type(
             int(TeraDeviceType.DeviceTypeEnum.ROBOT.value))
         db.session.add(devices)
