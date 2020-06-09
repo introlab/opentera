@@ -1,10 +1,10 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
-from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
+from libtera.db.models.TeraService import TeraService
+from modules.RedisVars import RedisVars
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
 
@@ -94,10 +94,22 @@ class UserSessionManager(Resource):
 
         json_session_manager = request.json['session_manage']
 
+        if 'id_service' not in json_session_manager:
+            return gettext('Missing session id'), 400
+
         if 'id_creator_user' not in json_session_manager:
             json_session_manager['id_creator_user'] = current_user.id_user
 
-        # TODO Validate user rights if user can access that service
+        # Validate user rights if user can access that service
+        if json_session_manager['id_service'] not in user_access.get_accessible_services_ids():
+            return gettext('User doesn\'t have access to that service.'), 403
+
+        # Get Redis key for service
+        service = TeraService.get_service_by_id(json_session_manager['id_service'])
+        if not service:
+            return gettext('Service not found'), 500
+
+        service_redis_key = RedisVars.RedisVar_ServicePrefixKey + service.service_key
 
         # TODO If session is of category "Service":
         # - Starts / stops / ... the service using RPC API:
@@ -110,5 +122,5 @@ class UserSessionManager(Resource):
         # - Service will return id_session and status code as a result to the RPC call and this will be the reply of
         #   this query
 
-        return '', 200
+        return {}, 200
 
