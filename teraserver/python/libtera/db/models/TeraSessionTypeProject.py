@@ -28,10 +28,10 @@ class TeraSessionTypeProject(db.Model, BaseModel):
         from libtera.db.models.TeraSessionType import TeraSessionType
         from libtera.db.models.TeraProject import TeraProject
 
-        video_session = TeraSessionType.get_session_type_by_prefix('VIDEO')
-        sensor_session = TeraSessionType.get_session_type_by_prefix('SENSOR')
-        data_session = TeraSessionType.get_session_type_by_prefix('DATA')
-        exerc_session = TeraSessionType.get_session_type_by_prefix('EXERC')
+        video_session = TeraSessionType.get_session_type_by_id(1)
+        sensor_session = TeraSessionType.get_session_type_by_id(2)
+        data_session = TeraSessionType.get_session_type_by_id(3)
+        exerc_session = TeraSessionType.get_session_type_by_id(4)
 
         project = TeraProject.get_project_by_projectname('Default Project #1')
 

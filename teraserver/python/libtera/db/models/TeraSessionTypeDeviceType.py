@@ -28,10 +28,10 @@ class TeraSessionTypeDeviceType(db.Model, BaseModel):
         from libtera.db.models.TeraSessionType import TeraSessionType
         from libtera.db.models.TeraDeviceType import TeraDeviceType
 
-        video_session = TeraSessionType.get_session_type_by_prefix('VIDEO')
-        sensor_session = TeraSessionType.get_session_type_by_prefix('SENSOR')
-        data_session = TeraSessionType.get_session_type_by_prefix('DATA')
-        exer_session = TeraSessionType.get_session_type_by_prefix('EXERC')
+        video_session = TeraSessionType.get_session_type_by_id(1)
+        sensor_session = TeraSessionType.get_session_type_by_id(2)
+        data_session = TeraSessionType.get_session_type_by_id(3)
+        exer_session = TeraSessionType.get_session_type_by_id(4)
 
         devices = TeraSessionTypeDeviceType()
         devices.session_type_device_session_type = video_session

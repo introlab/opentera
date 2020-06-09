@@ -36,8 +36,8 @@ class TeraSessionTypeForm:
         # Items
         section.add_item(TeraFormItem("id_session_type", gettext("ID Type Séance"), "hidden", True))
         section.add_item(TeraFormItem("session_type_name", gettext("Nom du type de séance"), "text", True))
-        section.add_item(TeraFormItem("session_type_prefix", gettext("Code du type de séance"), "text", True,
-                                      item_options={'max_length': 10}))
+        # section.add_item(TeraFormItem("session_type_prefix", gettext("Code du type de séance"), "text", True,
+        #                               item_options={'max_length': 10}))
         section.add_item(TeraFormItem("session_type_category", gettext("Catégorie"), "array", item_required=True,
                                       item_values=categories_list))
         section.add_item(TeraFormItem("id_service", gettext("Service"), "array", item_required=False,

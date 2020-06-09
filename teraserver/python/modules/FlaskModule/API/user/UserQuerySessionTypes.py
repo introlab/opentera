@@ -89,17 +89,21 @@ class UserQuerySessionTypes(Resource):
         if 'id_session_type' not in json_session_type:
             return '', 400
 
-        # Check if current user can modify the posted group
-        # User can modify or add a group if it has admin access to that project
-        if json_session_type['id_session_type'] not in user_access.get_accessible_session_types_ids(admin_only=True) \
-                and json_session_type['id_session_type'] > 0:
-            return '', 403
+        # Check if current user can modify the posted type
+        if json_session_type['id_session_type'] > 0:
+            if json_session_type['id_session_type'] not in \
+                    user_access.get_accessible_session_types_ids(admin_only=True):
+                return '', 403
+        else:
+            # Allows session type creation if the user is at least admin in one project
+            if len(user_access.get_accessible_projects(admin_only=True)) == 0:
+                return gettext('User must be admin in at least one site to create new type'), 403
 
         # Check if we have a session type of type "service" and, if there's changes in the id_service, it won't break
         # any project association
         session_type_category = None
         if 'session_type_category' in json_session_type:
-            session_type_category = json_session_type['session_type_category']
+            session_type_category = TeraSessionType.SessionCategoryEnum(json_session_type['session_type_category'])
 
         session_type = None
         if json_session_type['id_session_type'] > 0 and not session_type_category:
@@ -109,7 +113,7 @@ class UserQuerySessionTypes(Resource):
         if session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE:
             # Check if we have a service id associated
             current_service_id = None
-            if 'id_service' not in json_session_type:
+            if 'id_service' in json_session_type:
                 # Get service id directly from the request
                 current_service_id = json_session_type['id_service']
             else:
@@ -165,9 +169,15 @@ class UserQuerySessionTypes(Resource):
         session_type = TeraSessionType.get_session_type_by_id(id_todel)
 
         # Check if we are admin of all projects of that session_type
-        for proj in session_type.session_type_projects:
-            if user_access.get_project_role(proj.id_project) != "admin":
-                return gettext('Impossible de supprimer - pas administrateur dans tous les projets de ce type.'), 403
+        if len(session_type.session_type_projects) > 0:
+            for proj in session_type.session_type_projects:
+                if user_access.get_project_role(proj.id_project) != "admin":
+                    return gettext('Impossible de supprimer - pas administrateur dans tous les projets de ce type.'), \
+                           403
+        else:
+            # No project right now for that session type - must at least project admin somewhere to delete
+            if len(user_access.get_accessible_projects(admin_only=True)) == 0:
+                return gettext('Unable to delete - not admin in at least one project'), 403
 
         # Check if there's some sessions that are using that session type. If so, we must not delete!
         if len(TeraSession.get_sessions_for_type(id_todel)) > 0:

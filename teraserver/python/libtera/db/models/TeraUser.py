@@ -271,6 +271,19 @@ class TeraUser(db.Model, BaseModel):
         # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
         db.session.add(user)
 
+        # No access user!
+        user = TeraUser()
+        user.user_enabled = True
+        user.user_firstname = "No Access"
+        user.user_lastname = "User!"
+        user.user_profile = ""
+        user.user_password = TeraUser.encrypt_password("user4")
+        user.user_superadmin = False
+        user.user_username = "user4"
+        user.user_uuid = str(uuid.uuid4())
+        # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
+        db.session.add(user)
+
         # Project Access
         # user_access = TeraProjectAccess()
         # user_access.id_user = TeraUser.get_user_by_username('user').id_user
