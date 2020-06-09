@@ -35,7 +35,8 @@ class TeraSessionType(db.Model, BaseModel):
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['session_type_projects', 'session_type_devices_types', 'SessionCategoryEnum'])
+        ignore_fields.extend(['session_type_projects', 'session_type_devices_types', 'SessionCategoryEnum',
+                              'session_type_service'])
         if minimal:
             ignore_fields.extend(['session_type_prefix', 'session_type_online', 'session_type_multiusers',
                                   'session_type_profile', 'session_type_color'])

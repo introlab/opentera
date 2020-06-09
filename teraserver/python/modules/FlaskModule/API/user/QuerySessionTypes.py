@@ -141,10 +141,9 @@ class QuerySessionTypes(Resource):
                 print(sys.exc_info())
                 return '', 500
 
-        # TODO: Publish update to everyone who is subscribed to update...
         update_session_type = TeraSessionType.get_session_type_by_id(json_session_type['id_session_type'])
 
-        return jsonify([update_session_type.to_json()])
+        return [update_session_type.to_json()]
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)
