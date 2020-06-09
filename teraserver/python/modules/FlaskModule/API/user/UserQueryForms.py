@@ -19,7 +19,7 @@ from libtera.forms.TeraUserGroupForm import TeraUserGroupForm
 from libtera.forms.TeraServiceForm import TeraServiceForm
 
 
-class QueryForms(Resource):
+class UserQueryForms(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         self.module = kwargs.get('flaskModule', None)

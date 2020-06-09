@@ -28,7 +28,7 @@ delete_parser.add_argument('id', type=int, help='Specific device-project associa
                                                 'association itself!', required=True)
 
 
-class QueryDeviceProjects(Resource):
+class UserQueryDeviceProjects(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

@@ -23,7 +23,7 @@ delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Session type ID to delete', required=True)
 
 
-class QuerySessionTypes(Resource):
+class UserQuerySessionTypes(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

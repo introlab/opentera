@@ -24,7 +24,7 @@ post_parser.add_argument('device_site', type=str, location='json',
 # delete_parser.add_argument('id', type=int, help='ID of the site to delete all devices from.', required=True)
 
 
-class QueryDeviceSites(Resource):
+class UserQueryDeviceSites(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

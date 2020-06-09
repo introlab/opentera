@@ -4,7 +4,7 @@ from flask import session
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 
 
-class Logout(Resource):
+class UserLogout(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)

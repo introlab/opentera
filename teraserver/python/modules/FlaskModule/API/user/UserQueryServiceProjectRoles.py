@@ -27,7 +27,7 @@ delete_parser.add_argument('id', type=int, help='Specific service project role a
                                                 ' of the association itself!', required=True)
 
 
-class QueryServiceProjectRoles(Resource):
+class UserQueryServiceProjectRoles(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

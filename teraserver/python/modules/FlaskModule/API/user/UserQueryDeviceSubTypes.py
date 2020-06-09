@@ -22,7 +22,7 @@ delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Device subtype ID to delete', required=True)
 
 
-class QueryDeviceSubTypes(Resource):
+class UserQueryDeviceSubTypes(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
