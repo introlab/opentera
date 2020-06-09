@@ -21,6 +21,9 @@ session_manager_schema = api.schema_model('session_manage', {
                 'id_session': {
                     'type': 'integer'
                 },
+                'id_service': {
+                    'type': 'integer'
+                },
                 'id_creator_user': {
                     'type': 'integer'
                 },
@@ -55,7 +58,7 @@ session_manager_schema = api.schema_model('session_manage', {
                     'type': 'object'
                 }
             },
-            'required': ['action']
+            'required': ['action', 'id_service']
         },
 
     },
@@ -71,7 +74,7 @@ class UserSessionManager(Resource):
         self.module = kwargs.get('flaskModule', None)
 
     @user_multi_auth.login_required
-    @api.expect(session_manager_schema, validate=True)
+    # @api.expect(session_manager_schema, validate=True)
     @api.doc(description='Manage a specific session',
              responses={200: 'Success',
                         400: 'Required parameter is missing',
