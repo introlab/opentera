@@ -159,14 +159,14 @@ class FlaskModule(BaseModule):
     def __init__(self, config: ConfigManager):
 
         # Warning, the name must be unique!
-        BaseModule.__init__(self, config.service_config['name'] + '.TwistedModule', config)
+        BaseModule.__init__(self, config.service_config['name'] + '.FlaskModule', config)
 
         flask_app.debug = True
         # flask_app.secret_key = 'development'
         # This is used for session encryption
         # TODO Change secret key
         # TODO STORE SECRET IN DB?
-        flask_app.secret_key = 'VideoDispatchSecret'
+        flask_app.secret_key = 'VideoRehabSecret'
 
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})

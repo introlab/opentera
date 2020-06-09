@@ -1,21 +1,113 @@
 import jwt
-import redis
+import json
 import time
 from modules.RedisVars import RedisVars
 from libtera.redis.RedisClient import RedisClient
 from requests import get, post, Response
+from services.shared.ServiceConfigManager import ServiceConfigManager
+import messages.python as messages
+from twisted.internet import defer
 
 
-class ServiceOpenTera:
+class ServiceOpenTera(RedisClient):
 
-    def __init__(self, backend_hostname: str, backend_port: int, service_uuid: str, redis_client: RedisClient):
-        self.backend_hostname = backend_hostname
-        self.backend_port = backend_port
-        self.service_uuid = service_uuid
-        self.redis_client = redis_client
+    def __init__(self, config_man: ServiceConfigManager):
+        # First initialize redis
+        RedisClient.__init__(self, config_man.redis_config)
+
+        # Store RPC API
+        self.rpc_api = dict()
+
+        # Store config
+        self.config = config_man.service_config
+
+        # Take values from config_man
+        # Values are checked when config is loaded...
+        self.backend_hostname = config_man.backend_config['hostname']
+        self.backend_port = config_man.backend_config['port']
+        self.service_uuid = config_man.service_config['ServiceUUID']
+
+        # TODO remove this, we already are a redis client...
+        # self.redis_client
 
         # Create service token for future uses
         self.service_token = self.service_generate_token()
+
+    def redisConnectionMade(self):
+        print('*************************** VideoRehabService.connectionMade', self.config['name'])
+
+        # Build RPC interface
+        self.setup_rpc_interface()
+
+        # Build standard interface
+        self.build_interface()
+
+    def setup_rpc_interface(self):
+        # Should be implemented in derived class
+        pass
+
+    def notify_service_messages(self, pattern, channel, message):
+        pass
+
+    @defer.inlineCallbacks
+    def build_interface(self):
+        # TODO not sure of the interface using UUID or name here...
+        ret1 = yield self.subscribe_pattern_with_callback('service.' + self.config['ServiceUUID']
+                                                          + '.messages', self.notify_service_messages)
+
+        ret2 = yield self.subscribe_pattern_with_callback('service.' + self.config['ServiceUUID']
+                                                          + '.rpc', self.notify_module_rpc)
+        print(ret1, ret2)
+
+    def notify_module_rpc(self, pattern, channel, message):
+        import threading
+        print('BaseModule - Received rpc', self, pattern, channel, message, ' thread:', threading.current_thread())
+
+        rpc_message = messages.RPCMessage()
+
+        try:
+            # Look for a RPCMessage
+            rpc_message.ParseFromString(message)
+
+            if self.rpc_api.__contains__(rpc_message.method):
+
+                # RPC method found, call it with the args
+                args = list()
+                kwargs = dict()
+
+                # TODO type checking with declared rpc interface ?
+                for value in rpc_message.args:
+                    # Append the oneof value to args
+                    args.append(getattr(value, value.WhichOneof('arg_value')))
+
+                # Call callback function
+                ret_value = self.rpc_api[rpc_message.method]['callback'](*args, **kwargs)
+
+                # More than we need?
+                my_dict = {'method': rpc_message.method,
+                           'id': rpc_message.id,
+                           'pattern': pattern,
+                           'status': 'OK',
+                           'return_value': ret_value}
+
+                json_data = json.dumps(my_dict)
+
+                # Return result (a json string)
+                self.publish(rpc_message.reply_to, json_data)
+
+        except:
+            import sys
+            print('Error calling rpc method', message, sys.exc_info())
+            my_dict = {'method': rpc_message.method,
+                       'id': rpc_message.id,
+                       'pattern': pattern,
+                       'status': 'Error',
+                       'return_value': None}
+
+            json_data = json.dumps(my_dict)
+
+            # Return result (a json string)
+            self.publish(rpc_message.reply_to, json_data)
 
     def service_generate_token(self):
         # Use redis key to generate token
@@ -26,7 +118,7 @@ class ServiceOpenTera:
             'service_uuid': self.service_uuid
         }
 
-        return jwt.encode(payload, self.redis_client.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey),
+        return jwt.encode(payload, self.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey),
                           algorithm='HS256').decode('utf-8')
 
     def post_to_opentera(self, api_url: str, json_data: dict) -> Response:
