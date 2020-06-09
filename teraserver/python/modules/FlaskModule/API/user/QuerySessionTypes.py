@@ -119,8 +119,6 @@ class QuerySessionTypes(Resource):
             if not current_service_id:
                 return gettext('Missing id_service for session type of type service'), 400
 
-
-
         # Do the update!
         if json_session_type['id_session_type'] > 0:
             # Already existing

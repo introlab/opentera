@@ -18,6 +18,8 @@ class TeraSessionStatus(Enum):
 class TeraSession(db.Model, BaseModel):
     __tablename__ = 't_sessions'
     id_session = db.Column(db.Integer, db.Sequence('id_session_sequence'), primary_key=True, autoincrement=True)
+    # TODO Session UUID
+
     id_session_type = db.Column(db.Integer, db.ForeignKey('t_sessions_types.id_session_type', ondelete='cascade'),
                                 nullable=False)
     # TODO Update forms / c++ client, queries
@@ -25,6 +27,7 @@ class TeraSession(db.Model, BaseModel):
     id_creator_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device', ondelete='set null'), nullable=True)
     id_creator_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant', ondelete='set null'),
                                        nullable=True)
+    # TODO: Add service creator
     session_name = db.Column(db.String, nullable=False)
     session_start_datetime = db.Column(db.TIMESTAMP, nullable=False)
     session_duration = db.Column(db.Integer, nullable=False, default=0)
@@ -32,6 +35,8 @@ class TeraSession(db.Model, BaseModel):
     session_comments = db.Column(db.String, nullable=True)
     session_participants = db.relationship("TeraParticipant", secondary="t_sessions_participants",
                                            back_populates="participant_sessions", cascade="delete")
+
+    # TODO: Add users in session
 
     session_creator_user = db.relationship('TeraUser')
     session_creator_device = db.relationship('TeraDevice')

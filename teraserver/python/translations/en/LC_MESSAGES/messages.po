@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-05-26 13:12-0400\n"
+"POT-Creation-Date: 2020-06-09 10:43-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -17,6 +17,26 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: libtera/db/models/TeraSessionType.py:116
+msgid "Inconue"
+msgstr ""
+
+#: libtera/db/models/TeraSessionType.py:118
+msgid "Service"
+msgstr ""
+
+#: libtera/db/models/TeraSessionType.py:120
+msgid "Envoi de fichiers"
+msgstr ""
+
+#: libtera/db/models/TeraSessionType.py:122
+msgid "Collecte de données"
+msgstr ""
+
+#: libtera/db/models/TeraSessionType.py:124
+msgid "Protocole"
+msgstr ""
 
 #: libtera/forms/TeraDeviceForm.py:23
 msgid "Paramètres"
@@ -63,7 +83,7 @@ msgid "Peut se connecter?"
 msgstr ""
 
 #: libtera/forms/TeraDeviceForm.py:44 libtera/forms/TeraParticipantForm.py:42
-#: libtera/forms/TeraUserForm.py:38
+#: libtera/forms/TeraUserForm.py:30
 msgid "Dernière connexion"
 msgstr ""
 
@@ -71,9 +91,10 @@ msgstr ""
 #: libtera/forms/TeraDeviceSubTypeForm.py:23
 #: libtera/forms/TeraParticipantForm.py:19
 #: libtera/forms/TeraParticipantGroupForm.py:20
-#: libtera/forms/TeraProjectForm.py:19 libtera/forms/TeraSessionForm.py:44
-#: libtera/forms/TeraSessionTypeForm.py:28 libtera/forms/TeraSiteForm.py:12
-#: libtera/forms/TeraUserForm.py:19
+#: libtera/forms/TeraProjectForm.py:19 libtera/forms/TeraServiceForm.py:18
+#: libtera/forms/TeraSessionForm.py:44 libtera/forms/TeraSessionTypeForm.py:33
+#: libtera/forms/TeraSiteForm.py:12 libtera/forms/TeraUserForm.py:13
+#: libtera/forms/TeraUserGroupForm.py:18
 msgid "Informations"
 msgstr ""
 
@@ -82,7 +103,7 @@ msgid "Configuration"
 msgstr ""
 
 #: libtera/forms/TeraDeviceForm.py:55 libtera/forms/TeraDeviceForm.py:57
-#: libtera/forms/TeraUserForm.py:36
+#: libtera/forms/TeraUserForm.py:28
 msgid "Notes"
 msgstr ""
 
@@ -134,8 +155,8 @@ msgstr ""
 msgid "Identification connexion"
 msgstr ""
 
-#: libtera/forms/TeraParticipantForm.py:40 libtera/forms/TeraUserForm.py:34
-#: libtera/forms/TeraUserForm.py:90
+#: libtera/forms/TeraParticipantForm.py:40 libtera/forms/TeraUserForm.py:26
+#: libtera/forms/TeraUserForm.py:82
 msgid "Mot de passe"
 msgstr ""
 
@@ -170,6 +191,42 @@ msgstr ""
 
 #: libtera/forms/TeraProjectForm.py:27
 msgid "Nom du site initial"
+msgstr ""
+
+#: libtera/forms/TeraServiceForm.py:25
+msgid "ID Service"
+msgstr ""
+
+#: libtera/forms/TeraServiceForm.py:26
+msgid "UUID Service"
+msgstr ""
+
+#: libtera/forms/TeraServiceForm.py:28
+msgid "Nom du service"
+msgstr ""
+
+#: libtera/forms/TeraServiceForm.py:29
+msgid "Code du service"
+msgstr ""
+
+#: libtera/forms/TeraServiceForm.py:30
+msgid "Adresse interne"
+msgstr ""
+
+#: libtera/forms/TeraServiceForm.py:31
+msgid "Port interne"
+msgstr ""
+
+#: libtera/forms/TeraServiceForm.py:32
+msgid "URL de base"
+msgstr ""
+
+#: libtera/forms/TeraServiceForm.py:33
+msgid "URL externe"
+msgstr ""
+
+#: libtera/forms/TeraServiceForm.py:34
+msgid "Service actif"
 msgstr ""
 
 #: libtera/forms/TeraSessionForm.py:48
@@ -232,35 +289,35 @@ msgstr ""
 msgid "A données capteur"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:32
+#: libtera/forms/TeraSessionTypeForm.py:37
 msgid "ID Type Séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:33
+#: libtera/forms/TeraSessionTypeForm.py:38
 msgid "Nom du type de séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:34
+#: libtera/forms/TeraSessionTypeForm.py:39
 msgid "Code du type de séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:36
+#: libtera/forms/TeraSessionTypeForm.py:41
 msgid "Catégorie"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:38
+#: libtera/forms/TeraSessionTypeForm.py:46
 msgid "Séance assistée?"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:39
+#: libtera/forms/TeraSessionTypeForm.py:47
 msgid "Séance de groupe?"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:40
+#: libtera/forms/TeraSessionTypeForm.py:48
 msgid "Couleur d'affichage"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:41
+#: libtera/forms/TeraSessionTypeForm.py:49
 msgid "Configuration spécifiques"
 msgstr ""
 
@@ -272,135 +329,139 @@ msgstr ""
 msgid "Rôle dans ce site"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:23
+#: libtera/forms/TeraUserForm.py:17
 msgid "ID Utilisateur"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:24
+#: libtera/forms/TeraUserForm.py:18
 msgid "UUID Utilisateur"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:25
+#: libtera/forms/TeraUserForm.py:19
 msgid "Nom complet Utilisateur"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:26
+#: libtera/forms/TeraUserForm.py:20
 msgid "Code utilisateur"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:27
+#: libtera/forms/TeraUserForm.py:21
 msgid "Activé"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:28
+#: libtera/forms/TeraUserForm.py:22
 msgid "Prénom"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:29
+#: libtera/forms/TeraUserForm.py:23
 msgid "Nom"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:30
+#: libtera/forms/TeraUserForm.py:24
 msgid "Courriel"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:31
-msgid "Groupe Utilisateur"
-msgstr ""
-
-#: libtera/forms/TeraUserForm.py:35
+#: libtera/forms/TeraUserForm.py:27
 msgid "Super administrateur"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:37
+#: libtera/forms/TeraUserForm.py:29
 msgid "Profil"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:48
+#: libtera/forms/TeraUserForm.py:40
 msgid "Configuration audio-vidéo"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:52
+#: libtera/forms/TeraUserForm.py:44
 msgid "Caméra"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:53
+#: libtera/forms/TeraUserForm.py:45
 msgid "Type de caméra"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:54
+#: libtera/forms/TeraUserForm.py:46
 msgid "Caméra réseau"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:55
+#: libtera/forms/TeraUserForm.py:47
 msgid "Capture d'écran"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:59
+#: libtera/forms/TeraUserForm.py:51
 msgid "Adresse du flux de la caméra"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:63
+#: libtera/forms/TeraUserForm.py:55
 msgid "Trames par seconde"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:68
+#: libtera/forms/TeraUserForm.py:60
 msgid "Résolution"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:76
+#: libtera/forms/TeraUserForm.py:68
 msgid "Caméra contrôlable (PTZ)"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:77
+#: libtera/forms/TeraUserForm.py:69
 msgid "Type de contrôle"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:78
+#: libtera/forms/TeraUserForm.py:70
 msgid "Vivotek"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:78
+#: libtera/forms/TeraUserForm.py:70
 msgid "ONVIF (générique)"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:81
+#: libtera/forms/TeraUserForm.py:73
 msgid "Adresse réseau"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:84
+#: libtera/forms/TeraUserForm.py:76
 msgid "Port"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:87
+#: libtera/forms/TeraUserForm.py:79
 msgid "Nom utilisateur"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:94
+#: libtera/forms/TeraUserForm.py:86
 msgid "Microphone"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:95
+#: libtera/forms/TeraUserForm.py:87
 msgid "Caméra secondaire"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:97
+#: libtera/forms/TeraUserForm.py:89
 msgid "Configuration générale"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:99
+#: libtera/forms/TeraUserForm.py:91
 msgid "Affichage en plein écran en séance"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:101
+#: libtera/forms/TeraUserForm.py:93
 msgid "Permettre l'accès via le web"
+msgstr ""
+
+#: libtera/forms/TeraUserGroupForm.py:22
+msgid "ID Groupe utilisateur"
+msgstr ""
+
+#: libtera/forms/TeraUserGroupForm.py:24
+msgid "Nom du groupe utilisateur"
 msgstr ""
 
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:66
 #: modules/FlaskModule/API/user/QueryDeviceProjects.py:55
 #: modules/FlaskModule/API/user/QueryDeviceSites.py:51
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:53
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:52
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:54
 msgid "Arguments manquants"
 msgstr ""
 
@@ -411,7 +472,7 @@ msgstr ""
 #: modules/FlaskModule/API/user/QueryDeviceSites.py:102
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:103
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:160
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:159
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:175
 msgid "Accès refusé"
 msgstr ""
 
@@ -421,40 +482,84 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:187
 #: modules/FlaskModule/API/user/QueryDeviceProjects.py:160
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:160
+#: modules/FlaskModule/API/user/QueryServiceProjects.py:244
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:157
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:156
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:172
 msgid "Non-trouvé"
 msgstr ""
 
 #: modules/FlaskModule/API/user/QueryDeviceParticipants.py:199
 #: modules/FlaskModule/API/user/QueryDeviceProjects.py:183
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:171
+#: modules/FlaskModule/API/user/QueryServiceProjects.py:255
 #: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:168
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:167
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:183
 msgid "Erreur base de données"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:52
+#: modules/FlaskModule/API/user/QueryServiceProjectRoles.py:54
+#: modules/FlaskModule/API/user/QueryServiceProjects.py:61
 msgid "Missing arguments"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:102
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:101
+#: modules/FlaskModule/API/user/QueryServiceProjectRoles.py:120
+#: modules/FlaskModule/API/user/QueryServiceProjects.py:187
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:106
 msgid "Acces refuse"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:163
+#: modules/FlaskModule/API/user/QueryServiceProjectRoles.py:169
+msgid "Not found"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryServiceProjectRoles.py:172
+msgid "Forbidden"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryServiceProjectRoles.py:180
+msgid "Database error"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryServiceProjects.py:122
+msgid "Missing id_service"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryServiceProjects.py:124
+msgid "Missing projects"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryServiceProjects.py:145
+msgid "Missing id_project"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryServiceProjects.py:147
+msgid "Missing services"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryServiceProjects.py:153
+msgid "Access denied"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryServiceProjects.py:247
 msgid "Opération non-permise"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessionTypes.py:147
+#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:125
+msgid ""
+"Trying to associate a session type of type \"service\" with a service not"
+" associated to that project"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QuerySessionTypes.py:120
+msgid "Missing id_service for session type of type service"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QuerySessionTypes.py:171
 msgid ""
 "Impossible de supprimer - pas administrateur dans tous les projets de ce "
 "type."
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessionTypes.py:151
+#: modules/FlaskModule/API/user/QuerySessionTypes.py:175
 msgid "Impossible de supprimer - des seances de ce type existent."
 msgstr ""
 
@@ -467,15 +572,19 @@ msgstr ""
 msgid "Vous n'avez pas acces a au moins un participant de la seance."
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:166
+#: modules/FlaskModule/API/user/QueryUsers.py:164
+msgid "No access for at a least one user group in the list"
+msgstr ""
+
+#: modules/FlaskModule/API/user/QueryUsers.py:179
 msgid "Password required"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:168
+#: modules/FlaskModule/API/user/QueryUsers.py:181
 msgid "Invalid password"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:172
+#: modules/FlaskModule/API/user/QueryUsers.py:185
 msgid "Username unavailable."
 msgstr ""
 
@@ -483,5 +592,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Impossible d'associer l'appareil au site du projet"
+#~ msgstr ""
+
+#~ msgid "Groupe Utilisateur"
 #~ msgstr ""
 
