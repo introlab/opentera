@@ -41,7 +41,7 @@ model = api.model('QueryDeviceParticipants', {
 })
 
 
-class QueryDeviceParticipants(Resource):
+class UserQueryDeviceParticipants(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

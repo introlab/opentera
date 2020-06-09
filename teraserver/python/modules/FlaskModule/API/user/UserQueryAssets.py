@@ -20,7 +20,7 @@ delete_parser = api.parser()
 delete_parser.add_argument('id', type=int, help='Specific asset ID to delete', required=True)
 
 
-class QueryAssets(Resource):
+class UserQueryAssets(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

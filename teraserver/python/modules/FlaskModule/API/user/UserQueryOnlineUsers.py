@@ -11,7 +11,7 @@ from twisted.internet import defer
 import datetime
 
 
-class QueryOnlineUsers(Resource):
+class UserQueryOnlineUsers(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.flaskModule = kwargs.get('flaskModule', None)

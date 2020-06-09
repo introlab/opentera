@@ -23,7 +23,7 @@ delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='User group ID to delete', required=True)
 
 
-class QueryUserGroups(Resource):
+class UserQueryUserGroups(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

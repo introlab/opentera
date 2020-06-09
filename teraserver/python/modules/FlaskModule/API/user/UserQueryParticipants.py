@@ -34,7 +34,7 @@ delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Participant ID to delete', required=True)
 
 
-class QueryParticipants(Resource):
+class UserQueryParticipants(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

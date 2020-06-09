@@ -34,7 +34,7 @@ delete_parser.add_argument('id', type=int, help='Specific service - project asso
                                                 ' of the association itself!', required=True)
 
 
-class QueryServiceProjects(Resource):
+class UserQueryServiceProjects(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

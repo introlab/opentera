@@ -25,7 +25,7 @@ delete_parser = api.parser()
 delete_parser.add_argument('id', type=int, help='Specific device data ID to delete', required=True)
 
 
-class QueryDeviceData(Resource):
+class UserQueryDeviceData(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

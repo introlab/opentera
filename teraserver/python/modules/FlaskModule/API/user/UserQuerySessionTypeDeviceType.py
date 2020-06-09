@@ -26,7 +26,7 @@ delete_parser.add_argument('id', type=int, help='Specific device-type - session-
                                                 ' of the association itself!', required=True)
 
 
-class QuerySessionTypeDeviceType(Resource):
+class UserQuerySessionTypeDeviceType(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

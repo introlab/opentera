@@ -11,7 +11,7 @@ model = api.model('Login', {
 })
 
 
-class Login(Resource):
+class UserLogin(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
