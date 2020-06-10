@@ -124,6 +124,9 @@ class UserSessionManager(Resource):
         # - Service will send invitations / updates to participants / users
         # - Service will return id_session and status code as a result to the RPC call and this will be the reply of
         #   this query
+        if answer:
+            return answer, 200
+        else:
+            return None, 500
 
-        return answer, 200
 

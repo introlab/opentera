@@ -244,9 +244,11 @@ class FlaskModule(BaseModule):
         # Services
         from .API.service.ServiceQueryParticipants import ServiceQueryParticipants
         from .API.service.ServiceQueryAssets import ServiceQueryAssets
+        from .API.service.ServiceQuerySessions import ServiceQuerySessions
 
         service_api_ns.add_resource(ServiceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryAssets, '/assets', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
 
         # Add namespace
         api.add_namespace(service_api_ns)

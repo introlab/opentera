@@ -94,7 +94,9 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
             self.assertTrue(data_item.__contains__('session_name'))
             self.assertTrue(data_item.__contains__('session_start_datetime'))
             self.assertTrue(data_item.__contains__('session_status'))
-            self.assertTrue(data_item.__contains__('session_participants_ids'))
+            self.assertTrue(data_item.__contains__('session_uuid'))
+            self.assertTrue(data_item.__contains__('session_participants'))
+            self.assertTrue(data_item.__contains__('session_users'))
             self.assertTrue(data_item.__contains__('session_has_device_data'))
 
     def test_query_token_auth_no_params(self):
@@ -128,7 +130,9 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
             self.assertTrue(data_item.__contains__('session_name'))
             self.assertTrue(data_item.__contains__('session_start_datetime'))
             self.assertTrue(data_item.__contains__('session_status'))
-            self.assertTrue(data_item.__contains__('session_participants_ids'))
+            self.assertTrue(data_item.__contains__('session_uuid'))
+            self.assertTrue(data_item.__contains__('session_participants'))
+            self.assertTrue(data_item.__contains__('session_users'))
             self.assertTrue(data_item.__contains__('session_has_device_data'))
 
     def test_query_base_token(self):

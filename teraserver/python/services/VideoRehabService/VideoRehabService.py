@@ -48,6 +48,14 @@ class VideoRehabService(ServiceOpenTera):
     def session_manage(self, json_str):
         import json
         session_manage = json.loads(json_str)
+
+        # - Service will create session if needed or reuse existing one
+        # - Service will send invitations / updates to participants / users
+        # - Service will return id_session and status code as a result to the RPC call and this will be the reply of
+        #   this query
+
+
+
         return session_manage
 
 
