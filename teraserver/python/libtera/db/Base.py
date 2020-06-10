@@ -74,6 +74,10 @@ class BaseModel:
         values = cls.clean_values(values)
         update_obj = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
         update_obj.from_json(values)
+        cls.commit()
+
+    @classmethod
+    def commit(cls):
         db.session.commit()
 
     @classmethod
@@ -83,14 +87,14 @@ class BaseModel:
 
         # Add to database session and commit
         db.session.add(db_object)
-        db.session.commit()
+        cls.commit()
 
     @classmethod
     def delete(cls, id_todel):
         delete_obj = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
         if delete_obj:
             db.session.delete(delete_obj)
-            db.session.commit()
+            cls.commit()
 
     @classmethod
     def query_with_filters(cls, filters=None):

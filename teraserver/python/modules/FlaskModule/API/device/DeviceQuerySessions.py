@@ -13,7 +13,6 @@ from libtera.db.models.TeraDevice import TeraDevice
 get_parser = api.parser()
 get_parser.add_argument('token', type=str, help='Secret Token')
 get_parser.add_argument('id_session', type=int, help='Session ID')
-# get_parser.add_argument('id_participant', type=int, help='Participant ID')
 get_parser.add_argument('list', type=inputs.boolean, help='List all sessions')
 
 post_parser = api.parser()
@@ -129,8 +128,9 @@ class DeviceQuerySessions(Resource):
         if 'id_session_type' not in json_session:
             return '', 400
 
-        # Validate that we have session participants for new sessions
-        if 'session_participants' not in json_session and json_session['id_session'] == 0:
+        # Validate that we have session participants or users for new sessions
+        if ('session_participants' not in json_session or 'session_users' not in json_session) \
+                and json_session['id_session'] == 0:
             return '', 400
 
         # We know we have a device
@@ -145,7 +145,6 @@ class DeviceQuerySessions(Resource):
 
         # Do the update!
         if json_session['id_session'] > 0:
-
             # Already existing
             # TODO handle participant list (remove, add) in session
             try:
@@ -178,7 +177,6 @@ class DeviceQuerySessions(Resource):
                 print(sys.exc_info())
                 return '', 500
 
-        # TODO: Publish update to everyone who is subscribed to sites update...
         update_session = TeraSession.get_session_by_id(json_session['id_session'])
 
         return jsonify(update_session.to_json())

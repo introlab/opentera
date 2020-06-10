@@ -4,7 +4,7 @@ from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
+from libtera.db.models.TeraUserGroup import TeraUserGroup
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
 
@@ -151,7 +151,6 @@ class UserQueryUsers(Resource):
             json_user.pop('user_superadmin')
 
         # Manage user groups
-        user_user_groups = []
         user_user_groups_ids = []
         update_user_groups = False
         if 'user_groups' in json_user:
@@ -200,23 +199,26 @@ class UserQueryUsers(Resource):
 
         # Update user groups, if needed
         if update_user_groups:
+            update_user.user_user_groups = [TeraUserGroup.get_user_group_by_id(user_group_id)
+                                            for user_group_id in user_user_groups_ids]
+            update_user.commit()
             # Check if there's some user groups for the updated user that we need to delete
-            id_groups_to_delete = set([group.id_user_group for group in update_user.user_user_groups])\
-                .difference(user_user_groups_ids)
-
-            for id_to_del in id_groups_to_delete:
-                uug_to_del = TeraUserUserGroup.query_user_user_group_for_user_user_group(user_id=update_user.id_user,
-                                                                                         user_group_id=id_to_del)
-                TeraUserUserGroup.delete(id_todel=uug_to_del.id_user_user_group)
-
-            # Update / insert user groups
-            for user_group in user_user_groups:
-                if not TeraUserUserGroup.query_user_user_group_for_user_user_group(user_id=update_user.id_user,
-                                                                                   user_group_id=
-                                                                                   user_group['id_user_group']):
-                    # Group not already associated - associates!
-                    TeraUserUserGroup.insert_user_user_group(id_user_group=user_group['id_user_group'],
-                                                             id_user=update_user.id_user)
+            # id_groups_to_delete = set([group.id_user_group for group in update_user.user_user_groups])\
+            #     .difference(user_user_groups_ids)
+            #
+            # for id_to_del in id_groups_to_delete:
+            #     uug_to_del = TeraUserUserGroup.query_user_user_group_for_user_user_group(user_id=update_user.id_user,
+            #                                                                              user_group_id=id_to_del)
+            #     TeraUserUserGroup.delete(id_todel=uug_to_del.id_user_user_group)
+            #
+            # # Update / insert user groups
+            # for user_group in user_user_groups:
+            #     if not TeraUserUserGroup.query_user_user_group_for_user_user_group(user_id=update_user.id_user,
+            #                                                                        user_group_id=
+            #                                                                        user_group['id_user_group']):
+            #         # Group not already associated - associates!
+            #         TeraUserUserGroup.insert_user_user_group(id_user_group=user_group['id_user_group'],
+            #                                                  id_user=update_user.id_user)
 
         return [update_user.to_json()]
 

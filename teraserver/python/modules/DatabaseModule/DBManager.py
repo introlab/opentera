@@ -5,8 +5,7 @@ import messages.python as messages
 # Must include all Database objects here to be properly initialized and created if needed
 from modules.BaseModule import BaseModule, ModuleNames, create_module_event_topic_from_name
 
-# All at once to make sure all files ar registered.
-
+# All at once to make sure all files are registered.
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject

@@ -4,6 +4,7 @@ from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSession import TeraSession
+from libtera.db.models.TeraParticipant import TeraParticipant
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -13,6 +14,7 @@ from flask_babel import gettext
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query')
 get_parser.add_argument('id_participant', type=int, help='ID of the participant from which to get all sessions')
+get_parser.add_argument('id_user', type=int, help='ID of the user from which to get all sessions')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 post_parser = reqparse.RequestParser()
@@ -52,6 +54,9 @@ class UserQuerySessions(Resource):
                 sessions = TeraSession.get_sessions_for_participant(args['id_participant'])
         elif args['id_session']:
             sessions = [user_access.query_session(args['id_session'])]
+        elif args['id_user']:
+            if args['id_user'] in user_access.get_accessible_users_ids():
+                sessions = TeraSession.get_sessions_for_user(args['id_user'])
 
         try:
             sessions_list = []
@@ -71,13 +76,13 @@ class UserQuerySessions(Resource):
     @user_multi_auth.login_required
     @api.expect(post_parser)
     @api.doc(description='Create / update session. id_session must be set to "0" to create a new '
-                         'session. A session can be created/modified if the user has access to at least one participant'
-                         ' in the session.',
+                         'session. A session can be created/modified if the user has access to all participants and '
+                         'users in the session.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified session',
-                        400: 'Badly formed JSON or missing fields(session, id_session, session_participants_ids [for '
-                             'new sessions]) in the JSON body',
-                        500: 'Internal error when saving device'})
+                        400: 'Badly formed JSON or missing fields(session, id_session, session_participants_ids and/or '
+                             'session_users_ids[for new sessions]) in the JSON body',
+                        500: 'Internal error when saving session'})
     def post(self):
         # parser = post_parser
 
@@ -93,31 +98,32 @@ class UserQuerySessions(Resource):
         if 'id_session' not in json_session:
             return '', 400
 
-        # Check if current user can modify the posted group
-        # User can modify or add a session if they have access (not necessary admin) to at least a participant in the
-        # session
-
-        can_update = False
+        # User can modify or add a session if they have access to all the participants and users in the session
         session_parts_ids = []
+        session_users_ids = []
         if json_session['id_session'] == 0:
-            # New session - check if we have a participant list
-            if 'session_participants_ids' not in json_session:
-                return gettext('Participants absents'), 400
-            session_parts_ids = json_session['session_participants_ids']
+            # New session - check if we have a participant or users list
+            if 'session_participants_ids' not in json_session and 'session_users_ids' not in json_session:
+                return gettext('Missing session participants and users'), 400
+            if 'session_participants_ids' in json_session:
+                session_parts_ids = json_session['session_participants_ids']
+            if 'session_users_ids' in json_session:
+                session_users_ids = json_session['session_users_ids']
         else:
             # Query the session
             ses_to_update = TeraSession.get_session_by_id(json_session['id_session'])
-            for part in ses_to_update.session_participants:
-                session_parts_ids.append(part.id_participant)
+            session_parts_ids = [part.id_participant for part in ses_to_update.session_participants]
+            session_users_ids = [user.id_user for user in ses_to_update.session_users]
 
-        accessibles_ids = user_access.get_accessible_participants_ids()
-        for part_id in session_parts_ids:
-            if part_id in accessibles_ids:
-                can_update = True
-                break
+        accessibles_part_ids = user_access.get_accessible_participants_ids()
+        if set(session_parts_ids).difference(accessibles_part_ids):
+            # At least one participant is not accessible to the user
+            return gettext('User doesn\'t have access to at least one participant of that session.'), 403
 
-        if not can_update:
-            return gettext('Vous n\'avez pas acces a au moins un participant de la seance.'), 403
+        accessibles_user_ids = user_access.get_accessible_users_ids()
+        if set(session_users_ids).difference(accessibles_user_ids):
+            # At least one session user is not accessible to the user
+            return gettext('User doesn\'t have access to at least one user of that session.'), 403
 
         # Do the update!
         if json_session['id_session'] > 0:
@@ -141,16 +147,30 @@ class UserQuerySessions(Resource):
                 print(sys.exc_info())
                 return '', 500
 
-        # TODO: Publish update to everyone who is subscribed to sites update...
         update_session = TeraSession.get_session_by_id(json_session['id_session'])
 
-        return jsonify([update_session.to_json()])
+        # Manage session participants
+        if 'session_participants_ids' in json_session:
+            new_parts = [TeraParticipant.get_participant_by_id(part_id)
+                         for part_id in json_session['session_participants_ids']]
+            update_session.session_participants = new_parts
+
+        # Manager session users
+        if 'session_users_ids' in json_session:
+            update_session.session_users = [TeraUser.get_user_by_id(user_id)
+                                            for user_id in json_session['session_users_ids']]
+
+        if session_users_ids or session_parts_ids:
+            # Commit the changes
+            update_session.commit()
+
+        return [update_session.to_json()]
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific session',
              responses={200: 'Success',
-                        403: 'Logged user can\'t delete session (must have access to at least one participant in the '
+                        403: 'Logged user can\'t delete session (must have access to all participants and users in the '
                              'session to delete)',
                         500: 'Database error.'})
     def delete(self):
@@ -165,14 +185,18 @@ class UserQuerySessions(Resource):
         # Check if current user can delete
         # User can delete a session if it has access to one of its participant
         todel_session = TeraSession.get_session_by_id(id_todel)
-        can_delete = False
-        for ses_part in todel_session.session_participants:
-            if ses_part in user_access.get_accessible_participants():
-                can_delete = True
-                break
+        session_parts_ids = [part.id_participant for part in todel_session.session_participants]
+        session_users_ids = [user.id_user for user in todel_session.session_users]
 
-        if not can_delete:
-            return gettext('Vous n\'avez pas acces a au moins un participant de la seance.'), 403
+        accessibles_part_ids = user_access.get_accessible_participants_ids()
+        if set(session_parts_ids).difference(accessibles_part_ids):
+            # At least one participant is not accessible to the user
+            return gettext('User doesn\'t have access to at least one participant of that session.'), 403
+
+        accessibles_user_ids = user_access.get_accessible_users_ids()
+        if set(session_users_ids).difference(accessibles_user_ids):
+            # At least one session user is not accessible to the user
+            return gettext('User doesn\'t have access to at least one user of that session.'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:

@@ -90,7 +90,7 @@ class TeraParticipant(db.Model, BaseModel):
                               'participant_project', 'participant_participant_group',
                               ])
         if minimal:
-            ignore_fields.extend(['participant_uuid', 'participant_username', 'participant_lastonline',
+            ignore_fields.extend(['participant_username', 'participant_lastonline',
                                   'participant_login_enabled', 'participant_token'])
 
         return super().to_json(ignore_fields=ignore_fields)
@@ -218,6 +218,16 @@ class TeraParticipant(db.Model, BaseModel):
         # participant2.create_token()
         db.session.add(participant2)
 
+        participant2 = TeraParticipant()
+        participant2.participant_name = 'Participant #3'
+        participant2.participant_enabled = True
+        participant2.participant_uuid = str(uuid.uuid4())
+        participant2.participant_participant_group = None
+        participant2.participant_project = project1
+
+        # participant2.create_token()
+        db.session.add(participant2)
+
         db.session.commit()
 
         # Create token with added participants, since we need to have the id_participant field set
@@ -231,6 +241,10 @@ class TeraParticipant(db.Model, BaseModel):
         if 'participant_username' in values:
             if not TeraParticipant.is_participant_username_available(values['participant_username']):
                 raise NameError('Participant username already in use.')
+
+        # Prevent changes on UUID
+        if 'participant_uuid' in values:
+            del values['participant_uuid']
 
         # Remove the password field is present and if empty
         if 'participant_password' in values:

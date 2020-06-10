@@ -30,13 +30,14 @@ class TeraUser(db.Model, BaseModel):
     # user_projects_access = db.relationship("TeraProjectAccess", cascade="all,delete")
     user_user_groups = db.relationship("TeraUserGroup", secondary="t_users_users_groups",
                                        back_populates="user_group_users")
+    user_sessions = db.relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users")
 
     authenticated = False
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['authenticated', 'user_password', 'user_user_groups'])
+        ignore_fields.extend(['authenticated', 'user_password', 'user_user_groups', 'user_sessions'])
         if minimal:
             ignore_fields.extend(['user_username', 'user_email', 'user_profile', 'user_notes', 'user_lastonline',
                                   'user_superadmin'])
@@ -184,6 +185,10 @@ class TeraUser(db.Model, BaseModel):
         if 'user_profile' in values:
             if isinstance(values['user_profile'], dict):
                 values['user_profile'] = json.dumps(values['user_profile'])
+
+        # Prevent changes on UUID
+        if 'user_uuid' in values:
+            del values['user_uuid']
 
         super().update(id_user, values)
 

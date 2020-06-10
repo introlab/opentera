@@ -228,6 +228,10 @@ class TeraDevice(db.Model, BaseModel):
             if values['id_device_subtype'] == 0:
                 values['id_device_subtype'] = None
 
+        # Prevent changes on UUID
+        if 'device_uuid' in values:
+            del values['device_uuid']
+
         super().update(update_id=update_id, values=values)
 
     @classmethod
