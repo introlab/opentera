@@ -34,9 +34,8 @@ class TeraSession(db.Model, BaseModel):
     session_status = db.Column(db.Integer, nullable=False)
     session_comments = db.Column(db.String, nullable=True)
     session_participants = db.relationship("TeraParticipant", secondary="t_sessions_participants",
-                                           back_populates="participant_sessions", cascade="delete")
-    session_users = db.relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions",
-                                    cascade="delete")
+                                           back_populates="participant_sessions")
+    session_users = db.relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions")
 
     session_creator_user = db.relationship('TeraUser')
     session_creator_device = db.relationship('TeraDevice')
