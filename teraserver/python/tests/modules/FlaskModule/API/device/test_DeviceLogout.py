@@ -7,7 +7,7 @@ import json
 class DeviceLogoutTest(unittest.TestCase):
 
     host = 'localhost'
-    port = 4040
+    port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
     user_device_endpoint = '/api/user/devices'
@@ -42,9 +42,14 @@ class DeviceLogoutTest(unittest.TestCase):
 
     def test_device_logout_with_token(self):
         for device in self.all_devices:
+
             response = self._token_auth(device['device_token'])
-            # First Login
-            self.assertEqual(response.status_code, 200)
-            # Then Logout
-            response = self._token_auth_logout(device['device_token'])
-            self.assertEqual(response.status_code, 403)
+            if device['device_enabled']:
+                # First Login
+                self.assertEqual(response.status_code, 200)
+                # Then Logout
+                response = self._token_auth_logout(device['device_token'])
+                self.assertEqual(response.status_code, 403)
+            else:
+                self.assertEqual(response.status_code, 401)
+

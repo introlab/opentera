@@ -7,7 +7,7 @@ from datetime import datetime
 class DeviceQuerySessions(unittest.TestCase):
 
     host = 'localhost'
-    port = 4040
+    port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
     device_query_session_endpoint = '/api/device/sessions'
@@ -55,13 +55,11 @@ class DeviceQuerySessions(unittest.TestCase):
     def test_device_query_sessions_get(self):
         # Populate sessions for all devices
         for device in self.all_devices:
+            response_sessions = self._token_auth_query_sessions_get(device['device_token'])
             if device['device_enabled']:
-                response_sessions = self._token_auth_query_sessions_get(device['device_token'])
-                self.assertEqual(response_sessions.status_code, 200)
-                device['sessions'] = json.loads(response_sessions.text)
-            else:
-                response_sessions = self._token_auth_query_sessions_get(device['device_token'])
                 self.assertEqual(response_sessions.status_code, 403)
+            else:
+                self.assertEqual(response_sessions.status_code, 401)
 
     def test_device_query_sessions_post(self):
         # Populate sessions for all devices
@@ -101,4 +99,4 @@ class DeviceQuerySessions(unittest.TestCase):
                     pass
             else:
                 login_response = self._token_auth(device['device_token'])
-                self.assertEqual(login_response.status_code, 403)
+                self.assertEqual(login_response.status_code, 401)

@@ -7,7 +7,7 @@ from modules.LoginModule.LoginModule import LoginModule
 from sqlalchemy import exc
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from libtera.db.models.TeraDevice import TeraDevice
-
+import uuid
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -129,7 +129,7 @@ class DeviceQuerySessions(Resource):
             return '', 400
 
         # Validate that we have session participants or users for new sessions
-        if ('session_participants' not in json_session or 'session_users' not in json_session) \
+        if ('session_participants' not in json_session and 'session_users' not in json_session) \
                 and json_session['id_session'] == 0:
             return '', 400
 
@@ -167,6 +167,10 @@ class DeviceQuerySessions(Resource):
                 for uuid in participants:
                     participant = TeraParticipant.get_participant_by_uuid(uuid)
                     new_ses.session_participants.append(participant)
+
+                # Create session uuid
+
+                new_ses.session_uuid = uuid.uuid4()
 
                 TeraSession.insert(new_ses)
                 # Update ID for further use

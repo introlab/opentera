@@ -7,7 +7,7 @@ import json
 class DeviceRegisterTest(unittest.TestCase):
 
     host = 'localhost'
-    port = 4040
+    port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
     device_register_endpoint = '/api/device/register'
@@ -58,5 +58,5 @@ class DeviceRegisterTest(unittest.TestCase):
 
         # Validate that we cannot authenticate (device should be disabled)
         response = self._token_auth(token_dict['token'])
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 

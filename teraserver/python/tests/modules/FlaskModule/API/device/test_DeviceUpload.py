@@ -7,7 +7,7 @@ import json
 class DeviceUploadTest(unittest.TestCase):
 
     host = 'localhost'
-    port = 4040
+    port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
     device_query_session_endpoint = '/api/device/sessions'

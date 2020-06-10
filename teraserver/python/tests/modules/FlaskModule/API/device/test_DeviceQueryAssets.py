@@ -7,7 +7,7 @@ import json
 class DeviceQueryAssetsTest(unittest.TestCase):
 
     host = 'localhost'
-    port = 4040
+    port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
     device_query_assets_endpoint = '/api/device/assets'
@@ -50,14 +50,15 @@ class DeviceQueryAssetsTest(unittest.TestCase):
         for device in self.all_devices:
             if device['device_enabled']:
                 response = self._token_auth_query_assets(device['device_token'])
-                self.assertEqual(response.status_code, 200)
-                assets = json.loads(response.text)
-                self.assertTrue(assets.__contains__('device_assets'))
-                for asset in assets['device_assets']:
-                    print(asset)
-                    # TODO Validate Asset JSON
+                # Should be forbidden
+                self.assertEqual(response.status_code, 403)
+                # assets = json.loads(response.text)
+                # self.assertTrue(assets.__contains__('device_assets'))
+                # for asset in assets['device_assets']:
+                #     print(asset)
+                #     # TODO Validate Asset JSON
             else:
                 # Device not enabled should return access denied
                 response = self._token_auth_query_assets(device['device_token'])
-                self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.status_code, 401)
 
