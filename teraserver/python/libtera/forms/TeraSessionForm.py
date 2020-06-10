@@ -90,7 +90,8 @@ class TeraSessionForm:
         section.add_item(TeraFormItem("session_comments", gettext("Commentaires"), "longtext", False))
 
         # Hidden as handled elsewhere
-        section.add_item(TeraFormItem("session_participants_ids", gettext("Participants"), "hidden", False))
+        section.add_item(TeraFormItem("session_participants", gettext("Participants"), "hidden", False))
+        section.add_item(TeraFormItem("session_users", gettext("Utilisateurs"), "hidden", False))
         section.add_item(TeraFormItem("session_has_device_data", gettext("A données capteur"), "hidden", False))
 
         return form.to_dict()
