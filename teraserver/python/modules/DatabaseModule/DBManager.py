@@ -181,10 +181,14 @@ class DBManager (BaseModule):
         # Apply any database upgrade, if needed
         self.upgrade_db()
 
-    def open_local(self, db_infos, echo=False):
+    def open_local(self, db_infos, echo=False, ram=True):
         # self.db_uri = 'sqlite:///%(filename)s' % db_infos
+
         # IN RAM
-        self.db_uri = 'sqlite://'
+        if ram:
+            self.db_uri = 'sqlite://'
+        else:
+            self.db_uri = 'sqlite:///%(filename)s' % db_infos
 
         flask_app.config.update({
             'SQLALCHEMY_DATABASE_URI': self.db_uri,

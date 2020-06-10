@@ -11,9 +11,12 @@ from twisted.internet import defer
 
 class ServiceOpenTera(RedisClient):
 
-    def __init__(self, config_man: ServiceConfigManager):
+    def __init__(self, config_man: ServiceConfigManager, service_info):
         # First initialize redis
         RedisClient.__init__(self, config_man.redis_config)
+
+        # Store service info
+        self.service_info = service_info
 
         # Store RPC API
         self.rpc_api = dict()
@@ -52,16 +55,24 @@ class ServiceOpenTera(RedisClient):
     @defer.inlineCallbacks
     def build_interface(self):
         # TODO not sure of the interface using UUID or name here...
-        ret1 = yield self.subscribe_pattern_with_callback('service.' + self.config['ServiceUUID']
-                                                          + '.messages', self.notify_service_messages)
+        # Will do  both!
+        ret1 = yield self.subscribe_pattern_with_callback(
+            RedisVars.build_service_message_topic( self.service_info['service_uuid']), self.notify_service_messages)
 
-        ret2 = yield self.subscribe_pattern_with_callback('service.' + self.config['ServiceUUID']
-                                                          + '.rpc', self.notify_module_rpc)
-        print(ret1, ret2)
+        ret2 = yield self.subscribe_pattern_with_callback(
+            RedisVars.build_service_message_topic(self.service_info['service_key']), self.notify_service_messages)
 
-    def notify_module_rpc(self, pattern, channel, message):
+        ret3 = yield self.subscribe_pattern_with_callback(
+            RedisVars.build_service_rpc_topic(self.service_info['service_uuid']), self.notify_service_rpc)
+
+        ret4 = yield self.subscribe_pattern_with_callback(
+            RedisVars.build_service_rpc_topic(self.service_info['service_key']), self.notify_service_rpc)
+
+        print(ret1, ret2, ret3, ret4)
+
+    def notify_service_rpc(self, pattern, channel, message):
         import threading
-        print('BaseModule - Received rpc', self, pattern, channel, message, ' thread:', threading.current_thread())
+        print('ServiceOpenTera - Received rpc', self, pattern, channel, message, ' thread:', threading.current_thread())
 
         rpc_message = messages.RPCMessage()
 

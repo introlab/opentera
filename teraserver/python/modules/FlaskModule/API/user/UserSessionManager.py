@@ -7,6 +7,8 @@ from libtera.db.models.TeraService import TeraService
 from modules.RedisVars import RedisVars
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
+from libtera.redis.RedisRPCClient import RedisRPCClient
+import json
 
 # Parser definition(s)
 post_parser = api.parser()
@@ -109,7 +111,8 @@ class UserSessionManager(Resource):
         if not service:
             return gettext('Service not found'), 500
 
-        service_redis_key = RedisVars.RedisVar_ServicePrefixKey + service.service_key
+        rpc = RedisRPCClient(self.module.config.redis_config)
+        answer = rpc.call_service(service.service_key, 'session_manage', json.dumps(request.json))
 
         # TODO If session is of category "Service":
         # - Starts / stops / ... the service using RPC API:
@@ -122,5 +125,5 @@ class UserSessionManager(Resource):
         # - Service will return id_session and status code as a result to the RPC call and this will be the reply of
         #   this query
 
-        return {}, 200
+        return answer, 200
 

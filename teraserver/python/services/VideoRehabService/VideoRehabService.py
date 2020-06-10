@@ -22,8 +22,8 @@ from services.shared.ServiceOpenTera import ServiceOpenTera
 
 
 class VideoRehabService(ServiceOpenTera):
-    def __init__(self, config_man: ConfigManager):
-        ServiceOpenTera.__init__(self, config_man)
+    def __init__(self, config_man: ConfigManager, service_info):
+        ServiceOpenTera.__init__(self, config_man, service_info)
 
         self.application = service.Application(self.config['name'])
 
@@ -41,19 +41,14 @@ class VideoRehabService(ServiceOpenTera):
 
     def setup_rpc_interface(self):
         # TODO Update rpc interface
-        self.rpc_api['create_session'] = {'args': ['str:room_name', 'str:owner_uuid'],
+        self.rpc_api['session_manage'] = {'args': ['str:json_info'],
                                           'returns': 'dict',
-                                          'callback': self.create_webrtc_session}
+                                          'callback': self.session_manage}
 
-        self.rpc_api['stop_session'] = {'args': ['str:room_name'],
-                                        'returns': 'dict',
-                                        'callback': self.stop_webrtc_session}
-
-    def create_webrtc_session(self, room_name, uuid):
-        return dict()
-
-    def stop_webrtc_session(self, room_name):
-        return dict()
+    def session_manage(self, json_str):
+        import json
+        session_manage = json.loads(json_str)
+        return session_manage
 
 
 if __name__ == '__main__':
@@ -88,8 +83,12 @@ if __name__ == '__main__':
     # Update service uuid
     Globals.config_man.service_config['ServiceUUID'] = service_info['service_uuid']
 
+    # Update port, hostname, endpoint
+    Globals.config_man.service_config['port'] = service_info['service_port']
+    Globals.config_man.service_config['hostname'] = service_info['service_hostname']
+
     # Create the Service
-    service = VideoRehabService(Globals.config_man)
+    service = VideoRehabService(Globals.config_man, service_info)
 
     # Start App / reactor events
     reactor.run()
