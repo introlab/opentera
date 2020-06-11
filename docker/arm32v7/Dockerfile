@@ -3,13 +3,14 @@
 # LABEL version="0.1"
 # LABEL description="OpenTera Test Server from IntRoLab."
 
-FROM arm32v7/ubuntu:18.04
-
+# FROM arm32v7/ubuntu:18.04
+#FROM resin/armv7hf-debian-qemu
+FROM balenalib/rpi-raspbian
 RUN [ "cross-build-start" ]
 
 # Install build dependencies
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-	postgresql redis-server build-essential cmake git sudo vim libprotobuf-dev \
+RUN apt-get update && apt-get upgrade && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+	redis-server build-essential cmake git sudo vim libprotobuf-dev \
 	cmake protobuf-compiler locales wget curl nginx
 
 # Set system locale
@@ -22,6 +23,29 @@ ENV LC_ALL en_US.UTF-8
 # Clone repository
 ARG CACHE_DATE=2020-05-13
 RUN git clone --recurse-submodules -b dev https://github.com/introlab/opentera.git
+
+
+# Install miniconda
+WORKDIR /root
+RUN wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
+# RUN bash ~/Miniconda3-latest-Linux-armv7l.sh -h
+RUN echo "yes" | bash ~/Miniconda3-latest-Linux-armv7l.sh -f -b -p $HOME/miniconda3
+
+# Install latest npm / nodejs
+#RUN curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh
+#RUN bash ~/nodesource_setup.sh
+#RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
+#RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y npm nodejs
+
+#Add Postgres source
+# RUN wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O- | sudo apt-key add -
+# RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main" | sudo tee /etc/apt/sources.list.d/postgresql.list
+
+# Install database
+RUN apt-get update
+RUN apt-cache search postgresql
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql
 
 #Create dbs and users
 RUN service postgresql start &&\
@@ -40,23 +64,19 @@ RUN service postgresql start &&\
 RUN mkdir /config
 VOLUME /config
 
-# Install miniconda
-WORKDIR /root
-RUN wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
-RUN bash ~/Miniconda3-latest-Linux-armv7l.sh -b -p $HOME/miniconda3
+# Install python
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3 python3-pip
 
-# Install latest npm / nodejs
-RUN curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh
-RUN bash ~/nodesource_setup.sh
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
-
+# Install python deps
+WORKDIR /opentera/teraserver/python/env
+RUN pip3 install -r requirements.txt
 
 # Build environment
 WORKDIR /opentera/teraserver
 RUN ["/bin/bash", "-c", "cmake ."]
-RUN ["/bin/bash", "-c", "make python-all"]
+RUN ["/bin/bash", "-c", "make docker-all"]
 
-ENV PYTHON3_EXEC /opentera/teraserver/python/env/python-3.6/bin/python3
+ENV PYTHON3_EXEC python3
 
 # Install nodejs package
 WORKDIR /opentera/teraserver/easyrtc
@@ -78,8 +98,9 @@ ENV VIDEODISPATCH_CONFIG_PATH /opentera/teraserver/python/services/VideoDispatch
 
 # Create nginx logs directory
 RUN mkdir -p config/logs
+
 # Set Python path
-ENV PYTHONPATH /opentera/teraserver/python
+# ENV PYTHONPATH /opentera/teraserver/python
 
 # Run the required services and python script
 CMD nginx -c /opentera/teraserver/python/config/nginx.conf -p /opentera/teraserver/python/config/ && ./start_docker.sh

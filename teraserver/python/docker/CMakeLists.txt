@@ -41,7 +41,7 @@ foreach(file ${protofiles})
     #Add command to generate target
     # message(STATUS "Should run: ${PROTOC_EXECUTABLE} ${file} -I. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/python")
     add_custom_target(${output_target}
-        COMMAND ${PROTOC_EXECUTABLE} ${file} -I. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/../python
+        COMMAND ${PROTOC_EXECUTABLE} ${file} -I. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/python
         WORKING_DIRECTORY ${MESSAGES_PATH}
         DEPENDS ${MESSAGES_PATH}/${file} )
 endforeach(file)
