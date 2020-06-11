@@ -23,11 +23,9 @@ class DeviceUploadTest(unittest.TestCase):
         self.assertGreater(len(self.all_devices), 0)
 
         # Populate sessions for all devices
-        for device in self.all_devices:
-            response_sessions = self._token_auth_query_sessions(device['device_token'])
-            self.assertEqual(response_sessions.status_code, 200)
-            device['sessions'] = json.loads(response_sessions.text)
-            print(device['sessions'])
+        # for device in self.all_devices:
+        #     response_sessions = self._token_auth_query_sessions(device['device_token'])
+        #     self.assertEqual(response_sessions.status_code, 200)
 
     def tearDown(self):
         pass
