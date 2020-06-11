@@ -40,12 +40,18 @@ class TeraSessionType(db.Model, BaseModel):
             ignore_fields.extend(['session_type_online', 'session_type_multi',
                                   'session_type_profile', 'session_type_color', 'session_type_config'])
         rval = super().to_json(ignore_fields=ignore_fields)
+
+        if not minimal:
+            # Also includes service key
+            if self.session_type_service:
+                rval['session_type_service_key'] = self.session_type_service.service_key;
         return rval
 
     @staticmethod
     def create_defaults():
         # from libtera.db.models.TeraProject import TeraProject
         # from libtera.db.models.TeraDeviceType import TeraDeviceType
+        from libtera.db.models.TeraService import TeraService
 
         # type_project = TeraProject.get_project_by_projectname('Default Project #1')
         video_session = TeraSessionType()
@@ -55,6 +61,7 @@ class TeraSessionType(db.Model, BaseModel):
         video_session.session_type_config = ""
         video_session.session_type_color = "#00FF00"
         video_session.session_type_category = TeraSessionType.SessionCategoryEnum.SERVICE.value
+        video_session.id_service = TeraService.get_service_by_key('VideoRehabService').id_service
         # video_session.session_type_projects = [type_project]
         # video_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
         #     int(TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value))]

@@ -20,7 +20,7 @@ session_manager_schema = api.schema_model('session_manage', {
         'session_manage': {
             'type': 'object',
             'properties': {
-                'id_session': {
+                'session_uuid': {
                     'type': 'integer'
                 },
                 'id_service': {
@@ -127,6 +127,11 @@ class UserSessionManager(Resource):
         if answer:
             return answer, 200
         else:
-            return None, 500
+            # Test and debug for now
+            if json_session_manager['action'] == 'start':
+                return {'status': 'started', 'id_session': 1}, 200
+            if json_session_manager['action'] == 'stop':
+                return {'status': 'stopped', 'id_session': 1}, 200
+            return gettext('No answer from service.'), 500
 
 

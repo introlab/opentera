@@ -48,7 +48,7 @@ class DBManagerTeraUserAccessTest(unittest.TestCase):
 
     def test_admin_get_accessible_users_ids(self):
         users = DBManager.userAccess(self.admin_user).get_accessible_users()
-        self.assertEqual(len(users), 4)
+        self.assertEqual(len(users), 6)
 
     def test_admin_accessible_sites(self):
         sites = DBManager.userAccess(self.admin_user).get_accessible_sites()
