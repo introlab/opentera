@@ -164,15 +164,15 @@ class DeviceQuerySessions(Resource):
                 participants = json_session.pop('session_participants')
                 new_ses.from_json(json_session)
 
-                for uuid in participants:
-                    participant = TeraParticipant.get_participant_by_uuid(uuid)
+                TeraSession.insert(new_ses)
+
+                for p_uuid in participants:
+                    participant = TeraParticipant.get_participant_by_uuid(p_uuid)
                     new_ses.session_participants.append(participant)
 
-                # Create session uuid
+                if len(participants) > 0:
+                    new_ses.commit() # Commits added participants
 
-                new_ses.session_uuid = uuid.uuid4()
-
-                TeraSession.insert(new_ses)
                 # Update ID for further use
                 json_session['id_session'] = new_ses.id_session
 
