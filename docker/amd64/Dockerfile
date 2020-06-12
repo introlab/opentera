@@ -44,7 +44,7 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN bash ~/Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
 
 # Install latest npm / nodejs
-RUN curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh
+RUN curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh
 RUN bash ~/nodesource_setup.sh
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
 

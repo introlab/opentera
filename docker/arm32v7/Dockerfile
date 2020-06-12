@@ -31,7 +31,7 @@ RUN git clone --recurse-submodules -b dev https://github.com/introlab/opentera.g
 # RUN bash ~/Miniconda3-latest-Linux-armv7l.sh -f -b -p $HOME/miniconda3
 
 # Install latest npm / nodejs
-RUN wget -qO- https://deb.nodesource.com/setup_12.x | bash -
+RUN wget -qO- https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
 
 # Install database
