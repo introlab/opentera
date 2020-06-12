@@ -65,8 +65,10 @@ RUN pip3 install -r requirements.txt
 
 # Build environment
 WORKDIR /opentera/teraserver
-RUN ["/bin/bash", "-c", "cmake ."]
-RUN ["/bin/bash", "-c", "make docker-all"]
+#RUN ["/bin/bash", "-c", "cmake ."]
+RUN cmake .
+#RUN ["/bin/bash", "-c", "make docker-all"]
+RUN make docker-all
 
 #ENV PYTHON3_EXEC /opentera/teraserver/python/env/python-3.6/bin/python3
 ENV PYTHON3_EXEC /usr/bin/python3
@@ -79,8 +81,10 @@ RUN npm install
 WORKDIR /opentera/teraserver/python
 
 # Create certificates from new python env
-RUN ["/bin/bash", "-c", "$PYTHON3_EXEC ./CreateCertificates.py"]
-RUN ["/bin/bash", "-c", "ls -l certificates/"]
+# RUN ["/bin/bash", "-c", "$PYTHON3_EXEC ./CreateCertificates.py"]
+RUN $PYTHON3_EXEC ./CreateCertificates.py
+# RUN ["/bin/bash", "-c", "ls -l certificates/"]
+RUN ls -l certificates/
 
 # Private and public mapping
 EXPOSE 40075/tcp
