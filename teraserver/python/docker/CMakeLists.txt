@@ -1,7 +1,4 @@
 # Automate docker setup here
-add_custom_target(docker-Dockerfile
-    SOURCES Dockerfile
-)
 
 # WORKDIR /opentera/teraserver/python
 # Generate translations
@@ -54,5 +51,5 @@ add_custom_target(
 
 
 add_custom_target(docker-all
-    DEPENDS docker-Dockerfile docker-translations docker-messages
+    DEPENDS docker-translations docker-messages
 )
