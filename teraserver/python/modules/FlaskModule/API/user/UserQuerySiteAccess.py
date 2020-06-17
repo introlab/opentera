@@ -21,8 +21,11 @@ get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with 
 get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_user_group. Also return sites that don\'t'
                                                                 ' have any access with that user group')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('site_access', type=str, location='json', help='Site access to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('site_access', type=str, location='json', help='Site access to create / update', required=True)
+post_schema = api.schema_model('user_site_access', {'properties': TeraSiteAccess.get_json_schema(),
+                                                    'type': 'object',
+                                                    'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Site Access ID to delete', required=True)
@@ -98,7 +101,7 @@ class UserQuerySiteAccess(Resource):
         return [], 200
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create/update site access for a user group.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify this site or user access (site admin access required)',

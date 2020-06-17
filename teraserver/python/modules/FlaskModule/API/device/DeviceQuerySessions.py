@@ -19,7 +19,7 @@ post_parser = api.parser()
 post_parser.add_argument('token', type=str, help='Secret Token')
 post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
 
-session_schema = api.schema_model('session', {
+session_schema = api.schema_model('device_session', {
     'properties': {
         'session': {
             'type': 'object',
@@ -30,7 +30,7 @@ session_schema = api.schema_model('session', {
                 'session_participants': {
                     'type': 'array',
                     'uniqueItems': True,
-                    'contains': {
+                    'items': {
                         'type': 'string',
                         'format': 'uuid'
                     }
@@ -100,7 +100,7 @@ class DeviceQuerySessions(Resource):
         return '', 403
 
     @LoginModule.device_token_or_certificate_required
-    # @api.expect(session_schema, validate=True)
+    @api.expect(session_schema, validate=True)
     @api.doc(description='Update/Create session',
              responses={200: 'Success',
                         400: 'Required parameter is missing',

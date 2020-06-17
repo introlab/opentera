@@ -16,8 +16,11 @@ get_parser.add_argument('id_device', type=int, help='ID of the device from which
 get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get all sites that are accessible')
 get_parser.add_argument('name', type=str, help='Site name to query')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('site', type=str, location='json', help='Site to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('site', type=str, location='json', help='Site to create / update', required=True)
+post_schema = api.schema_model('user_site', {'properties': TeraSite.get_json_schema(),
+                                             'type': 'object',
+                                             'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Site ID to delete', required=True)
@@ -92,7 +95,7 @@ class UserQuerySites(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create / update site. id_site must be set to "0" to create a new '
                          'site. A site can be created/modified if the user has admin rights to the site itself or is'
                          'superadmin.',
@@ -101,8 +104,8 @@ class UserQuerySites(Resource):
                         400: 'Badly formed JSON or missing field(id_site) in the JSON body',
                         500: 'Internal error when saving site'})
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('site', type=str, location='json', help='Site to create / update', required=True)
+        # parser = reqparse.RequestParser()
+        # parser.add_argument('site', type=str, location='json', help='Site to create / update', required=True)
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)

@@ -15,9 +15,13 @@ get_parser = api.parser()
 get_parser.add_argument('id_session_type', type=int, help='ID of the session type to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('session_type', type=str, location='json', help='Session type to create / update',
-                         required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('session_type', type=str, location='json', help='Session type to create / update',
+#                          required=True)
+
+post_schema = api.schema_model('user_session_type', {'properties': TeraSessionType.get_json_schema(),
+                                                     'type': 'object',
+                                                     'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Session type ID to delete', required=True)
@@ -66,7 +70,7 @@ class UserQuerySessionTypes(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create / update session type. id_session_type must be set to "0" to create a new '
                          'type. A session type can be created/modified if the user has access to a related session type'
                          'project.',
@@ -75,8 +79,6 @@ class UserQuerySessionTypes(Resource):
                         400: 'Badly formed JSON or missing field(id_session_type) in the JSON body',
                         500: 'Internal error when saving session type'})
     def post(self):
-        parser = post_parser
-
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!

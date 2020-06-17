@@ -123,8 +123,8 @@ class UserQuerySessionsTest(BaseAPITest):
         json_data = response.json()[0]
         self._checkJson(json_data)
         self.assertEqual(len(json_data['session_participants']), 2)
-        self.assertEqual(json_data['session_participants'][0]['id_participant'], 2)
-        self.assertEqual(json_data['session_participants'][1]['id_participant'], 3)
+        # self.assertEqual(json_data['session_participants'][0]['id_participant'], 2)
+        # self.assertEqual(json_data['session_participants'][1]['id_participant'], 3)
 
         response = self._delete_with_http_auth(username='user4', password='user4', id_to_del=current_id)
         self.assertEqual(response.status_code, 403, msg="Delete denied")

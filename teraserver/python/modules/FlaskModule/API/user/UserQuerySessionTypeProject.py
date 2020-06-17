@@ -17,9 +17,12 @@ get_parser.add_argument('id_session_type', type=int, help='Session type ID to qu
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ids only)')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('session_type_project', type=str, location='json',
-                         help='Device type - project association to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('session_type_project', type=str, location='json',
+#                          help='Device type - project association to create / update', required=True)
+post_schema = api.schema_model('user_session_type_project', {'properties': TeraSessionTypeProject.get_json_schema(),
+                                                             'type': 'object',
+                                                             'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific device-type - project association ID to delete. '
@@ -75,7 +78,7 @@ class UserQuerySessionTypeProject(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create/update session-type - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (session type must be accessible from project '

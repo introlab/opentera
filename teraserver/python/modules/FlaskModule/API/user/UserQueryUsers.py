@@ -21,9 +21,11 @@ get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Include us
                                                                      'Can\'t be combined with "list" argument.')
 
 post_parser = reqparse.RequestParser()
-post_parser.add_argument('user', type=str, location='json', help='User to create / update. If structure has a field '
-                                                                 '"user_groups", also update user groups for that user',
-                         required=True)
+# post_parser.add_argument('user', type=str, location='json', help='User to create / update. If structure has a field '
+#                                                                '"user_groups", also update user groups for that user',
+#                          required=True)
+
+post_schema = api.schema_model('user_user', {'properties': TeraUser.get_json_schema(), 'type': 'object', 'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='User ID to delete', required=True)
@@ -117,7 +119,8 @@ class UserQueryUsers(Resource):
         #     return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    # @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create / update user. id_user must be set to "0" to create a new user. User can be modified '
                          'if: current user is super admin or user is part of a project which the current user is admin.'
                          ' Promoting a user to super admin is restricted to super admins. If data contains "user_groups'
