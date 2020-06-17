@@ -45,6 +45,7 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
                 create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
             user_connected = messages.UserEvent()
             user_connected.user_uuid = str(self.user.user_uuid)
+            user_connected.user_fullname = self.user.get_fullname()
             user_connected.type = messages.UserEvent.USER_CONNECTED
             # Need to use Any container
             any_message = messages.Any()
