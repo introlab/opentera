@@ -7,7 +7,7 @@ from requests import get, post, Response
 from services.shared.ServiceConfigManager import ServiceConfigManager
 import messages.python as messages
 from twisted.internet import defer
-
+import datetime
 
 class ServiceOpenTera(RedisClient):
 
@@ -141,3 +141,16 @@ class ServiceOpenTera(RedisClient):
         request_headers = {'Authorization': 'OpenTera ' + self.service_token}
         return get(url=url, verify=False, headers=request_headers, params=params)
 
+    def send_event_message(self, event, topic: str):
+        message = self.create_event_message(topic)
+        any_message = messages.Any()
+        any_message.Pack(event)
+        message.events.extend([any_message])
+        self.publish(message.header.topic, message.SerializeToString())
+
+    def create_event_message(self, topic):
+        event_message = messages.TeraEvent()
+        event_message.header.version = 1
+        event_message.header.time = datetime.datetime.now().timestamp()
+        event_message.header.topic = topic
+        return event_message

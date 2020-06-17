@@ -1,4 +1,5 @@
 import services.VideoRehabService.Globals as Globals
+from services.shared.modules.WebRTCModule import WebRTCModule
 from libtera.redis.RedisClient import RedisClient
 from services.VideoRehabService.ConfigManager import ConfigManager
 from modules.RedisVars import RedisVars
@@ -15,6 +16,7 @@ from twisted.python import log
 import messages.python as messages
 import sys
 import os
+import uuid
 
 # Flask Module
 from services.VideoRehabService.FlaskModule import FlaskModule
@@ -35,6 +37,9 @@ class VideoRehabService(ServiceOpenTera):
 
         # Connect our services to the application, just like a normal service.
         self.flaskModuleService.setServiceParent(self.application)
+
+        # Create WebRTCModule
+        self.webRTCModule = WebRTCModule(config_man)
 
     def notify_service_messages(self, pattern, channel, message):
         pass
@@ -65,30 +70,113 @@ class VideoRehabService(ServiceOpenTera):
                 action = session_manage_args['action']
                 id_service = session_manage_args['id_service']
                 id_creator_user = session_manage_args['id_creator_user']
+                id_session_type = session_manage_args['id_session_type']
 
                 if action == 'start':
                     # Get additional "start" arguments
                     parameters = session_manage_args['parameters']
                     participants = session_manage_args['session_participants']
                     users = session_manage_args['session_users']
+                    # TODO handle devices
+                    devices = []
 
                     # Call service API to create session
                     api_req = {'create_session': {'id_service': id_service,
                                                   'id_creator_user': id_creator_user,
-                                                  'id_session_type': 1,
+                                                  'id_session_type': id_session_type,
                                                   'participants': participants,
                                                   'users': users,
-                                                  'devices': []}
+                                                  'devices': devices}
                                }
 
                     api_response = self.post_to_opentera('/api/service/sessions', api_req)
+
+                    if api_response.status_code == 200:
+
+                        session_info = api_response.json()
+
+                        # Replace fields with uuids
+                        session_info['session_participants'] = participants
+                        session_info['session_users'] = users
+                        session_info['session_devices'] = devices
+
+                        # Add session key
+                        session_info['session_key'] = str(uuid.uuid4())
+
+                        # Start webrtc process
+                        retval, process_info = self.webRTCModule.create_webrtc_session(
+                            session_info['session_key'], id_creator_user, users, participants, devices)
+
+                        if not retval or not process_info:
+                            return {'Error': 'Cannot create process'}
+
+                        session_info['session_url'] = process_info['url']
+
+                        # message
+                        # JoinSessionEvent
+                        # {
+                        #     string
+                        # session_url = 1;
+                        # string
+                        # session_creator_name = 2;
+                        # string
+                        # session_uuid = 3;
+                        # repeated
+                        # string
+                        # session_participants = 4;
+                        # repeated
+                        # string
+                        # session_users = 5;
+                        # repeated
+                        # string
+                        # session_devices = 6;
+                        # string
+                        # join_msg = 7;
+                        # string
+                        # session_parameters = 8;
+                        # string
+                        # service_uuid = 9;
+                        # }
+
+
+                        # Fill event information
+                        joinMessage = messages.JoinSessionEvent()
+                        joinMessage.session_url = session_info['session_url']
+                        joinMessage.session_creator_name = session_info['session_creator_user']
+                        joinMessage.session_uuid = session_info['session_uuid']
+                        for user_uuid in users:
+                            joinMessage.session_users.extend([user_uuid])
+                        for participant_uuid in participants:
+                            joinMessage.session_participants.extend([participant_uuid])
+                        for device_uuid in devices:
+                            joinMessage.session_devices.extend([device_uuid])
+                        joinMessage.join_msg = 'Hello World'
+                        joinMessage.session_parameters = ''
+                        joinMessage.service_uuid = self.service_uuid
+
+                        # Send invitations
+                        for user_uuid in users:
+                            self.send_event_message(joinMessage, 'websocket.user.' + user_uuid)
+
+                        for participant_uuid in participants:
+                            self.send_event_message(joinMessage, 'websocket.participant.' + participant_uuid)
+
+                        for device_uuid in devices:
+                            self.send_event_message(joinMessage, 'websocket.device.' + device_uuid)
+
+                        # Return session information
+                        return session_info
+
+                    else:
+                        return {'Error': 'Cannot create session'}
 
                 elif action == 'stop':
                     id_session = session_manage_args['id_session']
                     pass
 
                 return None
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            print('Error', e)
             return None
 
         return None
