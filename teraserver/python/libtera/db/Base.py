@@ -23,10 +23,9 @@ class BaseModel:
             ignore_fields = []
         pr = {}
         for name in dir(self):
-            if not name.startswith('__') and not name.startswith('_') and not name.startswith('query') and \
-                    not name.startswith('metadata') and name != 'version_id' and name not in ignore_fields:
+            if self.is_valid_property_name(name) and name not in ignore_fields:
                 value = getattr(self, name)
-                if not inspect.ismethod(value) and not inspect.isfunction(value):
+                if self.is_valid_property_value(value):
                     if isinstance(value, datetime.datetime):
                         value = value.isoformat()
                     pr[name] = value
@@ -39,6 +38,15 @@ class BaseModel:
             else:
                 print('Attribute ' + name + ' not found.')
 
+    @staticmethod
+    def is_valid_property_name(name: str) -> bool:
+        return not name.startswith('__') and not name.startswith('_') and not name.startswith('query') and \
+               not name.startswith('metadata') and name != 'version_id'
+
+    @staticmethod
+    def is_valid_property_value(value: str) -> bool:
+        return not inspect.ismethod(value) and not inspect.isfunction(value)
+
     @classmethod
     def clean_values(cls, values: dict):
         # This method is used to remove item from the values dict that are not properties of the object
@@ -47,8 +55,7 @@ class BaseModel:
         # Build available properties
         for name in dir(cls):
             value = getattr(cls, name)
-            if not name.startswith('__') and not inspect.ismethod(value) and not inspect.isfunction(value) and not \
-                    name.startswith('_') and not name.startswith('query') and not name.startswith('metadata'):
+            if cls.is_valid_property_name(name) and cls.is_valid_property_value(value):
                 obj_properties.append(name)
 
         # Remove any property not in the available list
@@ -65,9 +72,15 @@ class BaseModel:
         return count
 
     @classmethod
-    def get_primary_key_name(cls):
+    def get_primary_key_name(cls) -> str:
         from sqlalchemy import inspect
         return inspect(cls).primary_key[0].name
+
+    @classmethod
+    def get_model_name(cls) -> str:
+        key = cls.get_primary_key_name()
+        key_split = key.split('_', 1)
+        return key_split[-1]
 
     @classmethod
     def update(cls, update_id: int, values: dict):
@@ -115,6 +128,43 @@ class BaseModel:
         #         pass
         #
         # return query.all()
+
+    @classmethod
+    def get_json_schema(cls) -> dict:
+        schema = dict()
+
+        # Get model prefix (name)
+        model_name = cls.get_model_name()
+
+        # Browse each
+        pr_dict = dict()
+        for name in dir(cls):
+            value = getattr(cls, name)
+            if cls.is_valid_property_name(name) and cls.is_valid_property_value(value) and \
+                    (name.startswith(model_name) or name.startswith('id')):
+                # Ok so far, do we have a column and not a relationship or something else?
+                if 'ColumnProperty' in str(type(value.prop)):
+                    # Get correct data type
+                    data_type = 'object'
+                    data_format = None
+                    column_type = str(value.prop.columns[0].type).lower()
+                    if 'string' in column_type or 'timestamp' in column_type or 'varchar' in column_type:
+                        data_type = 'string'
+                        if 'uuid' in name:
+                            data_format = 'uuid'
+                        if 'timestamp' in column_type:
+                            data_format = 'date-time'
+                    if 'integer' in column_type:
+                        data_type = 'integer'
+                    if 'boolean' in column_type:
+                        data_type = 'boolean'
+
+                    pr_dict[name] = {'type': data_type, 'required': not value.prop.columns[0].nullable}
+                    if data_format:
+                        pr_dict[name]['format'] = data_format
+        schema = {model_name: {'properties': pr_dict, 'type': 'object'}}
+
+        return schema
 
 
 

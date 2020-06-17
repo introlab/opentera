@@ -14,12 +14,16 @@ get_parser = api.parser()
 get_parser.add_argument('id_device_type', type=int, help='Device type ID to query associated session types from'
                         )
 get_parser.add_argument('id_session_type', type=int, help='Session type ID to query associated device types from')
-get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ids only)')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
+                                                          '(ids only)')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('session_type_device_type', type=str, location='json',
-                         help='Device type - session type association to create / update', required=True)
-
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('session_type_device_type', type=str, location='json',
+#                          help='Device type - session type association to create / update', required=True)
+post_schema = api.schema_model('user_session_type_device_type', {
+    'properties': TeraSessionTypeDeviceType.get_json_schema(),
+    'type': 'object',
+    'location': 'json'})
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific device-type - session-type association ID to delete. '
                                                 'Be careful: this is not the session-type or device-type ID, but the ID'
@@ -75,7 +79,7 @@ class UserQuerySessionTypeDeviceType(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create/update session types - device type association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (session type must be accessible from project '

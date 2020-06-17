@@ -42,9 +42,10 @@ class TeraSessionType(db.Model, BaseModel):
         rval = super().to_json(ignore_fields=ignore_fields)
 
         if not minimal:
-            # Also includes service key
+            # Also includes service key and uuid
             if self.session_type_service:
-                rval['session_type_service_key'] = self.session_type_service.service_key;
+                rval['session_type_service_key'] = self.session_type_service.service_key
+                rval['session_type_service_uuid'] = self.session_type_service.service_uuid
         return rval
 
     @staticmethod

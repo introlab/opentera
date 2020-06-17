@@ -17,8 +17,11 @@ get_parser.add_argument('id_participant', type=int, help='ID of the participant 
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to get all sessions')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
+post_schema = api.schema_model('user_session', {'properties': TeraSession.get_json_schema(),
+                                                'type': 'object',
+                                                'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Session ID to delete', required=True)
@@ -74,7 +77,6 @@ class UserQuerySessions(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
     @api.doc(description='Create / update session. id_session must be set to "0" to create a new '
                          'session. A session can be created/modified if the user has access to all participants and '
                          'users in the session.',
@@ -83,6 +85,7 @@ class UserQuerySessions(Resource):
                         400: 'Badly formed JSON or missing fields(session, id_session, session_participants_ids and/or '
                              'session_users_ids[for new sessions]) in the JSON body',
                         500: 'Internal error when saving session'})
+    @api.expect(post_schema)
     def post(self):
         # parser = post_parser
 
