@@ -30,10 +30,7 @@ class ServiceOpenTera(RedisClient):
         self.backend_port = config_man.backend_config['port']
         self.service_uuid = config_man.service_config['ServiceUUID']
 
-        # TODO remove this, we already are a redis client...
-        # self.redis_client
-
-        # Create service token for future uses
+        # Create service token for service api requests
         self.service_token = self.service_generate_token()
 
     def redisConnectionMade(self):

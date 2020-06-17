@@ -46,17 +46,52 @@ class VideoRehabService(ServiceOpenTera):
                                           'callback': self.session_manage}
 
     def session_manage(self, json_str):
-        import json
-        session_manage = json.loads(json_str)
 
         # - Service will create session if needed or reuse existing one
         # - Service will send invitations / updates to participants / users
         # - Service will return id_session and status code as a result to the RPC call and this will be the reply of
         #   this query
+        import json
+        try:
 
+            session_manage = json.loads(json_str)
 
+            if 'session_manage' in session_manage:
+                session_manage_args = session_manage['session_manage']
+                # Get all arguments
+                # TODO VALIDATE ARGUMENTS
 
-        return session_manage
+                # Get "common" arguments
+                action = session_manage_args['action']
+                id_service = session_manage_args['id_service']
+                id_creator_user = session_manage_args['id_creator_user']
+
+                if action == 'start':
+                    # Get additional "start" arguments
+                    parameters = session_manage_args['parameters']
+                    participants = session_manage_args['session_participants']
+                    users = session_manage_args['session_users']
+
+                    # Call service API to create session
+                    api_req = {'create_session': {'id_service': id_service,
+                                                  'id_creator_user': id_creator_user,
+                                                  'id_session_type': 1,
+                                                  'participants': participants,
+                                                  'users': users,
+                                                  'devices': []}
+                               }
+
+                    api_response = self.post_to_opentera('/api/service/sessions', api_req)
+
+                elif action == 'stop':
+                    id_session = session_manage_args['id_session']
+                    pass
+
+                return None
+        except json.JSONDecodeError:
+            return None
+
+        return None
 
 
 if __name__ == '__main__':

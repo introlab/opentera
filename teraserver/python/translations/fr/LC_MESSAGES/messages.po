@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-06-09 11:43-0400\n"
+"POT-Creation-Date: 2020-06-17 09:41-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -16,25 +16,26 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.6.0\n"
 
-#: libtera/db/models/TeraSessionType.py:116
+#: libtera/db/models/TeraSessionType.py:115
 msgid "Inconue"
 msgstr ""
 
-#: libtera/db/models/TeraSessionType.py:118
+#: libtera/db/models/TeraSessionType.py:117
+#: libtera/forms/TeraSessionTypeForm.py:43
 msgid "Service"
 msgstr ""
 
-#: libtera/db/models/TeraSessionType.py:120
+#: libtera/db/models/TeraSessionType.py:119
 msgid "Envoi de fichiers"
 msgstr ""
 
-#: libtera/db/models/TeraSessionType.py:122
+#: libtera/db/models/TeraSessionType.py:121
 msgid "Collecte de données"
 msgstr ""
 
-#: libtera/db/models/TeraSessionType.py:124
+#: libtera/db/models/TeraSessionType.py:123
 msgid "Protocole"
 msgstr ""
 
@@ -92,7 +93,7 @@ msgstr ""
 #: libtera/forms/TeraParticipantForm.py:19
 #: libtera/forms/TeraParticipantGroupForm.py:20
 #: libtera/forms/TeraProjectForm.py:19 libtera/forms/TeraServiceForm.py:18
-#: libtera/forms/TeraSessionForm.py:44 libtera/forms/TeraSessionTypeForm.py:33
+#: libtera/forms/TeraSessionForm.py:50 libtera/forms/TeraSessionTypeForm.py:33
 #: libtera/forms/TeraSiteForm.py:12 libtera/forms/TeraUserForm.py:13
 #: libtera/forms/TeraUserGroupForm.py:18
 msgid "Informations"
@@ -229,63 +230,79 @@ msgstr ""
 msgid "Service actif"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:48
+#: libtera/forms/TeraSessionForm.py:54
 msgid "ID séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:49
+#: libtera/forms/TeraSessionForm.py:55
+msgid "UUID Séance"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:56
 msgid "Nom de la séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:50
+#: libtera/forms/TeraSessionForm.py:57
 msgid "Type de séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:51
+#: libtera/forms/TeraSessionForm.py:58
 msgid "Nom créateur (Utilisateur)"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:52
+#: libtera/forms/TeraSessionForm.py:59
 msgid "Créateur (Utilisateur)"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:57
+#: libtera/forms/TeraSessionForm.py:64
 msgid "Nom créateur (Appareil)"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:58
+#: libtera/forms/TeraSessionForm.py:65
 msgid "Créateur (Appareil)"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:64
+#: libtera/forms/TeraSessionForm.py:71
 msgid "Nom créateur (Participant)"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:66
+#: libtera/forms/TeraSessionForm.py:73
 msgid "Créateur (Participant)"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:71
-msgid "Date de début"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:72
-msgid "Durée"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:75
-msgid "État"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:76
-msgid "Commentaires"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:79
-msgid "Participants"
+#: libtera/forms/TeraSessionForm.py:78
+msgid "Nom créateur (Service)"
 msgstr ""
 
 #: libtera/forms/TeraSessionForm.py:80
+msgid "Créateur (Service)"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:85
+msgid "Date de début"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:86
+msgid "Durée"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:89
+msgid "État"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:90
+msgid "Commentaires"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:93
+msgid "Participants"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:94
+msgid "Utilisateurs"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:95
 msgid "A données capteur"
 msgstr ""
 
@@ -297,27 +314,27 @@ msgstr ""
 msgid "Nom du type de séance"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:39
-msgid "Code du type de séance"
-msgstr ""
-
 #: libtera/forms/TeraSessionTypeForm.py:41
 msgid "Catégorie"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:46
+#: libtera/forms/TeraSessionTypeForm.py:50
+msgid "Code du service associé"
+msgstr ""
+
+#: libtera/forms/TeraSessionTypeForm.py:51
 msgid "Séance assistée?"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:47
+#: libtera/forms/TeraSessionTypeForm.py:52
 msgid "Séance de groupe?"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:48
+#: libtera/forms/TeraSessionTypeForm.py:53
 msgid "Couleur d'affichage"
 msgstr ""
 
-#: libtera/forms/TeraSessionTypeForm.py:49
+#: libtera/forms/TeraSessionTypeForm.py:54
 msgid "Configuration spécifiques"
 msgstr ""
 
@@ -457,135 +474,164 @@ msgstr ""
 msgid "Nom du groupe utilisateur"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:66
-#: modules/FlaskModule/API/user/QueryDeviceProjects.py:55
-#: modules/FlaskModule/API/user/QueryDeviceSites.py:51
-#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:53
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:54
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:66
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:55
+#: modules/FlaskModule/API/user/UserQueryDeviceSites.py:51
+#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:53
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:54
 msgid "Arguments manquants"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:122
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:191
-#: modules/FlaskModule/API/user/QueryDeviceProjects.py:105
-#: modules/FlaskModule/API/user/QueryDeviceProjects.py:165
-#: modules/FlaskModule/API/user/QueryDeviceSites.py:102
-#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:103
-#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:160
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:175
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:122
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:191
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:105
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:165
+#: modules/FlaskModule/API/user/UserQueryDeviceSites.py:102
+#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:103
+#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:160
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:175
 msgid "Accès refusé"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:138
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:138
 msgid "Appareil non-assigné au projet du participant"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:187
-#: modules/FlaskModule/API/user/QueryDeviceProjects.py:160
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:244
-#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:157
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:172
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:187
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:160
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:244
+#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:157
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:172
 msgid "Non-trouvé"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryDeviceParticipants.py:199
-#: modules/FlaskModule/API/user/QueryDeviceProjects.py:183
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:255
-#: modules/FlaskModule/API/user/QuerySessionTypeDeviceType.py:168
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:183
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:199
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:183
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:255
+#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:168
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:183
 msgid "Erreur base de données"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjectRoles.py:54
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:61
+#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:54
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:61
 msgid "Missing arguments"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjectRoles.py:120
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:187
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:106
+#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:120
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:187
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:106
 msgid "Acces refuse"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjectRoles.py:169
+#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:169
 msgid "Not found"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjectRoles.py:172
+#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:172
 msgid "Forbidden"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjectRoles.py:180
+#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:180
 msgid "Database error"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:122
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:122
 msgid "Missing id_service"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:124
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:124
 msgid "Missing projects"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:145
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:145
 msgid "Missing id_project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:147
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:147
 msgid "Missing services"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:153
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:153
 msgid "Access denied"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryServiceProjects.py:247
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:247
 msgid "Opération non-permise"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessionTypeProject.py:125
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:125
 msgid ""
 "Trying to associate a session type of type \"service\" with a service not"
 " associated to that project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessionTypes.py:120
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:100
+msgid "User must be admin in at least one site to create new type"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:124
 msgid "Missing id_service for session type of type service"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessionTypes.py:171
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:175
 msgid ""
 "Impossible de supprimer - pas administrateur dans tous les projets de ce "
 "type."
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessionTypes.py:175
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:180
+msgid "Unable to delete - not admin in at least one project"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:184
 msgid "Impossible de supprimer - des seances de ce type existent."
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessions.py:105
-msgid "Participants absents"
+#: modules/FlaskModule/API/user/UserQuerySessions.py:107
+msgid "Missing session participants and users"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QuerySessions.py:120
-#: modules/FlaskModule/API/user/QuerySessions.py:175
-msgid "Vous n'avez pas acces a au moins un participant de la seance."
+#: modules/FlaskModule/API/user/UserQuerySessions.py:121
+#: modules/FlaskModule/API/user/UserQuerySessions.py:194
+msgid "User doesn't have access to at least one participant of that session."
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:164
+#: modules/FlaskModule/API/user/UserQuerySessions.py:126
+#: modules/FlaskModule/API/user/UserQuerySessions.py:199
+msgid "User doesn't have access to at least one user of that session."
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserQueryUsers.py:163
 msgid "No access for at a least one user group in the list"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:179
+#: modules/FlaskModule/API/user/UserQueryUsers.py:178
 msgid "Password required"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:181
+#: modules/FlaskModule/API/user/UserQueryUsers.py:180
 msgid "Invalid password"
 msgstr ""
 
-#: modules/FlaskModule/API/user/QueryUsers.py:185
+#: modules/FlaskModule/API/user/UserQueryUsers.py:184
 msgid "Username unavailable."
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserSessionManager.py:100
+msgid "Missing session id"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserSessionManager.py:107
+msgid "User doesn't have access to that service."
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserSessionManager.py:112
+msgid "Service not found"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserSessionManager.py:135
+msgid "No answer from service."
 msgstr ""
 
 #~ msgid "Projet inconnu"
@@ -595,5 +641,14 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Groupe Utilisateur"
+#~ msgstr ""
+
+#~ msgid "Code du type de séance"
+#~ msgstr ""
+
+#~ msgid "Participants absents"
+#~ msgstr ""
+
+#~ msgid "Vous n'avez pas acces a au moins un participant de la seance."
 #~ msgstr ""
 
