@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-06-17 12:08-0400\n"
+"POT-Creation-Date: 2020-06-18 16:16-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,24 +18,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: libtera/db/models/TeraSessionType.py:115
+#: libtera/db/models/TeraSessionType.py:116
 msgid "Inconue"
 msgstr ""
 
-#: libtera/db/models/TeraSessionType.py:117
+#: libtera/db/models/TeraSessionType.py:118
 #: libtera/forms/TeraSessionTypeForm.py:43
 msgid "Service"
 msgstr ""
 
-#: libtera/db/models/TeraSessionType.py:119
+#: libtera/db/models/TeraSessionType.py:120
 msgid "Envoi de fichiers"
 msgstr ""
 
-#: libtera/db/models/TeraSessionType.py:121
+#: libtera/db/models/TeraSessionType.py:122
 msgid "Collecte de données"
 msgstr ""
 
-#: libtera/db/models/TeraSessionType.py:123
+#: libtera/db/models/TeraSessionType.py:124
 msgid "Protocole"
 msgstr ""
 
@@ -474,163 +474,163 @@ msgstr ""
 msgid "Nom du groupe utilisateur"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:66
-#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:55
-#: modules/FlaskModule/API/user/UserQueryDeviceSites.py:51
-#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:53
-#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:54
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:70
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:58
+#: modules/FlaskModule/API/user/UserQueryDeviceSites.py:56
+#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:57
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:57
 msgid "Arguments manquants"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:122
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:191
-#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:105
-#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:165
-#: modules/FlaskModule/API/user/UserQueryDeviceSites.py:102
-#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:103
-#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:160
-#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:175
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:126
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:195
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:108
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:168
+#: modules/FlaskModule/API/user/UserQueryDeviceSites.py:106
+#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:107
+#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:164
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:178
 msgid "Accès refusé"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:138
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:142
 msgid "Appareil non-assigné au projet du participant"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:187
-#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:160
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:244
-#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:157
-#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:172
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:191
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:163
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:247
+#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:161
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:175
 msgid "Non-trouvé"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:199
-#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:183
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:255
-#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:168
-#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:183
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:203
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:186
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:258
+#: modules/FlaskModule/API/user/UserQuerySessionTypeDeviceType.py:172
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:186
 msgid "Erreur base de données"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:54
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:61
+#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:58
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:64
 msgid "Missing arguments"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:120
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:187
-#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:106
+#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:124
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:190
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:109
 msgid "Acces refuse"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:169
+#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:173
 msgid "Not found"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:172
+#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:176
 msgid "Forbidden"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:180
+#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:184
 msgid "Database error"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:122
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:125
 msgid "Missing id_service"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:124
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:127
 msgid "Missing projects"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:145
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:148
 msgid "Missing id_project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:147
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:150
 msgid "Missing services"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:153
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:156
 msgid "Access denied"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:247
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:250
 msgid "Opération non-permise"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:125
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:128
 msgid ""
 "Trying to associate a session type of type \"service\" with a service not"
 " associated to that project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:100
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:102
 msgid "User must be admin in at least one site to create new type"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:124
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:126
 msgid "Missing id_service for session type of type service"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:175
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:177
 msgid ""
 "Impossible de supprimer - pas administrateur dans tous les projets de ce "
 "type."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:180
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:182
 msgid "Unable to delete - not admin in at least one project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:184
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:186
 msgid "Impossible de supprimer - des seances de ce type existent."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:107
+#: modules/FlaskModule/API/user/UserQuerySessions.py:110
 msgid "Missing session participants and users"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:121
-#: modules/FlaskModule/API/user/UserQuerySessions.py:194
+#: modules/FlaskModule/API/user/UserQuerySessions.py:124
+#: modules/FlaskModule/API/user/UserQuerySessions.py:197
 msgid "User doesn't have access to at least one participant of that session."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:126
-#: modules/FlaskModule/API/user/UserQuerySessions.py:199
+#: modules/FlaskModule/API/user/UserQuerySessions.py:129
+#: modules/FlaskModule/API/user/UserQuerySessions.py:202
 msgid "User doesn't have access to at least one user of that session."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:163
+#: modules/FlaskModule/API/user/UserQueryUsers.py:166
 msgid "No access for at a least one user group in the list"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:178
+#: modules/FlaskModule/API/user/UserQueryUsers.py:181
 msgid "Password required"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:180
+#: modules/FlaskModule/API/user/UserQueryUsers.py:183
 msgid "Invalid password"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:184
+#: modules/FlaskModule/API/user/UserQueryUsers.py:187
 msgid "Username unavailable."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:100
+#: modules/FlaskModule/API/user/UserSessionManager.py:103
 msgid "Missing session id"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:107
+#: modules/FlaskModule/API/user/UserSessionManager.py:110
 msgid "User doesn't have access to that service."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:112
+#: modules/FlaskModule/API/user/UserSessionManager.py:115
 msgid "Service not found"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:135
+#: modules/FlaskModule/API/user/UserSessionManager.py:138
 msgid "No answer from service."
 msgstr ""
 

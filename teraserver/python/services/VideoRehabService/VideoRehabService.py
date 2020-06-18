@@ -105,8 +105,26 @@ class VideoRehabService(ServiceOpenTera):
 
             api_response = self.post_to_opentera('/api/service/sessions', api_req)
 
+            # Send events
+            def send_stop_session_events():
+                stop_session_event = messages.StopSessionEvent()
+                stop_session_event.session_uuid = session_info['session_uuid']
+                stop_session_event.service_uuid = self.service_uuid
+
+                for user_uuid in session_info['session_users']:
+                    self.send_event_message(stop_session_event, 'websocket.user.' + user_uuid + '.events')
+
+                for participant_uuid in session_info['session_participants']:
+                    self.send_event_message(stop_session_event, 'websocket.participant.' + participant_uuid + '.events')
+
+                for device_uuid in session_info['session_devices']:
+                    self.send_event_message(stop_session_event, 'websocket.device.' + device_uuid + '.events')
+
             # Remove session from list
             del self.sessions[id_session]
+
+            # Send events in 5 seconds
+            reactor.callLater(5.0, send_stop_session_events)
 
             if api_response.status_code == 200:
                 return api_response.json()
@@ -160,40 +178,39 @@ class VideoRehabService(ServiceOpenTera):
 
             session_info['session_url'] = process_info['url']
 
-            # message
-            # JoinSessionEvent
-            # Fill event information
-            joinMessage = messages.JoinSessionEvent()
-            joinMessage.session_url = session_info['session_url']
-            joinMessage.session_creator_name = session_info['session_creator_user']
-            joinMessage.session_uuid = session_info['session_uuid']
-            for user_uuid in users:
-                joinMessage.session_users.extend([user_uuid])
-            for participant_uuid in participants:
-                joinMessage.session_participants.extend([participant_uuid])
-            for device_uuid in devices:
-                joinMessage.session_devices.extend([device_uuid])
-            joinMessage.join_msg = gettext('Join Session')
-            joinMessage.session_parameters = parameters
-            joinMessage.service_uuid = self.service_uuid
+            def send_join_session_events():
+                # JoinSessionEvent
+                # Fill event information
+                joinMessage = messages.JoinSessionEvent()
+                joinMessage.session_url = session_info['session_url']
+                joinMessage.session_creator_name = session_info['session_creator_user']
+                joinMessage.session_uuid = session_info['session_uuid']
+                for user_uuid in users:
+                    joinMessage.session_users.extend([user_uuid])
+                for participant_uuid in participants:
+                    joinMessage.session_participants.extend([participant_uuid])
+                for device_uuid in devices:
+                    joinMessage.session_devices.extend([device_uuid])
+                joinMessage.join_msg = gettext('Join Session')
+                joinMessage.session_parameters = parameters
+                joinMessage.service_uuid = self.service_uuid
 
-            def send_events():
                 # Send invitations (as events)
                 # Closure, variables will be captured from outer scope
-                for u_uuid in users:
+                for user_uuid in users:
                     self.send_event_message(joinMessage, 'websocket.user.'
-                                            + u_uuid + '.events')
+                                            + user_uuid + '.events')
 
-                for p_uuid in participants:
+                for participant_uuid in participants:
                     self.send_event_message(joinMessage, 'websocket.participant.'
-                                            + p_uuid + '.events')
+                                            + participant_uuid + '.events')
 
-                for d_uuid in devices:
+                for device_uuid in devices:
                     self.send_event_message(joinMessage, 'websocket.device.'
-                                            + d_uuid + '.events')
+                                            + device_uuid + '.events')
 
             # Send events in 5 seconds
-            reactor.callLater(5.0, send_events)
+            reactor.callLater(5.0, send_join_session_events)
 
             # Keep session info for future use
             self.sessions[session_info['id_session']] = session_info
