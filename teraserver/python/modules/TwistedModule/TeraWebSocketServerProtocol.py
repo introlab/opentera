@@ -35,6 +35,7 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
     def redis_tera_message_received(self, pattern, channel, message):
         print('TeraWebSocketServerProtocol - redis_tera_message_received', pattern, channel, message)
 
+        # TODO Should  be removed completely? We are using events
         # Forward as JSON to websocket
         try:
             tera_module_message = messages.TeraModuleMessage()
@@ -99,5 +100,9 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
 
     def answer_topic(self):
         return ''
+
+    def event_topic(self):
+        return ''
+
 
 

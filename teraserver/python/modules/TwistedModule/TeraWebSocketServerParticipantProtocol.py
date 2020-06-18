@@ -36,8 +36,8 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
         print('TeraWebSocketServerParticipantProtocol redisConnectionMade (redis)')
 
         # This will wait until subscribe result is available...
-        ret = yield self.subscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
-        print(ret)
+        # ret = yield self.subscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
+        # print(ret)
 
         if self.participant:
             tera_message = self.create_tera_message(
@@ -57,12 +57,17 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
             # This will wait until subscribe result is available...
             # Register only once to events from modules, will be filtered after
             # ret = yield self.subscribe(create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+            ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
-            print(ret)
-            ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+
+            ret2 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.DATABASE_MODULE_NAME), self.redis_event_message_received)
-            print(ret)
+
+            # Direct events
+            ret3 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            print(ret1, ret2, ret3)
+
 
     def onMessage(self, msg, binary):
         # Handle websocket communication
@@ -134,26 +139,32 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
 
             # Unsubscribe to events
             # ret = yield self.unsubscribe(create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            ret = yield self.unsubscribe_pattern_with_callback(
+            ret1 = yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                 self.redis_event_message_received)
-            print(ret)
 
-            ret = yield self.unsubscribe_pattern_with_callback(
+            ret2 = yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
                 self.redis_event_message_received)
-            print(ret)
+
+            ret3 = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            print(ret1, ret2, ret3)
 
         # Unsubscribe to messages
         # ret = yield self.unsubscribe(self.answer_topic())
-        ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
-        print(ret)
+        # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
+        # print(ret)
 
         print('TeraWebSocketServerParticipantProtocol - onClose', self, wasClean, code, reason)
 
     def answer_topic(self):
         if self.participant:
             return 'websocket.participant.' + self.participant.participant_uuid
-        return ""
+        return super().answer_topic()
 
+    def event_topic(self):
+        if self.participant:
+            return 'websocket.participant.' + self.participant.participant_uuid + '.events'
+        return super().event_topic()
 

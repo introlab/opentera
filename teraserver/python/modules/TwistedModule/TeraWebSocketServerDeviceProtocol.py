@@ -36,8 +36,8 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
         print('TeraWebSocketServerDeviceProtocol redisConnectionMade (redis)')
 
         # This will wait until subscribe result is available...
-        ret = yield self.subscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
-        print(ret)
+        # ret = yield self.subscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
+        # print(ret)
 
         if self.device:
             tera_message = self.create_tera_message(
@@ -56,12 +56,16 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
 
             # This will wait until subscribe result is available...
             # Register only once to events from modules, will be filtered after
-            ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+            ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
-            print(ret)
-            ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+
+            ret2 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.DATABASE_MODULE_NAME), self.redis_event_message_received)
-            print(ret)
+
+            # Direct events
+            ret3 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            print(ret1, ret2, ret3)
 
     def onMessage(self, msg, binary):
         # Handle websocket communication
@@ -133,26 +137,31 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
                          tera_message.SerializeToString())
 
             # Unsubscribe to events
-            ret = yield self.unsubscribe_pattern_with_callback(
+            ret1 = yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                 self.redis_event_message_received)
-            print(ret)
 
-            ret = yield self.unsubscribe_pattern_with_callback(
+            ret2 = yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
                 self.redis_event_message_received)
-            print(ret)
+
+            ret3 = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            print(ret1, ret2, ret3)
 
         # Unsubscribe to messages
-        ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
-        print(ret)
+        # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
+        # print(ret)
 
         print('TeraWebSocketServerDeviceProtocol - onClose', self, wasClean, code, reason)
 
     def answer_topic(self):
         if self.device:
             return 'websocket.device.' + self.device.device_uuid
-        return ""
+        super().answer_topic()
 
-
+    def event_topic(self):
+        if self.device:
+            return 'websocket.device.' + self.device.device_uuid + '.events'
+        super().event_topic()
 

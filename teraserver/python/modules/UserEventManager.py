@@ -18,8 +18,11 @@ class UserEventManager(EventManager):
         return False
 
     def filter_join_session_event(self, event: messages.JoinSessionEvent):
-        # TODO how do we verify the invitation
-        return True
+        # Check if we are invited
+        if self.user.user_uuid in event.session_users:
+            return True
+        # Not accessible
+        return False
 
     def filter_participant_event(self, event: messages.ParticipantEvent):
         # If uuid is accessible, return true

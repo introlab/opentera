@@ -36,8 +36,8 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
 
         # This will wait until subscribe result is available...
         # Subscribe to messages to the websocket
-        ret = yield self.subscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
-        print(ret)
+        # ret = yield self.subscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
+        # print(ret)
 
         if self.user:
             # Advertise that we have a new user
@@ -58,17 +58,24 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
 
             # This will wait until subscribe result is available...
             # Register only once to events from modules, will be filtered after
-            ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+
+            # Events from UserManagerModule
+            ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
-            print(ret)
-            ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+
+            # Events from DatabaseModule
+            ret2 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.DATABASE_MODULE_NAME), self.redis_event_message_received)
-            print(ret)
+
+            # Direct events
+            ret3 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            print(ret1, ret2, ret3)
 
     def onMessage(self, msg, binary):
         # Handle websocket communication
         # TODO use protobuf ?
-        print('TeraWebSocketServerUserProtocol onMessage', self, msg, binary)
+        print('TeraWebSocketServerUserProtocol onMessage (websocket in)', self, msg, binary)
 
         if binary:
             # Decode protobuf before parsing
@@ -180,23 +187,30 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
                          tera_message.SerializeToString())
 
             # Unsubscribe to events
-            ret = yield self.unsubscribe_pattern_with_callback(
+            ret1 = yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                 self.redis_event_message_received)
-            print(ret)
 
-            ret = yield self.unsubscribe_pattern_with_callback(
+            ret2 = yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
                 self.redis_event_message_received)
-            print(ret)
+
+            ret3 = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            print(ret1, ret2, ret3)
 
         # Unsubscribe to messages
-        ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
-        print(ret)
+        # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
+        # print(ret)
 
         print('onClose', self, wasClean, code, reason)
 
     def answer_topic(self):
         if self.user:
             return 'websocket.user.' + self.user.user_uuid
+        return super().answer_topic()
 
+    def event_topic(self):
+        if self.user:
+            return 'websocket.user.' + self.user.user_uuid + '.events'
+        return super().event_topic()
