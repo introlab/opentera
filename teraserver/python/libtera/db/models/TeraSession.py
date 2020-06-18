@@ -33,9 +33,13 @@ class TeraSession(db.Model, BaseModel):
     session_duration = db.Column(db.Integer, nullable=False, default=0)
     session_status = db.Column(db.Integer, nullable=False)
     session_comments = db.Column(db.String, nullable=True)
+    session_parameters = db.Column(db.String, nullable=True)
+
     session_participants = db.relationship("TeraParticipant", secondary="t_sessions_participants",
                                            back_populates="participant_sessions")
     session_users = db.relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions")
+
+    # TODO session_devices
 
     session_creator_user = db.relationship('TeraUser')
     session_creator_device = db.relationship('TeraDevice')
@@ -53,7 +57,8 @@ class TeraSession(db.Model, BaseModel):
                               'session_creator_participant', 'session_creator_service', 'session_session_type',
                               'session_events', 'session_users'])
         if minimal:
-            ignore_fields.extend(['session_comments', 'session_duration', 'session_start_datetime'])
+            ignore_fields.extend(['session_comments', 'session_duration', 'session_start_datetime',
+                                  'session_parameters'])
 
         rval = super().to_json(ignore_fields=ignore_fields)
 

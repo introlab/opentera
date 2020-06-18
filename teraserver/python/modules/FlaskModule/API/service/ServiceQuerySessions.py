@@ -75,8 +75,7 @@ class ServiceQuerySessions(Resource):
 
             # Optional parameters
             if 'parameters' in session_args:
-                # TODO session params
-                pass
+                session.session_parameters = session_args['parameters']
 
             # Set session name
             session.session_comments = 'Created by service for user ' + str(session.id_creator_user)
