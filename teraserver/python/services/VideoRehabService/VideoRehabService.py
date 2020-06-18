@@ -131,18 +131,22 @@ class VideoRehabService(ServiceOpenTera):
                         joinMessage.session_parameters = parameters
                         joinMessage.service_uuid = self.service_uuid
 
-                        # Send invitations (as events)
-                        for user_uuid in users:
-                            self.send_event_message(joinMessage, 'websocket.user.'
-                                                    + user_uuid + '.events')
+                        def send_events():
+                            # Send invitations (as events)
+                            for user_uuid in users:
+                                self.send_event_message(joinMessage, 'websocket.user.'
+                                                        + user_uuid + '.events')
 
-                        for participant_uuid in participants:
-                            self.send_event_message(joinMessage, 'websocket.participant.'
-                                                    + participant_uuid + '.events')
+                            for participant_uuid in participants:
+                                self.send_event_message(joinMessage, 'websocket.participant.'
+                                                        + participant_uuid + '.events')
 
-                        for device_uuid in devices:
-                            self.send_event_message(joinMessage, 'websocket.device.'
-                                                    + device_uuid + '.events')
+                            for device_uuid in devices:
+                                self.send_event_message(joinMessage, 'websocket.device.'
+                                                        + device_uuid + '.events')
+
+                        # Send events in 5 seconds
+                        reactor.callLater(5.0, send_events)
 
                         # Return session information
                         return session_info
