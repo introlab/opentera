@@ -28,8 +28,11 @@ get_parser.add_argument('projects', type=inputs.boolean, help='Flag that indicat
                                                               'should be included in the returned device list')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('device', type=str, location='json', help='Device to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('device', type=str, location='json', help='Device to create / update', required=True)
+post_schema = api.schema_model('user_device', {'properties': TeraDevice.get_json_schema(),
+                                               'type': 'object',
+                                               'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Device ID to delete', required=True)
@@ -153,7 +156,7 @@ class UserQueryDevices(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create / update devices. id_device must be set to "0" to create a new device. Only '
                          'superadmins can create new devices, site admin can update and project admin can modify config'
                          ' and notes.',

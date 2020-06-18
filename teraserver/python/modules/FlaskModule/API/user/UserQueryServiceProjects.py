@@ -24,9 +24,12 @@ get_parser.add_argument('with_services', type=inputs.boolean, help='Used with id
 get_parser.add_argument('with_roles', type=inputs.boolean, help='Used with id_project. Returns detailled information on'
                                                                 'each role for this service.')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('service_project', type=str, location='json',
-                         help='Service - project association to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('service_project', type=str, location='json',
+#                          help='Service - project association to create / update', required=True)
+post_schema = api.schema_model('user_service_project', {'properties': TeraServiceProject.get_json_schema(),
+                                                        'type': 'object',
+                                                        'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific service - project association ID to delete. '
@@ -103,7 +106,7 @@ class UserQueryServiceProjects(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create/update service - project association. If a "service" json is received, the list of '
                          '"projects" is replaced. If a "project" json is received, the list of "services" is replaced.'
                          'If a "service_project" is received, each of the item in the list is added.',

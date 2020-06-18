@@ -14,11 +14,16 @@ get_parser = api.parser()
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all associated sites'
                         )
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
-get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ids only)')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
+                                                          '(ids only)')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('device_site', type=str, location='json',
-                         help='Device site association to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('device_site', type=str, location='json',
+#                          help='Device site association to create / update', required=True)
+post_schema = api.schema_model('user_device_site', {'properties': TeraDeviceProject.get_json_schema(),
+                                                    'type': 'object',
+                                                    'location': 'json'})
+
 
 # delete_parser = reqparse.RequestParser()
 # delete_parser.add_argument('id', type=int, help='ID of the site to delete all devices from.', required=True)
@@ -74,14 +79,13 @@ class UserQueryDeviceSites(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create/update devices associated with a site.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify device association',
                         400: 'Badly formed JSON or missing fields(id_site or id_device) in the JSON body',
                         500: 'Internal error occured when saving device association'})
     def post(self):
-        parser = post_parser
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)

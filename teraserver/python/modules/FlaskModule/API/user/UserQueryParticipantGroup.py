@@ -16,8 +16,11 @@ get_parser.add_argument('id_project', type=int, help='ID of the project from whi
 get_parser.add_argument('id', type=int, help='Alias for "id_group"')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('group', type=str, location='json', help='Participant group to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('group', type=str, location='json', help='Participant group to create / update', required=True)
+post_schema = api.schema_model('user_participant_group', {'properties': TeraParticipantGroup.get_json_schema(),
+                                                          'type': 'object',
+                                                          'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Participant Group ID to delete', required=True)
@@ -74,7 +77,7 @@ class UserQueryParticipantGroup(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create / update participant groups. id_participant_group must be set to "0" to create a new '
                          'group. A group can be created/modified if the user has admin rights to the project.',
              responses={200: 'Success',

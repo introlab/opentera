@@ -17,9 +17,13 @@ get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the 
 get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Also return user groups information even for '
                                                                      'those without any role in that service-project')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('service_project_role', type=str, location='json',
-                         help='Role for specific service and project to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('service_project_role', type=str, location='json',
+#                          help='Role for specific service and project to create / update', required=True)
+post_schema = api.schema_model('user_service_project_role', {'properties': TeraServiceProjectRole.get_json_schema(),
+                                                             'type': 'object',
+                                                             'location': 'json'})
+
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific service project role association ID to delete. '
@@ -91,7 +95,7 @@ class UserQueryServiceProjectRoles(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create/update service - project - role association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only site admin can modify association)',

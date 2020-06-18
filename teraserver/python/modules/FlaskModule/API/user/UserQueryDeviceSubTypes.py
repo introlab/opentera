@@ -14,9 +14,12 @@ get_parser.add_argument('id_device_subtype', type=int, help='ID of the device su
 get_parser.add_argument('id_device_type', type=int, help='ID of the device type from which to get all subtypes')
 get_parser.add_argument('list', type=inputs.boolean, help='List of all device types')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('device_subtype', type=str, location='json', help='Device subtype to create / update',
-                         required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('device_subtype', type=str, location='json', help='Device subtype to create / update',
+#                          required=True)
+post_schema = api.schema_model('user_device_subtype', {'properties': TeraDeviceSubType.get_json_schema(),
+                                                       'type': 'object',
+                                                       'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Device subtype ID to delete', required=True)
@@ -73,7 +76,7 @@ class UserQueryDeviceSubTypes(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create / update devices subtypes. id_device_subtype must be set to "0" to create a new '
                          'subtype. Only site admins can create new devices subtypes.',
              responses={200: 'Success',

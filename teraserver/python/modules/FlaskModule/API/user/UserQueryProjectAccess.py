@@ -23,9 +23,13 @@ get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with 
 get_parser.add_argument('with_projects', type=inputs.boolean, help='Used with id_user_group. Also return projects that '
                                                                    'don\'t have any access with that user group')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('project_access', type=str, location='json',
-                         help='Project access to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('project_access', type=str, location='json',
+#                          help='Project access to create / update', required=True)
+post_schema = api.schema_model('user_project_access', {'properties': TeraProjectAccess.get_json_schema(),
+                                                       'type': 'object',
+                                                       'location': 'json'})
+
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Project Access ID to delete', required=True)
@@ -109,15 +113,13 @@ class UserQueryProjectAccess(Resource):
         return [], 200
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create/update project access for an user.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify this project or user access (project admin access required)',
                         400: 'Badly formed JSON or missing fields(id_user_group or id_project) in the JSON body',
                         500: 'Database error'})
     def post(self):
-        parser = post_parser
-
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!

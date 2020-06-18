@@ -18,8 +18,11 @@ get_parser.add_argument('key', type=str, help='Service Key to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('service', type=str, location='json', help='Service to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('service', type=str, location='json', help='Service to create / update', required=True)
+post_schema = api.schema_model('user_service', {'properties': TeraService.get_json_schema(),
+                                                'type': 'object',
+                                                'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Service ID to delete', required=True)
@@ -79,7 +82,7 @@ class UserQueryServices(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create / update services. id_service must be set to "0" to create a new '
                          'service. A service can be created/modified only by super-admins. If data contains "roles", '
                          'also update the roles with the list.',

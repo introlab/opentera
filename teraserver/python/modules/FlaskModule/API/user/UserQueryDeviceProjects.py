@@ -18,9 +18,12 @@ get_parser.add_argument('id_project', type=int, help='ID of the project from whi
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ids only)')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('device_project', type=str, location='json',
-                         help='Device-project association to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('device_project', type=str, location='json',
+#                          help='Device-project association to create / update', required=True)
+post_schema = api.schema_model('user_device_project', {'properties': TeraDeviceProject.get_json_schema(),
+                                                       'type': 'object',
+                                                       'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific device-project association ID to delete. Be careful: this'
@@ -76,7 +79,7 @@ class UserQueryDeviceProjects(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create/update devices associated with a project.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify device association - the user isn\'t admin '

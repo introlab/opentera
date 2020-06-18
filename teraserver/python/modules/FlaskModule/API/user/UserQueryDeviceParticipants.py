@@ -22,11 +22,15 @@ get_parser.add_argument('id_site', type=int, help='ID of the site from which to 
                                                   'participants')
 get_parser.add_argument('id_device_type', type=int, help='ID of device type from which to get all devices and '
                                                          'associated participants')
-get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information (ids only)')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
+                                                          '(ids only)')
 
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('device_participant', type=str, location='json',
-                         help='Device participant to create / update', required=True)
+# post_parser = reqparse.RequestParser()
+# post_parser.add_argument('device_participant', type=str, location='json',
+#                          help='Device participant to create / update', required=True)
+post_schema = api.schema_model('user_device_participant', {'properties': TeraDeviceParticipant.get_json_schema(),
+                                                           'type': 'object',
+                                                           'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific device-participant association ID to delete. Be careful: this'
@@ -96,7 +100,7 @@ class UserQueryDeviceParticipants(Resource):
             return '', 500
 
     @user_multi_auth.login_required
-    @api.expect(post_parser)
+    @api.expect(post_schema)
     @api.doc(description='Create/update devices associated with a participant.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify device association',
