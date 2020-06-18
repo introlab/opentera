@@ -108,4 +108,22 @@ class ServiceQuerySessions(Resource):
             # Return session info
             return session.to_json(minimal=False), 200
 
+        if 'update_session' in service_req:
+            session_args = service_req['update_session']
+            session = TeraSession.get_session_by_id(session_args['id_session'])
+
+            # Update state
+            if session:
+                if 'session_status' in session_args:
+                    session.session_status = session_args['session_status']
+
+                if 'session_duration' in session_args:
+                    session.session_duration = session_args['session_duration']
+
+                session.commit()
+
+                return session.to_json(minimal=False), 200
+
+        # Unhandled
         return 'missing json fields', 500
+

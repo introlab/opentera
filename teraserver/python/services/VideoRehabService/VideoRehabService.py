@@ -1,6 +1,7 @@
 import services.VideoRehabService.Globals as Globals
 from services.shared.modules.WebRTCModule import WebRTCModule
 from libtera.redis.RedisClient import RedisClient
+from libtera.db.models.TeraSession import TeraSessionStatus
 from services.VideoRehabService.ConfigManager import ConfigManager
 from modules.RedisVars import RedisVars
 
@@ -21,6 +22,7 @@ import uuid
 # Flask Module
 from services.VideoRehabService.FlaskModule import FlaskModule
 from services.shared.ServiceOpenTera import ServiceOpenTera
+from flask_babel import gettext
 
 
 class VideoRehabService(ServiceOpenTera):
@@ -40,6 +42,8 @@ class VideoRehabService(ServiceOpenTera):
 
         # Create WebRTCModule
         self.webRTCModule = WebRTCModule(config_man)
+
+        self.sessions = dict()
 
     def notify_service_messages(self, pattern, channel, message):
         pass
@@ -68,102 +72,137 @@ class VideoRehabService(ServiceOpenTera):
 
                 # Get "common" arguments
                 action = session_manage_args['action']
-                id_service = session_manage_args['id_service']
-                id_creator_user = session_manage_args['id_creator_user']
-                id_session_type = session_manage_args['id_session_type']
 
                 if action == 'start':
-                    # Get additional "start" arguments
-                    parameters = session_manage_args['parameters']
-                    participants = session_manage_args['session_participants']
-                    users = session_manage_args['session_users']
-                    # TODO handle devices
-                    devices = []
-
-                    # Call service API to create session
-                    api_req = {'create_session': {'id_service': id_service,
-                                                  'id_creator_user': id_creator_user,
-                                                  'id_session_type': id_session_type,
-                                                  'participants': participants,
-                                                  'users': users,
-                                                  'devices': devices,
-                                                  'parameters': parameters}
-                               }
-
-                    api_response = self.post_to_opentera('/api/service/sessions', api_req)
-
-                    if api_response.status_code == 200:
-
-                        session_info = api_response.json()
-
-                        # Replace fields with uuids
-                        session_info['session_participants'] = participants
-                        session_info['session_users'] = users
-                        session_info['session_devices'] = devices
-
-                        # Add session key
-                        session_info['session_key'] = str(uuid.uuid4())
-
-                        # Start webrtc process
-                        # TODO do something with parameters
-                        retval, process_info = self.webRTCModule.create_webrtc_session(
-                            session_info['session_key'], id_creator_user, users, participants, devices)
-
-                        if not retval or not process_info:
-                            return {'Error': 'Cannot create process'}
-
-                        session_info['session_url'] = process_info['url']
-
-                        # message
-                        # JoinSessionEvent
-                        # Fill event information
-                        joinMessage = messages.JoinSessionEvent()
-                        joinMessage.session_url = session_info['session_url']
-                        joinMessage.session_creator_name = session_info['session_creator_user']
-                        joinMessage.session_uuid = session_info['session_uuid']
-                        for user_uuid in users:
-                            joinMessage.session_users.extend([user_uuid])
-                        for participant_uuid in participants:
-                            joinMessage.session_participants.extend([participant_uuid])
-                        for device_uuid in devices:
-                            joinMessage.session_devices.extend([device_uuid])
-                        joinMessage.join_msg = 'Hello World'
-                        joinMessage.session_parameters = parameters
-                        joinMessage.service_uuid = self.service_uuid
-
-                        def send_events():
-                            # Send invitations (as events)
-                            for user_uuid in users:
-                                self.send_event_message(joinMessage, 'websocket.user.'
-                                                        + user_uuid + '.events')
-
-                            for participant_uuid in participants:
-                                self.send_event_message(joinMessage, 'websocket.participant.'
-                                                        + participant_uuid + '.events')
-
-                            for device_uuid in devices:
-                                self.send_event_message(joinMessage, 'websocket.device.'
-                                                        + device_uuid + '.events')
-
-                        # Send events in 5 seconds
-                        reactor.callLater(5.0, send_events)
-
-                        # Return session information
-                        return session_info
-
-                    else:
-                        return {'Error': 'Cannot create session'}
-
+                    return self.manage_start_session(session_manage_args)
                 elif action == 'stop':
-                    id_session = session_manage_args['id_session']
-                    pass
+                    return self.manage_stop_session(session_manage_args)
 
-                return None
         except json.JSONDecodeError as e:
             print('Error', e)
             return None
 
         return None
+
+    def manage_stop_session(self, session_manage_args: dict):
+        id_session = session_manage_args['id_session']
+        id_service = session_manage_args['id_service']
+        id_creator_user = session_manage_args['id_creator_user']
+
+        if id_session in self.sessions:
+            session_info = self.sessions[id_session]
+            # Room name = key
+            self.webRTCModule.stop_webrtc_session(session_info['session_key'])
+
+            from  datetime import datetime
+            duration = 0 # datetime.time session_info['session_start_datetime']
+
+            # Call service API for session changes...
+            # Call service API to create session
+            api_req = {'update_session': {'id_session': id_session,
+                                          'session_status': TeraSessionStatus.STATUS_COMPLETED.value,
+                                          'session_duration': duration}}
+
+            api_response = self.post_to_opentera('/api/service/sessions', api_req)
+
+            # Remove session from list
+            del self.sessions[id_session]
+
+            if api_response.status_code == 200:
+                return api_response.json()
+
+        return None
+
+    def manage_start_session(self, session_manage_args: dict):
+        # Get "useful" arguments
+        id_service = session_manage_args['id_service']
+        id_creator_user = session_manage_args['id_creator_user']
+        id_session_type = session_manage_args['id_session_type']
+
+        # Get additional "start" arguments
+        parameters = session_manage_args['parameters']
+        participants = session_manage_args['session_participants']
+        users = session_manage_args['session_users']
+        # TODO handle devices
+        devices = []
+
+        # Call service API to create session
+        api_req = {'create_session': {'id_service': id_service,
+                                      'id_creator_user': id_creator_user,
+                                      'id_session_type': id_session_type,
+                                      'participants': participants,
+                                      'users': users,
+                                      'devices': devices,
+                                      'parameters': parameters}
+                   }
+
+        api_response = self.post_to_opentera('/api/service/sessions', api_req)
+
+        if api_response.status_code == 200:
+
+            session_info = api_response.json()
+
+            # Replace fields with uuids
+            session_info['session_participants'] = participants
+            session_info['session_users'] = users
+            session_info['session_devices'] = devices
+
+            # Add session key
+            session_info['session_key'] = str(uuid.uuid4())
+
+            # Start webrtc process
+            # TODO do something with parameters
+            retval, process_info = self.webRTCModule.create_webrtc_session(
+                session_info['session_key'], id_creator_user, users, participants, devices)
+
+            if not retval or not process_info:
+                return {'Error': 'Cannot create process'}
+
+            session_info['session_url'] = process_info['url']
+
+            # message
+            # JoinSessionEvent
+            # Fill event information
+            joinMessage = messages.JoinSessionEvent()
+            joinMessage.session_url = session_info['session_url']
+            joinMessage.session_creator_name = session_info['session_creator_user']
+            joinMessage.session_uuid = session_info['session_uuid']
+            for user_uuid in users:
+                joinMessage.session_users.extend([user_uuid])
+            for participant_uuid in participants:
+                joinMessage.session_participants.extend([participant_uuid])
+            for device_uuid in devices:
+                joinMessage.session_devices.extend([device_uuid])
+            joinMessage.join_msg = gettext('Join Session')
+            joinMessage.session_parameters = parameters
+            joinMessage.service_uuid = self.service_uuid
+
+            def send_events():
+                # Send invitations (as events)
+                # Closure, variables will be captured from outer scope
+                for u_uuid in users:
+                    self.send_event_message(joinMessage, 'websocket.user.'
+                                            + u_uuid + '.events')
+
+                for p_uuid in participants:
+                    self.send_event_message(joinMessage, 'websocket.participant.'
+                                            + p_uuid + '.events')
+
+                for d_uuid in devices:
+                    self.send_event_message(joinMessage, 'websocket.device.'
+                                            + d_uuid + '.events')
+
+            # Send events in 5 seconds
+            reactor.callLater(5.0, send_events)
+
+            # Keep session info for future use
+            self.sessions[session_info['id_session']] = session_info
+
+            # Return session information
+            return session_info
+
+        else:
+            return {'Error': 'Cannot create session'}
 
 
 if __name__ == '__main__':
