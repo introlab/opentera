@@ -73,6 +73,11 @@ class ServiceQuerySessions(Resource):
             else:
                 return 'Missing id_session_type', 500
 
+            # Optional parameters
+            if 'parameters' in session_args:
+                # TODO session params
+                pass
+
             # Set session name
             session.session_comments = 'Created by service for user ' + str(session.id_creator_user)
             session.session_start_datetime = datetime.datetime.now()

@@ -86,7 +86,8 @@ class VideoRehabService(ServiceOpenTera):
                                                   'id_session_type': id_session_type,
                                                   'participants': participants,
                                                   'users': users,
-                                                  'devices': devices}
+                                                  'devices': devices,
+                                                  'parameters': parameters}
                                }
 
                     api_response = self.post_to_opentera('/api/service/sessions', api_req)
@@ -104,6 +105,7 @@ class VideoRehabService(ServiceOpenTera):
                         session_info['session_key'] = str(uuid.uuid4())
 
                         # Start webrtc process
+                        # TODO do something with parameters
                         retval, process_info = self.webRTCModule.create_webrtc_session(
                             session_info['session_key'], id_creator_user, users, participants, devices)
 
@@ -114,31 +116,6 @@ class VideoRehabService(ServiceOpenTera):
 
                         # message
                         # JoinSessionEvent
-                        # {
-                        #     string
-                        # session_url = 1;
-                        # string
-                        # session_creator_name = 2;
-                        # string
-                        # session_uuid = 3;
-                        # repeated
-                        # string
-                        # session_participants = 4;
-                        # repeated
-                        # string
-                        # session_users = 5;
-                        # repeated
-                        # string
-                        # session_devices = 6;
-                        # string
-                        # join_msg = 7;
-                        # string
-                        # session_parameters = 8;
-                        # string
-                        # service_uuid = 9;
-                        # }
-
-
                         # Fill event information
                         joinMessage = messages.JoinSessionEvent()
                         joinMessage.session_url = session_info['session_url']
@@ -151,7 +128,7 @@ class VideoRehabService(ServiceOpenTera):
                         for device_uuid in devices:
                             joinMessage.session_devices.extend([device_uuid])
                         joinMessage.join_msg = 'Hello World'
-                        joinMessage.session_parameters = ''
+                        joinMessage.session_parameters = parameters
                         joinMessage.service_uuid = self.service_uuid
 
                         # Send invitations (as events)
