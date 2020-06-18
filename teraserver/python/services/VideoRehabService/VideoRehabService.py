@@ -94,8 +94,10 @@ class VideoRehabService(ServiceOpenTera):
             # Room name = key
             self.webRTCModule.stop_webrtc_session(session_info['session_key'])
 
-            from  datetime import datetime
-            duration = 0 # datetime.time session_info['session_start_datetime']
+            from datetime import datetime
+            time_diff = datetime.now() - datetime.strptime(
+                session_info['session_start_datetime'], '%Y-%m-%dT%H:%M:%S.%f')
+            duration = int(time_diff.total_seconds())
 
             # Call service API for session changes...
             # Call service API to create session
