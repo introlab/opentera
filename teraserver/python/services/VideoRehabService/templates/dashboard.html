@@ -24,9 +24,10 @@
 			var service_port = {{ port }};
 			var backend_hostname = "{{ backend_hostname }}";
 			var backend_port = {{ backend_port }};
+			var participant_token = "{{ participant_token }}";
 	   </script>
    </head>
-   <body onload = "init_dashboard('{{ backend_hostname }}', {{ backend_port }});{% if is_participant %}doParticipantLogin(backend_hostname, backend_port);
+   <body onload = "init_dashboard('{{ backend_hostname }}', {{ backend_port }});{% if is_participant %}doParticipantLogin(backend_hostname, backend_port, participant_token);
    {% else %}webSocketConnect();{% endif %}">
 	<div id="communicator" style="position:absolute;top:0;left:0;width:100%;height:50px;border:0;">
 		<div align="left" style="display:block;position:absolute;">
@@ -47,7 +48,7 @@
 			<label id="displayname">{{ user_fullname }}</label>
 		</div>
 	</div>
-	<iframe id="mainview" src={% if is_participant %}"participant"{% else %}"dashboard_main"{% endif %} style="position:absolute;top:50px;left:0;width:100%;height:calc(100% - 50px);border:0;" allow="camera; microphone;">Frames not supported in this browser!</iframe>
+	<iframe id="mainview" src={% if is_participant %}"participant?token={{ participant_token }}"{% else %}"dashboard_main"{% endif %} style="position:absolute;top:50px;left:0;width:100%;height:calc(100% - 50px);border:0;" allow="camera; microphone;">Frames not supported in this browser!</iframe>
    {% include "footer.html" %}
     </body>
 </html>

@@ -47,5 +47,6 @@ class Dashboard(MethodView):
 
         return render_template('dashboard.html', hostname=hostname, port=port,
                                backend_hostname=backend_hostname, backend_port=backend_port,
-                               user_fullname=user_fullname, is_participant=is_participant
+                               user_fullname=user_fullname, is_participant=is_participant,
+                               participant_token=current_participant_client.participant_token
                                )

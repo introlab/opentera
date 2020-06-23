@@ -46,7 +46,7 @@ function doLogin(backend_url, backend_port){
 
 }
 
-function doParticipantLogin(backend_url, backend_port){
+function doParticipantLogin(backend_url, backend_port, participant_token){
     timeout++;
 	if (timerId == -1){
 		$.ajaxSetup({
@@ -79,7 +79,7 @@ function doParticipantLogin(backend_url, backend_port){
                 webSocketConnect();
             },
           beforeSend: function (xhr) {
-            xhr.setRequestHeader('Authorization', 'OpenTera ' + getCookie('VideoDispatchTokenParticipant'));
+            xhr.setRequestHeader('Authorization', 'OpenTera ' + participant_token);
             }
         });
 		//$.post('https://' + $('#name').val() + ':' + $('#password').val() + '@localhost:4040/api/user/login', $('#loginform').serialize(), loginReply);

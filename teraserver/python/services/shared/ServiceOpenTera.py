@@ -132,13 +132,13 @@ class ServiceOpenTera(RedisClient):
 
     def post_to_opentera(self, api_url: str, json_data: dict) -> Response:
         # Synchronous call to OpenTera backend
-        url = "http://" + self.backend_hostname + ':' + str(self.backend_port) + api_url
+        url = "https://" + self.backend_hostname + ':' + str(self.backend_port) + api_url
         request_headers = {'Authorization': 'OpenTera ' + self.service_token}
         return post(url=url, verify=False, headers=request_headers, json=json_data)
 
     def get_from_opentera(self, api_url: str, params: dict) -> Response:
         # Synchronous call to OpenTera backend
-        url = "http://" + self.backend_hostname + ':' + str(self.backend_port) + api_url
+        url = "https://" + self.backend_hostname + ':' + str(self.backend_port) + api_url
         request_headers = {'Authorization': 'OpenTera ' + self.service_token}
         return get(url=url, verify=False, headers=request_headers, params=params)
 

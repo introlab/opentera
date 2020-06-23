@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="./static/css/teraplus.css" />
 
 </head>
-<body onload="init_dashboard('{{ backend_hostname }}', {{ backend_port }}); startStatusUpdates(); initLocalVideo('#selfVideo');" style="background-color:black;">
+<body onload="init_dashboard('{{ backend_hostname }}', {{ backend_port }}); /*startStatusUpdates();*/ initLocalVideo('#selfVideo');" style="background-color:black;">
 <div class="container-fluid" id="mainContainer">
 	<div class="card bg-warning" id="cardRank" style="display:none;">
 		<center>Vous avez la position #<label id="lblRank">10</label> dans la file d'attente. Merci de votre patience!</center>
