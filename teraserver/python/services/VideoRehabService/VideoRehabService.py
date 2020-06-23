@@ -3,6 +3,7 @@ from services.shared.modules.WebRTCModule import WebRTCModule
 from libtera.redis.RedisClient import RedisClient
 from libtera.db.models.TeraSession import TeraSessionStatus
 from services.VideoRehabService.ConfigManager import ConfigManager
+from services.shared.ServiceAccessManager import ServiceAccessManager
 from modules.RedisVars import RedisVars
 
 # Twisted
@@ -29,7 +30,7 @@ class VideoRehabService(ServiceOpenTera):
     def __init__(self, config_man: ConfigManager, service_info):
         ServiceOpenTera.__init__(self, config_man, service_info)
 
-        self.application = service.Application(self.config['name'])
+        # self.application = service.Application(self.config['name'])
 
         # Create REST backend
         self.flaskModule = FlaskModule(Globals.config_man)
@@ -38,7 +39,7 @@ class VideoRehabService(ServiceOpenTera):
         self.flaskModuleService = self.flaskModule.create_service()
 
         # Connect our services to the application, just like a normal service.
-        self.flaskModuleService.setServiceParent(self.application)
+        # self.flaskModuleService.setServiceParent(self.application)
 
         # Create WebRTCModule
         self.webRTCModule = WebRTCModule(config_man)
@@ -238,6 +239,12 @@ if __name__ == '__main__':
     Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
     Globals.api_device_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
     Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
+
+    # Update Service Access information
+    ServiceAccessManager.api_user_token_key = Globals.api_user_token_key
+    ServiceAccessManager.api_participant_token_key = Globals.api_participant_token_key
+    ServiceAccessManager.api_device_token_key = Globals.api_device_token_key
+    ServiceAccessManager.config_man = Globals.config_man
 
     # Get service UUID
     service_info = Globals.redis_client.redisGet(RedisVars.RedisVar_ServicePrefixKey +

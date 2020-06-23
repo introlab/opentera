@@ -200,8 +200,9 @@ class FlaskModule(BaseModule):
 
         # Create a Twisted Web Site
         site = MySite(root_resource)
-
-        return internet.TCPServer(self.config.service_config['port'], site)
+        #val = internet.TCPServer(self.config.service_config['port'], site)
+        val = reactor.listenTCP(self.config.service_config['port'], site)
+        return val
 
     def __del__(self):
         pass
@@ -233,6 +234,13 @@ class FlaskModule(BaseModule):
         # Default arguments
         args = []
         kwargs = {'flaskModule': self}
+
+        from services.VideoRehabService.Views.Index import Index
+        from services.VideoRehabService.Views.Participant import Participant
+
+        # Will create a function that calls the __index__ method with args, kwargs
+        flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
+        flask_app.add_url_rule('/participant', view_func=Participant.as_view('participant', *args, **kwargs))
 
 
 @flask_app.after_request
