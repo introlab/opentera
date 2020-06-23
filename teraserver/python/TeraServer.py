@@ -101,13 +101,16 @@ def init_shared_variables(config):
     redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, service_token_key)
 
     # Set DEVICE
+    # TODO - Verify static / dynamic tokens for devices
     redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey, TeraServerSettings.get_server_setting_value(
+        TeraServerSettings.ServerDeviceTokenKey))
+    redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey, TeraServerSettings.get_server_setting_value(
         TeraServerSettings.ServerDeviceTokenKey))
 
     # Set PARTICIPANT
     redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, participant_token_key)
-    # redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, TeraServerSettings.get_server_setting_value(
-    #                                  TeraServerSettings.ServerParticipantTokenKey))
+    redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey, TeraServerSettings.get_server_setting_value(
+                                      TeraServerSettings.ServerParticipantTokenKey))
 
 
 def init_services(config: ConfigManager):

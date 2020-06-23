@@ -23,11 +23,6 @@ class TeraDeviceClient:
 
         self.__backend_url = 'https://' + backend_hostname + ':' + backend_port
 
-        import os
-
-        # TODO Certificates should be from proxy?
-        self.__backend_cacert = os.path.join(config_man.server_config["ssl_path"],
-                                             config_man.server_config["site_certificate"])
 
     @property
     def device_uuid(self):

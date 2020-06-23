@@ -2,7 +2,9 @@
 class RedisVars:
     RedisVar_UserTokenAPIKey = "UserTokenAPIKey"
     RedisVar_DeviceTokenAPIKey = "DeviceTokenAPIKey"
+    RedisVar_DeviceStaticTokenAPIKey = "DeviceStaticTokenAPIKey"
     RedisVar_ParticipantTokenAPIKey = "ParticipantTokenAPIKey"
+    RedisVar_ParticipantStaticTokenAPIKey = "ParticipantStaticTokenAPIKey"
     RedisVar_ServiceTokenAPIKey = "ServiceTokenAPIKey"
     RedisVar_ServicePrefixKey = "service."
 
