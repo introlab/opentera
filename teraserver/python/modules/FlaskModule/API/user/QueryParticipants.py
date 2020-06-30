@@ -21,6 +21,8 @@ get_parser.add_argument('id_group', type=int, help='ID of the participant groups
 get_parser.add_argument('id_session', type=int, help='ID of the session from which to get all participants')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all participants associated')
 get_parser.add_argument('name', type=str, help='Name of the participant to query')
+get_parser.add_argument('enabled', type=inputs.boolean, help='Flag that limits the returned data to the enabled '
+                                                             'participants')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('full', type=inputs.boolean, help='Flag that expands the returned data to include all '
                                                           'information')
@@ -72,9 +74,15 @@ class QueryParticipants(Resource):
                 if participant.id_participant in user_access.get_accessible_participants_ids():
                     participants = [participant]
         elif args['id_site']:
-            participants = user_access.query_participants_for_site(args['id_site'])
+            if args['enabled'] is not None:
+                participants = user_access.query_enabled_participants_for_site(args['id_site'])
+            else:
+                participants = user_access.query_all_participants_for_site(args['id_site'])
         elif args['id_project']:
-            participants = user_access.query_participants_for_project(args['id_project'])
+            if args['enabled'] is not None:
+                participants = user_access.query_enabled_participants_for_project(args['id_project'])
+            else:
+                participants = user_access.query_all_participants_for_project(args['id_project'])
         elif args['id_group']:
             participants = user_access.query_participants_for_group(args['id_group'])
         elif args['id_device']:

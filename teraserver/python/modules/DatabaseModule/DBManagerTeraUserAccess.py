@@ -1,3 +1,4 @@
+from sqlalchemy import true
 
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
@@ -352,17 +353,33 @@ class DBManagerTeraUserAccess:
             .all()
         return projects
 
-    def query_participants_for_site(self, site_id: int):
+    def query_all_participants_for_site(self, site_id: int):
         part_ids = self.get_accessible_participants_ids()
         participants = TeraParticipant.query.join(TeraProject)\
             .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids))\
             .order_by(TeraParticipant.id_participant.asc()).all()
         return participants
 
-    def query_participants_for_project(self, project_id: int):
+    def query_enabled_participants_for_site(self, site_id: int):
+        part_ids = self.get_accessible_participants_ids()
+        participants = TeraParticipant.query.join(TeraProject)\
+            .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids))\
+            .filter(TeraParticipant.participant_enabled == true())\
+            .order_by(TeraParticipant.id_participant.asc()).all()
+        return participants
+
+    def query_all_participants_for_project(self, project_id: int):
         part_ids = self.get_accessible_participants_ids()
         participants = TeraParticipant.query.filter(TeraParticipant.id_project == project_id,
                                                     TeraParticipant.id_participant.in_(part_ids))\
+            .order_by(TeraParticipant.id_participant.asc()).all()
+        return participants
+
+    def query_enabled_participants_for_project(self, project_id: int):
+        part_ids = self.get_accessible_participants_ids()
+        participants = TeraParticipant.query.filter(TeraParticipant.id_project == project_id,
+                                                    TeraParticipant.id_participant.in_(part_ids))\
+            .filter(TeraParticipant.participant_enabled == true())\
             .order_by(TeraParticipant.id_participant.asc()).all()
         return participants
 
