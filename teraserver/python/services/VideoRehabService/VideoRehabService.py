@@ -55,6 +55,18 @@ class VideoRehabService(ServiceOpenTera):
                                           'returns': 'dict',
                                           'callback': self.session_manage}
 
+        self.rpc_api['participant_info'] = {'args': ['str:participant_uuid'],
+                                            'returns': 'dict',
+                                            'callback': self.participant_info}
+
+    def participant_info(self, participant_uuid):
+        # Getting participant info from uuid
+        params = {'participant_uuid': participant_uuid}
+        response = self.get_from_opentera('/api/service/participants', params)
+        if response.status_code == 200:
+            return response.json()
+        return {}
+
     def session_manage(self, json_str):
 
         # - Service will create session if needed or reuse existing one
@@ -233,6 +245,7 @@ if __name__ == '__main__':
     # Load configuration
     if not Globals.config_man.load_config('VideoRehabService.json'):
         print('Invalid config')
+        exit(1)
 
     # Global redis client
     Globals.redis_client = RedisClient(Globals.config_man.redis_config)

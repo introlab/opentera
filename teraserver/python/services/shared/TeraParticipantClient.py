@@ -2,7 +2,7 @@ import uuid
 
 from requests import Response
 from flask import request
-
+from libtera.redis.RedisRPCClient import RedisRPCClient
 
 class TeraParticipantClient:
 
@@ -22,6 +22,8 @@ class TeraParticipantClient:
             backend_port = request.headers['X-Externalport']
 
         self.__backend_url = 'https://' + backend_hostname + ':' + backend_port
+        self.__config_man = config_man
+        self.__rpc_client = RedisRPCClient(config_man.redis_config)
 
     @property
     def participant_uuid(self):
@@ -48,10 +50,14 @@ class TeraParticipantClient:
         self.__participant_token = token
 
     def get_participant_infos(self) -> dict:
-        response = self.do_get_request_to_backend('/api/participants/participants')
-        if response.status_code == 200:
-            return response.json()
-        return {}
+        # Get information from service rpc function since participant has no rights from the participants api
+        participant_info = self.__rpc_client.call_service(self.__config_man.service_config['name'],
+                                                          'participant_info', self.__participant_uuid)
+        return participant_info
+        # response = self.do_get_request_to_backend('/api/participants/participants')
+        # if response.status_code == 200:
+        #     return response.json()
+        # return {}
 
     def do_get_request_to_backend(self, path: str) -> Response:
         from requests import get

@@ -9,6 +9,8 @@ from datetime import datetime
 
 # Parser definition(s)
 get_parser = api.parser()
+get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the participant to query')
+
 post_parser = api.parser()
 
 
@@ -54,8 +56,16 @@ class ServiceQueryParticipants(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
-        print('hello')
-        return 'Not implemented', 501
+
+        args = get_parser.parse_args()
+
+        # args['participant_uuid'] Will be None if not specified in args
+        if args['participant_uuid']:
+            participant = TeraParticipant.get_participant_by_uuid(args['participant_uuid'])
+            if participant:
+                return participant.to_json()
+
+        return 'Missing parameter', 500
 
     @LoginModule.service_token_or_certificate_required
     # @api.expect(post_parser)

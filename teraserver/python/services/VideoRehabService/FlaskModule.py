@@ -238,11 +238,14 @@ class FlaskModule(BaseModule):
         from services.VideoRehabService.Views.Index import Index
         from services.VideoRehabService.Views.Participant import Participant
         from services.VideoRehabService.Views.Dashboard import Dashboard
+        from services.VideoRehabService.Views.ParticipantEndpoint import ParticipantEndpoint
 
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
         flask_app.add_url_rule('/participant', view_func=Participant.as_view('participant', *args, **kwargs))
         flask_app.add_url_rule('/dashboard', view_func=Dashboard.as_view('dashboard', *args, **kwargs))
+        flask_app.add_url_rule('/participant_endpoint',
+                               view_func=ParticipantEndpoint.as_view('participant_endpoint', *args, **kwargs))
 
 @flask_app.after_request
 def apply_caching(response):

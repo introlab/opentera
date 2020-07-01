@@ -27,6 +27,12 @@ class Dashboard(MethodView):
 
         user_fullname = "Anonymous"
         is_participant = True
+
+        if current_participant_client:
+            participant_info = current_participant_client.get_participant_infos()
+            if participant_info and 'participant_name' in participant_info:
+                user_fullname = participant_info['participant_name']
+
         # if current_user_client:
         #     user_reply = current_user_client.do_get_request_to_backend('/api/user/users?user_uuid='
         #                                                                + current_user_client.user_uuid)
