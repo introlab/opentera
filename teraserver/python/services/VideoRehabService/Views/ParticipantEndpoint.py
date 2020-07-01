@@ -21,14 +21,16 @@ class ParticipantEndpoint(MethodView):
         if 'X_EXTERNALPORT' in request.headers:
             backend_port = request.headers['X_EXTERNALPORT']
 
-        # Get participant information
-        response = current_participant_client.do_get_request_to_backend('/api/participant/participants')
+        participant_name = 'Anonymous'
 
-        if response.status_code == 200:
-            participant_info = response.json()
+        # Get participant information
+        if current_participant_client:
+            participant_info = current_participant_client.get_participant_infos()
+            if participant_info and 'participant_name' in participant_info:
+                participant_name = participant_info['participant_name']
 
             return render_template('participant_endpoint.html', backend_hostname=backend_hostname,
                                    backend_port=backend_port,
-                                   participant_name=participant_info['participant_name'])
+                                   participant_name=participant_name)
         else:
             return 'Unauthorized', 403

@@ -75,6 +75,9 @@ function doParticipantLogin(backend_url, backend_port, participant_token){
                 // Set flag to indicate participant login
                 sessionStorage.setItem("is_participant", true);
 
+                // Set token
+                sessionStorage.setItem("participant_token", participant_token)
+
                 // Connect websocket
                 webSocketConnect();
             },
@@ -139,15 +142,20 @@ function loginParticipantError(event, status){
 
 function doLogout(backend_url, backend_port){
     // Important: OpenTera.js must be included for this to work.
+    // TODO Handle participant logout as well
     doGetRequest(backend_url, backend_port, '/api/user/logout', logoutSuccess, logoutError);
 }
 
 function logoutSuccess(response, status, request){
     // Redirect to login page
     if (sessionStorage.getItem("is_participant") == "false")
+    {
         window.location.replace("login");
+    }
     else
-        window.location.replace("participant_endpoint");
+    {
+        window.location.replace("participant_endpoint?token=" + sessionStorage.getItem("participant_token"));
+    }
 }
 
 function logoutError(event, status){
