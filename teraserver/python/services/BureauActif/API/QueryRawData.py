@@ -11,6 +11,7 @@ from services.BureauActif.FlaskModule import default_api_ns as api, flask_app
 from services.BureauActif.libbureauactif.db.Base import db
 from services.BureauActif.Globals import service_opentera
 from services.BureauActif.libbureauactif.db.models.BureauActifData import BureauActifData
+from services.BureauActif.libbureauactif.db.DBManager import DBManager
 
 
 # Parser definition(s)
@@ -33,6 +34,7 @@ class QueryRawData(Resource):
                         500: 'No participant associated to that device'})
     @AccessManager.token_required
     def post(self):
+        data_process = DBManager.dataProcess()
 
         # Only devices can upload data for now
         if current_login_type != LoginType.DEVICE_LOGIN:
@@ -50,8 +52,8 @@ class QueryRawData(Resource):
             creation_date = datetime.datetime.strptime(request.headers['X-Filedate'], '%Y-%m-%d %H:%M:%S')
 
             # Check if device is allowed to access the specified session
-            if not current_device_client.can_access_session(id_session):
-                return 'Session not available', 404
+            # if not current_device_client.can_access_session(id_session):
+            #    return 'Session not available', 404
 
             # Get participants for that session
             device_info = current_device_client.get_device_infos()
@@ -71,19 +73,20 @@ class QueryRawData(Resource):
                 return 'Unable to decode raw data', 400
 
             # Only considers the first participant in the list for now
-            id_participant = device_info['participants_info'][0]['id_participant']
+            participant_uuid = device_info['participants_info'][0]['participant_uuid']
 
             # Create file entry in database
             file_db_entry = BureauActifData()
             file_db_entry.id_device = id_device
             file_db_entry.id_session = id_session
-            file_db_entry.id_participant = id_participant
+            file_db_entry.data_participant_uuid = participant_uuid
             file_db_entry.data_original_filename = filename
             file_db_entry.data_name = filename
             file_db_entry.data_saved_date = creation_date
             file_db_entry.data_uuid = str(uuid.uuid4())
             file_db_entry.data_filesize = len(request.data)
             db.session.add(file_db_entry)
+
             db.session.commit()
 
             # Save file on disk
@@ -110,6 +113,8 @@ class QueryRawData(Resource):
             #          Timestamp, current_height, button_pressed, present, raw_sensor_values
             # timers -> dict of values for "up_secs" and "down_secs", corresponding to the current Bureau config
             # config -> dict of values for the "max_height" and the "min_height" of the Bureau
+
+            data_process.process_data(raw_data, file_db_entry)
 
             return '', 200
 

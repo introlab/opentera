@@ -1,3 +1,5 @@
+from sqlalchemy import and_
+
 from services.BureauActif.libbureauactif.db.Base import db
 from libtera.db.Base import BaseModel
 import datetime
@@ -8,6 +10,7 @@ class BureauActifTimelineDay(db.Model, BaseModel):
     __tablename__ = "ba_timeline_day"
     id_timeline_day = db.Column(db.Integer, db.Sequence('id_timeline_day_sequence'), primary_key=True,
                                 autoincrement=True)
+    participant_uuid = db.Column(db.String(36), nullable=True)
     name = db.Column(db.TIMESTAMP, nullable=False)
 
     series = db.relationship('BureauActifTimelineDayEntry')
@@ -20,13 +23,27 @@ class BureauActifTimelineDay(db.Model, BaseModel):
 
     @staticmethod
     def get_timeline_data(start_date, end_date):
-        print(start_date, end_date)
+        # TODO add filter by uuid_participant
         days = BureauActifTimelineDay.query.filter(BureauActifTimelineDay.name.between(start_date, end_date)).all()
 
         if days:
             return days
-
         return None
+
+    @staticmethod
+    def get_timeline_day(uuid_participant, date):
+        entry = BureauActifTimelineDay.query.filter(
+            and_(BureauActifTimelineDay.name == date,
+                 BureauActifTimelineDay.participant_uuid == uuid_participant)).first()
+        if entry:
+            return entry
+        return None
+
+    @classmethod
+    def insert(cls, new_day):
+        super().insert(new_day)
+        db.session.commit()
+        return new_day
 
     @staticmethod
     def create_defaults():

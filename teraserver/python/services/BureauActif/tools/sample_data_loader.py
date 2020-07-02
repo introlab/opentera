@@ -61,14 +61,14 @@ def load_data_from_path(path):
 
     file_data = {'config': {'max_height': 0, 'min_height': 0}}
 
-    for root, subFolders, files in os.walk(path):
+    for root, subFolders, files in os.walk(path, topdown=True):
         # print(root, subFolders, files)
 
         # First pass, read data, create data structure
-        for file in files:
+        for filename in files:
             # Data file
-            if '.dat' in file:
-                result = parse_data_file(os.path.join(root, file))
+            if '.dat' in filename:
+                result = parse_data_file(os.path.join(root, filename))
 
                 # Fill data
                 for res in result:
@@ -76,12 +76,10 @@ def load_data_from_path(path):
                         file_data[res] = {'data': result[res],
                                           'timers': {'up_secs': 0, 'down_secs': 0}}
 
-        # Second pass, add configurations
-        for file in files:
             # Config file
-            if '.txt' in file:
-                if 'Config' in file:
-                    result = parse_config_file(os.path.join(root, file))
+            if '.txt' in filename:
+                if 'Config' in filename:
+                    result = parse_config_file(os.path.join(root, filename))
 
                     # Fill data
                     for res in result:
@@ -89,8 +87,8 @@ def load_data_from_path(path):
                             # Replace configuration
                             file_data['config'] = result[res]
 
-                elif 'Timers_' in file:
-                    result = parse_timers_file(os.path.join(root, file))
+                elif 'Timers_' in filename:
+                    result = parse_timers_file(os.path.join(root, filename))
                     # Fill data
                     for res in result:
                         if res != 'invalid':
@@ -98,10 +96,10 @@ def load_data_from_path(path):
                                 file_data[res]['timers'] = result[res]
                             else:
                                 print('missing data file for: ', res, ' skipping...')
-                else:
-                    print('Unknown file:', file, ' skipping...')
+            else:
+                print('Unknown file:', filename, ' skipping...')
 
-        return file_data
+    return file_data
 
 
 # if __name__ == '__main__':

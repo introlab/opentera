@@ -28,6 +28,21 @@ class BureauActifTimelineDayEntry(db.Model, BaseModel):
     def get_timeline_day_entries(timeline_day_id: int):
         return BureauActifTimelineDayEntry.query.filter_by(id_timeline_day=timeline_day_id).all()
 
+    @classmethod
+    def insert(cls, new_entry):
+        super().insert(new_entry)
+        db.session.commit()
+        return new_entry
+
+    @staticmethod
+    def update_entry(id_entry, value):
+        BureauActifTimelineDayEntry.query.filter_by(id_timeline_day_entry=id_entry).update(dict(value=value))
+        db.session.commit()
+
+    @classmethod
+    def update(cls, id_entry, value):
+        super().update(id_entry, dict(value=value))
+
     @staticmethod
     def create_defaults():
         first_day1 = BureauActifTimelineDayEntry()

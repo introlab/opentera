@@ -4,6 +4,7 @@ from services.BureauActif.libbureauactif.db.Base import db
 # Must include all Database objects here to be properly initialized and created if needed
 # All at once to make sure all files are registered.
 from services.BureauActif.libbureauactif.db.models import *
+from .DBManagerBureauActifDataProcess import DBManagerBureauActifDataProcess
 
 from .models.BureauActifData import BureauActifData
 from .models.BureauActifTimelineDay import BureauActifTimelineDay
@@ -46,6 +47,11 @@ class DBManager:
     @staticmethod
     def timelineAccess():
         access = DBManagerBureauActifTimelineAccess()
+        return access
+
+    @staticmethod
+    def dataProcess():
+        access = DBManagerBureauActifDataProcess()
         return access
 
     def create_defaults(self, config: ConfigManager):

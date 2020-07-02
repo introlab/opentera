@@ -4,6 +4,7 @@ from libtera.db.Base import BaseModel
 
 class BureauActifCalendarData(db.Model, BaseModel):
     __tablename__ = "ba_calendar_data"
+
     id_calendar_data = db.Column(db.Integer, db.Sequence('id_calendar_data_sequence'), primary_key=True,
                                  autoincrement=True)
     id_calendar_day = db.Column(db.Integer,
@@ -32,6 +33,15 @@ class BureauActifCalendarData(db.Model, BaseModel):
             return data
 
         return None
+
+    @classmethod
+    def insert(cls, new_data):
+        super().insert(new_data)
+        db.session.commit()
+
+    @classmethod
+    def update(cls, update_id, values):
+        super().update(update_id, values)
 
     @staticmethod
     def create_defaults():
