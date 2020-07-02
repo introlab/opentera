@@ -276,8 +276,9 @@ class TeraParticipant(db.Model, BaseModel):
     def delete(cls, id_todel: int):
         super().delete(id_todel)
 
+        # FIXME: Not working anymore...
         # Check if we need to delete orphan sessions (sessions that have no more participants left
-        from libtera.db.models.TeraSession import TeraSession
-        TeraSession.delete_orphaned_sessions(False)
+        # from libtera.db.models.TeraSession import TeraSession
+        # TeraSession.delete_orphaned_sessions(False)
 
         db.session.commit()

@@ -20,8 +20,8 @@ class QueryServiceInfos(Resource):
         if current_login_type != LoginType.USER_LOGIN:
             return '', 403
 
-        infos = {'service_name': config_man.server_config['name'],
-                 'service_uuid': config_man.server_config['ServiceUUID']
+        infos = {'service_name': config_man.service_config['name'],
+                 'service_uuid': config_man.service_config['ServiceUUID']
                  }
 
         return jsonify(infos)

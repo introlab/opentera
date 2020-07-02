@@ -355,7 +355,7 @@ def create_session_data(config: Config, token: str, filename: str, data, id_sess
 
 
 def get_bureau_actif_service_uuid(config: Config, token: str) -> str:
-    url = _make_url(config.hostname, config.port, config.servicename + '/' + config.service_info_endpoint)
+    url = _make_url(config.hostname, config.port, config.servicename + config.service_info_endpoint)
     params = {'token': token}
     try:
         response = get(url=url, params=params, verify=False)
