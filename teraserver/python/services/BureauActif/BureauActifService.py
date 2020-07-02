@@ -23,8 +23,8 @@ def verify_file_upload_directory(config: ConfigManager, create=True):
 
 
 class ServiceBureauActif(ServiceOpenTera):
-    def __init__(self, config_man: ConfigManager):
-        ServiceOpenTera.__init__(self, config_man)
+    def __init__(self, config_man: ConfigManager, info_service):
+        ServiceOpenTera.__init__(self, config_man, info_service)
 
     def notify_service_messages(self, pattern, channel, message):
         pass
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     config_man.service_config['ServiceUUID'] = service_info['service_uuid']
 
     # Creates communication interface with OpenTera
-    Globals.service_opentera = ServiceBureauActif(config_man)
+    Globals.service_opentera = ServiceBureauActif(config_man, service_info)
 
     # TODO: Set port from service config from server?
 
