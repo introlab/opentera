@@ -219,7 +219,7 @@ class TeraSession(db.Model, BaseModel):
         orphans_users = TeraSession.query.outerjoin(TeraSession.session_users).filter(
             TeraSession.session_users == None).all()
 
-        orphans = orphans_parts + orphans_users
+        orphans = list(set(orphans_parts + orphans_users))  # Keep unique sessions only!
 
         if orphans:
             for orphan in orphans:

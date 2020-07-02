@@ -23,8 +23,8 @@ def verify_file_upload_directory(config: ConfigManager, create=True):
 
 
 class ServiceBureauActif(ServiceOpenTera):
-    def __init__(self, config_man: ConfigManager, info_service):
-        ServiceOpenTera.__init__(self, config_man, info_service)
+    def __init__(self, config_man: ConfigManager, this_service_info):
+        ServiceOpenTera.__init__(self, config_man, this_service_info)
 
     def notify_service_messages(self, pattern, channel, message):
         pass

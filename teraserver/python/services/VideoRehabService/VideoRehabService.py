@@ -27,8 +27,8 @@ from flask_babel import gettext
 
 
 class VideoRehabService(ServiceOpenTera):
-    def __init__(self, config_man: ConfigManager, service_info):
-        ServiceOpenTera.__init__(self, config_man, service_info)
+    def __init__(self, config_man: ConfigManager, this_service_info):
+        ServiceOpenTera.__init__(self, config_man, this_service_info)
 
         # self.application = service.Application(self.config['name'])
 
