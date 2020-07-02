@@ -159,14 +159,14 @@ class FlaskModule(BaseModule):
     def __init__(self, config: ConfigManager):
 
         # Warning, the name must be unique!
-        BaseModule.__init__(self, config.service_config['name'] + '.TwistedModule', config)
+        BaseModule.__init__(self, config.service_config['name'] + '.FlaskModule', config)
 
         flask_app.debug = True
         # flask_app.secret_key = 'development'
         # This is used for session encryption
         # TODO Change secret key
         # TODO STORE SECRET IN DB?
-        flask_app.secret_key = 'VideoDispatchSecret'
+        flask_app.secret_key = 'VideoRehabSecret'
 
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
@@ -200,8 +200,9 @@ class FlaskModule(BaseModule):
 
         # Create a Twisted Web Site
         site = MySite(root_resource)
-
-        return internet.TCPServer(self.config.service_config['port'], site)
+        #val = internet.TCPServer(self.config.service_config['port'], site)
+        val = reactor.listenTCP(self.config.service_config['port'], site)
+        return val
 
     def __del__(self):
         pass
@@ -234,6 +235,17 @@ class FlaskModule(BaseModule):
         args = []
         kwargs = {'flaskModule': self}
 
+        from services.VideoRehabService.Views.Index import Index
+        from services.VideoRehabService.Views.Participant import Participant
+        from services.VideoRehabService.Views.Dashboard import Dashboard
+        from services.VideoRehabService.Views.ParticipantEndpoint import ParticipantEndpoint
+
+        # Will create a function that calls the __index__ method with args, kwargs
+        flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
+        flask_app.add_url_rule('/participant', view_func=Participant.as_view('participant', *args, **kwargs))
+        flask_app.add_url_rule('/dashboard', view_func=Dashboard.as_view('dashboard', *args, **kwargs))
+        flask_app.add_url_rule('/participant_endpoint',
+                               view_func=ParticipantEndpoint.as_view('participant_endpoint', *args, **kwargs))
 
 @flask_app.after_request
 def apply_caching(response):

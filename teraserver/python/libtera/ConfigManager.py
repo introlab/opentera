@@ -49,6 +49,10 @@ class ConfigManager:
         redis_required_fields = ['hostname', 'port', 'db', 'username', 'password']
         for field in redis_required_fields:
             self.redis_config[field] = ''
+        # Default redis configuration
+        self.redis_config['hostname'] = 'localhost'
+        self.redis_config['port'] = 6379
+        self.redis_config['db'] = 0
 
     @staticmethod
     def validate_server_config(config):

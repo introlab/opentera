@@ -7,25 +7,22 @@ from libtera.ConfigManager import ConfigManager
 
 class TeraDeviceTest(unittest.TestCase):
 
-    filename = 'TeraDeviceTest.db'
+    filename = os.path.join(os.path.dirname(__file__), 'TeraDeviceTest.db')
 
     SQLITE = {
         'filename': filename
     }
-
-    db_man = DBManager()
-
-    config = ConfigManager()
 
     def setUp(self):
         if os.path.isfile(self.filename):
             print('removing database')
             os.remove(self.filename)
 
-        self.db_man.open_local(self.SQLITE)
-
         # Create default config
+        self.config = ConfigManager()
         self.config.create_defaults()
+        self.db_man = DBManager(self.config)
+        self.db_man.open_local(self.SQLITE)
 
         # Creating default users / tests.
         self.db_man.create_defaults(self.config)

@@ -1,5 +1,5 @@
 {
-	"Server": {
+	"Service": {
 		"name": "BureauActif",
 		"hostname": "localhost",
 		"port": 4050,

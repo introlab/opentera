@@ -7,7 +7,7 @@ import json
 class DeviceQueryDevices(unittest.TestCase):
 
     host = 'localhost'
-    port = 4040
+    port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
     device_query_devices_endpoint = '/api/device/devices'
@@ -49,10 +49,12 @@ class DeviceQueryDevices(unittest.TestCase):
     def test_query_devices_get(self):
         for device in self.all_devices:
             response = self._token_auth_query_devices(device['device_token'])
-            self.assertEqual(response.status_code, 200)
-            info = json.loads(response.text)
-            self.assertTrue(info.__contains__('device_info'))
-            self.assertTrue(info.__contains__('participants_info'))
-            self.assertTrue(info.__contains__('session_types_info'))
-            self.assertEqual(device['id_device'], info['device_info']['id_device'])
-
+            if device['device_enabled']:
+                self.assertEqual(response.status_code, 200)
+                info = json.loads(response.text)
+                self.assertTrue(info.__contains__('device_info'))
+                self.assertTrue(info.__contains__('participants_info'))
+                self.assertTrue(info.__contains__('session_types_info'))
+                self.assertEqual(device['id_device'], info['device_info']['id_device'])
+            else:
+                self.assertEqual(response.status_code, 401)

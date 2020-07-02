@@ -1,11 +1,12 @@
 from libtera.forms.TeraForm import *
 from flask_babel import gettext
+from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 
 
 class TeraUserForm:
 
     @staticmethod
-    def get_user_form():
+    def get_user_form(user_access: DBManagerTeraUserAccess):
         form = TeraForm("user")
 
         # Sections

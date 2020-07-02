@@ -93,23 +93,23 @@ class TwistedModule(BaseModule):
 
         ctx = self.ssl_factory.getContext()
         res1 = ctx.use_privatekey_file(os.path.join(
-            os.path.abspath(self.config.server_config['ssl_path']),
-            self.config.server_config['site_private_key']))
+            os.path.abspath(self.config.service_config['ssl_path']),
+            self.config.service_config['site_private_key']))
 
         res2 = ctx.use_certificate_file(os.path.join(
-            os.path.abspath(self.config.server_config['ssl_path']),
-            self.config.server_config['site_certificate']))
+            os.path.abspath(self.config.service_config['ssl_path']),
+            self.config.service_config['site_certificate']))
 
         # Certificate verification callback
         ctx.set_verify(SSL.VERIFY_NONE, self.verifyCallback)
 
         # With self-signed certs we have to explicitely tell the server to trust certificates
         ctx.load_verify_locations(os.path.join(
-            os.path.abspath(self.config.server_config['ssl_path']),
-            self.config.server_config['ca_certificate']))
+            os.path.abspath(self.config.service_config['ssl_path']),
+            self.config.service_config['ca_certificate']))
 
-        # reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
-        reactor.listenTCP(self.config.server_config['port'], site)
+        # reactor.listenSSL(self.config.service_config['port'], site, self.ssl_factory)
+        reactor.listenTCP(self.config.service_config['port'], site)
 
     def __del__(self):
         pass

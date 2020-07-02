@@ -1,7 +1,4 @@
 # Automate docker setup here
-add_custom_target(docker-Dockerfile
-    SOURCES Dockerfile
-)
 
 # WORKDIR /opentera/teraserver/python
 # Generate translations
@@ -41,7 +38,7 @@ foreach(file ${protofiles})
     #Add command to generate target
     # message(STATUS "Should run: ${PROTOC_EXECUTABLE} ${file} -I. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/python")
     add_custom_target(${output_target}
-        COMMAND ${PROTOC_EXECUTABLE} ${file} -I. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/../python
+        COMMAND ${PROTOC_EXECUTABLE} ${file} -I. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/python
         WORKING_DIRECTORY ${MESSAGES_PATH}
         DEPENDS ${MESSAGES_PATH}/${file} )
 endforeach(file)
@@ -54,5 +51,5 @@ add_custom_target(
 
 
 add_custom_target(docker-all
-    DEPENDS docker-Dockerfile docker-translations docker-messages
+    DEPENDS docker-translations docker-messages
 )

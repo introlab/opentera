@@ -11,7 +11,7 @@ import os
 
 
 def verify_file_upload_directory(config: ConfigManager, create=True):
-    file_upload_path = config.server_config['upload_path']
+    file_upload_path = config.service_config['upload_path']
 
     if not os.path.exists(file_upload_path):
         if create:
@@ -20,6 +20,18 @@ def verify_file_upload_directory(config: ConfigManager, create=True):
         else:
             return None
     return file_upload_path
+
+
+class ServiceBureauActif(ServiceOpenTera):
+    def __init__(self, config_man: ConfigManager):
+        ServiceOpenTera.__init__(self, config_man)
+
+    def notify_service_messages(self, pattern, channel, message):
+        pass
+
+    def setup_rpc_interface(self):
+        # TODO Update rpc interface
+        pass
 
 
 if __name__ == '__main__':
@@ -57,7 +69,7 @@ if __name__ == '__main__':
     Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
 
     # Get service UUID
-    service_info = Globals.redis_client.redisGet(RedisVars.RedisVar_ServicePrefixKey + config_man.server_config['name'])
+    service_info = Globals.redis_client.redisGet(RedisVars.RedisVar_ServicePrefixKey + config_man.service_config['name'])
     import sys
     if service_info is None:
         sys.stderr.write('Error: Unable to get service info from OpenTera Server - is the server running and config '
@@ -69,13 +81,10 @@ if __name__ == '__main__':
         sys.stderr.write('OpenTera Server didn\'t return a valid service UUID - aborting.')
         exit(1)
 
-    config_man.server_config['ServiceUUID'] = service_info['service_uuid']
+    config_man.service_config['ServiceUUID'] = service_info['service_uuid']
 
     # Creates communication interface with OpenTera
-    Globals.service_opentera = ServiceOpenTera(backend_hostname=config_man.backend_config['hostname'],
-                                               backend_port=config_man.backend_config['port'],
-                                               redis_client=Globals.redis_client,
-                                               service_uuid=service_info['service_uuid'])
+    Globals.service_opentera = ServiceBureauActif(config_man)
 
     # TODO: Set port from service config from server?
 

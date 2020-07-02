@@ -7,7 +7,7 @@ import json
 class DeviceQuerySessionEvents(unittest.TestCase):
 
     host = 'localhost'
-    port = 4040
+    port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
     device_query_session_endpoint = '/api/device/sessions'
@@ -25,9 +25,11 @@ class DeviceQuerySessionEvents(unittest.TestCase):
         # Populate sessions for all devices
         for device in self.all_devices:
             response_sessions = self._token_auth_query_sessions(device['device_token'])
-            self.assertEqual(response_sessions.status_code, 200)
-            device['sessions'] = json.loads(response_sessions.text)
-            print(device['sessions'])
+            if device['device_enabled']:
+                # Should be forbidden
+                self.assertEqual(response_sessions.status_code, 403)
+            else:
+                self.assertEqual(response_sessions.status_code, 401)
 
     def tearDown(self):
         pass
@@ -65,26 +67,30 @@ class DeviceQuerySessionEvents(unittest.TestCase):
     def test_query_session_events_get_without_session_id(self):
         for device in self.all_devices:
             response = self._token_auth_query_session_events(device['device_token'])
-            self.assertEqual(response.status_code, 400)
-            errors = json.loads(response.text)
-            self.assertGreater(len(errors), 0)
+            if device['device_enabled']:
+                # Should be forbidden
+                self.assertEqual(response.status_code, 403)
+            else:
+                self.assertEqual(response.status_code, 401)
 
     def test_query_session_events_get_wrong_session_id(self):
         for device in self.all_devices:
             response = self._token_auth_query_session_events(device['device_token'], -1)
-            self.assertEqual(response.status_code, 403)
+            if device['device_enabled']:
+                # Should be forbidden
+                self.assertEqual(response.status_code, 403)
+            else:
+                self.assertEqual(response.status_code, 401)
 
     def test_query_session_event_get_invalid_args(self):
         for device in self.all_devices:
             # Custom request
             url = self._make_url(self.host, self.port, self.device_query_session_events_endpoint) + '?invalid=True'
             request_headers = {'Authorization': 'OpenTera ' + device['device_token']}
-            response = get(url=url, verify=False, headers=request_headers)
-            self.assertEqual(response.status_code, 400)
+            response = self._token_auth_query_session_events(device['device_token'], -1)
+            if device['device_enabled']:
+                # Should be forbidden
+                self.assertEqual(response.status_code, 403)
+            else:
+                self.assertEqual(response.status_code, 401)
 
-    def test_query_session_event_get_valid_session_id(self):
-        for device in self.all_devices:
-            for session in device['sessions']:
-                response = self._token_auth_query_session_events(device['device_token'], session['id_session'])
-                self.assertEqual(response.status_code, 200)
-                # TODO to something with session events

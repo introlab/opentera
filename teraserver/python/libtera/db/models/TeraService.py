@@ -8,7 +8,7 @@ class TeraService(db.Model, BaseModel):
     id_service = db.Column(db.Integer, db.Sequence('id_service_sequence'), primary_key=True, autoincrement=True)
     service_uuid = db.Column(db.String(36), nullable=False, unique=True)
     service_name = db.Column(db.String, nullable=False)
-    service_key = db.Column(db.String, nullable=False)
+    service_key = db.Column(db.String, nullable=False, unique=True)
     service_hostname = db.Column(db.String, nullable=False)
     service_port = db.Column(db.Integer, nullable=False)
     service_endpoint = db.Column(db.String, nullable=False)
@@ -35,7 +35,15 @@ class TeraService(db.Model, BaseModel):
         if minimal:
             ignore_fields.extend([])
 
-        return super().to_json(ignore_fields=ignore_fields)
+        json_service = super().to_json(ignore_fields=ignore_fields)
+        if not minimal:
+            # Add roles for that service
+            roles = []
+            for role in self.service_roles:
+                roles.append(role.to_json())
+            json_service['service_roles'] = roles
+
+        return json_service
 
     @staticmethod
     def get_service_by_key(key: str):
@@ -115,4 +123,11 @@ class TeraService(db.Model, BaseModel):
     def insert(cls, service):
         service.service_uuid = str(uuid.uuid4())
         super().insert(service)
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        # Prevent changes on UUID
+        if 'service_uuid' in values:
+            del values['service_uuid']
+        super().update(update_id, values)
 

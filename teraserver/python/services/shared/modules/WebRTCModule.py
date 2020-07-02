@@ -18,35 +18,16 @@ class WebRTCModule(BaseModule):
         self.available_ports = [port for port in range(self.base_port, self.base_port + self.max_sessions)]
         self.used_ports = []
 
-    def __del__(self):
-        # self.unsubscribe_pattern_with_callback("webrtc.*", self.webrtc_message_callback_deprecated)
-        pass
-
     def setup_module_pubsub(self):
-        # Additional subscribe
-        # TODO change those messages to use complete protobuf messaging system
-        # self.subscribe_pattern_with_callback("webrtc.*", self.webrtc_message_callback_deprecated)
         pass
 
     def setup_rpc_interface(self):
-        self.rpc_api['create_session'] = {'args': ['str:room_name', 'str:owner_uuid'],
-                                          'returns': 'dict',
-                                          'callback': self.create_webrtc_session}
+        pass
 
-        self.rpc_api['stop_session'] = {'args': ['str:room_name'],
-                                        'returns': 'dict',
-                                        'callback': self.stop_webrtc_session}
-
-    def create_webrtc_session(self, room_name, owner_uuid, *args, **kwargs):
-
+    def create_webrtc_session(self, room_name, owner_uuid, users: list, participants: list, devices: list):
         # make sure we kill sessions already started with this owner_uuid or room name
         self.terminate_webrtc_session_with_owner_uuid(owner_uuid)
         self.terminate_webrtc_session_with_room_name(room_name)
-
-        # Participants are listed in args
-        participant_list = []
-        for participant in args:
-            participant_list.append(participant)
 
         # Get next available port
         port = self.get_available_port()
@@ -59,22 +40,22 @@ class WebRTCModule(BaseModule):
                   + str(self.config.webrtc_config['external_port']) \
                   + '/teraplus/' + str(port) + '/teraplus?key=' + key
 
-            if self.launch_node(port=port, key=key, owner=owner_uuid, participants=participant_list):
+            if self.launch_node(port=port, key=key, owner=owner_uuid,
+                                users=users, participants=participants, devices=devices):
                 # Return url
-                return {'url': url, 'key': key, 'port': port, 'owner': owner_uuid, 'participants': participant_list}
+                return True, {'url': url, 'key': key, 'port': port, 'owner': owner_uuid, 'users': users,
+                              'participants': participants, 'devices': devices}
             else:
-                return {'error': 'Process not launched.'}
+                return False, {'error': 'Process not launched.'}
         else:
-            return {'error': 'No available port left.'}
+            return False, {'error': 'No available port left.'}
 
     def stop_webrtc_session(self, room_name, *args, **kwargs):
         for process_dict in self.processList:
             if process_dict['key'] == room_name:
-                participants = process_dict['participants']
-                owner = process_dict['owner']
                 if self.terminate_webrtc_session_with_room_name(room_name):
-                    return {'participants': participants, 'owner': owner}
-        return {}
+                    return True, process_dict['key']
+        return False, {}
 
     def terminate_webrtc_session_with_room_name(self, room_name):
         for process_dict in self.processList:
@@ -132,7 +113,7 @@ class WebRTCModule(BaseModule):
         self.used_ports.append(port)
         return port
 
-    def launch_node(self, port, key, owner, participants):
+    def launch_node(self, port, key, owner, users, participants, devices):
         executable_args = [self.config.webrtc_config['executable'],
                            self.config.webrtc_config['script'],
                            str(port),
@@ -148,7 +129,9 @@ class WebRTCModule(BaseModule):
                                      'port': port,
                                      'key': key,
                                      'owner': owner,
-                                     'participants': participants})
+                                     'users': users,
+                                     'participants': participants,
+                                     'devices': devices})
 
             print(self.module_name + ' - started process', process)
             return True

@@ -35,6 +35,12 @@ class TeraSessionForm:
         for part in participants:
             parts_list.append(TeraFormValue(value_id=part.id_participant, value=part.participant_name))
 
+        # Services
+        services = user_access.get_accessible_services()
+        services_list = list()
+        for service in services:
+            services_list.append(TeraFormValue(value_id=service.id_service, value=service.service_name))
+
         # Session status
         status_list = []
         for status in TeraSessionStatus:
@@ -46,6 +52,7 @@ class TeraSessionForm:
 
         # Items
         section.add_item(TeraFormItem("id_session", gettext("ID séance"), "hidden", True))
+        section.add_item(TeraFormItem("session_uuid", gettext("UUID Séance"), "hidden", True))
         section.add_item(TeraFormItem("session_name", gettext("Nom de la séance"), "text", True))
         section.add_item(TeraFormItem("id_session_type", gettext("Type de séance"), "array", True, item_values=st_list))
         section.add_item(TeraFormItem('session_creator_user', gettext('Nom créateur (Utilisateur)'), 'hidden', False))
@@ -68,6 +75,13 @@ class TeraSessionForm:
                                       item_condition=TeraFormItemCondition(condition_item='session_creator_participant',
                                                                            condition_operator='NOT NULL',
                                                                            condition_condition=None)))
+        section.add_item(TeraFormItem('session_creator_service', gettext('Nom créateur (Service)'), 'hidden',
+                                      False))
+        section.add_item(TeraFormItem("id_creator_service", gettext("Créateur (Service)"), "array", True,
+                                      item_values=services_list, item_options={"readonly": True},
+                                      item_condition=TeraFormItemCondition(condition_item='session_creator_service',
+                                                                           condition_operator='NOT NULL',
+                                                                           condition_condition=None)))
         section.add_item(TeraFormItem("session_start_datetime", gettext("Date de début"), "datetime", True))
         section.add_item(TeraFormItem("session_duration", gettext("Durée"), "duration", True,
                                       item_options={"default": 0, "readonly": True}))
@@ -76,7 +90,8 @@ class TeraSessionForm:
         section.add_item(TeraFormItem("session_comments", gettext("Commentaires"), "longtext", False))
 
         # Hidden as handled elsewhere
-        section.add_item(TeraFormItem("session_participants_ids", gettext("Participants"), "hidden", False))
+        section.add_item(TeraFormItem("session_participants", gettext("Participants"), "hidden", False))
+        section.add_item(TeraFormItem("session_users", gettext("Utilisateurs"), "hidden", False))
         section.add_item(TeraFormItem("session_has_device_data", gettext("A données capteur"), "hidden", False))
 
         return form.to_dict()

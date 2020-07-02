@@ -18,7 +18,8 @@ class TeraProject(db.Model, BaseModel):
         rval = super().to_json(ignore_fields=ignore_fields)
 
         # Add sitename
-        rval['site_name'] = self.project_site.site_name
+        if 'site_name' not in ignore_fields and not minimal:
+            rval['site_name'] = self.project_site.site_name
 
         return rval
 
@@ -34,11 +35,15 @@ class TeraProject(db.Model, BaseModel):
 
     def get_users_in_project(self):
         # Get all users who has a role in the project
-        project_access = TeraProjectAccess.query.filter(TeraProjectAccess.id_project == self.id_project).all()
+        # project_access = TeraProjectAccess.query.filter(TeraProjectAccess.id_project == self.id_project).all()
+        project_access = TeraProjectAccess.get_projects_access_for_project(self.id_project)
         users = []
         for access in project_access:
-            if access.project_access_user not in users:
-                users.append(access.project_access_user)
+            # Get all users in the related group
+            users = access.project_access_user_group.user_group_users
+            for user in users:
+                if user not in users:
+                    users.append(user)
 
         return users
 

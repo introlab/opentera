@@ -52,8 +52,9 @@ class QueryRawData(Resource):
             creation_date = datetime.datetime.strptime(request.headers['X-Filedate'], '%Y-%m-%d %H:%M:%S')
 
             # Check if device is allowed to access the specified session
+            # TODO - right now, this API was disabled for security reasons
             # if not current_device_client.can_access_session(id_session):
-            #    return 'Session not available', 404
+            #     return 'Session not available', 404
 
             # Get participants for that session
             device_info = current_device_client.get_device_infos()

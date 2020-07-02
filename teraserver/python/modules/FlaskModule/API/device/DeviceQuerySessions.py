@@ -7,20 +7,19 @@ from modules.LoginModule.LoginModule import LoginModule
 from sqlalchemy import exc
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from libtera.db.models.TeraDevice import TeraDevice
-
+import uuid
 
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('token', type=str, help='Secret Token')
 get_parser.add_argument('id_session', type=int, help='Session ID')
-# get_parser.add_argument('id_participant', type=int, help='Participant ID')
 get_parser.add_argument('list', type=inputs.boolean, help='List all sessions')
 
 post_parser = api.parser()
 post_parser.add_argument('token', type=str, help='Secret Token')
 post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
 
-session_schema = api.schema_model('session', {
+session_schema = api.schema_model('device_session', {
     'properties': {
         'session': {
             'type': 'object',
@@ -31,7 +30,7 @@ session_schema = api.schema_model('session', {
                 'session_participants': {
                     'type': 'array',
                     'uniqueItems': True,
-                    'contains': {
+                    'items': {
                         'type': 'string',
                         'format': 'uuid'
                     }
@@ -101,7 +100,7 @@ class DeviceQuerySessions(Resource):
         return '', 403
 
     @LoginModule.device_token_or_certificate_required
-    # @api.expect(session_schema, validate=True)
+    @api.expect(session_schema, validate=True)
     @api.doc(description='Update/Create session',
              responses={200: 'Success',
                         400: 'Required parameter is missing',
@@ -129,8 +128,9 @@ class DeviceQuerySessions(Resource):
         if 'id_session_type' not in json_session:
             return '', 400
 
-        # Validate that we have session participants for new sessions
-        if 'session_participants' not in json_session and json_session['id_session'] == 0:
+        # Validate that we have session participants or users for new sessions
+        if ('session_participants' not in json_session and 'session_users' not in json_session) \
+                and json_session['id_session'] == 0:
             return '', 400
 
         # We know we have a device
@@ -145,7 +145,6 @@ class DeviceQuerySessions(Resource):
 
         # Do the update!
         if json_session['id_session'] > 0:
-
             # Already existing
             # TODO handle participant list (remove, add) in session
             try:
@@ -165,11 +164,15 @@ class DeviceQuerySessions(Resource):
                 participants = json_session.pop('session_participants')
                 new_ses.from_json(json_session)
 
-                for uuid in participants:
-                    participant = TeraParticipant.get_participant_by_uuid(uuid)
+                TeraSession.insert(new_ses)
+
+                for p_uuid in participants:
+                    participant = TeraParticipant.get_participant_by_uuid(p_uuid)
                     new_ses.session_participants.append(participant)
 
-                TeraSession.insert(new_ses)
+                if len(participants) > 0:
+                    new_ses.commit() # Commits added participants
+
                 # Update ID for further use
                 json_session['id_session'] = new_ses.id_session
 
@@ -178,7 +181,6 @@ class DeviceQuerySessions(Resource):
                 print(sys.exc_info())
                 return '', 500
 
-        # TODO: Publish update to everyone who is subscribed to sites update...
         update_session = TeraSession.get_session_by_id(json_session['id_session'])
 
         return jsonify(update_session.to_json())

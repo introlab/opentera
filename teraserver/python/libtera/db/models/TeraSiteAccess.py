@@ -5,53 +5,39 @@ class TeraSiteAccess(db.Model, BaseModel):
     __tablename__ = 't_sites_access'
     id_site_access = db.Column(db.Integer, db.Sequence('id_site_access_sequence'), primary_key=True, autoincrement=True)
     id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
-    id_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user', ondelete='cascade'), nullable=False)
+    id_user_group = db.Column(db.Integer, db.ForeignKey('t_users_groups.id_user_group', ondelete='cascade'),
+                              nullable=False)
     site_access_role = db.Column(db.String(100), nullable=False, unique=False)
 
     site_access_site = db.relationship('TeraSite')
-    site_access_user = db.relationship('TeraUser')
-
-    def __init__(self):
-        self.site_access_inherited = False
+    site_access_user_group = db.relationship('TeraUserGroup')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['id_site_access', 'site_access_site', 'site_access_user'])
+        ignore_fields.extend(['id_site_access', 'site_access_site', 'site_access_user_group'])
         rval = super().to_json(ignore_fields=ignore_fields)
 
         rval['site_name'] = self.site_access_site.site_name
-        rval['user_name'] = self.site_access_user.get_fullname()
+        if self.site_access_user_group:
+            rval['user_group_name'] = self.site_access_user_group.user_group_name
+        else:
+            rval['user_group_name'] = None
         return rval
 
     @staticmethod
-    def build_superadmin_access_object(site_id: int, user_id: int):
-        from libtera.db.models.TeraSite import TeraSite
-        from libtera.db.models.TeraUser import TeraUser
-        super_admin = TeraSiteAccess()
-        super_admin.id_user = user_id
-        super_admin.id_site = site_id
-        super_admin.site_access_role = 'admin'
-        super_admin.site_access_inherited = True
-        super_admin.site_access_user = TeraUser.get_user_by_id(user_id)
-        super_admin.site_access_site = TeraSite.get_site_by_id(site_id)
-
-        return super_admin
-
-    @staticmethod
-    def update_site_access(id_user: int, id_site: int, rolename: str):
+    def update_site_access(id_user_group: int, id_site: int, rolename: str):
         # Check if access already exists
-        access = TeraSiteAccess.get_specific_site_access(id_user=id_user, id_site=id_site)
+        access = TeraSiteAccess.get_specific_site_access(id_user_group=id_user_group, id_site=id_site)
         if access is None:
             # No access already present for that user and site - create new one
-            return TeraSiteAccess.insert_site_access(id_user=id_user, id_site=id_site, rolename=rolename)
+            return TeraSiteAccess.insert_site_access(id_user_group=id_user_group, id_site=id_site, rolename=rolename)
         else:
             # Update it
             if rolename == '':
                 # No role anymore - delete it from the database
                 db.session.delete(access)
-                db.session.commit()
-                return None
+                access = None
             else:
                 access.site_access_role = rolename
 
@@ -59,7 +45,7 @@ class TeraSiteAccess(db.Model, BaseModel):
             return access
 
     @staticmethod
-    def insert_site_access(id_user: int, id_site: int, rolename: str):
+    def insert_site_access(id_user_group: int, id_site: int, rolename: str):
         # No role - don't insert anything!
         if rolename == '':
             return
@@ -67,7 +53,7 @@ class TeraSiteAccess(db.Model, BaseModel):
         new_access = TeraSiteAccess()
         new_access.site_access_role = rolename
         new_access.id_site = id_site
-        new_access.id_user = id_user
+        new_access.id_user_group = id_user_group
 
         db.session.add(new_access)
         db.session.commit()
@@ -75,9 +61,21 @@ class TeraSiteAccess(db.Model, BaseModel):
         return new_access
 
     @staticmethod
-    def get_specific_site_access(id_user: int, id_site: int):
-        access = TeraSiteAccess.query.filter_by(id_user=id_user, id_site=id_site).first()
+    def get_specific_site_access(id_user_group: int, id_site: int):
+        access = TeraSiteAccess.query.filter_by(id_user_group=id_user_group, id_site=id_site).first()
         return access
+
+    @staticmethod
+    def get_sites_access_for_user_group(id_user_group: int):
+        return TeraSiteAccess.query.filter_by(id_user_group=id_user_group).all()
+
+    @staticmethod
+    def get_sites_access_for_site(id_site: int):
+        return TeraSiteAccess.query.filter_by(id_site=id_site).all()
+
+    @staticmethod
+    def get_site_access_by_id(site_access_id: int):
+        return TeraSiteAccess.query.filter_by(id_site_access=site_access_id).first()
 
     @staticmethod
     def create_defaults():

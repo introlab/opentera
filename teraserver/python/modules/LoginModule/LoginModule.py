@@ -279,15 +279,6 @@ class LoginModule(BaseModule):
                     login_user(current_device, remember=True)
                     return f(*args, **kwargs)
 
-            elif request.headers.__contains__('X-Participant-Uuid'):
-                # Load participant from DB
-                _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_uuid(
-                    request.headers['X-Participant-Uuid'])
-
-                if current_participant and current_participant.participant_enabled:
-                    login_user(current_participant, remember=True)
-                    return f(*args, **kwargs)
-
             # Then verify tokens...
             # Verify token in auth headers (priority over token in params)
             if 'Authorization' in request.headers:
@@ -300,14 +291,6 @@ class LoginModule(BaseModule):
 
                 # Verify scheme and token
                 if scheme == 'OpenTera':
-                    # Load participant from DB
-                    _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token)
-
-                    if current_participant and current_participant.participant_enabled:
-                        # Returns the function if authenticated with token
-                        login_user(current_participant, remember=True)
-                        return f(*args, **kwargs)
-
                     # Load device from DB
                     _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(token)
 
@@ -324,14 +307,6 @@ class LoginModule(BaseModule):
 
             # Verify token in params
             if 'token' in token_args:
-                # Load participant from DB
-                _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_args['token'])
-
-                if current_participant and current_participant.participant_enabled:
-                    # Returns the function if authenticated with token
-                    login_user(current_participant, remember=True)
-                    return f(*args, **kwargs)
-
                 # Load device from DB
                 _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(token_args['token'])
 
