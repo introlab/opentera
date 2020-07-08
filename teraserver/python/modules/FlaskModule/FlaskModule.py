@@ -84,6 +84,7 @@ class FlaskModule(BaseModule):
 
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
+        flask_app.config.update({'SESSION_COOKIE_SECURE': True})
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
         flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})

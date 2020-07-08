@@ -14,7 +14,7 @@ function startStatusUpdates(){
     updateStatus();
 }
 
-function connectToNextParticipant(){
+/*function connectToNextParticipant(){
     doGetRequest(service_hostname, service_port, '/videodispatch/api/videodispatch/sessiondispatch', connectSuccess, connectError);
 }
 
@@ -42,7 +42,7 @@ function connectSuccess(response, status, request){
 function connectError(event, status){
     console.error("connectError: " + event.status + " : " + event.responseText);
 
-}
+}*/
 
 
 var sessionUrlTries = 0;
@@ -73,7 +73,7 @@ function testCurrentSessionUrlValid(){
     request.send();
 }
 
-function updateStatus(){
+/*function updateStatus(){
     //console.log("Updating status...");
     doGetRequest(service_hostname, service_port, '/videodispatch/api/videodispatch/status', statusSuccess);
 }
@@ -96,7 +96,7 @@ function statusSuccess(response, status, request){
             document.getElementById('lblRank').innerHTML = response['rank'];
         }
     }
-}
+}*/
 
 function doStopCurrentSession(session_key){
     if (session_key === undefined)

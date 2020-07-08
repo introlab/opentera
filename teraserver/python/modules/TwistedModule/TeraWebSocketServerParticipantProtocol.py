@@ -45,6 +45,9 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
             participant_connected = messages.ParticipantEvent()
             participant_connected.participant_uuid = str(self.participant.participant_uuid)
             participant_connected.type = messages.ParticipantEvent.PARTICIPANT_CONNECTED
+            participant_connected.participant_name = self.participant.participant_name
+            participant_connected.participant_project_name = self.participant.participant_project.project_name
+            participant_connected.participant_site_name = self.participant.participant_project.project_site.site_name
             # Need to use Any container
             any_message = Any()
             any_message.Pack(participant_connected)

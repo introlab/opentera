@@ -170,6 +170,8 @@ class FlaskModule(BaseModule):
 
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
+        flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
         # flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
@@ -200,7 +202,7 @@ class FlaskModule(BaseModule):
 
         # Create a Twisted Web Site
         site = MySite(root_resource)
-        #val = internet.TCPServer(self.config.service_config['port'], site)
+        # val = internet.TCPServer(self.config.service_config['port'], site)
         val = reactor.listenTCP(self.config.service_config['port'], site)
         return val
 
@@ -236,14 +238,16 @@ class FlaskModule(BaseModule):
         kwargs = {'flaskModule': self}
 
         from services.VideoRehabService.Views.Index import Index
-        from services.VideoRehabService.Views.Participant import Participant
-        from services.VideoRehabService.Views.Dashboard import Dashboard
+        from services.VideoRehabService.Views.ParticipantLocalView import ParticipantLocalView
+        from services.VideoRehabService.Views.ParticipantDashboard import ParticipantDashboard
         from services.VideoRehabService.Views.ParticipantEndpoint import ParticipantEndpoint
 
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
-        flask_app.add_url_rule('/participant', view_func=Participant.as_view('participant', *args, **kwargs))
-        flask_app.add_url_rule('/dashboard', view_func=Dashboard.as_view('dashboard', *args, **kwargs))
+        flask_app.add_url_rule('/participant_localview', view_func=ParticipantLocalView.as_view('participant_localview',
+                                                                                                *args, **kwargs))
+        flask_app.add_url_rule('/participant', view_func=ParticipantDashboard.as_view('participant_dashboard', *args,
+                                                                                      **kwargs))
         flask_app.add_url_rule('/participant_endpoint',
                                view_func=ParticipantEndpoint.as_view('participant_endpoint', *args, **kwargs))
 
