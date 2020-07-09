@@ -264,15 +264,15 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_services(self, admin_only=False):
         from libtera.db.models.TeraService import TeraService
-        from libtera.db.models.TeraServiceProjectRole import TeraServiceProjectRole
+        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
         from libtera.db.models.TeraServiceRole import TeraServiceRole
 
         if self.user.user_superadmin:
             return TeraService.query.all()
 
         accessible_projects_ids = self.get_accessible_projects_ids()
-        query = TeraService.query.join(TeraServiceProjectRole).filter(
-            TeraServiceProjectRole.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
+        query = TeraService.query.join(TeraServiceAccess).filter(
+            TeraServiceAccess.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
 
         if admin_only:
             query = query.join(TeraServiceRole).filter(TeraServiceRole.service_role_name == 'admin')
@@ -637,15 +637,15 @@ class DBManagerTeraUserAccess:
         return service_projects
 
     def query_services_roles_for_project(self, project_id: int):
-        from libtera.db.models.TeraServiceProjectRole import TeraServiceProjectRole
+        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
         group_ids = self.get_accessible_users_groups_ids()
         participant_ids = self.get_accessible_participants_ids()
         device_ids = self.get_accessible_devices_ids()
 
-        service_projects_roles = TeraServiceProjectRole.query.filter(or_(
-            TeraServiceProjectRole.id_user_group.in_(group_ids),
-            TeraServiceProjectRole.id_device.in_(device_ids),
-            TeraServiceProjectRole.id_participant.in_(participant_ids))).filter_by(id_project=project_id).all()
+        service_projects_roles = TeraServiceAccess.query.filter(or_(
+            TeraServiceAccess.id_user_group.in_(group_ids),
+            TeraServiceAccess.id_device.in_(device_ids),
+            TeraServiceAccess.id_participant.in_(participant_ids))).filter_by(id_project=project_id).all()
 
         # if include_empty_services:
         #     # We must add missing services in the list
@@ -661,15 +661,15 @@ class DBManagerTeraUserAccess:
         return service_projects_roles
 
     def query_services_roles_for_service(self, service_id: int):
-        from libtera.db.models.TeraServiceProjectRole import TeraServiceProjectRole
+        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
         group_ids = self.get_accessible_users_groups_ids()
         participant_ids = self.get_accessible_participants_ids()
         device_ids = self.get_accessible_devices_ids()
 
-        service_projects_roles = TeraServiceProjectRole.query.filter(or_(
-            TeraServiceProjectRole.id_user_group.in_(group_ids),
-            TeraServiceProjectRole.id_device.in_(device_ids),
-            TeraServiceProjectRole.id_participant.in_(participant_ids))).filter_by(id_service=service_id).all()
+        service_projects_roles = TeraServiceAccess.query.filter(or_(
+            TeraServiceAccess.id_user_group.in_(group_ids),
+            TeraServiceAccess.id_device.in_(device_ids),
+            TeraServiceAccess.id_participant.in_(participant_ids))).filter_by(id_service=service_id).all()
 
         return service_projects_roles
 

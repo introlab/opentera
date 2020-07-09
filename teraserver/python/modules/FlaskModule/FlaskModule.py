@@ -146,7 +146,7 @@ class FlaskModule(BaseModule):
         from .API.user.UserQueryAssets import UserQueryAssets
         from .API.user.UserQueryServices import UserQueryServices
         from .API.user.UserQueryServiceProjects import UserQueryServiceProjects
-        from .API.user.UserQueryServiceProjectRoles import UserQueryServiceProjectRoles
+        from .API.user.UserQueryServiceAccess import UserQueryServiceAccess
         from .API.user.UserSessionManager import UserSessionManager
 
         # Resources
@@ -176,7 +176,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQueryAssets, '/assets', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServices, '/services', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServiceProjects, '/serviceprojects', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryServiceProjectRoles, '/serviceprojectroles', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryServiceAccess, '/serviceaccess', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserSessionManager, '/sessions/manager', resource_class_kwargs=kwargs)
         api.add_namespace(user_api_ns)
 

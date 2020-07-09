@@ -6,9 +6,13 @@ class TeraServiceRole(db.Model, BaseModel):
     id_service_role = db.Column(db.Integer, db.Sequence('id_service_role_sequence'), primary_key=True,
                                 autoincrement=True)
     id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
+    id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=True)
+    id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=True)
     service_role_name = db.Column(db.String(100), nullable=False)
 
     service_role_service = db.relationship("TeraService")
+    service_role_project = db.relationship('TeraProject')
+    service_role_site = db.relationship('TeraSite')
 
     def __init__(self):
         pass
@@ -44,14 +48,17 @@ class TeraServiceRole(db.Model, BaseModel):
         from libtera.db.models.TeraService import TeraService
 
         for service in TeraService.query.all():
-            new_role = TeraServiceRole()
-            new_role.id_service = service.id_service
-            new_role.service_role_name = 'admin'
-            db.session.add(new_role)
+            if service.service_key != 'OpenTeraServer':  # Don't add global roles for TeraServer
+                new_role = TeraServiceRole()
+                new_role.id_service = service.id_service
+                new_role.service_role_name = 'admin'
+                db.session.add(new_role)
 
-            new_role = TeraServiceRole()
-            new_role.id_service = service.id_service
-            new_role.service_role_name = 'user'
-            db.session.add(new_role)
+                new_role = TeraServiceRole()
+                new_role.id_service = service.id_service
+                new_role.service_role_name = 'user'
+                db.session.add(new_role)
+            else:
+                pass  # TODO: do what we did in Project and Site Access
 
         db.session.commit()

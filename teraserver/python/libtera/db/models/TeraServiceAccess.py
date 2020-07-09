@@ -1,26 +1,22 @@
 from libtera.db.Base import db, BaseModel
 
 
-class TeraServiceProjectRole(db.Model, BaseModel):
-    __tablename__ = 't_services_project_roles'
-    id_service_project_role = db.Column(db.Integer, db.Sequence('id_service_project_role_sequence'), primary_key=True,
-                                        autoincrement=True)
-    id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
-    id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
+class TeraServiceAccess(db.Model, BaseModel):
+    __tablename__ = 't_services_access'
+    id_service_access = db.Column(db.Integer, db.Sequence('id_service_project_role_sequence'), primary_key=True,
+                                  autoincrement=True)
     id_user_group = db.Column(db.Integer, db.ForeignKey('t_users_groups.id_user_group', ondelete='cascade'),
                               nullable=True)
     id_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device', ondelete='cascade'), nullable=True)
-    id_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant', ondelete='cascade'),
-                               nullable=True)
+    id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group',
+                                                               ondelete='cascade'), nullable=True)
     id_service_role = db.Column(db.Integer, db.ForeignKey('t_services_roles.id_service_role', ondelete='cascade'),
                                 nullable=False)
 
-    service_project_role_service = db.relationship("TeraService")
-    service_project_role_project = db.relationship("TeraProject")
-    service_project_role_role = db.relationship("TeraServiceRole")
-    service_project_role_user_group = db.relationship("TeraUserGroup")
-    service_project_role_device = db.relationship("TeraDevice")
-    service_project_role_participant = db.relationship("TeraParticipant")
+    service_access_role = db.relationship("TeraServiceRole")
+    service_access_user_group = db.relationship("TeraUserGroup")
+    service_access_device = db.relationship("TeraDevice")
+    service_access_participant_group = db.relationship("TeraParticipantGroup")
 
     def __init__(self):
         pass
@@ -48,8 +44,8 @@ class TeraServiceProjectRole(db.Model, BaseModel):
 
         # Complete information if not minimal
         if not minimal:
-            if self.service_project_role_service:
-                json_val['service_name'] = self.service_project_role_service.service_name
+            if self.service_access_service:
+                json_val['service_name'] = self.service_access_service.service_name
             else:
                 # This happens on transient objects
                 from libtera.db.models.TeraService import TeraService
@@ -57,8 +53,8 @@ class TeraServiceProjectRole(db.Model, BaseModel):
                 if service:
                     json_val['service_name'] = service.service_name
             if self.id_user_group:
-                if self.service_project_role_user_group:
-                    json_val['user_group_name'] = self.service_project_role_user_group.user_group_name
+                if self.service_access_user_group:
+                    json_val['user_group_name'] = self.service_access_user_group.user_group_name
                 else:
                     # This happens on transient objects
                     from libtera.db.models.TeraUserGroup import TeraUserGroup
@@ -66,14 +62,14 @@ class TeraServiceProjectRole(db.Model, BaseModel):
                     if ug:
                         json_val['user_group_name'] = ug.user_group_name
             if self.id_device:
-                json_val['device_name'] = self.service_project_role_device.device_name
+                json_val['device_name'] = self.service_access_device.device_name
             if self.id_participant:
                 json_val['participant_name'] = self.service_project_role_participant.participant_name
         return json_val
 
     @staticmethod
     def get_service_project_role_by_id(service_project_role_id: int):
-        return TeraServiceProjectRole.query.filter_by(id_service_project_role=service_project_role_id).first()
+        return TeraServiceAccess.query.filter_by(id_service_project_role=service_project_role_id).first()
 
     @staticmethod
     def create_defaults():
@@ -92,14 +88,14 @@ class TeraServiceProjectRole(db.Model, BaseModel):
         user_group1 = TeraUserGroup.get_user_group_by_group_name('Users - Project 1')
         user_group2 = TeraUserGroup.get_user_group_by_group_name('Admins - Project 1')
 
-        service_role = TeraServiceProjectRole()
+        service_role = TeraServiceAccess()
         service_role.id_user_group = user_group1.id_user_group
         service_role.id_project = project1.id_project
         service_role.id_service = servicebureau.id_service
         service_role.id_service_role = servicebureauadmin.id_service_role
         db.session.add(service_role)
 
-        service_role = TeraServiceProjectRole()
+        service_role = TeraServiceAccess()
         service_role.id_user_group = user_group2.id_user_group
         service_role.id_project = project1.id_project
         service_role.id_service = serviceviddispatch.id_service

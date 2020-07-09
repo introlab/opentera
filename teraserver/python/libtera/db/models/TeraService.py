@@ -74,6 +74,17 @@ class TeraService(db.Model, BaseModel):
     @staticmethod
     def create_defaults():
         new_service = TeraService()
+        new_service.service_uuid = '00000000-0000-0000-0000-000000000001'
+        new_service.service_key = 'OpenTeraServer'
+        new_service.service_name = 'OpenTera Server'
+        new_service.service_hostname = 'localhost'
+        new_service.service_port = 4040
+        new_service.service_endpoint = '/'
+        new_service.service_clientendpoint = '/'
+        new_service.service_enabled = True
+        db.session.add(new_service)
+
+        new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
         new_service.service_key = 'BureauActif'
         new_service.service_name = 'Bureau Actif'
