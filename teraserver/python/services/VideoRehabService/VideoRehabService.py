@@ -5,6 +5,9 @@ from libtera.db.models.TeraSession import TeraSessionStatus
 from services.VideoRehabService.ConfigManager import ConfigManager
 from services.shared.ServiceAccessManager import ServiceAccessManager
 from modules.RedisVars import RedisVars
+from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
+from google.protobuf.json_format import Parse, ParseError
+from google.protobuf.message import DecodeError
 
 # Twisted
 from twisted.application import internet, service
@@ -48,6 +51,44 @@ class VideoRehabService(ServiceOpenTera):
 
     def notify_service_messages(self, pattern, channel, message):
         pass
+
+    @defer.inlineCallbacks
+    def register_to_events(self):
+        # Need to register to events produced by UserManagerModule
+        ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+            ModuleNames.USER_MANAGER_MODULE_NAME), self.user_manager_event_received)
+
+        print(ret1)
+
+    def user_manager_event_received(self, pattern, channel, message):
+        print('VideoRehabService - user_manager_event_received', pattern, channel, message)
+        try:
+            tera_event = messages.TeraEvent()
+            if isinstance(message, str):
+                ret = tera_event.ParseFromString(message.encode('utf-8'))
+            elif isinstance(message, bytes):
+                ret = tera_event.ParseFromString(message)
+
+            # Look for ParticipantEvent, DeviceEvent, UserEvent
+            user_event = messages.UserEvent()
+            participant_event = messages.ParticipantEvent()
+            device_event = messages.DeviceEvent()
+
+            for any_msg in tera_event.events:
+                if any_msg.Unpack(user_event):
+                    print('user_event')
+
+                if any_msg.Unpack(participant_event):
+                    print('participant_event')
+
+                if any_msg.Unpack(device_event):
+                    print('device_event')
+
+        except DecodeError as d:
+            print('VideoRehabService - DecodeError ', pattern, channel, message, d)
+        except ParseError as e:
+            print('VideoRehabService - Failure in redisMessageReceived', e)
+
 
     def setup_rpc_interface(self):
         # TODO Update rpc interface

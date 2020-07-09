@@ -10,6 +10,7 @@ from twisted.internet import defer
 import datetime
 
 
+
 class ServiceOpenTera(RedisClient):
 
     def __init__(self, config_man: ServiceConfigManager, service_info):
@@ -43,8 +44,15 @@ class ServiceOpenTera(RedisClient):
         # Build standard interface
         self.build_interface()
 
+        # Register to system events
+        self.register_to_events()
+
     def setup_rpc_interface(self):
-        # Should be implemented in derived class
+        # Should be implemented in derived classes
+        pass
+
+    def register_to_events(self):
+        # Should be implemented in derived classes
         pass
 
     def notify_service_messages(self, pattern, channel, message):

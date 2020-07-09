@@ -49,7 +49,7 @@ if __name__ == '__main__':
     graph = create_schema_graph(metadata=MetaData(db_uri),
                                 show_datatypes=True,  # The image would get nasty big if we'd show the datatypes
                                 show_indexes=True,  # ditto for indexes
-                                rankdir='LR',  # From left to right (instead of top to bottom)
+                                rankdir='TB',  # From left to right (instead of top to bottom)
                                 concentrate=True  # Don't try to join the relation lines together
                                 )
     graph.write_png('opentera_dbschema.png')   # write out the file
