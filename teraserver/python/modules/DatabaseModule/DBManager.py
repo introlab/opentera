@@ -87,14 +87,6 @@ class DBManager (BaseModule):
             print('No server settings - creating defaults')
             TeraServerSettings.create_defaults()
 
-        if TeraSite.get_count() == 0:
-            print('No sites - creating defaults')
-            TeraSite.create_defaults()
-
-        if TeraProject.get_count() == 0:
-            print("No projects - creating defaults")
-            TeraProject.create_defaults()
-
         if TeraService.get_count() == 0:
             print("No services - creating defaults")
             TeraService.create_defaults()
@@ -102,6 +94,14 @@ class DBManager (BaseModule):
         if TeraServiceRole.get_count() == 0:
             print("No service roles - creating defaults for each service")
             TeraServiceRole.create_defaults()
+
+        if TeraSite.get_count() == 0:
+            print('No sites - creating defaults')
+            TeraSite.create_defaults()
+
+        if TeraProject.get_count() == 0:
+            print("No projects - creating defaults")
+            TeraProject.create_defaults()
 
         if TeraServiceProject.get_count() == 0:
             print('No service - project association - creating defaults')

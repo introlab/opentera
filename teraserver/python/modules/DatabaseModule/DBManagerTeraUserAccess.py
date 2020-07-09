@@ -15,7 +15,6 @@ from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
 
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 
 from sqlalchemy import or_
 

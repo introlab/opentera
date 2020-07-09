@@ -1,6 +1,5 @@
 from libtera.db.Base import db, BaseModel
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
 from flask_sqlalchemy import event

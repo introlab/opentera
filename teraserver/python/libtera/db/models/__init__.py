@@ -21,7 +21,6 @@ from .TeraSessionType import TeraSessionType
 from .TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
 from .TeraSessionTypeProject import TeraSessionTypeProject
 from .TeraSite import TeraSite
-from .TeraSiteAccess import TeraSiteAccess
 from .TeraTest import TeraTest
 from .TeraTestType import TeraTestType
 
@@ -49,6 +48,5 @@ __all__ = ['TeraAsset',
            'TeraSessionTypeProject',
            'TeraSessionUsers',
            'TeraSite',
-           'TeraSiteAccess',
            'TeraTest',
            'TeraTestType']

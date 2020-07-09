@@ -28,16 +28,45 @@ class TeraServiceRole(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend(['service_role_service'])
+        ignore_fields.extend(['service_role_service', 'service_role_project', 'service_role_site'])
 
         if minimal:
             ignore_fields.extend([])
 
-        return super().to_json(ignore_fields=ignore_fields)
+        json_val = super().to_json(ignore_fields=ignore_fields)
+
+        # Remove null values
+        if not json_val['id_project']:
+            del json_val['id_project']
+        if not json_val['id_site']:
+            del json_val['id_site']
+        else:
+            if not minimal:
+                json_val['site_name'] = self.service_role_site.site_name
+
+        return json_val
 
     @staticmethod
     def get_service_roles(service_id: int):
         return TeraServiceRole.query.filter_by(id_service=service_id).all()
+
+    @staticmethod
+    def get_service_roles_for_site(service_id: int, site_id: int):
+        return TeraServiceRole.query.filter_by(id_service=service_id, id_site=site_id).all()
+
+    @staticmethod
+    def get_specific_service_role_for_site(service_id: int, site_id: int, rolename: str):
+        return TeraServiceRole.query.filter_by(id_service=service_id, id_site=site_id, service_role_name=rolename)\
+            .first()
+
+    @staticmethod
+    def get_service_roles_for_project(service_id: int, project_id: int):
+        return TeraServiceRole.query.filter_by(id_service=service_id, id_project=project_id).all()
+
+    @staticmethod
+    def get_specific_service_role_for_project(service_id: int, project_id: int, rolename: str):
+        return TeraServiceRole.query.filter_by(id_service=service_id, id_project=project_id,
+                                               service_role_name=rolename).first()
 
     @staticmethod
     def get_service_role_by_id(role_id: int):

@@ -1,4 +1,5 @@
 from libtera.db.Base import db, BaseModel
+from libtera.db.models.TeraServiceRole import TeraServiceRole
 
 
 class TeraServiceAccess(db.Model, BaseModel):
@@ -25,33 +26,35 @@ class TeraServiceAccess(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend(['service_project_role_service', 'service_project_role_project',
-                              'service_project_role_role', 'service_project_role_user_group',
-                              'service_project_role_device', 'service_project_role_participant'])
+        ignore_fields.extend(['service_access_role', 'service_access_user_group',
+                              'service_access_device', 'service_access_participant_group', 'id_service_role'])
 
         if minimal:
             ignore_fields.extend([])
 
         json_val = super().to_json(ignore_fields=ignore_fields)
 
+        # Also expands with service_role infos
+        json_val.update(self.service_access_role.to_json(minimal=minimal))
+
         # Remove null values
         if not json_val['id_device']:
             del json_val['id_device']
-        if not json_val['id_participant']:
-            del json_val['id_participant']
+        if not json_val['id_participant_group']:
+            del json_val['id_participant_group']
         if not json_val['id_user_group']:
             del json_val['id_user_group']
 
         # Complete information if not minimal
         if not minimal:
-            if self.service_access_service:
-                json_val['service_name'] = self.service_access_service.service_name
-            else:
-                # This happens on transient objects
-                from libtera.db.models.TeraService import TeraService
-                service = TeraService.get_service_by_id(self.id_service)
-                if service:
-                    json_val['service_name'] = service.service_name
+            if self.service_access_role:
+                json_val['service_name'] = self.service_access_role.service_role_service.service_name
+            # else:
+            #     # This happens on transient objects
+            #     from libtera.db.models.TeraService import TeraService
+            #     service = TeraService.get_service_by_id(self.id_service)
+            #     if service:
+            #         json_val['service_name'] = service.service_name
             if self.id_user_group:
                 if self.service_access_user_group:
                     json_val['user_group_name'] = self.service_access_user_group.user_group_name
@@ -63,13 +66,49 @@ class TeraServiceAccess(db.Model, BaseModel):
                         json_val['user_group_name'] = ug.user_group_name
             if self.id_device:
                 json_val['device_name'] = self.service_access_device.device_name
-            if self.id_participant:
-                json_val['participant_name'] = self.service_project_role_participant.participant_name
+            if self.id_participant_group:
+                json_val['participant_group_name'] = self.service_project_role_participant_group.participant_group_name
         return json_val
 
     @staticmethod
-    def get_service_project_role_by_id(service_project_role_id: int):
-        return TeraServiceAccess.query.filter_by(id_service_project_role=service_project_role_id).first()
+    def get_service_access_by_id(service_access_id: int):
+        return TeraServiceAccess.query.filter_by(id_service_access=service_access_id).first()
+
+    @staticmethod
+    def get_specific_access_for_user_group(id_user_group: int, id_service_role: int):
+        return TeraServiceAccess.query.filter_by(id_user_group=id_user_group, id_service_role=id_service_role).first()
+
+    @staticmethod
+    def update_service_access_for_user_group(id_user_group: int, id_service_role: int):
+        # Check if access already exists
+        access = TeraServiceAccess.get_specific_access_for_user_group(id_user_group=id_user_group,
+                                                                      id_service_role=id_service_role)
+        if access is None:
+            # No access already present for that user - create new one
+            access = TeraServiceAccess()
+            access.id_user_group = id_user_group
+            access.id_service_role = id_service_role
+            TeraServiceAccess.insert(access)
+        else:
+            # Update it
+            access.id_service_role = id_service_role
+
+            db.session.commit()
+        return access
+
+    @staticmethod
+    def get_service_access_for_user_group(id_service: int, id_user_group: int):
+        return TeraServiceAccess.join(TeraServiceRole).filter_by(id_service=id_service, id_user_group=id_user_group)\
+            .all()
+
+    @staticmethod
+    def delete_service_access_for_user_group_for_site(id_site: int, id_user_group: int):
+        import modules.Globals as Globals
+        for service_access in TeraServiceAccess.get_service_access_for_user_group(
+                id_service=Globals.opentera_service_id, id_user_group=id_user_group):
+            if service_access.service_access_role.id_site == id_site:
+                TeraServiceAccess.delete(service_access.id_service_access)
+                break
 
     @staticmethod
     def create_defaults():
@@ -90,15 +129,11 @@ class TeraServiceAccess(db.Model, BaseModel):
 
         service_role = TeraServiceAccess()
         service_role.id_user_group = user_group1.id_user_group
-        service_role.id_project = project1.id_project
-        service_role.id_service = servicebureau.id_service
         service_role.id_service_role = servicebureauadmin.id_service_role
         db.session.add(service_role)
 
         service_role = TeraServiceAccess()
         service_role.id_user_group = user_group2.id_user_group
-        service_role.id_project = project1.id_project
-        service_role.id_service = serviceviddispatch.id_service
         service_role.id_service_role = serviceviddispatchadmin.id_service_role
         db.session.add(service_role)
 

@@ -4,11 +4,13 @@ from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
+from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+from libtera.db.models.TeraServiceRole import TeraServiceRole
 from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 from libtera.db.models.TeraUserGroup import TeraUserGroup
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
+import modules.Globals as Globals
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -135,9 +137,20 @@ class UserQueryUserGroups(Resource):
                 # Check if current user is admin of that site, if not, ignore it...
                 if user_access.get_site_role(site_id=site['id_site']) == 'admin':
                     try:
-                        TeraSiteAccess.update_site_access(id_user_group=json_user_group['id_user_group'],
-                                                          id_site=int(site['id_site']),
-                                                          rolename=site['site_role'])
+                        # Check if we must remove access for that site
+                        if site['site_role'] == '':
+                            # No more access to that site for that user group - remove all access!
+                            TeraServiceAccess.delete_service_access_for_user_group_for_site(
+                                id_user_group=json_user_group['id_user_group'], id_site=int(site['id_site']))
+                            continue
+
+                        # Find id_service_role
+                        site_service_role = \
+                            TeraServiceRole.get_specific_service_role_for_site(service_id=Globals.opentera_service_id,
+                                                                               site_id=site['id_site'],
+                                                                               rolename=site['site_role'])
+                        TeraServiceAccess.update_service_access_for_user_group(json_user_group['id_user_group'],
+                                                                               site_service_role.id_service_role)
                     except exc.SQLAlchemyError:
                         import sys
                         print(sys.exc_info())
