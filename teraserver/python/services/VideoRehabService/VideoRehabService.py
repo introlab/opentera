@@ -47,6 +47,7 @@ class VideoRehabService(ServiceOpenTera):
         # Create WebRTCModule
         self.webRTCModule = WebRTCModule(config_man)
 
+        # Active sessions
         self.sessions = dict()
 
     def notify_service_messages(self, pattern, channel, message):
@@ -69,26 +70,124 @@ class VideoRehabService(ServiceOpenTera):
             elif isinstance(message, bytes):
                 ret = tera_event.ParseFromString(message)
 
-            # Look for ParticipantEvent, DeviceEvent, UserEvent
             user_event = messages.UserEvent()
             participant_event = messages.ParticipantEvent()
             device_event = messages.DeviceEvent()
 
+            # Look for UserEvent, ParticipantEvent, DeviceEvent
             for any_msg in tera_event.events:
                 if any_msg.Unpack(user_event):
-                    print('user_event')
-
+                    self.handle_user_event(user_event)
                 if any_msg.Unpack(participant_event):
-                    print('participant_event')
-
+                    self.handle_participant_event(participant_event)
                 if any_msg.Unpack(device_event):
-                    print('device_event')
+                    self.handle_device_event(device_event)
 
         except DecodeError as d:
             print('VideoRehabService - DecodeError ', pattern, channel, message, d)
         except ParseError as e:
             print('VideoRehabService - Failure in redisMessageReceived', e)
 
+    def handle_user_event(self, event: messages.UserEvent):
+        print('VideoRehabService.handle_user_event', event)
+        # Verify each session
+        for id_session in self.sessions:
+            session_info = self.sessions[id_session]
+
+            # Verify if it contains the user_uuid
+            if event.user_uuid in session_info['session_users']:
+                # Verify the event type
+                if event.type == messages.UserEvent.USER_CONNECTED:
+                    # Resend invitation to newly connected user
+                    print('Resending invitation to ', event, session_info)
+
+                    join_message = messages.JoinSessionEvent()
+
+                    # Fill information for join_message
+                    join_message.session_url = session_info['session_url']
+                    join_message.session_creator_name = session_info['session_creator_user']
+                    join_message.session_uuid = session_info['session_uuid']
+                    for user_uuid in session_info['session_users']:
+                        join_message.session_users.extend([user_uuid])
+                    for participant_uuid in session_info['session_participants']:
+                        join_message.session_participants.extend([participant_uuid])
+                    for device_uuid in session_info['session_devices']:
+                        join_message.session_devices.extend([device_uuid])
+
+                    # Send message
+                    self.send_event_message(join_message, 'websocket.user.' + event.user_uuid + '.events')
+
+                elif event.type == messages.UserEvent.USER_DISCONNECTED:
+                    # Terminate session
+                    if session_info['creator_user'] == event.user_uuid:
+                        manage_session_args = {'id_session': id_session}
+                        self.manage_stop_session(manage_session_args)
+
+    def handle_participant_event(self, event: messages.ParticipantEvent):
+        print('VideoRehabService.handle_participant_event', event)
+        # Verify each session
+        for id_session in self.sessions:
+            session_info = self.sessions[id_session]
+
+            # Verify if it contains the user_uuid
+            if event.participant_uuid in session_info['session_participants']:
+                # Verify the event type
+                if event.type == messages.ParticipantEvent.PARTICIPANT_CONNECTED:
+                    # Resend invitation to newly connected user
+                    print('Resending invitation to ', event, session_info)
+
+                    join_message = messages.JoinSessionEvent()
+
+                    # Fill information for join_message
+                    join_message.session_url = session_info['session_url']
+                    join_message.session_creator_name = session_info['session_creator_user']
+                    join_message.session_uuid = session_info['session_uuid']
+                    for user_uuid in session_info['session_users']:
+                        join_message.session_users.extend([user_uuid])
+                    for participant_uuid in session_info['session_participants']:
+                        join_message.session_participants.extend([participant_uuid])
+                    for device_uuid in session_info['session_devices']:
+                        join_message.session_devices.extend([device_uuid])
+
+                    # Send message
+                    self.send_event_message(join_message, 'websocket.participant.' + event.participant_uuid + '.events')
+
+                elif event.type == messages.ParticipantEvent.PARTICIPANT_DISCONNECTED:
+                    # Nothing to do?
+                    pass
+
+    def handle_device_event(self, event: messages.DeviceEvent):
+        print('VideoRehabService.handle_device_event', event)
+        # Verify each session
+        for id_session in self.sessions:
+            session_info = self.sessions[id_session]
+
+            # Verify if it contains the user_uuid
+            if event.device_uuid in session_info['session_devices']:
+                # Verify the event type
+                if event.type == messages.DeviceEvent.DEVICE_CONNECTED:
+                    # Resend invitation to newly connected user
+                    print('Resending invitation to ', event, session_info)
+
+                    join_message = messages.JoinSessionEvent()
+
+                    # Fill information for join_message
+                    join_message.session_url = session_info['session_url']
+                    join_message.session_creator_name = session_info['session_creator_user']
+                    join_message.session_uuid = session_info['session_uuid']
+                    for user_uuid in session_info['session_users']:
+                        join_message.session_users.extend([user_uuid])
+                    for participant_uuid in session_info['session_participants']:
+                        join_message.session_participants.extend([participant_uuid])
+                    for device_uuid in session_info['session_devices']:
+                        join_message.session_devices.extend([device_uuid])
+
+                    # Send message
+                    self.send_event_message(join_message, 'websocket.device.' + event.device_uuid + '.events')
+
+                elif event.type == messages.DeviceEvent.DEVICE_DISCONNECTED:
+                    # Nothing to do?
+                    pass
 
     def setup_rpc_interface(self):
         # TODO Update rpc interface
@@ -140,8 +239,8 @@ class VideoRehabService(ServiceOpenTera):
 
     def manage_stop_session(self, session_manage_args: dict):
         id_session = session_manage_args['id_session']
-        id_service = session_manage_args['id_service']
-        id_creator_user = session_manage_args['id_creator_user']
+        # id_service = session_manage_args['id_service']
+        # id_creator_user = session_manage_args['id_creator_user']
 
         if id_session in self.sessions:
             session_info = self.sessions[id_session]
