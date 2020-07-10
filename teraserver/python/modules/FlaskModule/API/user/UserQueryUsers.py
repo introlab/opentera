@@ -102,7 +102,7 @@ class UserQueryUsers(Resource):
                             user_groups_list = []
                             for user_group in user.user_user_groups:
                                 user_groups_list.append(user_group.to_json(minimal=True))
-                            user_json['user_groups'] = user_groups_list
+                            user_json['user_user_groups'] = user_groups_list
                         users_list.append(user_json)
                     else:
                         users_list.append(user.to_json(minimal=True))
@@ -123,8 +123,8 @@ class UserQueryUsers(Resource):
     @api.expect(post_schema)
     @api.doc(description='Create / update user. id_user must be set to "0" to create a new user. User can be modified '
                          'if: current user is super admin or user is part of a project which the current user is admin.'
-                         ' Promoting a user to super admin is restricted to super admins. If data contains "user_groups'
-                         '", also set user groups for that user.',
+                         ' Promoting a user to super admin is restricted to super admins.'
+                         '"If data contains "user_user_groups, also set user groups for that user.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified user',
                         400: 'Badly formed JSON or missing field(id_user or missing password when new user) in the '
@@ -156,8 +156,8 @@ class UserQueryUsers(Resource):
         # Manage user groups
         user_user_groups_ids = []
         update_user_groups = False
-        if 'user_groups' in json_user:
-            user_user_groups = json_user.pop('user_groups')
+        if 'user_user_groups' in json_user:
+            user_user_groups = json_user.pop('user_user_groups')
             # Check if the current user can modified each of the user groups - current user must be admin in one of
             # those groups to allow modification.
             user_user_groups_ids = [group['id_user_group'] for group in user_user_groups]

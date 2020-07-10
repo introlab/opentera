@@ -62,7 +62,16 @@ class UserQueryUserGroups(Resource):
             user_groups_list = []
             for group in user_groups:
                 if group is not None:
-                    user_groups_list.append(group.to_json(minimal=args['list']))
+                    group_json = group.to_json(minimal=args['list'])
+                    sites_list = []
+                    for site in group.user_group_sites_access:
+                        sites_list.append(site.to_json())
+                    group_json['user_group_sites_access'] = sites_list
+                    projects_list = []
+                    for project in group.user_group_projects_access:
+                        projects_list.append(project.to_json())
+                    group_json['user_group_projects_access'] = projects_list
+                    user_groups_list.append(group_json)
             return jsonify(user_groups_list)
         return [], 200
 
@@ -94,19 +103,19 @@ class UserQueryUserGroups(Resource):
 
         # Check if we have site access to handle separately
         json_sites = None
-        if 'sites' in json_user_group:
-            json_sites = json_user_group.pop('sites')
+        if 'user_group_sites_access' in json_user_group:
+            json_sites = json_user_group.pop('user_group_sites_access')
 
         # If user is not super admin, we must add site access to at least one of the current user's site where he is
         # admin to allow further modification on user groups
         if not json_sites and not current_user.user_superadmin:
-            site = {'id_site': current_user_sites[0].id_site, 'site_role': 'user'}
+            site = {'id_site': current_user_sites[0].id_site, 'site_access_role': 'user'}
             json_sites = [site]
 
         # Check if we have project access to handle separately
         json_projects = None
-        if 'projects' in json_user_group:
-            json_projects = json_user_group.pop('projects')
+        if 'user_group_projects_access' in json_user_group:
+            json_projects = json_user_group.pop('user_group_projects_access')
 
         # Do the update!
         if json_user_group['id_user_group'] > 0:
@@ -137,7 +146,7 @@ class UserQueryUserGroups(Resource):
                     try:
                         TeraSiteAccess.update_site_access(id_user_group=json_user_group['id_user_group'],
                                                           id_site=int(site['id_site']),
-                                                          rolename=site['site_role'])
+                                                          rolename=site['site_access_role'])
                     except exc.SQLAlchemyError:
                         import sys
                         print(sys.exc_info())
@@ -150,7 +159,7 @@ class UserQueryUserGroups(Resource):
                     try:
                         TeraProjectAccess.update_project_access(id_user_group=json_user_group['id_user_group'],
                                                                 id_project=project['id_project'],
-                                                                rolename=project['project_role'])
+                                                                rolename=project['project_access_role'])
                     except exc.SQLAlchemyError:
                         import sys
                         print(sys.exc_info())
