@@ -16,9 +16,9 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
     2. Mac & Windows: Download from [here.](https://cmake.org/download/) 
 
 3.  Install [Qt + QtCreator](https://www.qt.io/)
-    1. Install the latest Qt Open Source Edition (Qt 5.15 Desktop or later, will be useful for Qt client application)
-    2. Use the [Qt Online Installer](https://www.qt.io/download-open-source) (will require a free Qt Account)
-    3. Linux: run the installer script, do not forget to make it executable first ```chmod +x <qt-unified-linux...>```
+    1. Use the [Qt Online Installer](https://www.qt.io/download-open-source) (will require a free Qt Account)
+    2. Linux: run the installer script, do not forget to make it executable first ```chmod +x <qt-unified-linux...>```
+    3. Install the latest Qt Open Source Edition (Qt 5.15 Desktop or later, will be useful for Qt client application)
     4. Install all components except "Android and WebAssembly".
  
 4.  Install [MiniConda3](https://conda.io/miniconda.html)
