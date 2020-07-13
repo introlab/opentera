@@ -22,8 +22,9 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
     4. Install all components except "Android" and "WebAssembly".
     5. Use default directories
  
-4.  Install [MiniConda3](https://conda.io/miniconda.html)
-    1. Install Python 3.x version for current user (in user directory).
+4.  Install MiniConda3
+    1. Use installer from [here](https://conda.io/miniconda.html)
+    1. Install Python 3.x version for current user (in default user directory).
     
 5.  Install [PyCharm Community Edition](https://www.jetbrains.com/pycharm/)
 
