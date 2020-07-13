@@ -46,6 +46,7 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
 ### Step 1 : Open the root CMakeLists.txt in QtCreator
 1.  Opening the root teraserver/CMakeLists.txt will allow to create and build the project
     1. Build the project **using the python-all target**, it will automatically generate the Python environment in env/python-3.6
+    2. Click on the "Projects" and change Build steps target by clicking on "Details"
     2. All python dependencies will be automatically downloaded
     3. Once the project is built, you will not need QtCreator (for now).
    
