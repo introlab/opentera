@@ -43,7 +43,8 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
     2. Mac: install with [brew](https://brew.sh/index)
     3. Linux: install with package manager : ```sudo apt-get install nginx```
 
-### Step1 : Create the database and database users
+### Step1 : Create the database and database users 
+This step needs to be done only once.
    ```
 sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"
 sudo -u postgres psql -c "create database test"
@@ -56,8 +57,7 @@ sudo -u postgres psql -c "grant all privileges on database videodispatch to vide
 sudo -u postgres psql -c "ALTER USER videodispatch WITH PASSWORD 'videodispatch';"
 sudo -u postgres psql -c "\l"
    ```
-
-### Step 2 : Open the root CMakeLists.txt in QtCreator
+### Step 2 : Open the root CMakeLists.txt in QtCreator (only once)
 1.  Opening the root teraserver/CMakeLists.txt will allow to create and build the project
     1. Build the project **using the python-all target**, it will automatically generate the Python environment in env/python-3.6
     2. Click on the "Projects" and change Build steps target by clicking on "Details"
@@ -68,7 +68,12 @@ sudo -u postgres psql -c "\l"
 1.  Using PyCharm, opening the directory "{PROJECT_ROOT}/python"
     1. Select the existing Python 3.6 environment in "{PROJECT_ROOT}/python/env/python-3.6" in the app menu: PyCharm->Preferences->Project:python->Project Interpreter
         
-### Step 4 : Run the application
+### Step 4 : Run the nginx reverse proxy (every time)
+1. Go to the **{PROJECT_ROOT}/teraserver/python/config** directory.
+2. Create the logs directory (only once) : ```mkdir logs````
+3. Run the script : ```./start_nginx.sh```
+
+### Step 5 : Run the application
 1.  Run the TeraServer.py application from PyCharm
 2.  Edit the code as you would normally do in a python program.
 3.  Run tests in the tests directory
