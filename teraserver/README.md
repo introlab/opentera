@@ -32,7 +32,21 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
 6.  Install PostgreSQL with default parameters
     1. Linux : ```sudo apt-get install postgresql```
     2. Mac & Windows: Download and install from : https://www.postgresql.org/download/
- 
+   
+    
+6.5 Create database users and table (Linux)
+   ```
+   	sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"
+	sudo -u postgres psql -c "create database test"
+	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"
+	sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"
+	sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"
+	sudo -u postgres psql -c "create database videodispatch"
+	sudo -u postgres psql -c "create user videodispatch with encrypted password 'videodispatch';"
+	sudo -u postgres psql -c "grant all privileges on database videodispatch to videodispatch;"
+	sudo -u postgres psql -c "ALTER USER videodispatch WITH PASSWORD 'videodispatch';"
+	sudo -u postgres psql -c "\l"
+   ```
 7.  Install redis server. 
     1. Recommanded: Install redis from [Docker](https://hub.docker.com/_/redis)
     2. Linux, Install redis with apt with `sudo apt-get install redis-server`
