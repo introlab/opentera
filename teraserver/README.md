@@ -7,9 +7,9 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
 
 ### Requirements
 1.  Make sure you have a valid compiler installed:
-    1.  Linux : gcc/g++
-    2.  Mac : LLVM through XCode
-    3.  Windows: Visual Studio C++ 2017
+    1.  Linux : gcc/g++. Install it with ```sudo apt-get install build-essential```
+    2.  Mac : LLVM through XCode from the App Store
+    3.  Windows: [Visual Studio C++ 2017 Community Edition](https://visualstudio.microsoft.com/fr/vs/older-downloads/)
 
 2.  Install [CMake](https://cmake.org/download/)
 
