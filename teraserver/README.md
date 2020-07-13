@@ -33,9 +33,6 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
     1. Linux : ```sudo apt-get install postgresql```
     2. Mac & Windows: Download and install from : https://www.postgresql.org/download/
    
-    
-6.5 Create database users and table (Linux)
-
 7.  Install redis server. 
     1. Recommanded: Install redis from [Docker](https://hub.docker.com/_/redis)
     2. Linux, Install redis with apt with `sudo apt-get install redis-server`
