@@ -24,7 +24,8 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
  
 4.  Install MiniConda3
     1. Use installer from [here](https://conda.io/miniconda.html)
-    1. Install Python 3.x version for current user (in default user directory).
+    2. Install Python 3.x version for current user (in default user directory).
+    3. Use default settings.
     
 5.  Install [PyCharm Community Edition](https://www.jetbrains.com/pycharm/)
 
