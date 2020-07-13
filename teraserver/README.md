@@ -1,5 +1,5 @@
 ## Getting Started for Developers
-Please follow those steps to setup your development environment. Clone this directory with submodules using :
+Please follow those steps to setup your development environment. Clone this directory (change branch if not developement dev->master) with submodules using :
 
 ```
 git clone --recursive -b dev https://github.com/introlab/opentera.git
