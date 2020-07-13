@@ -1,5 +1,9 @@
 ## Getting Started for Developers
-Please follow those steps to setup your development environment.
+Please follow those steps to setup your development environment. Clone this directory with submodules using :
+
+```
+git clone --recursive -b dev https://github.com/introlab/opentera.git
+```
 
 ### Requirements
 1.  Make sure you have a valid compiler installed:
@@ -12,9 +16,8 @@ Please follow those steps to setup your development environment.
 3.  Install [Qt + QtCreator](https://www.qt.io/)
     1. Install the latest Desktop distribution fitting your compiling environment (will not be needed in the future)
  
- 
 4.  Install [MiniConda3](https://conda.io/miniconda.html)
-    1. Install Python 3.6 version for current user (in user directory)
+    1. Install Python 3.6 version for current user (in user directory) or latest 3.x version.
     
 5.  Install [PyCharm Community Edition](https://www.jetbrains.com/pycharm/)
 
@@ -25,10 +28,15 @@ Please follow those steps to setup your development environment.
     1. Recommanded: Install redis from [Docker](https://hub.docker.com/_/redis)
     2. Linux, Install redis with apt with `sudo apt-get install redis-server`
     3. Windows: install [redis binaries](https://github.com/MicrosoftArchive/redis/releases)
+ 
+8. Install NGINX.
+    1. Windows:  http://nginx.org/en/docs/windows.html
+    2. Mac: install with brew
+    3. Linux: install with package manager (apt)
 
 ### Step 1 : Open the root CMakeLists.txt in QtCreator
 1.  Opening the root teraserver/CMakeLists.txt will allow to create and build the project
-    1. Build the project, it will automatically generate the Python environment in env/python-3.6
+    1. Build the project **using the python-all target**, it will automatically generate the Python environment in env/python-3.6
     2. All python dependencies will be automatically downloaded
     3. Once the project is built, you will not need QtCreator (for now).
    
@@ -38,9 +46,7 @@ Please follow those steps to setup your development environment.
         
 ### Step 3 : Run the application
 1.  Run the TeraServer.py application from PyCharm
- 
 2.  Edit the code as you would normally do in a python program.
- 
 3.  Run tests in the tests directory
 
 ### Notes
