@@ -41,7 +41,7 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
 8. Install NGINX.
     1. Windows:  http://nginx.org/en/docs/windows.html
     2. Mac: install with [brew](https://brew.sh/index)
-    3. Linux: install with package manager (apt)
+    3. Linux: install with package manager : ```sudo apt-get install nginx```
 
 ### Step 1 : Open the root CMakeLists.txt in QtCreator
 1.  Opening the root teraserver/CMakeLists.txt will allow to create and build the project
