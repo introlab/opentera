@@ -35,6 +35,18 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
    
     
 6.5 Create database users and table (Linux)
+
+7.  Install redis server. 
+    1. Recommanded: Install redis from [Docker](https://hub.docker.com/_/redis)
+    2. Linux, Install redis with apt with `sudo apt-get install redis-server`
+    3. Windows: install [redis binaries](https://github.com/MicrosoftArchive/redis/releases)
+ 
+8. Install NGINX.
+    1. Windows:  http://nginx.org/en/docs/windows.html
+    2. Mac: install with [brew](https://brew.sh/index)
+    3. Linux: install with package manager : ```sudo apt-get install nginx```
+
+### Step1 : Create the database and database users
    ```
 sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"
 sudo -u postgres psql -c "create database test"
@@ -47,28 +59,19 @@ sudo -u postgres psql -c "grant all privileges on database videodispatch to vide
 sudo -u postgres psql -c "ALTER USER videodispatch WITH PASSWORD 'videodispatch';"
 sudo -u postgres psql -c "\l"
    ```
-7.  Install redis server. 
-    1. Recommanded: Install redis from [Docker](https://hub.docker.com/_/redis)
-    2. Linux, Install redis with apt with `sudo apt-get install redis-server`
-    3. Windows: install [redis binaries](https://github.com/MicrosoftArchive/redis/releases)
- 
-8. Install NGINX.
-    1. Windows:  http://nginx.org/en/docs/windows.html
-    2. Mac: install with [brew](https://brew.sh/index)
-    3. Linux: install with package manager : ```sudo apt-get install nginx```
 
-### Step 1 : Open the root CMakeLists.txt in QtCreator
+### Step 2 : Open the root CMakeLists.txt in QtCreator
 1.  Opening the root teraserver/CMakeLists.txt will allow to create and build the project
     1. Build the project **using the python-all target**, it will automatically generate the Python environment in env/python-3.6
     2. Click on the "Projects" and change Build steps target by clicking on "Details"
     2. All python dependencies will be automatically downloaded
     3. Once the project is built, you will not need QtCreator (for now).
    
-### Step 2 : Create a PyCharm project
+### Step 3 : Create a PyCharm project
 1.  Using PyCharm, opening the directory "{PROJECT_ROOT}/python"
     1. Select the existing Python 3.6 environment in "{PROJECT_ROOT}/python/env/python-3.6" in the app menu: PyCharm->Preferences->Project:python->Project Interpreter
         
-### Step 3 : Run the application
+### Step 4 : Run the application
 1.  Run the TeraServer.py application from PyCharm
 2.  Edit the code as you would normally do in a python program.
 3.  Run tests in the tests directory
