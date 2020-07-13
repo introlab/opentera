@@ -19,7 +19,8 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
     1. Use the [Qt Online Installer](https://www.qt.io/download-open-source) (will require a free Qt Account)
     2. Linux: run the installer script, do not forget to make it executable first ```chmod +x <qt-unified-linux...>```
     3. Install the latest Qt Open Source Edition (Qt 5.15 Desktop or later, will be useful for Qt client application)
-    4. Install all components except "Android and WebAssembly".
+    4. Install all components except "Android" and "WebAssembly".
+    5. Use default directories
  
 4.  Install [MiniConda3](https://conda.io/miniconda.html)
     1. Install Python 3.x version for current user (in user directory).
