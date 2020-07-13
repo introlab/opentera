@@ -43,7 +43,7 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
     2. Mac: install with [brew](https://brew.sh/index)
     3. Linux: install with package manager : ```sudo apt-get install nginx```
 
-### Step1 : Create the database and database users 
+### Step1 : Create the database and database users (only once)
 This step needs to be done only once.
    ```
 sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"
@@ -64,7 +64,7 @@ sudo -u postgres psql -c "\l"
     2. All python dependencies will be automatically downloaded
     3. Once the project is built, you will not need QtCreator (for now).
    
-### Step 3 : Create a PyCharm project
+### Step 3 : Create a PyCharm project (only once)
 1.  Using PyCharm, opening the directory "{PROJECT_ROOT}/python"
     1. Select the existing Python 3.6 environment in "{PROJECT_ROOT}/python/env/python-3.6" in the app menu: PyCharm->Preferences->Project:python->Project Interpreter
         
@@ -73,10 +73,13 @@ sudo -u postgres psql -c "\l"
 2. Create the logs directory (only once) : ```mkdir logs```
 3. Run the script : ```./start_nginx.sh```
 
-### Step 5 : Run the application
+### Step 5 : Run the application (every time)
 1.  Run the TeraServer.py application from PyCharm
 2.  Edit the code as you would normally do in a python program.
 3.  Run tests in the tests directory
+
+### Step 6 : Try the API with swagger UI" (as needed)
+1. Navigate to : [API](https://localhost:40075/doc)
 
 ### Notes
 1.  In a near future, we hope to have everything in the QtCreator IDE. Stay tuned!
