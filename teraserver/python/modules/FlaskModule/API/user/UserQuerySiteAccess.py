@@ -26,7 +26,6 @@ get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_us
 # post_parser = reqparse.RequestParser()
 post_schema = api.schema_model('user_site_access', {
     'properties': {
-        'type': 'object',
         'site_access': {
             'properties': {
                 'id_site': {

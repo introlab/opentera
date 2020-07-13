@@ -7,7 +7,6 @@ from .TeraDeviceSubType import TeraDeviceSubType
 from .TeraParticipant import TeraParticipant
 from .TeraParticipantGroup import TeraParticipantGroup
 from .TeraProject import TeraProject
-from .TeraProjectAccess import TeraProjectAccess
 from .TeraServerSettings import TeraServerSettings
 from .TeraService import TeraService
 from .TeraServiceProject import TeraServiceProject
@@ -34,7 +33,6 @@ __all__ = ['TeraAsset',
            'TeraParticipant',
            'TeraParticipantGroup',
            'TeraProject',
-           'TeraProjectAccess',
            'TeraServerSettings',
            'TeraService',
            'TeraServiceProject',

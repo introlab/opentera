@@ -98,8 +98,13 @@ class TeraServiceAccess(db.Model, BaseModel):
 
     @staticmethod
     def get_service_access_for_user_group(id_service: int, id_user_group: int):
-        return TeraServiceAccess.join(TeraServiceRole).filter_by(id_service=id_service, id_user_group=id_user_group)\
-            .all()
+        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
+                                                                       id_user_group=id_user_group).all()
+
+    @staticmethod
+    def get_service_access_for_project(id_service: int, id_project: int):
+        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
+                                                                       id_project=id_project).all()
 
     @staticmethod
     def delete_service_access_for_user_group_for_site(id_site: int, id_user_group: int):
@@ -107,6 +112,15 @@ class TeraServiceAccess(db.Model, BaseModel):
         for service_access in TeraServiceAccess.get_service_access_for_user_group(
                 id_service=Globals.opentera_service_id, id_user_group=id_user_group):
             if service_access.service_access_role.id_site == id_site:
+                TeraServiceAccess.delete(service_access.id_service_access)
+                break
+
+    @staticmethod
+    def delete_service_access_for_user_group_for_project(id_project: int, id_user_group: int):
+        import modules.Globals as Globals
+        for service_access in TeraServiceAccess.get_service_access_for_user_group(
+                id_service=Globals.opentera_service_id, id_user_group=id_user_group):
+            if service_access.service_access_role.id_project == id_project:
                 TeraServiceAccess.delete(service_access.id_service_access)
                 break
 

@@ -53,7 +53,7 @@ class TeraSite(db.Model, BaseModel):
 
     @classmethod
     def insert(cls, site):
-        # Creates admin and user roles for that session
+        # Creates admin and user roles for that site
         super().insert(site)
 
         from libtera.db.models.TeraServiceRole import TeraServiceRole

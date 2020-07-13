@@ -4,8 +4,10 @@ from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
+from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+from libtera.db.models.TeraServiceRole import TeraServiceRole
 from modules.DatabaseModule.DBManager import DBManager
+import modules.Globals as Globals
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -26,9 +28,29 @@ get_parser.add_argument('with_projects', type=inputs.boolean, help='Used with id
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('project_access', type=str, location='json',
 #                          help='Project access to create / update', required=True)
-post_schema = api.schema_model('user_project_access', {'properties': TeraProjectAccess.get_json_schema(),
-                                                       'type': 'object',
-                                                       'location': 'json'})
+post_schema = api.schema_model('user_project_access', {
+    'properties': {
+        'project_access': {
+            'properties': {
+                'id_project': {
+                    'type': 'integer',
+                    'required': True
+                },
+                'id_user_group': {
+                    'type': 'integer',
+                    'required': True
+                },
+                'project_access_role': {
+                    'type': 'string'
+                },
+                'id_service_role': {
+                    'type': 'integer'
+                }
+            }
+        }
+    },
+    'type': 'object',
+    'location': 'json'})
 
 
 delete_parser = reqparse.RequestParser()
@@ -135,23 +157,57 @@ class UserQueryProjectAccess(Resource):
                 return 'Missing id_user_group', 400
             if 'id_project' not in json_project:
                 return 'Missing id_project', 400
+            if 'project_access_role' not in json_project and 'id_project_role' not in json_project:
+                return 'Missing role name or id', 400
 
-            # Check if current user can change the access for that site
+            # Check if current user can change the access for that project
             if user_access.get_project_role(project_id=json_project['id_project']) != 'admin':
                 return 'Forbidden', 403
 
+            project_service_role = None
+            if 'project_access_role' in json_project:
+                # Check if we must remove access for that site
+                if json_project['project_access_role'] == '':
+                    # No more access to that project for that user group - remove all access!
+                    TeraServiceAccess.delete_service_access_for_user_group_for_project(
+                        id_user_group=json_project['id_user_group'], id_project=json_project['id_project'])
+                    continue
+
+                # Find id_service_role for that
+                project_service_role = \
+                    TeraServiceRole.get_specific_service_role_for_project(service_id=Globals.opentera_service_id,
+                                                                          project_id=json_project['id_project'],
+                                                                          rolename=json_project['project_access_role'])
+            if 'id_service_role' in json_project:
+                if json_project['id_service_role'] == 0:
+                    # No more access to that project for that user group - remove all access!
+                    TeraServiceAccess.delete_service_access_for_user_group_for_project(
+                        id_user_group=json_project['id_user_group'], id_project=json_project['id_project'])
+                    continue
+                project_service_role = TeraServiceRole.get_service_role_by_id(json_project['id_service_role'])
+
+            if not project_service_role:
+                return 'Invalid role name or id for that project', 400
+
             # Do the update!
             try:
-                access = TeraProjectAccess.update_project_access(json_project['id_user_group'],
-                                                                 json_project['id_project'],
-                                                                 json_project['project_access_role'])
+                # access = TeraProjectAccess.update_project_access(json_project['id_user_group'],
+                #                                                  json_project['id_project'],
+                #                                                  json_project['project_access_role'])
+                access = TeraServiceAccess.update_service_access_for_user_group(id_user_group=
+                                                                                json_project['id_user_group'],
+                                                                                id_service_role=project_service_role
+                                                                                .id_service_role)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
                 return '', 500
 
             if access:
-                json_rval.append(access.to_json())
+                json_access = access.to_json()
+                # For backwards compatibility with "old" API
+                json_access['id_project_access'] = access.id_service_access
+                json_rval.append(json_access)
 
         return jsonify(json_rval)
 
@@ -171,7 +227,7 @@ class UserQueryProjectAccess(Resource):
         args = parser.parse_args()
         id_todel = args['id']
 
-        project_access = TeraProjectAccess.get_project_access_by_id(id_todel)
+        project_access = TeraServiceAccess.get_service_access_by_id(id_todel)
         if not project_access:
             return 'No project access to delete.', 500
 
@@ -181,7 +237,7 @@ class UserQueryProjectAccess(Resource):
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraProjectAccess.delete(id_todel=id_todel)
+            TeraServiceAccess.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
