@@ -70,7 +70,7 @@ sudo -u postgres psql -c "\l"
         
 ### Step 4 : Run the nginx reverse proxy (every time)
 1. Go to the **{PROJECT_ROOT}/teraserver/python/config** directory.
-2. Create the logs directory (only once) : ```mkdir logs````
+2. Create the logs directory (only once) : ```mkdir logs```
 3. Run the script : ```./start_nginx.sh```
 
 ### Step 5 : Run the application
