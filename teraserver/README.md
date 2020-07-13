@@ -25,7 +25,8 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
 5.  Install [PyCharm Community Edition](https://www.jetbrains.com/pycharm/)
 
 6.  Install PostgreSQL with default parameters
-    1. Download and install from : https://www.postgresql.org/download/
+    1. Linux : ```sudo apt-get install postgresql```
+    2. Mac & Windows: Download and install from : https://www.postgresql.org/download/
  
 7.  Install redis server. 
     1. Recommanded: Install redis from [Docker](https://hub.docker.com/_/redis)
@@ -34,7 +35,7 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
  
 8. Install NGINX.
     1. Windows:  http://nginx.org/en/docs/windows.html
-    2. Mac: install with brew
+    2. Mac: install with [brew](https://brew.sh/index)
     3. Linux: install with package manager (apt)
 
 ### Step 1 : Open the root CMakeLists.txt in QtCreator
