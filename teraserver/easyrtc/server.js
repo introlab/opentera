@@ -6,6 +6,7 @@ var express = require("express");   // web framework external module
 var io      = require("socket.io"); // web socket external module
 var easyrtc = require("open-easyrtc");   // EasyRTC external module
 var ejs = require("ejs");
+var redis = require('redis')
 
 var myport = 8080;
 var mykey = "";
@@ -15,7 +16,6 @@ if (process.argv[2])
 
 if (process.argv[3])
     mykey = process.argv[3];
-
 
 // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
 var httpApp = express();
@@ -37,6 +37,19 @@ httpApp.use('/teraplus', function(req, res){
         //res.sendFile('/index.html',{ root: __dirname + "/protected/"});
 });
 
+httpApp.use('/status', function(req,res) {
+  //Query server status
+  if (req.query.key == mykey || mykey == "") {
+    //Send the status of the server
+    //TODO: add connected user information?
+    //TODO: add active sessions informations?
+    res.send({status: 'OK'})
+  } else {
+    // Not authorized
+    res.sendFile('/denied.html',{ root: __dirname + "/static/"});
+  }
+
+});
 
 // Start Express https server on port 8443
 /*
@@ -90,6 +103,21 @@ easyrtc.setOption("logLevel", "debug");
 easyrtc.setOption("demosEnable", true);
 //easyrtc.setOption("updateCheckEnable",false);
 
+//Setup redis client (default configuration)
+var client = redis.createClient()
+
+client.on("connect", function() {
+  console.log("Redis now connected");
+
+  //Publish message that we are ready
+  client.publish("webrtc." + mykey, "Ready!", 
+  function(){
+    console.log("Message published");
+   });
+});
+
+
 
 // Start EasyRTC server
 var rtc = easyrtc.listen(httpApp, socketServer);
+

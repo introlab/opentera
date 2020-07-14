@@ -118,10 +118,13 @@ class VideoRehabService(ServiceOpenTera):
                     self.send_event_message(join_message, 'websocket.user.' + event.user_uuid + '.events')
 
                 elif event.type == messages.UserEvent.USER_DISCONNECTED:
-                    # Terminate session
-                    if session_info['creator_user'] == event.user_uuid:
-                        manage_session_args = {'id_session': id_session}
-                        self.manage_stop_session(manage_session_args)
+                    # Terminate session if last user ?
+                    if 'session_creator_user_uuid' in session_info:
+                        if session_info['session_creator_user_uuid'] == event.user_uuid:
+                            manage_session_args = {'id_session': id_session}
+                            self.manage_stop_session(manage_session_args)
+                            # End loop, sessions dict will be changed in manage_stop_session
+                            break
 
     def handle_participant_event(self, event: messages.ParticipantEvent):
         print('VideoRehabService.handle_participant_event', event)
@@ -188,6 +191,59 @@ class VideoRehabService(ServiceOpenTera):
                 elif event.type == messages.DeviceEvent.DEVICE_DISCONNECTED:
                     # Nothing to do?
                     pass
+
+    def nodejs_webrtc_message_callback(self, pattern, channel, message):
+        print('WebRTCModule - nodejs_webrtc_message_callback', pattern, channel, message)
+        parts = channel.split(".")
+        if len(parts) == 2:
+            session_key = parts[1]
+            print(session_key)
+            if message == 'Ready!':
+                print('Ready!')
+                self.handle_nodejs_session_ready(session_key)
+
+    def get_session_info_from_key(self, session_key):
+        for session_id in self.sessions:
+            if self.sessions[session_id]['session_key'] == session_key:
+                return self.sessions[session_id]
+        return None
+
+    def handle_nodejs_session_ready(self, session_key):
+        # Should send invitations
+        session_info = self.get_session_info_from_key(session_key)
+
+        if session_info:
+
+            users = session_info['session_users']
+            participants = session_info['session_participants']
+            devices = session_info['session_devices']
+            parameters = session_info['session_parameters']
+
+            # Create event
+            joinMessage = messages.JoinSessionEvent()
+            joinMessage.session_url = session_info['session_url']
+            joinMessage.session_creator_name = session_info['session_creator_user']
+            joinMessage.session_uuid = session_info['session_uuid']
+            for user_uuid in users:
+                joinMessage.session_users.extend([user_uuid])
+            for participant_uuid in participants:
+                joinMessage.session_participants.extend([participant_uuid])
+            for device_uuid in devices:
+                joinMessage.session_devices.extend([device_uuid])
+            joinMessage.join_msg = gettext('Join Session')
+            joinMessage.session_parameters = parameters
+            joinMessage.service_uuid = self.service_uuid
+
+            # Send invitations (as events) for users, participants and devices
+            for user_uuid in users:
+                self.send_event_message(joinMessage, 'websocket.user.'
+                                        + user_uuid + '.events')
+            for participant_uuid in participants:
+                self.send_event_message(joinMessage, 'websocket.participant.'
+                                        + participant_uuid + '.events')
+            for device_uuid in devices:
+                self.send_event_message(joinMessage, 'websocket.device.'
+                                        + device_uuid + '.events')
 
     def setup_rpc_interface(self):
         # TODO Update rpc interface
@@ -261,26 +317,23 @@ class VideoRehabService(ServiceOpenTera):
             api_response = self.post_to_opentera('/api/service/sessions', api_req)
 
             # Send events
-            def send_stop_session_events():
-                stop_session_event = messages.StopSessionEvent()
-                stop_session_event.session_uuid = session_info['session_uuid']
-                stop_session_event.service_uuid = self.service_uuid
+            stop_session_event = messages.StopSessionEvent()
+            stop_session_event.session_uuid = session_info['session_uuid']
+            stop_session_event.service_uuid = self.service_uuid
 
-                for user_uuid in session_info['session_users']:
-                    self.send_event_message(stop_session_event, 'websocket.user.' + user_uuid + '.events')
+            for user_uuid in session_info['session_users']:
+                self.send_event_message(stop_session_event, 'websocket.user.' + user_uuid + '.events')
 
-                for participant_uuid in session_info['session_participants']:
-                    self.send_event_message(stop_session_event, 'websocket.participant.' + participant_uuid + '.events')
+            for participant_uuid in session_info['session_participants']:
+                self.send_event_message(stop_session_event, 'websocket.participant.' + participant_uuid + '.events')
 
-                for device_uuid in session_info['session_devices']:
-                    self.send_event_message(stop_session_event, 'websocket.device.' + device_uuid + '.events')
+            for device_uuid in session_info['session_devices']:
+                self.send_event_message(stop_session_event, 'websocket.device.' + device_uuid + '.events')
 
             # Remove session from list
             del self.sessions[id_session]
 
-            # Send events in 5 seconds
-            reactor.callLater(5.0, send_stop_session_events)
-
+            # Return response
             if api_response.status_code == 200:
                 return api_response.json()
 
@@ -323,49 +376,22 @@ class VideoRehabService(ServiceOpenTera):
             # Add session key
             session_info['session_key'] = str(uuid.uuid4())
 
-            # Start webrtc process
+            # New WebRTC process with send events on this pattern
+            self.subscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
+                                                 self.nodejs_webrtc_message_callback)
+
+            # Start WebRTC process
             # TODO do something with parameters
             retval, process_info = self.webRTCModule.create_webrtc_session(
                 session_info['session_key'], id_creator_user, users, participants, devices)
 
             if not retval or not process_info:
+                self.unsubscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
+                                                 self.nodejs_webrtc_message_callback)
                 return {'Error': 'Cannot create process'}
 
+            # Add URL to session_info
             session_info['session_url'] = process_info['url']
-
-            def send_join_session_events():
-                # JoinSessionEvent
-                # Fill event information
-                joinMessage = messages.JoinSessionEvent()
-                joinMessage.session_url = session_info['session_url']
-                joinMessage.session_creator_name = session_info['session_creator_user']
-                joinMessage.session_uuid = session_info['session_uuid']
-                for user_uuid in users:
-                    joinMessage.session_users.extend([user_uuid])
-                for participant_uuid in participants:
-                    joinMessage.session_participants.extend([participant_uuid])
-                for device_uuid in devices:
-                    joinMessage.session_devices.extend([device_uuid])
-                joinMessage.join_msg = gettext('Join Session')
-                joinMessage.session_parameters = parameters
-                joinMessage.service_uuid = self.service_uuid
-
-                # Send invitations (as events)
-                # Closure, variables will be captured from outer scope
-                for user_uuid in users:
-                    self.send_event_message(joinMessage, 'websocket.user.'
-                                            + user_uuid + '.events')
-
-                for participant_uuid in participants:
-                    self.send_event_message(joinMessage, 'websocket.participant.'
-                                            + participant_uuid + '.events')
-
-                for device_uuid in devices:
-                    self.send_event_message(joinMessage, 'websocket.device.'
-                                            + device_uuid + '.events')
-
-            # Send events in 5 seconds
-            reactor.callLater(5.0, send_join_session_events)
 
             # Keep session info for future use
             self.sessions[session_info['id_session']] = session_info
