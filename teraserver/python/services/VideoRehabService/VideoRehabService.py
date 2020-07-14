@@ -303,6 +303,10 @@ class VideoRehabService(ServiceOpenTera):
             # Room name = key
             self.webRTCModule.stop_webrtc_session(session_info['session_key'])
 
+            # Unsubscribe to messages from this process
+            self.unsubscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
+                                                   self.nodejs_webrtc_message_callback)
+
             from datetime import datetime
             time_diff = datetime.now() - datetime.strptime(
                 session_info['session_start_datetime'], '%Y-%m-%dT%H:%M:%S.%f')
