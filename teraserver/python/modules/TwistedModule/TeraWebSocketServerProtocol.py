@@ -29,6 +29,11 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
         # Moved handling code in redisConnectionMade...
         # because it always occurs after onOpen...
 
+    def onPong(self, payload):
+        # print('onPong', payload)
+        # Should we do something?
+        pass
+
     def onOpenHandshakeTimeout(self):
         print('TeraWebSocketServerProtocol - onOpenHandshakeTimeout', self)
 
