@@ -31,9 +31,8 @@ class DeviceQueryParticipants(Resource):
         # Device must have device_onlineable flag
         if device and device.device_onlineable:
             response = {'participants_info': []}
-
+            
             # Get all participants
-            participants = []
             for participant in device.device_participants:
                 response['participants_info'].append(participant.to_json(minimal=False))
 
