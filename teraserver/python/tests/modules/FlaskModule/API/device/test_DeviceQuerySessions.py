@@ -4,7 +4,8 @@ from requests import get, post
 import json
 from datetime import datetime
 
-class DeviceQuerySessions(unittest.TestCase):
+
+class DeviceQuerySessionsTest(unittest.TestCase):
 
     host = 'localhost'
     port = 40075
