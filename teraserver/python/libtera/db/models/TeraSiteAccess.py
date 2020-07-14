@@ -15,7 +15,7 @@ class TeraSiteAccess(db.Model, BaseModel):
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['id_site_access', 'site_access_site', 'site_access_user_group'])
+        ignore_fields.extend(['site_access_site', 'site_access_user_group'])
         rval = super().to_json(ignore_fields=ignore_fields)
 
         rval['site_name'] = self.site_access_site.site_name

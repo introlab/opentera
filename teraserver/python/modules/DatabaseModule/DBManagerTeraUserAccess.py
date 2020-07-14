@@ -289,9 +289,18 @@ class DBManagerTeraUserAccess:
 
     def get_site_role(self, site_id: int):
         sites_roles = self.user.get_sites_roles()
-        role = [role for site, role in sites_roles.items() if site.id_site == site_id]
+        role = [role for site, role in sites_roles.items() if site.id_site == int(site_id)]
         if len(role) == 1:
             return role[0]['site_role']
+        return None
+
+    def get_user_site_role(self, user_id: int, site_id: int):
+        if user_id not in self.get_accessible_users_ids():
+            return None
+        user = TeraUser.get_user_by_id(id_user=user_id)
+        role = [role for site, role in user.get_sites_roles().items() if site.id_site == site_id]
+        if len(role) == 1:
+            return role[0]
         return None
         # role_name = None
         # site_roles = self.user.get_sites_roles()
