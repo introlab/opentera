@@ -44,6 +44,7 @@ class UserQuerySiteAccess(Resource):
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading sites roles'})
     def get(self):
+        from libtera.db.models.TeraSite import TeraSite
         parser = get_parser
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
@@ -66,7 +67,7 @@ class UserQuerySiteAccess(Resource):
         if args['id_user_group']:
             if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
                 access = user_access.query_site_access_for_user_group(user_group_id=args['id_user_group'],
-                                                                      admin_only=args['admins'],
+                                                                      admin_only=args['admins'] is not None,
                                                                       include_sites_without_access=args['with_sites'])
 
         # Query access for site id
@@ -77,7 +78,7 @@ class UserQuerySiteAccess(Resource):
 
         if access is not None:
             access_list = []
-            if not args['by_users']:
+            if not args['by_users'] or args['id_user']:
                 for site, site_role in access.items():
                     site_access_json = site.to_json()
                     if site_role:
@@ -88,13 +89,30 @@ class UserQuerySiteAccess(Resource):
                         site_access_json['site_access_role'] = None
                     access_list.append(site_access_json)
             else:
-                # Find users of each user group
-                for site, site_role in access.items():
-                    for user in user_access.query_users_for_usergroup(site.id_user_group):
+                users_list = []
+                sites_list = []
+                if args['id_site']:
+                    for usergroup, site_role in access.items():
+                        users_list.extend(user_access.query_users_for_usergroup(user_group_id=usergroup.id_user_group))
+                    sites_list = [TeraSite.get_site_by_id(args['id_site'])]
+
+                if args['id_user_group']:
+                    users_list = user_access.query_users_for_usergroup(user_group_id=args['id_user_group'])
+                    sites_list = [site for site in access]
+
+                for user in users_list:
+                    for site in sites_list:
+                        site_role = user_access.get_user_site_role(user_id=user.id_user, site_id=site.id_site)
+                        if args['admins'] and site_role and site_role['site_role'] != 'admin':
+                            site_role = None
                         site_access_json = {'id_user': user.id_user,
+                                            'id_site': site.id_site,
                                             'user_name': user.user_user_group_user.get_fullname(),
-                                            'site_access_role': site_role['site_role']}
-                        access_list.append(site_access_json)
+                                            'site_access_role': site_role['site_role'] if site_role else None,
+                                            'site_access_inherited': site_role['inherited'] if site_role else None
+                                            }
+                        if site_access_json:
+                            access_list.append(site_access_json)
             return access_list
 
         # No access, but still fine
