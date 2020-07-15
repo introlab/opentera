@@ -16,7 +16,7 @@ class TeraProjectAccess(db.Model, BaseModel):
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['id_project_access', 'project_access_project', 'project_access_user_group'])
+        ignore_fields.extend(['project_access_project', 'project_access_user_group'])
         rval = super().to_json(ignore_fields=ignore_fields)
 
         rval['project_name'] = self.project_access_project.project_name
@@ -24,6 +24,10 @@ class TeraProjectAccess(db.Model, BaseModel):
             rval['user_group_name'] = self.project_access_user_group.user_group_name
         else:
             rval['user_group_name'] = None
+
+        if 'id_site' not in ignore_fields and not minimal:
+            rval['id_site'] = self.project_access_project.id_site
+
         return rval
 
     @staticmethod

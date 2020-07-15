@@ -88,9 +88,18 @@ class DBManagerTeraUserAccess:
 
     def get_project_role(self, project_id: int):
         projects_roles = self.user.get_projects_roles()
-        role = [role for project, role in projects_roles.items() if project.id_project == project_id]
+        role = [role for project, role in projects_roles.items() if project.id_project == int(project_id)]
         if len(role) == 1:
             return role[0]['project_role']
+        return None
+
+    def get_user_project_role(self, user_id: int, project_id: int):
+        if user_id not in self.get_accessible_users_ids():
+            return None
+        user = TeraUser.get_user_by_id(id_user=user_id)
+        role = [role for project, role in user.get_projects_roles().items() if project.id_project == int(project_id)]
+        if len(role) == 1:
+            return role[0]
         return None
 
     def get_accessible_projects(self, admin_only=False):

@@ -48,6 +48,7 @@ class UserQueryProjectAccess(Resource):
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading project roles'})
     def get(self):
+        from libtera.db.models.TeraProject import TeraProject
         parser = get_parser
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
@@ -85,12 +86,20 @@ class UserQueryProjectAccess(Resource):
 
         if access is not None:
             access_list = []
-            if not args['by_users']:
+            if not args['by_users'] or args['id_user']:
                 for project, project_role in access.items():
                     filters = []
                     if not args['with_sites']:
                         filters = ['id_site', 'site_name']
                     proj_access_json = project.to_json(ignore_fields=filters)
+                    if args['with_sites']:
+                        if not args['id_project']:
+                            current_project = project
+                        else:
+                            # When we have a id_project request, we have usergroups, not project here
+                            current_project = TeraProject.get_project_by_id(args['id_project'])
+                        proj_access_json['id_site'] = current_project.id_site
+                        proj_access_json['site_name'] = current_project.project_site.site_name
                     if project_role:
                         proj_access_json['project_access_role'] = project_role['project_role']
                         if project_role['inherited']:
@@ -99,13 +108,38 @@ class UserQueryProjectAccess(Resource):
                         proj_access_json['project_access_role'] = None
                     access_list.append(proj_access_json)
             else:
-                # Find users of each user group
-                for project, project_role in access.items():
-                    for user in user_access.query_users_for_usergroup(project.id_user_group):
-                        proj_access_json = {'id_user': user.id_user,
-                                            'user_name': user.user_user_group_user.get_fullname(),
-                                            'project_access_role': project_role['project_role']}
-                        access_list.append(proj_access_json)
+                users_list = []
+                projects_list = []
+                if args['id_project']:
+                    # We have user groups if we queried for a specific project
+                    for usergroup, site_role in access.items():
+                        users_list.extend(user_access.query_users_for_usergroup(user_group_id=usergroup.id_user_group))
+                    projects_list = [TeraProject.get_project_by_id(args['id_project'])]
+
+                if args['id_user_group']:
+                    users_list = user_access.query_users_for_usergroup(user_group_id=args['id_user_group'])
+                    projects_list = [project for project in access]
+
+                for user in users_list:
+                    if user.user_user_group_user.id_user not in [value['id_user'] for value in access_list]:
+                        for project in projects_list:
+                            project_role = user_access.get_user_project_role(user_id=user.id_user,
+                                                                             project_id=project.id_project)
+                            if args['admins'] and project_role and project_role['project_role'] != 'admin':
+                                site_role = None
+                            project_access_json = {'id_user': user.id_user,
+                                                   'id_project': project.id_project,
+                                                   'user_name': user.user_user_group_user.get_fullname(),
+                                                   'project_access_role': project_role['project_role']
+                                                   if project_role else None,
+                                                   'project_access_inherited': project_role['inherited']
+                                                   if project_role else None
+                                                   }
+                            if args['with_sites']:
+                                project_access_json['id_site'] = project.id_site
+                                project_access_json['site_name'] = project.project_site.site_name
+                            if project_access_json:
+                                access_list.append(project_access_json)
 
             return access_list
 
