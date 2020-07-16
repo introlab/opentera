@@ -75,14 +75,43 @@ class TeraServiceAccess(db.Model, BaseModel):
         return TeraServiceAccess.query.filter_by(id_service_access=service_access_id).first()
 
     @staticmethod
-    def get_specific_access_for_user_group(id_user_group: int, id_service_role: int):
-        return TeraServiceAccess.query.filter_by(id_user_group=id_user_group, id_service_role=id_service_role).first()
+    def get_specific_access_for_user_group(id_service: int, id_user_group: int, id_service_role: int):
+        return TeraServiceAccess.query.filter_by(id_service=id_service, id_user_group=id_user_group,
+                                                 id_service_role=id_service_role).first()
 
     @staticmethod
-    def update_service_access_for_user_group(id_user_group: int, id_service_role: int):
+    def update_service_access_for_user_group_for_site(id_service: int, id_user_group: int, id_service_role: int,
+                                                      id_site: int):
         # Check if access already exists
-        access = TeraServiceAccess.get_specific_access_for_user_group(id_user_group=id_user_group,
-                                                                      id_service_role=id_service_role)
+        # access = TeraServiceAccess.get_specific_access_for_user_group(id_service=id_service,
+        #                                                               id_user_group=id_user_group,
+        #                                                               id_service_role=id_service_role)
+
+        access = TeraServiceAccess.get_service_access_for_user_group_for_site(id_service=id_service,
+                                                                              id_user_group=id_user_group,
+                                                                              id_site=id_site)
+
+        if access is None:
+            # No access already present for that user - create new one
+            access = TeraServiceAccess()
+            access.id_user_group = id_user_group
+            access.id_service_role = id_service_role
+            TeraServiceAccess.insert(access)
+        else:
+            # Update it
+            access.id_service_role = id_service_role
+
+            db.session.commit()
+        return access
+
+    @staticmethod
+    def update_service_access_for_user_group_for_project(id_service: int, id_user_group: int, id_service_role: int,
+                                                         id_project: int):
+        # Check if access already exists
+        access = TeraServiceAccess.get_service_access_for_user_group_for_project(id_service=id_service,
+                                                                                 id_user_group=id_user_group,
+                                                                                 id_project=id_project)
+
         if access is None:
             # No access already present for that user - create new one
             access = TeraServiceAccess()
@@ -105,6 +134,23 @@ class TeraServiceAccess(db.Model, BaseModel):
     def get_service_access_for_project(id_service: int, id_project: int):
         return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
                                                                        id_project=id_project).all()
+
+    @staticmethod
+    def get_service_access_for_site(id_service: int, id_site: int):
+        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
+                                                                       id_site=id_site).all()
+
+    @staticmethod
+    def get_service_access_for_user_group_for_site(id_service: int, id_user_group: int, id_site: int):
+        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
+                                                                       id_site=id_site).filter(
+            TeraServiceAccess.id_user_group == id_user_group).first()
+
+    @staticmethod
+    def get_service_access_for_user_group_for_project(id_service: int, id_user_group: int, id_project: int):
+        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
+                                                                       id_project=id_project).filter(
+            TeraServiceAccess.id_user_group == id_user_group).first()
 
     @staticmethod
     def delete_service_access_for_user_group_for_site(id_site: int, id_user_group: int):

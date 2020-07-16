@@ -148,8 +148,9 @@ class UserQueryUserGroups(Resource):
                             TeraServiceRole.get_specific_service_role_for_site(service_id=Globals.opentera_service_id,
                                                                                site_id=int(site['id_site']),
                                                                                rolename=site['site_role'])
-                        TeraServiceAccess.update_service_access_for_user_group(json_user_group['id_user_group'],
-                                                                               site_service_role.id_service_role)
+                        TeraServiceAccess.update_service_access_for_user_group_for_site(
+                            id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
+                            id_service_role=site_service_role.id_service_role, id_site=int(site['id_site']))
                     except exc.SQLAlchemyError:
                         import sys
                         print(sys.exc_info())
@@ -172,10 +173,9 @@ class UserQueryUserGroups(Resource):
                             TeraServiceRole.get_specific_service_role_for_project(service_id=Globals.opentera_service_id,
                                                                                   project_id=int(project['id_project']),
                                                                                   rolename=project['project_role'])
-                        TeraServiceAccess.update_service_access_for_user_group(id_user_group=
-                                                                               json_user_group['id_user_group'],
-                                                                               id_service_role=project_service_role
-                                                                               .id_service_role)
+                        TeraServiceAccess.update_service_access_for_user_group_for_project(
+                            id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
+                            id_service_role=project_service_role.id_service_role, id_project=int(project['id_project']))
 
                     except exc.SQLAlchemyError:
                         import sys

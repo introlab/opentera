@@ -200,8 +200,9 @@ class UserQuerySiteAccess(Resource):
             try:
                 # access = TeraSiteAccess.update_site_access(json_site['id_user_group'], json_site['id_site'],
                 #                                            json_site['site_access_role'])
-                access = TeraServiceAccess.update_service_access_for_user_group(json_site['id_user_group'],
-                                                                                site_service_role.id_service_role)
+                access = TeraServiceAccess.update_service_access_for_user_group_for_site(
+                    id_service=Globals.opentera_service_id, id_user_group=json_site['id_user_group'],
+                    id_service_role=site_service_role.id_service_role, id_site=json_site['id_site'])
 
             except exc.SQLAlchemyError:
                 import sys
@@ -210,7 +211,9 @@ class UserQuerySiteAccess(Resource):
 
             if access:
                 json_access = access.to_json()
-                json_access['id_site_access'] = access.id_service_access  # For backwards compatibility with "old" API
+                # For backwards compatibility with "old" API
+                json_access['id_site_access'] = access.id_service_access
+                json_access['site_access_role'] = access.service_access_role.service_role_name
                 json_rval.append(json_access)
 
         return jsonify(json_rval)
@@ -235,7 +238,7 @@ class UserQuerySiteAccess(Resource):
             return 'No site access to delete.', 500
 
         # Check if current user can delete
-        if user_access.get_site_role(site_access.id_site) != 'admin':
+        if user_access.get_site_role(site_access.service_access_role.id_site) != 'admin':
             return '', 403
 
         # If we are here, we are allowed to delete. Do so.

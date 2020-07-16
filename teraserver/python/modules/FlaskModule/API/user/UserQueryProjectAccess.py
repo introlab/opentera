@@ -228,10 +228,9 @@ class UserQueryProjectAccess(Resource):
                 # access = TeraProjectAccess.update_project_access(json_project['id_user_group'],
                 #                                                  json_project['id_project'],
                 #                                                  json_project['project_access_role'])
-                access = TeraServiceAccess.update_service_access_for_user_group(id_user_group=
-                                                                                json_project['id_user_group'],
-                                                                                id_service_role=project_service_role
-                                                                                .id_service_role)
+                access = TeraServiceAccess.update_service_access_for_user_group_for_project(
+                    id_service=Globals.opentera_service_id, id_user_group=json_project['id_user_group'],
+                    id_service_role=project_service_role.id_service_role, id_project=json_project['id_project'])
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
@@ -241,6 +240,7 @@ class UserQueryProjectAccess(Resource):
                 json_access = access.to_json()
                 # For backwards compatibility with "old" API
                 json_access['id_project_access'] = access.id_service_access
+                json_access['project_access_role'] = access.service_access_role.service_role_name
                 json_rval.append(json_access)
 
         return jsonify(json_rval)
@@ -266,7 +266,7 @@ class UserQueryProjectAccess(Resource):
             return 'No project access to delete.', 500
 
         # Check if current user can delete
-        if user_access.get_project_role(project_access.id_project) != 'admin':
+        if user_access.get_project_role(project_access.service_access_role.id_project) != 'admin':
             return '', 403
 
         # If we are here, we are allowed to delete. Do so.

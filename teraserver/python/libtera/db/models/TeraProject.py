@@ -108,7 +108,7 @@ class TeraProject(db.Model, BaseModel):
 
         access_role = TeraServiceRole()
         access_role.id_service = opentera_service_id
-        access_role.id_project = project.id_site
+        access_role.id_project = project.id_project
         access_role.service_role_name = 'admin'
         db.session.add(access_role)
 

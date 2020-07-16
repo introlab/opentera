@@ -127,7 +127,7 @@ class TeraUserGroup(db.Model, BaseModel):
         access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Users - Project 1').id_user_group
         user_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
                                                                           project_id=id_project, rolename='user')
-        access.id_service_role = admin_role.id_service_role
+        access.id_service_role = user_role.id_service_role
         db.session.add(access)
 
         db.session.commit()
