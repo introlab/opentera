@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-07-08 16:44-0400\n"
+"POT-Creation-Date: 2020-07-16 14:18-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -513,26 +513,26 @@ msgstr ""
 msgid "Erreur base de données"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:58
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:58
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:64
 msgid "Missing arguments"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:124
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:124
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:190
 #: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:109
 msgid "Acces refuse"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:173
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:173
 msgid "Not found"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:176
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:176
 msgid "Forbidden"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjectRoles.py:184
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:184
 msgid "Database error"
 msgstr ""
 

@@ -10,7 +10,6 @@ from twisted.internet import defer
 import datetime
 
 
-
 class ServiceOpenTera(RedisClient):
 
     def __init__(self, config_man: ServiceConfigManager, service_info):
