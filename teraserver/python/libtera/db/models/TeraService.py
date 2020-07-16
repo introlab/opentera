@@ -90,6 +90,17 @@ class TeraService(db.Model, BaseModel):
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
+        new_service.service_key = 'LoggingService'
+        new_service.service_name = 'Logging Service'
+        new_service.service_hostname = 'localhost'
+        new_service.service_port = 4041
+        new_service.service_endpoint = '/'
+        new_service.service_clientendpoint = '/log'
+        new_service.service_enabled = True
+        db.session.add(new_service)
+
+        new_service = TeraService()
+        new_service.service_uuid = str(uuid.uuid4())
         new_service.service_key = 'BureauActif'
         new_service.service_name = 'Bureau Actif'
         new_service.service_hostname = 'localhost'
