@@ -8,6 +8,10 @@ class TwistedModuleWebSocketServerFactory(WebSocketServerFactory):
         self.config = kwargs.pop('redis_config', None)
         WebSocketServerFactory.__init__(self, *args, **kwargs)
 
+        # Manage automatic ping/pong to make sure connection persists though proxy
+        # Values are in seconds
+        self.setProtocolOptions(autoPingInterval=10, autoPingTimeout=30, autoPingSize=20)
+
     def buildProtocol(self, addr):
         """
         This overloaded function is called when a new protocol (effective connection to the websocket server) is

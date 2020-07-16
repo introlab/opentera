@@ -193,6 +193,7 @@ class FlaskModule(BaseModule):
         from .API.device.DeviceQuerySessionEvents import DeviceQuerySessionEvents
         from .API.device.DeviceQueryDevices import DeviceQueryDevices
         from .API.device.DeviceQueryAssets import DeviceQueryAssets
+        from .API.device.DeviceQueryParticipants import DeviceQueryParticipants
 
         # Resources
         # TODO remove legacy endpoint 'device_login'
@@ -215,6 +216,9 @@ class FlaskModule(BaseModule):
         device_api_ns.add_resource(DeviceQuerySessionEvents, '/sessionevents', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceQueryDevices, '/devices', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceQueryAssets, '/assets', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
+
+        # Finally add namespace
         api.add_namespace(device_api_ns)
 
     def init_participant_api(self):

@@ -57,6 +57,18 @@ class WebRTCModule(BaseModule):
                     return True, process_dict['key']
         return False, {}
 
+    def get_webrtc_session_status(self, room_name):
+        from requests import get, post, Response
+        for process_dict in self.processList:
+            if process_dict['key'] == room_name:
+                url = 'https://' + self.config.webrtc_config['hostname'] + ':' \
+                      + str(self.config.webrtc_config['external_port']) \
+                      + '/teraplus/' + str(process_dict['port']) + '/status?key=' + room_name
+                response = get(url, timeout=5, verify=False)
+                if response.status_code == 200:
+                    return response.json()
+        return None
+
     def terminate_webrtc_session_with_room_name(self, room_name):
         for process_dict in self.processList:
             if process_dict['key'] == room_name:

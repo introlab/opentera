@@ -64,23 +64,27 @@ class TeraSession(db.Model, BaseModel):
 
         if not minimal:
             # Append list of participants ids and names
-            rval["session_participants"] = [{'id_participant': part.id_participant,
+            rval['session_participants'] = [{'id_participant': part.id_participant,
                                              'participant_name': part.participant_name}
                                             for part in self.session_participants]
 
             # Append list of users ids and names
-            rval["session_users"] = [{'id_user': user.id_user, 'user_name': user.get_fullname()}
+            rval['session_users'] = [{'id_user': user.id_user, 'user_name': user.get_fullname()}
                                      for user in self.session_users]
 
             # Append user name
             if self.session_creator_user:
-                rval["session_creator_user"] = self.session_creator_user.get_fullname()
+                rval['session_creator_user'] = self.session_creator_user.get_fullname()
+                rval['session_creator_user_uuid'] = self.session_creator_user.user_uuid
             elif self.session_creator_device:
-                rval["session_creator_device"] = self.session_creator_device.device_name
+                rval['session_creator_device'] = self.session_creator_device.device_name
+                rval['session_creator_device_uuid'] = self.session_creator_device.device_uuid
             elif self.session_creator_participant:
-                rval["session_creator_participant"] = self.session_creator_participant.participant_name
+                rval['session_creator_participant'] = self.session_creator_participant.participant_name
+                rval['session_creator_participant_uuid'] = self.session_creator_participant.participant_uuid
             elif self.session_creator_service:
                 rval['session_creator_service'] = self.session_creator_service.service_name
+                rval['session_creator_service_uuid'] = self.session_creator_service.service_uuid
 
             # Append session components
             from libtera.db.models.TeraDeviceData import TeraDeviceData

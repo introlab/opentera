@@ -4,7 +4,7 @@ from requests import get
 import json
 
 
-class DeviceQuerySessionEvents(unittest.TestCase):
+class DeviceQuerySessionEventsTest(unittest.TestCase):
 
     host = 'localhost'
     port = 40075
