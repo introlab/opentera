@@ -127,6 +127,10 @@ def init_services(config: ConfigManager):
 
     services = TeraService.query.all()
     for service in services:
+        # Ignore special service TeraServer
+        if service.service_key == 'OpenTeraServer':
+            Globals.opentera_service_id = service.id_service
+            continue
         if service.service_enabled:
             print('Activating service: ' + service.service_key)
             redis_client.set(RedisVars.RedisVar_ServicePrefixKey + service.service_key, json.dumps(service.to_json()))

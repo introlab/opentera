@@ -29,7 +29,7 @@ from libtera.db.models.TeraServiceRole import TeraServiceRole
 from libtera.db.models.TeraServiceProject import TeraServiceProject
 from libtera.db.models.TeraUserGroup import TeraUserGroup
 from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
-from libtera.db.models.TeraServiceProjectRole import TeraServiceProjectRole
+from libtera.db.models.TeraServiceAccess import TeraServiceAccess
 
 from libtera.ConfigManager import ConfigManager
 
@@ -87,14 +87,6 @@ class DBManager (BaseModule):
             print('No server settings - creating defaults')
             TeraServerSettings.create_defaults()
 
-        if TeraSite.get_count() == 0:
-            print('No sites - creating defaults')
-            TeraSite.create_defaults()
-
-        if TeraProject.get_count() == 0:
-            print("No projects - creating defaults")
-            TeraProject.create_defaults()
-
         if TeraService.get_count() == 0:
             print("No services - creating defaults")
             TeraService.create_defaults()
@@ -102,6 +94,14 @@ class DBManager (BaseModule):
         if TeraServiceRole.get_count() == 0:
             print("No service roles - creating defaults for each service")
             TeraServiceRole.create_defaults()
+
+        if TeraSite.get_count() == 0:
+            print('No sites - creating defaults')
+            TeraSite.create_defaults()
+
+        if TeraProject.get_count() == 0:
+            print("No projects - creating defaults")
+            TeraProject.create_defaults()
 
         if TeraServiceProject.get_count() == 0:
             print('No service - project association - creating defaults')
@@ -115,9 +115,9 @@ class DBManager (BaseModule):
             print("No user groups - creating defaults")
             TeraUserGroup.create_defaults()
 
-        if TeraServiceProjectRole.get_count() == 0:
+        if TeraServiceAccess.get_count() == 0:
             print('No service - project - roles - creating defaults')
-            TeraServiceProjectRole.create_defaults()
+            TeraServiceAccess.create_defaults()
 
         if TeraParticipant.get_count() == 0:
             print("No participant - creating defaults")
@@ -174,7 +174,7 @@ class DBManager (BaseModule):
         db.app = flask_app
 
         # Init tables
-        # db.drop_all()
+        db.drop_all()
         db.create_all()
 
         # Apply any database upgrade, if needed

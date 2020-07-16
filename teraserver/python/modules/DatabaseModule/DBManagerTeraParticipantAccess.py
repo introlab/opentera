@@ -13,9 +13,6 @@ from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
-
 
 class DBManagerTeraParticipantAccess:
     def __init__(self, participant: TeraParticipant):

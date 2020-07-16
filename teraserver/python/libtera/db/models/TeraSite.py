@@ -1,4 +1,5 @@
 from libtera.db.Base import db, BaseModel
+from flask_sqlalchemy import event
 
 
 class TeraSite(db.Model, BaseModel):
@@ -21,12 +22,11 @@ class TeraSite(db.Model, BaseModel):
     def create_defaults():
         base_site = TeraSite()
         base_site.site_name = 'Default Site'
-        db.session.add(base_site)
+        TeraSite.insert(base_site)
 
-        base_site2 = TeraSite()
-        base_site2.site_name = 'Top Secret Site'
-        db.session.add(base_site2)
-        db.session.commit()
+        base_site = TeraSite()
+        base_site.site_name = 'Top Secret Site'
+        TeraSite.insert(base_site)
 
     @staticmethod
     def get_site_by_sitename(sitename):
@@ -50,3 +50,44 @@ class TeraSite(db.Model, BaseModel):
 
         from libtera.db.models.TeraSession import TeraSession
         TeraSession.delete_orphaned_sessions()
+
+    @classmethod
+    def insert(cls, site):
+        # Creates admin and user roles for that site
+        super().insert(site)
+
+        from libtera.db.models.TeraServiceRole import TeraServiceRole
+        from libtera.db.models.TeraService import TeraService
+        opentera_service_id = TeraService.get_openteraserver_service().id_service
+        access_role = TeraServiceRole()
+        access_role.id_service = opentera_service_id
+        access_role.id_site = site.id_site
+        access_role.service_role_name = 'admin'
+        db.session.add(access_role)
+
+        access_role = TeraServiceRole()
+        access_role.id_service = opentera_service_id
+        access_role.id_site = site.id_site
+        access_role.service_role_name = 'user'
+        db.session.add(access_role)
+
+        db.session.commit()
+
+#
+# @event.listens_for(TeraSite, 'after_insert')
+# def site_inserted(mapper, connection, target):
+#     # By default, creates user and admin roles after a site has been added
+#     from libtera.db.models.TeraServiceRole import TeraServiceRole
+#     from libtera.db.models.TeraService import TeraService
+#
+#     access_role = TeraServiceRole()
+#     access_role.id_service = Globals.opentera_service_id
+#     access_role.id_site = target.id_site
+#     access_role.service_role_name = 'admin'
+#     db.session.add(access_role)
+#
+#     access_role = TeraServiceRole()
+#     access_role.id_service = Globals.opentera_service_id
+#     access_role.id_site = target.id_site
+#     access_role.service_role_name = 'user'
+#     db.session.add(access_role)

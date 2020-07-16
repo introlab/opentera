@@ -2,7 +2,7 @@ from flask import jsonify, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraServiceProjectRole import TeraServiceProjectRole
+from libtera.db.models.TeraServiceAccess import TeraServiceAccess
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -20,7 +20,7 @@ get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Also retur
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('service_project_role', type=str, location='json',
 #                          help='Role for specific service and project to create / update', required=True)
-post_schema = api.schema_model('user_service_project_role', {'properties': TeraServiceProjectRole.get_json_schema(),
+post_schema = api.schema_model('user_service_project_role', {'properties': TeraServiceAccess.get_json_schema(),
                                                              'type': 'object',
                                                              'location': 'json'})
 
@@ -31,7 +31,7 @@ delete_parser.add_argument('id', type=int, help='Specific service project role a
                                                 ' of the association itself!', required=True)
 
 
-class UserQueryServiceProjectRoles(Resource):
+class UserQueryServiceAccess(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
@@ -76,7 +76,7 @@ class UserQueryServiceProjectRoles(Resource):
                                            if spr.id_service == service_id and spr.id_project == project_id]
                     missing_user_groups_ids = set(user_group_ids).difference(service_user_groups)
                     for user_group_id in missing_user_groups_ids:
-                        new_spr = TeraServiceProjectRole()
+                        new_spr = TeraServiceAccess()
                         new_spr.id_service = service_id
                         new_spr.id_project = project_id
                         new_spr.id_user_group = user_group_id
@@ -133,18 +133,18 @@ class UserQueryServiceProjectRoles(Resource):
             if json_sp['id_service_project_role'] > 0:
                 # Already existing
                 try:
-                    TeraServiceProjectRole.update(json_sp['id_service_project_role'], json_sp)
+                    TeraServiceAccess.update(json_sp['id_service_project_role'], json_sp)
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
                     return '', 500
             else:
                 try:
-                    new_sp = TeraServiceProjectRole()
+                    new_sp = TeraServiceAccess()
                     new_sp.from_json(json_sp)
-                    TeraServiceProjectRole.insert(new_sp)
+                    TeraServiceAccess.insert(new_sp)
                     # Update ID for further use
-                    json_sp['id_service_project_role'] = new_sp.id_service_project_role
+                    json_sp['id_service_project_role'] = new_sp.id_service_access
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
@@ -168,16 +168,16 @@ class UserQueryServiceProjectRoles(Resource):
         id_todel = args['id']
 
         # Check if current user can delete
-        sp = TeraServiceProjectRole.get_service_project_role_by_id(id_todel)
+        sp = TeraServiceAccess.get_service_project_role_by_id(id_todel)
         if not sp:
             return gettext('Not found'), 500
 
-        if sp.service_project_role_project.id_site not in user_access.get_accessible_sites_ids(admin_only=True):
+        if sp.service_access_project.id_site not in user_access.get_accessible_sites_ids(admin_only=True):
             return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraServiceProjectRole.delete(id_todel=id_todel)
+            TeraServiceAccess.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

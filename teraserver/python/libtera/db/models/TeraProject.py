@@ -1,5 +1,4 @@
 from libtera.db.Base import db, BaseModel
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
 
 
 class TeraProject(db.Model, BaseModel):
@@ -34,16 +33,26 @@ class TeraProject(db.Model, BaseModel):
         return users_ids
 
     def get_users_in_project(self):
+        import modules.Globals as Globals
+        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+        from libtera.db.models.TeraUser import TeraUser
         # Get all users who has a role in the project
-        # project_access = TeraProjectAccess.query.filter(TeraProjectAccess.id_project == self.id_project).all()
-        project_access = TeraProjectAccess.get_projects_access_for_project(self.id_project)
+        project_access = TeraServiceAccess.get_service_access_for_project(id_service=Globals.opentera_service_id,
+                                                                          id_project=self.id_project)
+
         users = []
         for access in project_access:
             # Get all users in the related group
-            users = access.project_access_user_group.user_group_users
-            for user in users:
-                if user not in users:
-                    users.append(user)
+            if access.service_access_user_group:
+                users = access.service_access_user_group.user_group_users
+                for user in users:
+                    if user not in users:
+                        users.append(user)
+
+        # Also appends super admins!
+        for user in TeraUser.get_superadmins():
+            if user not in users:
+                users.append(user)
 
         return users
 
@@ -53,20 +62,17 @@ class TeraProject(db.Model, BaseModel):
         base_project = TeraProject()
         base_project.project_name = 'Default Project #1'
         base_project.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        db.session.add(base_project)
+        TeraProject.insert(base_project)
 
         base_project2 = TeraProject()
         base_project2.project_name = 'Default Project #2'
         base_project2.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        db.session.add(base_project2)
+        TeraProject.insert(base_project2)
 
         secret_project = TeraProject()
         secret_project.project_name = "Secret Project #1"
         secret_project.id_site = TeraSite.get_site_by_sitename('Top Secret Site').id_site
-        db.session.add(secret_project)
-
-        # Commit
-        db.session.commit()
+        TeraProject.insert(secret_project)
 
     @staticmethod
     def get_project_by_projectname(projectname):
@@ -90,3 +96,26 @@ class TeraProject(db.Model, BaseModel):
 
         from libtera.db.models.TeraSession import TeraSession
         TeraSession.delete_orphaned_sessions()
+
+    @classmethod
+    def insert(cls, project):
+        # Creates admin and user roles for that project
+        super().insert(project)
+
+        from libtera.db.models.TeraServiceRole import TeraServiceRole
+        from libtera.db.models.TeraService import TeraService
+        opentera_service_id = TeraService.get_openteraserver_service().id_service
+
+        access_role = TeraServiceRole()
+        access_role.id_service = opentera_service_id
+        access_role.id_project = project.id_project
+        access_role.service_role_name = 'admin'
+        db.session.add(access_role)
+
+        access_role = TeraServiceRole()
+        access_role.id_service = opentera_service_id
+        access_role.id_project = project.id_project
+        access_role.service_role_name = 'user'
+        db.session.add(access_role)
+
+        db.session.commit()
