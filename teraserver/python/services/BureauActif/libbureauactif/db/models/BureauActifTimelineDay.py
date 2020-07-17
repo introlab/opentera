@@ -22,10 +22,9 @@ class BureauActifTimelineDay(db.Model, BaseModel):
         return super().to_json(ignore_fields=ignore_fields)
 
     @staticmethod
-    def get_timeline_data(start_date, end_date):
-        # TODO add filter by uuid_participant
-        days = BureauActifTimelineDay.query.filter(BureauActifTimelineDay.name.between(start_date, end_date)).all()
-
+    def get_timeline_data(start_date, end_date, participant_uuid):
+        days = BureauActifTimelineDay.query.filter(BureauActifTimelineDay.name.between(start_date, end_date),
+                                                   BureauActifTimelineDay.participant_uuid == participant_uuid).all()
         if days:
             return days
         return None

@@ -3,7 +3,6 @@ from sqlalchemy import and_
 from services.BureauActif.libbureauactif.db.Base import db
 from libtera.db.Base import BaseModel
 import datetime
-import calendar
 
 
 class BureauActifCalendarDay(db.Model, BaseModel):
@@ -34,8 +33,9 @@ class BureauActifCalendarDay(db.Model, BaseModel):
         return super().to_json(ignore_fields=ignore_fields)
 
     @staticmethod
-    def get_calendar_day_by_month(start_date, end_date):
-        days = BureauActifCalendarDay.query.filter(BureauActifCalendarDay.date.between(start_date, end_date)).all()
+    def get_calendar_day_by_month(start_date, end_date, participant_uuid):
+        days = BureauActifCalendarDay.query.filter(BureauActifCalendarDay.date.between(start_date, end_date),
+                                                   BureauActifCalendarDay.participant_uuid == participant_uuid).all()
         if days:
             return days
         return None

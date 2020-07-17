@@ -6,7 +6,7 @@ import calendar
 
 class DBManagerBureauActifCalendarAccess:
 
-    def query_calendar_day_by_month(self, date: datetime):
+    def query_calendar_day_by_month(self, date: datetime, participant_uuid):
         month = date.month
         year = date.year
 
@@ -14,7 +14,7 @@ class DBManagerBureauActifCalendarAccess:
         start_date = datetime.date(year, month, 1)
         end_date = datetime.date(year, month, num_days)
 
-        calendar_days = BureauActifCalendarDay.get_calendar_day_by_month(start_date, end_date)
+        calendar_days = BureauActifCalendarDay.get_calendar_day_by_month(start_date, end_date, participant_uuid)
 
         return calendar_days
 

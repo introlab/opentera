@@ -26,7 +26,8 @@ class BureauActifTimelineDayEntry(db.Model, BaseModel):
 
     @staticmethod
     def get_timeline_day_entries(timeline_day_id: int):
-        return BureauActifTimelineDayEntry.query.filter_by(id_timeline_day=timeline_day_id).all()
+        return BureauActifTimelineDayEntry.query.filter_by(id_timeline_day=timeline_day_id).order_by(
+            BureauActifTimelineDayEntry.id_timeline_day_entry).all()
 
     @classmethod
     def insert(cls, new_entry):

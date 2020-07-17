@@ -135,7 +135,8 @@ class UserQueryParticipants(Resource):
 
                             if args['full'] is not None:
                                 if participant.id_participant_group is not None:
-                                    participant_json['participant_participant_group'] = participant.participant_participant_group.to_json()
+                                    participant_json[
+                                        'participant_participant_group'] = participant.participant_participant_group.to_json()
                                 participant_json['participant_project'] = participant.participant_project.to_json()
                             participant_list.append(participant_json)
                         else:
@@ -179,14 +180,15 @@ class UserQueryParticipants(Resource):
 
         # Check if current user can modify the posted group
         if 'id_participant_group' in json_participant:
-            if json_participant['id_participant_group'] > 0 and \
+            if json_participant['id_participant_group'] is not None and \
+                    json_participant['id_participant_group'] > 0 and \
                     json_participant['id_participant_group'] not in \
                     user_access.get_accessible_groups_ids(admin_only=True):
                 return 'No admin access to group', 403
 
         # If we have both an id_group and an id_project, make sure that the id_project in the group matches
         if 'id_project' in json_participant and 'id_participant_group' in json_participant:
-            if json_participant['id_participant_group'] > 0:
+            if json_participant['id_participant_group'] is not None and json_participant['id_participant_group'] > 0:
                 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
                 participant_group = TeraParticipantGroup.get_participant_group_by_id(
                     json_participant['id_participant_group'])

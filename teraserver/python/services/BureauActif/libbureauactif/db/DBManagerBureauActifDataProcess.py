@@ -74,15 +74,21 @@ class DBManagerBureauActifDataProcess:
     timeline_day_entries = []
 
     def process_data(self, raw_data, file_db_entry):
+        self.initialize()
         self.data = raw_data['data']
         self.desk_config = raw_data['config']
         self.timers = raw_data['timers']
+
+        # Sort data by time
+        self.data = sorted(self.data, key=lambda x: datetime.datetime.strptime(x[0].lstrip(' '), '%Y-%m-%d %H:%M:%S'))
         uuid_participant = file_db_entry.data_participant_uuid
         date_str = raw_data['data'][0][0].lstrip(' ')
         date = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
 
         self.create_calendar_objects(uuid_participant, date)
         self.create_timeline(uuid_participant, date)
+
+        self.set_starting_hour(date)  # Add starting bloc in timeline
         self.get_starting_position()
 
         self.half_timer_starting_position = self.first_position_timer / 2  # Half of the timer of the first position
@@ -118,7 +124,7 @@ class DBManagerBureauActifDataProcess:
                 entries_before_position_change = 0
             else:
                 entries_before_position_change += 1
-                
+
         self.save_calendar_data()
 
     def get_absent_time(self, current_index):
@@ -247,8 +253,6 @@ class DBManagerBureauActifDataProcess:
 
     def update_last_timeline_entry(self, delta, id_type):
         if delta > 0:
-            if len(self.timeline_day_entries) == 0:  # If no entries in the timeline yet, add starting time bloc first
-                self.set_starting_hour()
             last_entry = self.timeline_day_entries[len(self.timeline_day_entries) - 1]
             if last_entry.id_timeline_entry_type == id_type:
                 last_entry.value += delta
@@ -274,8 +278,8 @@ class DBManagerBureauActifDataProcess:
         entry.id_timeline_day = self.timeline_day.id_timeline_day
         return entry
 
-    def set_starting_hour(self):
-        starting_time = self.calendar_day.date.time()
+    def set_starting_hour(self, date):
+        starting_time = date.time()
         time = starting_time.hour + (starting_time.minute / 60)
         first_entry = BureauActifTimelineDayEntry.insert(self.create_new_timeline_entry(1, time))
         self.timeline_day_entries.append(first_entry)
@@ -301,3 +305,16 @@ class DBManagerBureauActifDataProcess:
 
     def check_if_config_is_respected(self, is_standing):
         self.config_is_respected = self.actual_config_is_up == is_standing
+
+    def initialize(self):
+        self.config_is_respected = True
+        self.actual_config_is_up = True
+        self.button_pressed = False
+
+        self.calendar_day = BureauActifCalendarDay()
+        self.seating = BureauActifCalendarData()
+        self.standing = BureauActifCalendarData()
+        self.position_changes = BureauActifCalendarData()
+
+        self.timeline_day = BureauActifTimelineDay()
+        self.timeline_day_entries = []

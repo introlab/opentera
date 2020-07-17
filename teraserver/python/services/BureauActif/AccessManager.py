@@ -32,7 +32,7 @@ class AccessManager:
     def token_required(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            # We support 3 authentification scheme: token in url, cookie and authorization header
+            # We support 3 authentication scheme: token in url, cookie and authorization header
             token = None
             ######################
             # AUTHORIZATION HEADER
