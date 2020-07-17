@@ -1,3 +1,4 @@
+from services.LoggingService.FlaskModule import flask_app
 import services.LoggingService.Globals as Globals
 from libtera.redis.RedisClient import RedisClient
 from services.LoggingService.ConfigManager import ConfigManager
@@ -139,6 +140,9 @@ if __name__ == '__main__':
     except OperationalError:
         print("Unable to connect to database - please check settings in config file!")
         quit()
+
+    with flask_app.app_context():
+        Globals.db_man.create_defaults(Globals.config_man)
 
     # Create the Service
     service = LoggingService(Globals.config_man, service_info)

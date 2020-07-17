@@ -3,9 +3,7 @@ from services.LoggingService.libloggingservice.db.Base import db
 
 # Must include all Database objects here to be properly initialized and created if needed
 # All at once to make sure all files are registered.
-from services.LoggingService.libloggingservice.db.models import *
 from services.LoggingService.libloggingservice.db.models.LogEntry import LogEntry
-
 
 from services.LoggingService.ConfigManager import ConfigManager
 from services.LoggingService.FlaskModule import flask_app
@@ -30,7 +28,9 @@ class DBManager:
         self.db_uri = None
 
     def create_defaults(self, config: ConfigManager):
-        pass
+
+        if LogEntry.get_count() == 0:
+            print('enable')
 
     def open(self, db_infos, echo=False):
         self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
@@ -46,7 +46,7 @@ class DBManager:
         db.app = flask_app
 
         # Init tables
-        db.drop_all()
+        # db.drop_all()
         db.create_all()
 
         # Apply any database upgrade, if needed
@@ -65,7 +65,7 @@ class DBManager:
         db.init_app(flask_app)
         db.app = flask_app
 
-        # Init tables
+        # db.drop_all()
         db.create_all()
 
         # Apply any database upgrade, if needed

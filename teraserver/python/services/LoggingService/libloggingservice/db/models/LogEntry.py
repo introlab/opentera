@@ -1,4 +1,4 @@
-from services.BureauActif.libbureauactif.db.Base import db
+from services.LoggingService.libloggingservice.db.Base import db
 from libtera.db.Base import BaseModel
 
 
@@ -14,9 +14,5 @@ class LogEntry(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
         return super().to_json(ignore_fields=ignore_fields)
-
-    @staticmethod
-    def create_defaults():
-        pass
 
 
