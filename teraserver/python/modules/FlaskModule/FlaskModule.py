@@ -84,6 +84,7 @@ class FlaskModule(BaseModule):
 
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
+        flask_app.config.update({'SESSION_COOKIE_SECURE': True})
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
         flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
@@ -145,7 +146,7 @@ class FlaskModule(BaseModule):
         from .API.user.UserQueryAssets import UserQueryAssets
         from .API.user.UserQueryServices import UserQueryServices
         from .API.user.UserQueryServiceProjects import UserQueryServiceProjects
-        from .API.user.UserQueryServiceProjectRoles import UserQueryServiceProjectRoles
+        from .API.user.UserQueryServiceAccess import UserQueryServiceAccess
         from .API.user.UserSessionManager import UserSessionManager
 
         # Resources
@@ -175,7 +176,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQueryAssets, '/assets', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServices, '/services', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServiceProjects, '/serviceprojects', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryServiceProjectRoles, '/serviceprojectroles', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryServiceAccess, '/serviceaccess', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserSessionManager, '/sessions/manager', resource_class_kwargs=kwargs)
         api.add_namespace(user_api_ns)
 
@@ -192,6 +193,7 @@ class FlaskModule(BaseModule):
         from .API.device.DeviceQuerySessionEvents import DeviceQuerySessionEvents
         from .API.device.DeviceQueryDevices import DeviceQueryDevices
         from .API.device.DeviceQueryAssets import DeviceQueryAssets
+        from .API.device.DeviceQueryParticipants import DeviceQueryParticipants
 
         # Resources
         # TODO remove legacy endpoint 'device_login'
@@ -214,6 +216,9 @@ class FlaskModule(BaseModule):
         device_api_ns.add_resource(DeviceQuerySessionEvents, '/sessionevents', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceQueryDevices, '/devices', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceQueryAssets, '/assets', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
+
+        # Finally add namespace
         api.add_namespace(device_api_ns)
 
     def init_participant_api(self):

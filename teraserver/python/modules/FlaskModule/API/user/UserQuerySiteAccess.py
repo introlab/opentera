@@ -4,8 +4,10 @@ from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
+from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+from libtera.db.models.TeraServiceRole import TeraServiceRole
 from modules.DatabaseModule.DBManager import DBManager
+import modules.Globals as Globals
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -22,10 +24,29 @@ get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_us
                                                                 ' have any access with that user group')
 
 # post_parser = reqparse.RequestParser()
-# post_parser.add_argument('site_access', type=str, location='json', help='Site access to create / update', required=True)
-post_schema = api.schema_model('user_site_access', {'properties': TeraSiteAccess.get_json_schema(),
-                                                    'type': 'object',
-                                                    'location': 'json'})
+post_schema = api.schema_model('user_site_access', {
+    'properties': {
+        'site_access': {
+            'properties': {
+                'id_site': {
+                    'type': 'integer',
+                    'required': True
+                },
+                'id_user_group': {
+                    'type': 'integer',
+                    'required': True
+                },
+                'site_access_role': {
+                    'type': 'string'
+                },
+                'id_service_role': {
+                    'type': 'integer'
+                }
+            }
+        }
+    },
+    'type': 'object',
+    'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Site Access ID to delete', required=True)
@@ -44,6 +65,7 @@ class UserQuerySiteAccess(Resource):
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading sites roles'})
     def get(self):
+        from libtera.db.models.TeraSite import TeraSite
         parser = get_parser
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
@@ -66,7 +88,7 @@ class UserQuerySiteAccess(Resource):
         if args['id_user_group']:
             if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
                 access = user_access.query_site_access_for_user_group(user_group_id=args['id_user_group'],
-                                                                      admin_only=args['admins'],
+                                                                      admin_only=args['admins'] is not None,
                                                                       include_sites_without_access=args['with_sites'])
 
         # Query access for site id
@@ -77,7 +99,7 @@ class UserQuerySiteAccess(Resource):
 
         if access is not None:
             access_list = []
-            if not args['by_users']:
+            if not args['by_users'] or args['id_user']:
                 for site, site_role in access.items():
                     site_access_json = site.to_json()
                     if site_role:
@@ -88,13 +110,30 @@ class UserQuerySiteAccess(Resource):
                         site_access_json['site_access_role'] = None
                     access_list.append(site_access_json)
             else:
-                # Find users of each user group
-                for site, site_role in access.items():
-                    for user in user_access.query_users_for_usergroup(site.id_user_group):
+                users_list = []
+                sites_list = []
+                if args['id_site']:
+                    for usergroup, site_role in access.items():
+                        users_list.extend(user_access.query_users_for_usergroup(user_group_id=usergroup.id_user_group))
+                    sites_list = [TeraSite.get_site_by_id(args['id_site'])]
+
+                if args['id_user_group']:
+                    users_list = user_access.query_users_for_usergroup(user_group_id=args['id_user_group'])
+                    sites_list = [site for site in access]
+
+                for user in users_list:
+                    for site in sites_list:
+                        site_role = user_access.get_user_site_role(user_id=user.id_user, site_id=site.id_site)
+                        if args['admins'] and site_role and site_role['site_role'] != 'admin':
+                            site_role = None
                         site_access_json = {'id_user': user.id_user,
+                                            'id_site': site.id_site,
                                             'user_name': user.user_user_group_user.get_fullname(),
-                                            'site_access_role': site_role['site_role']}
-                        access_list.append(site_access_json)
+                                            'site_access_role': site_role['site_role'] if site_role else None,
+                                            'site_access_inherited': site_role['inherited'] if site_role else None
+                                            }
+                        if site_access_json:
+                            access_list.append(site_access_json)
             return access_list
 
         # No access, but still fine
@@ -125,23 +164,57 @@ class UserQuerySiteAccess(Resource):
                 return 'Missing id_user_group', 400
             if 'id_site' not in json_site:
                 return 'Missing id_site', 400
+            if 'site_access_role' not in json_site and 'id_service_role' not in json_site:
+                return 'Missing role name or id', 400
 
             # Check if current user can change the access for that site
             if user_access.get_site_role(site_id=json_site['id_site']) != 'admin':
                 return 'Forbidden', 403
 
+            site_service_role = None
+            if 'site_access_role' in json_site:
+                # Check if we must remove access for that site
+                if json_site['site_access_role'] == '':
+                    # No more access to that site for that user group - remove all access!
+                    TeraServiceAccess.delete_service_access_for_user_group_for_site(
+                        id_user_group=json_site['id_user_group'], id_site=json_site['id_site'])
+                    continue
+
+                # Find id_service_role for that
+                site_service_role = \
+                    TeraServiceRole.get_specific_service_role_for_site(service_id=Globals.opentera_service_id,
+                                                                       site_id=json_site['id_site'],
+                                                                       rolename=json_site['site_access_role'])
+            if 'id_service_role' in json_site:
+                if json_site['id_service_role'] == 0:
+                    # No more access to that site for that user group - remove all access!
+                    TeraServiceAccess.delete_service_access_for_user_group_for_site(
+                        id_user_group=json_site['id_user_group'], id_site=json_site['id_site'])
+                    continue
+                site_service_role = TeraServiceRole.get_service_role_by_id(json_site['id_service_role'])
+
+            if not site_service_role:
+                return 'Invalid role name or id for that site', 400
+
             # Do the update!
             try:
-                access = TeraSiteAccess.update_site_access(json_site['id_user_group'], json_site['id_site'],
-                                                           json_site['site_access_role'])
+                # access = TeraSiteAccess.update_site_access(json_site['id_user_group'], json_site['id_site'],
+                #                                            json_site['site_access_role'])
+                access = TeraServiceAccess.update_service_access_for_user_group_for_site(
+                    id_service=Globals.opentera_service_id, id_user_group=json_site['id_user_group'],
+                    id_service_role=site_service_role.id_service_role, id_site=json_site['id_site'])
+
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
                 return '', 500
 
-            # TODO: Publish update to everyone who is subscribed to site access update...
             if access:
-                json_rval.append(access.to_json())
+                json_access = access.to_json()
+                # For backwards compatibility with "old" API
+                json_access['id_site_access'] = access.id_service_access
+                json_access['site_access_role'] = access.service_access_role.service_role_name
+                json_rval.append(json_access)
 
         return jsonify(json_rval)
 
@@ -160,17 +233,17 @@ class UserQuerySiteAccess(Resource):
         args = parser.parse_args()
         id_todel = args['id']
 
-        site_access = TeraSiteAccess.get_site_access_by_id(id_todel)
+        site_access = TeraServiceAccess.get_service_access_by_id(id_todel)
         if not site_access:
             return 'No site access to delete.', 500
 
         # Check if current user can delete
-        if user_access.get_site_role(site_access.id_site) != 'admin':
+        if user_access.get_site_role(site_access.service_access_role.id_site) != 'admin':
             return '', 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraSiteAccess.delete(id_todel=id_todel)
+            TeraServiceAccess.delete(id_todel=id_todel)
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

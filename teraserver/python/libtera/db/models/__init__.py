@@ -7,11 +7,10 @@ from .TeraDeviceSubType import TeraDeviceSubType
 from .TeraParticipant import TeraParticipant
 from .TeraParticipantGroup import TeraParticipantGroup
 from .TeraProject import TeraProject
-from .TeraProjectAccess import TeraProjectAccess
 from .TeraServerSettings import TeraServerSettings
 from .TeraService import TeraService
 from .TeraServiceProject import TeraServiceProject
-from .TeraServiceProjectRole import TeraServiceProjectRole
+from .TeraServiceAccess import TeraServiceAccess
 from .TeraServiceRole import TeraServiceRole
 from .TeraSession import TeraSession
 from .TeraSessionEvent import TeraSessionEvent
@@ -21,7 +20,6 @@ from .TeraSessionType import TeraSessionType
 from .TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
 from .TeraSessionTypeProject import TeraSessionTypeProject
 from .TeraSite import TeraSite
-from .TeraSiteAccess import TeraSiteAccess
 from .TeraTest import TeraTest
 from .TeraTestType import TeraTestType
 
@@ -35,11 +33,10 @@ __all__ = ['TeraAsset',
            'TeraParticipant',
            'TeraParticipantGroup',
            'TeraProject',
-           'TeraProjectAccess',
            'TeraServerSettings',
            'TeraService',
            'TeraServiceProject',
-           'TeraServiceProjectRole',
+           'TeraServiceAccess',
            'TeraServiceRole',
            'TeraSession',
            'TeraSessionEvent',
@@ -49,6 +46,5 @@ __all__ = ['TeraAsset',
            'TeraSessionTypeProject',
            'TeraSessionUsers',
            'TeraSite',
-           'TeraSiteAccess',
            'TeraTest',
            'TeraTestType']

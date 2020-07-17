@@ -52,6 +52,9 @@ class ConfigManager:
         # Default redis configuration
         self.redis_config['hostname'] = 'localhost'
         self.redis_config['port'] = 6379
+        # Already set to empty string previously
+        self.redis_config['username'] = ''
+        self.redis_config['password'] = ''
         self.redis_config['db'] = 0
 
     @staticmethod

@@ -72,7 +72,33 @@ class TeraService(db.Model, BaseModel):
         return TeraService.query.filter_by(id_service=s_id).first()
 
     @staticmethod
+    def get_openteraserver_service():
+        return TeraService.get_service_by_key('OpenTeraServer')
+
+    @staticmethod
     def create_defaults():
+        new_service = TeraService()
+        new_service.service_uuid = '00000000-0000-0000-0000-000000000001'
+        new_service.service_key = 'OpenTeraServer'
+        new_service.service_name = 'OpenTera Server'
+        new_service.service_hostname = 'localhost'
+        new_service.service_port = 4040
+        new_service.service_endpoint = '/'
+        new_service.service_clientendpoint = '/'
+        new_service.service_enabled = True
+        db.session.add(new_service)
+
+        new_service = TeraService()
+        new_service.service_uuid = str(uuid.uuid4())
+        new_service.service_key = 'LoggingService'
+        new_service.service_name = 'Logging Service'
+        new_service.service_hostname = 'localhost'
+        new_service.service_port = 4041
+        new_service.service_endpoint = '/'
+        new_service.service_clientendpoint = '/log'
+        new_service.service_enabled = True
+        db.session.add(new_service)
+
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
         new_service.service_key = 'BureauActif'

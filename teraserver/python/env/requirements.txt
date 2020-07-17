@@ -3,6 +3,8 @@ treq
 cryptography
 autobahn
 sqlalchemy
+sqlalchemy_schemadisplay
+pydot
 psycopg2-binary
 python-oauth2
 flask

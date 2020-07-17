@@ -9,9 +9,6 @@ from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraSession import TeraSession
 
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
-
 
 class DBManagerTeraDeviceAccess:
     def __init__(self, device: TeraDevice):

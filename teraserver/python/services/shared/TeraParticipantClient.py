@@ -4,6 +4,7 @@ from requests import Response
 from flask import request
 from libtera.redis.RedisRPCClient import RedisRPCClient
 
+
 class TeraParticipantClient:
 
     def __init__(self, token_dict: dict, token: str, config_man):

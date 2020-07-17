@@ -6,7 +6,7 @@ from flask_babel import Babel
 
 # OpenTera
 from modules.BaseModule import BaseModule, ModuleNames
-from services.VideoRehabService.ConfigManager import ConfigManager
+from services.LoggingService.ConfigManager import ConfigManager
 
 # WebSockets
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
@@ -40,7 +40,7 @@ authorizations = {
 
 
 # Flask application
-flask_app = Flask("VideoRehabService")
+flask_app = Flask("LoggingService")
 
 # Translations
 babel = Babel(flask_app)
@@ -149,8 +149,8 @@ class CustomAPI(Api):
 class FlaskModule(BaseModule):
 
     # API
-    api = CustomAPI(flask_app, version='1.0.0', title='VideoRehabService API',
-                    description='VideoRehabService API Documentation', doc='/doc', prefix='/api',
+    api = CustomAPI(flask_app, version='1.0.0', title='LoggingService API',
+                    description='LoggingService API Documentation', doc='/doc', prefix='/api',
                     authorizations=authorizations)
 
     # Namespaces
@@ -166,8 +166,7 @@ class FlaskModule(BaseModule):
         # This is used for session encryption
         # TODO Change secret key
         # TODO STORE SECRET IN DB?
-        flask_app.secret_key = 'VideoRehabSecret'
-
+        flask_app.secret_key = 'LoggingServiceSecret'
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
@@ -225,7 +224,7 @@ class FlaskModule(BaseModule):
         """
         We have received a published message from redis
         """
-        print('VideoDispatchService.FlaskModule - Received message ', pattern, channel, message)
+        print('LoggingService.FlaskModule - Received message ', pattern, channel, message)
         pass
 
     def init_api(self):
@@ -237,19 +236,6 @@ class FlaskModule(BaseModule):
         args = []
         kwargs = {'flaskModule': self}
 
-        from services.VideoRehabService.Views.Index import Index
-        from services.VideoRehabService.Views.ParticipantLocalView import ParticipantLocalView
-        from services.VideoRehabService.Views.ParticipantDashboard import ParticipantDashboard
-        from services.VideoRehabService.Views.ParticipantEndpoint import ParticipantEndpoint
-
-        # Will create a function that calls the __index__ method with args, kwargs
-        flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
-        flask_app.add_url_rule('/participant_localview', view_func=ParticipantLocalView.as_view('participant_localview',
-                                                                                                *args, **kwargs))
-        flask_app.add_url_rule('/participant', view_func=ParticipantDashboard.as_view('participant_dashboard', *args,
-                                                                                      **kwargs))
-        flask_app.add_url_rule('/participant_endpoint',
-                               view_func=ParticipantEndpoint.as_view('participant_endpoint', *args, **kwargs))
 
 @flask_app.after_request
 def apply_caching(response):

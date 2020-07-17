@@ -77,6 +77,6 @@ function ws_MessageReceived(evt){
     // Stop session
     if (msg_type == "type.googleapis.com/opentera.protobuf.StopSessionEvent"){
         showElement('btnLogout');
-        window.location.replace("participant_endpoint");
+        window.location.replace("participant_endpoint?token=" + sessionStorage.getItem("participant_token"));
     }
 }

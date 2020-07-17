@@ -99,7 +99,10 @@ class ServiceConfig:
 class ServiceConfigManager(ServiceConfig, RedisConfig, BackendConfig):
 
     def __init__(self):
-        pass
+        # Initialize base class
+        ServiceConfig.__init__(self)
+        RedisConfig.__init__(self)
+        BackendConfig.__init__(self)
 
     def load_config(self, filename):
         try:

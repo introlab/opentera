@@ -4,13 +4,13 @@ from requests import get
 import json
 
 
-class DeviceQueryDevicesTest(unittest.TestCase):
+class DeviceQueryParticipantsTest(unittest.TestCase):
 
     host = 'localhost'
     port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
-    device_query_devices_endpoint = '/api/device/devices'
+    device_query_participants_endpoint = '/api/device/participants'
     user_device_endpoint = '/api/user/devices'
     all_devices = None
 
@@ -41,20 +41,28 @@ class DeviceQueryDevicesTest(unittest.TestCase):
         request_headers = {'Authorization': 'OpenTera ' + token}
         return get(url=url, verify=False, headers=request_headers)
 
-    def _token_auth_query_devices(self, token):
-        url = self._make_url(self.host, self.port, self.device_query_devices_endpoint)
+    def _token_auth_query_participants(self, token):
+        url = self._make_url(self.host, self.port, self.device_query_participants_endpoint)
         request_headers = {'Authorization': 'OpenTera ' + token}
         return get(url=url, verify=False, headers=request_headers)
 
-    def test_query_devices_get(self):
+    def test_query_participants_get_with_valid_token(self):
         for device in self.all_devices:
-            response = self._token_auth_query_devices(device['device_token'])
-            if device['device_enabled']:
+            response = self._token_auth_query_participants(device['device_token'])
+            if device['device_onlineable']:
                 self.assertEqual(response.status_code, 200)
-                info = json.loads(response.text)
-                self.assertTrue(info.__contains__('device_info'))
-                self.assertTrue(info.__contains__('participants_info'))
-                self.assertTrue(info.__contains__('session_types_info'))
-                self.assertEqual(device['id_device'], info['device_info']['id_device'])
+                participants = response.json()
+                self.assertTrue(participants.__contains__('participants_info'))
             else:
-                self.assertEqual(response.status_code, 401)
+                if not device['device_enabled']:
+                    # Should return unauthorized
+                    self.assertEqual(response.status_code, 401)
+                else:
+                    # Should return forbidden (not onlinable but enabled = forbidden)
+                    self.assertEqual(response.status_code, 403)
+
+    def test_query_participants_get_with_invalid_token(self):
+        for device in self.all_devices:
+            response = self._token_auth_query_participants(device['device_token'] + str('invalid'))
+            # Should return unauthorized
+            self.assertEqual(response.status_code, 401)

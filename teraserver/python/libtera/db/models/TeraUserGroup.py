@@ -6,14 +6,13 @@ class TeraUserGroup(db.Model, BaseModel):
     id_user_group = db.Column(db.Integer, db.Sequence('id_usergroup_sequence'), primary_key=True, autoincrement=True)
     user_group_name = db.Column(db.String, nullable=False, unique=False)
 
-    user_group_sites_access = db.relationship('TeraSiteAccess', cascade="all,delete")
-    user_group_projects_access = db.relationship("TeraProjectAccess", cascade="all,delete")
+    user_group_services_access = db.relationship('TeraServiceAccess', cascade="all,delete")
     user_group_users = db.relationship("TeraUser", secondary="t_users_users_groups", back_populates="user_user_groups")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['user_group_users', 'user_group_sites_access', 'user_group_projects_access'])
+        ignore_fields.extend(['user_group_users', 'user_group_services_access', 'user_group_projects_access'])
         if minimal:
             ignore_fields.extend([])
         rval = super().to_json(ignore_fields=ignore_fields)
@@ -24,29 +23,34 @@ class TeraUserGroup(db.Model, BaseModel):
         projects_roles = {}
 
         # Projects
-        for project_access in self.user_group_projects_access:
-            projects_roles[project_access.project_access_project] = {'project_role': project_access.project_access_role,
-                                                                     'inherited': False}
+        for service_access in self.user_group_services_access:
+            if service_access.service_access_role.id_project:
+                projects_roles[service_access.service_access_role.service_role_project] = \
+                    {'project_role': service_access.service_access_role.service_role_name, 'inherited': False}
 
         # Sites - if we are admin in a site, we are automatically admin in all its project
-        for site_access in self.user_group_sites_access:
-            if site_access.site_access_role == 'admin':
-                for project in site_access.site_access_site.site_projects:
-                    projects_roles[project] = {'project_role': 'admin', 'inherited': True}
+        for service_access in self.user_group_services_access:
+            if service_access.service_access_role.id_site:
+                if service_access.service_access_role.service_role_name == 'admin':
+                    for project in service_access.service_access_role.service_role_site.site_projects:
+                        projects_roles[project] = {'project_role': 'admin', 'inherited': True}
 
         return projects_roles
 
     def get_sites_roles(self) -> dict:
         sites_roles = {}
         # Sites
-        for site_access in self.user_group_sites_access:
-            sites_roles[site_access.site_access_site] = {'site_role': site_access.site_access_role, 'inherited': False}
+        for service_access in self.user_group_services_access:
+            if service_access.service_access_role.id_site:
+                sites_roles[service_access.service_access_role.service_role_site] = \
+                    {'site_role': service_access.service_access_role.service_role_name, 'inherited': False}
 
         # Projects - each project's site also provides a "user" access for that site
-        for project_access in self.user_group_projects_access:
-            if project_access.project_access_project.project_site not in sites_roles:
-                sites_roles[project_access.project_access_project.project_site] = {'site_role': 'user',
-                                                                                   'inherited': True}
+        for service_access in self.user_group_services_access:
+            if service_access.service_access_role.id_project:
+                project_site = service_access.service_access_role.service_role_project.project_site
+                if project_site not in sites_roles:
+                    sites_roles[project_site] = {'site_role': 'user', 'inherited': True}
 
         return sites_roles
 
@@ -60,10 +64,13 @@ class TeraUserGroup(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults():
-        from libtera.db.models.TeraProjectAccess import TeraProjectAccess
         from libtera.db.models.TeraProject import TeraProject
-        from libtera.db.models.TeraSiteAccess import TeraSiteAccess
+        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+        from libtera.db.models.TeraServiceRole import TeraServiceRole
+        from libtera.db.models.TeraService import TeraService
         from libtera.db.models.TeraSite import TeraSite
+
+        opentera_service_id = TeraService.get_openteraserver_service().id_service
 
         ugroup = TeraUserGroup()
         ugroup.user_group_name = "Users - Projects 1 & 2"
@@ -82,33 +89,45 @@ class TeraUserGroup(db.Model, BaseModel):
         db.session.add(ugroup)
         db.session.commit()
 
-        access = TeraProjectAccess()
-        access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Users - Projects 1 & 2').id_user_group
-        access.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
-        access.project_access_role = 'user'
-        db.session.add(access)
-        access = TeraProjectAccess()
-        access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Users - Projects 1 & 2').id_user_group
-        access.id_project = TeraProject.get_project_by_projectname('Default Project #2').id_project
-        access.project_access_role = 'user'
+        id_user_group = TeraUserGroup.get_user_group_by_group_name('Users - Projects 1 & 2').id_user_group
+        access = TeraServiceAccess()
+        access.id_user_group = id_user_group
+        id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
+        user_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
+                                                                          project_id=id_project, rolename='user')
+        access.id_service_role = user_role.id_service_role
         db.session.add(access)
 
-        admin_access = TeraSiteAccess()
+        access = TeraServiceAccess()
+        access.id_user_group = id_user_group
+        id_project = TeraProject.get_project_by_projectname('Default Project #2').id_project
+        user_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
+                                                                          project_id=id_project, rolename='user')
+        access.id_service_role = user_role.id_service_role
+        db.session.add(access)
+
+        admin_access = TeraServiceAccess()
+        admin_role = TeraServiceRole.get_specific_service_role_for_site(service_id=opentera_service_id,
+                                                                        site_id=TeraSite
+                                                                        .get_site_by_sitename('Default Site').id_site,
+                                                                        rolename='admin')
+        admin_access.id_service_role = admin_role.id_service_role
         admin_access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Admins - Default Site').id_user_group
-        admin_access.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        admin_access.site_access_role = 'admin'
         db.session.add(admin_access)
 
-        access = TeraProjectAccess()
+        access = TeraServiceAccess()
         access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Admins - Project 1').id_user_group
-        access.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
-        access.project_access_role = 'admin'
+        id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
+        admin_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
+                                                                           project_id=id_project, rolename='admin')
+        access.id_service_role = admin_role.id_service_role
         db.session.add(access)
 
-        access = TeraProjectAccess()
+        access = TeraServiceAccess()
         access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Users - Project 1').id_user_group
-        access.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
-        access.project_access_role = 'user'
+        user_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
+                                                                          project_id=id_project, rolename='user')
+        access.id_service_role = user_role.id_service_role
         db.session.add(access)
 
         db.session.commit()

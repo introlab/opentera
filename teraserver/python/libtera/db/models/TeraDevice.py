@@ -25,7 +25,6 @@ class TeraDevice(db.Model, BaseModel):
     device_certificate = db.Column(db.String, nullable=True)
     device_enabled = db.Column(db.Boolean, nullable=False, default=False)
     device_onlineable = db.Column(db.Boolean, nullable=False, default=False)
-    device_optional = db.Column(db.Boolean, nullable=False, default=False)
     device_config = db.Column(db.String, nullable=True)
     device_infos = db.Column(db.String, nullable=True)
     device_notes = db.Column(db.String, nullable=True)
