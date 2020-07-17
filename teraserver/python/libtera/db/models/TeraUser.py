@@ -54,7 +54,8 @@ class TeraUser(db.Model, BaseModel):
             'iss': 'TeraServer',
             'user_uuid': self.user_uuid,
             'id_user': self.id_user,
-            'user_fullname': self.get_fullname()
+            'user_fullname': self.get_fullname(),
+            'user_superadmin': self.user_superadmin
         }
 
         return jwt.encode(payload, token_key, algorithm='HS256').decode('utf-8')

@@ -10,6 +10,7 @@ class TeraUserClient:
         self.__id_user = token_dict['id_user']
         self.__user_fullname = token_dict['user_fullname']
         self.__user_token = token
+        self.__user_superadmin = token_dict['user_superadmin']
 
         # A little trick here to get the right URL for the server if we are using a proxy
         backend_hostname = config_man.backend_config["hostname"]
@@ -55,6 +56,14 @@ class TeraUserClient:
     def user_token(self, token: str):
         self.__user_token = token
 
+    @property
+    def user_superadmin(self):
+        return self.__user_superadmin
+
+    @user_superadmin.setter
+    def user_superadmin(self, superadmin: bool):
+        self.__user_superadmin = superadmin
+
     def do_get_request_to_backend(self, path: str) -> Response:
         from requests import get
         request_headers = {'Authorization': 'OpenTera ' + self.__user_token}
@@ -91,6 +100,14 @@ class TeraUserClient:
                     return project['project_role']
 
         return 'Undefined'
+
+    def get_user_info(self):
+        response = self.do_get_request_to_backend('/api/user/users?user_uuid=' + self.__user_uuid)
+
+        if response.status_code == 200:
+            return response.json()
+
+        return {}
 
     def __repr__(self):
         return '<TeraUserClient - UUID: ' + self.__user_uuid + ', Token: ' + self.__user_token + '>'

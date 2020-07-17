@@ -24,21 +24,6 @@ from OpenSSL import SSL
 import sys
 import os
 
-# API
-# TODO - Fix auth
-authorizations = {
-    'HTTPAuth': {
-        'type': 'basic',
-        'in': 'header'
-    },
-    'Token Authentication': {
-        'type': 'apiKey',
-        'in': 'header',
-        'name': 'OpenTera'
-    }
-}
-
-
 # Flask application
 flask_app = Flask("LoggingService")
 
@@ -146,15 +131,30 @@ class CustomAPI(Api):
             return url_for(self.endpoint('root'), _external=False)
 
 
+# API
+# TODO - Fix auth
+authorizations = {
+    'HTTPAuth': {
+        'type': 'basic',
+        'in': 'header'
+    },
+    'Token Authentication': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'OpenTera'
+    }
+}
+
+# API
+api = CustomAPI(flask_app, version='1.0.0', title='LoggingService API',
+                description='LoggingService API Documentation', doc='/doc', prefix='/api',
+                authorizations=authorizations)
+
+# Namespaces
+logging_api_ns = api.namespace('logging', description='LoggingService API')
+
+
 class FlaskModule(BaseModule):
-
-    # API
-    api = CustomAPI(flask_app, version='1.0.0', title='LoggingService API',
-                    description='LoggingService API Documentation', doc='/doc', prefix='/api',
-                    authorizations=authorizations)
-
-    # Namespaces
-    default_api_ns = api.namespace('default', description='default API')
 
     def __init__(self, config: ConfigManager):
 
@@ -230,6 +230,10 @@ class FlaskModule(BaseModule):
     def init_api(self):
         # Default arguments
         kwargs = {'flaskModule': self}
+
+        from services.LoggingService.API.QueryLogEntries import QueryLogEntries
+        logging_api_ns.add_resource(QueryLogEntries, '/log_entries', resource_class_kwargs=kwargs)
+
 
     def init_views(self):
         # Default arguments
