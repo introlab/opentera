@@ -34,6 +34,7 @@ class LoggingService(ServiceOpenTera):
         self.flaskModuleService = self.flaskModule.create_service()
 
         # self.application = service.Application(self.config['name'])
+
         # TODO update log level according to configuration
         self.loglevel = messages.LogEvent.LOGLEVEL_TRACE
 
@@ -60,7 +61,11 @@ class LoggingService(ServiceOpenTera):
             # Look for UserEvent, ParticipantEvent, DeviceEvent
             for any_msg in tera_event.events:
                 if any_msg.Unpack(log_event):
-                    print(log_event)
+                    # Check current log level, store db if lower than current log level
+                    if log_event.level <= self.loglevel:
+                        Globals.db_man.store_log_event(log_event)
+                    else:
+                        print(log_event)
 
         except DecodeError as d:
             print('LoggingService - DecodeError ', pattern, channel, message, d)

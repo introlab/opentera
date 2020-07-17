@@ -7,7 +7,8 @@ from services.LoggingService.libloggingservice.db.models.LogEntry import LogEntr
 
 from services.LoggingService.ConfigManager import ConfigManager
 from services.LoggingService.FlaskModule import flask_app
-
+from messages.python.LogEvent_pb2 import LogEvent
+import datetime
 
 # Alembic
 from alembic.config import Config
@@ -28,9 +29,14 @@ class DBManager:
         self.db_uri = None
 
     def create_defaults(self, config: ConfigManager):
-
         if LogEntry.get_count() == 0:
-            print('enable')
+            entry = LogEntry()
+            entry.log_level = LogEvent.LogLevel.LOGLEVEL_INFO
+            entry.sender = 'service.LoggingService'
+            entry.timestamp = datetime.datetime.now()
+            entry.message = 'Database initialized.'
+            db.session.add(entry)
+            db.session.commit()
 
     def open(self, db_infos, echo=False):
         self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
@@ -78,3 +84,12 @@ class DBManager:
     def stamp_db(self):
         # TODO ALEMBIC UPGRADES
         pass
+
+    def store_log_event(self, event: LogEvent):
+        entry = LogEntry()
+        entry.log_level = event.level
+        entry.sender = event.sender
+        entry.timestamp = datetime.datetime.fromtimestamp(event.timestamp)
+        entry.message = event.message
+        db.session.add(entry)
+        db.session.commit()
