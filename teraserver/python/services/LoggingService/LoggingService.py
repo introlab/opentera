@@ -10,11 +10,6 @@ from google.protobuf.message import DecodeError
 # Twisted
 from twisted.application import internet, service
 from twisted.internet import reactor, ssl, defer
-from twisted.python.threadpool import ThreadPool
-from twisted.web.http import HTTPChannel
-from twisted.web.server import Site
-from twisted.web.static import File
-from twisted.web.wsgi import WSGIResource
 from twisted.python import log
 import messages.python as messages
 import sys
@@ -23,13 +18,22 @@ import uuid
 
 from services.shared.ServiceOpenTera import ServiceOpenTera
 from flask_babel import gettext
+from sqlalchemy.exc import OperationalError
+from services.LoggingService.FlaskModule import FlaskModule
 
 
 class LoggingService(ServiceOpenTera):
     def __init__(self, config_man: ConfigManager, this_service_info):
         ServiceOpenTera.__init__(self, config_man, this_service_info)
 
+        # Create REST backend
+        self.flaskModule = FlaskModule(Globals.config_man)
+
+        # Create twisted service
+        self.flaskModuleService = self.flaskModule.create_service()
+
         # self.application = service.Application(self.config['name'])
+        # TODO update log level according to configuration
         self.loglevel = messages.LogEvent.LOGLEVEL_TRACE
 
     def notify_service_messages(self, pattern, channel, message):
@@ -119,6 +123,22 @@ if __name__ == '__main__':
     # Update port, hostname, endpoint
     Globals.config_man.service_config['port'] = service_info['service_port']
     Globals.config_man.service_config['hostname'] = service_info['service_hostname']
+
+    # DATABASE CONFIG AND OPENING
+    #############################
+    POSTGRES = {
+        'user': Globals.config_man.db_config['username'],
+        'pw': Globals.config_man.db_config['password'],
+        'db': Globals.config_man.db_config['name'],
+        'host': Globals.config_man.db_config['url'],
+        'port': Globals.config_man.db_config['port']
+    }
+
+    try:
+        Globals.db_man.open(POSTGRES, True)
+    except OperationalError:
+        print("Unable to connect to database - please check settings in config file!")
+        quit()
 
     # Create the Service
     service = LoggingService(Globals.config_man, service_info)

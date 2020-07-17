@@ -17,5 +17,13 @@
   },
   "Logging" : {
     "level": "trace"
+  },
+  "Database": {
+    "db_type": "QPSQL",
+    "name": "openteralogs",
+    "url": "localhost",
+    "port": 5432,
+    "username": "teraagent",
+    "password": "tera"
   }
 }

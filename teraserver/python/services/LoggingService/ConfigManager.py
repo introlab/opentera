@@ -1,4 +1,4 @@
-from services.shared.ServiceConfigManager import ServiceConfigManager
+from services.shared.ServiceConfigManager import ServiceConfigManager, DBConfig
 
 
 class LoggingConfig:
@@ -23,8 +23,9 @@ class LoggingConfig:
 
 
 # Build configuration from base classes
-class ConfigManager(ServiceConfigManager, LoggingConfig):
+class ConfigManager(ServiceConfigManager, LoggingConfig, DBConfig):
     def validate_config(self, config_json):
-        return super().validate_config(config_json) and self.validate_logging_config(config_json)
+        return super().validate_config(config_json) \
+               and self.validate_logging_config(config_json) and self.validate_database_config(config_json)
 
 
