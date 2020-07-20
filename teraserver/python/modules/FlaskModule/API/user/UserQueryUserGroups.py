@@ -64,14 +64,40 @@ class UserQueryUserGroups(Resource):
             for group in user_groups:
                 if group is not None:
                     group_json = group.to_json(minimal=args['list'])
-                    sites_list = []
-                    for site in group.user_group_sites_access:
-                        sites_list.append(site.to_json())
-                    group_json['user_group_sites_access'] = sites_list
-                    projects_list = []
-                    for project in group.user_group_projects_access:
-                        projects_list.append(project.to_json())
-                    group_json['user_group_projects_access'] = projects_list
+
+                    if not args['list']:
+                        # Sites for that user group
+                        sites_list = []
+                        access = user_access.query_site_access_for_user_group(user_group_id=group.id_user_group,
+                                                                              admin_only=False,
+                                                                              include_sites_without_access=False)
+                        for site, site_role in access.items():
+                            site_access_json = site.to_json()
+                            if site_role:
+                                site_access_json['site_access_role'] = site_role['site_role']
+                                if site_role['inherited']:
+                                    site_access_json['site_access_inherited'] = True
+                            else:
+                                site_access_json['site_access_role'] = None
+                            sites_list.append(site_access_json)
+                        group_json['user_group_sites_access'] = sites_list
+
+                        # Projects for that user group
+                        projects_list = []
+                        access = user_access.query_project_access_for_user_group(user_group_id=group.id_user_group,
+                                                                                 admin_only=False,
+                                                                                 include_projects_without_access=
+                                                                                 False
+                                                                                 )
+                        for project, project_role in access.items():
+                            # Remove site information for projects
+                            proj_access_json = project.to_json(ignore_fields=['id_site', 'site_name'])
+                            if project_role:
+                                proj_access_json['project_access_role'] = project_role['project_role']
+                                if project_role['inherited']:
+                                    proj_access_json['project_access_inherited'] = True
+                            projects_list.append(proj_access_json)
+                        group_json['user_group_projects_access'] = projects_list
                     user_groups_list.append(group_json)
             return jsonify(user_groups_list)
         return [], 200
