@@ -14,6 +14,8 @@ class TeraService(db.Model, BaseModel):
     service_endpoint = db.Column(db.String, nullable=False)
     service_clientendpoint = db.Column(db.String, nullable=False)
     service_enabled = db.Column(db.Boolean, nullable=False, default=False)
+    service_system = db.Column(db.Boolean, nullable=False, default=False)
+    service_config_schema = db.Column(db.String, nullable=False, default='{"type": "object","properties": {}}')
 
     service_roles = db.relationship('TeraServiceRole')
 
@@ -30,10 +32,10 @@ class TeraService(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend(['service_roles'])
+        ignore_fields.extend(['service_roles', 'service_system'])
 
         if minimal:
-            ignore_fields.extend([])
+            ignore_fields.extend(['service_config_schema'])
 
         json_service = super().to_json(ignore_fields=ignore_fields)
         if not minimal:
@@ -86,6 +88,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/'
         new_service.service_enabled = True
+        new_service.service_system = True
         db.session.add(new_service)
 
         new_service = TeraService()
@@ -97,6 +100,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/log'
         new_service.service_enabled = True
+        new_service.service_system = True
         db.session.add(new_service)
 
         new_service = TeraService()
@@ -148,6 +152,14 @@ class TeraService(db.Model, BaseModel):
     @classmethod
     def insert(cls, service):
         service.service_uuid = str(uuid.uuid4())
+
+        # Validate that the service config schema is a valid json schema
+        if service.service_config_schema:
+            import jsonschema
+            try:
+                jsonschema.Draft7Validator.check_schema(cls.service_config_schema)
+            except jsonschema.exceptions.SchemaError as err:
+                raise err
         super().insert(service)
 
     @classmethod
@@ -155,5 +167,12 @@ class TeraService(db.Model, BaseModel):
         # Prevent changes on UUID
         if 'service_uuid' in values:
             del values['service_uuid']
+        # Validate that the service config schema is a valid json schema
+        if 'service_config_schema' in values:
+            import jsonschema
+            try:
+                jsonschema.Draft7Validator.check_schema(values['service_config_schema'])
+            except jsonschema.exceptions.SchemaError as err:
+                raise err
         super().update(update_id, values)
 

@@ -107,20 +107,33 @@ class UserQueryServices(Resource):
         if 'id_service' not in json_service:
             return '', 400
 
+        # Check if that service is in the accessible service list, even for super admins since system services are not
+        # modifiables
+        if json_service['id_service'] not in user_access.get_accessible_services_ids() \
+                and json_service['id_service'] != 0:
+            return 'Forbidden', 403
+
         # Manage service roles
         service_roles = []
         if 'roles' in json_service:
             service_roles = json_service.pop('roles')
 
         # Do the update!
+        import jsonschema
         if json_service['id_service'] > 0:
             # Already existing
             try:
+                if 'service_system' in json_service:
+                    service = TeraService.get_service_by_id(json_service['id_service'])
+                    if service.service_system != json_service['service_system']:
+                        return 'Can\'t change system services from that API', 403
                 TeraService.update(json_service['id_service'], json_service)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
                 return '', 500
+            except jsonschema.exceptions.SchemaError:
+                return 'Invalid config json schema', 400
         else:
             # New
             try:
@@ -128,11 +141,13 @@ class UserQueryServices(Resource):
                 new_service.from_json(json_service)
                 TeraService.insert(new_service)
                 # Update ID for further use
-                json_service['id_service'] = json_service.id_service
+                json_service['id_service'] = new_service.id_service
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
                 return '', 500
+            except jsonschema.exceptions.SchemaError:
+                return 'Invalid config json schema', 400
 
         update_service = TeraService.get_service_by_id(json_service['id_service'])
 
@@ -167,7 +182,9 @@ class UserQueryServices(Resource):
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific service',
              responses={200: 'Success',
-                        403: 'Logged user can\'t delete service (only super admins can delete)',
+                        400: 'Service doesn\'t exists',
+                        403: 'Logged user can\'t delete service (only super admins can delete) or service is a system '
+                             'service',
                         500: 'Database error.'})
     def delete(self):
         parser = delete_parser
@@ -180,6 +197,14 @@ class UserQueryServices(Resource):
         # Check if current user can delete
         if not current_user.user_superadmin:
             return '', 403
+
+        # Check that we are not trying to delete a system service
+        service = TeraService.get_service_by_id(id_todel)
+        if not service:
+            return 'Invalid service', 400
+
+        if service.service_system:
+            return 'Forbidden', 403
 
         # If we are here, we are allowed to delete. Do so.
         try:

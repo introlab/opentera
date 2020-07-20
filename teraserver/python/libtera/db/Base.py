@@ -148,6 +148,7 @@ class BaseModel:
                     data_type = 'object'
                     data_format = None
                     column_type = str(value.prop.columns[0].type).lower()
+                    default_value = value.prop.columns[0].default
                     if 'string' in column_type or 'timestamp' in column_type or 'varchar' in column_type:
                         data_type = 'string'
                         if 'uuid' in name:
@@ -162,6 +163,10 @@ class BaseModel:
                     pr_dict[name] = {'type': data_type, 'required': not value.prop.columns[0].nullable}
                     if data_format:
                         pr_dict[name]['format'] = data_format
+                    if default_value:
+                        if hasattr(default_value, 'arg'):
+                            pr_dict[name]['default'] = default_value.arg
+
         schema = {model_name: {'properties': pr_dict, 'type': 'object'}}
 
         return schema

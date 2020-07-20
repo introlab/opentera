@@ -273,13 +273,15 @@ class DBManagerTeraUserAccess:
         from libtera.db.models.TeraService import TeraService
         from libtera.db.models.TeraServiceAccess import TeraServiceAccess
         from libtera.db.models.TeraServiceRole import TeraServiceRole
+        from libtera.db.models.TeraServiceProject import TeraServiceProject
 
         if self.user.user_superadmin:
-            return TeraService.query.all()
+            # return TeraService.query.all()
+            return TeraService.query.filter_by(service_system=False).all()
 
         accessible_projects_ids = self.get_accessible_projects_ids()
-        query = TeraService.query.join(TeraServiceAccess).filter(
-            TeraServiceAccess.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
+        query = TeraService.query.filter_by(service_system=False).join(TeraServiceProject).filter(
+            TeraServiceProject.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
 
         if admin_only:
             query = query.join(TeraServiceRole).filter(TeraServiceRole.service_role_name == 'admin')
