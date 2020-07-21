@@ -188,7 +188,7 @@ class UserQueryUserGroups(Resource):
                 if user_access.get_site_role(site_id=site['id_site']) == 'admin':
                     try:
                         # Check if we must remove access for that site
-                        if 'site_role' not in site or site['site_role'] == '':
+                        if 'site_access_role' not in site or site['site_access_role'] == '':
                             # No more access to that site for that user group - remove all access!
                             TeraServiceAccess.delete_service_access_for_user_group_for_site(
                                 id_user_group=json_user_group['id_user_group'], id_site=int(site['id_site']))
@@ -198,7 +198,7 @@ class UserQueryUserGroups(Resource):
                         site_service_role = \
                             TeraServiceRole.get_specific_service_role_for_site(service_id=Globals.opentera_service_id,
                                                                                site_id=int(site['id_site']),
-                                                                               rolename=site['site_role'])
+                                                                               rolename=site['site_access_role'])
                         TeraServiceAccess.update_service_access_for_user_group_for_site(
                             id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
                             id_service_role=site_service_role.id_service_role, id_site=int(site['id_site']))
@@ -213,7 +213,7 @@ class UserQueryUserGroups(Resource):
                 if user_access.get_project_role(project_id=project['id_project']) == 'admin':
                     try:
                         # Check if we must remove access for that project
-                        if 'project_role' not in project or project['project_role'] == '':
+                        if 'project_access_role' not in project or project['project_access_role'] == '':
                             # No more access to that project for that user group - remove all access!
                             TeraServiceAccess.delete_service_access_for_user_group_for_project(
                                 id_user_group=json_user_group['id_user_group'], id_project=int(project['id_project']))
@@ -223,7 +223,7 @@ class UserQueryUserGroups(Resource):
                         project_service_role = \
                             TeraServiceRole.get_specific_service_role_for_project(service_id=Globals.opentera_service_id,
                                                                                   project_id=int(project['id_project']),
-                                                                                  rolename=project['project_role'])
+                                                                                  rolename=project['project_access_role'])
                         TeraServiceAccess.update_service_access_for_user_group_for_project(
                             id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
                             id_service_role=project_service_role.id_service_role, id_project=int(project['id_project']))
