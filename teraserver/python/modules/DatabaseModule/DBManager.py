@@ -30,6 +30,7 @@ from libtera.db.models.TeraServiceProject import TeraServiceProject
 from libtera.db.models.TeraUserGroup import TeraUserGroup
 from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+from libtera.db.models.TeraServiceConfig import TeraServiceConfig
 
 from libtera.ConfigManager import ConfigManager
 
@@ -158,6 +159,10 @@ class DBManager (BaseModule):
         if TeraAsset.get_count() == 0:
             print('No assets - creating defaults')
             TeraAsset.create_defaults()
+
+        if TeraServiceConfig.get_count() == 0:
+            print('No service config - creating defaults')
+            TeraServiceConfig.create_defaults()
 
     def open(self, echo=False):
         # self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos

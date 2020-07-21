@@ -269,29 +269,35 @@ class DBManagerTeraUserAccess:
 
         return ses_ids
 
-    def get_accessible_services(self, admin_only=False):
+    def get_accessible_services(self, admin_only=False, include_system_services=False):
         from libtera.db.models.TeraService import TeraService
-        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
         from libtera.db.models.TeraServiceRole import TeraServiceRole
         from libtera.db.models.TeraServiceProject import TeraServiceProject
 
         if self.user.user_superadmin:
-            # return TeraService.query.all()
+            if include_system_services:
+                return TeraService.query.all()
             return TeraService.query.filter_by(service_system=False).all()
 
         accessible_projects_ids = self.get_accessible_projects_ids()
-        query = TeraService.query.filter_by(service_system=False).join(TeraServiceProject).filter(
-            TeraServiceProject.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
+        if not include_system_services:
+            query = TeraService.query.filter_by(service_system=False).join(TeraServiceProject).filter(
+                TeraServiceProject.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
+        else:
+            query = TeraService.query.join(TeraServiceProject).filter(TeraServiceProject
+                                                                      .id_project.in_(accessible_projects_ids))\
+                .group_by(TeraService.id_service)
 
         if admin_only:
             query = query.join(TeraServiceRole).filter(TeraServiceRole.service_role_name == 'admin')
 
         return query.all()
 
-    def get_accessible_services_ids(self, admin_only=False):
+    def get_accessible_services_ids(self, admin_only=False, include_system_services=False):
         services_ids = []
 
-        for service in self.get_accessible_services(admin_only=admin_only):
+        for service in self.get_accessible_services(admin_only=admin_only,
+                                                    include_system_services=include_system_services):
             services_ids.append(service.id_service)
 
         return services_ids
@@ -711,3 +717,38 @@ class DBManagerTeraUserAccess:
         accessible_users_ids = self.get_accessible_users_ids()
         return TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).filter(TeraUserUserGroup.id_user
                                                                                      .in_(accessible_users_ids)).all()
+
+    def query_service_configs(self, service_id: int = None, user_id: int = None, device_id: int = None,
+                              participant_id: int = None):
+        if service_id and service_id not in self.get_accessible_services_ids(include_system_services=True):
+            return None
+        if user_id and user_id not in self.get_accessible_users_ids():
+            return None
+        if device_id and device_id not in self.get_accessible_devices_ids():
+            return None
+        if participant_id and participant_id not in self.get_accessible_participants_ids():
+            return None
+
+        from libtera.db.models.TeraServiceConfig import TeraServiceConfig
+
+        if service_id:
+            if user_id:
+                return TeraServiceConfig.get_service_config_for_service_for_user(service_id=service_id, user_id=user_id)
+            if device_id:
+                return TeraServiceConfig.get_service_config_for_service_for_device(service_id=service_id,
+                                                                                   device_id=device_id)
+            if participant_id:
+                return TeraServiceConfig.get_service_config_for_service_for_participant(service_id=service_id,
+                                                                                        participant_id=participant_id)
+            return TeraServiceConfig.get_service_config_for_service(service_id=service_id)
+
+        if user_id:
+            return TeraServiceConfig.query.filter_by(id_user=user_id).all()
+
+        if device_id:
+            return TeraServiceConfig.query.filter_by(id_device=device_id).all()
+
+        if participant_id:
+            return TeraServiceConfig.query.filter_by(id_participant=participant_id).all()
+
+        return None
