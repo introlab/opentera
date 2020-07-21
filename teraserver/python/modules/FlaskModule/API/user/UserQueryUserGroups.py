@@ -33,6 +33,42 @@ class UserQueryUserGroups(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
+    @staticmethod
+    def get_projects_roles_json(user_access, user_group_id: int):
+        projects_list = []
+        access = user_access.query_project_access_for_user_group(user_group_id=user_group_id,
+                                                                 admin_only=False,
+                                                                 include_projects_without_access=
+                                                                 False
+                                                                 )
+        for project, project_role in access.items():
+            # Remove site information for projects
+            proj_access_json = project.to_json(ignore_fields=['id_site', 'site_name'])
+            if project_role:
+                proj_access_json['project_access_role'] = project_role['project_role']
+                if project_role['inherited']:
+                    proj_access_json['project_access_inherited'] = True
+            projects_list.append(proj_access_json)
+
+        return projects_list
+
+    @staticmethod
+    def get_sites_roles_json(user_access, user_group_id: int):
+        sites_list = []
+        access = user_access.query_site_access_for_user_group(user_group_id=user_group_id,
+                                                              admin_only=False,
+                                                              include_sites_without_access=False)
+        for site, site_role in access.items():
+            site_access_json = site.to_json()
+            if site_role:
+                site_access_json['site_access_role'] = site_role['site_role']
+                if site_role['inherited']:
+                    site_access_json['site_access_inherited'] = True
+            else:
+                site_access_json['site_access_role'] = None
+            sites_list.append(site_access_json)
+        return sites_list
+
     @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get user group information. If no id specified, returns all accessible users groups',
@@ -67,36 +103,14 @@ class UserQueryUserGroups(Resource):
 
                     if not args['list']:
                         # Sites for that user group
-                        sites_list = []
-                        access = user_access.query_site_access_for_user_group(user_group_id=group.id_user_group,
-                                                                              admin_only=False,
-                                                                              include_sites_without_access=False)
-                        for site, site_role in access.items():
-                            site_access_json = site.to_json()
-                            if site_role:
-                                site_access_json['site_access_role'] = site_role['site_role']
-                                if site_role['inherited']:
-                                    site_access_json['site_access_inherited'] = True
-                            else:
-                                site_access_json['site_access_role'] = None
-                            sites_list.append(site_access_json)
+                        sites_list = UserQueryUserGroups.get_sites_roles_json(user_access=user_access,
+                                                                              user_group_id=group.id_user_group)
                         group_json['user_group_sites_access'] = sites_list
 
                         # Projects for that user group
-                        projects_list = []
-                        access = user_access.query_project_access_for_user_group(user_group_id=group.id_user_group,
-                                                                                 admin_only=False,
-                                                                                 include_projects_without_access=
-                                                                                 False
-                                                                                 )
-                        for project, project_role in access.items():
-                            # Remove site information for projects
-                            proj_access_json = project.to_json(ignore_fields=['id_site', 'site_name'])
-                            if project_role:
-                                proj_access_json['project_access_role'] = project_role['project_role']
-                                if project_role['inherited']:
-                                    proj_access_json['project_access_inherited'] = True
-                            projects_list.append(proj_access_json)
+                        projects_list = UserQueryUserGroups.get_projects_roles_json(user_access=user_access,
+                                                                                    user_group_id=group.id_user_group)
+
                         group_json['user_group_projects_access'] = projects_list
                     user_groups_list.append(group_json)
             return jsonify(user_groups_list)
@@ -166,13 +180,15 @@ class UserQueryUserGroups(Resource):
                 print(sys.exc_info())
                 return '', 500
 
+        update_user_group = TeraUserGroup.get_user_group_by_id(json_user_group['id_user_group'])
+        json_user_group = update_user_group.to_json()
         if json_sites:
             for site in json_sites:
                 # Check if current user is admin of that site, if not, ignore it...
                 if user_access.get_site_role(site_id=site['id_site']) == 'admin':
                     try:
                         # Check if we must remove access for that site
-                        if site['site_role'] == '':
+                        if 'site_role' not in site or site['site_role'] == '':
                             # No more access to that site for that user group - remove all access!
                             TeraServiceAccess.delete_service_access_for_user_group_for_site(
                                 id_user_group=json_user_group['id_user_group'], id_site=int(site['id_site']))
@@ -197,7 +213,7 @@ class UserQueryUserGroups(Resource):
                 if user_access.get_project_role(project_id=project['id_project']) == 'admin':
                     try:
                         # Check if we must remove access for that project
-                        if project['project_role'] == '':
+                        if 'project_role' not in project or project['project_role'] == '':
                             # No more access to that project for that user group - remove all access!
                             TeraServiceAccess.delete_service_access_for_user_group_for_project(
                                 id_user_group=json_user_group['id_user_group'], id_project=int(project['id_project']))
@@ -216,10 +232,15 @@ class UserQueryUserGroups(Resource):
                         import sys
                         print(sys.exc_info())
                         return '', 500
+            # Returns full list in reply
+            json_user_group['user_group_projects_access'] = UserQueryUserGroups.get_projects_roles_json(
+                user_access=user_access, user_group_id=json_user_group['id_user_group'])
 
-        update_user_group = TeraUserGroup.get_user_group_by_id(json_user_group['id_user_group'])
-
-        return [update_user_group.to_json()]
+        if json_sites:
+            # Returns full list in reply - done here, since inheritance might occurs if done before project completed
+            json_user_group['user_group_sites_access'] = UserQueryUserGroups.get_sites_roles_json(
+                user_access=user_access, user_group_id=json_user_group['id_user_group'])
+        return [json_user_group]
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)
@@ -239,7 +260,9 @@ class UserQueryUserGroups(Resource):
         # Check if current user can delete
         # Only site admin with an user group that includes that site can delete
         user_group = TeraUserGroup.get_user_group_by_id(id_todel)
-        if not set(user_access.get_accessible_sites(admin_only=True)).intersection(user_group.get_sites_roles().keys()):
+        accessible_sites = user_access.get_accessible_sites(admin_only=True)
+        sites_roles = user_group.get_sites_roles().keys()  # When there's no role, only super admin can delete!
+        if not set(accessible_sites).intersection(sites_roles) and not current_user.user_superadmin:
             return '', 403
 
         # If we are here, we are allowed to delete that user group. Do so.

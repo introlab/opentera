@@ -127,8 +127,8 @@ class TeraServiceAccess(db.Model, BaseModel):
 
     @staticmethod
     def get_service_access_for_user_group(id_service: int, id_user_group: int):
-        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
-                                                                       id_user_group=id_user_group).all()
+        return TeraServiceAccess.query.filter_by(id_user_group=id_user_group).join(TeraServiceRole)\
+            .filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_service_access_for_project(id_service: int, id_project: int):
