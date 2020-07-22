@@ -16,7 +16,7 @@
     "password": ""
   },
   "FileTransfer" : {
-    "upload_directory": "/upload"
+    "upload_directory": "upload"
   },
   "Database": {
     "db_type": "QPSQL",

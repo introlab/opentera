@@ -27,13 +27,26 @@ class FileTransferService(ServiceOpenTera):
     def __init__(self, config_man: ConfigManager, this_service_info):
         ServiceOpenTera.__init__(self, config_man, this_service_info)
 
+        self.verify_file_upload_directory(config_man)
+
         # Create REST backend
-        self.flaskModule = FlaskModule(Globals.config_man)
+        self.flaskModule = FlaskModule(config_man)
 
         # Create twisted service
         self.flaskModuleService = self.flaskModule.create_service()
 
         # self.application = service.Application(self.config['name'])
+
+    def verify_file_upload_directory(self, config: ConfigManager, create=True):
+        file_upload_path = config.filetransfer_config['upload_directory']
+
+        if not os.path.exists(file_upload_path):
+            if create:
+                # TODO Change permissions?
+                os.mkdir(file_upload_path, 0o700)
+            else:
+                return None
+        return file_upload_path
 
     def notify_service_messages(self, pattern, channel, message):
         pass
@@ -41,6 +54,7 @@ class FileTransferService(ServiceOpenTera):
     # @defer.inlineCallbacks
     def register_to_events(self):
         pass
+
 
 
 if __name__ == '__main__':
