@@ -16,6 +16,7 @@ from .TeraSession import TeraSession
 from .TeraSessionEvent import TeraSessionEvent
 from .TeraSessionParticipants import TeraSessionParticipants
 from .TeraSessionUsers import TeraSessionUsers
+from .TeraSessionDevices import TeraSessionDevices
 from .TeraSessionType import TeraSessionType
 from .TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
 from .TeraSessionTypeProject import TeraSessionTypeProject
@@ -41,6 +42,7 @@ __all__ = ['TeraAsset',
            'TeraSession',
            'TeraSessionEvent',
            'TeraSessionParticipants',
+           'TeraSessionDevices',
            'TeraSessionType',
            'TeraSessionTypeDeviceType',
            'TeraSessionTypeProject',

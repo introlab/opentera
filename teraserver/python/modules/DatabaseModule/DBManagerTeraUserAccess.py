@@ -11,7 +11,6 @@ from libtera.db.models.TeraDeviceSubType import TeraDeviceSubType
 from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraDeviceProject import TeraDeviceProject
-from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
 

@@ -35,6 +35,7 @@ class TeraDevice(db.Model, BaseModel):
     # device_session_types = db.relationship("TeraSessionTypeDeviceType")
     device_participants = db.relationship("TeraParticipant",  secondary="t_devices_participants",
                                           back_populates="participant_devices")
+    device_sessions = db.relationship("TeraSession", secondary="t_sessions_devices", back_populates="session_devices")
     device_subtype = db.relationship('TeraDeviceSubType')
 
     authenticated = False
@@ -49,7 +50,7 @@ class TeraDevice(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields += ['device_projects', 'device_participants', 'device_certificate', 'secret',
+        ignore_fields += ['device_projects', 'device_participants', 'device_sessions', 'device_certificate', 'secret',
                           'device_subtype', 'authenticated']
 
         if minimal:
