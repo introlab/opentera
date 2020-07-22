@@ -38,8 +38,8 @@ class TeraSession(db.Model, BaseModel):
     session_participants = db.relationship("TeraParticipant", secondary="t_sessions_participants",
                                            back_populates="participant_sessions")
     session_users = db.relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions")
-
-    # TODO session_devices
+    session_devices = db.relationship("TeraDevice", secondary="t_sessions_devices",
+                                      back_populates="device_sessions")
 
     session_creator_user = db.relationship('TeraUser')
     session_creator_device = db.relationship('TeraDevice')
@@ -48,6 +48,7 @@ class TeraSession(db.Model, BaseModel):
 
     session_session_type = db.relationship('TeraSessionType')
     session_events = db.relationship('TeraSessionEvent', cascade="delete")
+    session_assets = db.relationship('TeraAsset', cascade='delete')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -55,7 +56,7 @@ class TeraSession(db.Model, BaseModel):
 
         ignore_fields.extend(['session_participants', 'session_creator_user', 'session_creator_device',
                               'session_creator_participant', 'session_creator_service', 'session_session_type',
-                              'session_events', 'session_users'])
+                              'session_events', 'session_users', 'session_devices', 'session_assets'])
         if minimal:
             ignore_fields.extend(['session_comments', 'session_duration', 'session_start_datetime',
                                   'session_parameters'])
@@ -71,6 +72,10 @@ class TeraSession(db.Model, BaseModel):
             # Append list of users ids and names
             rval['session_users'] = [{'id_user': user.id_user, 'user_name': user.get_fullname()}
                                      for user in self.session_users]
+
+            # Append list of devices ids and names
+            rval['session_devices'] = [{'id_device': device.id_device, 'device_name': device.device_name}
+                                       for device in self.session_devices]
 
             # Append user name
             if self.session_creator_user:
@@ -104,6 +109,7 @@ class TeraSession(db.Model, BaseModel):
         session_part = TeraParticipant.get_participant_by_name('Participant #1')
         session_part2 = TeraParticipant.get_participant_by_name('Participant #2')
         session_service = TeraService.get_service_by_key('VideoRehabService')
+        session_device = TeraDevice.get_device_by_id(2)
 
         # Create user sessions
         for i in range(8):
@@ -124,6 +130,8 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_users = [base_session.session_creator_user]
             else:
                 base_session.session_users = [base_session.session_creator_user, session_user2]
+            if i == 3:
+                base_session.session_devices = [session_device]
             base_session.session_uuid = str(uuid.uuid4())
             db.session.add(base_session)
 
@@ -208,6 +216,12 @@ class TeraSession(db.Model, BaseModel):
     def get_sessions_for_user(user_id: int):
         from libtera.db.models.TeraUser import TeraUser
         return TeraSession.query.join(TeraSession.session_users).filter(TeraUser.id_user == user_id) \
+            .order_by(TeraSession.session_start_datetime.desc()).all()
+
+    @staticmethod
+    def get_sessions_for_device(device_id: int):
+        from libtera.db.models.TeraDevice import TeraDevice
+        return TeraSession.query.join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id) \
             .order_by(TeraSession.session_start_datetime.desc()).all()
 
     @staticmethod
