@@ -1,2 +1,3 @@
 # All exported symbols
-__all__ = []
+from .AssetFileData import AssetFileData
+__all__ = ['AssetFileData']
