@@ -64,7 +64,7 @@ class DBManager:
         db.init_app(flask_app)
         db.app = flask_app
 
-        # db.drop_all()
+        db.drop_all()
         db.create_all()
 
         # Apply any database upgrade, if needed
