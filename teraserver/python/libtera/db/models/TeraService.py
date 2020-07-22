@@ -105,6 +105,18 @@ class TeraService(db.Model, BaseModel):
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
+        new_service.service_key = 'FileTransferService'
+        new_service.service_name = 'File Transfer Service'
+        new_service.service_hostname = 'localhost'
+        new_service.service_port = 4042
+        new_service.service_endpoint = '/'
+        new_service.service_clientendpoint = '/file'
+        new_service.service_enabled = True
+        new_service.service_system = True
+        db.session.add(new_service)
+
+        new_service = TeraService()
+        new_service.service_uuid = str(uuid.uuid4())
         new_service.service_key = 'BureauActif'
         new_service.service_name = 'Bureau Actif'
         new_service.service_hostname = 'localhost'
