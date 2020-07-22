@@ -20,7 +20,9 @@ class TeraAsset(db.Model, BaseModel):
     id_asset = db.Column(db.Integer, db.Sequence('id_asset_sequence'), primary_key=True, autoincrement=True)
     id_session = db.Column(db.Integer, db.ForeignKey("t_sessions.id_session", ondelete='cascade'), nullable=False)
     id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=True)
-    asset_name = db.Column(db.String, nullable=False, unique=True)
+    # Put a description of the asset here
+    asset_name = db.Column(db.String, nullable=False)
+
     asset_uuid = db.Column(db.String(36), nullable=False, unique=True)
     asset_service_uuid = db.Column(db.String(36), nullable=False)
     asset_type = db.Column(db.Integer, nullable=False)
