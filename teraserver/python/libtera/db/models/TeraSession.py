@@ -39,6 +39,9 @@ class TeraSession(db.Model, BaseModel):
                                            back_populates="participant_sessions")
     session_users = db.relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions")
 
+    # TODO Should we have this kind of relationship?
+    # session_assets = db.relationship("TeraAsset", secondary="t_assets", back_populates="asset_session")
+
     # TODO session_devices
 
     session_creator_user = db.relationship('TeraUser')

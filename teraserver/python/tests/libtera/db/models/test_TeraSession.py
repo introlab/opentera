@@ -33,7 +33,14 @@ class TeraSessionTest(unittest.TestCase):
         from libtera.db.Base import db
         print('tear down')
 
-    def test_Session_new(self):
+    def test_session_defaults(self):
+        for session in TeraSession.query.all():
+            my_list = [session.id_creator_device, session.id_creator_participant,
+                       session.id_creator_service, session.id_creator_user]
+            # Only one not None
+            self.assertEqual(1, len([x for x in my_list if x is not None]))
+
+    def test_session_new(self):
         from datetime import datetime
         from modules.DatabaseModule.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
 
@@ -57,7 +64,7 @@ class TeraSessionTest(unittest.TestCase):
             session.id_session_type = session_types[0].id_session_type
             TeraSession.insert(session)
 
-    def test_Session_from_json(self):
+    def test_session_from_json(self):
         pass
         #
         # session = {'session': {'id_session': 0,

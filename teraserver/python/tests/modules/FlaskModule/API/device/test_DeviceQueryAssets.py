@@ -62,3 +62,5 @@ class DeviceQueryAssetsTest(unittest.TestCase):
                 response = self._token_auth_query_assets(device['device_token'])
                 self.assertEqual(response.status_code, 401)
 
+    def test_query_assets_post(self):
+        pass

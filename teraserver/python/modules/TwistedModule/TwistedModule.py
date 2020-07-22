@@ -26,6 +26,8 @@ from OpenSSL import SSL
 import sys
 import os
 
+from flask import session
+
 
 class MyHTTPChannel(HTTPChannel):
     def allHeadersReceived(self):
