@@ -154,7 +154,7 @@ class UserQueryParticipants(Resource):
                          'participant. A participant can be created/modified if the user has admin rights to the '
                          'project.',
              responses={200: 'Success',
-                        403: 'Logged user can\'t create/update the specified device',
+                        403: 'Logged user can\'t create/update the specified participant',
                         400: 'Badly formed JSON or missing fields(id_participant or id_project/id_group [only one of '
                              'them]) in the JSON body, or mismatch between id_project and participant group project',
                         500: 'Internal error when saving device'})
@@ -172,10 +172,10 @@ class UserQueryParticipants(Resource):
                                                         and 'id_participant_group' not in json_participant):
             return '', 400
 
-        # User can modify or add a group if it has admin access to that project
+        # User can modify or add a participant if it has admin to that project
         if 'id_project' in json_participant:
             if json_participant['id_project'] > 0 and \
-                    json_participant['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True):
+                    json_participant['id_project'] not in user_access.get_accessible_projects_ids(admin_only=False):
                 return 'No admin access to project', 403
 
         # Check if current user can modify the posted group
@@ -183,7 +183,7 @@ class UserQueryParticipants(Resource):
             if json_participant['id_participant_group'] is not None and \
                     json_participant['id_participant_group'] > 0 and \
                     json_participant['id_participant_group'] not in \
-                    user_access.get_accessible_groups_ids(admin_only=True):
+                    user_access.get_accessible_groups_ids(admin_only=False):
                 return 'No admin access to group', 403
 
         # If we have both an id_group and an id_project, make sure that the id_project in the group matches
