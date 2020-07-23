@@ -130,6 +130,13 @@ class BaseModel:
         # return query.all()
 
     @classmethod
+    def count_with_filters(cls, filters=None):
+        if filters is None:
+            filters = dict()
+
+        return cls.query.filter_by(**filters).count()
+
+    @classmethod
     def get_json_schema(cls) -> dict:
         schema = dict()
 

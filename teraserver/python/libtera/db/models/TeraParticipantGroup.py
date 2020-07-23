@@ -10,11 +10,12 @@ class TeraParticipantGroup(db.Model, BaseModel):
     participant_group_name = db.Column(db.String, nullable=False, unique=False)
 
     participant_group_project = db.relationship('TeraProject')
+    participant_group_participants = db.relationship("TeraParticipant")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['participant_group_project'])
+        ignore_fields.extend(['participant_group_project', 'participant_group_participants'])
         rval = super().to_json(ignore_fields=ignore_fields)
 
         if not minimal:

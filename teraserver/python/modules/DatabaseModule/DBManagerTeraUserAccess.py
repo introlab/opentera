@@ -712,10 +712,39 @@ class DBManagerTeraUserAccess:
 
         return service_projects_roles
 
-    def query_users_for_usergroup(self, user_group_id: int):
+    def query_users_for_usergroup(self, user_group_id: int, enabled_only: bool = False):
         accessible_users_ids = self.get_accessible_users_ids()
-        return TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).filter(TeraUserUserGroup.id_user
-                                                                                     .in_(accessible_users_ids)).all()
+        query = TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).filter(TeraUserUserGroup.id_user
+                                                                                      .in_(accessible_users_ids))
+        if enabled_only:
+            query = query.join(TeraUser).filter(TeraUser.user_enabled is True)
+        return query.all()
+
+    def query_users_for_site(self, site_id: int, enabled_only: bool = False, admin_only: bool = False):
+        accessible_users = self.get_accessible_users()
+        users = set()
+        for user in accessible_users:
+            if enabled_only and not user.user_enabled:
+                continue
+            sites_roles = user.get_sites_roles()
+            if site_id in [site.id_site for site, site_role in sites_roles.items()
+                           if (admin_only and site_role['site_role'] == 'admin') or not admin_only]:
+                users.add(user)
+
+        return users
+
+    def query_users_for_project(self, project_id: int, enabled_only: bool = False, admin_only: bool = False):
+        accessible_users = self.get_accessible_users()
+        users = set()
+        for user in accessible_users:
+            if enabled_only and not user.user_enabled:
+                continue
+            project_roles = user.get_projects_roles()
+            if project_id in [proj.id_project for proj, proj_role in project_roles.items()
+                              if (admin_only and proj_role['project_role'] == 'admin') or not admin_only]:
+                users.add(user)
+
+        return users
 
     def query_service_configs(self, service_id: int = None, user_id: int = None, device_id: int = None,
                               participant_id: int = None):
