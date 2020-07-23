@@ -185,7 +185,8 @@ class UserQueryAssets(Resource):
                 TeraAsset.insert(new_asset)
 
                 # Upload to FileTransferService
-                token = service.get_token(self.module.redis.get(RedisVars.RedisVar_ServiceTokenAPIKey))
+                tera_service = TeraService.get_openteraserver_service()
+                token = tera_service.get_token(self.module.redis.get(RedisVars.RedisVar_ServiceTokenAPIKey))
                 params = {'asset_uuid': new_asset.asset_uuid}
                 request_headers = {'Authorization': 'OpenTera ' + token}
                 from requests import post

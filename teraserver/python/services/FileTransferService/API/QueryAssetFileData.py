@@ -70,6 +70,7 @@ class QueryAssetFileData(Resource):
             # Create DB entry
             file_asset = AssetFileData()
             file_asset.asset_uuid = args['asset_uuid']
+            file_asset.asset_creator_service_uuid = current_service_client.service_uuid
             file_asset.asset_original_filename = secure_filename(request.headers['X-Filename'])
             file_asset.asset_file_size = len(request.data)
             file_asset.asset_saved_date = datetime.now()
@@ -104,6 +105,7 @@ class QueryAssetFileData(Resource):
                 # Create DB entry
                 file_asset = AssetFileData()
                 file_asset.asset_uuid = args['asset_uuid']
+                file_asset.asset_creator_service_uuid = current_service_client.service_uuid
                 file_asset.asset_original_filename = filename
                 file_asset.asset_file_size = file_size
                 file_asset.asset_saved_date = datetime.now()
