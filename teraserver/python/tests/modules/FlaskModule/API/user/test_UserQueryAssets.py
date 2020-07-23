@@ -43,3 +43,15 @@ class UserQueryAssetsTest(BaseAPITest):
         response = self._post_file_with_http_auth(username='admin', password='admin',
                                                   params=params, files=files)
         self.assertEqual(response.status_code, 200)
+
+    def test_post_as_admin_huge(self):
+        # Creating fake data
+        import io
+        import os
+        # 100 MB file
+        f = io.BytesIO(os.urandom(1024 * 1024 * 99))
+        files = {'upload_file': ('foobar.txt', f, 'text/x-spam')}
+        params = {'id_session': 1}
+        response = self._post_file_with_http_auth(username='admin', password='admin',
+                                                  params=params, files=files)
+        self.assertEqual(response.status_code, 200)

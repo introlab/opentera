@@ -9,7 +9,7 @@ class AssetFileData(db.Model, BaseModel):
                                    primary_key=True, autoincrement=True)
 
     asset_uuid = db.Column(db.String(36), nullable=False, unique=True)
-    asset_creator_service_uuid = db.Column(db.String(36), nullable=False, unique=True)
+    asset_creator_service_uuid = db.Column(db.String(36), nullable=False, unique=False)
     asset_original_filename = db.Column(db.String, nullable=False)
     asset_saved_date = db.Column(db.TIMESTAMP, nullable=False)
     asset_file_size = db.Column(db.Integer, nullable=False)
