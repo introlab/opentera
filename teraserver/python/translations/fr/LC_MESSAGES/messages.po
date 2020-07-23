@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-07-17 08:32-0400\n"
+"POT-Creation-Date: 2020-07-23 08:06-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -588,18 +588,23 @@ msgstr ""
 msgid "Impossible de supprimer - des seances de ce type existent."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:110
+#: modules/FlaskModule/API/user/UserQuerySessions.py:112
 msgid "Missing session participants and users"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:124
-#: modules/FlaskModule/API/user/UserQuerySessions.py:197
+#: modules/FlaskModule/API/user/UserQuerySessions.py:128
+#: modules/FlaskModule/API/user/UserQuerySessions.py:212
 msgid "User doesn't have access to at least one participant of that session."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:129
-#: modules/FlaskModule/API/user/UserQuerySessions.py:202
+#: modules/FlaskModule/API/user/UserQuerySessions.py:133
+#: modules/FlaskModule/API/user/UserQuerySessions.py:217
 msgid "User doesn't have access to at least one user of that session."
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserQuerySessions.py:138
+#: modules/FlaskModule/API/user/UserQuerySessions.py:222
+msgid "User doesn't have access to at least one device of that session."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:166
