@@ -3,10 +3,15 @@ from flask_restx import Resource
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraAsset import TeraAsset
+from libtera.db.models.TeraAsset import TeraAsset, AssetType
+from libtera.db.models.TeraService import TeraService
+from werkzeug.utils import secure_filename
 
 from sqlalchemy import exc
 from modules.DatabaseModule.DBManager import DBManager
+from modules.RedisVars import RedisVars
+
+import uuid
 
 # Parser definition(s)
 # GET
@@ -20,6 +25,7 @@ get_parser.add_argument('all', type=str, help='return all assets accessible from
 
 # POST
 post_parser = api.parser()
+post_parser.add_argument('id_session', type=int, help='ID of session to add the assets')
 
 # DELETE
 delete_parser = api.parser()
@@ -94,7 +100,8 @@ class UserQueryAssets(Resource):
                 port = request.headers['X_EXTERNALPORT']
 
             asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
-                                      + service.service_clientendpoint + 'api/assets?asset_uuid=' + asset.asset_uuid
+                                      + service.service_clientendpoint \
+                                      + 'api/file/assets?asset_uuid=' + asset.asset_uuid
 
             assets_list.append(asset_json)
 
@@ -147,4 +154,57 @@ class UserQueryAssets(Resource):
     @api.expect(post_parser)
     def post(self):
         # TODO What to do here exactly?
-        pass
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
+        user_access = DBManager.userAccess(current_user)
+        args = post_parser.parse_args()
+
+        # Verify if user can access session
+        session_ids = user_access.get_accessible_sessions_ids()
+
+        if args['id_session'] in session_ids:
+
+            created_assets = []
+
+            for file in request.files:
+                storage = request.files[file]
+                filename = secure_filename(storage.filename)
+
+                # TODO Asset associated with FileTransferService?
+                service = TeraService.get_service_by_key('FileTransferService')
+
+                # Create asset
+                new_asset = TeraAsset()
+                new_asset.asset_name = filename
+                # TODO HARDCODED ASSET TYPE FOR NOW
+                new_asset.asset_type = AssetType.RAW_FILE.value
+                new_asset.id_session = args['id_session']
+                # TODO Asset associated to us
+                new_asset.id_user = current_user.id_user
+                # TeraServer service_uuid
+                new_asset.asset_service_uuid = service.service_uuid
+                TeraAsset.insert(new_asset)
+
+                # Upload to FileTransferService
+                token = service.get_token(self.module.redis.get(RedisVars.RedisVar_ServiceTokenAPIKey))
+                params = {'asset_uuid': new_asset.asset_uuid}
+                request_headers = {'Authorization': 'OpenTera ' + token}
+                from requests import post
+                import io
+                # TODO AVOID USING RAM?
+                f = io.BytesIO(storage.stream.read())
+                files = {'file': (filename, f)}
+                url = 'http://' + service.service_hostname + ':' + str(service.service_port) + '/api/file/assets'
+                response = post(url=url, files=files, params=params, headers=request_headers)
+                storage.close()
+                f.close()
+
+                if response.status_code == 200:
+                    # Success!
+                    asset_json = new_asset.to_json()
+                    asset_json['asset_data'] = response.json()
+                    return asset_json
+                else:
+                    # Remove asset, was not able to upload
+                    TeraAsset.delete(new_asset.id_asset)
+                    return 'Error uploading file', 500
+        return 'Not authorized', 403

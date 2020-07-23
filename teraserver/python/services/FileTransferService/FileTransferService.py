@@ -56,7 +56,6 @@ class FileTransferService(ServiceOpenTera):
         pass
 
 
-
 if __name__ == '__main__':
 
     # Very first thing, log to stdout
@@ -69,19 +68,23 @@ if __name__ == '__main__':
 
     # Global redis client
     Globals.redis_client = RedisClient(Globals.config_man.redis_config)
-    Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
-    Globals.api_device_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
-    Globals.api_device_static_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
-    Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
-    Globals.api_participant_static_token_key = \
-        Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantStaticTokenAPIKey)
 
     # Update Service Access information
-    ServiceAccessManager.api_user_token_key = Globals.api_user_token_key
-    ServiceAccessManager.api_participant_token_key = Globals.api_participant_token_key
-    ServiceAccessManager.api_participant_static_token_key = Globals.api_participant_static_token_key
-    ServiceAccessManager.api_device_token_key = Globals.api_device_token_key
-    ServiceAccessManager.api_device_static_token_key = Globals.api_device_static_token_key
+    ServiceAccessManager.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
+
+    ServiceAccessManager.api_participant_token_key = \
+        Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
+
+    ServiceAccessManager.api_participant_static_token_key = \
+        Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantStaticTokenAPIKey)
+
+    ServiceAccessManager.api_device_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
+
+    ServiceAccessManager.api_device_static_token_key = \
+        Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
+
+    ServiceAccessManager.api_service_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
+
     ServiceAccessManager.config_man = Globals.config_man
 
     # Get service UUID

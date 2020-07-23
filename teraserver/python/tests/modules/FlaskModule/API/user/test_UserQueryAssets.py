@@ -32,5 +32,14 @@ class UserQueryAssetsTest(BaseAPITest):
     def test_query_tera_server_assets_as_admin(self):
         payload = {'service_uuid': '00000000-0000-0000-0000-000000000001'}
         response = self._request_with_http_auth(username='admin', password='admin', payload=payload)
+        self.assertEqual(response.status_code, 200)
 
+    def test_post_as_admin(self):
+        # Creating fake data
+        import io
+        f = io.BytesIO(b"\x00\x00\x00\x00\x00\x00\x00\x00\x01\x01\x01\x01\x01\x01")
+        files = {'upload_file': ('foobar.txt', f, 'text/x-spam')}
+        params = {'id_session': 1}
+        response = self._post_file_with_http_auth(username='admin', password='admin',
+                                                  params=params, files=files)
         self.assertEqual(response.status_code, 200)

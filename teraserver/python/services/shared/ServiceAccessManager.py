@@ -8,11 +8,15 @@ from enum import Enum
 from services.shared.TeraUserClient import TeraUserClient
 from services.shared.TeraDeviceClient import TeraDeviceClient
 from services.shared.TeraParticipantClient import TeraParticipantClient
+from services.shared.TeraServiceClient import TeraServiceClient
 
 # Current client identity, stacked
 current_user_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_user_client', None))
 current_device_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_device_client', None))
 current_participant_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant_client', None))
+current_service_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_service_client', None))
+
+
 current_login_type = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_login_type', LoginType.UNKNOWN_LOGIN))
 
 
@@ -20,7 +24,8 @@ class LoginType(Enum):
     UNKNOWN_LOGIN = 0,
     USER_LOGIN = 1,
     DEVICE_LOGIN = 2,
-    PARTICIPANT_LOGIN = 3
+    PARTICIPANT_LOGIN = 3,
+    SERVICE_LOGIN = 4
 
 
 class ServiceAccessManager:
@@ -30,6 +35,7 @@ class ServiceAccessManager:
     api_participant_static_token_key = None
     api_device_token_key = None
     api_device_static_token_key = None
+    api_service_token_key = None
     token_cookie_name = 'OpenTera'
     config_man = None
 
@@ -177,6 +183,45 @@ class ServiceAccessManager:
                 _request_ctx_stack.top.current_participant_client = \
                     TeraParticipantClient(token_dict, token, ServiceAccessManager.config_man)
                 _request_ctx_stack.top.current_login_type = LoginType.PARTICIPANT_LOGIN
+                return f(*args, **kwargs)
+
+            return 'Forbidden', 403
+
+        return decorated
+
+    @staticmethod
+    def service_token_required(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            # We support token auth. only.
+            token = None
+            ######################
+            # AUTHORIZATION HEADER
+            if 'Authorization' in request.headers:
+                try:
+                    # Default whitespace as separator, 1 split max
+                    scheme, atoken = request.headers['Authorization'].split(None, 1)
+                except ValueError:
+                    # malformed Authorization header
+                    return 'Forbidden', 403
+
+                # Verify scheme and token
+                if scheme == 'OpenTera':
+                    token = atoken
+
+            # Verify token from with service api key
+            import jwt
+
+            try:
+                token_dict = jwt.decode(token, ServiceAccessManager.api_service_token_key)
+            except jwt.PyJWTError as e:
+                # Not a device, or invalid token, will continue...
+                pass
+            else:
+                # Service token
+                _request_ctx_stack.top.current_service_client = \
+                    TeraServiceClient(token_dict, token, ServiceAccessManager.config_man)
+                _request_ctx_stack.top.current_login_type = LoginType.SERVICE_LOGIN
                 return f(*args, **kwargs)
 
             return 'Forbidden', 403

@@ -47,6 +47,20 @@ class TeraService(db.Model, BaseModel):
 
         return json_service
 
+    def get_token(self, token_key: str, expiration=3600):
+        import time
+        import jwt
+        # Creating token with user info
+        now = time.time()
+        payload = {
+            'iat': int(now),
+            'exp': int(now) + expiration,
+            'iss': 'TeraServer',
+            'service_uuid': self.service_uuid
+        }
+
+        return jwt.encode(payload, token_key, algorithm='HS256').decode('utf-8')
+
     @staticmethod
     def get_service_by_key(key: str):
         service = TeraService.query.filter_by(service_key=key).first()
