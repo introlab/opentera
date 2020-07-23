@@ -49,6 +49,10 @@
 | **Sites**: Delete                     | ![ True](images/on_.png) | ![False](images/off.png) | ![False](images/off.png) | ![False](images/off.png)     | ![False](images/off.png)
 | **System Services**                   | ![False](images/off.png) | ![False](images/off.png) | ![False](images/off.png) | ![False](images/off.png)     | ![False](images/off.png)
 | **System Service: Logger**: Read      | ![ True](images/on_.png) | ![False](images/off.png) | ![False](images/off.png) | ![False](images/off.png)     | ![False](images/off.png)
+| **Users**: Create                     | ![ True](images/on_.png) | ![ True](images/lim.png) | ![False](images/off.png) | ![False](images/off.png)     | ![False](images/off.png)
+| **Users**: Read                       | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Users**: Update                     | ![ True](images/on_.png) | ![ True](images/lim.png) | ![False](images/off.png) | ![False](images/off.png)     | ![False](images/off.png)
+| **Users**: Delete                     | ![ True](images/on_.png) | ![ True](images/lim.png) | ![False](images/off.png) | ![False](images/off.png)     | ![False](images/off.png)
 | **User Groups**: Create               | ![ True](images/on_.png) | ![ True](images/on_.png) | ![False](images/off.png) | ![False](images/off.png)     | ![False](images/off.png)
 | **User Groups**: Read                 | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
 | **User Groups**: Update               | ![ True](images/on_.png) | ![ True](images/on_.png) | ![False](images/off.png) | ![False](images/off.png)     | ![False](images/off.png)
@@ -61,4 +65,5 @@
 [3] Any user group with a role in a project automatically have a **Site Role: User** access
 
 [4] Any user group with a **Site Role: Admin** automatically have a **Project Role: Admin**
- ## Project level features
+
+ ## Features
