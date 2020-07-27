@@ -52,25 +52,25 @@ class UserEventManager(EventManager):
         import json
         # Default = no access
         try:
-            if event.object_type == 'user':
+            if event.object_type == TeraUser.get_model_name():
                 user = TeraUser()
                 user.from_json(json.loads(event.object_value))
                 # Minimal ->we have only id_user
                 if user.id_user in self.accessManager.get_accessible_users_ids():
                     return True
-            elif event.object_type == 'participant':
+            elif event.object_type == TeraParticipant.get_model_name():
                 participant = TeraParticipant()
                 participant.from_json(json.loads(event.object_value))
                 # Minimal ->we have only id_participant
                 if participant.id_participant in self.accessManager.get_accessible_participants_ids():
                     return True
-            elif event.object_type == 'device':
+            elif event.object_type == TeraDevice.get_model_name():
                 device = TeraDevice()
                 device.from_json(json.loads(event.object_value))
                 # Minimal ->we have only id_device
                 if device.id_device in self.accessManager.get_accessible_devices_ids():
                     return True
-            elif event.object_type == 'asset':
+            elif event.object_type == TeraAsset.get_model_name():
                 # TODO Verify asset access
                 asset = TeraAsset()
                 asset.from_json(json.loads(event.object_value))
