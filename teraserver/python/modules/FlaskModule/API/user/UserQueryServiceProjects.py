@@ -126,6 +126,7 @@ class UserQueryServiceProjects(Resource):
             if 'projects' not in request.json['service']:
                 return gettext('Missing projects'), 400
             id_service = request.json['service']['id_service']
+
             # Only super admins can modify a service like that
             if not current_user.user_superadmin:
                 return '', 403

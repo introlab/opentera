@@ -141,7 +141,6 @@ class UserQueryDeviceParticipants(Resource):
                     project_id=part.id_project):
                 return gettext('Appareil non-assigné au projet du participant'), 403
 
-
             # Do the update!
             if json_device_part['id_device_participant'] > 0:
                 # Already existing

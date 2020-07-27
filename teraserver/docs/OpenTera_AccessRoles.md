@@ -39,6 +39,10 @@
 | **Sessions**: Read                    | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
 | **Sessions**: Update                  | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
 | **Sessions**: Delete                  | ![ True](images/on_.png) | ![ True](images/on_.png) | ![False](images/off.png) | ![ True](images/on_.png)     | ![False](images/off.png)
+| **Sessions Types**: Create            | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/off.png) | ![ True](images/on_.png)     | ![ True](images/off.png)
+| **Sessions Types**: Read              | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Sessions Types**: Update            | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Sessions Types**: Delete            | ![ True](images/on_.png) | ![ True](images/on_.png) | ![False](images/off.png) | ![ True](images/on_.png)     | ![False](images/off.png)
 | **Sessions Events**: Create           | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
 | **Sessions Events**: Read             | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
 | **Sessions Events**: Update           | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
@@ -58,7 +62,7 @@
 | **User Groups**: Update               | ![ True](images/on_.png) | ![ True](images/on_.png) | ![False](images/off.png) | ![False](images/off.png)     | ![False](images/off.png)
 | **User Groups**: Delete               | ![ True](images/on_.png) | ![ True](images/on_.png) | ![False](images/off.png) | ![False](images/off.png)     | ![False](images/off.png)
 
-[1] All features are filtered according to the specific user group access. For exemple, if **Sites: Read** is done, only sites where the user have access with its usergroups are read.
+[1] All data are filtered according to the specific user group access. For exemple, if **Sites: Read** is done, only sites where the user have access with its usergroups are read.
 
 [2] Super admins always have a **Site Role: Admin** on all sites in the system
 
@@ -67,3 +71,31 @@
 [4] Any user group with a **Site Role: Admin** automatically have a **Project Role: Admin**
 
  ## Features
+| Feature [1]                                   | Super Admin              | Site Role: *Admin* [2]   | Site Role: *User* [3]    | Project Role: *Admin* [4]    | Project Role: *User* 
+| :---                                          | :---:                    | :---:                    | :---:                    | :---:                        | :---:
+| **Data entry forms request**                  | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Device - Participant assignation**          | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Device - Project assignation**              | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/off.png) | ![ True](images/on_.png)     | ![ True](images/off.png)
+| **Device - Site assignation**                 | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/off.png) | ![ True](images/on_.png)     | ![ True](images/off.png)
+| **Login**                                     | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Logout**                                    | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Online users list**                         | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Online participants list**                  | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Manage project access**                     | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/off.png) | ![ True](images/on_.png)     | ![ True](images/off.png)
+| **Manage services roles**                     | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/off.png) | ![ True](images/off.png)     | ![ True](images/off.png)
+| **Manage site access**                        | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/off.png) | ![ True](images/off.png)     | ![ True](images/off.png)
+| **Service configuration (self)**              | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Service configuration (others)**            | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/off.png) | ![ True](images/on_.png)     | ![ True](images/off.png)
+| **Service - Project assignation**             | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/off.png) | ![ True](images/off.png)     | ![ True](images/off.png)
+| **Session Type - Device Type assignation**    | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/off.png) | ![ True](images/off.png)     | ![ True](images/off.png)
+| **Session Type - Project assignation**        | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/off.png) | ![ True](images/on_.png)     | ![ True](images/off.png)
+| **Statistics module**                         | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Managing sessions start/stop/resume**       | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+
+[1] All features are limited to data that the user can access. For example, if an user can't access a specific project, that user won't be able to use any feature on that project.
+
+[2] Super admins always have a **Site Role: Admin** on all sites in the system
+
+[3] Any user group with a role in a project automatically have a **Site Role: User** access
+
+[4] Any user group with a **Site Role: Admin** automatically have a **Project Role: Admin**
