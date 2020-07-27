@@ -4,6 +4,10 @@ from autobahn.websocket.types import ConnectionDeny
 
 # OpenTera
 from libtera.db.models.TeraUser import TeraUser
+from libtera.db.models.TeraParticipant import TeraParticipant
+from libtera.db.models.TeraDevice import TeraDevice
+from libtera.db.models.TeraAsset import TeraAsset
+
 from libtera.redis.RedisClient import RedisClient
 from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 
@@ -63,14 +67,24 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
             ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
 
-            # Events from DatabaseModule
+            # Specific events from DatabaseModule
+            # We are specific otherwise we receive every database event
             ret2 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
-                ModuleNames.DATABASE_MODULE_NAME), self.redis_event_message_received)
+                ModuleNames.DATABASE_MODULE_NAME, TeraUser.get_model_name()), self.redis_event_message_received)
+
+            ret3 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+                ModuleNames.DATABASE_MODULE_NAME, TeraParticipant.get_model_name()), self.redis_event_message_received)
+
+            ret4 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+                ModuleNames.DATABASE_MODULE_NAME, TeraDevice.get_model_name()), self.redis_event_message_received)
+
+            ret5 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+                ModuleNames.DATABASE_MODULE_NAME, TeraAsset.get_model_name()), self.redis_event_message_received)
 
             # Direct events
-            ret3 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+            ret6 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
-            print(ret1, ret2, ret3)
+            print(ret1, ret2, ret3, ret4, ret5, ret6)
 
     def onMessage(self, msg, binary):
         # Handle websocket communication

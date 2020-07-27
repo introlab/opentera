@@ -48,8 +48,8 @@ class UserQueryAssetsTest(BaseAPITest):
         # Creating fake data
         import io
         import os
-        # 100 MB file
-        f = io.BytesIO(os.urandom(1024 * 1024 * 99))
+        # 1 MB file
+        f = io.BytesIO(os.urandom(1024 * 1024 * 1))
         files = {'upload_file': ('foobar.txt', f, 'text/x-spam')}
         params = {'id_session': 1}
         response = self._post_file_with_http_auth(username='admin', password='admin',

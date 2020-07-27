@@ -177,6 +177,3 @@ class BaseModel:
         schema = {model_name: {'properties': pr_dict, 'type': 'object'}}
 
         return schema
-
-
-
