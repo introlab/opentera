@@ -43,6 +43,16 @@ class TeraUser(db.Model, BaseModel):
         rval['user_name'] = self.get_fullname()
         return rval
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_user': self.id_user, 'user_uuid': self.user_uuid}
+
     def get_token(self, token_key: str, expiration=3600):
         import time
         import jwt

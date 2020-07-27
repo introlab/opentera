@@ -1,14 +1,11 @@
 from modules.EventManager import EventManager
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraAsset import TeraAsset
+import libtera.db.models as models
 from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 import messages.python as messages
 
 
 class UserEventManager(EventManager):
-    def __init__(self, user: TeraUser):
+    def __init__(self, user: models.TeraUser):
         EventManager.__init__(self)
         self.user = user
         self.accessManager = DBManagerTeraUserAccess(self.user)
@@ -50,35 +47,51 @@ class UserEventManager(EventManager):
 
     def filter_database_event(self, event: messages.DatabaseEvent):
         import json
-        # Default = no access
+        from libtera.db.models import EventNameClassMap
+
         try:
-            if event.object_type == TeraUser.get_model_name():
-                user = TeraUser()
-                user.from_json(json.loads(event.object_value))
-                # Minimal ->we have only id_user
-                if user.id_user in self.accessManager.get_accessible_users_ids():
+            if event.object_type in EventNameClassMap:
+                # Create instance
+                obj = EventNameClassMap[event.object_type]()
+                # Load from json
+                obj.from_json(json.loads(event.object_value))
+
+                # No way to determine if we can access this message
+                # This should return minimal information
+                if event.type == messages.DatabaseEvent.DB_DELETE:
                     return True
-            elif event.object_type == TeraParticipant.get_model_name():
-                participant = TeraParticipant()
-                participant.from_json(json.loads(event.object_value))
-                # Minimal ->we have only id_participant
-                if participant.id_participant in self.accessManager.get_accessible_participants_ids():
-                    return True
-            elif event.object_type == TeraDevice.get_model_name():
-                device = TeraDevice()
-                device.from_json(json.loads(event.object_value))
-                # Minimal ->we have only id_device
-                if device.id_device in self.accessManager.get_accessible_devices_ids():
-                    return True
-            elif event.object_type == TeraAsset.get_model_name():
-                # TODO Verify asset access
-                asset = TeraAsset()
-                asset.from_json(json.loads(event.object_value))
-                # if asset.asset_uuid in self.accessManager.get_accessible_assets_uuid():
-                #   return True
-                return False
+
+                # Any other type (UPDATE, CREATE) will verify if we can access first
+                # TODO can we do better than test each type?
+                if event.object_type == models.TeraUser.get_model_name():
+                    if obj.id_user in self.accessManager.get_accessible_users_ids():
+                        return True
+                elif event.object_type == models.TeraParticipant.get_model_name():
+                    if obj.id_participant in self.accessManager.get_accessible_participants_ids():
+                        return True
+                elif event.object_type == models.TeraDevice.get_model_name():
+                    if obj.id_device in self.accessManager.get_accessible_devices_ids():
+                        return True
+                elif event.object_type == models.TeraUserGroup.get_model_name():
+                    if obj.id_user_group in self.accessManager.get_accessible_users_groups_ids():
+                        return True
+                elif event.object_type == models.TeraSession.get_model_name():
+                    if obj.id_session in self.accessManager.get_accessible_sessions_ids():
+                        return True
+                elif event.object_type == models.TeraProject.get_model_name():
+                    if obj.id_project in self.accessManager.get_accessible_projects_ids():
+                        return True
+                elif event.object_type == models.TeraSite.get_model_name():
+                    if obj.id_site in self.accessManager.get_accessible_sites_ids():
+                        return True
+                elif event.object_type == models.TeraAsset.get_model_name():
+                    # TODO Verify asset access
+                    # if asset.asset_uuid in self.accessManager.get_accessible_assets_uuid():
+                    #   return True
+                    return False
         except json.JSONDecodeError as e:
             print('JSON Decode Error', e)
             return False
-        finally:
-            return False
+
+        # Default = no access
+        return False

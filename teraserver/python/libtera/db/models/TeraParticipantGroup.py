@@ -23,6 +23,16 @@ class TeraParticipantGroup(db.Model, BaseModel):
         # rval['id_site'] = self.participant_group_project.id_site
         return rval
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_participant_group': self.id_participant_group}
+
     @staticmethod
     def get_participant_group_by_group_name(name: str):
         return TeraParticipantGroup.query.filter_by(participant_group_name=name).first()

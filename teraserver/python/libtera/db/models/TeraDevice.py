@@ -55,12 +55,22 @@ class TeraDevice(db.Model, BaseModel):
                           'device_subtype', 'authenticated', 'device_assets']
 
         if minimal:
-            ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_config', 'device_notes',
+            ignore_fields += ['device_type', 'device_onlineable', 'device_config', 'device_notes',
                               'device_lastonline', 'device_infos',  'device_token']
 
         device_json = super().to_json(ignore_fields=ignore_fields)
 
         return device_json
+
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_device': self.id_device, 'device_uuid': self.device_uuid}
 
     def from_json(self, json):
         super().from_json(json)

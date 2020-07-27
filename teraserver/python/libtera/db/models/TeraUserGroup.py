@@ -19,6 +19,16 @@ class TeraUserGroup(db.Model, BaseModel):
 
         return rval
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_user_group': self.id_user_group}
+
     def get_projects_roles(self) -> dict:
         projects_roles = {}
 

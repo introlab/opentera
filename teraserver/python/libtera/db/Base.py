@@ -38,6 +38,18 @@ class BaseModel:
             else:
                 print('Attribute ' + name + ' not found.')
 
+    def to_json_create_event(self):
+        # Default is None, will not be sent
+        return None
+
+    def to_json_update_event(self):
+        # Default is None, will not be sent
+        return None
+
+    def to_json_delete_event(self):
+        # Default is None, will not be sent
+        return None
+
     @staticmethod
     def is_valid_property_name(name: str) -> bool:
         return not name.startswith('__') and not name.startswith('_') and not name.startswith('query') and \

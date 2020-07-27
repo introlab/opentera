@@ -95,6 +95,16 @@ class TeraParticipant(db.Model, BaseModel):
 
         return super().to_json(ignore_fields=ignore_fields)
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_participant': self.id_participant, 'participant_uuid': self.participant_uuid}
+
     def is_authenticated(self):
         return self.authenticated
 

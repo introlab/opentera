@@ -64,27 +64,20 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
             # Register only once to events from modules, will be filtered after
 
             # Events from UserManagerModule
-            ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+            ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
 
             # Specific events from DatabaseModule
             # We are specific otherwise we receive every database event
-            ret2 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
-                ModuleNames.DATABASE_MODULE_NAME, TeraUser.get_model_name()), self.redis_event_message_received)
+            from libtera.db.models import EventNameClassMap
 
-            ret3 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
-                ModuleNames.DATABASE_MODULE_NAME, TeraParticipant.get_model_name()), self.redis_event_message_received)
-
-            ret4 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
-                ModuleNames.DATABASE_MODULE_NAME, TeraDevice.get_model_name()), self.redis_event_message_received)
-
-            ret5 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
-                ModuleNames.DATABASE_MODULE_NAME, TeraAsset.get_model_name()), self.redis_event_message_received)
+            for name in EventNameClassMap:
+                ret = yield self.subscribe_pattern_with_callback(
+                    create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME, name),
+                    self.redis_event_message_received)
 
             # Direct events
-            ret6 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
-
-            print(ret1, ret2, ret3, ret4, ret5, ret6)
+            ret = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
     def onMessage(self, msg, binary):
         # Handle websocket communication

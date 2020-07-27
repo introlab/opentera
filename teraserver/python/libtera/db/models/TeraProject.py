@@ -24,6 +24,16 @@ class TeraProject(db.Model, BaseModel):
 
         return rval
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_project': self.id_project}
+
     def get_users_ids_in_project(self):
         # Get all users who has a role in the project
         users = self.get_users_in_project()

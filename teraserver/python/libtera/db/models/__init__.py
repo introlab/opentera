@@ -23,6 +23,26 @@ from .TeraSessionTypeProject import TeraSessionTypeProject
 from .TeraSite import TeraSite
 from .TeraTest import TeraTest
 from .TeraTestType import TeraTestType
+from .TeraUser import TeraUser
+from .TeraUserGroup import TeraUserGroup
+from .TeraUserUserGroup import TeraUserUserGroup
+
+
+"""
+    A map containing the event name and class, useful for event filtering. 
+    Insert only useful events here.
+"""
+EventNameClassMap = {
+    TeraAsset.get_model_name(): TeraAsset,
+    TeraDevice.get_model_name(): TeraDevice,
+    TeraParticipant.get_model_name(): TeraParticipant,
+    TeraParticipantGroup.get_model_name(): TeraParticipantGroup,
+    TeraProject.get_model_name(): TeraProject,
+    TeraSession.get_model_name(): TeraSession,
+    TeraSite.get_model_name(): TeraSite,
+    TeraUser.get_model_name(): TeraUser,
+    TeraUserGroup.get_model_name(): TeraUserGroup
+}
 
 # All exported symbols
 __all__ = ['TeraAsset',
@@ -31,22 +51,29 @@ __all__ = ['TeraAsset',
            'TeraDeviceParticipant',
            'TeraDeviceProject',
            'TeraDeviceSubType',
+           'TeraDeviceType',
            'TeraParticipant',
            'TeraParticipantGroup',
            'TeraProject',
            'TeraServerSettings',
            'TeraService',
-           'TeraServiceProject',
            'TeraServiceAccess',
+           'TeraServiceConfig',
+           'TeraServiceProject',
            'TeraServiceRole',
            'TeraSession',
+           'TeraSessionDevices',
            'TeraSessionEvent',
            'TeraSessionParticipants',
-           'TeraSessionDevices',
            'TeraSessionType',
            'TeraSessionTypeDeviceType',
            'TeraSessionTypeProject',
            'TeraSessionUsers',
            'TeraSite',
            'TeraTest',
-           'TeraTestType']
+           'TeraTestType',
+           'TeraUser',
+           'TeraUserGroup',
+           'TeraUserUserGroup',
+           'EventNameClassMap'
+           ]

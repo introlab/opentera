@@ -31,10 +31,8 @@ from libtera.db.models.TeraUserGroup import TeraUserGroup
 from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from libtera.db.models.TeraServiceAccess import TeraServiceAccess
 from libtera.db.models.TeraServiceConfig import TeraServiceConfig
-from libtera.db.Base import BaseModel
 
 from libtera.ConfigManager import ConfigManager
-
 from modules.FlaskModule.FlaskModule import flask_app
 
 # User access with roles
@@ -67,12 +65,10 @@ class DBManager (BaseModule):
     def setup_events_for_class(self, cls, event_name):
         import json
 
-        print('SetupEvents for class', cls, event_name)
-
         @event.listens_for(cls, 'after_update')
         def base_model_updated(mapper, connection, target):
             # print(mapper, connection, target, event_name)
-            json_update_event = target.to_json(minimal=True)
+            json_update_event = target.to_json_update_event()
             if json_update_event:
                 database_event = messages.DatabaseEvent()
                 database_event.type = messages.DatabaseEvent.DB_UPDATE
@@ -92,7 +88,7 @@ class DBManager (BaseModule):
         @event.listens_for(cls, 'after_delete')
         def base_model_deleted(mapper, connection, target):
             # print(mapper, connection, target, event_name)
-            json_delete_event = target.to_json(minimal=True)
+            json_delete_event = target.to_json_delete_event()
             if json_delete_event:
                 database_event = messages.DatabaseEvent()
                 database_event.type = messages.DatabaseEvent.DB_DELETE
@@ -111,7 +107,7 @@ class DBManager (BaseModule):
         @event.listens_for(cls, 'after_insert')
         def base_model_inserted(mapper, connection, target):
             # print(mapper, connection, target, event_name)
-            json_create_event = target.to_json(minimal=True)
+            json_create_event = target.to_json_create_event()
             if json_create_event:
                 database_event = messages.DatabaseEvent()
                 database_event.type = messages.DatabaseEvent.DB_CREATE
@@ -231,10 +227,10 @@ class DBManager (BaseModule):
     def setup_events(self):
         # TODO Add events that need to be sent through redis
         # TODO Useful to specify event name, always get_model_name() ?
-        self.setup_events_for_class(TeraUser, TeraUser.get_model_name())
-        self.setup_events_for_class(TeraParticipant, TeraParticipant.get_model_name())
-        self.setup_events_for_class(TeraDevice, TeraDevice.get_model_name())
-        self.setup_events_for_class(TeraAsset, TeraAsset.get_model_name())
+
+        from libtera.db.models import EventNameClassMap
+        for name in EventNameClassMap:
+            self.setup_events_for_class(EventNameClassMap[name], name)
 
     def open(self, echo=False):
         # self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
@@ -402,12 +398,6 @@ class DBManager (BaseModule):
 #
 #             db_man.publish(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
 #                            tera_message.SerializeToString())
-
-
-
-
-
-
 
 # @event.listens_for(TeraUser, 'after_update')
 # def user_updated(mapper, connection, target):

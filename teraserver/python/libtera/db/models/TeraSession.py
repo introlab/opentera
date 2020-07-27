@@ -96,6 +96,16 @@ class TeraSession(db.Model, BaseModel):
             rval['session_has_device_data'] = len(TeraDeviceData.get_data_for_session(self.id_session)) > 0
         return rval
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_session': self.id_session, 'session_uuid': self.session_uuid}
+
     @staticmethod
     def create_defaults():
         from libtera.db.models.TeraUser import TeraUser
