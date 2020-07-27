@@ -89,7 +89,7 @@ class DBManager (BaseModule):
                 self.publish(event_message.header.topic, event_message.SerializeToString())
 
         # Send the event before we delete so we can trace it...
-        @event.listens_for(cls, 'before_delete')
+        @event.listens_for(cls, 'after_delete')
         def base_model_deleted(mapper, connection, target):
             # print(mapper, connection, target, event_name)
             json_delete_event = target.to_json(minimal=True)
