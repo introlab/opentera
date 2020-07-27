@@ -123,20 +123,24 @@ class UserQueryUserStats(Resource):
         participants_total = 0
         participants_enabled = 0
         sessions_total = 0
+        devices = []
         for project in site_projects:
             site_groups_total += len(project.project_participants_groups)
             participants_total += len(project.project_participants)
             participants_enabled += len([part for part in project.project_participants if part.participant_enabled])
+            devices.extend([device.id_device for device in project.project_devices])
             for part in project.project_participants:
                 sessions_total += len(TeraSession.get_sessions_for_participant(part.id_participant))
 
+        devices = set(devices)  # Remove duplicates
         stats = {'users_total_count': len(site_users),
                  'users_enabled_count': len(site_users_enabled),
                  'projects_count': len(site_projects),
                  'participants_groups_count': site_groups_total,
                  'participants_total_count': participants_total,
                  'participants_enabled_count': participants_enabled,
-                 'sessions_total_count': sessions_total
+                 'sessions_total_count': sessions_total,
+                 'devices_total_count': len(devices)
                  }
 
         return stats

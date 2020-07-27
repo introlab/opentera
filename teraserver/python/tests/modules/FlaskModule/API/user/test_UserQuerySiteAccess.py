@@ -101,7 +101,7 @@ class UserQuerySiteAccessTest(BaseAPITest):
         # Now query with by_user flags
         response = self._request_with_http_auth(username='admin', password='admin',
                                                 payload='id_user_group=3&by_users='
-                                                        'true&with_sites=true')
+                                                        'true&with_empty=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -119,7 +119,7 @@ class UserQuerySiteAccessTest(BaseAPITest):
         # Now query with by_user flags
         response = self._request_with_http_auth(username='admin', password='admin',
                                                 payload='id_user_group=2&by_users='
-                                                        'true&with_sites=true&admins=true')
+                                                        'true&with_empty=true&admins=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -132,7 +132,7 @@ class UserQuerySiteAccessTest(BaseAPITest):
     def test_query_specific_user_group_with_sites_admins(self):
         # Now query with by_user flags
         response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload='id_user_group=3&with_sites=true&admins=true')
+                                                payload='id_user_group=3&with_empty=true&admins=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -179,7 +179,7 @@ class UserQuerySiteAccessTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 5)
+        self.assertGreaterEqual(len(json_data), 4)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -202,32 +202,36 @@ class UserQuerySiteAccessTest(BaseAPITest):
     def test_query_specific_site_by_users_with_user_groups(self):
         # Query specific site
         response = self._request_with_http_auth(username='admin', password='admin', payload='id_site=2&by_users=true'
+                                                                                            '&with_empty=true'
                                                                                             '&with_usergroups=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 5)
+        self.assertGreaterEqual(len(json_data), 4)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
             self.assertTrue(data_item.__contains__('id_user'))
             self.assertEqual(data_item['site_access_role'], None)
             self.assertEqual(data_item['site_access_inherited'], None)
+            self.assertTrue(data_item.__contains__('user_groups'))
 
     def test_query_specific_site_by_users_with_user_groups_admins(self):
         # Query specific site
         response = self._request_with_http_auth(username='admin', password='admin', payload='id_site=2&by_users=true'
+                                                                                            '&with_empty=true'
                                                                                             '&with_usergroups=true'
                                                                                             '&admins=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 5)
+        self.assertGreaterEqual(len(json_data), 4)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
             self.assertTrue(data_item.__contains__('id_user'))
             self.assertEqual(data_item['site_access_role'], None)
+            self.assertTrue(data_item.__contains__('user_groups'))
 
     def test_post_and_delete(self):
         # New with minimal infos
