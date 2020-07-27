@@ -10,12 +10,13 @@ class TeraProject(db.Model, BaseModel):
     project_site = db.relationship("TeraSite")
     project_participants = db.relationship("TeraParticipant")
     project_participants_groups = db.relationship("TeraParticipantGroup")
+    project_devices = db.relationship('TeraDeviceProject')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend(['project_site', 'project_participants', 'project_participants_groups'])
+        ignore_fields.extend(['project_site', 'project_participants', 'project_participants_groups', 'project_devices'])
         rval = super().to_json(ignore_fields=ignore_fields)
 
         # Add sitename

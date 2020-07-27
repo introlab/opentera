@@ -720,11 +720,18 @@ class DBManagerTeraUserAccess:
             query = query.join(TeraUser).filter(TeraUser.user_enabled is True)
         return query.all()
 
+    def query_usergroups_for_user(self, user_id: int):
+        accessible_user_groups_ids = self.get_accessible_users_groups_ids()
+        query = TeraUserUserGroup.query.filter_by(id_user=user_id).filter(TeraUserUserGroup.id_user_group
+                                                                          .in_(accessible_user_groups_ids))
+        user_usergroups = query.all()
+        return [ug.user_user_group_user_group for ug in user_usergroups]
+
     def query_users_for_site(self, site_id: int, enabled_only: bool = False, admin_only: bool = False):
         accessible_users = self.get_accessible_users()
         users = set()
         for user in accessible_users:
-            if enabled_only and not user.user_enabled:
+            if (enabled_only and not user.user_enabled) or user.user_superadmin:  # Don't include super admins!
                 continue
             sites_roles = user.get_sites_roles()
             if site_id in [site.id_site for site, site_role in sites_roles.items()

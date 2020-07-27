@@ -179,7 +179,7 @@ class UserQuerySiteAccessTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 5)
+        self.assertGreaterEqual(len(json_data), 4)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -206,13 +206,14 @@ class UserQuerySiteAccessTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 5)
+        self.assertGreaterEqual(len(json_data), 4)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
             self.assertTrue(data_item.__contains__('id_user'))
             self.assertEqual(data_item['site_access_role'], None)
             self.assertEqual(data_item['site_access_inherited'], None)
+            self.assertTrue(data_item.__contains__('user_groups'))
 
     def test_query_specific_site_by_users_with_user_groups_admins(self):
         # Query specific site
@@ -222,12 +223,13 @@ class UserQuerySiteAccessTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 5)
+        self.assertGreaterEqual(len(json_data), 4)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
             self.assertTrue(data_item.__contains__('id_user'))
             self.assertEqual(data_item['site_access_role'], None)
+            self.assertTrue(data_item.__contains__('user_groups'))
 
     def test_post_and_delete(self):
         # New with minimal infos

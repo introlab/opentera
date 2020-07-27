@@ -18,8 +18,10 @@ get_parser.add_argument('admins', type=inputs.boolean, help='Flag to limit to si
                                                             'admin or users in site that have the admin role')
 get_parser.add_argument('by_users', type=inputs.boolean, help='If specified, returns roles by users instead of by user'
                                                               'groups')
-get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with id_site. Also return user groups that '
-                                                                     'don\'t have any access to the site')
+get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with id_site. Return user groups that '
+                                                                     'don\'t have any access to the site. With '
+                                                                     '"by_users" parameter, it instead returns the '
+                                                                     'usergroups of each user.')
 get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_user_group. Also return sites that don\'t'
                                                                 ' have any access with that user group')
 
@@ -121,7 +123,11 @@ class UserQuerySiteAccess(Resource):
                     users_list = user_access.query_users_for_usergroup(user_group_id=args['id_user_group'])
                     sites_list = [site for site in access]
 
+                user_ids = []
                 for user in users_list:
+                    if user.id_user in user_ids:
+                        continue  # Don't add duplicates users
+                    user_ids.append(user.id_user)
                     for site in sites_list:
                         site_role = user_access.get_user_site_role(user_id=user.id_user, site_id=site.id_site)
                         if args['admins'] and site_role and site_role['site_role'] != 'admin':
@@ -133,6 +139,11 @@ class UserQuerySiteAccess(Resource):
                                             'site_access_inherited': site_role['inherited'] if site_role else None
                                             }
                         if site_access_json:
+                            if args['with_usergroups']:
+                                usergroups = user_access.query_usergroups_for_user(user.id_user)
+                                ug_list = [ug.to_json() for ug in usergroups]
+                                site_access_json['user_groups'] = ug_list
+
                             access_list.append(site_access_json)
             return access_list
 
