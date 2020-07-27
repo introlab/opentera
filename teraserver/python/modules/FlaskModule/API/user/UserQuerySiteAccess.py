@@ -18,12 +18,12 @@ get_parser.add_argument('admins', type=inputs.boolean, help='Flag to limit to si
                                                             'admin or users in site that have the admin role')
 get_parser.add_argument('by_users', type=inputs.boolean, help='If specified, returns roles by users instead of by user'
                                                               'groups')
-get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with id_site. Return user groups that '
-                                                                     'don\'t have any access to the site. With '
-                                                                     '"by_users" parameter, it instead returns the '
-                                                                     'usergroups of each user.')
-get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_user_group. Also return sites that don\'t'
-                                                                ' have any access with that user group')
+get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used With the "by_users" parameter, it instead '
+                                                                     'returns the usergroups of each user.')
+get_parser.add_argument('with_empty', type=inputs.boolean, help='Used with id_site, also return user or user groups '
+                                                                'that don\'t have any access to the site. Used with '
+                                                                'id_user_group, also return sites that don\'t '
+                                                                'have any access with that user group')
 
 # post_parser = reqparse.RequestParser()
 post_schema = api.schema_model('user_site_access', {
@@ -91,13 +91,13 @@ class UserQuerySiteAccess(Resource):
             if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
                 access = user_access.query_site_access_for_user_group(user_group_id=args['id_user_group'],
                                                                       admin_only=args['admins'] is not None,
-                                                                      include_sites_without_access=args['with_sites'])
+                                                                      include_sites_without_access=args['with_empty'])
 
         # Query access for site id
         if args['id_site']:
             site_id = args['id_site']
             access = user_access.query_access_for_site(site_id=site_id, admin_only=args['admins'] is not None,
-                                                       include_empty_groups=args['with_usergroups'])
+                                                       include_empty_groups=args['with_empty'])
 
         if access is not None:
             access_list = []
@@ -110,6 +110,7 @@ class UserQuerySiteAccess(Resource):
                             site_access_json['site_access_inherited'] = True
                     else:
                         site_access_json['site_access_role'] = None
+
                     access_list.append(site_access_json)
             else:
                 users_list = []
