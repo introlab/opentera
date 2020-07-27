@@ -35,7 +35,8 @@ class TeraServiceAccess(db.Model, BaseModel):
         json_val = super().to_json(ignore_fields=ignore_fields)
 
         # Also expands with service_role infos
-        json_val.update(self.service_access_role.to_json(minimal=minimal))
+        if self.service_access_role:
+            json_val.update(self.service_access_role.to_json(minimal=minimal))
 
         # Remove null values
         if not json_val['id_device']:
