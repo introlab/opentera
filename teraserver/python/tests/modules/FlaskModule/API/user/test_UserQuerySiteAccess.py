@@ -197,6 +197,8 @@ class UserQuerySiteAccessTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item)
             self.assertTrue(data_item.__contains__('id_user'))
+            self.assertTrue(data_item.__contains__('user_name'))
+            self.assertTrue(data_item.__contains__('user_enabled'))
             self.assertEqual(data_item['site_access_role'], 'admin')
 
     def test_query_specific_site_by_users_with_user_groups(self):

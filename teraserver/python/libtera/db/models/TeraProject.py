@@ -63,9 +63,9 @@ class TeraProject(db.Model, BaseModel):
                         users.append(user)
 
         # Also appends super admins!
-        for user in TeraUser.get_superadmins():
-            if user not in users:
-                users.append(user)
+        # for user in TeraUser.get_superadmins():
+        #     if user not in users:
+        #         users.append(user)
 
         return users
 

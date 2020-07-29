@@ -31,7 +31,7 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_users(self, admin_only=False):
         if self.user.user_superadmin:
-            users = TeraUser.query.all()
+            users = TeraUser.query.order_by(TeraUser.user_firstname.asc()).all()
         else:
             projects = self.get_accessible_projects(admin_only=admin_only)
             users = []
@@ -44,8 +44,8 @@ class DBManagerTeraUserAccess:
             if self.user not in users:
                 users.append(self.user)
 
-        # TODO Sort by username
-        return users
+        # Sort by user first name
+        return sorted(users, key=lambda suser: suser.user_firstname)
 
     def get_accessible_users_groups_ids(self, admin_only=False):
         users_groups = self.get_accessible_users_groups(admin_only=admin_only)
@@ -715,9 +715,10 @@ class DBManagerTeraUserAccess:
     def query_users_for_usergroup(self, user_group_id: int, enabled_only: bool = False):
         accessible_users_ids = self.get_accessible_users_ids()
         query = TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).filter(TeraUserUserGroup.id_user
-                                                                                      .in_(accessible_users_ids))
+                                                                                      .in_(accessible_users_ids))\
+            .join(TeraUser).order_by(TeraUser.user_firstname.asc())
         if enabled_only:
-            query = query.join(TeraUser).filter(TeraUser.user_enabled is True)
+            query = query.filter(TeraUser.user_enabled is True)
         return query.all()
 
     def query_usergroups_for_user(self, user_id: int):

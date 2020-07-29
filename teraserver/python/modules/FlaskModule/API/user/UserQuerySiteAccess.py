@@ -136,6 +136,7 @@ class UserQuerySiteAccess(Resource):
                         site_access_json = {'id_user': user.id_user,
                                             'id_site': site.id_site,
                                             'user_name': user.user_user_group_user.get_fullname(),
+                                            'user_enabled': user.user_user_group_user.user_enabled,
                                             'site_access_role': site_role['site_role'] if site_role else None,
                                             'site_access_inherited': site_role['inherited'] if site_role else None
                                             }
