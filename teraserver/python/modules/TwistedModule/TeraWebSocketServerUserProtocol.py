@@ -194,17 +194,20 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
                          tera_message.SerializeToString())
 
             # Unsubscribe to events
-            ret1 = yield self.unsubscribe_pattern_with_callback(
+            ret = yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                 self.redis_event_message_received)
 
-            ret2 = yield self.unsubscribe_pattern_with_callback(
-                create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
-                self.redis_event_message_received)
+            # Specific events from DatabaseModule
+            # We are specific otherwise we receive every database event
+            from libtera.db.models import EventNameClassMap
 
-            ret3 = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+            for name in EventNameClassMap:
+                ret = yield self.unsubscribe_pattern_with_callback(
+                    create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME, name),
+                    self.redis_event_message_received)
 
-            print(ret1, ret2, ret3)
+            ret = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
         # Unsubscribe to messages
         # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
