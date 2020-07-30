@@ -65,8 +65,7 @@ class UserQueryUsers(Resource):
             users.append(current_user.get_user_by_username(args['username']))
         elif args['id_user_group']:
             if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
-                users = [user.user_user_group_user for user in user_access.query_users_for_usergroup(
-                    args['id_user_group'])]
+                users = user_access.query_users_for_usergroup(args['id_user_group'])
         else:
             # If we have no arguments, return all accessible users
             users = user_access.get_accessible_users()
@@ -100,7 +99,7 @@ class UserQueryUsers(Resource):
                         if args['with_usergroups']:
                             # Append user groups
                             user_groups_list = []
-                            for user_group in user.user_user_groups:
+                            for user_group in user_access.query_usergroups_for_user(user.id_user):
                                 user_groups_list.append(user_group.to_json(minimal=True))
                             user_json['user_user_groups'] = user_groups_list
                         users_list.append(user_json)
@@ -157,6 +156,9 @@ class UserQueryUsers(Resource):
         user_user_groups_ids = []
         update_user_groups = False
         if 'user_user_groups' in json_user:
+            if json_user['id_user'] > 0:
+                return gettext('User groups may be specified with that API only on a new user. Use '
+                               '"user_usergroups" instead'), 400
             user_user_groups = json_user.pop('user_user_groups')
             # Check if the current user can modified each of the user groups - current user must be admin in one of
             # those groups to allow modification.
@@ -202,9 +204,10 @@ class UserQueryUsers(Resource):
 
         # Update user groups, if needed
         if update_user_groups:
-            update_user.user_user_groups = [TeraUserGroup.get_user_group_by_id(user_group_id)
-                                            for user_group_id in user_user_groups_ids]
-            update_user.commit()
+            if not update_user.user_superadmin:  # Don't add groups if super admin!
+                update_user.user_user_groups = [TeraUserGroup.get_user_group_by_id(user_group_id)
+                                                for user_group_id in user_user_groups_ids]
+                update_user.commit()
             # Check if there's some user groups for the updated user that we need to delete
             # id_groups_to_delete = set([group.id_user_group for group in update_user.user_user_groups])\
             #     .difference(user_user_groups_ids)

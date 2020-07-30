@@ -19,7 +19,7 @@ get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the 
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('user_group', type=str, location='json', help='User group to create / update', required=True)
-post_schema = api.schema_model('user_user_group', {'properties': TeraUserGroup.get_json_schema(),
+post_schema = api.schema_model('user_group', {'properties': TeraUserGroup.get_json_schema(),
                                                    'type': 'object',
                                                    'location': 'json'})
 
@@ -89,8 +89,7 @@ class UserQueryUserGroups(Resource):
                 user_groups.append(TeraUserGroup.get_user_group_by_id(args['id_user_group']))
         elif args['id_user']:
             if args['id_user'] in user_access.get_accessible_users_ids():
-                user = TeraUser.get_user_by_id(args['id_user'])
-                user_groups = user.user_user_groups
+                user_groups = user_access.query_usergroups_for_user(args['id_user'])
         else:
             # If we have no arguments, return all accessible user groups
             user_groups = user_access.get_accessible_users_groups()

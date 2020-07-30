@@ -150,6 +150,7 @@ class FlaskModule(BaseModule):
         from .API.user.UserSessionManager import UserSessionManager
         from .API.user.UserQueryServiceConfigs import UserQueryServiceConfig
         from .API.user.UserQueryStats import UserQueryUserStats
+        from .API.user.UserQueryUserUserGroups import UserQueryUserUserGroups
 
         # Resources
         user_api_ns.add_resource(UserLogin, '/login', resource_class_kwargs=kwargs)
@@ -157,6 +158,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQuerySites, '/sites', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUsers, '/users', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUserGroups, '/usergroups', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryUserUserGroups, '/users/usergroups', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryForms, '/forms', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryOnlineUsers, '/online', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryProjects, '/projects', resource_class_kwargs=kwargs)

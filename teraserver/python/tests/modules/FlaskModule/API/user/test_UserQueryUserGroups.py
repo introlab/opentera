@@ -85,13 +85,13 @@ class UserQueryUserGroupsTest(BaseAPITest):
                 self.assertEqual(site_item['site_access_role'], 'admin')
 
     def test_query_specific_user_as_user(self):
-        response = self._request_with_http_auth(username='user', password='user', payload="id_user=1")
+        response = self._request_with_http_auth(username='user', password='user', payload="id_user=2")
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        self.assertEqual(len(json_data), 0)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+        # for data_item in json_data:
+        #     self._checkJson(json_data=data_item)
 
     def test_post_and_delete(self):
         # New with minimal infos

@@ -143,7 +143,7 @@ class UserQueryProjectAccess(Resource):
                     projects_list = [project for project in access]
 
                 for user in users_list:
-                    if user.user_user_group_user.id_user not in [value['id_user'] for value in access_list]:
+                    if user.id_user not in [value['id_user'] for value in access_list]:
                         for project in projects_list:
                             project_role = user_access.get_user_project_role(user_id=user.id_user,
                                                                              project_id=project.id_project)
@@ -151,7 +151,7 @@ class UserQueryProjectAccess(Resource):
                                 site_role = None
                             project_access_json = {'id_user': user.id_user,
                                                    'id_project': project.id_project,
-                                                   'user_name': user.user_user_group_user.get_fullname(),
+                                                   'user_name': user.get_fullname(),
                                                    'project_access_role': project_role['project_role']
                                                    if project_role else None,
                                                    'project_access_inherited': project_role['inherited']

@@ -712,20 +712,28 @@ class DBManagerTeraUserAccess:
 
         return service_projects_roles
 
-    def query_users_for_usergroup(self, user_group_id: int, enabled_only: bool = False):
+    def query_users_usergroups_for_usergroup(self, user_group_id: int, enabled_only: bool = False):
         accessible_users_ids = self.get_accessible_users_ids()
         query = TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).filter(TeraUserUserGroup.id_user
-                                                                                      .in_(accessible_users_ids))\
+                                                                                      .in_(accessible_users_ids)) \
             .join(TeraUser).order_by(TeraUser.user_firstname.asc())
         if enabled_only:
             query = query.filter(TeraUser.user_enabled is True)
         return query.all()
 
-    def query_usergroups_for_user(self, user_id: int):
+    def query_users_for_usergroup(self, user_group_id: int, enabled_only: bool = False):
+        user_usergroups = self.query_users_usergroups_for_usergroup(user_group_id=user_group_id,
+                                                                    enabled_only=enabled_only)
+        return [u.user_user_group_user for u in user_usergroups]
+
+    def query_users_usergroups_for_user(self, user_id: int):
         accessible_user_groups_ids = self.get_accessible_users_groups_ids()
         query = TeraUserUserGroup.query.filter_by(id_user=user_id).filter(TeraUserUserGroup.id_user_group
                                                                           .in_(accessible_user_groups_ids))
-        user_usergroups = query.all()
+        return query.all()
+
+    def query_usergroups_for_user(self, user_id: int):
+        user_usergroups = self.query_users_usergroups_for_user(user_id=user_id)
         return [ug.user_user_group_user_group for ug in user_usergroups]
 
     def query_users_for_site(self, site_id: int, enabled_only: bool = False, admin_only: bool = False):
