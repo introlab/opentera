@@ -7,6 +7,7 @@ from libtera.db.models.TeraDevice import TeraDevice
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from modules.DatabaseModule.DBManager import DBManager, TeraDeviceProject
+from flask_babel import gettext
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -165,6 +166,7 @@ class UserQueryDevices(Resource):
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
                         500: 'Internal error occured when saving device'})
     def post(self):
+        from libtera.db.models.TeraProject import TeraProject
         # parser = post_parser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -173,12 +175,29 @@ class UserQueryDevices(Resource):
 
         # Validate if we have an id
         if 'id_device' not in json_device:
-            return '', 400
+            return gettext('Missing id_device'), 400
 
-        # New devices can only be added by super admins
+        # Manage device projects
+        device_projects_ids = []
+        update_device_projects = False
+        if 'device_projects' in json_device:
+            if json_device['id_device'] > 0:
+                return gettext('Device projects may be specified with that API only on a new device. Use '
+                               '"device_projects" instead'), 400
+            device_projects = json_device.pop('device_projects')
+            # Check if the current user is site admin in all of those projects
+            device_projects_ids = [project['id_project'] for project in device_projects]
+
+            for project_id in device_projects_ids:
+                project = TeraProject.get_project_by_id(project_id)
+                if user_access.get_site_role(project.id_site) != 'admin':
+                    return gettext('No site admin access for at a least one project in the list'), 403
+            update_device_projects = True
+
+        # New devices can only be added by super admins or by site admins
         if json_device['id_device'] == 0:
-            if not current_user.user_superadmin:
-                return '', 403
+            if not current_user.user_superadmin and not update_device_projects:
+                return gettext('Forbidden'), 403
         else:
             # Check if current user can modify the posted device
             if json_device['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
@@ -223,10 +242,15 @@ class UserQueryDevices(Resource):
                 print(sys.exc_info())
                 return '', 500
 
-        # TODO: Publish update to everyone who is subscribed to devices update...
         update_device = TeraDevice.get_device_by_id(json_device['id_device'])
 
-        return jsonify([update_device.to_json()])
+        # Update device projects, if needed
+        if update_device_projects:
+            update_device.device_projects = [TeraProject.get_project_by_id(project_id)
+                                             for project_id in device_projects_ids]
+            update_device.commit()
+
+        return [update_device.to_json()]
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)

@@ -47,31 +47,45 @@ class DBManagerTeraUserAccess:
         # Sort by user first name
         return sorted(users, key=lambda suser: suser.user_firstname)
 
-    def get_accessible_users_groups_ids(self, admin_only=False):
-        users_groups = self.get_accessible_users_groups(admin_only=admin_only)
+    def get_accessible_users_groups_ids(self, admin_only=False, by_sites=False):
+        users_groups = self.get_accessible_users_groups(admin_only=admin_only, by_sites=by_sites)
         users_groups_ids = [ug.id_user_group for ug in users_groups]
         return users_groups_ids
 
-    def get_accessible_users_groups(self, admin_only=False):
+    def get_accessible_users_groups(self, admin_only=False, by_sites=False):
         users_groups = []
         all_users_groups = TeraUserGroup.query.order_by(TeraUserGroup.user_group_name.asc()).all()
         if self.user.user_superadmin:
             users_groups = all_users_groups
         else:
-            # Gets user group that have access to projects we have access. We only consider projects because of the
-            # hierarchy between sites and projects
-            projects_access = self.user.get_projects_roles()
+            if not by_sites:
+                # Gets user group that have access to projects we have access. We only consider projects because of the
+                # hierarchy between sites and projects
+                projects_access = self.user.get_projects_roles()
 
-            if admin_only:
-                # Remove not admin roles
-                projects_access = {key: value for key, value in projects_access.items()
-                                   if value['project_role'] == 'admin'}
+                if admin_only:
+                    # Remove not admin roles
+                    projects_access = {key: value for key, value in projects_access.items()
+                                       if value['project_role'] == 'admin'}
 
-            for user_group in all_users_groups:
-                group_project_access = user_group.get_projects_roles()
-                if set(group_project_access).intersection(projects_access):
-                    # We have a project both in the user accessible list and in the user_group access list
-                    users_groups.append(user_group)
+                for user_group in all_users_groups:
+                    group_project_access = user_group.get_projects_roles()
+                    if set(group_project_access).intersection(projects_access):
+                        # We have a project both in the user accessible list and in the user_group access list
+                        users_groups.append(user_group)
+            else:
+                # Check access by sites instead of projects
+                sites_access = self.user.get_sites_roles()
+
+                if admin_only:
+                    # Remove not admin roles
+                    sites_access = {key: value for key, value in sites_access.items() if value['site_role'] == 'admin'}
+
+                for user_group in all_users_groups:
+                    group_site_access = user_group.get_sites_roles()
+                    if set(group_site_access).intersection(sites_access):
+                        # We have a project both in the user accessible list and in the user_group access list
+                        users_groups.append(user_group)
 
         return users_groups
 
@@ -214,7 +228,7 @@ class DBManagerTeraUserAccess:
             site_list = []
             site_roles = self.user.get_sites_roles()
             for site in site_roles:
-                if not admin_only or (admin_only and site_roles[site] == 'admin'):
+                if not admin_only or (admin_only and site_roles[site]['site_role'] == 'admin'):
                     site_list.append(site)
 
             # for site_access in self.user.user_user_group.user_group_sites_access:
