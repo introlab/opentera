@@ -18,7 +18,8 @@ class QueryLoginType(Resource):
     def get(self):
         login_infos = {
             'login_type': 'unknown',
-            'login_id': 0
+            'login_id': 0,
+            'is_super_admin': False
         }
 
         if current_login_type == LoginType.DEVICE_LOGIN:
@@ -32,6 +33,7 @@ class QueryLoginType(Resource):
         if current_login_type == LoginType.USER_LOGIN:
             login_infos['login_type'] = 'user'
             login_infos['login_id'] = current_user_client.id_user
+            login_infos['is_super_admin'] = current_user_client.user_superadmin
 
         return login_infos
 
