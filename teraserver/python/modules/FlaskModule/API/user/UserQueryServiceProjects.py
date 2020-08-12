@@ -196,19 +196,20 @@ class UserQueryServiceProjects(Resource):
                 return 'Access denied', 403
 
         for json_sp in json_sps:
-            # Check if already exists
-            sp = TeraServiceProject.get_service_project_for_service_project(project_id=json_sp['id_project'],
-                                                                            service_id=json_sp['id_service'])
-            if sp:
-                json_sp['id_service_project'] = sp.id_service_project
-            else:
-                json_sp['id_service_project'] = 0
+            if 'id_service_project' not in json_sp:
+                # Check if already exists
+                sp = TeraServiceProject.get_service_project_for_service_project(project_id=int(json_sp['id_project']),
+                                                                                service_id=int(json_sp['id_service']))
+                if sp:
+                    json_sp['id_service_project'] = sp.id_service_project
+                else:
+                    json_sp['id_service_project'] = 0
 
             # Do the update!
-            if json_sp['id_service_project'] > 0:
+            if int(json_sp['id_service_project']) > 0:
                 # Already existing
                 try:
-                    TeraServiceProject.update(json_sp['id_service_project'], json_sp)
+                    TeraServiceProject.update(int(json_sp['id_service_project']), json_sp)
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
