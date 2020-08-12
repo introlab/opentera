@@ -68,17 +68,12 @@ class TeraServiceAccess(db.Model, BaseModel):
             if self.id_device:
                 json_val['device_name'] = self.service_access_device.device_name
             if self.id_participant_group:
-                json_val['participant_group_name'] = self.service_project_role_participant_group.participant_group_name
+                json_val['participant_group_name'] = self.service_access_participant_group.participant_group_name
         return json_val
 
     @staticmethod
     def get_service_access_by_id(service_access_id: int):
         return TeraServiceAccess.query.filter_by(id_service_access=service_access_id).first()
-
-    @staticmethod
-    def get_specific_access_for_user_group(id_service: int, id_user_group: int, id_service_role: int):
-        return TeraServiceAccess.query.filter_by(id_service=id_service, id_user_group=id_user_group,
-                                                 id_service_role=id_service_role).first()
 
     @staticmethod
     def update_service_access_for_user_group_for_site(id_service: int, id_user_group: int, id_service_role: int,
@@ -174,16 +169,19 @@ class TeraServiceAccess(db.Model, BaseModel):
     @staticmethod
     def create_defaults():
         from libtera.db.models.TeraService import TeraService
-        from libtera.db.models.TeraProject import TeraProject
         from libtera.db.models.TeraUserGroup import TeraUserGroup
+        from libtera.db.models.TeraDevice import TeraDevice
+        from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 
-        project1 = TeraProject.get_project_by_projectname('Default Project #1')
-        project2 = TeraProject.get_project_by_projectname('Default Project #2')
+        device = TeraDevice.get_device_by_name('Apple Watch #W05P1')
+        group = TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
 
         servicebureau = TeraService.get_service_by_key('BureauActif')
         servicebureauadmin = servicebureau.service_roles[0]
+        servicebureauuser = servicebureau.service_roles[1]
         serviceviddispatch = TeraService.get_service_by_key('VideoDispatch')
         serviceviddispatchadmin = serviceviddispatch.service_roles[0]
+        serviceviddispatchuser = serviceviddispatch.service_roles[1]
 
         user_group1 = TeraUserGroup.get_user_group_by_group_name('Users - Project 1')
         user_group2 = TeraUserGroup.get_user_group_by_group_name('Admins - Project 1')
@@ -196,6 +194,16 @@ class TeraServiceAccess(db.Model, BaseModel):
         service_role = TeraServiceAccess()
         service_role.id_user_group = user_group2.id_user_group
         service_role.id_service_role = serviceviddispatchadmin.id_service_role
+        db.session.add(service_role)
+
+        service_role = TeraServiceAccess()
+        service_role.id_device = device.id_device
+        service_role.id_service_role = servicebureauuser.id_service_role
+        db.session.add(service_role)
+
+        service_role = TeraServiceAccess()
+        service_role.id_participant_group = group.id_participant_group
+        service_role.id_service_role = serviceviddispatchuser.id_service_role
         db.session.add(service_role)
 
         db.session.commit()

@@ -4,6 +4,7 @@ from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
+from libtera.db.models.TeraParticipant import TeraParticipant
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager, DBManagerTeraUserAccess
 
@@ -18,6 +19,10 @@ get_parser.add_argument('id_group', type=int, help='ID of the participant group 
 get_parser.add_argument('id_session', type=int, help='ID of the session to query stats for.')
 get_parser.add_argument('id_participant', type=int, help='ID of the participant to query stats for.')
 get_parser.add_argument('id_device', type=int, help='ID of the device to query stats for.')
+get_parser.add_argument('with_participants', type=inputs.boolean, help='Also includes related participants stats. Can '
+                                                                       'not be used with "id_participant", '
+                                                                       '"id_user_group", "id_session", "id_user" or '
+                                                                       '"id_device".')
 
 
 class UserQueryUserStats(Resource):
@@ -53,17 +58,18 @@ class UserQueryUserStats(Resource):
         if args['id_site']:
             if not args['id_site'] in user_access.get_accessible_sites_ids():
                 return 'Forbidden', 403
-            return UserQueryUserStats.get_site_stats(user_access, args['id_site'])
+            return UserQueryUserStats.get_site_stats(user_access, args['id_site'], args['with_participants'])
 
         if args['id_project']:
             if not args['id_project'] in user_access.get_accessible_projects_ids():
                 return 'Forbidden', 403
-            return UserQueryUserStats.get_project_stats(user_access, args['id_project'])
+            return UserQueryUserStats.get_project_stats(user_access, args['id_project'], args['with_participants'])
 
         if args['id_group']:
             if not args['id_group'] in user_access.get_accessible_groups_ids():
                 return 'Forbidden', 403
-            return UserQueryUserStats.get_participant_group_stats(user_access, args['id_group'])
+            return UserQueryUserStats.get_participant_group_stats(user_access, args['id_group'],
+                                                                  args['with_participants'])
 
         if args['id_session']:
             if not args['id_session'] in user_access.get_accessible_sessions_ids():
@@ -114,7 +120,7 @@ class UserQueryUserStats(Resource):
         return stats
 
     @staticmethod
-    def get_site_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:
+    def get_site_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool) -> dict:
         from libtera.db.models.TeraSession import TeraSession
         site_projects = user_access.query_projects_for_site(item_id)
         site_users = user_access.query_users_for_site(site_id=item_id)
@@ -142,11 +148,16 @@ class UserQueryUserStats(Resource):
                  'sessions_total_count': sessions_total,
                  'devices_total_count': len(devices)
                  }
+        # Add participants information?
+        if with_parts:
+            participants = user_access.query_all_participants_for_site(item_id)
+            part_stats = [UserQueryUserStats.get_participant_list_stats(part) for part in participants]
+            stats['participants'] = part_stats
 
         return stats
 
     @staticmethod
-    def get_project_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:
+    def get_project_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool) -> dict:
         from libtera.db.models.TeraSession import TeraSession
         from libtera.db.models.TeraProject import TeraProject
         project_users = user_access.query_users_for_project(project_id=item_id)
@@ -167,23 +178,36 @@ class UserQueryUserStats(Resource):
                  'sessions_total_count': sessions_total
                  }
 
+        # Add participants information?
+        if with_parts:
+            participants = user_access.query_all_participants_for_project(item_id)
+            part_stats = [UserQueryUserStats.get_participant_list_stats(part) for part in participants]
+            stats['participants'] = part_stats
+
         return stats
 
     @staticmethod
-    def get_participant_group_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:
+    def get_participant_group_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool) -> dict:
         from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
         from libtera.db.models.TeraSession import TeraSession
         group = TeraParticipantGroup.get_participant_group_by_id(item_id)
-        participants_total = len(group.participant_group_participants)
-        participants_enabled = len([part for part in group.participant_group_participants if part.participant_enabled])
+        participants = user_access.query_participants_for_group(item_id)
+        participants_total = len(participants)
+
+        participants_enabled = len([part for part in participants if part.participant_enabled])
         sessions_total = 0
-        for part in group.participant_group_participants:
+        for part in participants:
             sessions_total += len(TeraSession.get_sessions_for_participant(part.id_participant))
 
         stats = {'participants_total_count': participants_total,
                  'participants_enabled_count': participants_enabled,
                  'sessions_total_count': sessions_total
                  }
+
+        # Add participants information?
+        if with_parts:
+            part_stats = [UserQueryUserStats.get_participant_list_stats(part) for part in participants]
+            stats['participants'] = part_stats
 
         return stats
 
@@ -235,8 +259,29 @@ class UserQueryUserStats(Resource):
     def get_device_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:
         from libtera.db.models.TeraDevice import TeraDevice
         device = TeraDevice.get_device_by_id(item_id)
-        stats ={'assets_total_count': len(device.device_assets),
-                'projects_total_count': len(device.device_projects),
-                'participants_total_count': len(device.device_participants),
-                }
+        stats = {'assets_total_count': len(device.device_assets),
+                 'projects_total_count': len(device.device_projects),
+                 'participants_total_count': len(device.device_participants),
+                 }
+        return stats
+
+    @staticmethod
+    def get_participant_list_stats(participant: TeraParticipant):
+        first_session = participant.get_first_session()
+        first_session_date = None
+        if first_session:
+            first_session_date = first_session.session_start_datetime.isoformat()
+
+        last_session = participant.get_last_session()
+        last_session_date = None
+        if last_session:
+            last_session_date = last_session.session_start_datetime.isoformat()
+
+        stats = {'id_participant': participant.id_participant,
+                 'participant_name': participant.participant_name,
+                 'participant_enabled': participant.participant_enabled,
+                 'participant_sessions_count': len(participant.participant_sessions),
+                 'participant_first_session': first_session_date,
+                 'participant_last_session': last_session_date
+                 }
         return stats

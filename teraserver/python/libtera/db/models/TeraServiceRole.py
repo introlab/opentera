@@ -6,7 +6,9 @@ class TeraServiceRole(db.Model, BaseModel):
     id_service_role = db.Column(db.Integer, db.Sequence('id_service_role_sequence'), primary_key=True,
                                 autoincrement=True)
     id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
+    # Specific project role for a project, used mostly with OpenTera service for project access
     id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=True)
+    # Specific site role for a site, used mostly with OpenTera service for site access
     id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=True)
     service_role_name = db.Column(db.String(100), nullable=False)
 

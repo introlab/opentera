@@ -176,10 +176,6 @@ class DBManager (BaseModule):
             print("No user groups - creating defaults")
             TeraUserGroup.create_defaults()
 
-        if TeraServiceAccess.get_count() == 0:
-            print('No service - project - roles - creating defaults')
-            TeraServiceAccess.create_defaults()
-
         if TeraParticipant.get_count() == 0:
             print("No participant - creating defaults")
             TeraParticipant.create_defaults()
@@ -202,6 +198,7 @@ class DBManager (BaseModule):
             TeraDevice.create_defaults()
             TeraDeviceProject.create_defaults()
             TeraDeviceParticipant.create_defaults()
+            TeraServiceAccess.create_defaults()
 
         if TeraSessionType.get_count() == 0:
             print("No session type - creating defaults")

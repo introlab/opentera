@@ -29,7 +29,7 @@ class TeraUserGroup(db.Model, BaseModel):
         # Minimal information, delete can not be filtered
         return {'id_user_group': self.id_user_group}
 
-    def get_projects_roles(self) -> dict:
+    def get_projects_roles(self, no_inheritance: bool = False) -> dict:
         projects_roles = {}
 
         # Projects
@@ -39,11 +39,12 @@ class TeraUserGroup(db.Model, BaseModel):
                     {'project_role': service_access.service_access_role.service_role_name, 'inherited': False}
 
         # Sites - if we are admin in a site, we are automatically admin in all its project
-        for service_access in self.user_group_services_access:
-            if service_access.service_access_role.id_site:
-                if service_access.service_access_role.service_role_name == 'admin':
-                    for project in service_access.service_access_role.service_role_site.site_projects:
-                        projects_roles[project] = {'project_role': 'admin', 'inherited': True}
+        if not no_inheritance:
+            for service_access in self.user_group_services_access:
+                if service_access.service_access_role.id_site:
+                    if service_access.service_access_role.service_role_name == 'admin':
+                        for project in service_access.service_access_role.service_role_site.site_projects:
+                            projects_roles[project] = {'project_role': 'admin', 'inherited': True}
 
         return projects_roles
 
@@ -97,6 +98,11 @@ class TeraUserGroup(db.Model, BaseModel):
         ugroup = TeraUserGroup()
         ugroup.user_group_name = "Users - Project 1"
         db.session.add(ugroup)
+
+        ugroup = TeraUserGroup()
+        ugroup.user_group_name = "No access!"
+        db.session.add(ugroup)
+
         db.session.commit()
 
         id_user_group = TeraUserGroup.get_user_group_by_group_name('Users - Projects 1 & 2').id_user_group

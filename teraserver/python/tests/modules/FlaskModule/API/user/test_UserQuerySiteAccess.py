@@ -272,6 +272,33 @@ class UserQuerySiteAccessTest(BaseAPITest):
 
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Post update")
+        # Setting user role, but that usergroup already inherits that access, so no return value!
+        self.assertEqual(len(response.json()), 0)
+
+        json_data = {
+            'site_access': {
+                'site_access_role': 'admin',
+                'id_user_group': 5, # No access usergroup
+                'id_site': 1
+            }
+        }
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        self.assertEqual(response.status_code, 200, msg="Post new, take 2")
+
+        json_data = response.json()[0]
+        self._checkJson(json_data)
+        current_id = json_data['id_site_access']
+        self.assertEqual(json_data['site_access_role'], 'admin')
+
+        json_data = {
+            'site_access': {
+                'site_access_role': 'user',
+                'id_user_group': 5,
+                'id_site': 1
+            }
+        }
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        self.assertEqual(response.status_code, 200, msg="Post update, take 2")
         json_data = response.json()[0]
         self._checkJson(json_data)
         self.assertEqual(json_data['site_access_role'], 'user')

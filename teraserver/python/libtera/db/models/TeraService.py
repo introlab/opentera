@@ -16,6 +16,7 @@ class TeraService(db.Model, BaseModel):
     service_enabled = db.Column(db.Boolean, nullable=False, default=False)
     service_system = db.Column(db.Boolean, nullable=False, default=False)
     service_config_schema = db.Column(db.String, nullable=False, default='{"type": "object", "properties": {} }')
+    service_default_config = db.Column(db.String, nullable=True, default='{"Globals": {}}')
 
     service_roles = db.relationship('TeraServiceRole')
 

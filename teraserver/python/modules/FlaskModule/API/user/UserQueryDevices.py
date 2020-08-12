@@ -20,11 +20,11 @@ get_parser.add_argument('id_device_subtype', type=int, help='Device subtype id t
 get_parser.add_argument('name', type=str, help='Name of the device to query')
 get_parser.add_argument('available', type=inputs.boolean, help='Flag that indicates if only available (devices not '
                                                                'associated to a participant) should be returned')
-get_parser.add_argument('participants', type=inputs.boolean, help='Flag that indicates if associated participant(s) '
-                                                                  'information should be included in the returned '
-                                                                  'device list')
-get_parser.add_argument('sites', type=inputs.boolean, help='Flag that indicates if associated site(s) information '
-                                                           'should be included in the returned device list')
+get_parser.add_argument('with_participants', type=inputs.boolean, help='Flag that indicates if associated '
+                                                                       'participant(s) information should be included '
+                                                                       'in the returned device list')
+get_parser.add_argument('with_sites', type=inputs.boolean, help='Flag that indicates if associated site(s) information '
+                                                                'should be included in the returned device list')
 get_parser.add_argument('projects', type=inputs.boolean, help='Flag that indicates if associated project(s) information'
                                                               'should be included in the returned device list')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
@@ -99,7 +99,7 @@ class UserQueryDevices(Resource):
                     else:
                         device_json = device.to_json(minimal=True)
 
-                    if args['participants'] is not None:
+                    if args['with_participants'] is not None:
                         # Add participants information to the device, is available
                         dev_participants = user_access.query_participants_for_device(device.id_device)
                         parts = []
@@ -117,7 +117,7 @@ class UserQueryDevices(Resource):
                             parts.append(part_info)
                         device_json['device_participants'] = parts
 
-                    if args['sites'] is not None:
+                    if args['with_sites'] is not None:
                         # Add sites
                         sites_list = []
                         device_sites = user_access.query_sites_for_device(device.id_device)

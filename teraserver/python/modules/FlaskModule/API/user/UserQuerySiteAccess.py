@@ -193,6 +193,19 @@ class UserQuerySiteAccess(Resource):
                         id_user_group=json_site['id_user_group'], id_site=json_site['id_site'])
                     continue
 
+                # If we are setting a "user" role for a site, check if there's already such an inherited role from
+                # projects
+                if json_site['site_access_role'] == 'user':
+                    from libtera.db.models.TeraUserGroup import TeraUserGroup
+                    user_group = TeraUserGroup.get_user_group_by_id(json_site['id_user_group'])
+                    projects_roles = [role for project, role in user_group.get_projects_roles(no_inheritance=True)
+                                      .items() if project.id_site == json_site['id_site']]
+                    if projects_roles:
+                        # Delete that site access without adding new access
+                        TeraServiceAccess.delete_service_access_for_user_group_for_site(
+                            id_user_group=json_site['id_user_group'], id_site=json_site['id_site'])
+                        continue
+
                 # Find id_service_role for that
                 site_service_role = \
                     TeraServiceRole.get_specific_service_role_for_site(service_id=Globals.opentera_service_id,
@@ -229,7 +242,7 @@ class UserQuerySiteAccess(Resource):
                 json_access['site_access_role'] = access.service_access_role.service_role_name
                 json_rval.append(json_access)
 
-        return jsonify(json_rval)
+        return json_rval
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)
