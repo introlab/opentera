@@ -18,6 +18,16 @@ class TeraSite(db.Model, BaseModel):
 
         return super().to_json(ignore_fields=ignore_fields)
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_site': self.id_site}
+
     @staticmethod
     def create_defaults():
         base_site = TeraSite()

@@ -38,6 +38,18 @@ class BaseModel:
             else:
                 print('Attribute ' + name + ' not found.')
 
+    def to_json_create_event(self):
+        # Default is None, will not be sent
+        return None
+
+    def to_json_update_event(self):
+        # Default is None, will not be sent
+        return None
+
+    def to_json_delete_event(self):
+        # Default is None, will not be sent
+        return None
+
     @staticmethod
     def is_valid_property_name(name: str) -> bool:
         return not name.startswith('__') and not name.startswith('_') and not name.startswith('query') and \
@@ -130,9 +142,14 @@ class BaseModel:
         # return query.all()
 
     @classmethod
-    def get_json_schema(cls) -> dict:
-        schema = dict()
+    def count_with_filters(cls, filters=None):
+        if filters is None:
+            filters = dict()
 
+        return cls.query.filter_by(**filters).count()
+
+    @classmethod
+    def get_json_schema(cls) -> dict:
         # Get model prefix (name)
         model_name = cls.get_model_name()
 
@@ -171,5 +188,24 @@ class BaseModel:
 
         return schema
 
+    @classmethod
+    def validate_required_fields(cls, json_data: dict, ignore_fields: list = None):
+        if not ignore_fields:
+            ignore_fields = []
 
+        # Get model prefix (name)
+        model_name = cls.get_model_name()
+        missing_fields = []
 
+        # Browse each
+        pr_dict = dict()
+        for name in dir(cls):
+            value = getattr(cls, name)
+            if cls.is_valid_property_name(name) and cls.is_valid_property_value(value) and \
+                    (name.startswith(model_name) or name.startswith('id')):
+                # Ok so far, check if column is required or not
+                if 'ColumnProperty' in str(type(value.prop)):
+                    if not value.prop.columns[0].nullable and name not in json_data and name not in ignore_fields:
+                        missing_fields.append(name)
+
+        return missing_fields

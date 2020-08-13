@@ -30,9 +30,9 @@ from libtera.db.models.TeraServiceProject import TeraServiceProject
 from libtera.db.models.TeraUserGroup import TeraUserGroup
 from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+from libtera.db.models.TeraServiceConfig import TeraServiceConfig
 
 from libtera.ConfigManager import ConfigManager
-
 from modules.FlaskModule.FlaskModule import flask_app
 
 # User access with roles
@@ -61,6 +61,67 @@ class DBManager (BaseModule):
         BaseModule.__init__(self, ModuleNames.DATABASE_MODULE_NAME.value, config)
 
         self.db_uri = None
+
+    def setup_events_for_class(self, cls, event_name):
+        import json
+
+        @event.listens_for(cls, 'after_update')
+        def base_model_updated(mapper, connection, target):
+            # print(mapper, connection, target, event_name)
+            json_update_event = target.to_json_update_event()
+            if json_update_event:
+                database_event = messages.DatabaseEvent()
+                database_event.type = messages.DatabaseEvent.DB_UPDATE
+                database_event.object_type = str(target.get_model_name())
+                database_event.object_value = json.dumps(json_update_event)
+
+                event_message = self.create_event_message(
+                    create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME, event_name))
+
+                any_message = messages.Any()
+                any_message.Pack(database_event)
+                event_message.events.append(any_message)
+                # Specific topic for each class
+                self.publish(event_message.header.topic, event_message.SerializeToString())
+
+        # Send the event before we delete so we can trace it...
+        @event.listens_for(cls, 'after_delete')
+        def base_model_deleted(mapper, connection, target):
+            # print(mapper, connection, target, event_name)
+            json_delete_event = target.to_json_delete_event()
+            if json_delete_event:
+                database_event = messages.DatabaseEvent()
+                database_event.type = messages.DatabaseEvent.DB_DELETE
+                database_event.object_type = str(target.get_model_name())
+                database_event.object_value = json.dumps(json_delete_event)
+
+                event_message = self.create_event_message(
+                    create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME, event_name))
+
+                any_message = messages.Any()
+                any_message.Pack(database_event)
+                event_message.events.append(any_message)
+                # Specific topic for each class
+                self.publish(event_message.header.topic, event_message.SerializeToString())
+
+        @event.listens_for(cls, 'after_insert')
+        def base_model_inserted(mapper, connection, target):
+            # print(mapper, connection, target, event_name)
+            json_create_event = target.to_json_create_event()
+            if json_create_event:
+                database_event = messages.DatabaseEvent()
+                database_event.type = messages.DatabaseEvent.DB_CREATE
+                database_event.object_type = str(target.get_model_name())
+                database_event.object_value = json.dumps(json_create_event)
+
+                event_message = self.create_event_message(
+                    create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME, event_name))
+
+                any_message = messages.Any()
+                any_message.Pack(database_event)
+                event_message.events.append(any_message)
+                # Specific topic for each class
+                self.publish(event_message.header.topic, event_message.SerializeToString())
 
     @staticmethod
     def userAccess(user: TeraUser):
@@ -115,10 +176,6 @@ class DBManager (BaseModule):
             print("No user groups - creating defaults")
             TeraUserGroup.create_defaults()
 
-        if TeraServiceAccess.get_count() == 0:
-            print('No service - project - roles - creating defaults')
-            TeraServiceAccess.create_defaults()
-
         if TeraParticipant.get_count() == 0:
             print("No participant - creating defaults")
             TeraParticipant.create_defaults()
@@ -141,6 +198,7 @@ class DBManager (BaseModule):
             TeraDevice.create_defaults()
             TeraDeviceProject.create_defaults()
             TeraDeviceParticipant.create_defaults()
+            TeraServiceAccess.create_defaults()
 
         if TeraSessionType.get_count() == 0:
             print("No session type - creating defaults")
@@ -158,6 +216,18 @@ class DBManager (BaseModule):
         if TeraAsset.get_count() == 0:
             print('No assets - creating defaults')
             TeraAsset.create_defaults()
+
+        if TeraServiceConfig.get_count() == 0:
+            print('No service config - creating defaults')
+            TeraServiceConfig.create_defaults()
+
+    def setup_events(self):
+        # TODO Add events that need to be sent through redis
+        # TODO Useful to specify event name, always get_model_name() ?
+
+        from libtera.db.models import EventNameClassMap
+        for name in EventNameClassMap:
+            self.setup_events_for_class(EventNameClassMap[name], name)
 
     def open(self, echo=False):
         # self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
@@ -179,6 +249,9 @@ class DBManager (BaseModule):
 
         # Apply any database upgrade, if needed
         self.upgrade_db()
+
+        # Now ready for events
+        self.setup_events()
 
     def open_local(self, db_infos, echo=False, ram=True):
         # self.db_uri = 'sqlite:///%(filename)s' % db_infos
@@ -205,6 +278,9 @@ class DBManager (BaseModule):
 
         # Apply any database upgrade, if needed
         self.upgrade_db()
+
+        # Now ready for events
+        self.setup_events()
 
     def init_alembic(self):
         import sys
@@ -256,49 +332,69 @@ class DBManager (BaseModule):
         command.stamp(config, revision, sql, tag)
 
 
-@event.listens_for(db.session, 'after_flush')
-def receive_after_flush(session, flush_context):
-    from modules.Globals import db_man
-
-    if db_man:
-        events = list()
-
-        # Updated objects
-        for obj in session.dirty:
-            if isinstance(obj, TeraUser):
-                new_event = messages.UserEvent()
-                new_event.user_uuid = str(obj.user_uuid)
-                new_event.type = messages.UserEvent.USER_UPDATED
-                events.append(new_event)
-
-        # Inserted objects
-        for obj in session.new:
-            if isinstance(obj, TeraUser):
-                new_event = messages.UserEvent()
-                new_event.user_uuid = str(obj.user_uuid)
-                new_event.type = messages.UserEvent.USER_ADDED
-                events.append(new_event)
-
-        # Deleted objects
-        for obj in session.deleted:
-            if isinstance(obj, TeraUser):
-                new_event = messages.UserEvent()
-                new_event.user_uuid = str(obj.user_uuid)
-                new_event.type = messages.UserEvent.USER_DELETED
-                events.append(new_event)
-
-        # Create event message
-        if len(events) > 0:
-            tera_message = db_man.create_event_message(
-                create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME))
-            any_events = list()
-            for db_event in events:
-                any_message = messages.Any()
-                any_message.Pack(db_event)
-                tera_message.events.append(any_message)
-            db_man.publish(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
-                           tera_message.SerializeToString())
-
+# @event.listens_for(db.session, 'after_flush')
+# def receive_after_flush(session, flush_context):
+#     from modules.Globals import db_man
+#     import json
+#
+#     if db_man:
+#         events = list()
+#         # Updated objects
+#         for obj in session.dirty:
+#             # json_update_event = obj.to_json_update_event()
+#             # if json_update_event:
+#             #     database_event = messages.DatabaseEvent()
+#             #     database_event.type = messages.DatabaseEvent.DB_UPDATE
+#             #     database_event.object_type = str(obj.get_model_name())
+#             #     database_event.object_value = json.dumps(json_update_event)
+#             #     events.append(database_event)
+#
+#             if isinstance(obj, TeraUser):
+#                 new_event = messages.UserEvent()
+#                 new_event.user_uuid = str(obj.user_uuid)
+#                 new_event.type = messages.UserEvent.USER_UPDATED
+#                 events.append(new_event)
+#
+#         # Inserted objects
+#         for obj in session.new:
+#             # database_event = messages.DatabaseEvent()
+#             # database_event.type = messages.DatabaseEvent.DB_CREATE
+#             # database_event.object_type = str(obj.get_model_name())
+#             # database_event.object_value = json.dumps(obj.to_json())
+#             # events.append(database_event)
+#
+#             if isinstance(obj, TeraUser):
+#                 new_event = messages.UserEvent()
+#                 new_event.user_uuid = str(obj.user_uuid)
+#                 new_event.type = messages.UserEvent.USER_ADDED
+#                 events.append(new_event)
+#
+#         # Deleted objects
+#         for obj in session.deleted:
+#             # database_event = messages.DatabaseEvent()
+#             # database_event.type = messages.DatabaseEvent.DB_DELETE
+#             # database_event.object_type = str(obj.get_model_name())
+#             # database_event.object_value = json.dumps(obj.to_json())
+#             # events.append(database_event)
+#
+#             if isinstance(obj, TeraUser):
+#                 new_event = messages.UserEvent()
+#                 new_event.user_uuid = str(obj.user_uuid)
+#                 new_event.type = messages.UserEvent.USER_DELETED
+#                 events.append(new_event)
+#
+#         # Create event message
+#         if len(events) > 0:
+#             tera_message = db_man.create_event_message(
+#                 create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME))
+#             any_events = list()
+#             for db_event in events:
+#                 any_message = messages.Any()
+#                 any_message.Pack(db_event)
+#                 tera_message.events.append(any_message)
+#
+#             db_man.publish(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
+#                            tera_message.SerializeToString())
 
 # @event.listens_for(TeraUser, 'after_update')
 # def user_updated(mapper, connection, target):

@@ -10,17 +10,28 @@ class TeraParticipantGroup(db.Model, BaseModel):
     participant_group_name = db.Column(db.String, nullable=False, unique=False)
 
     participant_group_project = db.relationship('TeraProject')
+    participant_group_participants = db.relationship("TeraParticipant")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['participant_group_project'])
+        ignore_fields.extend(['participant_group_project', 'participant_group_participants'])
         rval = super().to_json(ignore_fields=ignore_fields)
 
         if not minimal:
             rval['project_name'] = self.participant_group_project.project_name
         # rval['id_site'] = self.participant_group_project.id_site
         return rval
+
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_participant_group': self.id_participant_group}
 
     @staticmethod
     def get_participant_group_by_group_name(name: str):

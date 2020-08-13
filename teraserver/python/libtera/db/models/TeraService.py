@@ -15,7 +15,8 @@ class TeraService(db.Model, BaseModel):
     service_clientendpoint = db.Column(db.String, nullable=False)
     service_enabled = db.Column(db.Boolean, nullable=False, default=False)
     service_system = db.Column(db.Boolean, nullable=False, default=False)
-    service_config_schema = db.Column(db.String, nullable=False, default='{"type": "object","properties": {}}')
+    service_config_schema = db.Column(db.String, nullable=False, default='{"type": "object", "properties": {} }')
+    service_default_config = db.Column(db.String, nullable=True, default='{"Globals": {}}')
 
     service_roles = db.relationship('TeraServiceRole')
 
@@ -46,6 +47,20 @@ class TeraService(db.Model, BaseModel):
             json_service['service_roles'] = roles
 
         return json_service
+
+    def get_token(self, token_key: str, expiration=3600):
+        import time
+        import jwt
+        # Creating token with user info
+        now = time.time()
+        payload = {
+            'iat': int(now),
+            'exp': int(now) + expiration,
+            'iss': 'TeraServer',
+            'service_uuid': self.service_uuid
+        }
+
+        return jwt.encode(payload, token_key, algorithm='HS256').decode('utf-8')
 
     @staticmethod
     def get_service_by_key(key: str):
@@ -99,6 +114,18 @@ class TeraService(db.Model, BaseModel):
         new_service.service_port = 4041
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/log'
+        new_service.service_enabled = True
+        new_service.service_system = True
+        db.session.add(new_service)
+
+        new_service = TeraService()
+        new_service.service_uuid = str(uuid.uuid4())
+        new_service.service_key = 'FileTransferService'
+        new_service.service_name = 'File Transfer Service'
+        new_service.service_hostname = 'localhost'
+        new_service.service_port = 4042
+        new_service.service_endpoint = '/'
+        new_service.service_clientendpoint = '/file'
         new_service.service_enabled = True
         new_service.service_system = True
         db.session.add(new_service)

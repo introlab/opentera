@@ -35,7 +35,9 @@ class TeraDevice(db.Model, BaseModel):
     # device_session_types = db.relationship("TeraSessionTypeDeviceType")
     device_participants = db.relationship("TeraParticipant",  secondary="t_devices_participants",
                                           back_populates="participant_devices")
+    device_sessions = db.relationship("TeraSession", secondary="t_sessions_devices", back_populates="session_devices")
     device_subtype = db.relationship('TeraDeviceSubType')
+    device_assets = db.relationship('TeraAsset')
 
     authenticated = False
 
@@ -49,16 +51,26 @@ class TeraDevice(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields += ['device_projects', 'device_participants', 'device_certificate', 'secret',
-                          'device_subtype', 'authenticated']
+        ignore_fields += ['device_projects', 'device_participants', 'device_sessions', 'device_certificate', 'secret',
+                          'device_subtype', 'authenticated', 'device_assets']
 
         if minimal:
-            ignore_fields += ['device_type', 'device_uuid', 'device_onlineable', 'device_config', 'device_notes',
+            ignore_fields += ['device_type', 'device_onlineable', 'device_config', 'device_notes',
                               'device_lastonline', 'device_infos',  'device_token']
 
         device_json = super().to_json(ignore_fields=ignore_fields)
 
         return device_json
+
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_device': self.id_device, 'device_uuid': self.device_uuid}
 
     def from_json(self, json):
         super().from_json(json)

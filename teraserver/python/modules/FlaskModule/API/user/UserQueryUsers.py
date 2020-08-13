@@ -62,11 +62,12 @@ class UserQueryUsers(Resource):
         elif args['self'] is not None:
             users.append(current_user)
         elif args['username'] is not None:
-            users.append(current_user.get_user_by_username(args['username']))
+            user = TeraUser.get_user_by_username(args['username'])
+            if user.id_user in user_access.get_accessible_users_ids():
+                users.append(user)
         elif args['id_user_group']:
             if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
-                users = [user.user_user_group_user for user in user_access.query_users_for_usergroup(
-                    args['id_user_group'])]
+                users = user_access.query_users_for_usergroup(args['id_user_group'])
         else:
             # If we have no arguments, return all accessible users
             users = user_access.get_accessible_users()
@@ -100,7 +101,7 @@ class UserQueryUsers(Resource):
                         if args['with_usergroups']:
                             # Append user groups
                             user_groups_list = []
-                            for user_group in user.user_user_groups:
+                            for user_group in user_access.query_usergroups_for_user(user.id_user):
                                 user_groups_list.append(user_group.to_json(minimal=True))
                             user_json['user_user_groups'] = user_groups_list
                         users_list.append(user_json)
@@ -141,33 +142,51 @@ class UserQueryUsers(Resource):
 
         # Validate if we have an id_user
         if 'id_user' not in json_user:
-            return '', 400
-
-        # Check if current user can modify the posted user
-        if json_user['id_user'] not in user_access.get_accessible_users_ids(admin_only=True) and \
-                json_user['id_user'] > 0:
-            return '', 403
-
-        # Only superadmin can modify superadmin status
-        if not current_user.user_superadmin and json_user['user_superadmin']:
-            # Remove field
-            json_user.pop('user_superadmin')
+            return gettext('Missing id_user'), 400
 
         # Manage user groups
         user_user_groups_ids = []
         update_user_groups = False
         if 'user_user_groups' in json_user:
+            if json_user['id_user'] > 0:
+                return gettext('User groups may be specified with that API only on a new user. Use '
+                               '"user_usergroups" instead'), 400
             user_user_groups = json_user.pop('user_user_groups')
-            # Check if the current user can modified each of the user groups - current user must be admin in one of
-            # those groups to allow modification.
+            # Check if the current user can modify each of the user groups
             user_user_groups_ids = [group['id_user_group'] for group in user_user_groups]
-            if len(set(user_user_groups_ids).intersection(user_access.get_accessible_users_groups_ids(
-                    admin_only=True))) != len(user_user_groups):
-                return gettext('No access for at a least one user group in the list'), 403
+            # if len(set(user_user_groups_ids).intersection(user_access.get_accessible_users_groups_ids(
+            #         admin_only=True))) != len(user_user_groups):
+            for user_group_id in user_user_groups_ids:
+                if len(user_access.query_site_access_for_user_group(user_group_id=user_group_id, admin_only=True)) == 0:
+                    return gettext('No access for at a least one user group in the list'), 403
             update_user_groups = True
+
+        # Check if current user can modify the posted user
+        if json_user['id_user'] > 0:
+            # Existing user
+            update_user = TeraUser.get_user_by_id(json_user['id_user'])
+            if not update_user:
+                return '', 500
+            site_roles = update_user.get_sites_roles()
+            user_sites_ids = [site.id_site for site in site_roles]
+            # if json_user['id_user'] not in user_access.get_accessible_users_ids(admin_only=True):
+            if len(set(user_sites_ids).intersection(user_access.get_accessible_sites_ids(admin_only=True))) == 0:
+                return gettext('Forbidden'), 403
+        else:
+            # New user can be created by superadmins and by site admins, when user groups are specified
+            # If update_user_group is set, we have new user groups with that user, and we are admin in all of them!
+            if not current_user.user_superadmin and not update_user_groups:
+                return gettext('Forbidden'), 403
+
+        # Only superadmin can modify superadmin status
+        if not current_user.user_superadmin and 'user_superadmin' in json_user:
+            json_user['user_superadmin'] = False
 
         # Do the update for user
         if json_user['id_user'] > 0:
+            if 'user_username' in json_user:
+                return gettext('Username can\'t be modified'), 400
+
             # Already existing user
             try:
                 TeraUser.update(json_user['id_user'], json_user)
@@ -177,8 +196,15 @@ class UserQueryUsers(Resource):
                 return '', 500
         else:
             # New user, check if password is set
-            if 'user_password' not in json_user:
-                return gettext('Password required'), 400
+            # if 'user_password' not in json_user:
+            #     return gettext('Password required'), 400
+
+            # Validate required fields
+            missing_fields = TeraUser.validate_required_fields(json_data=json_user, ignore_fields=['user_uuid',
+                                                                                                   'user_superadmin'])
+            if missing_fields:
+                return gettext('Missing required fields: ') + str(missing_fields), 400
+
             if json_user['user_password'] is None or json_user['user_password'] == '':
                 return gettext('Invalid password'), 400
 
@@ -202,9 +228,10 @@ class UserQueryUsers(Resource):
 
         # Update user groups, if needed
         if update_user_groups:
-            update_user.user_user_groups = [TeraUserGroup.get_user_group_by_id(user_group_id)
-                                            for user_group_id in user_user_groups_ids]
-            update_user.commit()
+            if not update_user.user_superadmin:  # Don't add groups if super admin!
+                update_user.user_user_groups = [TeraUserGroup.get_user_group_by_id(user_group_id)
+                                                for user_group_id in user_user_groups_ids]
+                update_user.commit()
             # Check if there's some user groups for the updated user that we need to delete
             # id_groups_to_delete = set([group.id_user_group for group in update_user.user_user_groups])\
             #     .difference(user_user_groups_ids)
@@ -234,22 +261,41 @@ class UserQueryUsers(Resource):
     def delete(self):
         parser = delete_parser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-        # userAccess = DBManager.userAccess(current_user)
+        user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete
+        full_delete = current_user.user_superadmin
+        dif_groups = []
+        user_to_del = TeraUser.get_user_by_id(id_todel)
+        if not user_to_del:
+            return gettext('Invalid id'), 400
         if not current_user.user_superadmin:
-            return '', 403
+            # We must check if we need to remove usergroups from that user or delete it completely
+            access_user_groups = user_access.get_accessible_users_groups(admin_only=True, by_sites=True)
+            if not access_user_groups:
+                return 'Forbidden', 403
+            dif_groups = set(user_to_del.user_user_groups).difference(access_user_groups)
+            if len(dif_groups) == 0:
+                full_delete = True
 
-        # If we are here, we are allowed to delete that user. Do so.
-        try:
-            TeraUser.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
-            import sys
-            print(sys.exc_info())
-            return 'Database error', 500
+        if full_delete:
+            # If we are here, we are allowed to delete that user. Do so.
+            try:
+                TeraUser.delete(id_todel=id_todel)
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return 'Database error', 500
+        else:
+            # Only remove usergroups from that user so that user is "apparently" deleted to the site admin
+            user_groups = user_to_del.user_user_groups
+            for user_group in user_groups:
+                if user_group.id_user_group not in dif_groups:
+                    user_to_del.user_user_groups.remove(user_group)
+            user_to_del.commit()
 
         return '', 200
 

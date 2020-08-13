@@ -35,7 +35,7 @@ class ServiceOpenTera(RedisClient):
         self.service_token = self.service_generate_token()
 
     def redisConnectionMade(self):
-        print('*************************** VideoRehabService.connectionMade', self.config['name'])
+        print('*** ServiceOpenTera.redisConnectionMade for', self.config['name'])
 
         # Build RPC interface
         self.setup_rpc_interface()

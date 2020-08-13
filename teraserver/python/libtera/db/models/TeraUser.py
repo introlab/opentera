@@ -22,7 +22,7 @@ class TeraUser(db.Model, BaseModel):
     user_profile = db.Column(db.String, nullable=False)
     user_notes = db.Column(db.String, nullable=True)
     user_lastonline = db.Column(db.TIMESTAMP, nullable=True)
-    user_superadmin = db.Column(db.Boolean, nullable=False)
+    user_superadmin = db.Column(db.Boolean, nullable=False, default=False)
 
     # user_sites_access = db.relationship('TeraSiteAccess', cascade="all,delete")
     # user_projects_access = db.relationship("TeraProjectAccess", cascade="all,delete")
@@ -42,6 +42,16 @@ class TeraUser(db.Model, BaseModel):
         rval = super().to_json(ignore_fields=ignore_fields)
         rval['user_name'] = self.get_fullname()
         return rval
+
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_user': self.id_user, 'user_uuid': self.user_uuid}
 
     def get_token(self, token_key: str, expiration=3600):
         import time

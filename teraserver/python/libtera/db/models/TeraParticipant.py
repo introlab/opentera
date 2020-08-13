@@ -87,13 +87,23 @@ class TeraParticipant(db.Model, BaseModel):
 
         ignore_fields.extend(['authenticated', 'participant_devices',
                               'participant_sessions', 'participant_password',
-                              'participant_project', 'participant_participant_group',
+                              'participant_project', 'participant_participant_group', 'fullAccess'
                               ])
         if minimal:
             ignore_fields.extend(['participant_username', 'participant_lastonline',
                                   'participant_login_enabled', 'participant_token'])
 
         return super().to_json(ignore_fields=ignore_fields)
+
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_participant': self.id_participant, 'participant_uuid': self.participant_uuid}
 
     def is_authenticated(self):
         return self.authenticated
@@ -109,6 +119,18 @@ class TeraParticipant(db.Model, BaseModel):
 
     def get_id(self):
         return self.participant_uuid
+
+    def get_first_session(self):
+        sessions = sorted(self.participant_sessions, key=lambda session: session.session_start_datetime)
+        if sessions:
+            return sessions[0]
+        return None
+
+    def get_last_session(self):
+        sessions = sorted(self.participant_sessions, key=lambda session: session.session_start_datetime)
+        if sessions:
+            return sessions[-1]
+        return None
 
     @staticmethod
     def encrypt_password(password):

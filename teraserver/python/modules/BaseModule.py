@@ -21,8 +21,11 @@ def create_module_message_topic_from_name(name: ModuleNames):
     return 'module.' + name.value + '.messages'
 
 
-def create_module_event_topic_from_name(name: ModuleNames):
-    return 'module.' + name.value + '.events'
+def create_module_event_topic_from_name(name: ModuleNames, subtopic=None):
+    if subtopic:
+        return 'module.' + name.value + '.events.' + str(subtopic)
+    else:
+        return 'module.' + name.value + '.events'
 
 
 class BaseModule(RedisClient):

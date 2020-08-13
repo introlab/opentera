@@ -18,10 +18,12 @@ get_parser.add_argument('admins', type=inputs.boolean, help='Flag to limit to si
                                                             'admin or users in site that have the admin role')
 get_parser.add_argument('by_users', type=inputs.boolean, help='If specified, returns roles by users instead of by user'
                                                               'groups')
-get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with id_site. Also return user groups that '
-                                                                     'don\'t have any access to the site')
-get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_user_group. Also return sites that don\'t'
-                                                                ' have any access with that user group')
+get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used With the "by_users" parameter, it instead '
+                                                                     'returns the usergroups of each user.')
+get_parser.add_argument('with_empty', type=inputs.boolean, help='Used with id_site, also return user or user groups '
+                                                                'that don\'t have any access to the site. Used with '
+                                                                'id_user_group, also return sites that don\'t '
+                                                                'have any access with that user group')
 
 # post_parser = reqparse.RequestParser()
 post_schema = api.schema_model('user_site_access', {
@@ -89,13 +91,13 @@ class UserQuerySiteAccess(Resource):
             if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
                 access = user_access.query_site_access_for_user_group(user_group_id=args['id_user_group'],
                                                                       admin_only=args['admins'] is not None,
-                                                                      include_sites_without_access=args['with_sites'])
+                                                                      include_sites_without_access=args['with_empty'])
 
         # Query access for site id
         if args['id_site']:
             site_id = args['id_site']
             access = user_access.query_access_for_site(site_id=site_id, admin_only=args['admins'] is not None,
-                                                       include_empty_groups=args['with_usergroups'])
+                                                       include_empty_groups=args['with_empty'])
 
         if access is not None:
             access_list = []
@@ -108,6 +110,7 @@ class UserQuerySiteAccess(Resource):
                             site_access_json['site_access_inherited'] = True
                     else:
                         site_access_json['site_access_role'] = None
+
                     access_list.append(site_access_json)
             else:
                 users_list = []
@@ -121,18 +124,28 @@ class UserQuerySiteAccess(Resource):
                     users_list = user_access.query_users_for_usergroup(user_group_id=args['id_user_group'])
                     sites_list = [site for site in access]
 
+                user_ids = []
                 for user in users_list:
+                    if user.id_user in user_ids:
+                        continue  # Don't add duplicates users
+                    user_ids.append(user.id_user)
                     for site in sites_list:
                         site_role = user_access.get_user_site_role(user_id=user.id_user, site_id=site.id_site)
                         if args['admins'] and site_role and site_role['site_role'] != 'admin':
                             site_role = None
                         site_access_json = {'id_user': user.id_user,
                                             'id_site': site.id_site,
-                                            'user_name': user.user_user_group_user.get_fullname(),
+                                            'user_name': user.get_fullname(),
+                                            'user_enabled': user.user_enabled,
                                             'site_access_role': site_role['site_role'] if site_role else None,
                                             'site_access_inherited': site_role['inherited'] if site_role else None
                                             }
                         if site_access_json:
+                            if args['with_usergroups']:
+                                usergroups = user_access.query_usergroups_for_user(user.id_user)
+                                ug_list = [ug.to_json() for ug in usergroups]
+                                site_access_json['user_groups'] = ug_list
+
                             access_list.append(site_access_json)
             return access_list
 
@@ -180,6 +193,19 @@ class UserQuerySiteAccess(Resource):
                         id_user_group=json_site['id_user_group'], id_site=json_site['id_site'])
                     continue
 
+                # If we are setting a "user" role for a site, check if there's already such an inherited role from
+                # projects
+                if json_site['site_access_role'] == 'user':
+                    from libtera.db.models.TeraUserGroup import TeraUserGroup
+                    user_group = TeraUserGroup.get_user_group_by_id(json_site['id_user_group'])
+                    projects_roles = [role for project, role in user_group.get_projects_roles(no_inheritance=True)
+                                      .items() if project.id_site == json_site['id_site']]
+                    if projects_roles:
+                        # Delete that site access without adding new access
+                        TeraServiceAccess.delete_service_access_for_user_group_for_site(
+                            id_user_group=json_site['id_user_group'], id_site=json_site['id_site'])
+                        continue
+
                 # Find id_service_role for that
                 site_service_role = \
                     TeraServiceRole.get_specific_service_role_for_site(service_id=Globals.opentera_service_id,
@@ -216,7 +242,7 @@ class UserQuerySiteAccess(Resource):
                 json_access['site_access_role'] = access.service_access_role.service_role_name
                 json_rval.append(json_access)
 
-        return jsonify(json_rval)
+        return json_rval
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)

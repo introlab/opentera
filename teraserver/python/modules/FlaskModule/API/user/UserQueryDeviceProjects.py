@@ -137,7 +137,6 @@ class UserQueryDeviceProjects(Resource):
                     print(sys.exc_info())
                     return '', 500
 
-        # TODO: Publish update to everyone who is subscribed to devices update...
         update_device_project = json_device_projects
 
         return jsonify(update_device_project)

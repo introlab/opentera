@@ -11,7 +11,6 @@ from libtera.db.models.TeraDeviceSubType import TeraDeviceSubType
 from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraDeviceProject import TeraDeviceProject
-from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
 
@@ -32,7 +31,7 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_users(self, admin_only=False):
         if self.user.user_superadmin:
-            users = TeraUser.query.all()
+            users = TeraUser.query.order_by(TeraUser.user_firstname.asc()).all()
         else:
             projects = self.get_accessible_projects(admin_only=admin_only)
             users = []
@@ -45,34 +44,48 @@ class DBManagerTeraUserAccess:
             if self.user not in users:
                 users.append(self.user)
 
-        # TODO Sort by username
-        return users
+        # Sort by user first name
+        return sorted(users, key=lambda suser: suser.user_firstname)
 
-    def get_accessible_users_groups_ids(self, admin_only=False):
-        users_groups = self.get_accessible_users_groups(admin_only=admin_only)
+    def get_accessible_users_groups_ids(self, admin_only=False, by_sites=False):
+        users_groups = self.get_accessible_users_groups(admin_only=admin_only, by_sites=by_sites)
         users_groups_ids = [ug.id_user_group for ug in users_groups]
         return users_groups_ids
 
-    def get_accessible_users_groups(self, admin_only=False):
+    def get_accessible_users_groups(self, admin_only=False, by_sites=False):
         users_groups = []
         all_users_groups = TeraUserGroup.query.order_by(TeraUserGroup.user_group_name.asc()).all()
         if self.user.user_superadmin:
             users_groups = all_users_groups
         else:
-            # Gets user group that have access to projects we have access. We only consider projects because of the
-            # hierarchy between sites and projects
-            projects_access = self.user.get_projects_roles()
+            if not by_sites:
+                # Gets user group that have access to projects we have access. We only consider projects because of the
+                # hierarchy between sites and projects
+                projects_access = self.user.get_projects_roles()
 
-            if admin_only:
-                # Remove not admin roles
-                projects_access = {key: value for key, value in projects_access.items()
-                                   if value['project_role'] == 'admin'}
+                if admin_only:
+                    # Remove not admin roles
+                    projects_access = {key: value for key, value in projects_access.items()
+                                       if value['project_role'] == 'admin'}
 
-            for user_group in all_users_groups:
-                group_project_access = user_group.get_projects_roles()
-                if set(group_project_access).intersection(projects_access):
-                    # We have a project both in the user accessible list and in the user_group access list
-                    users_groups.append(user_group)
+                for user_group in all_users_groups:
+                    group_project_access = user_group.get_projects_roles()
+                    if set(group_project_access).intersection(projects_access):
+                        # We have a project both in the user accessible list and in the user_group access list
+                        users_groups.append(user_group)
+            else:
+                # Check access by sites instead of projects
+                sites_access = self.user.get_sites_roles()
+
+                if admin_only:
+                    # Remove not admin roles
+                    sites_access = {key: value for key, value in sites_access.items() if value['site_role'] == 'admin'}
+
+                for user_group in all_users_groups:
+                    group_site_access = user_group.get_sites_roles()
+                    if set(group_site_access).intersection(sites_access):
+                        # We have a project both in the user accessible list and in the user_group access list
+                        users_groups.append(user_group)
 
         return users_groups
 
@@ -215,7 +228,7 @@ class DBManagerTeraUserAccess:
             site_list = []
             site_roles = self.user.get_sites_roles()
             for site in site_roles:
-                if not admin_only or (admin_only and site_roles[site] == 'admin'):
+                if not admin_only or (admin_only and site_roles[site]['site_role'] == 'admin'):
                     site_list.append(site)
 
             # for site_access in self.user.user_user_group.user_group_sites_access:
@@ -269,29 +282,35 @@ class DBManagerTeraUserAccess:
 
         return ses_ids
 
-    def get_accessible_services(self, admin_only=False):
+    def get_accessible_services(self, admin_only=False, include_system_services=False):
         from libtera.db.models.TeraService import TeraService
-        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
         from libtera.db.models.TeraServiceRole import TeraServiceRole
         from libtera.db.models.TeraServiceProject import TeraServiceProject
 
         if self.user.user_superadmin:
-            # return TeraService.query.all()
+            if include_system_services:
+                return TeraService.query.all()
             return TeraService.query.filter_by(service_system=False).all()
 
         accessible_projects_ids = self.get_accessible_projects_ids()
-        query = TeraService.query.filter_by(service_system=False).join(TeraServiceProject).filter(
-            TeraServiceProject.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
+        if not include_system_services:
+            query = TeraService.query.filter_by(service_system=False).join(TeraServiceProject).filter(
+                TeraServiceProject.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
+        else:
+            query = TeraService.query.join(TeraServiceProject).filter(TeraServiceProject
+                                                                      .id_project.in_(accessible_projects_ids))\
+                .group_by(TeraService.id_service)
 
         if admin_only:
             query = query.join(TeraServiceRole).filter(TeraServiceRole.service_role_name == 'admin')
 
         return query.all()
 
-    def get_accessible_services_ids(self, admin_only=False):
+    def get_accessible_services_ids(self, admin_only=False, include_system_services=False):
         services_ids = []
 
-        for service in self.get_accessible_services(admin_only=admin_only):
+        for service in self.get_accessible_services(admin_only=admin_only,
+                                                    include_system_services=include_system_services):
             services_ids.append(service.id_service)
 
         return services_ids
@@ -647,12 +666,15 @@ class DBManagerTeraUserAccess:
                 service_project = TeraServiceProject()
                 service_project.id_project = missing_project_id
                 service_project.id_service = None
+                service_project.service_project_project = TeraProject.get_project_by_id(missing_project_id)
                 service_projects.append(service_project)
 
-        return service_projects
+        # Sort by project id
+        return sorted(service_projects, key=lambda sp: sp.service_project_project.project_name)
 
     def query_services_for_project(self, project_id: int, include_other_services=False):
         from libtera.db.models.TeraServiceProject import TeraServiceProject
+        from libtera.db.models.TeraService import TeraService
         services_ids = self.get_accessible_services_ids()
 
         service_projects = TeraServiceProject.query.filter(TeraServiceProject.id_service.in_(services_ids)) \
@@ -666,48 +688,154 @@ class DBManagerTeraUserAccess:
                 service_project = TeraServiceProject()
                 service_project.id_project = None
                 service_project.id_service = missing_service_id
+                service_project.service_project_service = TeraService.get_service_by_id(missing_service_id)
                 service_projects.append(service_project)
 
-        return service_projects
+        # Sort by service name
+        return sorted(service_projects, key=lambda sp: sp.service_project_service.service_name)
 
-    def query_services_roles_for_project(self, project_id: int):
-        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
-        group_ids = self.get_accessible_users_groups_ids()
-        participant_ids = self.get_accessible_participants_ids()
-        device_ids = self.get_accessible_devices_ids()
+    # def query_services_roles_for_project(self, project_id: int):
+    #     from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+    #     group_ids = self.get_accessible_users_groups_ids()
+    #     participant_groups_ids = self.get_accessible_groups_ids()
+    #     device_ids = self.get_accessible_devices_ids()
+    #
+    #     service_projects_roles = TeraServiceAccess.query.filter(or_(
+    #         TeraServiceAccess.id_user_group.in_(group_ids),
+    #         TeraServiceAccess.id_device.in_(device_ids),
+    #         TeraServiceAccess.id_participant_group.in_(participant_groups_ids)))\
+    #         .join(TeraServiceAccess.service_access_role).filter_by(id_project=project_id).all()
+    #
+    #     # if include_empty_services:
+    #     #     # We must add missing services in the list
+    #     #     services_ids = self.get_accessible_services_ids()
+    #     #     missing_services_ids = set(services_ids).difference([sp.id_service for sp in service_projects_roles])
+    #     #     for missing_service_id in missing_services_ids:
+    #     #         service_project_role = TeraServiceProjectRole()
+    #     #         service_project_role.id_project = project_id
+    #     #         service_project_role.id_service = missing_service_id
+    #     #         service_project_role.id_service_role = None
+    #     #         service_projects_roles.append(service_project_role)
+    #
+    #     return service_projects_roles
+    #
+    # def query_services_roles_for_service(self, service_id: int):
+    #     from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+    #     group_ids = self.get_accessible_users_groups_ids()
+    #     participant_groups_ids = self.get_accessible_groups_ids()
+    #     device_ids = self.get_accessible_devices_ids()
+    #
+    #     service_projects_roles = TeraServiceAccess.query.filter(or_(
+    #         TeraServiceAccess.id_user_group.in_(group_ids),
+    #         TeraServiceAccess.id_device.in_(device_ids),
+    #         TeraServiceAccess.id_participant_group.in_(participant_groups_ids)))\
+    #         .join(TeraServiceAccess.service_access_role).filter_by(id_service=service_id).all()
+    #
+    #     return service_projects_roles
 
-        service_projects_roles = TeraServiceAccess.query.filter(or_(
-            TeraServiceAccess.id_user_group.in_(group_ids),
-            TeraServiceAccess.id_device.in_(device_ids),
-            TeraServiceAccess.id_participant.in_(participant_ids))).filter_by(id_project=project_id).all()
-
-        # if include_empty_services:
-        #     # We must add missing services in the list
-        #     services_ids = self.get_accessible_services_ids()
-        #     missing_services_ids = set(services_ids).difference([sp.id_service for sp in service_projects_roles])
-        #     for missing_service_id in missing_services_ids:
-        #         service_project_role = TeraServiceProjectRole()
-        #         service_project_role.id_project = project_id
-        #         service_project_role.id_service = missing_service_id
-        #         service_project_role.id_service_role = None
-        #         service_projects_roles.append(service_project_role)
-
-        return service_projects_roles
-
-    def query_services_roles_for_service(self, service_id: int):
-        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
-        group_ids = self.get_accessible_users_groups_ids()
-        participant_ids = self.get_accessible_participants_ids()
-        device_ids = self.get_accessible_devices_ids()
-
-        service_projects_roles = TeraServiceAccess.query.filter(or_(
-            TeraServiceAccess.id_user_group.in_(group_ids),
-            TeraServiceAccess.id_device.in_(device_ids),
-            TeraServiceAccess.id_participant.in_(participant_ids))).filter_by(id_service=service_id).all()
-
-        return service_projects_roles
-
-    def query_users_for_usergroup(self, user_group_id: int):
+    def query_users_usergroups_for_usergroup(self, user_group_id: int, enabled_only: bool = False):
         accessible_users_ids = self.get_accessible_users_ids()
-        return TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).filter(TeraUserUserGroup.id_user
-                                                                                     .in_(accessible_users_ids)).all()
+        query = TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).filter(TeraUserUserGroup.id_user
+                                                                                      .in_(accessible_users_ids)) \
+            .join(TeraUser).order_by(TeraUser.user_firstname.asc())
+        if enabled_only:
+            query = query.filter(TeraUser.user_enabled is True)
+        return query.all()
+
+    def query_users_for_usergroup(self, user_group_id: int, enabled_only: bool = False):
+        user_usergroups = self.query_users_usergroups_for_usergroup(user_group_id=user_group_id,
+                                                                    enabled_only=enabled_only)
+        return [u.user_user_group_user for u in user_usergroups]
+
+    def query_users_usergroups_for_user(self, user_id: int):
+        accessible_user_groups_ids = self.get_accessible_users_groups_ids()
+        query = TeraUserUserGroup.query.filter_by(id_user=user_id).filter(TeraUserUserGroup.id_user_group
+                                                                          .in_(accessible_user_groups_ids))
+        return query.all()
+
+    def query_usergroups_for_user(self, user_id: int):
+        user_usergroups = self.query_users_usergroups_for_user(user_id=user_id)
+        return [ug.user_user_group_user_group for ug in user_usergroups]
+
+    def query_users_for_site(self, site_id: int, enabled_only: bool = False, admin_only: bool = False):
+        accessible_users = self.get_accessible_users()
+        users = set()
+        for user in accessible_users:
+            if (enabled_only and not user.user_enabled) or user.user_superadmin:  # Don't include super admins!
+                continue
+            sites_roles = user.get_sites_roles()
+            if site_id in [site.id_site for site, site_role in sites_roles.items()
+                           if (admin_only and site_role['site_role'] == 'admin') or not admin_only]:
+                users.add(user)
+
+        return users
+
+    def query_users_for_project(self, project_id: int, enabled_only: bool = False, admin_only: bool = False):
+        accessible_users = self.get_accessible_users()
+        users = set()
+        for user in accessible_users:
+            if enabled_only and not user.user_enabled:
+                continue
+            project_roles = user.get_projects_roles()
+            if project_id in [proj.id_project for proj, proj_role in project_roles.items()
+                              if (admin_only and proj_role['project_role'] == 'admin') or not admin_only]:
+                users.add(user)
+
+        return users
+
+    def query_service_configs(self, service_id: int = None, user_id: int = None, device_id: int = None,
+                              participant_id: int = None):
+        if service_id and service_id not in self.get_accessible_services_ids(include_system_services=True):
+            return None
+        if user_id and user_id not in self.get_accessible_users_ids():
+            return None
+        if device_id and device_id not in self.get_accessible_devices_ids():
+            return None
+        if participant_id and participant_id not in self.get_accessible_participants_ids():
+            return None
+
+        from libtera.db.models.TeraServiceConfig import TeraServiceConfig
+
+        if service_id:
+            if user_id:
+                return TeraServiceConfig.get_service_config_for_service_for_user(service_id=service_id, user_id=user_id)
+            if device_id:
+                return TeraServiceConfig.get_service_config_for_service_for_device(service_id=service_id,
+                                                                                   device_id=device_id)
+            if participant_id:
+                return TeraServiceConfig.get_service_config_for_service_for_participant(service_id=service_id,
+                                                                                        participant_id=participant_id)
+            return TeraServiceConfig.get_service_config_for_service(service_id=service_id)
+
+        if user_id:
+            return TeraServiceConfig.query.filter_by(id_user=user_id).all()
+
+        if device_id:
+            return TeraServiceConfig.query.filter_by(id_device=device_id).all()
+
+        if participant_id:
+            return TeraServiceConfig.query.filter_by(id_participant=participant_id).all()
+
+        return None
+
+    def query_service_access(self, user_group_id: int = None, device_id: int = None, participant_group_id: int = None,
+                             service_id: int = None):
+        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+        from libtera.db.models.TeraServiceRole import TeraServiceRole
+        accessible_services_ids = self.get_accessible_services_ids()
+
+        query = TeraServiceAccess.query
+        if user_group_id:
+            query = query.filter_by(id_user_group=user_group_id)
+        if device_id:
+            query = query.filter_by(id_device=device_id)
+        if participant_group_id:
+            query = query.filter_by(id_participant_group=participant_group_id)
+        if service_id:
+            query = query.join(TeraServiceAccess.service_access_role).filter_by(id_service=service_id)
+        else:
+            query = query.join(TeraServiceAccess.service_access_role).filter(TeraServiceRole
+                                                                             .id_service.in_(accessible_services_ids))
+
+        return query.all()
+

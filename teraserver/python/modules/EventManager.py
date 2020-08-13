@@ -32,6 +32,10 @@ class EventManager:
         # Default = no access
         return False
 
+    def filter_database_event(self, event: messages.DatabaseEvent):
+        # Default = no access
+        return False
+
     def filter_events(self, message: messages.TeraEvent) -> messages.TeraEvent:
         # Will receive message containing events
         # Let's try to unpack the messages first and call the adequate method
@@ -52,6 +56,8 @@ class EventManager:
             stop_session_event = messages.StopSessionEvent()
             # Test for UserEvent
             user_event = messages.UserEvent()
+            # Test for DatabaseEvent
+            database_event = messages.DatabaseEvent()
 
             if any_msg.Unpack(device_event):
                 if not self.filter_device_event(device_event):
@@ -72,6 +78,10 @@ class EventManager:
             elif any_msg.Unpack(user_event):
                 if not self.filter_user_event(user_event):
                     print('removing:', user_event)
+                    filtered_message.events.remove(any_msg)
+            elif any_msg.Unpack(database_event):
+                if not self.filter_database_event(database_event):
+                    print('removing', database_event)
                     filtered_message.events.remove(any_msg)
             else:
                 print('Unknown event, removing: ', any_msg)

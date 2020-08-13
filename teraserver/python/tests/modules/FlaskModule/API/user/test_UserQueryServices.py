@@ -66,7 +66,7 @@ class UserQueryServicesTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 0)  # OpenTera service is a system service, and should not be returned here!
 
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=3")
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=4")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -75,7 +75,7 @@ class UserQueryServicesTest(BaseAPITest):
         service_uuid = None
         for data_item in json_data:
             self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['id_service'], 3)
+            self.assertEqual(data_item['id_service'], 4)
             service_uuid = data_item['service_uuid']
 
         # Now try to query with service uuid
@@ -87,7 +87,7 @@ class UserQueryServicesTest(BaseAPITest):
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['id_service'], 3)
+            self.assertEqual(data_item['id_service'], 4)
             self.assertEqual(data_item['service_uuid'], service_uuid)
 
     def test_query_by_key_as_admin(self):

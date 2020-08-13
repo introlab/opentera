@@ -28,7 +28,7 @@ class UserQueryUserGroupsTest(BaseAPITest):
         response = self._request_with_http_auth(username='admin', password='admin')
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        self.assertEqual(len(json_data), 5)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -43,7 +43,7 @@ class UserQueryUserGroupsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        self.assertEqual(len(json_data), 5)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item, minimal=True)
@@ -85,13 +85,13 @@ class UserQueryUserGroupsTest(BaseAPITest):
                 self.assertEqual(site_item['site_access_role'], 'admin')
 
     def test_query_specific_user_as_user(self):
-        response = self._request_with_http_auth(username='user', password='user', payload="id_user=1")
+        response = self._request_with_http_auth(username='user', password='user', payload="id_user=2")
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        self.assertEqual(len(json_data), 0)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+        # for data_item in json_data:
+        #     self._checkJson(json_data=data_item)
 
     def test_post_and_delete(self):
         # New with minimal infos
@@ -121,12 +121,12 @@ class UserQueryUserGroupsTest(BaseAPITest):
                 'user_group_name': 'Test2',
                 'user_group_sites_access': [{
                     'id_site': 1,
-                    'site_role': 'user'
+                    'site_access_role': 'user'
                 }],
                 'user_group_projects_access': [
                     {
                         'id_project': 2,
-                        'project_role': 'admin'
+                        'project_access_role': 'admin'
                     }
                 ]
             }
@@ -143,8 +143,8 @@ class UserQueryUserGroupsTest(BaseAPITest):
         self.assertEqual(json_reply['user_group_projects_access'][0]['id_project'], 2)
         self.assertEqual(json_reply['user_group_projects_access'][0]['project_access_role'], 'admin')
 
-        json_data['user_group']['user_group_sites_access'][0]['site_role'] = ''
-        json_data['user_group']['user_group_projects_access'][0]['project_role'] = ''
+        json_data['user_group']['user_group_sites_access'][0]['site_access_role'] = ''
+        json_data['user_group']['user_group_projects_access'][0]['project_access_role'] = ''
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Post update removing roles OK")
         json_reply = response.json()[0]

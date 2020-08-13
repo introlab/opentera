@@ -41,3 +41,7 @@ class DeviceEventManager(EventManager):
     def filter_user_event(self, event: messages.UserEvent):
         # Not accessible
         return False
+
+    def filter_database_event(self, event: messages.DatabaseEvent):
+        # Default = no access
+        return False

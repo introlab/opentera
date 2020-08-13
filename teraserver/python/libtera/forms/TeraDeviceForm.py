@@ -37,7 +37,6 @@ class TeraDeviceForm:
         section.add_item(TeraFormItem("device_certificate", gettext("Certificat"), "hidden",
                                       item_options={"readonly": True}))
         section.add_item(TeraFormItem("device_enabled", gettext("Activé?"), "boolean", item_required=True))
-        section.add_item(TeraFormItem("device_optional", gettext("Optionel?"), "boolean"))
         section.add_item(TeraFormItem("device_onlineable", gettext("Peut se connecter?"), "boolean",
                                       item_required=True))
 

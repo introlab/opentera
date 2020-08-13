@@ -88,6 +88,7 @@ class UserQuerySessions(Resource):
     @api.expect(post_schema)
     def post(self):
         # parser = post_parser
+        from libtera.db.models.TeraDevice import TeraDevice
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -104,6 +105,7 @@ class UserQuerySessions(Resource):
         # User can modify or add a session if they have access to all the participants and users in the session
         session_parts_ids = []
         session_users_ids = []
+        session_devices_ids = []
         if json_session['id_session'] == 0:
             # New session - check if we have a participant or users list
             if 'session_participants_ids' not in json_session and 'session_users_ids' not in json_session:
@@ -112,6 +114,8 @@ class UserQuerySessions(Resource):
                 session_parts_ids = json_session['session_participants_ids']
             if 'session_users_ids' in json_session:
                 session_users_ids = json_session['session_users_ids']
+            if 'session_devices_ids' in json_session:
+                session_devices_ids = json_session['session_devices_ids']
         else:
             # Query the session
             ses_to_update = TeraSession.get_session_by_id(json_session['id_session'])
@@ -127,6 +131,11 @@ class UserQuerySessions(Resource):
         if set(session_users_ids).difference(accessibles_user_ids):
             # At least one session user is not accessible to the user
             return gettext('User doesn\'t have access to at least one user of that session.'), 403
+
+        accessibles_device_ids = user_access.get_accessible_devices_ids()
+        if set(session_devices_ids).difference(accessibles_device_ids):
+            # At least one session user is not accessible to the user
+            return gettext('User doesn\'t have access to at least one device of that session.'), 403
 
         # Do the update!
         if json_session['id_session'] > 0:
@@ -158,12 +167,17 @@ class UserQuerySessions(Resource):
                          for part_id in json_session['session_participants_ids']]
             update_session.session_participants = new_parts
 
-        # Manager session users
+        # Manage session users
         if 'session_users_ids' in json_session:
             update_session.session_users = [TeraUser.get_user_by_id(user_id)
                                             for user_id in json_session['session_users_ids']]
 
-        if session_users_ids or session_parts_ids:
+        # Manage session devices
+        if 'session_devices_ids' in json_session:
+            update_session.session_devices = [TeraDevice.get_device_by_id(device_id)
+                                              for device_id in json_session['session_devices_ids']]
+
+        if session_users_ids or session_parts_ids or session_devices_ids:
             # Commit the changes
             update_session.commit()
 
@@ -190,6 +204,7 @@ class UserQuerySessions(Resource):
         todel_session = TeraSession.get_session_by_id(id_todel)
         session_parts_ids = [part.id_participant for part in todel_session.session_participants]
         session_users_ids = [user.id_user for user in todel_session.session_users]
+        session_devices_ids = [device.id_device for device in todel_session.session_devices]
 
         accessibles_part_ids = user_access.get_accessible_participants_ids()
         if set(session_parts_ids).difference(accessibles_part_ids):
@@ -200,6 +215,11 @@ class UserQuerySessions(Resource):
         if set(session_users_ids).difference(accessibles_user_ids):
             # At least one session user is not accessible to the user
             return gettext('User doesn\'t have access to at least one user of that session.'), 403
+
+        accessibles_device_ids = user_access.get_accessible_devices_ids()
+        if set(session_devices_ids).difference(accessibles_device_ids):
+            # At least one session user is not accessible to the user
+            return gettext('User doesn\'t have access to at least one device of that session.'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:

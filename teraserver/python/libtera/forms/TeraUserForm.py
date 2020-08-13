@@ -18,7 +18,7 @@ class TeraUserForm:
         section.add_item(TeraFormItem("user_uuid", gettext("UUID Utilisateur"), "hidden"))
         section.add_item(TeraFormItem("user_name", gettext("Nom complet Utilisateur"), "hidden"))
         section.add_item(TeraFormItem("user_username", gettext("Code utilisateur"), "text", True))
-        section.add_item(TeraFormItem("user_enabled", gettext("Activé"), "boolean", True))
+        section.add_item(TeraFormItem("user_enabled", gettext("Activé"), "boolean", True, item_default=True))
         section.add_item(TeraFormItem("user_firstname", gettext("Prénom"), "text", True))
         section.add_item(TeraFormItem("user_lastname", gettext("Nom"), "text", True))
         section.add_item(TeraFormItem("user_email", gettext("Courriel"), "text"))

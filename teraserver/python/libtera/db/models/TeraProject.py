@@ -8,12 +8,15 @@ class TeraProject(db.Model, BaseModel):
     project_name = db.Column(db.String, nullable=False, unique=False)
 
     project_site = db.relationship("TeraSite")
+    project_participants = db.relationship("TeraParticipant")
+    project_participants_groups = db.relationship("TeraParticipantGroup")
+    project_devices = db.relationship('TeraDeviceProject')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend(['project_site'])
+        ignore_fields.extend(['project_site', 'project_participants', 'project_participants_groups', 'project_devices'])
         rval = super().to_json(ignore_fields=ignore_fields)
 
         # Add sitename
@@ -21,6 +24,16 @@ class TeraProject(db.Model, BaseModel):
             rval['site_name'] = self.project_site.site_name
 
         return rval
+
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_project': self.id_project}
 
     def get_users_ids_in_project(self):
         # Get all users who has a role in the project
@@ -50,9 +63,9 @@ class TeraProject(db.Model, BaseModel):
                         users.append(user)
 
         # Also appends super admins!
-        for user in TeraUser.get_superadmins():
-            if user not in users:
-                users.append(user)
+        # for user in TeraUser.get_superadmins():
+        #     if user not in users:
+        #         users.append(user)
 
         return users
 
