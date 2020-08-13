@@ -31,7 +31,7 @@ class TeraDevice(db.Model, BaseModel):
     device_lastonline = db.Column(db.TIMESTAMP, nullable=True)
 
     # device_sites = db.relationship("TeraDeviceSite")
-    device_projects = db.relationship('TeraDeviceProject')
+    device_projects = db.relationship('TeraDeviceProject', cascade='delete')
     # device_session_types = db.relationship("TeraSessionTypeDeviceType")
     device_participants = db.relationship("TeraParticipant",  secondary="t_devices_participants",
                                           back_populates="participant_devices")
