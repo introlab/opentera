@@ -138,6 +138,7 @@ class UserQueryDevices(Resource):
                             if args['list'] is not None:
                                 ignore_project_fields = ['project_name']
                             project_json = device_project.to_json(ignore_fields=ignore_project_fields)
+                            project_json['project'] = device_project.device_project_project.to_json()
                             projects_list.append(project_json)
 
                         device_json['device_projects'] = projects_list
