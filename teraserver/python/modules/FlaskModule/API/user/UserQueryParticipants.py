@@ -137,11 +137,10 @@ class UserQueryParticipants(Resource):
                                 if participant.id_participant_group is not None:
                                     participant_json[
                                         'participant_participant_group'] = participant.participant_participant_group.to_json()
-                                desks = []
+                                devices = []
                                 for device in participant.participant_devices:
-                                    if device.device_type == 4:
-                                        desks.append(device.to_json())
-                                participant_json['participant_desks'] = desks
+                                    devices.append(device.to_json())
+                                participant_json['participant_devices'] = devices
                                 participant_json['participant_project'] = participant.participant_project.to_json()
                             participant_list.append(participant_json)
                         else:
