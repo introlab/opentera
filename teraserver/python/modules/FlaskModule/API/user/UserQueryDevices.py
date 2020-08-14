@@ -65,7 +65,8 @@ class UserQueryDevices(Resource):
                 not args['name']:
             devices = user_access.get_accessible_devices()
         elif args['id_device']:
-            devices = [user_access.query_device_by_id(device_id=args['id_device'])]
+            if args['id_device'] in user_access.get_accessible_devices_ids():
+                devices = [TeraDevice.get_device_by_id(args['id_device'])]
         elif args['id_site']:
             # Check if has access to the requested site
             devices = user_access.query_devices_for_site(args['id_site'], args['device_type'])
@@ -269,16 +270,34 @@ class UserQueryDevices(Resource):
         id_todel = args['id']
 
         # Check if current user can delete
-        # if user_access.query_device_by_id(device_id=id_todel) is None:
+        full_delete = current_user.user_superadmin
+        dif_projects = []
+        device_to_del = TeraDevice.get_device_by_id(id_todel)
+        if not device_to_del:
+            return gettext('Invalid id'), 400
         if not current_user.user_superadmin:
-            return '', 403
+            # We must check if we need to remove projects from that device or delete it completely
+            access_projects = user_access.get_accessible_projects(admin_only=True)
+            if not access_projects:
+                return 'Forbidden', 403
+            dif_projects = set(device_to_del.device_projects).difference(access_projects)
+            if len(dif_projects) == 0:
+                full_delete = True
 
-        # If we are here, we are allowed to delete. Do so.
-        try:
-            TeraDevice.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
-            import sys
-            print(sys.exc_info())
-            return 'Database error', 500
+        if full_delete:
+            # If we are here, we are allowed to delete. Do so.
+            try:
+                TeraDevice.delete(id_todel=id_todel)
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return 'Database error', 500
+        else:
+            # Only remove projects from that device so that device is "apparently" deleted to the user
+            projects = device_to_del.device_projects
+            for project in projects:
+                if project.id_project not in dif_projects:
+                    device_to_del.device_projects.remove(project)
+            device_to_del.commit()
 
         return '', 200

@@ -83,19 +83,19 @@ class UserQuerySessionTypes(Resource):
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_type' not in request.json:
-            return '', 400
+            return gettext('Missing session_type'), 400
 
         json_session_type = request.json['session_type']
 
         # Validate if we have an id
         if 'id_session_type' not in json_session_type:
-            return '', 400
+            return gettext('Missing id_session_type'), 400
 
         # Check if current user can modify the posted type
         if json_session_type['id_session_type'] > 0:
             if json_session_type['id_session_type'] not in \
                     user_access.get_accessible_session_types_ids(admin_only=True):
-                return '', 403
+                return gettext('Forbidden'), 403
         else:
             # Allows session type creation if the user is at least admin in one project
             if len(user_access.get_accessible_projects(admin_only=True)) == 0:
@@ -105,7 +105,7 @@ class UserQuerySessionTypes(Resource):
         # any project association
         session_type_category = None
         if 'session_type_category' in json_session_type:
-            session_type_category = TeraSessionType.SessionCategoryEnum(json_session_type['session_type_category'])
+            session_type_category = TeraSessionType.SessionCategoryEnum(int(json_session_type['session_type_category']))
 
         session_type = None
         if json_session_type['id_session_type'] > 0 and not session_type_category:
@@ -124,6 +124,21 @@ class UserQuerySessionTypes(Resource):
                     current_service_id = session_type.id_service
             if not current_service_id:
                 return gettext('Missing id_service for session type of type service'), 400
+
+        st_projects_ids = []
+        update_st_projects = False
+        if 'session_type_projects' in json_session_type:
+            if json_session_type['id_session_type'] > 0:
+                return gettext('Session type projects may be specified with that API only on a new session type. Use '
+                               '"sessiontypeproject" instead'), 400
+            session_type_projects = json_session_type.pop('session_type_projects')
+            # Check if the current user is project admin in all of those projects
+            st_projects_ids = [project['id_project'] for project in session_type_projects]
+
+            for project_id in st_projects_ids:
+                if user_access.get_project_role(project_id) != 'admin':
+                    return gettext('No project admin access for at a least one project in the list'), 403
+            update_st_projects = True
 
         # Do the update!
         if json_session_type['id_session_type'] > 0:
@@ -148,6 +163,13 @@ class UserQuerySessionTypes(Resource):
                 return '', 500
 
         update_session_type = TeraSessionType.get_session_type_by_id(json_session_type['id_session_type'])
+
+        # Update session type projects, if needed
+        if update_st_projects:
+            from libtera.db.models.TeraProject import TeraProject
+            update_session_type.session_type_projects = [TeraProject.get_project_by_id(project_id)
+                                                         for project_id in st_projects_ids]
+            update_session_type.commit()
 
         return [update_session_type.to_json()]
 

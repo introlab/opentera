@@ -25,8 +25,9 @@ class TeraSessionType(db.Model, BaseModel):
     session_type_color = db.Column(db.String(7), nullable=False)
     session_type_category = db.Column(db.Integer, nullable=False)
 
-    # session_type_projects = db.relationship("TeraProject", secondary=sessions_types_projects_table)
-    session_type_projects = db.relationship("TeraSessionTypeProject")
+    # session_type_projects = db.relationship("TeraSessionTypeProject")
+    session_type_projects = db.relationship("TeraProject", secondary="t_sessions_types_projects",
+                                            back_populates="project_session_types")
 
     session_type_devices_types = db.relationship("TeraSessionTypeDeviceType")
     session_type_service = db.relationship("TeraService")
@@ -125,4 +126,18 @@ class TeraSessionType(db.Model, BaseModel):
 
         return name
 
+    @classmethod
+    def update(cls, id_st: int, values: dict):
+        # Set service id to None if setted to 0
+        if 'id_service' in values:
+            if values['id_service'] == 0:
+                del values['id_service']
 
+        super().update(id_st, values)
+
+    @classmethod
+    def insert(cls, st):
+        if st.id_service == 0:
+            st.id_service = None
+
+        super().insert(st)

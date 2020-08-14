@@ -49,7 +49,7 @@ class TeraSessionTypeForm:
                          )
         section.add_item(TeraFormItem("session_type_service_key", gettext("Code du service associé"), "hidden", False))
         section.add_item(TeraFormItem("session_type_online", gettext("Séance assistée?"), "boolean", True))
-        section.add_item(TeraFormItem("session_type_multiusers", gettext("Séance de groupe?"), "boolean", True))
+        section.add_item(TeraFormItem("session_type_multi", gettext("Séance de groupe?"), "boolean", True))
         section.add_item(TeraFormItem("session_type_color", gettext("Couleur d'affichage"), "color", True))
         section.add_item(TeraFormItem("session_type_config", gettext("Configuration spécifiques"), "longtext", False))
 

@@ -14,7 +14,7 @@ from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
 
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 
 
 class DBManagerTeraUserAccess:
@@ -122,7 +122,7 @@ class DBManagerTeraUserAccess:
             # Build project list
             project_roles = self.user.get_projects_roles()
             for project in project_roles:
-                if not admin_only or (admin_only and project_roles[project] == 'admin'):
+                if not admin_only or (admin_only and project_roles[project]['project_role'] == 'admin'):
                     project_list.append(project)
 
         return project_list
@@ -355,14 +355,6 @@ class DBManagerTeraUserAccess:
         #             break
         #
         # return role_name
-
-    def query_device_by_id(self, device_id: int):
-        if self.user.user_superadmin:
-            device = TeraDevice.get_device_by_id(device_id)
-        else:
-            sites_ids = self.get_accessible_sites_ids()
-            device = TeraDevice.query.filter_by(id_device=device_id).filter(TeraDevice.id_site.in_(sites_ids)).first()
-        return device
 
     def query_devices_for_site(self, site_id: int, device_type_id: int):
         devices = []
@@ -634,11 +626,16 @@ class DBManagerTeraUserAccess:
 
     def query_session_types_for_project(self, project_id: int):
         from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+        from libtera.db.models.TeraSessionType import TeraSessionType
         session_types_ids = self.get_accessible_session_types_ids()
+        service_ids = self.get_accessible_services_ids()
 
         session_types = TeraSessionTypeProject.query.filter(TeraSessionTypeProject.id_session_type.
                                                             in_(session_types_ids))\
-            .filter_by(id_project=project_id).all()
+            .filter_by(id_project=project_id).join(TeraSessionType).filter(or_(
+                TeraSessionType.session_type_category != TeraSessionType.SessionCategoryEnum.SERVICE.value, and_(
+                    TeraSessionType.session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE.value,
+                    TeraSessionType.id_service.in_(service_ids)).self_group())).all()
         return session_types
 
     def query_assets_for_service(self, uuid_service: str):
