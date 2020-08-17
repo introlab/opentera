@@ -41,7 +41,7 @@
 | **Sessions**: Delete                  | ![ True](images/on_.png) | ![ True](images/on_.png) | ![False](images/off.png) | ![ True](images/on_.png)     | ![False](images/off.png)
 | **Sessions Types**: Create            | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/off.png) | ![ True](images/on_.png)     | ![ True](images/off.png)
 | **Sessions Types**: Read              | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
-| **Sessions Types**: Update            | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
+| **Sessions Types**: Update            | ![ True](images/on_.png) | ![ True](images/on_.png) | ![False](images/off.png) | ![ True](images/on_.png)     | ![False](images/off.png)
 | **Sessions Types**: Delete            | ![ True](images/on_.png) | ![ True](images/on_.png) | ![False](images/off.png) | ![ True](images/on_.png)     | ![False](images/off.png)
 | **Sessions Events**: Create           | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
 | **Sessions Events**: Read             | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png) | ![ True](images/on_.png)     | ![ True](images/on_.png)
