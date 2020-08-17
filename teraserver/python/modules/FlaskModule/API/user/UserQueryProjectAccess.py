@@ -20,10 +20,10 @@ get_parser.add_argument('admins', type=inputs.boolean,
 get_parser.add_argument('with_sites', type=inputs.boolean, help='Include sites information for each project.')
 get_parser.add_argument('by_users', type=inputs.boolean, help='If specified, returns roles by users instead of by user'
                                                               'groups')
-get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Used with id_project. Also return user groups '
-                                                                     'that don\'t have any access to the project')
-get_parser.add_argument('with_projects', type=inputs.boolean, help='Used with id_user_group. Also return projects that '
-                                                                   'don\'t have any access with that user group')
+get_parser.add_argument('with_empty', type=inputs.boolean, help='Used with id_user_group. Also return projects that '
+                                                                'don\'t have any access with that user group. Used with'
+                                                                ' id_project. also return user groups that don\'t have '
+                                                                'any access to the project')
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('project_access', type=str, location='json',
@@ -96,7 +96,7 @@ class UserQueryProjectAccess(Resource):
                 access = user_access.query_project_access_for_user_group(user_group_id=args['id_user_group'],
                                                                          admin_only=args['admins'],
                                                                          include_projects_without_access=
-                                                                         args['with_projects']
+                                                                         args['with_empty']
                                                                          )
 
         # Query access for project id
@@ -104,7 +104,7 @@ class UserQueryProjectAccess(Resource):
             project_id = args['id_project']
             access = user_access.query_access_for_project(project_id=project_id,
                                                           admin_only=args['admins'],
-                                                          include_empty_groups=args['with_usergroups'])
+                                                          include_empty_groups=args['with_empty'])
 
         if access is not None:
             access_list = []

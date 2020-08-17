@@ -134,28 +134,42 @@ class UserQueryUserGroups(Resource):
 
         # Validate if we have an id_user_group
         if 'id_user_group' not in json_user_group:
-            return '', 400
+            return gettext('Missing id_user_group'), 400
 
         # Check if current user has at least an accessible site as admin
         current_user_sites = user_access.get_accessible_sites(admin_only=True)
         if not current_user_sites:
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # Check if we have site access to handle separately
         json_sites = None
         if 'user_group_sites_access' in json_user_group:
             json_sites = json_user_group.pop('user_group_sites_access')
+            # Check if the current user is site admin in all of those sites
+            site_ids = [site['id_site'] for site in json_sites]
+
+            for site_id in site_ids:
+                if user_access.get_site_role(site_id) != 'admin':
+                    return gettext('No site admin access for at a least one site in the list'), 403
 
         # If user is not super admin, we must add site access to at least one of the current user's site where he is
         # admin to allow further modification on user groups
-        if not json_sites and not current_user.user_superadmin:
-            site = {'id_site': current_user_sites[0].id_site, 'site_access_role': 'user'}
-            json_sites = [site]
+        # if not json_sites and not current_user.user_superadmin:
+        #     site = {'id_site': current_user_sites[0].id_site, 'site_access_role': 'user'}
+        #     json_sites = [site]
 
         # Check if we have project access to handle separately
         json_projects = None
         if 'user_group_projects_access' in json_user_group:
             json_projects = json_user_group.pop('user_group_projects_access')
+            # Check if the current user is site admin in all of those projects
+            project_ids = [project['id_project'] for project in json_projects]
+
+            from libtera.db.models.TeraProject import TeraProject
+            for proj_id in project_ids:
+                proj = TeraProject.get_project_by_id(proj_id)
+                if user_access.get_site_role(proj.id_site) != 'admin':
+                    return gettext('No site admin access for at a least one project in the list'), 403
 
         # Do the update!
         if json_user_group['id_user_group'] > 0:
@@ -183,54 +197,50 @@ class UserQueryUserGroups(Resource):
         json_user_group = update_user_group.to_json()
         if json_sites:
             for site in json_sites:
-                # Check if current user is admin of that site, if not, ignore it...
-                if user_access.get_site_role(site_id=site['id_site']) == 'admin':
-                    try:
-                        # Check if we must remove access for that site
-                        if 'site_access_role' not in site or site['site_access_role'] == '':
-                            # No more access to that site for that user group - remove all access!
-                            TeraServiceAccess.delete_service_access_for_user_group_for_site(
-                                id_user_group=json_user_group['id_user_group'], id_site=int(site['id_site']))
-                            continue
+                try:
+                    # Check if we must remove access for that site
+                    if 'site_access_role' not in site or site['site_access_role'] == '':
+                        # No more access to that site for that user group - remove all access!
+                        TeraServiceAccess.delete_service_access_for_user_group_for_site(
+                            id_user_group=json_user_group['id_user_group'], id_site=int(site['id_site']))
+                        continue
 
-                        # Find id_service_role
-                        site_service_role = \
-                            TeraServiceRole.get_specific_service_role_for_site(service_id=Globals.opentera_service_id,
-                                                                               site_id=int(site['id_site']),
-                                                                               rolename=site['site_access_role'])
-                        TeraServiceAccess.update_service_access_for_user_group_for_site(
-                            id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
-                            id_service_role=site_service_role.id_service_role, id_site=int(site['id_site']))
-                    except exc.SQLAlchemyError:
-                        import sys
-                        print(sys.exc_info())
-                        return '', 500
+                    # Find id_service_role
+                    site_service_role = \
+                        TeraServiceRole.get_specific_service_role_for_site(service_id=Globals.opentera_service_id,
+                                                                           site_id=int(site['id_site']),
+                                                                           rolename=site['site_access_role'])
+                    TeraServiceAccess.update_service_access_for_user_group_for_site(
+                        id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
+                        id_service_role=site_service_role.id_service_role, id_site=int(site['id_site']))
+                except exc.SQLAlchemyError:
+                    import sys
+                    print(sys.exc_info())
+                    return '', 500
 
         if json_projects:
             for project in json_projects:
-                # Check if current user is admin of that project
-                if user_access.get_project_role(project_id=project['id_project']) == 'admin':
-                    try:
-                        # Check if we must remove access for that project
-                        if 'project_access_role' not in project or project['project_access_role'] == '':
-                            # No more access to that project for that user group - remove all access!
-                            TeraServiceAccess.delete_service_access_for_user_group_for_project(
-                                id_user_group=json_user_group['id_user_group'], id_project=int(project['id_project']))
-                            continue
+                try:
+                    # Check if we must remove access for that project
+                    if 'project_access_role' not in project or project['project_access_role'] == '':
+                        # No more access to that project for that user group - remove all access!
+                        TeraServiceAccess.delete_service_access_for_user_group_for_project(
+                            id_user_group=json_user_group['id_user_group'], id_project=int(project['id_project']))
+                        continue
 
-                        # Find id_service_role
-                        project_service_role = \
-                            TeraServiceRole.get_specific_service_role_for_project(service_id=Globals.opentera_service_id,
-                                                                                  project_id=int(project['id_project']),
-                                                                                  rolename=project['project_access_role'])
-                        TeraServiceAccess.update_service_access_for_user_group_for_project(
-                            id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
-                            id_service_role=project_service_role.id_service_role, id_project=int(project['id_project']))
+                    # Find id_service_role
+                    project_service_role = \
+                        TeraServiceRole.get_specific_service_role_for_project(service_id=Globals.opentera_service_id,
+                                                                              project_id=int(project['id_project']),
+                                                                              rolename=project['project_access_role'])
+                    TeraServiceAccess.update_service_access_for_user_group_for_project(
+                        id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
+                        id_service_role=project_service_role.id_service_role, id_project=int(project['id_project']))
 
-                    except exc.SQLAlchemyError:
-                        import sys
-                        print(sys.exc_info())
-                        return '', 500
+                except exc.SQLAlchemyError:
+                    import sys
+                    print(sys.exc_info())
+                    return '', 500
             # Returns full list in reply
             json_user_group['user_group_projects_access'] = UserQueryUserGroups.get_projects_roles_json(
                 user_access=user_access, user_group_id=json_user_group['id_user_group'])

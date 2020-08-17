@@ -39,6 +39,20 @@ class UserQueryUserGroupsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
             self.assertEqual(data_item['id_user_group'], 1)
 
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user_group=1"
+                                                                                            "&with_empty=true")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 5)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            if data_item['id_user_group'] != 1:
+                self.assertEqual(data_item['id_user_group'], None)
+                self.assertNotEqual(data_item['id_user'], None)
+                self.assertNotEqual(data_item['user_fullname'], None)
+
     def test_query_specific_usergroup_as_user(self):
         response = self._request_with_http_auth(username='user', password='user', payload="id_user_group=4")
         self.assertEqual(response.status_code, 200)
@@ -59,6 +73,21 @@ class UserQueryUserGroupsTest(BaseAPITest):
             self._checkJson(json_data=data_item, minimal=True)
             self.assertEqual(data_item['id_user_group'], 4)
 
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user_group=4"
+                                                                                            "&list=1"
+                                                                                            "&with_empty=true")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 5)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item, minimal=True)
+            if data_item['id_user_group'] != 4:
+                self.assertEqual(data_item['id_user_group'], None)
+                self.assertNotEqual(data_item['id_user'], None)
+                self.assertFalse(data_item.__contains__('user_fullname'))
+
     def test_query_specific_user_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=4")
         self.assertEqual(response.status_code, 200)
@@ -70,6 +99,20 @@ class UserQueryUserGroupsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
             self.assertEqual(data_item['id_user'], 4)
 
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=4&with_empty=true")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 5)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            if data_item['id_user'] != 4:
+                self.assertEqual(data_item['id_user'], None)
+                self.assertNotEqual(data_item['id_user_group'], None)
+                self.assertEqual(data_item['user_fullname'], None)
+                self.assertNotEqual(data_item['user_group_name'], None)
+
     def test_query_specific_user_list_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=4&list=1")
         self.assertEqual(response.status_code, 200)
@@ -80,6 +123,20 @@ class UserQueryUserGroupsTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item, minimal=True)
             self.assertEqual(data_item['id_user'], 4)
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=4&list=1&"
+                                                                                            "with_empty=true")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 5)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item, minimal=True)
+            if data_item['id_user'] != 4:
+                self.assertEqual(data_item['id_user'], None)
+                self.assertNotEqual(data_item['id_user_group'], None)
+                self.assertFalse(data_item.__contains__('user_group_name'))
 
     def test_query_specific_user_as_user(self):
         response = self._request_with_http_auth(username='user', password='user', payload="id_user=1")

@@ -174,7 +174,7 @@ class UserQueryProjectAccessTest(BaseAPITest):
         # Now query with by_user flags
         response = self._request_with_http_auth(username='admin', password='admin',
                                                 payload='id_user_group=3&by_users='
-                                                        'true&with_projects=true')
+                                                        'true&with_empty=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -192,7 +192,7 @@ class UserQueryProjectAccessTest(BaseAPITest):
         # Now query with by_user flags
         response = self._request_with_http_auth(username='admin', password='admin',
                                                 payload='id_user_group=3&by_users='
-                                                        'true&with_projects=true&with_sites=true')
+                                                        'true&with_empty=true&with_sites=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -211,7 +211,7 @@ class UserQueryProjectAccessTest(BaseAPITest):
         # Now query with by_user flags
         response = self._request_with_http_auth(username='admin', password='admin',
                                                 payload='id_user_group=2&by_users='
-                                                        'true&with_projects=true&admins=true')
+                                                        'true&with_empty=true&admins=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -228,7 +228,7 @@ class UserQueryProjectAccessTest(BaseAPITest):
         # Now query with by_user flags
         response = self._request_with_http_auth(username='admin', password='admin',
                                                 payload='id_user_group=4&by_users='
-                                                        'true&with_projects=true&admins=true&with_sites=true')
+                                                        'true&with_empty=true&admins=true&with_sites=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -245,7 +245,7 @@ class UserQueryProjectAccessTest(BaseAPITest):
     def test_query_specific_user_group_with_projects_admins(self):
         # Now query with by_user flags
         response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload='id_user_group=3&with_projects=true&admins=true')
+                                                payload='id_user_group=3&with_empty=true&admins=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -261,7 +261,7 @@ class UserQueryProjectAccessTest(BaseAPITest):
     def test_query_specific_user_group_with_projects_admins_with_sites(self):
         # Now query with by_user flags
         response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload='id_user_group=2&with_projects=true&admins=true'
+                                                payload='id_user_group=2&with_empty=true&admins=true'
                                                         '&with_sites=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
@@ -398,7 +398,7 @@ class UserQueryProjectAccessTest(BaseAPITest):
     def test_query_specific_project_by_users_with_user_groups(self):
         # Query specific project
         response = self._request_with_http_auth(username='admin', password='admin', payload='id_project=2&by_users=true'
-                                                                                            '&with_usergroups=true')
+                                                                                            '&with_empty=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -420,7 +420,7 @@ class UserQueryProjectAccessTest(BaseAPITest):
     def test_query_specific_project_by_users_with_user_groups_with_sites(self):
         # Query specific project
         response = self._request_with_http_auth(username='admin', password='admin', payload='id_project=2&by_users=true'
-                                                                                            '&with_usergroups=true'
+                                                                                            '&with_empty=true'
                                                                                             '&with_sites=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
@@ -444,7 +444,7 @@ class UserQueryProjectAccessTest(BaseAPITest):
     def test_query_specific_project_by_users_with_user_groups_admins(self):
         # Query specific site
         response = self._request_with_http_auth(username='admin', password='admin', payload='id_project=2&by_users=true'
-                                                                                            '&with_usergroups=true'
+                                                                                            '&with_empty=true'
                                                                                             '&admins=true')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
@@ -464,7 +464,7 @@ class UserQueryProjectAccessTest(BaseAPITest):
     def test_query_specific_project_by_users_with_user_groups_admins_with_sites(self):
         # Query specific site
         response = self._request_with_http_auth(username='admin', password='admin', payload='id_project=2&by_users=true'
-                                                                                            '&with_usergroups=true'
+                                                                                            '&with_empty=true'
                                                                                             '&admins=true'
                                                                                             '&with_sites=true')
         self.assertEqual(response.status_code, 200)

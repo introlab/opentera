@@ -13,6 +13,9 @@ get_parser = api.parser()
 get_parser.add_argument('id_user_group', type=int, help='ID of the user group to query')
 get_parser.add_argument('id_user', type=int, help='ID of the user to get all user groups')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('with_empty', type=inputs.boolean, help="Used with id_user, also returns users groups that the "
+                                                                "user is not part of. Used with id_user_group, also "
+                                                                "returns users not part of that user group.")
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('user_group', type=str, location='json', help='User group to create / update', required=True)
@@ -46,10 +49,12 @@ class UserQueryUserUserGroups(Resource):
         user_user_groups = []
 
         if args['id_user_group']:
-            user_user_groups = user_access.query_users_usergroups_for_usergroup(args['id_user_group'])
+            user_user_groups = user_access.query_users_usergroups_for_usergroup(user_group_id=args['id_user_group'],
+                                                                                include_other_users=args['with_empty'])
 
         elif args['id_user']:
-            user_user_groups = user_access.query_users_usergroups_for_user(args['id_user'])
+            user_user_groups = user_access.query_users_usergroups_for_user(user_id=args['id_user'],
+                                                                           include_other_user_groups=args['with_empty'])
         else:
             # No argument
             return gettext('At least one id must be specified'), 400
@@ -60,8 +65,14 @@ class UserQueryUserUserGroups(Resource):
                 uug_json = uug.to_json(minimal=args['list'])
 
                 if not args['list']:
-                    uug_json['user_fullname'] = uug.user_user_group_user.get_fullname()
-                    uug_json['user_group_name'] = uug.user_user_group_user_group.user_group_name
+                    if uug.id_user:
+                        uug_json['user_fullname'] = uug.user_user_group_user.get_fullname()
+                    else:
+                        uug_json['user_fullname'] = None
+                    if uug.id_user_group:
+                        uug_json['user_group_name'] = uug.user_user_group_user_group.user_group_name
+                    else:
+                        uug_json['user_group_name'] = None
                 user_user_groups_list.append(uug_json)
         return user_user_groups_list
 
@@ -106,7 +117,8 @@ class UserQueryUserUserGroups(Resource):
         for json_user_group in json_user_groups:
             # Check if the relationship already exists or not
             uug = TeraUserUserGroup.query_user_user_group_for_user_user_group(user_id=json_user_group['id_user'],
-                                                                              user_group_id=json_user_group['id_user_group']
+                                                                              user_group_id=
+                                                                              json_user_group['id_user_group']
                                                                               )
             if uug:
                 # Already existing user - user group relationship, just append the id

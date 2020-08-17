@@ -17,8 +17,7 @@ get_parser.add_argument('username', type=str, help='Username of the user to quer
 get_parser.add_argument('self', type=inputs.boolean, help='Query information about the currently logged user')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ID, name, enabled)')
-get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Include usergroups information for each user. '
-                                                                     'Can\'t be combined with "list" argument.')
+get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Include usergroups information for each user.')
 
 post_parser = reqparse.RequestParser()
 # post_parser.add_argument('user', type=str, location='json', help='User to create / update. If structure has a field '
@@ -76,9 +75,9 @@ class UserQueryUsers(Resource):
             users_list = []
             for user in users:
                 if user is not None:
+                    user_json = user.to_json(minimal=args['list'])
                     if args['list'] is None:
                         # If user is "self", append projects and sites roles
-                        user_json = user.to_json()
                         if user.id_user == current_user.id_user:
                             # Sites
                             sites = user_access.get_accessible_sites()
@@ -98,15 +97,14 @@ class UserQueryUsers(Resource):
                                     user_access.get_project_role(project.id_project)
                                 proj_list.append(proj_json)
                             user_json['projects'] = proj_list
-                        if args['with_usergroups']:
-                            # Append user groups
-                            user_groups_list = []
-                            for user_group in user_access.query_usergroups_for_user(user.id_user):
-                                user_groups_list.append(user_group.to_json(minimal=True))
-                            user_json['user_user_groups'] = user_groups_list
-                        users_list.append(user_json)
-                    else:
-                        users_list.append(user.to_json(minimal=True))
+
+                    if args['with_usergroups']:
+                        # Append user groups
+                        user_groups_list = []
+                        for user_group in user_access.query_usergroups_for_user(user.id_user):
+                            user_groups_list.append(user_group.to_json(minimal=True))
+                        user_json['user_user_groups'] = user_groups_list
+                    users_list.append(user_json)
             return jsonify(users_list)
 
         return [], 200

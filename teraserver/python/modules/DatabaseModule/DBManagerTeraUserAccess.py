@@ -730,25 +730,58 @@ class DBManagerTeraUserAccess:
     #
     #     return service_projects_roles
 
-    def query_users_usergroups_for_usergroup(self, user_group_id: int, enabled_only: bool = False):
+    def query_users_usergroups_for_usergroup(self, user_group_id: int, enabled_only: bool = False,
+                                             include_other_users: bool = False):
         accessible_users_ids = self.get_accessible_users_ids()
         query = TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).filter(TeraUserUserGroup.id_user
                                                                                       .in_(accessible_users_ids)) \
             .join(TeraUser).order_by(TeraUser.user_firstname.asc())
         if enabled_only:
             query = query.filter(TeraUser.user_enabled is True)
-        return query.all()
+        users_user_groups = query.all()
+
+        if include_other_users:
+            # We must add the missing users in the list
+            users_ids = self.get_accessible_users_ids()
+            missing_users_ids = set(users_ids).difference([uug.id_user for uug in users_user_groups])
+            for missing_user_id in missing_users_ids:
+                user = TeraUser.get_user_by_id(missing_user_id)
+                if not user.user_superadmin:
+                    user_user_group = TeraUserUserGroup()
+                    user_user_group.id_user_group = None
+                    user_user_group.id_user = missing_user_id
+                    user_user_group.user_user_group_user = user
+                    users_user_groups.append(user_user_group)
+
+        # Sort by user first
+        return sorted(users_user_groups, key=lambda suser: suser.user_user_group_user.user_firstname)
+        # return users_user_groups
 
     def query_users_for_usergroup(self, user_group_id: int, enabled_only: bool = False):
         user_usergroups = self.query_users_usergroups_for_usergroup(user_group_id=user_group_id,
                                                                     enabled_only=enabled_only)
         return [u.user_user_group_user for u in user_usergroups]
 
-    def query_users_usergroups_for_user(self, user_id: int):
+    def query_users_usergroups_for_user(self, user_id: int, include_other_user_groups: bool = False):
         accessible_user_groups_ids = self.get_accessible_users_groups_ids()
         query = TeraUserUserGroup.query.filter_by(id_user=user_id).filter(TeraUserUserGroup.id_user_group
                                                                           .in_(accessible_user_groups_ids))
-        return query.all()
+
+        users_user_groups = query.all()
+        if include_other_user_groups:
+            # We must add the missing user groups in the list
+            user_groups_ids = self.get_accessible_users_groups_ids()
+            missing_ug_ids = set(user_groups_ids).difference([uug.id_user_group for uug in users_user_groups])
+            for missing_ug_id in missing_ug_ids:
+                user_user_group = TeraUserUserGroup()
+                user_user_group.id_user_group = missing_ug_id
+                user_user_group.id_user = None
+                user_user_group.user_user_group_user_group = TeraUserGroup.get_user_group_by_id(missing_ug_id)
+                users_user_groups.append(user_user_group)
+
+        # return users_user_groups
+        # Sort by user group name
+        return sorted(users_user_groups, key=lambda suser: suser.user_user_group_user_group.user_group_name)
 
     def query_usergroups_for_user(self, user_id: int):
         user_usergroups = self.query_users_usergroups_for_user(user_id=user_id)
