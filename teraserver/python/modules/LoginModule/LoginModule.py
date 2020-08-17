@@ -48,6 +48,9 @@ participant_multi_auth = MultiAuth(participant_http_auth, participant_token_auth
 class LoginModule(BaseModule):
 
     redis_client = None
+    __user_disabled_tokens = set()
+    __participant_disabled_tokens = set()
+    __device_disabled_tokens = set()
 
     def __init__(self, config: ConfigManager):
 
@@ -122,6 +125,8 @@ class LoginModule(BaseModule):
 
         return None
 
+
+
     def user_verify_password(self, username, password):
         print('LoginModule - user_verify_password ', username)
 
@@ -138,10 +143,23 @@ class LoginModule(BaseModule):
             return True
         return False
 
+    @staticmethod
+    def user_push_disabled_token(token):
+        LoginModule.__user_disabled_tokens.add(token)
+        # TODO CLEANUP SET?
+
+    @staticmethod
+    def is_user_token_disabled(token):
+        return token in LoginModule.__user_disabled_tokens
+
     def user_verify_token(self, token_value):
         """
         Tokens key is dynamic and stored in a redis variable for users.
         """
+        # Disabled tokens should never be used
+        if LoginModule.is_user_token_disabled(token_value):
+            return False
+
         import jwt
         try:
             token_dict = jwt.decode(token_value, self.redisGet(RedisVars.RedisVar_UserTokenAPIKey),
@@ -166,6 +184,8 @@ class LoginModule(BaseModule):
                 return True
 
         return False
+
+
 
     def participant_verify_password(self, username, password):
         print('LoginModule - participant_verify_password for ', username)

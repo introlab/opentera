@@ -11,11 +11,24 @@ class BaseAPITest(unittest.TestCase):
     def _make_url(self, hostname, port, endpoint):
         return 'https://' + hostname + ':' + str(port) + endpoint
 
+    def _login_with_http_auth(self, username, password, payload=None):
+        if payload is None:
+            payload = {}
+        url = self._make_url(self.host, self.port, self.login_endpoint)
+        return get(url=url, verify=False, auth=(username, password), params=payload)
+
     def _request_with_http_auth(self, username, password, payload=None):
         if payload is None:
             payload = {}
         url = self._make_url(self.host, self.port, self.test_endpoint)
         return get(url=url, verify=False, auth=(username, password), params=payload)
+
+    def _request_with_token_auth(self, token, payload=None):
+        if payload is None:
+            payload = {}
+        request_headers = {'Authorization': 'OpenTera ' + token}
+        url = self._make_url(self.host, self.port, self.test_endpoint)
+        return get(url=url, verify=False, params=payload, headers=request_headers)
 
     def _request_with_no_auth(self, payload=None):
         if payload is None:

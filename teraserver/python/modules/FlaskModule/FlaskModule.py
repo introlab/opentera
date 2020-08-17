@@ -151,6 +151,7 @@ class FlaskModule(BaseModule):
         from .API.user.UserQueryServiceConfigs import UserQueryServiceConfig
         from .API.user.UserQueryStats import UserQueryUserStats
         from .API.user.UserQueryUserUserGroups import UserQueryUserUserGroups
+        from .API.user.UserRefreshToken import UserRefreshToken
 
         # Resources
         user_api_ns.add_resource(UserLogin, '/login', resource_class_kwargs=kwargs)
@@ -185,6 +186,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQueryServiceAccess,    '/services/access', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServiceConfig,    '/services/configs', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUserStats,        '/stats', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserRefreshToken,          '/refresh_token', resource_class_kwargs=kwargs)
         api.add_namespace(user_api_ns)
 
     def init_device_api(self):
