@@ -238,6 +238,7 @@ class FlaskModule(BaseModule):
         from .API.participant.ParticipantQueryDevices import ParticipantQueryDevices
         from .API.participant.ParticipantQueryParticipants import ParticipantQueryParticipants
         from .API.participant.ParticipantQuerySessions import ParticipantQuerySessions
+        from .API.participant.ParticipantRefreshToken import ParticipantRefreshToken
         # Resources
         participant_api_ns.add_resource(ParticipantLogin, '/login', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantLogout, '/logout', resource_class_kwargs=kwargs)
@@ -245,6 +246,7 @@ class FlaskModule(BaseModule):
         participant_api_ns.add_resource(ParticipantQueryDevices, '/devices', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantQueryParticipants, '/participants', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantQuerySessions, '/sessions', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantRefreshToken, '/refresh_token', resource_class_kwargs=kwargs)
 
         api.add_namespace(participant_api_ns)
 
