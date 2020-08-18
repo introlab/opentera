@@ -8,7 +8,7 @@ class TeraSite(db.Model, BaseModel):
     site_name = db.Column(db.String, nullable=False, unique=True)
 
     # site_devices = db.relationship("TeraDeviceSite")
-    site_projects = db.relationship("TeraProject")
+    site_projects = db.relationship("TeraProject", cascade="delete", passive_deletes=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -58,8 +58,8 @@ class TeraSite(db.Model, BaseModel):
     def delete(cls, id_todel):
         super().delete(id_todel)
 
-        from libtera.db.models.TeraSession import TeraSession
-        TeraSession.delete_orphaned_sessions()
+        # from libtera.db.models.TeraSession import TeraSession
+        # TeraSession.delete_orphaned_sessions()
 
     @classmethod
     def insert(cls, site):

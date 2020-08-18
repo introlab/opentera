@@ -288,6 +288,22 @@ class UserQueryDevices(Resource):
             # If we are here, we are allowed to delete. Do so.
             try:
                 TeraDevice.delete(id_todel=id_todel)
+            except exc.IntegrityError as e:
+                # Causes that could make an integrity error when deleting:
+                # - Associated with sessions
+                # - Associated with assets
+                # - Associated with participants
+                if 't_devices_participants' in str(e.args):
+                    return gettext('Can\'t delete device: please delete all participants association before deleting.'
+                                   ), 500
+                if 't_sessions_devices' in str(e.args):
+                    return gettext('Can\'t delete device: please remove all sessions refering to that device before '
+                                   'deleting.'), 500
+                if 't_sessions_id_creator' in str(e.args):
+                    return gettext('Can\'t delete device: please remove all sessions created by that device before '
+                                   'deleting.'), 500
+                return gettext('Can\'t delete device: please delete all assets created by that device before deleting.'
+                               ), 500
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())

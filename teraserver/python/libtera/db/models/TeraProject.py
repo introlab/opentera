@@ -8,8 +8,8 @@ class TeraProject(db.Model, BaseModel):
     project_name = db.Column(db.String, nullable=False, unique=False)
 
     project_site = db.relationship("TeraSite")
-    project_participants = db.relationship("TeraParticipant")
-    project_participants_groups = db.relationship("TeraParticipantGroup")
+    project_participants = db.relationship("TeraParticipant", passive_deletes=True)
+    project_participants_groups = db.relationship("TeraParticipantGroup", passive_deletes=True)
     project_devices = db.relationship("TeraDevice", secondary="t_devices_projects", back_populates="device_projects")
     project_session_types = db.relationship("TeraSessionType", secondary="t_sessions_types_projects",
                                             back_populates="session_type_projects")
@@ -110,8 +110,8 @@ class TeraProject(db.Model, BaseModel):
     def delete(cls, id_todel):
         super().delete(id_todel)
 
-        from libtera.db.models.TeraSession import TeraSession
-        TeraSession.delete_orphaned_sessions()
+        # from libtera.db.models.TeraSession import TeraSession
+        # TeraSession.delete_orphaned_sessions()
 
     @classmethod
     def insert(cls, project):

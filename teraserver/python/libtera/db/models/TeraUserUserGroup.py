@@ -6,7 +6,7 @@ class TeraUserUserGroup(db.Model, BaseModel):
     id_user_user_group = db.Column(db.Integer, db.Sequence('id_user_user_group_sequence'), primary_key=True,
                                    autoincrement=True)
     id_user = db.Column(db.Integer, db.ForeignKey("t_users.id_user", ondelete='cascade'), nullable=False)
-    id_user_group = db.Column(db.Integer, db.ForeignKey("t_users_groups.id_user_group", ondelete='cascade'),
+    id_user_group = db.Column(db.Integer, db.ForeignKey("t_users_groups.id_user_group"),
                               nullable=False)
 
     user_user_group_user = db.relationship("TeraUser")

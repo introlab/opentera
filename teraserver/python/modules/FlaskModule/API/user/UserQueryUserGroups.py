@@ -277,6 +277,11 @@ class UserQueryUserGroups(Resource):
         # If we are here, we are allowed to delete that user group. Do so.
         try:
             TeraUserGroup.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Associated users with that user group
+            return gettext('Can\'t delete user group: please delete all users part of that user group before deleting.'
+                           ), 500
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

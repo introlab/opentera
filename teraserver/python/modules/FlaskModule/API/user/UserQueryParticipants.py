@@ -8,6 +8,7 @@ from libtera.db.models.TeraSession import TeraSession
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
+from flask_babel import gettext
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -267,9 +268,17 @@ class UserQueryParticipants(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraParticipant.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting a participant:
+            # - Associated sessions
+            # - Sessions from which the participant is the creator
+            # - Assets by that participant
+            # In all case, deleting associated sessions will clear that all, since a participant cannot create sessions
+            # or assets not for itself.
+            return gettext('Can\'t delete participant: please delete all sessions before deleting.'), 500
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database Error'), 500
 
         return '', 200

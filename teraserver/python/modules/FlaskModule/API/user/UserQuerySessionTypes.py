@@ -204,12 +204,18 @@ class UserQuerySessionTypes(Resource):
                 return gettext('Unable to delete - not admin in at least one project'), 403
 
         # Check if there's some sessions that are using that session type. If so, we must not delete!
-        if len(TeraSession.get_sessions_for_type(id_todel)) > 0:
-            return gettext('Impossible de supprimer - des seances de ce type existent.'), 403
+        # Now done at database level
+        # if len(TeraSession.get_sessions_for_type(id_todel)) > 0:
+        #     return gettext('Impossible de supprimer - des seances de ce type existent.'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraSessionType.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Associated sessions of that session type
+            return gettext('Can\'t delete session type: please delete all sessions with that type before deleting.'
+                           ), 500
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())

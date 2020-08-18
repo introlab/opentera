@@ -7,7 +7,8 @@ class TeraUserGroup(db.Model, BaseModel):
     user_group_name = db.Column(db.String, nullable=False, unique=False)
 
     user_group_services_access = db.relationship('TeraServiceAccess', cascade="all,delete")
-    user_group_users = db.relationship("TeraUser", secondary="t_users_users_groups", back_populates="user_user_groups")
+    user_group_users = db.relationship("TeraUser", secondary="t_users_users_groups", back_populates="user_user_groups",
+                                       passive_deletes=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:

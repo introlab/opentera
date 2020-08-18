@@ -30,7 +30,7 @@ class TeraParticipant(db.Model, BaseModel):
                                           back_populates="device_participants")
 
     participant_sessions = db.relationship("TeraSession", secondary="t_sessions_participants",
-                                           back_populates="session_participants")
+                                           back_populates="session_participants", passive_deletes=True)
 
     participant_participant_group = db.relationship("TeraParticipantGroup")
 
@@ -297,10 +297,8 @@ class TeraParticipant(db.Model, BaseModel):
     @classmethod
     def delete(cls, id_todel: int):
         super().delete(id_todel)
-
-        # FIXME: Not working anymore...
         # Check if we need to delete orphan sessions (sessions that have no more participants left
-        from libtera.db.models.TeraSession import TeraSession
-        TeraSession.delete_orphaned_sessions(False)
-
-        db.session.commit()
+        # from libtera.db.models.TeraSession import TeraSession
+        # TeraSession.delete_orphaned_sessions(False)
+        #
+        # db.session.commit()

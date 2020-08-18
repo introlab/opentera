@@ -7,6 +7,7 @@ from sqlalchemy.exc import InvalidRequestError
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraSite import TeraSite
 from modules.DatabaseModule.DBManager import DBManager
+from flask_babel import gettext
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -170,9 +171,14 @@ class UserQuerySites(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraSite.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Associated projects with particiapnts with sessions
+            # - Associated projects with participant groups with participants with sessions
+            return gettext('Can\'t delete site: please delete all participants with sessions before deleting.'), 500
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200

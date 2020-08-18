@@ -7,6 +7,7 @@ from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
+from flask_babel import gettext
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -155,9 +156,14 @@ class UserQueryParticipantGroup(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraParticipantGroup.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting a participant:
+            # - Participants with associated sessions
+            return gettext('Can\'t delete participant group: please delete all sessions from all '
+                           'participants before deleting.'), 500
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200

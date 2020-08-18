@@ -5,7 +5,7 @@ class TeraDeviceParticipant(db.Model, BaseModel):
     __tablename__ = 't_devices_participants'
     id_device_participant = db.Column(db.Integer, db.Sequence('id_device_participant_sequence'), primary_key=True,
                                       autoincrement=True)
-    id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
+    id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device"), nullable=False)
     id_participant = db.Column(db.Integer, db.ForeignKey("t_participants.id_participant", ondelete='cascade'),
                                nullable=False)
 

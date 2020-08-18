@@ -35,10 +35,11 @@ class TeraDevice(db.Model, BaseModel):
     device_projects = db.relationship("TeraProject", secondary="t_devices_projects", back_populates="project_devices")
     # device_session_types = db.relationship("TeraSessionTypeDeviceType")
     device_participants = db.relationship("TeraParticipant",  secondary="t_devices_participants",
-                                          back_populates="participant_devices")
-    device_sessions = db.relationship("TeraSession", secondary="t_sessions_devices", back_populates="session_devices")
+                                          back_populates="participant_devices", passive_deletes=True)
+    device_sessions = db.relationship("TeraSession", secondary="t_sessions_devices", back_populates="session_devices",
+                                      passive_deletes=True)
     device_subtype = db.relationship('TeraDeviceSubType')
-    device_assets = db.relationship('TeraAsset')
+    device_assets = db.relationship('TeraAsset', passive_deletes=True)
 
     authenticated = False
 

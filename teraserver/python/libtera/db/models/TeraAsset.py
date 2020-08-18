@@ -20,10 +20,10 @@ class TeraAsset(db.Model, BaseModel):
     __tablename__ = 't_assets'
     id_asset = db.Column(db.Integer, db.Sequence('id_asset_sequence'), primary_key=True, autoincrement=True)
     id_session = db.Column(db.Integer, db.ForeignKey("t_sessions.id_session", ondelete='cascade'), nullable=False)
-    id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=True)
-    id_participant = db.Column(db.Integer, db.ForeignKey("t_participants.id_participant", ondelete='cascade'),
+    id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device"), nullable=True)
+    id_participant = db.Column(db.Integer, db.ForeignKey("t_participants.id_participant"),
                                nullable=True)
-    id_user = db.Column(db.Integer, db.ForeignKey("t_users.id_user", ondelete='cascade'), nullable=True)
+    id_user = db.Column(db.Integer, db.ForeignKey("t_users.id_user"), nullable=True)
     # Put a description of the asset here
     asset_name = db.Column(db.String, nullable=False)
 

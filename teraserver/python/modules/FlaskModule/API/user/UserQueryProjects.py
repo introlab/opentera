@@ -8,6 +8,7 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from modules.DatabaseModule.DBManager import DBManager
+from flask_babel import gettext
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -185,10 +186,15 @@ class UserQueryProjects(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraProject.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Associated participant groups with participants with sessions
+            # - Associated participants with sessions
+            return gettext('Can\'t delete project: please delete all participants with sessions before deleting.'), 500
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200
 

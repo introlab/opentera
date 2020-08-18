@@ -264,6 +264,10 @@ class UserQueryUsers(Resource):
         args = parser.parse_args()
         id_todel = args['id']
 
+        # Check if we are trying to delete ourselves!
+        if id_todel == current_user.id_user:
+            return gettext('Sorry, you can\'t delete yourself!'), 403
+
         # Check if current user can delete
         full_delete = current_user.user_superadmin
         dif_groups = []
@@ -283,6 +287,19 @@ class UserQueryUsers(Resource):
             # If we are here, we are allowed to delete that user. Do so.
             try:
                 TeraUser.delete(id_todel=id_todel)
+            except exc.IntegrityError as e:
+                # Causes that could make an integrity error when deleting:
+                # - Associated sessions in which the user is part of
+                # - Sessions that the user created
+                # - Assets that the user created
+                if 't_sessions_users' in str(e.args):
+                    return gettext('Can\'t delete user: please remove all sessions that this user is part of before '
+                                   'deleting.'), 500
+                if 't_sessions_id_creator' in str(e.args):
+                    return gettext('Can\'t delete user: please remove all sessions created by this user before '
+                                   'deleting.'), 500
+                return gettext('Can\'t delete user: please delete all assets created by this user before deleting.')\
+                    , 500
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())

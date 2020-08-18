@@ -19,12 +19,10 @@ class TeraSession(db.Model, BaseModel):
     id_session = db.Column(db.Integer, db.Sequence('id_session_sequence'), primary_key=True, autoincrement=True)
     session_uuid = db.Column(db.String(36), nullable=False, unique=True)
 
-    id_session_type = db.Column(db.Integer, db.ForeignKey('t_sessions_types.id_session_type', ondelete='cascade'),
-                                nullable=False)
-    id_creator_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user', ondelete='set null'), nullable=True)
-    id_creator_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device', ondelete='set null'), nullable=True)
-    id_creator_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant', ondelete='set null'),
-                                       nullable=True)
+    id_session_type = db.Column(db.Integer, db.ForeignKey('t_sessions_types.id_session_type'), nullable=False)
+    id_creator_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user'), nullable=True)
+    id_creator_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device'), nullable=True)
+    id_creator_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant'), nullable=True)
     id_creator_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='set null'),
                                    nullable=True)
 
@@ -238,25 +236,26 @@ class TeraSession(db.Model, BaseModel):
     def get_sessions_for_type(session_type_id: int):
         return TeraSession.query.filter_by(id_session_type=session_type_id).all()
 
-    @staticmethod
-    def delete_orphaned_sessions(commit_changes=True):
-        from libtera.db.models.TeraDeviceData import TeraDeviceData
-        orphans_parts = TeraSession.query.outerjoin(TeraSession.session_participants).filter(
-            TeraSession.session_participants == None).all()
-
-        orphans_users = TeraSession.query.outerjoin(TeraSession.session_users).filter(
-            TeraSession.session_users == None).all()
-
-        orphans = list(set(orphans_parts + orphans_users))  # Keep unique sessions only!
-
-        if orphans:
-            for orphan in orphans:
-                TeraDeviceData.delete_files_for_session(orphan.id_session)
-                db.session.delete(orphan)
-                # TeraSession.delete(orphan.id_session)
-
-        if commit_changes:
-            db.session.commit()
+    # THIS SHOULD NOT BE USED ANYMORE, AS DELETES CAN'T OCCUR IF THERE'S STILL ASSOCIATED SESSIONS
+    # @staticmethod
+    # def delete_orphaned_sessions(commit_changes=True):
+    #     from libtera.db.models.TeraDeviceData import TeraDeviceData
+    #     orphans_parts = TeraSession.query.outerjoin(TeraSession.session_participants).filter(
+    #         TeraSession.session_participants == None).all()
+    #
+    #     orphans_users = TeraSession.query.outerjoin(TeraSession.session_users).filter(
+    #         TeraSession.session_users == None).all()
+    #
+    #     orphans = list(set(orphans_parts + orphans_users))  # Keep unique sessions only!
+    #
+    #     if orphans:
+    #         for orphan in orphans:
+    #             TeraDeviceData.delete_files_for_session(orphan.id_session)
+    #             db.session.delete(orphan)
+    #             # TeraSession.delete(orphan.id_session)
+    #
+    #     if commit_changes:
+    #         db.session.commit()
 
     @classmethod
     def delete(cls, id_todel):

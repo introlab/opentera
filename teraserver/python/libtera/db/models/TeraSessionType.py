@@ -31,11 +31,13 @@ class TeraSessionType(db.Model, BaseModel):
 
     session_type_service = db.relationship("TeraService")
 
+    session_type_sessions = db.relationship("TeraSession", passive_deletes=True)
+
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
         ignore_fields.extend(['session_type_projects', 'session_type_devices_types', 'SessionCategoryEnum',
-                              'session_type_service'])
+                              'session_type_service', 'session_type_sessions'])
         if minimal:
             ignore_fields.extend(['session_type_online', 'session_type_multi',
                                   'session_type_profile', 'session_type_color', 'session_type_config'])
