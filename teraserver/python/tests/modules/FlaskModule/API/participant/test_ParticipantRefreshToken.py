@@ -4,7 +4,7 @@ from requests import get
 import json
 
 
-class ParticipantLoginTest(unittest.TestCase):
+class ParticipantRefreshTokenTest(unittest.TestCase):
 
     host = 'localhost'
     port = 40075

@@ -57,12 +57,16 @@ class TeraUser(db.Model, BaseModel):
     def get_token(self, token_key: str, expiration=3600):
         import time
         import jwt
+        import random
+
         # Creating token with user info
         now = time.time()
+
         payload = {
             'iat': int(now),
             'exp': int(now) + expiration,
             'iss': 'TeraServer',
+            'jti': random.random(),
             'user_uuid': self.user_uuid,
             'id_user': self.id_user,
             'user_fullname': self.get_fullname(),

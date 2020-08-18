@@ -45,6 +45,33 @@ participant_token_auth = HTTPTokenAuth("OpenTera")
 participant_multi_auth = MultiAuth(participant_http_auth, participant_token_auth)
 
 
+class DisabledTokenStorage:
+    def __init__(self):
+        self.token_dict = {}
+
+    def push_disabled_token(self, key, token):
+        if key in self.token_dict:
+            self.token_dict[key].add(token)
+        else:
+            self.token_dict[key] = set()
+            self.token_dict[key].add(token)
+
+    def get_disabled_tokens(self, key):
+        if key in self.token_dict:
+            return self.token_dict[key]
+        return None
+
+    def delete_disabled_tokens_with_key(self, key):
+        if key in self.token_dict:
+            del self.token_dict[key]
+            return True
+        return False
+
+    def remove_expired_tokens(self, key, api_key):
+        for token in self.token_dict[key]:
+            pass
+
+
 class LoginModule(BaseModule):
 
     redis_client = None
@@ -82,7 +109,6 @@ class LoginModule(BaseModule):
     def setup_login_manager(self):
         self.login_manager.init_app(flask_app)
         self.login_manager.session_protection = "strong"
-        # self.login_manager.request_loader(self.load_user)
 
         # Cookie based configuration
         flask_app.config.update({'REMEMBER_COOKIE_NAME': 'OpenTera',

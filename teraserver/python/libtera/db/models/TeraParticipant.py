@@ -51,12 +51,15 @@ class TeraParticipant(db.Model, BaseModel):
     def dynamic_token(self, token_key: str, expiration=3600):
         import time
         import jwt
+        import random
+
         # Creating token with participant info
         now = time.time()
         payload = {
             'iat': int(now),
             'exp': int(now) + expiration,
             'iss': 'TeraServer',
+            'jti': random.random(),
             'participant_uuid': self.participant_uuid,
             'id_participant': self.id_participant,
             'user_fullname': self.participant_name
@@ -65,9 +68,11 @@ class TeraParticipant(db.Model, BaseModel):
         return jwt.encode(payload, token_key, algorithm='HS256').decode('utf-8')
 
     def create_token(self):
+        import random
         # Creating token with user info
         payload = {
             'iss': 'TeraServer',
+            'jti': random.random(),
             'participant_uuid': self.participant_uuid,
             'id_participant': self.id_participant
         }
