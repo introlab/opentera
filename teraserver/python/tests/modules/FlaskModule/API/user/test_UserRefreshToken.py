@@ -45,3 +45,11 @@ class UserRefreshTokenTest(BaseAPITest):
         response = self._request_with_token_auth(token=login_token)
         self.assertEqual(response.status_code, 401)
 
+    def test_invalid_token_refresh_with_no_token(self):
+        response = self._login_with_http_auth(username='admin', password='admin')
+        self.assertEqual(response.status_code, 200)
+        login_info = response.json()
+        self.assertTrue(login_info.__contains__('user_token'))
+        login_token = login_info['user_token']
+        response = self._request_with_token_auth(token='')
+        self.assertEqual(response.status_code, 401)

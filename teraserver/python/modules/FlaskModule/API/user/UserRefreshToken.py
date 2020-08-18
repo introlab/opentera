@@ -32,7 +32,8 @@ class UserRefreshToken(Resource):
 
         # Put old token in disabled tokens
         scheme, old_token = request.headers['Authorization'].split(None, 1)
-        LoginModule.user_push_disabled_token(old_token)
+        if len(old_token) > 0:
+            LoginModule.user_push_disabled_token(old_token)
 
         # Regenerate token, 30 minutes expiration
         user_token = current_user.get_token(token_key, expiration=60 * 30)

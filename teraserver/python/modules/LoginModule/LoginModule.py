@@ -57,6 +57,8 @@ class LoginModule(BaseModule):
         # Update Global Redis Client
         LoginModule.redis_client = redis.Redis(host=config.redis_config['hostname'],
                                                port=config.redis_config['port'],
+                                               username=config.redis_config['username'],
+                                               password=config.redis_config['password'],
                                                db=config.redis_config['db'])
 
         BaseModule.__init__(self, ModuleNames.LOGIN_MODULE_NAME.value, config)
@@ -125,8 +127,6 @@ class LoginModule(BaseModule):
 
         return None
 
-
-
     def user_verify_password(self, username, password):
         print('LoginModule - user_verify_password ', username)
 
@@ -185,8 +185,6 @@ class LoginModule(BaseModule):
 
         return False
 
-
-
     def participant_verify_password(self, username, password):
         print('LoginModule - participant_verify_password for ', username)
 
@@ -207,6 +205,15 @@ class LoginModule(BaseModule):
             return True
         return False
 
+    @staticmethod
+    def participant_push_disabled_token(token):
+        LoginModule.__participant_disabled_tokens.add(token)
+        # TODO CLEANUP SET?
+
+    @staticmethod
+    def is_participant_token_disabled(token):
+        return token in LoginModule.__participant_disabled_tokens
+
     def participant_verify_token(self, token_value):
         """
         Tokens for participants are stored in the DB.
@@ -222,6 +229,11 @@ class LoginModule(BaseModule):
             return True
 
         # Second attempt, validate dynamic token
+
+        # Disabled tokens should never be used
+        if LoginModule.is_participant_token_disabled(token_value):
+            return False
+
         """
             Tokens key is dynamic and stored in a redis variable for participants.
         """
