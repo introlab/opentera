@@ -140,7 +140,6 @@ class FlaskModule(BaseModule):
         from .API.user.UserQuerySessionTypes import UserQuerySessionTypes
         from .API.user.UserQuerySessionEvents import UserQuerySessionEvents
         from .API.user.UserQueryDeviceData import UserQueryDeviceData
-        from .API.user.UserQuerySessionTypeDeviceType import UserQuerySessionTypeDeviceType
         from .API.user.UserQuerySessionTypeProject import UserQuerySessionTypeProject
         from .API.user.UserQueryDeviceSubTypes import UserQueryDeviceSubTypes
         from .API.user.UserQueryAssets import UserQueryAssets
@@ -174,8 +173,6 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQuerySessions,  '/sessions', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserSessionManager, '/sessions/manager', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessionTypes, '/sessiontypes', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQuerySessionTypeDeviceType, '/sessiontypedevicetypes',
-                                 resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessionTypeProject, '/sessiontypeprojects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessionEvents,    '/sessionevents', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceData,       '/data', resource_class_kwargs=kwargs)

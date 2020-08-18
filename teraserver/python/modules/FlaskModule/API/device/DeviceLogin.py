@@ -44,7 +44,7 @@ class DeviceLogin(Resource):
             port = request.headers['X_EXTERNALPORT']
 
         # Reply device information
-        response = {'device_info': current_device.to_json(minimal=True)}
+        response = {'device_info': current_device.to_json(minimal=False)}
 
         device_access = db_man.deviceAccess(current_device)
 

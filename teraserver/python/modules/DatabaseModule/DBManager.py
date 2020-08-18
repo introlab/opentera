@@ -19,7 +19,6 @@ from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraDeviceData import TeraDeviceData
 from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
-from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
 from libtera.db.models.TeraServerSettings import TeraServerSettings
 from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent
@@ -203,7 +202,6 @@ class DBManager (BaseModule):
         if TeraSessionType.get_count() == 0:
             print("No session type - creating defaults")
             TeraSessionType.create_defaults()
-            TeraSessionTypeDeviceType.create_defaults()
             TeraSessionTypeProject.create_defaults()
 
         if TeraSession.get_count() == 0:

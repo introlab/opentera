@@ -18,8 +18,6 @@ class TeraDeviceType(db.Model, BaseModel):
     id_device_type = db.Column(db.Integer, db.Sequence('id_device_type_sequence'), primary_key=True, autoincrement=True)
     device_type_name = db.Column(db.String, nullable=False)
 
-    device_type_session_types = db.relationship("TeraSessionTypeDeviceType")
-
     @staticmethod
     def create_defaults():
         for name, member in TeraDeviceType.DeviceTypeEnum.__members__.items():

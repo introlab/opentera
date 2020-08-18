@@ -13,7 +13,8 @@ class TeraDeviceForm:
         # Building lists
         #################
         # Device types & subtypes
-        device_types = user_access.get_accessible_devices_types()  # TeraDeviceType.get_devices_types()
+        from libtera.db.models.TeraDeviceType import TeraDeviceType
+        device_types = TeraDeviceType.get_devices_types()
         device_types_list = []
         for dev_type in device_types:
             name = gettext(dev_type.get_name())

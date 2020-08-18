@@ -29,7 +29,6 @@ class TeraSessionType(db.Model, BaseModel):
     session_type_projects = db.relationship("TeraProject", secondary="t_sessions_types_projects",
                                             back_populates="project_session_types")
 
-    session_type_devices_types = db.relationship("TeraSessionTypeDeviceType")
     session_type_service = db.relationship("TeraService")
 
     def to_json(self, ignore_fields=None, minimal=False):

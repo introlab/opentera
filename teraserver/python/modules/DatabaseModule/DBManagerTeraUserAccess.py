@@ -159,13 +159,14 @@ class DBManagerTeraUserAccess:
         return devices
 
     def get_accessible_devices_types(self, admin_only=False):
-        if self.user.user_superadmin:
-            return TeraDeviceType.query.all()
+        # if self.user.user_superadmin:
+        #     return TeraDeviceType.query.all()
+        return TeraDeviceType.get_devices_types()
 
-        from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
-        session_types_id_list = self.get_accessible_session_types_ids(admin_only=admin_only)
-        return TeraDeviceType.query.join(TeraSessionTypeDeviceType).join(TeraSessionType).\
-            filter(TeraSessionType.id_session_type.in_(session_types_id_list)).all()
+        # from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
+        # session_types_id_list = self.get_accessible_session_types_ids(admin_only=admin_only)
+        # return TeraDeviceType.query.join(TeraSessionTypeDeviceType).join(TeraSessionType).\
+        #     filter(TeraSessionType.id_session_type.in_(session_types_id_list)).all()
 
     def get_accessible_devices_types_ids(self, admin_only=False):
         device_types = []
@@ -615,14 +616,14 @@ class DBManagerTeraUserAccess:
 
         return []
 
-    def query_session_types_for_device(self, device_type_id: int):
-        from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
-        session_types_ids = self.get_accessible_session_types_ids()
-
-        session_types = TeraSessionTypeDeviceType.query.filter(TeraSessionTypeDeviceType.id_session_type.
-                                                               in_(session_types_ids))\
-            .filter_by(id_device_type=device_type_id).all()
-        return session_types
+    # def query_session_types_for_device(self, device_type_id: int):
+    #     from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
+    #     session_types_ids = self.get_accessible_session_types_ids()
+    #
+    #     session_types = TeraSessionTypeDeviceType.query.filter(TeraSessionTypeDeviceType.id_session_type.
+    #                                                            in_(session_types_ids))\
+    #         .filter_by(id_device_type=device_type_id).all()
+    #     return session_types
 
     def query_session_types_for_project(self, project_id: int):
         from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
