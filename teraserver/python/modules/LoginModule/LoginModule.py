@@ -16,11 +16,15 @@ import datetime
 import redis
 
 from flask import current_app, request, jsonify, _request_ctx_stack
+from flask_babel import gettext
 from werkzeug.local import LocalProxy
 from flask_restx import Resource, reqparse
 from functools import wraps
 
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
+
+from twisted.internet import task
+from twisted.internet import reactor
 
 # Current participant identity, stacked
 current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant', None))
@@ -47,37 +51,54 @@ participant_multi_auth = MultiAuth(participant_http_auth, participant_token_auth
 
 class DisabledTokenStorage:
     def __init__(self):
-        self.token_dict = {}
+        self.disabled_tokens = []
 
-    def push_disabled_token(self, key, token):
-        if key in self.token_dict:
-            self.token_dict[key].add(token)
-        else:
-            self.token_dict[key] = set()
-            self.token_dict[key].add(token)
+    def push_disabled_token(self, token):
+        if token not in self.disabled_tokens:
+            self.disabled_tokens.append(token)
 
-    def get_disabled_tokens(self, key):
-        if key in self.token_dict:
-            return self.token_dict[key]
-        return None
+    def get_disabled_tokens(self):
+        return self.disabled_tokens
 
-    def delete_disabled_tokens_with_key(self, key):
-        if key in self.token_dict:
-            del self.token_dict[key]
-            return True
-        return False
+    def is_disabled_token(self, token):
+        return token in self.disabled_tokens
 
-    def remove_expired_tokens(self, key, api_key):
-        for token in self.token_dict[key]:
-            pass
+    def clear_all_disabled_tokens(self):
+        self.disabled_tokens.clear()
+
+    def remove_disabled_token(self, token):
+        if token in self.disabled_tokens:
+            self.disabled_tokens.remove(token)
+
+    def remove_all_expired_tokens(self, key):
+        to_be_removed = []
+        for token in self.disabled_tokens:
+            import jwt
+            try:
+                token_dict = jwt.decode(token, key, algorithms='HS256')
+                # Expired tokens will throw exception.
+                # If we continue here, tokens have a valid expiration time.
+                # We should stop looking for expired tokens since they are added chronologically
+                break
+            except jwt.exceptions.ExpiredSignature as e:
+                to_be_removed.append(token)
+            except jwt.exceptions.PyJWTError as e:
+                print(e)
+                continue
+
+        # Remove expired tokens
+        for expired_token in to_be_removed:
+            self.disabled_tokens.remove(expired_token)
+
+        return to_be_removed
 
 
 class LoginModule(BaseModule):
 
     redis_client = None
-    __user_disabled_tokens = set()
-    __participant_disabled_tokens = set()
-    __device_disabled_tokens = set()
+    # Only user & participant tokens expire (for now)
+    __user_disabled_token_storage = DisabledTokenStorage()
+    __participant_disabled_token_storage = DisabledTokenStorage()
 
     def __init__(self, config: ConfigManager):
 
@@ -95,9 +116,26 @@ class LoginModule(BaseModule):
         # Setup login manager
         self.setup_login_manager()
 
+        # Setup cleanup task for disabled tokens
+        self.cleanup_disabled_tokens_loop_task = task.LoopingCall(self.cleanup_disabled_tokens)
+
+    def cleanup_disabled_tokens(self):
+        print('LoginModule.cleanup_disabled_tokens task')
+        # Remove expired tokens from user tokens disabled storage
+        LoginModule.__user_disabled_token_storage.remove_all_expired_tokens(
+            self.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
+        )
+        # Remove expired tokens from participant tokens disabled storage
+        LoginModule.__participant_disabled_token_storage.remove_all_expired_tokens(
+            self.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
+        )
+
     def setup_module_pubsub(self):
-        # Additional subscribe
-        pass
+        # Additional subscribe here
+
+        # We wait until we are connected to redis
+        # Every 30 minutes?
+        loopDeferred = self.cleanup_disabled_tokens_loop_task.start(60.0 * 30)
 
     def notify_module_messages(self, pattern, channel, message):
         """
@@ -171,12 +209,11 @@ class LoginModule(BaseModule):
 
     @staticmethod
     def user_push_disabled_token(token):
-        LoginModule.__user_disabled_tokens.add(token)
-        # TODO CLEANUP SET?
+        LoginModule.__user_disabled_token_storage.push_disabled_token(token)
 
     @staticmethod
     def is_user_token_disabled(token):
-        return token in LoginModule.__user_disabled_tokens
+        return LoginModule.__user_disabled_token_storage.is_disabled_token(token)
 
     def user_verify_token(self, token_value):
         """
@@ -233,12 +270,11 @@ class LoginModule(BaseModule):
 
     @staticmethod
     def participant_push_disabled_token(token):
-        LoginModule.__participant_disabled_tokens.add(token)
-        # TODO CLEANUP SET?
+        LoginModule.__participant_disabled_token_storage.push_disabled_token(token)
 
     @staticmethod
     def is_participant_token_disabled(token):
-        return token in LoginModule.__participant_disabled_tokens
+        return LoginModule.__participant_disabled_token_storage.is_disabled_token(token)
 
     def participant_verify_token(self, token_value):
         """
@@ -345,7 +381,7 @@ class LoginModule(BaseModule):
                     scheme, token = request.headers['Authorization'].split(None, 1)
                 except ValueError:
                     # malformed Authorization header
-                    return 'Invalid token', 401
+                    return gettext('Invalid token'), 401
 
                 # Verify scheme and token
                 if scheme == 'OpenTera':
@@ -375,7 +411,7 @@ class LoginModule(BaseModule):
                     return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.
-            return 'Unauthorized', 401
+            return gettext('Unauthorized'), 401
 
         return decorated
 
@@ -404,7 +440,7 @@ class LoginModule(BaseModule):
                     scheme, token = request.headers['Authorization'].split(None, 1)
                 except ValueError:
                     # malformed Authorization header
-                    return 'Invalid Token', 401
+                    return gettext('Invalid Token'), 401
 
                 # Verify scheme and token
                 if scheme == 'OpenTera':
@@ -417,7 +453,7 @@ class LoginModule(BaseModule):
                         if 'service_uuid' in token_dict:
                             service_uuid = token_dict['service_uuid']
                     except jwt.exceptions.PyJWTError as e:
-                        return 'Unauthorized', 401
+                        return gettext('Unauthorized'), 401
 
             # Parse args
             if not service_uuid:
@@ -435,7 +471,7 @@ class LoginModule(BaseModule):
                         if 'service_uuid' in token_dict:
                             service_uuid = token_dict['service_uuid']
                     except jwt.exceptions.PyJWTError as e:
-                        return 'Unauthorized', 401
+                        return gettext('Unauthorized'), 401
 
             if service_uuid:
                 # Check if service is allowed to connect
@@ -445,6 +481,37 @@ class LoginModule(BaseModule):
                     return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.
-            return 'Unauthorized', 401
+            return gettext('Unauthorized'), 401
 
         return decorated
+
+
+# if __name__ == '__main__':
+#     storage = DisabledTokenStorage()
+#     import uuid
+#
+#     def create_user():
+#         new_user = TeraUser()
+#         new_user.user_enabled = True
+#         new_user.user_firstname = "No Access"
+#         new_user.user_lastname = "User!"
+#         new_user.user_profile = ""
+#         new_user.user_password = TeraUser.encrypt_password("user4")
+#         new_user.user_superadmin = False
+#         new_user.user_username = "test_user"
+#         new_user.user_uuid = str(uuid.uuid4())
+#         return new_user
+#
+#     key = 'testkey'
+#     user = create_user()
+#     token1 = user.get_token(key, expiration=1)
+#     token2 = user.get_token(key, expiration=3600)
+#
+#     storage.push_disabled_token(token1)
+#     storage.push_disabled_token(token2)
+#     disabled = storage.is_disabled_token(token1)
+#     disabled = storage.is_disabled_token(token2)
+#
+#     storage.remove_expired_tokens(key)
+#     print(storage)
+

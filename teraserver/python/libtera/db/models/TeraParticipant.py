@@ -9,6 +9,18 @@ import datetime
 from passlib.hash import bcrypt
 
 
+# Generator for jti
+def infinite_jti_sequence():
+    num = 0
+    while True:
+        yield num
+        num += 1
+
+
+# Initialize generator, call next(participant_jti_generator) to get next sequence number
+participant_jti_generator = infinite_jti_sequence()
+
+
 class TeraParticipant(db.Model, BaseModel):
     __tablename__ = 't_participants'
     id_participant = db.Column(db.Integer, db.Sequence('id_participant_sequence'), primary_key=True, autoincrement=True)
@@ -51,7 +63,6 @@ class TeraParticipant(db.Model, BaseModel):
     def dynamic_token(self, token_key: str, expiration=3600):
         import time
         import jwt
-        import random
 
         # Creating token with participant info
         now = time.time()
@@ -59,7 +70,7 @@ class TeraParticipant(db.Model, BaseModel):
             'iat': int(now),
             'exp': int(now) + expiration,
             'iss': 'TeraServer',
-            'jti': random.random(),
+            'jti': next(participant_jti_generator),
             'participant_uuid': self.participant_uuid,
             'id_participant': self.id_participant,
             'user_fullname': self.participant_name
@@ -72,7 +83,7 @@ class TeraParticipant(db.Model, BaseModel):
         # Creating token with user info
         payload = {
             'iss': 'TeraServer',
-            'jti': random.random(),
+            'jti': next(participant_jti_generator),
             'participant_uuid': self.participant_uuid,
             'id_participant': self.id_participant
         }

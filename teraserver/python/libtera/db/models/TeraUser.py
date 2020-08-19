@@ -9,6 +9,18 @@ import datetime
 import json
 
 
+# Generator for jti
+def infinite_jti_sequence():
+    num = 0
+    while True:
+        yield num
+        num += 1
+
+
+# Initialize generator, call next(user_jti_generator) to get next sequence number
+user_jti_generator = infinite_jti_sequence()
+
+
 class TeraUser(db.Model, BaseModel):
     __tablename__ = 't_users'
     id_user = db.Column(db.Integer, db.Sequence('id_user_sequence'), primary_key=True, autoincrement=True)
@@ -66,7 +78,7 @@ class TeraUser(db.Model, BaseModel):
             'iat': int(now),
             'exp': int(now) + expiration,
             'iss': 'TeraServer',
-            'jti': random.random(),
+            'jti': next(user_jti_generator),
             'user_uuid': self.user_uuid,
             'id_user': self.id_user,
             'user_fullname': self.get_fullname(),
