@@ -27,6 +27,7 @@ import sys
 from modules.LoginModule.LoginModule import LoginModule
 from modules.FlaskModule.FlaskModule import FlaskModule
 from modules.TwistedModule.TwistedModule import TwistedModule
+from modules.ServiceLauncher.ServiceLauncher import ServiceLauncherModule
 
 from libtera.ConfigManager import ConfigManager
 from libtera.redis.RedisClient import RedisClient
@@ -210,6 +211,8 @@ if __name__ == '__main__':
     twisted_module = TwistedModule(config_man)
 
     user_manager_module = UserManagerModule(config_man)
+
+    service_launcher = ServiceLauncherModule(config_man)
 
     # This is blocking, running event loop
     twisted_module.run()

@@ -15,6 +15,7 @@ class ModuleNames(Enum):
     LOGIN_MODULE_NAME = str("TeraServer.LoginModule")
     USER_MANAGER_MODULE_NAME = str("TeraServer.UserManagerModule")
     DATABASE_MODULE_NAME = str("TeraServer.DatabaseModule")
+    SERVICE_LAUNCHER_NAME = str("TeraServer.ServiceLauncherModule")
 
 
 def create_module_message_topic_from_name(name: ModuleNames):
