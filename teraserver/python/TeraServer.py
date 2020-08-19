@@ -27,7 +27,7 @@ import sys
 from modules.LoginModule.LoginModule import LoginModule
 from modules.FlaskModule.FlaskModule import FlaskModule
 from modules.TwistedModule.TwistedModule import TwistedModule
-from modules.ServiceLauncher.ServiceLauncher import ServiceLauncherModule
+from modules.ServiceLauncherModule.ServiceLauncherModule import ServiceLauncherModule
 
 from libtera.ConfigManager import ConfigManager
 from libtera.redis.RedisClient import RedisClient

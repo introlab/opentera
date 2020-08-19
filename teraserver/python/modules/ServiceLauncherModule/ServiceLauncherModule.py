@@ -15,7 +15,7 @@ class ServiceLauncherModule(BaseModule):
         """
         We have received a published message from redis
         """
-        print('ServiceLauncher - Received message ', pattern, channel, message)
+        print('ServiceLauncherModule - Received message ', pattern, channel, message)
         pass
 
     def setup_rpc_interface(self):
