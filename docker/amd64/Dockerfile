@@ -28,10 +28,18 @@ RUN service postgresql start &&\
 	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"&&\
 	sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"&&\
 	sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"&&\
+	sudo -u postgres psql -c "create database openteralogs" &&\
+	sudo -u postgres psql -c "grant all privileges on database openteralogs to TeraAgent;"&&\
+	sudo -u postgres psql -c "create database openterafiles" &&\
+	sudo -u postgres psql -c "grant all privileges on database openterafiles to TeraAgent;"&&\
 	sudo -u postgres psql -c "create database videodispatch" &&\
 	sudo -u postgres psql -c "create user videodispatch with encrypted password 'videodispatch';"&&\
 	sudo -u postgres psql -c "grant all privileges on database videodispatch to videodispatch;"&&\
 	sudo -u postgres psql -c "ALTER USER videodispatch WITH PASSWORD 'videodispatch';"&&\
+	sudo -u postgres psql -c "create database bureauactif" &&\
+	sudo -u postgres psql -c "create user bureauactif with encrypted password 'bureauactif';"&&\
+	sudo -u postgres psql -c "grant all privileges on database bureauactif to bureauactif;"&&\
+	sudo -u postgres psql -c "ALTER USER bureauactif WITH PASSWORD 'bureauactif';"&&\
 	sudo -u postgres psql -c "\l"
 
 #VOLUME

@@ -14,4 +14,3 @@ add_subdirectory(python)
 # Easyrtc process
 add_subdirectory(easyrtc)
 
-

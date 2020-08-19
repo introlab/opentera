@@ -24,6 +24,8 @@ class ServiceLauncherModule(BaseModule):
                 print(service)
                 if service.service_key != 'OpenTeraServer':
                     self.launch_service(service)
+            elif service.service_enabled:
+                self.launch_service(service)
 
     def notify_module_messages(self, pattern, channel, message):
         """
@@ -49,6 +51,14 @@ class ServiceLauncherModule(BaseModule):
             path = os.path.join(os.getcwd(), 'services', 'FileTransferService', 'FileTransferService.py')
             executable_args.append(path)
             working_directory = os.path.join(os.getcwd(), 'services', 'FileTransferService')
+        elif service.service_key == 'BureauActif':
+            path = os.path.join(os.getcwd(), 'services', 'BureauActif', 'BureauActifService.py')
+            executable_args.append(path)
+            working_directory = os.path.join(os.getcwd(), 'services', 'BureauActif')
+        elif service.service_key == 'VideoRehabService':
+            path = os.path.join(os.getcwd(), 'services', 'VideoRehabService', 'VideoRehabService.py')
+            executable_args.append(path)
+            working_directory = os.path.join(os.getcwd(), 'services', 'VideoRehabService')
         else:
             print('Unable to start :', service.service_key)
             return
