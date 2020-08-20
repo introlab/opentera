@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Resource
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant
@@ -65,7 +66,7 @@ class ServiceQueryParticipants(Resource):
             if participant:
                 return participant.to_json()
 
-        return 'Missing parameter', 500
+        return gettext('Missing parameter'), 500
 
     @LoginModule.service_token_or_certificate_required
     # @api.expect(post_parser)
@@ -87,13 +88,13 @@ class ServiceQueryParticipants(Resource):
 
         # All fields validation
         if participant_info['id_project'] < 1:
-            return 'Unknown project', 403
+            return gettext('Unknown project'), 403
 
         if not participant_info['participant_name']:
-            return 'Invalid participant name', 403
+            return gettext('Invalid participant name'), 403
 
         if not participant_info['participant_email']:
-            return 'Invalid participant email', 403
+            return gettext('Invalid participant email'), 403
 
         # Everything ok...
         # Create a new participant?

@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Resource
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant
@@ -34,7 +35,7 @@ class ServiceQuerySessions(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
-        return 'Not implemented', 501
+        return gettext('Not implemented'), 501
 
     @LoginModule.service_token_or_certificate_required
     # @api.expect(post_parser)
@@ -59,19 +60,19 @@ class ServiceQuerySessions(Resource):
             if 'id_service' in session_args:
                 session.id_creator_service = session_args['id_service']
             else:
-                return 'Missing id_service', 500
+                return gettext('Missing id_service'), 500
 
             # Get Creator (always user?)
             if 'id_creator_user' in session_args:
                 session.id_creator_user = session_args['id_creator_user']
             else:
-                return 'Missing id_creator_user', 500
+                return gettext('Missing id_creator_user'), 500
 
             # Get session type
             if 'id_session_type' in session_args:
                 session.id_session_type = session_args['id_session_type']
             else:
-                return 'Missing id_session_type', 500
+                return gettext('Missing id_session_type'), 500
 
             # Optional parameters
             if 'parameters' in session_args:
@@ -125,5 +126,5 @@ class ServiceQuerySessions(Resource):
                 return session.to_json(minimal=False), 200
 
         # Unhandled
-        return 'missing json fields', 500
+        return gettext('missing json fields'), 500
 
