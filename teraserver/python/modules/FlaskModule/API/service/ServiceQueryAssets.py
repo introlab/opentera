@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Resource, reqparse
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from libtera.db.models.TeraAsset import TeraAsset, AssetType
@@ -89,17 +90,17 @@ class ServiceQueryAssets(Resource):
 
         # All fields validation
         if 'id_asset' not in asset_info:
-            return 'Missing id_asset field', 400
+            return gettext('Missing id_asset field'), 400
 
         if 'id_session' in asset_info and asset_info['id_session'] < 1:
-            return 'Unknown session', 400
+            return gettext('Unknown session'), 400
 
         if 'asset_name' in asset_info and not asset_info['asset_name']:
-            return 'Invalid asset name', 400
+            return gettext('Invalid asset name'), 400
 
         if 'asset_type' in asset_info and not asset_info['asset_type'] \
                                               in [asset_type.value for asset_type in AssetType]:
-            return 'Invalid asset type', 400
+            return gettext('Invalid asset type'), 400
 
         # Check if the service can create/update that asset
         if asset_info['id_asset'] != 0 and 'id_session' not in asset_info:
@@ -109,7 +110,7 @@ class ServiceQueryAssets(Resource):
                 args['id_session'] = asset.id_session
 
         if asset_info['id_session'] not in service_access.get_accessible_sessions_ids(True):
-            return 'Service can\'t create assets for that session', 403
+            return gettext('Service can\'t create assets for that session'), 403
 
         # Create a new asset?
         if asset_info['id_asset'] == 0:
@@ -162,7 +163,7 @@ class ServiceQueryAssets(Resource):
             return '', 500
 
         if asset.id_session not in service_access.get_accessible_sessions_ids(True):
-            return 'Service can\'t delete assets for that session', 403
+            return gettext('Service can\'t delete assets for that session'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
@@ -170,7 +171,7 @@ class ServiceQueryAssets(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200
 
