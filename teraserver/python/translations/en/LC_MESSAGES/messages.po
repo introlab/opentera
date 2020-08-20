@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-19 10:41-0400\n"
+"POT-Creation-Date: 2020-08-20 09:06-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -470,6 +470,77 @@ msgstr ""
 msgid "Nom du groupe utilisateur"
 msgstr ""
 
+#: modules/FlaskModule/API/service/ServiceQueryAssets.py:93
+msgid "Missing id_asset field"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryAssets.py:96
+msgid "Unknown session"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryAssets.py:99
+msgid "Invalid asset name"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryAssets.py:103
+msgid "Invalid asset type"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryAssets.py:113
+msgid "Service can't create assets for that session"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryAssets.py:166
+msgid "Service can't delete assets for that session"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryAssets.py:174
+#: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:167
+#: modules/FlaskModule/API/user/UserQueryProjects.py:197
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:145
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:217
+#: modules/FlaskModule/API/user/UserQuerySites.py:182
+msgid "Database error"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:69
+msgid "Missing parameter"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:91
+msgid "Unknown project"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:94
+msgid "Invalid participant name"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:97
+msgid "Invalid participant email"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:38
+msgid "Not implemented"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:63
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:125
+msgid "Missing id_service"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:69
+msgid "Missing id_creator_user"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:75
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:92
+msgid "Missing id_session_type"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:129
+msgid "missing json fields"
+msgstr ""
+
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:70
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:58
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:56
@@ -570,14 +641,6 @@ msgid ""
 "participants before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:167
-#: modules/FlaskModule/API/user/UserQueryProjects.py:197
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:145
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:217
-#: modules/FlaskModule/API/user/UserQuerySites.py:182
-msgid "Database error"
-msgstr ""
-
 #: modules/FlaskModule/API/user/UserQueryParticipants.py:278
 msgid "Can't delete participant: please delete all sessions before deleting."
 msgstr ""
@@ -625,10 +688,6 @@ msgstr ""
 msgid "Not found"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:125
-msgid "Missing id_service"
-msgstr ""
-
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:127
 msgid "Missing projects"
 msgstr ""
@@ -662,10 +721,6 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:86
 msgid "Missing session_type"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:92
-msgid "Missing id_session_type"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:102
@@ -839,18 +894,18 @@ msgstr ""
 msgid "No answer from service."
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:364
+#: modules/LoginModule/LoginModule.py:384
 msgid "Invalid token"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:394
-#: modules/LoginModule/LoginModule.py:436
-#: modules/LoginModule/LoginModule.py:454
-#: modules/LoginModule/LoginModule.py:464
+#: modules/LoginModule/LoginModule.py:414
+#: modules/LoginModule/LoginModule.py:456
+#: modules/LoginModule/LoginModule.py:474
+#: modules/LoginModule/LoginModule.py:484
 msgid "Unauthorized"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:423
+#: modules/LoginModule/LoginModule.py:443
 msgid "Invalid Token"
 msgstr ""
 
