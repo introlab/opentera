@@ -815,7 +815,7 @@ class DBManagerTeraUserAccess:
         return users
 
     def query_service_configs(self, service_id: int = None, user_id: int = None, device_id: int = None,
-                              participant_id: int = None):
+                              participant_id: int = None, include_services_without_config: bool = False):
         if service_id and service_id not in self.get_accessible_services_ids(include_system_services=True):
             return None
         if user_id and user_id not in self.get_accessible_users_ids():
@@ -827,27 +827,43 @@ class DBManagerTeraUserAccess:
 
         from libtera.db.models.TeraServiceConfig import TeraServiceConfig
 
+        services_configs = None
         if service_id:
             if user_id:
-                return TeraServiceConfig.get_service_config_for_service_for_user(service_id=service_id, user_id=user_id)
-            if device_id:
-                return TeraServiceConfig.get_service_config_for_service_for_device(service_id=service_id,
-                                                                                   device_id=device_id)
-            if participant_id:
-                return TeraServiceConfig.get_service_config_for_service_for_participant(service_id=service_id,
-                                                                                        participant_id=participant_id)
-            return TeraServiceConfig.get_service_config_for_service(service_id=service_id)
+                services_configs = TeraServiceConfig.get_service_config_for_service_for_user(service_id=service_id,
+                                                                                             user_id=user_id)
+            elif device_id:
+                services_configs = TeraServiceConfig.get_service_config_for_service_for_device(service_id=service_id,
+                                                                                               device_id=device_id)
+            elif participant_id:
+                services_configs = TeraServiceConfig.get_service_config_for_service_for_participant(
+                    service_id=service_id, participant_id=participant_id)
+            else:
+                services_configs = TeraServiceConfig.get_service_config_for_service(service_id=service_id)
+        else:
+            if user_id:
+                services_configs = TeraServiceConfig.query.filter_by(id_user=user_id).all()
 
-        if user_id:
-            return TeraServiceConfig.query.filter_by(id_user=user_id).all()
+            elif device_id:
+                services_configs = TeraServiceConfig.query.filter_by(id_device=device_id).all()
 
-        if device_id:
-            return TeraServiceConfig.query.filter_by(id_device=device_id).all()
+            elif participant_id:
+                services_configs = TeraServiceConfig.query.filter_by(id_participant=participant_id).all()
 
-        if participant_id:
-            return TeraServiceConfig.query.filter_by(id_participant=participant_id).all()
+        if include_services_without_config:
+            # Also create "empty" configs for service not in the list
+            services = self.get_accessible_services(include_system_services=True)
+            missing_services = set(services).difference([sc.service_config_service for sc in services_configs])
+            for service in missing_services:
+                # Check if that service defines a valid (not default) schema. If not, ignore!
+                if service.has_config_schema():
+                    temp_service_config = TeraServiceConfig()
+                    temp_service_config.id_service = service.id_service
+                    temp_service_config.service_config_service = service
+                    temp_service_config.service_config_config = None
+                    services_configs.append(temp_service_config)
 
-        return None
+        return services_configs
 
     def query_service_access(self, user_group_id: int = None, device_id: int = None, participant_group_id: int = None,
                              service_id: int = None):

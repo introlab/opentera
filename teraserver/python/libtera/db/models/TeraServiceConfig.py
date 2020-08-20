@@ -49,7 +49,22 @@ class TeraServiceConfig(db.Model, BaseModel):
 
         json_config = super().to_json(ignore_fields=ignore_fields)
 
-        json_config['last_update_time'] = self.get_last_update_datetime().isoformat()
+        if not minimal:
+            json_config['service_config_service_name'] = self.service_config_service.service_name
+            if self.version_id:  # No version ID can occur on temporary objects
+                json_config['service_config_last_update_time'] = self.get_last_update_datetime().isoformat()
+            else:
+                json_config['service_config_last_update_time'] = None
+
+        # Filter null ids
+        if not self.id_user:
+            del json_config['id_user']
+
+        if not self.id_participant:
+            del json_config['id_participant']
+
+        if not self.id_device:
+            del json_config['id_device']
 
         return json_config
 
@@ -90,11 +105,11 @@ class TeraServiceConfig(db.Model, BaseModel):
             return False
 
         # Validate that we have a match for the "Globals" config with the expected service schema
-        try:
-            schema_json = json.loads(self.service_config_service.service_config_schema)
-            jsonschema.validate(instance=config_json['Globals'], schema=schema_json)
-        except (ValueError, jsonschema.exceptions.ValidationError) as err:
-            raise err
+        # try:
+        #     schema_json = json.loads(self.service_config_service.service_config_schema)
+        #     jsonschema.validate(instance=config_json['Globals'], schema=schema_json)
+        # except (ValueError, jsonschema.exceptions.ValidationError) as err:
+        #     raise err
 
         if 'Specifics' in config_json:
             # Ensure we have an "id" in each of specifics items

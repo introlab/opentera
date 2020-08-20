@@ -19,6 +19,10 @@ get_parser.add_argument('id_user', type=int, help='ID of the user from which to 
                                                   'id_service or all configs')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get the service specified with '
                                                     'id_service or all configs')
+get_parser.add_argument('with_schema', type=inputs.boolean, help='Also returns the expected config TeraForm schema.')
+get_parser.add_argument('with_empty', type=inputs.boolean, help='Also include empty configs for services without '
+                                                                'config.')
+
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
@@ -39,7 +43,8 @@ class UserQueryServiceConfig(Resource):
     @user_multi_auth.login_required
     @api.expect(get_parser)
     @api.doc(description='Get service configuration. id_service can be combined with id_user, id_participant or '
-                         'id_device, if required.',
+                         'id_device, if required. If no id_user, id_participant and id_device specified, will return '
+                         'config the current user.',
              responses={200: 'Success - returns list of configurations',
                         400: 'No parameters specified - id_service is at least required',
                         500: 'Database error'})
@@ -59,11 +64,14 @@ class UserQueryServiceConfig(Resource):
             return 'Can\'t combine id_user, id_participant and id_device in request', 400
 
         if not id_user and not id_device and not id_service and not id_participant:
-            return 'Must specify at least one id parameter', 400
+            # return 'Must specify at least one id parameter', 400
+            # No parameters = return configs for current user
+            id_user = current_user.id_user
 
         # Do the query itself!
         configs = user_access.query_service_configs(service_id=id_service, user_id=id_user, device_id=id_device,
-                                                    participant_id=id_participant)
+                                                    participant_id=id_participant,
+                                                    include_services_without_config=args['with_empty'])
 
         if not configs:
             configs = []
@@ -74,6 +82,8 @@ class UserQueryServiceConfig(Resource):
             configs_list = []
             for config in configs:
                 config_json = config.to_json()
+                if args['with_schema']:
+                    config_json['service_config_schema'] = config.service_config_service.service_config_schema
                 configs_list.append(config_json)
 
             return configs_list

@@ -8,6 +8,7 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraService import TeraService
 from libtera.db.models.TeraServiceRole import TeraServiceRole
 from modules.DatabaseModule.DBManager import DBManager
+from flask_babel import gettext
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -98,20 +99,20 @@ class UserQueryServices(Resource):
 
         # Check if user is a super admin
         if not current_user.user_superadmin:
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # Using request.json instead of parser, since parser messes up the json!
         json_service = request.json['service']
 
         # Validate if we have an id
         if 'id_service' not in json_service:
-            return '', 400
+            return gettext('Missing id_service'), 400
 
         # Check if that service is in the accessible service list, even for super admins since system services are not
         # modifiables
         if json_service['id_service'] not in user_access.get_accessible_services_ids() \
                 and json_service['id_service'] != 0:
-            return 'Forbidden', 403
+            return gettext('Forbidden'), 403
 
         # Manage service roles
         service_roles = []
@@ -126,14 +127,14 @@ class UserQueryServices(Resource):
                 if 'service_system' in json_service:
                     service = TeraService.get_service_by_id(json_service['id_service'])
                     if service.service_system != json_service['service_system']:
-                        return 'Can\'t change system services from that API', 403
+                        return gettext('Can\'t change system services from that API'), 403
                 TeraService.update(json_service['id_service'], json_service)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
                 return '', 500
             except jsonschema.exceptions.SchemaError:
-                return 'Invalid config json schema', 400
+                return gettext('Invalid config json schema'), 400
         else:
             # New
             try:
@@ -147,7 +148,7 @@ class UserQueryServices(Resource):
                 print(sys.exc_info())
                 return '', 500
             except jsonschema.exceptions.SchemaError:
-                return 'Invalid config json schema', 400
+                return gettext('Invalid config json schema'), 400
 
         update_service = TeraService.get_service_by_id(json_service['id_service'])
 

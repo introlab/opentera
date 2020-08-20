@@ -32,5 +32,9 @@ class TeraServiceForm:
         section.add_item(TeraFormItem("service_endpoint", gettext("URL de base"), "text", item_required=True))
         section.add_item(TeraFormItem("service_clientendpoint", gettext("URL externe"), "text", item_required=True))
         section.add_item(TeraFormItem("service_enabled", gettext("Service actif"), "boolean", item_required=True))
+        section.add_item(TeraFormItem("service_config_schema", gettext("Schéma de configuration"), "longtext",
+                                      item_required=False))
+        section.add_item(TeraFormItem("service_default_config", gettext("Configuration par défaut"), "longtext",
+                                      item_required=False))
 
         return form.to_dict()

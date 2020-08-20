@@ -26,7 +26,14 @@ class UserQueryServiceConfigsTest(BaseAPITest):
 
     def test_query_no_params_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            self.assertEqual(data_item['id_user'], 1)
 
     def test_query_combined_params_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload='id_service=1&id_user=1'
@@ -51,6 +58,43 @@ class UserQueryServiceConfigsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
             self.assertEqual(data_item['id_service'], 1)
 
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=1&"
+                                                                                            "with_schema=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            self.assertTrue(data_item.__contains__('service_config_schema'))
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=1&"
+                                                                                            "with_empty=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 2)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            if data_item['id_service'] == 6:
+                self.assertEqual(data_item['id_service_config'], None)
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=1&"
+                                                                                            "with_empty=1&"
+                                                                                            "with_schema=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 2)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            if data_item['id_service'] == 6:
+                self.assertEqual(data_item['id_service_config'], None)
+            self.assertTrue(data_item.__contains__('service_config_schema'))
+
     def test_query_for_user_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=1")
         self.assertEqual(response.status_code, 200)
@@ -73,6 +117,32 @@ class UserQueryServiceConfigsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
             self.assertEqual(data_item['id_device'], 1)
 
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_device=1&"
+                                                                                            "with_empty=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 2)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            if data_item['id_service'] == 6:
+                self.assertEqual(data_item['id_service_config'], None)
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_device=1&"
+                                                                                            "with_empty=1&"
+                                                                                            "with_schema=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 2)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            if data_item['id_service'] == 6:
+                self.assertEqual(data_item['id_service_config'], None)
+            self.assertTrue(data_item.__contains__('service_config_schema'))
+
     def test_query_for_participant_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_participant=1")
         self.assertEqual(response.status_code, 200)
@@ -83,6 +153,28 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item)
             self.assertEqual(data_item['id_participant'], 1)
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_participant=1&"
+                                                                                            "with_empty=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_participant=1&"
+                                                                                            "with_empty=1&"
+                                                                                            "with_schema=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            self.assertTrue(data_item.__contains__('service_config_schema'))
 
     def test_query_specific_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=1&id_user=1")
@@ -178,4 +270,5 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         self.assertTrue(json_data.__contains__('id_service_config'))
         self.assertTrue(json_data.__contains__('id_service'))
         self.assertTrue(json_data.__contains__('service_config_config'))
-        self.assertTrue(json_data.__contains__('last_update_time'))
+        self.assertTrue(json_data.__contains__('service_config_last_update_time'))
+        self.assertTrue(json_data.__contains__('service_config_service_name'))
