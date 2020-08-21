@@ -53,7 +53,7 @@ class UserQueryDeviceSites(Resource):
         device_proj = []
         # If we have no arguments, return error
         if not any(args.values()):
-            return gettext('Arguments manquants'), 400
+            return gettext('Missing arguments'), 400
 
         if args['id_device']:
             if args['id_device'] in user_access.get_accessible_devices_ids():
@@ -98,12 +98,12 @@ class UserQueryDeviceSites(Resource):
         # Validate if we have an id
         for json_device_site in json_device_sites:
             if 'id_device' not in json_device_site or 'id_site' not in json_device_site:
-                return '', 400
+                return gettext('Missing id_device or id_site'), 400
 
             # Check if current user can modify the posted device
             if json_device_site['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True) or \
                     json_device_site['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
-                return gettext('Accès refusé'), 403
+                return gettext('Forbidden'), 403
 
             # Get list of all projects for that site
             projects = user_access.query_projects_for_site(json_device_site['id_site'])
@@ -136,7 +136,7 @@ class UserQueryDeviceSites(Resource):
                     except exc.SQLAlchemyError:
                         import sys
                         print(sys.exc_info())
-                        return '', 500
+                        return gettext('Database error'), 500
                 del json_device_site['id_device_project']
 
         # TODO: Publish update to everyone who is subscribed to devices update...

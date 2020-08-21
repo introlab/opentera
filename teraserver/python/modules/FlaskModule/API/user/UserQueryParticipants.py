@@ -66,7 +66,7 @@ class UserQueryParticipants(Resource):
 
         # If we have no arguments, return nothing
         if not any(args.values()):
-            return '', 400
+            return gettext('Missing arguments'), 400
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
                 participants = [TeraParticipant.get_participant_by_id(args['id_participant'])]
@@ -168,20 +168,20 @@ class UserQueryParticipants(Resource):
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'participant' not in request.json:
-            return '', 400
+            return gettext('Missing participant'), 400
 
         json_participant = request.json['participant']
 
         # Validate if we have an id
         if 'id_participant' not in json_participant or ('id_project' not in json_participant
                                                         and 'id_participant_group' not in json_participant):
-            return '', 400
+            return gettext('Missing id_participant, id_project or id_participant_group'), 400
 
         # User can modify or add a participant if it has admin to that project
         if 'id_project' in json_participant:
             if json_participant['id_project'] > 0 and \
                     json_participant['id_project'] not in user_access.get_accessible_projects_ids(admin_only=False):
-                return 'No admin access to project', 403
+                return gettext('No admin access to project'), 403
 
         # Check if current user can modify the posted group
         if 'id_participant_group' in json_participant:
@@ -189,7 +189,7 @@ class UserQueryParticipants(Resource):
                     json_participant['id_participant_group'] > 0 and \
                     json_participant['id_participant_group'] not in \
                     user_access.get_accessible_groups_ids(admin_only=False):
-                return 'No admin access to group', 403
+                return gettext('No admin access to group'), 403
 
         # If we have both an id_group and an id_project, make sure that the id_project in the group matches
         if 'id_project' in json_participant and 'id_participant_group' in json_participant:
@@ -198,10 +198,10 @@ class UserQueryParticipants(Resource):
                 participant_group = TeraParticipantGroup.get_participant_group_by_id(
                     json_participant['id_participant_group'])
                 if participant_group is None:
-                    return 'Participant group not found.', 500
+                    return gettext('Participant group not found.'), 500
                 if participant_group.id_project != json_participant['id_project'] \
                         and json_participant['id_project'] > 0:
-                    return 'Mismatch between id_project and group\'s project', 400
+                    return gettext('Mismatch between id_project and group\'s project'), 400
                 # Force id_project to group project.
                 json_participant['id_project'] = participant_group.id_project
 
@@ -263,7 +263,7 @@ class UserQueryParticipants(Resource):
         part = TeraParticipant.get_participant_by_id(id_todel)
 
         if user_access.get_project_role(part.participant_project.id_project) != 'admin':
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:

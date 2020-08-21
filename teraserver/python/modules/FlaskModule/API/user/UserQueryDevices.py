@@ -204,7 +204,7 @@ class UserQueryDevices(Resource):
         else:
             # Check if current user can modify the posted device
             if json_device['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
-                return '', 403
+                return gettext('Forbidden'), 403
 
             # Check if the user if a site admin of the projects, otherwise limit what can be updated
             current_device = TeraDevice.get_device_by_id(json_device['id_device'])
@@ -231,7 +231,7 @@ class UserQueryDevices(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
         else:
             # New
             try:
@@ -243,7 +243,7 @@ class UserQueryDevices(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
         update_device = TeraDevice.get_device_by_id(json_device['id_device'])
 
@@ -279,7 +279,7 @@ class UserQueryDevices(Resource):
             # We must check if we need to remove projects from that device or delete it completely
             access_projects = user_access.get_accessible_projects(admin_only=True)
             if not access_projects:
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
             dif_projects = set(device_to_del.device_projects).difference(access_projects)
             if len(dif_projects) == 0:
                 full_delete = True
@@ -297,7 +297,7 @@ class UserQueryDevices(Resource):
                     return gettext('Can\'t delete device: please delete all participants association before deleting.'
                                    ), 500
                 if 't_sessions_devices' in str(e.args):
-                    return gettext('Can\'t delete device: please remove all sessions refering to that device before '
+                    return gettext('Can\'t delete device: please remove all sessions referring to that device before '
                                    'deleting.'), 500
                 if 't_sessions_id_creator' in str(e.args):
                     return gettext('Can\'t delete device: please remove all sessions created by that device before '
@@ -307,7 +307,7 @@ class UserQueryDevices(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return 'Database error', 500
+                return gettext('Database error'), 500
         else:
             # Only remove projects from that device so that device is "apparently" deleted to the user
             projects = device_to_del.device_projects

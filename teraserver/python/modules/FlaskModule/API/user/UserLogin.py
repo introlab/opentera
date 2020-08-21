@@ -1,5 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, fields
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_http_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 

@@ -45,24 +45,24 @@ class ServiceQueryAssets(Resource):
             return '', 500
         elif args['id_device']:
             if args['id_device'] not in service_access.get_accessible_devices_ids():
-                return '', 403
+                return gettext('Device access denied'), 403
             assets = TeraAsset.get_assets_for_device(device_id=args['id_device'])
         elif args['id_session']:
             if not args['id_session'] in service_access.get_accessible_sessions_ids():
-                return '', 403
+                return gettext('Session access denied'), 403
             assets = TeraAsset.get_assets_for_session(session_id=args['id_session'])
         elif args['id_participant']:
             if args['id_participant'] not in service_access.get_accessible_participants_ids():
-                return '', 403
+                return gettext('Participant access denied'), 403
             assets = TeraAsset.get_assets_for_participant(part_id=args['id_participant'])
         elif args['id_asset']:
             assets = [TeraAsset.get_asset_by_id(args['id_asset'])]
             if assets[0] is not None:
                 if assets[0].id_device is not None and assets[0].id_device not in \
                         service_access.get_accessible_devices_ids():
-                    return '', 403
+                    return gettext('Permission denied'), 403
                 if not assets[0].id_session in service_access.get_accessible_sessions_ids():
-                    return '', 403
+                    return gettext('Permission denied'), 403
 
         assets_list = []
         for asset in assets:
@@ -84,7 +84,7 @@ class ServiceQueryAssets(Resource):
 
         # Using request.json instead of parser, since parser messes up the json!
         if 'asset' not in request.json:
-            return '', 400
+            return gettext('Missing asset field'), 400
 
         asset_info = request.json['asset']
 

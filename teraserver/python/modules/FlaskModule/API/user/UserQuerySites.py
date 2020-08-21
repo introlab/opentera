@@ -115,12 +115,12 @@ class UserQuerySites(Resource):
 
         # Validate if we have an id
         if 'id_site' not in json_site:
-            return '', 400
+            return gettext('Missing id_site field'), 400
 
         # Check if current user can modify the posted site
         if json_site['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True) and \
                 json_site['id_site'] > 0:
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # Do the update!
         if json_site['id_site'] > 0:
@@ -130,7 +130,7 @@ class UserQuerySites(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
         else:
             # New
             try:
@@ -142,7 +142,7 @@ class UserQuerySites(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to sites update...
         update_site = TeraSite.get_site_by_id(json_site['id_site'])
@@ -166,7 +166,7 @@ class UserQuerySites(Resource):
         # Check if current user can delete
         # Only superadmin can delete sites from here
         if not current_user.user_superadmin:
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:

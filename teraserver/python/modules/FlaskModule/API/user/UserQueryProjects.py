@@ -122,7 +122,7 @@ class UserQueryProjects(Resource):
 
         # Validate if we have an id
         if 'id_project' not in json_project or 'id_site' not in json_project:
-            return '', 400
+            return gettext('Missing id_project or id_site arguments'), 400
 
         # Check if current user can modify the posted kit
         # User can modify or add a project if it is the project admin of that kit
@@ -133,7 +133,7 @@ class UserQueryProjects(Resource):
         # Only site admins can create new projects
         if json_project['id_project'] == 0 and \
                 json_project['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True):
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # Do the update!
         if json_project['id_project'] > 0:
@@ -143,7 +143,7 @@ class UserQueryProjects(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
         else:
             # New
             try:
@@ -155,7 +155,7 @@ class UserQueryProjects(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to sites update...
         update_project = TeraProject.get_project_by_id(json_project['id_project'])
@@ -181,7 +181,7 @@ class UserQueryProjects(Resource):
         project = TeraProject.get_project_by_id(id_todel)
 
         if user_access.get_site_role(project.project_site.id_site) != 'admin':
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:

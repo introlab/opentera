@@ -169,7 +169,7 @@ class UserQueryUserUserGroups(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200
 

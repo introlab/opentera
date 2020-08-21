@@ -148,7 +148,7 @@ class UserQuerySessionTypes(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
         else:
             # New
             try:
@@ -160,7 +160,7 @@ class UserQuerySessionTypes(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
         update_session_type = TeraSessionType.get_session_type_by_id(json_session_type['id_session_type'])
 
@@ -196,7 +196,7 @@ class UserQuerySessionTypes(Resource):
         if len(session_type.session_type_projects) > 0:
             for proj in session_type.session_type_projects:
                 if user_access.get_project_role(proj.id_project) != "admin":
-                    return gettext('Impossible de supprimer - pas administrateur dans tous les projets de ce type.'), \
+                    return gettext('Cannot delete because you are not admin in all projects.'), \
                            403
         else:
             # No project right now for that session type - must at least project admin somewhere to delete
@@ -219,6 +219,6 @@ class UserQuerySessionTypes(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200

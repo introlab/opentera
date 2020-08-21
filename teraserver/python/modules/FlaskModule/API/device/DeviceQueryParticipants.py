@@ -1,5 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule
 from modules.Globals import db_man
 from modules.FlaskModule.FlaskModule import device_api_ns as api
@@ -38,4 +39,4 @@ class DeviceQueryParticipants(Resource):
 
             return response
 
-        return 'Invalid request', 403
+        return gettext('Invalid request'), 403

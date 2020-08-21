@@ -1,5 +1,6 @@
 from flask import jsonify, session
 from flask_restx import Resource, reqparse
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError

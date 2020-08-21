@@ -100,12 +100,12 @@ class UserQueryDeviceProjects(Resource):
         # Validate if we have an id
         for json_device_project in json_device_projects:
             if 'id_device' not in json_device_project or 'id_project' not in json_device_project:
-                return 'Missing fields in body', 400
+                return gettext('Missing fields in body'), 400
 
             # Check if current user can modify the posted device
             if json_device_project['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True) or\
                     json_device_project['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
-                return gettext('Accès refusé'), 403
+                return gettext('Forbidden'), 403
 
             # Check if already exists
             device_project = TeraDeviceProject.get_device_project_id_for_device_and_project(
@@ -124,7 +124,7 @@ class UserQueryDeviceProjects(Resource):
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    return gettext('Database error'), 500
             else:
                 try:
                     new_device_project = TeraDeviceProject()
@@ -135,7 +135,7 @@ class UserQueryDeviceProjects(Resource):
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    return gettext('Database error'), 500
 
         update_device_project = json_device_projects
 
@@ -159,12 +159,12 @@ class UserQueryDeviceProjects(Resource):
         # Check if current user can delete
         device_project = TeraDeviceProject.get_device_project_by_id(id_todel)
         if not device_project:
-            return gettext('Non-trouvé'), 500
+            return gettext('Not found'), 500
 
         if device_project.id_project not in user_access.get_accessible_projects_ids(admin_only=True) or \
                 device_project.device_project_device.id_device not in \
                 user_access.get_accessible_devices_ids(admin_only=True):
-            return gettext('Accès refusé'), 403
+            return gettext('Forbidden'), 403
 
         # Delete participants associated with that device, since the project was changed.
         associated_participants = TeraDeviceParticipant.query_participants_for_device(
@@ -182,6 +182,6 @@ class UserQueryDeviceProjects(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return gettext('Erreur base de données'), 500
+            return gettext('Database error'), 500
 
         return '', 200

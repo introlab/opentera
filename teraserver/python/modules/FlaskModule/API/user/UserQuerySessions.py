@@ -94,13 +94,13 @@ class UserQuerySessions(Resource):
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:
-            return '', 400
+            return gettext('Missing session'), 400
 
         json_session = request.json['session']
 
         # Validate if we have an id
         if 'id_session' not in json_session:
-            return '', 400
+            return gettext('Missing id_session'), 400
 
         # User can modify or add a session if they have access to all the participants and users in the session
         session_parts_ids = []
@@ -145,7 +145,7 @@ class UserQuerySessions(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
         else:
             # New
             try:
@@ -157,7 +157,7 @@ class UserQuerySessions(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
         update_session = TeraSession.get_session_by_id(json_session['id_session'])
 
@@ -227,6 +227,6 @@ class UserQuerySessions(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200

@@ -1,6 +1,7 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse
 from modules.LoginModule.LoginModule import LoginModule
+from flask_babel import gettext
 from modules.Globals import db_man
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from libtera.db.models.TeraDevice import TeraDevice

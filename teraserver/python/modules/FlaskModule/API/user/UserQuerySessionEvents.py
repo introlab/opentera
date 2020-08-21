@@ -1,5 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
@@ -46,7 +47,7 @@ class UserQuerySessionEvents(Resource):
         sessions_events = []
         # Can't query sessions event, unless we have a parameter - id_session
         if not any(args.values()):
-            return '', 400
+            return gettext('No arguments'), 400
         elif args['id_session']:
             sessions_events = user_access.query_session_events(args['id_session'])
 
@@ -76,13 +77,13 @@ class UserQuerySessionEvents(Resource):
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_event' not in request.json:
-            return '', 400
+            return gettext('Missing session_event field'), 400
 
         json_event = request.json['session_event']
 
         # Validate if we have an id
         if 'id_session' not in json_event or 'id_session_event' not in json_event:
-            return '', 400
+            return gettext('Missing id_session or id_session_event fields'), 400
 
         # Check if current user can modify the posted event
         # User can modify or add an event if they have access to the parent session
@@ -90,7 +91,7 @@ class UserQuerySessionEvents(Resource):
         parent_session = user_access.query_session(json_event['id_session'])
 
         if not parent_session:
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # Do the update!
         if json_event['id_session_event'] > 0:
@@ -100,7 +101,7 @@ class UserQuerySessionEvents(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
         else:
             # New
             try:
@@ -112,7 +113,7 @@ class UserQuerySessionEvents(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to sites update...
         update_event = TeraSessionEvent.get_session_event_by_id(json_event['id_session_event'])
@@ -139,7 +140,7 @@ class UserQuerySessionEvents(Resource):
         parent_session = user_access.query_session(session_event.id_session)
 
         if not parent_session:
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
@@ -147,6 +148,6 @@ class UserQuerySessionEvents(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200

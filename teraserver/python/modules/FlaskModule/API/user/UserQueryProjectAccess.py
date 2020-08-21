@@ -1,5 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
+from flask_babel import gettext
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -80,7 +81,7 @@ class UserQueryProjectAccess(Resource):
         access = None
         # If we have no arguments, return bad request
         if not any(args.values()):
-            return "ProjectAccess: missing argument.", 400
+            return gettext("ProjectAccess: missing argument."), 400
 
         # Query access for user id
         if args['id_user']:
@@ -188,15 +189,15 @@ class UserQueryProjectAccess(Resource):
         json_rval = []
         for json_project in json_projects:
             if 'id_user_group' not in json_project:
-                return 'Missing id_user_group', 400
+                return gettext('Missing id_user_group'), 400
             if 'id_project' not in json_project:
-                return 'Missing id_project', 400
+                return gettext('Missing id_project'), 400
             if 'project_access_role' not in json_project and 'id_project_role' not in json_project:
-                return 'Missing role name or id', 400
+                return gettext('Missing role name or id'), 400
 
             # Check if current user can change the access for that project
             if user_access.get_project_role(project_id=json_project['id_project']) != 'admin':
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
 
             project_service_role = None
             if 'project_access_role' in json_project:
@@ -221,7 +222,7 @@ class UserQueryProjectAccess(Resource):
                 project_service_role = TeraServiceRole.get_service_role_by_id(json_project['id_service_role'])
 
             if not project_service_role:
-                return 'Invalid role name or id for that project', 400
+                return gettext('Invalid role name or id for that project'), 400
 
             # Do the update!
             try:
@@ -234,7 +235,7 @@ class UserQueryProjectAccess(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
             if access:
                 json_access = access.to_json()
@@ -263,11 +264,11 @@ class UserQueryProjectAccess(Resource):
 
         project_access = TeraServiceAccess.get_service_access_by_id(id_todel)
         if not project_access:
-            return 'No project access to delete.', 500
+            return gettext('No project access to delete.'), 500
 
         # Check if current user can delete
         if user_access.get_project_role(project_access.service_access_role.id_project) != 'admin':
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
@@ -275,6 +276,6 @@ class UserQueryProjectAccess(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200

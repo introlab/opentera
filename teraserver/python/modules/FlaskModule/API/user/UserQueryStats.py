@@ -47,46 +47,46 @@ class UserQueryUserStats(Resource):
 
         if args['id_user_group']:
             if not args['id_user_group'] in user_access.get_accessible_users_groups_ids():
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
             return UserQueryUserStats.get_user_group_stats(user_access, args['id_user_group'])
 
         if args['id_user']:
             if not args['id_user'] in user_access.get_accessible_users_ids():
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
             return UserQueryUserStats.get_user_stats(user_access, args['id_user'])
 
         if args['id_site']:
             if not args['id_site'] in user_access.get_accessible_sites_ids():
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
             return UserQueryUserStats.get_site_stats(user_access, args['id_site'], args['with_participants'])
 
         if args['id_project']:
             if not args['id_project'] in user_access.get_accessible_projects_ids():
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
             return UserQueryUserStats.get_project_stats(user_access, args['id_project'], args['with_participants'])
 
         if args['id_group']:
             if not args['id_group'] in user_access.get_accessible_groups_ids():
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
             return UserQueryUserStats.get_participant_group_stats(user_access, args['id_group'],
                                                                   args['with_participants'])
 
         if args['id_session']:
             if not args['id_session'] in user_access.get_accessible_sessions_ids():
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
             return UserQueryUserStats.get_session_stats(user_access, args['id_session'])
 
         if args['id_participant']:
             if not args['id_participant'] in user_access.get_accessible_participants_ids():
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
             return UserQueryUserStats.get_participant_stats(user_access, args['id_participant'])
 
         if args['id_device']:
             if not args['id_device'] in user_access.get_accessible_devices_ids():
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
             return UserQueryUserStats.get_device_stats(user_access, args['id_device'])
 
-        return 'Missing id argument', 400
+        return gettext('Missing id argument'), 400
 
     @staticmethod
     def get_user_group_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:

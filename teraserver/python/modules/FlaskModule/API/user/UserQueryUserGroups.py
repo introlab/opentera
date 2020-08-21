@@ -179,7 +179,7 @@ class UserQueryUserGroups(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
         else:
             # Creates a new user group
             try:
@@ -191,7 +191,7 @@ class UserQueryUserGroups(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
         update_user_group = TeraUserGroup.get_user_group_by_id(json_user_group['id_user_group'])
         json_user_group = update_user_group.to_json()
@@ -216,7 +216,7 @@ class UserQueryUserGroups(Resource):
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    return gettext('Database error'), 500
 
         if json_projects:
             for project in json_projects:
@@ -240,7 +240,7 @@ class UserQueryUserGroups(Resource):
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    return gettext('Database error'), 500
             # Returns full list in reply
             json_user_group['user_group_projects_access'] = UserQueryUserGroups.get_projects_roles_json(
                 user_access=user_access, user_group_id=json_user_group['id_user_group'])
@@ -285,7 +285,7 @@ class UserQueryUserGroups(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200
 

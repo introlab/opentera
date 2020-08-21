@@ -1,5 +1,6 @@
 from flask import session, request
 from flask_restx import Resource, reqparse, inputs
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
@@ -50,7 +51,7 @@ class UserQueryDeviceSubTypes(Resource):
         device_subtypes = []
         # If we have no arguments, return all accessible devices
         if args['id_device_subtype'] is None and args['id_device_type'] is None and args['list'] is None:
-            return 'Missing parameters', 400
+            return gettext('Missing parameters'), 400
 
         if args['id_device_subtype']:
             device_subtypes = TeraDeviceSubType.query.filter(TeraDeviceSubType.id_device_type.
@@ -94,11 +95,11 @@ class UserQueryDeviceSubTypes(Resource):
 
         # Validate if we have an id
         if 'id_device_type' not in json_device_subtype or 'id_device_subtype' not in json_device_subtype:
-            return '', 400
+            return gettext('Missing id_device_type or id_device_subtype'), 400
 
         # Check if current user can modify the posted device
         if json_device_subtype['id_device_type'] not in user_access.get_accessible_devices_types_ids(admin_only=True):
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # Do the update!
         if json_device_subtype['id_device_subtype'] > 0:
@@ -108,7 +109,7 @@ class UserQueryDeviceSubTypes(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
         else:
             # New
             try:
@@ -120,7 +121,7 @@ class UserQueryDeviceSubTypes(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to devices update...
         update_device = TeraDeviceSubType.get_device_subtype(json_device_subtype['id_device_subtype'])
@@ -144,10 +145,10 @@ class UserQueryDeviceSubTypes(Resource):
         # Check if current user can delete
         todel = TeraDeviceSubType.get_device_subtype(id_todel)
         if not todel:
-            return 'Device subtype not found', 500
+            return gettext('Device subtype not found'), 500
         
         if todel.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
@@ -155,6 +156,6 @@ class UserQueryDeviceSubTypes(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200

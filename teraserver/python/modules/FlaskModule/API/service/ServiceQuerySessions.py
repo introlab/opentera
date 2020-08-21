@@ -126,5 +126,5 @@ class ServiceQuerySessions(Resource):
                 return session.to_json(minimal=False), 200
 
         # Unhandled
-        return gettext('missing json fields'), 500
+        return gettext('Missing json fields'), 500
 

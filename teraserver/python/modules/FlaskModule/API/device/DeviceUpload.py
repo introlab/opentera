@@ -1,5 +1,5 @@
 from flask_restx import Resource
-
+from flask_babel import gettext
 from modules.FlaskModule.Views.Upload import ALLOWED_EXTENSIONS
 from modules.LoginModule.LoginModule import LoginModule, current_device
 from flask import request
@@ -40,10 +40,10 @@ class DeviceUpload(Resource):
 
         if request.content_type == 'application/octet-stream':
             if 'X-Id-Session' not in request.headers:
-                return 'No ID Session specified', 400
+                return gettext('No ID Session specified'), 400
 
             if 'X-Filename' not in request.headers:
-                return 'No file specified', 400
+                return gettext('No file specified'), 400
 
             id_session = int(request.headers['X-Id-Session'])
             filename = secure_filename(request.headers['X-Filename'])
@@ -101,11 +101,11 @@ class DeviceUpload(Resource):
 
         elif request.content_type.__contains__('multipart/form-data'):
             if 'id_session' not in request.form:
-                return 'No ID Session specified', 400
+                return gettext('No ID Session specified'), 400
 
             # check if the post request has the file part
             if 'file' not in request.files:
-                return 'No file specified', 400
+                return gettext('No file specified'), 400
 
             file = request.files['file']
             id_session = int(request.form['id_session'])
@@ -119,7 +119,7 @@ class DeviceUpload(Resource):
             # if user does not select file, browser also
             # submit an empty part without filename
             if file.filename == '':
-                return 'No filename specified', 400
+                return gettext('No filename specified'), 400
 
             if file:
                 filename = secure_filename(file.filename)

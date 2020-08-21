@@ -1,5 +1,6 @@
 from flask import session, send_file
 from flask_restx import Resource, inputs
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_multi_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant
@@ -101,4 +102,4 @@ class ParticipantQueryDeviceData(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def post(self):
-        return '', 501
+        return gettext('Not implemented'), 501

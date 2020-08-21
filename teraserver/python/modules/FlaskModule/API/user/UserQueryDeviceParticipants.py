@@ -67,7 +67,7 @@ class UserQueryDeviceParticipants(Resource):
         device_part = []
         # If we have no arguments, return error
         if not any(args.values()):
-            return gettext('Arguments manquants'), 400
+            return gettext('Missing argumentrs'), 400
 
         if args['id_device']:
             if args['id_device'] in user_access.get_accessible_devices_ids():
@@ -123,7 +123,7 @@ class UserQueryDeviceParticipants(Resource):
             # Check if current user can modify the posted device
             if json_device_part['id_participant'] not in user_access.get_accessible_participants_ids(admin_only=True) \
                     or json_device_part['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
-                return gettext('Accès refusé'), 403
+                return gettext('Forbidden'), 403
 
             # Check if already exists
             device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
@@ -139,7 +139,7 @@ class UserQueryDeviceParticipants(Resource):
             if not TeraDeviceProject.get_device_project_id_for_device_and_project(
                     device_id=json_device_part['id_device'],
                     project_id=part.id_project):
-                return gettext('Appareil non-assigné au projet du participant'), 403
+                return gettext('Device not assigned to project or participant'), 403
 
             # Do the update!
             if json_device_part['id_device_participant'] > 0:
@@ -149,7 +149,7 @@ class UserQueryDeviceParticipants(Resource):
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    return gettext('Database error'), 500
             else:
                 try:
                     new_device_part = TeraDeviceParticipant()
@@ -163,7 +163,7 @@ class UserQueryDeviceParticipants(Resource):
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to devices update...
         update_device_part = json_device_parts
@@ -187,11 +187,11 @@ class UserQueryDeviceParticipants(Resource):
         # Check if current user can delete
         device_part = TeraDeviceParticipant.get_device_participant_by_id(id_todel)
         if not device_part:
-            return gettext('Non-trouvé'), 500
+            return gettext('Not found'), 500
 
         if device_part.id_participant not in user_access.get_accessible_participants_ids(admin_only=True) or \
                 device_part.id_device not in user_access.get_accessible_devices_ids(admin_only=True):
-            return gettext('Accès refusé'), 403
+            return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
@@ -199,6 +199,6 @@ class UserQueryDeviceParticipants(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return gettext('Erreur base de données'), 500
+            return gettext('Database error'), 500
 
         return '', 200

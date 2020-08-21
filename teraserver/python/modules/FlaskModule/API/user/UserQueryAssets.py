@@ -1,5 +1,6 @@
 from flask import session, request
 from flask_restx import Resource
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
@@ -52,27 +53,27 @@ class UserQueryAssets(Resource):
 
         # If we have no arguments, return all assets
         if not any(args.values()):
-            return '', 400
+            return gettext('No arguments specified'), 400
         elif args['id_device']:
             if args['id_device'] not in user_access.get_accessible_devices_ids():
-                return '', 403
+                return gettext('Device access denied'), 403
             assets = TeraAsset.get_assets_for_device(device_id=args['id_device'])
         elif args['id_session']:
             if not user_access.query_session(session_id=args['id_session']):
-                return '', 403
+                return gettext('Session access denied'), 403
             assets = TeraAsset.get_assets_for_session(session_id=args['id_session'])
         elif args['id_participant']:
             if args['id_participant'] not in user_access.get_accessible_participants_ids():
-                return '', 403
+                return gettext('Participant access denied'), 403
             assets = TeraAsset.get_assets_for_participant(part_id=args['id_participant'])
         elif args['id_asset']:
             assets = [TeraAsset.get_asset_by_id(args['id_asset'])]
             if assets[0] is not None:
                 if assets[0].id_device is not None and assets[0].id_device not in \
                         user_access.get_accessible_devices_ids():
-                    return '', 403
+                    return gettext('Permission denied'), 403
                 if not user_access.query_session(session_id=assets[0].id_session):
-                    return '', 403
+                    return gettext('Permission denied'), 403
         elif args['service_uuid']:
             assets = user_access.query_assets_for_service(args['service_uuid'])
         elif args['all']:
@@ -141,7 +142,7 @@ class UserQueryAssets(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200
 
@@ -207,5 +208,5 @@ class UserQueryAssets(Resource):
                 else:
                     # Remove asset, was not able to upload
                     TeraAsset.delete(new_asset.id_asset)
-                    return 'Error uploading file', 500
-        return 'Not authorized', 403
+                    return gettext('Error uploading file'), 500
+        return gettext('Not authorized'), 403

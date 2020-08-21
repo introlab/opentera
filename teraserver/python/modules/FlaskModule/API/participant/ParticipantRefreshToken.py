@@ -1,5 +1,6 @@
 from flask import session, request
 from flask_restx import Resource, inputs
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_token_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant
@@ -43,8 +44,3 @@ class ParticipantRefreshToken(Resource):
         reply = {"refresh_token": participant_token}
 
         return reply
-
-
-
-
-

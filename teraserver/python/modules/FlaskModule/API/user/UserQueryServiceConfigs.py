@@ -61,7 +61,7 @@ class UserQueryServiceConfig(Resource):
         id_participant = args['id_participant']
 
         if (id_participant and (id_device or id_user)) or (id_user and id_device):
-            return 'Can\'t combine id_user, id_participant and id_device in request', 400
+            return gettext('Can\'t combine id_user, id_participant and id_device in request'), 400
 
         if not id_user and not id_device and not id_service and not id_participant:
             # return 'Must specify at least one id parameter', 400
@@ -108,7 +108,7 @@ class UserQueryServiceConfig(Resource):
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'service_config' not in request.json:
-            return 'Missing service_config', 400
+            return gettext('Missing service_config'), 400
 
         json_config = request.json['service_config']
 
@@ -118,26 +118,26 @@ class UserQueryServiceConfig(Resource):
 
         if ('id_participant' in json_config and ('id_device' in json_config or 'id_user' in json_config)) \
                 or ('id_user' in json_config and 'id_device' in json_config):
-            return 'Can\'t combine id_user, id_participant and id_device in request', 400
+            return gettext('Can\'t combine id_user, id_participant and id_device in request'), 400
 
         # Validate if we can modify
         if 'id_service' in json_config:
             if json_config['id_service'] not in user_access.get_accessible_services_ids(include_system_services=True):
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
 
         if 'id_device' in json_config:
             if json_config['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
 
         if 'id_participant' in json_config:
             if json_config['id_participant'] not in user_access.get_accessible_participants_ids(admin_only=True):
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
 
         if 'id_user' in json_config:
             # Can always modify "self" config
             if json_config['id_user'] != session['_user_id'] and \
                     json_config['id_user'] not in user_access.get_accessible_users_ids(admin_only=True):
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
 
         import jsonschema
         # Do the update!
@@ -145,34 +145,34 @@ class UserQueryServiceConfig(Resource):
             # Already existing
             try:
                 if not TeraServiceConfig.update(json_config['id_service_config'], json_config):
-                    return 'Invalid config format provided', 400
+                    return gettext('Invalid config format provided'), 400
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database Error'), 500
             except (ValueError, jsonschema.exceptions.ValidationError) as err:
                 return str(err), 400
 
         else:
             # New
             if 'id_service' not in json_config:
-                return 'Missing id_service', 400
+                return gettext('Missing id_service'), 400
 
             if 'id_participant' not in json_config and 'id_user' not in json_config and 'id_device' not in json_config:
-                return 'Missing at least one id field', 400
+                return gettext('Missing at least one id field'), 400
 
             try:
                 new_sc = TeraServiceConfig()
                 new_sc.from_json(json_config)
                 if not TeraServiceConfig.insert(new_sc):
-                    return 'Invalid config format provided', 400
+                    return gettext('Invalid config format provided'), 400
 
                 # Update ID for further use
                 json_config['id_service_config'] = new_sc.id_service_config
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
             except (ValueError, jsonschema.exceptions.ValidationError) as err:
                 return str(err), 400
 
@@ -199,20 +199,20 @@ class UserQueryServiceConfig(Resource):
         todel_config = TeraServiceConfig.get_service_config_by_id(id_todel)
 
         if todel_config.id_service not in user_access.get_accessible_services_ids(include_system_services=True):
-            return 'Forbidden', 403
+            return gettext('Forbidden'), 403
 
         if todel_config.id_user:
             if todel_config.id_user != session['_user_id'] and \
                     todel_config.id_user not in user_access.get_accessible_users_ids(admin_only=True):
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
 
         if todel_config.id_participant:
             if todel_config.id_participant not in user_access.get_accessible_participants_ids(admin_only=True):
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
 
         if todel_config.id_device:
             if todel_config.id_device not in user_access.get_accessible_devices_ids(admin_only=True):
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
@@ -220,6 +220,6 @@ class UserQueryServiceConfig(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200

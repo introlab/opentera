@@ -220,7 +220,7 @@ class UserQueryUsers(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
         update_user = TeraUser.get_user_by_id(json_user['id_user'])
 
@@ -278,7 +278,7 @@ class UserQueryUsers(Resource):
             # We must check if we need to remove usergroups from that user or delete it completely
             access_user_groups = user_access.get_accessible_users_groups(admin_only=True, by_sites=True)
             if not access_user_groups:
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
             dif_groups = set(user_to_del.user_user_groups).difference(access_user_groups)
             if len(dif_groups) == 0:
                 full_delete = True
@@ -303,7 +303,7 @@ class UserQueryUsers(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return 'Database error', 500
+                return gettext('Database error'), 500
         else:
             # Only remove usergroups from that user so that user is "apparently" deleted to the site admin
             user_groups = user_to_del.user_user_groups

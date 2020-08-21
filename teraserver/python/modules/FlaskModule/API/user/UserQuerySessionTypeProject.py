@@ -93,7 +93,7 @@ class UserQuerySessionTypeProject(Resource):
 
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_type_project' not in request.json:
-            return '', 400
+            return gettext('Field session_type_project missing'), 400
 
         json_stps = request.json['session_type_project']
         if not isinstance(json_stps, list):
@@ -106,7 +106,7 @@ class UserQuerySessionTypeProject(Resource):
 
             # Check if current user can modify the posted information
             if json_stp['id_session_type'] not in user_access.get_accessible_session_types_ids(admin_only=True):
-                return gettext('Acces refuse'), 403
+                return gettext('Access denied'), 403
 
             # Check if already exists
             stp = TeraSessionTypeProject.query_session_type_project_for_session_type_project(
@@ -147,7 +147,7 @@ class UserQuerySessionTypeProject(Resource):
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to devices update...
         update_stp = json_stps
@@ -172,10 +172,10 @@ class UserQuerySessionTypeProject(Resource):
         # Check if current user can delete
         stp = TeraSessionTypeProject.get_session_type_project_by_id(id_todel)
         if not stp:
-            return gettext('Non-trouvé'), 500
+            return gettext('Not found'), 500
 
         if stp.id_session_type not in user_access.get_accessible_session_types_ids(admin_only=True):
-            return gettext('Accès refusé'), 403
+            return gettext('Access denied'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
@@ -183,6 +183,6 @@ class UserQuerySessionTypeProject(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return gettext('Erreur base de données'), 500
+            return gettext('Database error'), 500
 
         return '', 200

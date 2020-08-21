@@ -92,18 +92,18 @@ class UserQueryParticipantGroup(Resource):
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'group' not in request.json:
-            return '', 400
+            return gettext('Missing group'), 400
 
         json_group = request.json['group']
 
         # Validate if we have an id
         if 'id_participant_group' not in json_group or 'id_project' not in json_group:
-            return '', 400
+            return gettext('Missing id_participant_group or id_project'), 400
 
         # Check if current user can modify the posted group
         # User can modify or add a group if it has admin access to that project
         if json_group['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True):
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # Do the update!
         if json_group['id_participant_group'] > 0:
@@ -113,7 +113,7 @@ class UserQueryParticipantGroup(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
         else:
             # New
             try:
@@ -125,7 +125,7 @@ class UserQueryParticipantGroup(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to sites update...
         update_group = TeraParticipantGroup.get_participant_group_by_id(json_group['id_participant_group'])
@@ -151,7 +151,7 @@ class UserQueryParticipantGroup(Resource):
         group = TeraParticipantGroup.get_participant_group_by_id(id_todel)
 
         if user_access.get_project_role(group.id_project) != 'admin':
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:

@@ -1,5 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
+from flask_babel import gettext
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -77,7 +78,7 @@ class UserQuerySiteAccess(Resource):
         access = None
         # If we have no arguments, return bad request
         if not any(args.values()):
-            return "SiteAccess: missing argument.", 400
+            return gettext("SiteAccess: missing argument."), 400
 
         # Query access for user id
         if args['id_user']:
@@ -174,15 +175,15 @@ class UserQuerySiteAccess(Resource):
         json_rval = []
         for json_site in json_sites:
             if 'id_user_group' not in json_site:
-                return 'Missing id_user_group', 400
+                return gettext('Missing id_user_group'), 400
             if 'id_site' not in json_site:
-                return 'Missing id_site', 400
+                return gettext('Missing id_site'), 400
             if 'site_access_role' not in json_site and 'id_service_role' not in json_site:
-                return 'Missing role name or id', 400
+                return gettext('Missing role name or id'), 400
 
             # Check if current user can change the access for that site
             if user_access.get_site_role(site_id=json_site['id_site']) != 'admin':
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
 
             site_service_role = None
             if 'site_access_role' in json_site:
@@ -220,7 +221,7 @@ class UserQuerySiteAccess(Resource):
                 site_service_role = TeraServiceRole.get_service_role_by_id(json_site['id_service_role'])
 
             if not site_service_role:
-                return 'Invalid role name or id for that site', 400
+                return gettext('Invalid role name or id for that site'), 400
 
             # Do the update!
             try:
@@ -233,7 +234,7 @@ class UserQuerySiteAccess(Resource):
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                return gettext('Database error'), 500
 
             if access:
                 json_access = access.to_json()
@@ -261,11 +262,11 @@ class UserQuerySiteAccess(Resource):
 
         site_access = TeraServiceAccess.get_service_access_by_id(id_todel)
         if not site_access:
-            return 'No site access to delete.', 500
+            return gettext('No site access to delete'), 500
 
         # Check if current user can delete
         if user_access.get_site_role(site_access.service_access_role.id_site) != 'admin':
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
@@ -273,7 +274,7 @@ class UserQuerySiteAccess(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200
 

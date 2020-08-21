@@ -193,7 +193,7 @@ class UserQueryServiceProjects(Resource):
             from libtera.db.models.TeraProject import TeraProject
             project = TeraProject.get_project_by_id(json_sp['id_project'])
             if user_access.get_site_role(project.id_site) != 'admin':
-                return 'Access denied', 403
+                return gettext('Access denied'), 403
 
         for json_sp in json_sps:
             if 'id_service_project' not in json_sp:
@@ -213,7 +213,7 @@ class UserQueryServiceProjects(Resource):
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    return gettext('Database error'), 500
             else:
                 try:
                     new_sp = TeraServiceProject()
@@ -224,7 +224,7 @@ class UserQueryServiceProjects(Resource):
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    return gettext('Database error'), 500
 
         update_sp = json_sps
 
@@ -246,10 +246,10 @@ class UserQueryServiceProjects(Resource):
         # Check if current user can delete
         sp = TeraServiceProject.get_service_project_by_id(id_todel)
         if not sp:
-            return gettext('Non-trouvé'), 500
+            return gettext('Not found'), 500
 
         if sp.service_project_project.id_site not in user_access.get_accessible_sites_ids(admin_only=True):
-            return gettext('Opération non-permise'), 403
+            return gettext('Operation not completed'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
@@ -257,6 +257,6 @@ class UserQueryServiceProjects(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return gettext('Erreur base de données'), 500
+            return gettext('Database error'), 500
 
         return '', 200

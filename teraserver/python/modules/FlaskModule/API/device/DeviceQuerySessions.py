@@ -1,5 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, inputs
+from flask_babel import gettext
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraParticipant import TeraParticipant
 from modules.DatabaseModule.DBManager import DBManager

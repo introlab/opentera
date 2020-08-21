@@ -1,5 +1,6 @@
 from flask_login import logout_user
 from flask_restx import Resource, reqparse
+from flask_babel import gettext
 from flask import session
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 
@@ -15,4 +16,4 @@ class UserLogout(Resource):
         print('logout user')
         logout_user()
         session.clear()
-        return "User logged out."
+        return gettext("User logged out."), 200

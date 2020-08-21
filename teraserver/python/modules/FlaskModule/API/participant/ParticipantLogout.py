@@ -1,6 +1,7 @@
 from flask import jsonify, session
 from flask_login import logout_user
 from flask_restx import Resource, reqparse, fields
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_multi_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 
@@ -27,5 +28,5 @@ class ParticipantLogout(Resource):
         print('logout participant')
         logout_user()
         session.clear()
-        return "Participant logged out.", 200
+        return gettext("Participant logged out."), 200
 

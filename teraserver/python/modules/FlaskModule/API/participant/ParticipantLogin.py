@@ -1,5 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, fields
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from modules.RedisVars import RedisVars
@@ -70,6 +71,6 @@ class ParticipantLogin(Resource):
 
             return reply
         else:
-            return 'Missing current_participant', 501
+            return gettext('Missing current_participant'), 501
 
 

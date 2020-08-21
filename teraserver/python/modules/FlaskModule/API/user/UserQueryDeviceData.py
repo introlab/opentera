@@ -1,5 +1,6 @@
 from flask import jsonify, session, send_file #send_from_directory
 from flask_restx import Resource, inputs
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
@@ -51,23 +52,23 @@ class UserQueryDeviceData(Resource):
             return '', 500
         elif args['id_device']:
             if args['id_device'] not in user_access.get_accessible_devices_ids():
-                return '', 403
+                return gettext('Device access denied'), 403
             datas = TeraDeviceData.get_data_for_device(device_id=args['id_device'])
         elif args['id_session']:
             if not user_access.query_session(session_id=args['id_session']):
-                return '', 403
+                return gettext('Session access denied'), 403
             datas = TeraDeviceData.get_data_for_session(session_id=args['id_session'])
         elif args['id_participant']:
             if args['id_participant'] not in user_access.get_accessible_participants_ids():
-                return '', 403
+                return gettext('Participant access denied'), 403
             datas = TeraDeviceData.get_data_for_participant(part_id=args['id_participant'])
         elif args['id_device_data']:
             datas = [TeraDeviceData.get_data_by_id(args['id_device_data'])]
             if datas[0] is not None:
                 if datas[0].id_device not in user_access.get_accessible_devices_ids():
-                    return '', 403
+                    return gettext('Permission denied'), 403
                 if not user_access.query_session(session_id=datas[0].id_session):
-                    return '', 403
+                    return gettext('Permission denied'), 403
 
         if args['download'] is None:
             data_list = []
@@ -190,7 +191,7 @@ class UserQueryDeviceData(Resource):
 
         # Check if current user can delete
         if data.id_device not in user_access.get_accessible_devices_ids(admin_only=True):
-            return '', 403
+            return gettext('Device access denied'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
@@ -198,7 +199,7 @@ class UserQueryDeviceData(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200
 

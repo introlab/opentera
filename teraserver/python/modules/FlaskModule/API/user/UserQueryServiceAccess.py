@@ -151,7 +151,7 @@ class UserQueryServiceAccess(Resource):
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    return gettext('Database error'), 500
             else:
                 # New
                 if 'id_service_role' not in json_sa:
@@ -170,7 +170,7 @@ class UserQueryServiceAccess(Resource):
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    return gettext('Database error'), 500
 
         return json_sa_list
 

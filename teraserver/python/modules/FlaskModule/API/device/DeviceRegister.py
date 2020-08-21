@@ -1,4 +1,5 @@
 from flask_restx import Resource, reqparse
+from flask_babel import gettext
 from flask import jsonify
 from flask import request
 import base64
@@ -119,7 +120,7 @@ class DeviceRegister(Resource):
 
             # Check if we have device name
             if 'device_name' not in device_info:
-                return 'Invalid content type', 400
+                return gettext('Invalid content type'), 400
 
             device_name = device_info['device_name']
             device = self.create_device(device_name)
@@ -136,4 +137,4 @@ class DeviceRegister(Resource):
             # Return token
             return jsonify(result)
         else:
-            return 'Invalid content type', 400
+            return gettext('Invalid content type'), 400

@@ -197,15 +197,15 @@ class UserQueryServices(Resource):
 
         # Check if current user can delete
         if not current_user.user_superadmin:
-            return '', 403
+            return gettext('Forbidden'), 403
 
         # Check that we are not trying to delete a system service
         service = TeraService.get_service_by_id(id_todel)
         if not service:
-            return 'Invalid service', 400
+            return gettext('Invalid service'), 400
 
         if service.service_system:
-            return 'Forbidden', 403
+            return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
@@ -213,7 +213,7 @@ class UserQueryServices(Resource):
         except exc.SQLAlchemyError:
             import sys
             print(sys.exc_info())
-            return 'Database error', 500
+            return gettext('Database error'), 500
 
         return '', 200
 
