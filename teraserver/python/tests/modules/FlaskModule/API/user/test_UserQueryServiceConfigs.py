@@ -271,4 +271,4 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         self.assertTrue(json_data.__contains__('id_service'))
         self.assertTrue(json_data.__contains__('service_config_config'))
         self.assertTrue(json_data.__contains__('service_config_last_update_time'))
-        self.assertTrue(json_data.__contains__('service_config_service_name'))
+        self.assertTrue(json_data.__contains__('service_config_name'))

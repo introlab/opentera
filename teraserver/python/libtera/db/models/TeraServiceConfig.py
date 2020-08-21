@@ -50,7 +50,7 @@ class TeraServiceConfig(db.Model, BaseModel):
         json_config = super().to_json(ignore_fields=ignore_fields)
 
         if not minimal:
-            json_config['service_config_service_name'] = self.service_config_service.service_name
+            json_config['service_config_name'] = self.service_config_service.service_name
             if self.version_id:  # No version ID can occur on temporary objects
                 json_config['service_config_last_update_time'] = self.get_last_update_datetime().isoformat()
             else:

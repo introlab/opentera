@@ -3,6 +3,7 @@ from flask_restx import Resource, reqparse
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
+from flask_babel import gettext
 
 from libtera.db.models.TeraUser import TeraUser
 
@@ -18,24 +19,41 @@ from libtera.forms.TeraDeviceSubTypeForm import TeraDeviceSubTypeForm
 from libtera.forms.TeraUserGroupForm import TeraUserGroupForm
 from libtera.forms.TeraServiceForm import TeraServiceForm
 
+get_parser = api.parser()
+get_parser.add_argument(name='type', type=str, help='Data type of the required form. Currently, the '
+                                                    'following data types are supported: \n '
+                                                    'device\n'
+                                                    'device_subtype\n'
+                                                    'group\n'
+                                                    'participant\n'
+                                                    'project\n'
+                                                    'service\n'
+                                                    'service_config'
+                                                    'session\n'
+                                                    'session_type\n'
+                                                    'site\n'
+                                                    'user\n'
+                                                    'user_group\n'
+                                                    'user_profile\n'
+                        )
+get_parser.add_argument(name='id', type=int, help='Specific id of subitem to query. Used with service_config.')
+
 
 class UserQueryForms(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         self.module = kwargs.get('flaskModule', None)
         Resource.__init__(self, _api, *args, **kwargs)
-        self.parser = reqparse.RequestParser()
-        self.parser.add_argument('type', type=str, help='Definition type required', required=True)
 
     @user_multi_auth.login_required
+    @api.expect(get_parser)
     @api.doc(description='Get json description of standard input form for the specified data type.',
              responses={200: 'Success',
+                        400: 'Missing required parameter',
                         500: 'Unknown or unsupported data type'})
-    @api.param(name='type', type='string', description='Data type of the required form. Currently, the following data '
-                                                       'types are supported: \n user_profile\nuser\nsite\ndevice\n'
-                                                       'project\ngroup\nparticipant\nsession_type\nsession')
     def get(self):
-        args = self.parser.parse_args(strict=True)
+        parser = get_parser
+        args = parser.parse_args()
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
@@ -75,4 +93,22 @@ class UserQueryForms(Resource):
         if args['type'] == 'service':
             return TeraServiceForm.get_service_form(user_access=user_access)
 
-        return 'Unknown definition type: ' + args['type'], 500
+        if args['type'] == 'service_config':
+            if 'id' not in args:
+                return gettext('Missing required id.')
+
+            from libtera.db.models.TeraService import TeraService
+            service = TeraService.get_service_by_id(args['id'])
+
+            if not service:
+                return gettext('Invalid service id'), 400
+
+            if service.has_config_schema():
+                import json
+                config_json = json.loads(service.service_config_schema)
+                return config_json
+            else:
+                from libtera.forms.TeraForm import TeraForm
+                return TeraForm("service_config").to_dict()
+
+        return gettext('Unknown form type: ') + args['type'], 500
