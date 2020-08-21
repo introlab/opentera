@@ -16,14 +16,14 @@ class TeraProjectForm:
             sites_list.append(TeraFormValue(value_id=site.id_site, value=site.site_name))
 
         # Sections
-        section = TeraFormSection("informations", gettext("Informations"))
+        section = TeraFormSection("informations", gettext("Information"))
         form.add_section(section)
 
         # Items
-        section.add_item(TeraFormItem("id_project", gettext("ID Projet"), "hidden", True))
-        section.add_item(TeraFormItem("project_name", gettext("Nom du projet"), "text", True))
+        section.add_item(TeraFormItem("id_project", gettext("Project ID"), "hidden", True))
+        section.add_item(TeraFormItem("project_name", gettext("Project Name"), "text", True))
         section.add_item(TeraFormItem("id_site", gettext("Site"), "array", True, item_values=sites_list))
-        section.add_item(TeraFormItem("project_role", gettext("Rôle"), "hidden"))
-        section.add_item(TeraFormItem("site_name", gettext("Nom du site initial"), "hidden"))
+        section.add_item(TeraFormItem("project_role", gettext("Role"), "hidden"))
+        section.add_item(TeraFormItem("site_name", gettext("Site Name"), "hidden"))
 
         return form.to_dict()

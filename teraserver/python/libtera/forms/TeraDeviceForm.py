@@ -21,36 +21,36 @@ class TeraDeviceForm:
             device_types_list.append(TeraFormValue(value_id=dev_type.id_device_type, value=name))
 
         # Sections
-        section = TeraFormSection("details", gettext("Paramètres"))
+        section = TeraFormSection("details", gettext("Parameters"))
         form.add_section(section)
 
         # Items
-        section.add_item(TeraFormItem("id_device", gettext("ID Appareil"), "hidden", item_required=True))
-        section.add_item(TeraFormItem("device_uuid", gettext("UUID Appareil"), "hidden", item_required=True))
-        section.add_item(TeraFormItem("device_name", gettext("Nom appareil"), "text", item_required=True))
-        section.add_item(TeraFormItem("device_type", gettext("Type appareil"), "array", item_required=True,
+        section.add_item(TeraFormItem("id_device", gettext("Device ID"), "hidden", item_required=True))
+        section.add_item(TeraFormItem("device_uuid", gettext("Device UUID"), "hidden", item_required=True))
+        section.add_item(TeraFormItem("device_name", gettext("Device Name"), "text", item_required=True))
+        section.add_item(TeraFormItem("device_type", gettext("Device Type"), "array", item_required=True,
                                       item_values=device_types_list))
-        section.add_item(TeraFormItem("id_device_subtype", gettext("Sous-type appareil"), "array", item_required=False,
+        section.add_item(TeraFormItem("id_device_subtype", gettext("Device Sub-Type"), "array", item_required=False,
                                       item_condition=TeraFormItemCondition("device_type", "=", "changed",
                                                                            "/api/user/devicesubtypes?id_device_type=")))
-        section.add_item(TeraFormItem("device_token", gettext("Jeton d'accès"), "label",
+        section.add_item(TeraFormItem("device_token", gettext("Access Token"), "label",
                                       item_options={"readonly": False}))
-        section.add_item(TeraFormItem("device_certificate", gettext("Certificat"), "hidden",
+        section.add_item(TeraFormItem("device_certificate", gettext("Certificate"), "hidden",
                                       item_options={"readonly": True}))
-        section.add_item(TeraFormItem("device_enabled", gettext("Activé?"), "boolean", item_required=True))
-        section.add_item(TeraFormItem("device_onlineable", gettext("Peut se connecter?"), "boolean",
+        section.add_item(TeraFormItem("device_enabled", gettext("Device Enabled?"), "boolean", item_required=True))
+        section.add_item(TeraFormItem("device_onlineable", gettext("Device Onlineable?"), "boolean",
                                       item_required=True))
 
-        section.add_item(TeraFormItem("device_lastonline", gettext("Dernière connexion"), "label",
+        section.add_item(TeraFormItem("device_lastonline", gettext("Last Connection"), "label",
                                       item_options={"readonly": True}))
 
-        section3 = TeraFormSection("infos", gettext("Informations"))
+        section3 = TeraFormSection("infos", gettext("Information"))
         form.add_section(section3)
-        section3.add_item(TeraFormItem("device_infos", gettext("Informations"), "longtext"))
+        section3.add_item(TeraFormItem("device_infos", gettext("Device Information"), "longtext"))
 
         section2 = TeraFormSection("config", gettext("Configuration"))
         form.add_section(section2)
-        section2.add_item(TeraFormItem("device_config", gettext("Configuration"), "longtext"))
+        section2.add_item(TeraFormItem("device_config", gettext("Device Configuration"), "longtext"))
 
         section1 = TeraFormSection("notes", gettext("Notes"))
         form.add_section(section1)
