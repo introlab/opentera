@@ -10,24 +10,24 @@ class TeraUserForm:
         form = TeraForm("user")
 
         # Sections
-        section = TeraFormSection("informations", gettext("Informations"))
+        section = TeraFormSection("informations", gettext("Information"))
         form.add_section(section)
 
         # Items
-        section.add_item(TeraFormItem("id_user", gettext("ID Utilisateur"), "hidden", True))
-        section.add_item(TeraFormItem("user_uuid", gettext("UUID Utilisateur"), "hidden"))
-        section.add_item(TeraFormItem("user_name", gettext("Nom complet Utilisateur"), "hidden"))
-        section.add_item(TeraFormItem("user_username", gettext("Code utilisateur"), "text", True))
-        section.add_item(TeraFormItem("user_enabled", gettext("Activé"), "boolean", True, item_default=True))
-        section.add_item(TeraFormItem("user_firstname", gettext("Prénom"), "text", True))
-        section.add_item(TeraFormItem("user_lastname", gettext("Nom"), "text", True))
-        section.add_item(TeraFormItem("user_email", gettext("Courriel"), "text"))
+        section.add_item(TeraFormItem("id_user", gettext("User ID"), "hidden", True))
+        section.add_item(TeraFormItem("user_uuid", gettext("User UUID"), "hidden"))
+        section.add_item(TeraFormItem("user_name", gettext("User Full Name"), "hidden"))
+        section.add_item(TeraFormItem("user_username", gettext("Username"), "text", True))
+        section.add_item(TeraFormItem("user_enabled", gettext("User Enabled"), "boolean", True, item_default=True))
+        section.add_item(TeraFormItem("user_firstname", gettext("First Name"), "text", True))
+        section.add_item(TeraFormItem("user_lastname", gettext("Last NAme"), "text", True))
+        section.add_item(TeraFormItem("user_email", gettext("Email"), "text"))
         section.add_item(
-            TeraFormItem("user_password", gettext("Mot de passe"), "password", item_options={"confirm": True}))
-        section.add_item(TeraFormItem("user_superadmin", gettext("Super administrateur"), "boolean", True))
+            TeraFormItem("user_password", gettext("Password"), "password", item_options={"confirm": True}))
+        section.add_item(TeraFormItem("user_superadmin", gettext("User Is Super Administrator"), "boolean", True))
         section.add_item(TeraFormItem("user_notes", gettext("Notes"), "longtext"))
-        section.add_item(TeraFormItem("user_profile", gettext("Profil"), "hidden"))
-        section.add_item(TeraFormItem("user_lastonline", gettext("Dernière connexion"), "datetime",
+        section.add_item(TeraFormItem("user_profile", gettext("Profile"), "hidden"))
+        section.add_item(TeraFormItem("user_lastonline", gettext("Last Connection"), "datetime",
                                       item_options={"readonly": True}))
 
         return form.to_dict()
@@ -37,13 +37,13 @@ class TeraUserForm:
         form = TeraForm("profile")
 
         # Sections
-        section = TeraFormSection("main_prefs", gettext("Préférences"))
+        section = TeraFormSection("main_prefs", gettext("Preferences"))
         form.add_section(section)
 
-        section.add_item(TeraFormItem("language", gettext("Langue"), "array", False,
+        section.add_item(TeraFormItem("language", gettext("Language"), "array", False,
                                       [TeraFormValue("fr", gettext("Français")),
-                                       TeraFormValue("en", gettext("Anglais"))]))
-        section.add_item(TeraFormItem("notify_sounds", gettext("Son lorsque connexion/déconnexion"), "boolean", False))
+                                       TeraFormValue("en", gettext("English"))]))
+        section.add_item(TeraFormItem("notify_sounds", gettext("Activate Notification Sounds"), "boolean", False))
 
         # section1 = TeraFormSection("main_audio_video", gettext("Configuration audio-vidéo"))
         # form.add_section(section1)

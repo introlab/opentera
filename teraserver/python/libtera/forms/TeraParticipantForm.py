@@ -16,32 +16,33 @@ class TeraParticipantForm:
             groups_list.append(TeraFormValue(value_id=group.id_participant_group, value=group.participant_group_name))
 
         # Sections
-        section = TeraFormSection("informations", gettext("Informations"))
+        section = TeraFormSection("informations", gettext("Information"))
         form.add_section(section)
 
         # Items
-        section.add_item(TeraFormItem("id_participant", gettext("ID Participant"), "hidden", True))
-        section.add_item(TeraFormItem("id_project", gettext("ID Projet"), "hidden", True))
-        section.add_item(TeraFormItem("id_site", gettext("ID Site"), "hidden", True))
-        section.add_item(TeraFormItem("participant_uuid", gettext("UUID Participant"), "hidden", True))
-        section.add_item(TeraFormItem("participant_name", gettext("Nom Participant"), "text", True))
-        section.add_item(TeraFormItem("participant_email", gettext("Courriel Participant"), "text", False))
-        section.add_item(TeraFormItem("id_participant_group", gettext("Groupe"), "array", False,
+        section.add_item(TeraFormItem("id_participant", gettext("Participant ID"), "hidden", True))
+        section.add_item(TeraFormItem("id_project", gettext("Projet ID"), "hidden", True))
+        section.add_item(TeraFormItem("id_site", gettext("Site ID"), "hidden", True))
+        section.add_item(TeraFormItem("participant_uuid", gettext("Participant UUID"), "hidden", True))
+        section.add_item(TeraFormItem("participant_name", gettext("Participant Name"), "text", True))
+        section.add_item(TeraFormItem("participant_email", gettext("Participant Email"), "text", False))
+        section.add_item(TeraFormItem("id_participant_group", gettext("Participant Group"), "array", False,
                                       item_values=groups_list))
-        section.add_item(TeraFormItem("participant_enabled", gettext("Participant actif"), "boolean", True,
+        section.add_item(TeraFormItem("participant_enabled", gettext("Participant Enabled"), "boolean", True,
                                       item_default=True))
-        section.add_item(TeraFormItem("participant_token", gettext("Jeton Participant"), "label", False,
+        section.add_item(TeraFormItem("participant_token", gettext("Participant Token"), "label", False,
                                       item_options={"readonly": False}))
-        section.add_item(TeraFormItem("participant_login_enabled", gettext("Peut se connecter?"), "boolean", True,
-                                      item_default=False))
-        section.add_item(TeraFormItem("participant_username", gettext("Identification connexion"), "text", True,
+        section.add_item(TeraFormItem("participant_login_enabled", gettext("Participant Login Enabled"),
+                                      "boolean", True, item_default=False))
+        section.add_item(TeraFormItem("participant_username", gettext("Participant Username"), "text", True,
                                       item_condition=TeraFormItemCondition("participant_login_enabled", "=", True)))
         section.add_item(
-            TeraFormItem("participant_password", gettext("Mot de passe"), "password", item_options={"confirm": True},
+            TeraFormItem("participant_password", gettext("Participant Password"), "password",
+                         item_options={"confirm": True},
                          item_condition=TeraFormItemCondition("participant_login_enabled", "=", True)))
-        section.add_item(TeraFormItem("participant_lastonline", gettext("Dernière connexion"), "label",
+        section.add_item(TeraFormItem("participant_lastonline", gettext("Last Connection"), "label",
                                       item_options={"readonly": True}))
-        section.add_item(TeraFormItem("participant_lastsession", gettext("Dernière séance"), "label",
+        section.add_item(TeraFormItem("participant_lastsession", gettext("Last Session"), "label",
                                       item_options={"readonly": True}))
 
         return form.to_dict()

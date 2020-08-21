@@ -47,51 +47,51 @@ class TeraSessionForm:
             status_list.append(TeraFormValue(value_id=status.value, value=status.name))
 
         # Sections
-        section = TeraFormSection("informations", gettext("Informations"))
+        section = TeraFormSection("informations", gettext("Information"))
         form.add_section(section)
 
         # Items
-        section.add_item(TeraFormItem("id_session", gettext("ID séance"), "hidden", True))
-        section.add_item(TeraFormItem("session_uuid", gettext("UUID Séance"), "hidden", True))
-        section.add_item(TeraFormItem("session_name", gettext("Nom de la séance"), "text", True))
-        section.add_item(TeraFormItem("id_session_type", gettext("Type de séance"), "array", True, item_values=st_list))
-        section.add_item(TeraFormItem('session_creator_user', gettext('Nom créateur (Utilisateur)'), 'hidden', False))
-        section.add_item(TeraFormItem("id_creator_user", gettext("Créateur (Utilisateur)"), "array", True,
+        section.add_item(TeraFormItem("id_session", gettext("Session ID"), "hidden", True))
+        section.add_item(TeraFormItem("session_uuid", gettext("Session UUID"), "hidden", True))
+        section.add_item(TeraFormItem("session_name", gettext("Session Name"), "text", True))
+        section.add_item(TeraFormItem("id_session_type", gettext("Session Type"), "array", True, item_values=st_list))
+        section.add_item(TeraFormItem('session_creator_user', gettext('Session User Creator'), 'hidden', False))
+        section.add_item(TeraFormItem("id_creator_user", gettext("Session User Creator ID"), "array", True,
                                       item_values=users_list, item_options={"readonly": True},
                                       item_condition=TeraFormItemCondition(condition_item='session_creator_user',
                                                                            condition_operator='NOT NULL',
                                                                            condition_condition=None)))
-        section.add_item(TeraFormItem('session_creator_device', gettext('Nom créateur (Appareil)'), 'hidden', False))
-        section.add_item(TeraFormItem("id_creator_device", gettext("Créateur (Appareil)"), "array", True,
+        section.add_item(TeraFormItem('session_creator_device', gettext('Session Creator Device'), 'hidden', False))
+        section.add_item(TeraFormItem("id_creator_device", gettext("Session Creator Device ID"), "array", True,
                                       item_values=devices_list, item_options={"readonly": True},
                                       item_condition=TeraFormItemCondition(condition_item='session_creator_device',
                                                                            condition_operator='NOT NULL',
                                                                            condition_condition=None)
                                       ))
-        section.add_item(TeraFormItem('session_creator_participant', gettext('Nom créateur (Participant)'), 'hidden',
+        section.add_item(TeraFormItem('session_creator_participant', gettext('Session Creator Participant'), 'hidden',
                                       False))
-        section.add_item(TeraFormItem("id_creator_participant", gettext("Créateur (Participant)"), "array", True,
+        section.add_item(TeraFormItem("id_creator_participant", gettext("Session Creator Participant ID"), "array", True,
                                       item_values=parts_list, item_options={"readonly": True},
                                       item_condition=TeraFormItemCondition(condition_item='session_creator_participant',
                                                                            condition_operator='NOT NULL',
                                                                            condition_condition=None)))
-        section.add_item(TeraFormItem('session_creator_service', gettext('Nom créateur (Service)'), 'hidden',
+        section.add_item(TeraFormItem('session_creator_service', gettext('Session Creator Service'), 'hidden',
                                       False))
-        section.add_item(TeraFormItem("id_creator_service", gettext("Créateur (Service)"), "array", True,
+        section.add_item(TeraFormItem("id_creator_service", gettext("Session Creator Service ID"), "array", True,
                                       item_values=services_list, item_options={"readonly": True},
                                       item_condition=TeraFormItemCondition(condition_item='session_creator_service',
                                                                            condition_operator='NOT NULL',
                                                                            condition_condition=None)))
-        section.add_item(TeraFormItem("session_start_datetime", gettext("Date de début"), "datetime", True))
-        section.add_item(TeraFormItem("session_duration", gettext("Durée"), "duration", True,
+        section.add_item(TeraFormItem("session_start_datetime", gettext("Start Date"), "datetime", True))
+        section.add_item(TeraFormItem("session_duration", gettext("Duration"), "duration", True,
                                       item_options={"default": 0, "readonly": True}))
         # Session status is hidden as it needs to be handled elsewhere for now
-        section.add_item(TeraFormItem("session_status", gettext("État"), "hidden", True, item_values=status_list))
-        section.add_item(TeraFormItem("session_comments", gettext("Commentaires"), "longtext", False))
+        section.add_item(TeraFormItem("session_status", gettext("State"), "hidden", True, item_values=status_list))
+        section.add_item(TeraFormItem("session_comments", gettext("Comments"), "longtext", False))
 
         # Hidden as handled elsewhere
         section.add_item(TeraFormItem("session_participants", gettext("Participants"), "hidden", False))
-        section.add_item(TeraFormItem("session_users", gettext("Utilisateurs"), "hidden", False))
-        section.add_item(TeraFormItem("session_has_device_data", gettext("A données capteur"), "hidden", False))
+        section.add_item(TeraFormItem("session_users", gettext("Users"), "hidden", False))
+        section.add_item(TeraFormItem("session_has_device_data", gettext("Session Has Device Data"), "hidden", False))
 
         return form.to_dict()

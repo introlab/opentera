@@ -21,15 +21,15 @@ class TeraDeviceSubTypeForm:
             device_types_list.append(TeraFormValue(value_id=dev_type.id_device_type, value=name))
 
         # Sections
-        section = TeraFormSection("infos", gettext("Informations"))
+        section = TeraFormSection("infos", gettext("Information"))
         form.add_section(section)
 
         # Items
-        section.add_item(TeraFormItem("id_device_subtype", gettext("ID Sous-type appareil"), "hidden",
+        section.add_item(TeraFormItem("id_device_subtype", gettext("Device Sub-Type ID"), "hidden",
                                       item_required=True))
-        section.add_item(TeraFormItem("device_subtype_name", gettext("Nom du sous-type d'appareil"), "text",
+        section.add_item(TeraFormItem("device_subtype_name", gettext("Device Sub-Type Name"), "text",
                                       item_required=True))
-        section.add_item(TeraFormItem("id_device_type", gettext("Type appareil"), "array", item_required=True,
+        section.add_item(TeraFormItem("id_device_type", gettext("Device Type ID"), "array", item_required=True,
                                       item_values=device_types_list))
 
         return form.to_dict()

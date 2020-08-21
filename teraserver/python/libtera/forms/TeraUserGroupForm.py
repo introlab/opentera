@@ -15,13 +15,13 @@ class TeraUserGroupForm:
         # None to build!
 
         # Sections
-        section = TeraFormSection("infos", gettext("Informations"))
+        section = TeraFormSection("infos", gettext("Information"))
         form.add_section(section)
 
         # Items
-        section.add_item(TeraFormItem("id_user_group", gettext("ID Groupe utilisateur"), "hidden",
+        section.add_item(TeraFormItem("id_user_group", gettext("User Group ID"), "hidden",
                                       item_required=True))
-        section.add_item(TeraFormItem("user_group_name", gettext("Nom du groupe utilisateur"), "text",
+        section.add_item(TeraFormItem("user_group_name", gettext("User Group Name"), "text",
                                       item_required=True))
 
         return form.to_dict()

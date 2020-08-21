@@ -15,26 +15,27 @@ class TeraServiceForm:
         # None to build!
 
         # Sections
-        section = TeraFormSection("infos", gettext("Informations"))
+        section = TeraFormSection("infos", gettext("Information"))
         form.add_section(section)
 
         # service_endpoint = db.Column(db.String, nullable=False)
         # service_clientendpoint = db.Column(db.String, nullable=False)
         # service_enabled = db.Column(db.Boolean, nullable=False, default=False)
         # Items
-        section.add_item(TeraFormItem("id_service", gettext("ID Service"), "hidden", item_required=True))
-        section.add_item(TeraFormItem("service_uuid", gettext("UUID Service"), "label", item_required=False,
+        section.add_item(TeraFormItem("id_service", gettext("Service ID"), "hidden", item_required=True))
+        section.add_item(TeraFormItem("service_uuid", gettext("Service UUID"), "label", item_required=False,
                                       item_options={"readonly": False}))
-        section.add_item(TeraFormItem("service_name", gettext("Nom du service"), "text", item_required=True))
-        section.add_item(TeraFormItem("service_key", gettext("Code du service"), "text", item_required=True))
-        section.add_item(TeraFormItem("service_hostname", gettext("Adresse interne"), "text", item_required=True))
-        section.add_item(TeraFormItem("service_port", gettext("Port interne"), "numeric", item_required=True))
-        section.add_item(TeraFormItem("service_endpoint", gettext("URL de base"), "text", item_required=True))
-        section.add_item(TeraFormItem("service_clientendpoint", gettext("URL externe"), "text", item_required=True))
-        section.add_item(TeraFormItem("service_enabled", gettext("Service actif"), "boolean", item_required=True))
-        section.add_item(TeraFormItem("service_config_schema", gettext("Schéma de configuration"), "longtext",
+        section.add_item(TeraFormItem("service_name", gettext("Service Name"), "text", item_required=True))
+        section.add_item(TeraFormItem("service_key", gettext("Service Key"), "text", item_required=True))
+        section.add_item(TeraFormItem("service_hostname", gettext("Service Hostname"), "text", item_required=True))
+        section.add_item(TeraFormItem("service_port", gettext("Service Port"), "numeric", item_required=True))
+        section.add_item(TeraFormItem("service_endpoint", gettext("Service URL"), "text", item_required=True))
+        section.add_item(TeraFormItem("service_clientendpoint", gettext("Service Client Endpoint"), "text",
+                                      item_required=True))
+        section.add_item(TeraFormItem("service_enabled", gettext("Service Enabled"), "boolean", item_required=True))
+        section.add_item(TeraFormItem("service_config_schema", gettext("Service Configuration Schema"), "longtext",
                                       item_required=False))
-        section.add_item(TeraFormItem("service_default_config", gettext("Configuration par défaut"), "longtext",
+        section.add_item(TeraFormItem("service_default_config", gettext("Service Default Configuration"), "longtext",
                                       item_required=False))
 
         return form.to_dict()

@@ -30,15 +30,15 @@ class TeraSessionTypeForm:
             services_list.append(TeraFormValue(value_id=service.id_service, value=service.service_name))
 
         # Sections
-        section = TeraFormSection("informations", gettext("Informations"))
+        section = TeraFormSection("informations", gettext("Information"))
         form.add_section(section)
 
         # Items
-        section.add_item(TeraFormItem("id_session_type", gettext("ID Type Séance"), "hidden", True))
-        section.add_item(TeraFormItem("session_type_name", gettext("Nom du type de séance"), "text", True))
-        # section.add_item(TeraFormItem("session_type_prefix", gettext("Code du type de séance"), "text", True,
+        section.add_item(TeraFormItem("id_session_type", gettext("Session Type ID"), "hidden", True))
+        section.add_item(TeraFormItem("session_type_name", gettext("Session Type Name"), "text", True))
+        # section.add_item(TeraFormItem("session_type_prefix", gettext("Session Type Prefix"), "text", True,
         #                               item_options={'max_length': 10}))
-        section.add_item(TeraFormItem("session_type_category", gettext("Catégorie"), "array", item_required=True,
+        section.add_item(TeraFormItem("session_type_category", gettext("Category"), "array", item_required=True,
                                       item_values=categories_list))
         section.add_item(TeraFormItem("id_service", gettext("Service"), "array", item_required=False,
                                       item_values=services_list,
@@ -47,10 +47,10 @@ class TeraSessionTypeForm:
                                                                             .value)
                                       )
                          )
-        section.add_item(TeraFormItem("session_type_service_key", gettext("Code du service associé"), "hidden", False))
-        section.add_item(TeraFormItem("session_type_online", gettext("Séance assistée?"), "boolean", True))
-        section.add_item(TeraFormItem("session_type_multi", gettext("Séance de groupe?"), "boolean", True))
-        section.add_item(TeraFormItem("session_type_color", gettext("Couleur d'affichage"), "color", True))
-        section.add_item(TeraFormItem("session_type_config", gettext("Configuration spécifiques"), "longtext", False))
+        section.add_item(TeraFormItem("session_type_service_key", gettext("Session Type Service Key"), "hidden", False))
+        section.add_item(TeraFormItem("session_type_online", gettext("Session Type Online"), "boolean", True))
+        section.add_item(TeraFormItem("session_type_multi", gettext("Session Type Multiuser"), "boolean", True))
+        section.add_item(TeraFormItem("session_type_color", gettext("Session Type Display Color"), "color", True))
+        section.add_item(TeraFormItem("session_type_config", gettext("Session Type Configuration"), "longtext", False))
 
         return form.to_dict()
