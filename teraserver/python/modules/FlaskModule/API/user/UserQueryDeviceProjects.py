@@ -55,7 +55,7 @@ class UserQueryDeviceProjects(Resource):
         device_project = []
         # If we have no arguments, return error
         if not any(args.values()):
-            return gettext('Arguments manquants'), 400
+            return gettext('Missing arguments'), 400
 
         if args['id_device']:
             if args['id_device'] in user_access.get_accessible_devices_ids():

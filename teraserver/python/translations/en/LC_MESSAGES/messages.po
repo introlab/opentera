@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-21 15:21-0400\n"
+"POT-Creation-Date: 2020-08-24 08:16-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -770,7 +770,13 @@ msgid "Not authorized"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:70
-msgid "Missing argumentrs"
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:58
+#: modules/FlaskModule/API/user/UserQueryDeviceSites.py:56
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:69
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:52
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:64
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:57
+msgid "Missing arguments"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:142
@@ -785,20 +791,8 @@ msgstr ""
 msgid "Not found"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:58
-#: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:57
-msgid "Arguments manquants"
-msgstr ""
-
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:103
 msgid "Missing fields in body"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryDeviceSites.py:56
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:69
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:52
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:64
-msgid "Missing arguments"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:101
@@ -1007,14 +1001,11 @@ msgid "Missing services"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:157
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:191
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:196
 #: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:109
 #: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:178
 msgid "Access denied"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:191
-msgid "Acces refuse"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:252
@@ -1254,20 +1245,20 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserSessionManager.py:138
 msgid "No answer from service."
-msgstr ""
+msgstr "Pas de réponse du service."
 
 #: modules/LoginModule/LoginModule.py:384
 msgid "Invalid token"
-msgstr ""
+msgstr "Jeton invalide"
 
 #: modules/LoginModule/LoginModule.py:414
 #: modules/LoginModule/LoginModule.py:456
 #: modules/LoginModule/LoginModule.py:474
 #: modules/LoginModule/LoginModule.py:484
 msgid "Unauthorized"
-msgstr ""
+msgstr "Non autorisé"
 
 #: modules/LoginModule/LoginModule.py:443
 msgid "Invalid Token"
-msgstr ""
+msgstr "Jeton invalide"
 

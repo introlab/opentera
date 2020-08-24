@@ -54,7 +54,7 @@ class UserQuerySessionTypeProject(Resource):
         session_type_projects = []
         # If we have no arguments, return error
         if not any(args.values()):
-            return gettext('Arguments manquants'), 400
+            return gettext('Missing arguments'), 400
 
         if args['id_project']:
             session_type_projects = user_access.query_session_types_for_project(project_id=args['id_project'])
