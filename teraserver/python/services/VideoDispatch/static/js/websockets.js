@@ -61,7 +61,7 @@ function ws_MessageReceived(evt){
 
     var json_msg = JSON.parse(received_msg);
 
-    var msg_type = json_msg.data[0]["@type"];
+    var msg_type = json_msg.message.events[0]["@type"];
 
     // Join session
     if (msg_type == "type.googleapis.com/opentera.protobuf.JoinSessionEvent"){
@@ -69,7 +69,7 @@ function ws_MessageReceived(evt){
         // Join video session event - redirect to session url
         //document.getElementById('mainview').src = json_msg.data[0]["sessionUrl"];
         window.parent.document.getElementById('mainview').contentWindow.document.getElementById("dialogWait").style.display="inline";
-        current_session_url = json_msg.data[0]["sessionUrl"];
+        current_session_url = json_msg.message.events[0]["sessionUrl"];
         testCurrentSessionUrlValid();
 
     }

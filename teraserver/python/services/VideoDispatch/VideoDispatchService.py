@@ -6,10 +6,44 @@ from services.VideoDispatch.ConfigManager import ConfigManager
 from modules.RedisVars import RedisVars
 from libtera.redis.RedisClient import RedisClient
 import services.VideoDispatch.Globals as Globals
+from twisted.internet import reactor, ssl, defer
+from twisted.python import log
 import os, sys
 from sqlalchemy.exc import OperationalError
+from services.shared.ServiceOpenTera import ServiceOpenTera
+
+
+class VideoDispatchService(ServiceOpenTera):
+    def __init__(self, config_man: ConfigManager, this_service_info):
+        ServiceOpenTera.__init__(self, config_man, this_service_info)
+
+        # Pointer to self, hack
+        Globals.service = self
+        Globals.redis_client = self.redis
+
+        # Main Flask module
+        Globals.Flask_module = FlaskModule(config_man)
+
+        # Main Twisted module
+        Globals.Twisted_module = TwistedModule(config_man)
+
+        # Main WebRTC module
+        Globals.WebRTC_module = WebRTCModule(config_man)
+
+        # OnlineUsers Module
+        Globals.OnlineUsers_module = OnlineUsersModule(config_man)
+
+    def notify_service_messages(self, pattern, channel, message):
+        pass
+
+    def setup_rpc_interface(self):
+        # TODO Update rpc interface
+        pass
+
 
 if __name__ == '__main__':
+
+    log.startLogging(sys.stdout)
 
     # Load configuration
     from services.VideoDispatch.Globals import config_man
@@ -37,24 +71,6 @@ if __name__ == '__main__':
 
     config_man.load_config(config_file)
 
-    # DATABASE CONFIG AND OPENING
-    #############################
-    # UNUSED FOR NOW
-
-    # POSTGRES = {
-    #     'user': config_man.db_config['username'],
-    #     'pw': config_man.db_config['password'],
-    #     'db': config_man.db_config['name'],
-    #     'host': config_man.db_config['url'],
-    #     'port': config_man.db_config['port']
-    # }
-    #
-    # try:
-    #     Globals.db_man.open(POSTGRES, True)
-    # except OperationalError:
-    #     print("Unable to connect to database - please check settings in config file!")
-    #     quit()
-
     # Global redis client
     Globals.redis_client = RedisClient(config_man.redis_config)
     Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
@@ -77,19 +93,8 @@ if __name__ == '__main__':
 
     config_man.service_config['ServiceUUID'] = service_info['service_uuid']
 
-    # OnlineUsers Module
-    Globals.OnlineUsers_module = OnlineUsersModule(config_man)
+    # Create the Service
+    service = VideoDispatchService(Globals.config_man, service_info)
 
-    # Main Flask module
-    Globals.Flask_module = FlaskModule(config_man)
-
-    # Main Twisted module
-    Globals.Twisted_module = TwistedModule(config_man)
-
-    # Main WebRTC module
-    Globals.WebRTC_module = WebRTCModule(config_man)
-
-    # Run reactor
-    Globals.Twisted_module.run()
-
-    print('VideoDispatchService - done!')
+    # Start App / reactor events
+    reactor.run()

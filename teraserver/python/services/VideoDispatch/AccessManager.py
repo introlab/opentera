@@ -3,8 +3,9 @@ from functools import wraps
 from flask import _request_ctx_stack, request, redirect
 from flask_restx import reqparse
 
-from services.VideoDispatch.Globals import api_user_token_key, api_participant_token_key, UserTokenCookieName, \
-    ParticipantTokenCookieName, config_man
+from services.VideoDispatch.Globals import UserTokenCookieName, ParticipantTokenCookieName, config_man
+from services.VideoDispatch.Globals import redis_client
+from modules.RedisVars import RedisVars
 from services.shared.TeraUserClient import TeraUserClient
 from services.shared.TeraParticipantClient import TeraParticipantClient
 
@@ -46,7 +47,8 @@ class AccessManager:
                 # Verify token from redis
                 import jwt
                 try:
-                    token_dict = jwt.decode(token_value, api_participant_token_key)
+                    token_dict = jwt.decode(token_value,
+                                            redis_client.get(RedisVars.RedisVar_ParticipantStaticTokenAPIKey))
                 except jwt.exceptions.InvalidSignatureError as e:
                     print(e)
                     return 'Unauthorized', 403
@@ -74,7 +76,7 @@ class AccessManager:
                 # Verify token from redis
                 import jwt
                 try:
-                    token_dict = jwt.decode(token_value, api_user_token_key)
+                    token_dict = jwt.decode(token_value, redis_client.get(RedisVars.RedisVar_UserTokenAPIKey))
                 except jwt.exceptions.InvalidSignatureError as e:
                     print(e)
                     return redirect(login_path)

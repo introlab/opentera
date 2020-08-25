@@ -36,8 +36,8 @@ class Login(MethodView):
 
             return response
         else:
-            hostname = self.flaskModule.config.server_config['hostname']
-            port = self.flaskModule.config.server_config['port']
+            hostname = self.flaskModule.config.service_config['hostname']
+            port = self.flaskModule.config.service_config['port']
             backend_hostname = self.flaskModule.config.backend_config['hostname']
             backend_port = self.flaskModule.config.backend_config['port']
             if 'X-Externalhost' in request.headers:

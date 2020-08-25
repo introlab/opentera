@@ -135,9 +135,5 @@ class TwistedModule(BaseModule):
         print('VideoDispatchService.TwistedModule - Received message ', pattern, channel, message)
         pass
 
-    def run(self):
-        log.startLogging(sys.stdout)
-        reactor.run()
-
 
 
