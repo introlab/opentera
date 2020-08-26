@@ -247,13 +247,10 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         json_data = {
             'service_config': {
                 'id_service_config': current_id,
-                'service_config_config': '{"Test"'
+                'service_config_config': '{"Test"}'
             }
         }
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Post update with invalid service_config_config schema")
 
-        json_data['service_config']['service_config_config'] = '{"Globals": {"test_config": true}}'
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Post update OK")
         json_data = response.json()[0]

@@ -31,12 +31,15 @@ class BaseModel:
                     pr[name] = value
         return pr
 
-    def from_json(self, json):
+    def from_json(self, json, ignore_fields=None):
+        if ignore_fields is None:
+            ignore_fields = []
         for name in json:
-            if hasattr(self, name):
-                setattr(self, name, json[name])
-            else:
-                print('Attribute ' + name + ' not found.')
+            if name not in ignore_fields:
+                if hasattr(self, name):
+                    setattr(self, name, json[name])
+                else:
+                    print('Attribute ' + name + ' not found.')
 
     def to_json_create_event(self):
         # Default is None, will not be sent

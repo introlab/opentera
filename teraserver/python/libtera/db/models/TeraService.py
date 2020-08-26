@@ -193,7 +193,7 @@ class TeraService(db.Model, BaseModel):
         from libtera.forms.TeraForm import TeraForm, TeraFormItem, TeraFormItemCondition, TeraFormSection, TeraFormValue
         import json
 
-        form = TeraForm('service_config')
+        form = TeraForm('service_config_config')
 
         if self.service_key == 'VideoRehabService':
             # Sections
@@ -201,7 +201,7 @@ class TeraService(db.Model, BaseModel):
             form.add_section(section1)
 
             # Items
-            section1.add_item(TeraFormItem("camera", gettext("Caméra"), "videoinputs", True))
+            section1.add_item(TeraFormItem("camera", gettext("Caméra"), "videoinputs", False))
             item = TeraFormItem("teracam_type", gettext("Type de caméra"), "array", True,
                                 [TeraFormValue("0", gettext("Caméra réseau")),
                                  TeraFormValue("1", gettext("Capture d'écran"))],
@@ -225,6 +225,7 @@ class TeraService(db.Model, BaseModel):
                                 item_condition=TeraFormItemCondition("teracam_type", "=", 1))
             section1.add_item(item)
 
+            section1.add_item(TeraFormItem("camera_ptz", gettext("Caméra contrôlable (PTZ)"), "boolean"))
             item = TeraFormItem("camera_ptz_type", gettext("Type de contrôle"), "array", True,
                                 [TeraFormValue("0", gettext("Vivotek")), TeraFormValue("1", gettext("ONVIF (générique)"))],
                                 item_condition=TeraFormItemCondition("camera_ptz", "=", True))
@@ -242,7 +243,7 @@ class TeraService(db.Model, BaseModel):
                                 item_condition=TeraFormItemCondition("camera_ptz", "=", True))
             section1.add_item(item)
 
-            section1.add_item(TeraFormItem("audio", gettext("Microphone"), "audioinputs", True))
+            section1.add_item(TeraFormItem("audio", gettext("Microphone"), "audioinputs", False))
             section1.add_item(TeraFormItem("camera2", gettext("Caméra secondaire"), "videoinputs"))
 
             return json.dumps(form.to_dict())

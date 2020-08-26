@@ -19,9 +19,12 @@ get_parser.add_argument('id_user', type=int, help='ID of the user from which to 
                                                   'id_service or all configs')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get the service specified with '
                                                     'id_service or all configs')
+get_parser.add_argument('id_specific', type=str, help='ID of the specific configuration to get.')
 get_parser.add_argument('with_schema', type=inputs.boolean, help='Also returns the expected config TeraForm schema.')
 get_parser.add_argument('with_empty', type=inputs.boolean, help='Also include empty configs for services without '
                                                                 'config.')
+get_parser.add_argument('full', type=inputs.boolean, help='Include the full configuration: Globals and Specifics.')
+get_parser.add_argument('list', type=inputs.boolean, help='Also includes a list of all available specifics configs.')
 
 
 # post_parser = reqparse.RequestParser()
@@ -81,9 +84,12 @@ class UserQueryServiceConfig(Resource):
         try:
             configs_list = []
             for config in configs:
-                config_json = config.to_json()
+                config_json = config.to_json(specific_id=args['id_specific'], raw_config=args['full'])
                 if args['with_schema']:
                     config_json['service_config_schema'] = config.service_config_service.service_config_schema
+                if args['list']:
+                    config_json['service_config_specifics'] = config.get_specific_ids_list()
+
                 configs_list.append(config_json)
 
             return configs_list
@@ -116,6 +122,16 @@ class UserQueryServiceConfig(Resource):
         if 'id_service_config' not in json_config:
             return 'Missing id_service_config', 400
 
+        # Filter invalid (0) id_user, id_device and id_participant
+        if 'id_user' in json_config and json_config['id_user'] == 0:
+            del json_config['id_user']
+
+        if 'id_device' in json_config and json_config['id_device'] == 0:
+            del json_config['id_device']
+
+        if 'id_participant' in json_config and json_config['id_participant'] == 0:
+            del json_config['id_participant']
+
         if ('id_participant' in json_config and ('id_device' in json_config or 'id_user' in json_config)) \
                 or ('id_user' in json_config and 'id_device' in json_config):
             return gettext('Can\'t combine id_user, id_participant and id_device in request'), 400
@@ -140,7 +156,9 @@ class UserQueryServiceConfig(Resource):
                 return gettext('Forbidden'), 403
 
         import jsonschema
+        import json
         # Do the update!
+
         if json_config['id_service_config'] > 0:
             # Already existing
             try:
@@ -177,7 +195,10 @@ class UserQueryServiceConfig(Resource):
                 return str(err), 400
 
         update_config = TeraServiceConfig.get_service_config_by_id(s_id=json_config['id_service_config'])
-        return [update_config.to_json()]
+        if 'id_specific' in json_config:
+            return [update_config.to_json(specific_id=json_config['id_specific'])]
+        else:
+            return [update_config.to_json()]
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)

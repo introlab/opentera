@@ -18,6 +18,7 @@ from libtera.forms.TeraSessionForm import TeraSessionForm
 from libtera.forms.TeraDeviceSubTypeForm import TeraDeviceSubTypeForm
 from libtera.forms.TeraUserGroupForm import TeraUserGroupForm
 from libtera.forms.TeraServiceForm import TeraServiceForm
+from libtera.forms.TeraServiceConfigForm import TeraServiceConfigForm
 
 get_parser = api.parser()
 get_parser.add_argument(name='type', type=str, help='Data type of the required form. Currently, the '
@@ -28,7 +29,7 @@ get_parser.add_argument(name='type', type=str, help='Data type of the required f
                                                     'participant\n'
                                                     'project\n'
                                                     'service\n'
-                                                    'service_config'
+                                                    'service_config\n'
                                                     'session\n'
                                                     'session_type\n'
                                                     'site\n'
@@ -94,8 +95,8 @@ class UserQueryForms(Resource):
             return TeraServiceForm.get_service_form(user_access=user_access)
 
         if args['type'] == 'service_config':
-            if 'id' not in args:
-                return gettext('Missing required id.')
+            if not args['id']:
+                return TeraServiceConfigForm.get_service_config_form()
 
             from libtera.db.models.TeraService import TeraService
             service = TeraService.get_service_by_id(args['id'])
@@ -103,12 +104,13 @@ class UserQueryForms(Resource):
             if not service:
                 return gettext('Invalid service id'), 400
 
+            from libtera.forms.TeraForm import TeraForm
             if service.has_config_schema():
                 import json
                 config_json = json.loads(service.service_config_schema)
                 return config_json
             else:
-                from libtera.forms.TeraForm import TeraForm
+
                 return TeraForm("service_config").to_dict()
 
         return gettext('Unknown form type: ') + args['type'], 500
