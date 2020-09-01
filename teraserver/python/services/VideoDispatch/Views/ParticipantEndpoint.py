@@ -29,7 +29,7 @@ class ParticipantEndpoint(MethodView):
         if response.status_code == 200:
             participant_info = response.json()
 
-            return render_template('participant_endpoint.html', backend_hostname=backend_hostname,
+            return render_template('participant_endpoint_en.html', backend_hostname=backend_hostname,
                                    backend_port=backend_port,
                                    participant_name=participant_info['participant_name'])
         else:

@@ -46,7 +46,7 @@ class Dashboard(MethodView):
                     participant_json = participant_reply.json()
                     user_fullname = participant_json['participant_name']
 
-        return render_template('dashboard.html', hostname=hostname, port=port,
+        return render_template('dashboard_en.html', hostname=hostname, port=port,
                                backend_hostname=backend_hostname, backend_port=backend_port,
                                user_fullname=user_fullname, is_participant=is_participant
                                )

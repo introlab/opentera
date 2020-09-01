@@ -32,7 +32,7 @@ class DashboardMain(MethodView):
         # print(current_user_client.get_role_for_site(1))
         # print(current_user_client.get_role_for_project(1))
 
-        return render_template('main.html', hostname=hostname, port=port,
+        return render_template('main_en.html', hostname=hostname, port=port,
                                backend_hostname=backend_hostname, backend_port=backend_port)
 
     def post(self):

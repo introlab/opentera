@@ -27,7 +27,7 @@ class Index(MethodView):
         # print(current_user_client.get_role_for_site(1))
         # print(current_user_client.get_role_for_project(1))
 
-        return render_template('index.html')
+        return render_template('index_en.html')
 
     def post(self):
 
@@ -37,7 +37,7 @@ class Index(MethodView):
         if 'user-test-form' in request.form:
             # Survey results, TODO: process data if required
             survey_ok = True
-            return render_template('index.html', survey_ok=survey_ok)
+            return render_template('index_en.html', survey_ok=survey_ok)
 
         if 'user-infos-form' in request.form:
             if 'name' in request.form and 'email' in request.form:
@@ -83,7 +83,7 @@ class Index(MethodView):
                           server_participant_info['participant_token']
 
                     # Render template with participant information and link
-                    return render_template('index_participant_info.html', info=server_participant_info, participant_url=url)
+                    return render_template('index_participant_info_en.html', info=server_participant_info, participant_url=url)
                 else:
                     return 'Invalid', 500
 
