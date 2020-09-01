@@ -1,5 +1,4 @@
 from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
-import datetime
 
 
 class UserQueryServiceConfigsTest(BaseAPITest):
@@ -67,7 +66,6 @@ class UserQueryServiceConfigsTest(BaseAPITest):
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
-            self.assertTrue(data_item.__contains__('service_config_schema'))
 
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=1&"
                                                                                             "with_empty=1")
@@ -93,7 +91,6 @@ class UserQueryServiceConfigsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
             if data_item['id_service'] == 6:
                 self.assertEqual(data_item['id_service_config'], None)
-            self.assertTrue(data_item.__contains__('service_config_schema'))
 
     def test_query_for_user_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=1")
@@ -126,7 +123,7 @@ class UserQueryServiceConfigsTest(BaseAPITest):
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
-            if data_item['id_service'] == 6:
+            if data_item['id_service'] == 1:
                 self.assertEqual(data_item['id_service_config'], None)
 
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_device=1&"
@@ -139,9 +136,8 @@ class UserQueryServiceConfigsTest(BaseAPITest):
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
-            if data_item['id_service'] == 6:
+            if data_item['id_service'] == 1:
                 self.assertEqual(data_item['id_service_config'], None)
-            self.assertTrue(data_item.__contains__('service_config_schema'))
 
     def test_query_for_participant_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_participant=1")
@@ -159,7 +155,7 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -170,11 +166,35 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
+        self.assertEqual(len(json_data), 2)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+
+        # Check specific ids VS global
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_participant=1&"
+                                                                                            "id_specific=pc-001")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
         self.assertEqual(len(json_data), 1)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
-            self.assertTrue(data_item.__contains__('service_config_schema'))
+            self.assertEqual(data_item['id_participant'], 1)
+            self.assertEqual(data_item['service_config_specific_id'], 'pc-001')
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_participant=1&"
+                                                                                            "id_specific=pc-xxx")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            self.assertEqual(data_item['id_participant'], 1)
+            self.assertEqual(data_item['service_config_specific_id'], None)
 
     def test_query_specific_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=1&id_user=1")
@@ -204,7 +224,7 @@ class UserQueryServiceConfigsTest(BaseAPITest):
             self.assertEqual(data_item['id_participant'], 1)
             self.assertEqual(data_item['id_service'], 6)
 
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=4&"
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=6&"
                                                                                             "id_device=1")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
@@ -213,7 +233,7 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item)
             self.assertEqual(data_item['id_device'], 1)
-            self.assertEqual(data_item['id_service'], 4)
+            self.assertEqual(data_item['id_service'], 6)
 
     def test_post_and_delete(self):
         # New with minimal infos
@@ -229,7 +249,7 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 400, msg="Missing id_service")
 
-        json_data['service_config']['id_service'] = 1
+        json_data['service_config']['id_service'] = 3
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 400, msg="Missing at least one id")
 
@@ -247,14 +267,43 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         json_data = {
             'service_config': {
                 'id_service_config': current_id,
-                'service_config_config': '{"Test"}'
+                'service_config_config': '{"Test": "123"}'
             }
         }
 
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Post update OK")
+
+        json_data['service_config']['service_config_config'] = '{"Test": "456"}'
+        json_data['service_config']['id_specific'] = 'Test Spec'
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        self.assertEqual(response.status_code, 200, msg="Post specific config OK")
         json_data = response.json()[0]
         self._checkJson(json_data)
+
+        # Check config
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=3&"
+                                                                                            "id_user=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            self.assertEqual(data_item['service_config_config']['Test'], '123')
+            self.assertEqual(data_item['service_config_specific_id'], None)
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=3&"
+                                                                                            "id_user=1&"
+                                                                                            "id_specific=Test Spec")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            self.assertEqual(data_item['service_config_config']['Test'], '456')
+            self.assertEqual(data_item['service_config_specific_id'], 'Test Spec')
 
         response = self._delete_with_http_auth(username='user4', password='user4', id_to_del=current_id)
         self.assertEqual(response.status_code, 403, msg="Delete denied")

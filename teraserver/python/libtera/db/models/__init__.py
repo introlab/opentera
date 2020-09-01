@@ -12,6 +12,8 @@ from .TeraService import TeraService
 from .TeraServiceProject import TeraServiceProject
 from .TeraServiceAccess import TeraServiceAccess
 from .TeraServiceRole import TeraServiceRole
+from .TeraServiceConfig import TeraServiceConfig
+from .TeraServiceConfigSpecific import TeraServiceConfigSpecific
 from .TeraSession import TeraSession
 from .TeraSessionEvent import TeraSessionEvent
 from .TeraSessionParticipants import TeraSessionParticipants
@@ -58,6 +60,7 @@ __all__ = ['TeraAsset',
            'TeraService',
            'TeraServiceAccess',
            'TeraServiceConfig',
+           'TeraServiceConfigSpecific',
            'TeraServiceProject',
            'TeraServiceRole',
            'TeraSession',

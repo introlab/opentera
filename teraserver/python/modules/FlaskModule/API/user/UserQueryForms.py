@@ -104,13 +104,7 @@ class UserQueryForms(Resource):
             if not service:
                 return gettext('Invalid service id'), 400
 
-            from libtera.forms.TeraForm import TeraForm
-            if service.has_config_schema():
-                import json
-                config_json = json.loads(service.service_config_schema)
-                return config_json
-            else:
-
-                return TeraForm("service_config").to_dict()
+            return TeraServiceConfigForm.get_service_config_config_form(user_access=user_access,
+                                                                        service_key=service.service_key)
 
         return gettext('Unknown form type: ') + args['type'], 500

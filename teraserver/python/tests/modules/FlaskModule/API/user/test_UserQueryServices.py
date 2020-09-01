@@ -178,10 +178,9 @@ class UserQueryServicesTest(BaseAPITest):
         self.assertTrue(json_data.__contains__('service_endpoint'))
         self.assertTrue(json_data.__contains__('service_clientendpoint'))
         self.assertTrue(json_data.__contains__('service_enabled'))
+        self.assertTrue(json_data.__contains__('service_editable_config'))
 
         if not minimal:
-            self.assertTrue(json_data.__contains__('service_config_schema'))
             self.assertTrue(json_data.__contains__('service_roles'))
         else:
-            self.assertFalse(json_data.__contains__('service_config_schema'))
             self.assertFalse(json_data.__contains__('service_roles'))

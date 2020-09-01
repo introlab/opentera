@@ -33,7 +33,7 @@ class TeraServiceForm:
         section.add_item(TeraFormItem("service_clientendpoint", gettext("Service Client Endpoint"), "text",
                                       item_required=True))
         section.add_item(TeraFormItem("service_enabled", gettext("Service Enabled"), "boolean", item_required=True))
-        section.add_item(TeraFormItem("service_config_schema", gettext("Service Configuration Schema"), "longtext",
+        section.add_item(TeraFormItem("service_editable_config", gettext("Service has editable config"), "boolean",
                                       item_required=False))
         section.add_item(TeraFormItem("service_default_config", gettext("Service Default Configuration"), "longtext",
                                       item_required=False))

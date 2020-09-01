@@ -842,21 +842,24 @@ class DBManagerTeraUserAccess:
                 services_configs = TeraServiceConfig.get_service_config_for_service(service_id=service_id)
         else:
             if user_id:
-                services_configs = TeraServiceConfig.query.filter_by(id_user=user_id).all()
+                services_configs = TeraServiceConfig.query.filter_by(id_user=user_id).\
+                    join(TeraServiceConfig.service_config_service).filter_by(service_editable_config=True).all()
 
             elif device_id:
-                services_configs = TeraServiceConfig.query.filter_by(id_device=device_id).all()
+                services_configs = TeraServiceConfig.query.filter_by(id_device=device_id).\
+                    join(TeraServiceConfig.service_config_service).filter_by(service_editable_config=True).all()
 
             elif participant_id:
-                services_configs = TeraServiceConfig.query.filter_by(id_participant=participant_id).all()
+                services_configs = TeraServiceConfig.query.filter_by(id_participant=participant_id).\
+                    join(TeraServiceConfig.service_config_service).filter_by(service_editable_config=True).all()
 
         if include_services_without_config:
             # Also create "empty" configs for service not in the list
             services = self.get_accessible_services(include_system_services=True)
             missing_services = set(services).difference([sc.service_config_service for sc in services_configs])
             for service in missing_services:
-                # Check if that service defines a valid (not default) schema. If not, ignore!
-                if service.has_config_schema():
+                # Check if that service allows for editable configs. If not, ignore!
+                if service.service_editable_config:
                     temp_service_config = TeraServiceConfig()
                     temp_service_config.id_service = service.id_service
                     temp_service_config.service_config_service = service

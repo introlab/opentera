@@ -13,36 +13,20 @@ class TeraServiceConfig(db.Model, BaseModel):
     id_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant', ondelete='cascade'),
                                nullable=True)
     id_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device', ondelete='cascade'), nullable=True)
-
-    # Typical service config format is:
-    # { Globals: {
-    #               ---- Put "default" config values here with format:
-    #               {name: value, .... }
-    #            },
-    #   Specifics: [
-    #                   {
-    #                       xxxx, # Specific id of that config, for example hardware ID
-    #                       ---- Put "overriden" config values here for that config id
-    #                   },
-    #                   {
-    #                       xxxx, # Specific id of that config, for example hardware ID
-    #                       ---- Put "overriden" config values here for that config id
-    #                   }, ...
-    #              ]
-    # }
-    service_config_config = db.Column(db.String, nullable=False, default='{"Globals": {}}')
+    service_config_config = db.Column(db.String, nullable=False, default='{}')
 
     service_config_service = db.relationship("TeraService")
     service_config_user = db.relationship("TeraUser")
     service_config_participant = db.relationship('TeraParticipant')
     service_config_device = db.relationship('TeraDevice')
+    service_config_specifics = db.relationship('TeraServiceConfigSpecific', cascade='delete')
 
-    def to_json(self, ignore_fields=None, minimal=False, specific_id=None, raw_config=False):
+    def to_json(self, ignore_fields=None, minimal=False, specific_id=None):
         if ignore_fields is None:
             ignore_fields = []
 
         ignore_fields.extend(['service_config_service', 'service_config_user', 'service_config_participant',
-                              'service_config_device'])
+                              'service_config_device', 'service_config_specifics'])
 
         if minimal:
             ignore_fields.extend([])
@@ -66,12 +50,13 @@ class TeraServiceConfig(db.Model, BaseModel):
         if not self.id_device:
             del json_config['id_device']
 
-        # Generate correct config - hides Globals and Specifics if now requesting "raw" config
-        if not raw_config:
-            if specific_id:
-                json_config['service_config_config'] = self.get_config_for_specific_id(specific_id=specific_id)
-            else:
-                json_config['service_config_config'] = self.get_global_config()
+        # Get correct config
+        if specific_id and self.has_specific_config_for_specific_id(specific_id=specific_id):
+            json_config['service_config_config'] = self.get_config_for_specific_id(specific_id=specific_id)
+            json_config['service_config_specific_id'] = specific_id
+        else:
+            json_config['service_config_config'] = self.get_global_config()
+            json_config['service_config_specific_id'] = None
 
         return json_config
 
@@ -104,6 +89,12 @@ class TeraServiceConfig(db.Model, BaseModel):
     def get_service_config_for_service_for_device(service_id: int, device_id: int):
         return TeraServiceConfig.query.filter_by(id_service=service_id, id_device=device_id).first()
 
+    def has_specific_config_for_specific_id(self, specific_id: int) -> bool:
+        for specific in self.service_config_specifics:
+            if specific.service_config_specific_id == specific_id:
+                return True
+        return False
+
     def get_last_update_datetime(self) -> datetime:
         return datetime.fromtimestamp(self.version_id/1000)
 
@@ -111,30 +102,12 @@ class TeraServiceConfig(db.Model, BaseModel):
         if self.service_config_config is None:
             return True  # Will use default value
 
+        # Check if the config is a correct json format
         if isinstance(self.service_config_config, str):
             try:
-                config_json = json.loads(self.service_config_config)
+                json.loads(self.service_config_config)
             except ValueError as err:
                 raise err
-        else:
-            config_json = self.service_config_config
-
-        # Minimum required fields is "Globals"
-        if 'Globals' not in config_json:
-            return False
-
-        # Validate that we have a match for the "Globals" config with the expected service schema
-        # try:
-        #     schema_json = json.loads(self.service_config_service.service_config_schema)
-        #     jsonschema.validate(instance=config_json['Globals'], schema=schema_json)
-        # except (ValueError, jsonschema.exceptions.ValidationError) as err:
-        #     raise err
-
-        if 'Specifics' in config_json:
-            # Ensure we have an "id" in each of specifics items
-            for specific_config in config_json['Specifics']:
-                if not isinstance(config_json['Specifics'][specific_config], dict):
-                    return False
 
         return True
 
@@ -146,7 +119,7 @@ class TeraServiceConfig(db.Model, BaseModel):
             config_json = json.loads(self.service_config_config)
         except ValueError as err:
             raise err
-        return config_json['Globals']
+        return config_json
 
     def get_config_for_specific_id(self, specific_id: str) -> dict:
         if self.service_config_config is None:
@@ -157,67 +130,39 @@ class TeraServiceConfig(db.Model, BaseModel):
         except ValueError as err:
             raise err
 
-        # Get "Globals" config as base
-        current_config = config_json['Globals']
+        # No specific config at all - return global config
+        if self.service_config_specifics is None or len(self.service_config_specifics) == 0:
+            return config_json
 
         # Check if we have a specific config
-        if 'Specifics' in config_json:
-            for specific in config_json['Specifics']:
-                if specific == specific_id:
-                    # Complete or overwrite values in current config
-                    for specific_key, specific_value in config_json['Specifics'][specific].items():
-                        current_config[specific_key] = specific_value
+        for specific in self.service_config_specifics:
+            if specific.service_config_specific_id == specific_id:
+                # Complete or overwrite values in current config
+                try:
+                    specific_config = json.loads(specific.service_config_specific_config)
+                except ValueError as err:
+                    raise err
+                for specific_key, specific_value in specific_config.items():
+                    config_json[specific_key] = specific_value
 
-        return current_config
+        return config_json
 
     def set_config_for_specific_id(self, specific_id: str, config: str):
-        try:
-            config_json = json.loads(self.service_config_config)
-        except ValueError as err:
-            raise err
-        except TypeError:
-            config_json = self.get_empty_config()
-
-        config_json['Specifics'][specific_id] = config
-
-        try:
-            self.service_config_config = json.dumps(config_json)
-        except ValueError as err:
-            raise err
+        #  Set or update specific config
+        from libtera.db.models.TeraServiceConfigSpecific import TeraServiceConfigSpecific
+        TeraServiceConfigSpecific.insert_or_update_specific_config(service_config_id=self.id_service_config,
+                                                                   specific_id=specific_id, config=config)
 
     def set_global_config(self, config: str):
-        try:
-            config_json = json.loads(self.service_config_config)
-        except ValueError as err:
-            raise err
-        except TypeError:
-            config_json = self.get_empty_config()
-
-        config_json['Globals'] = config
-
-        try:
-            self.service_config_config = json.dumps(config_json)
-        except ValueError as err:
-            raise err
+        self.service_config_config = config
 
     @staticmethod
     def get_empty_config() -> dict:
-        return {'Globals': {}, 'Specifics': {}}
+        # return {'Globals': {}, 'Specifics': {}}
+        return dict()
 
     def get_specific_ids_list(self) -> list:
-        try:
-            config_json = json.loads(self.service_config_config)
-        except ValueError as err:
-            raise err
-        except TypeError:
-            config_json = self.get_empty_config()
-
-        if 'Specifics' in config_json:
-            ids = [specific_id for specific_id in config_json['Specifics']]
-        else:
-            ids = []
-
-        return ids
+        return [specific_config.service_config_specific_id for specific_config in self.service_config_specifics]
 
     @staticmethod
     def create_defaults():
@@ -225,24 +170,37 @@ class TeraServiceConfig(db.Model, BaseModel):
         from .TeraDevice import TeraDevice
         from .TeraService import TeraService
         from .TeraParticipant import TeraParticipant
+        from .TeraServiceConfigSpecific import TeraServiceConfigSpecific
 
         new_config = TeraServiceConfig()
         new_config.id_user = TeraUser.get_user_by_id(1).id_user
         new_config.id_service = TeraService.get_openteraserver_service().id_service
-        new_config.service_config_config = '{"Globals": {"notification_sounds": true}}'
+        new_config.service_config_config = '{"notification_sounds": true}'
         db.session.add(new_config)
 
         new_config = TeraServiceConfig()
         new_config.id_participant = TeraParticipant.get_participant_by_name('Participant #1').id_participant
         new_config.id_service = TeraService.get_service_by_key('VideoRehabService').id_service
-        new_config.service_config_config = '{"Globals": {"default_muted": false}, "Specifics": {"id": "pc-001", ' \
-                                           '"default_muted": true}}'
+        new_config.service_config_config = '{"default_muted": false, "view_local": true}'
         db.session.add(new_config)
+        db.session.commit()
+
+        new_specific_config = TeraServiceConfigSpecific()
+        new_specific_config.id_service_config = new_config.id_service_config
+        new_specific_config.service_config_specific_id = 'pc-001'
+        new_specific_config.service_config_specific_config = '{"default_muted": true}'
+        db.session.add(new_specific_config)
+
+        new_specific_config = TeraServiceConfigSpecific()
+        new_specific_config.id_service_config = new_config.id_service_config
+        new_specific_config.service_config_specific_id = 'pc-002'
+        new_specific_config.service_config_specific_config = '{"default_muted": true, "view_local": false}'
+        db.session.add(new_specific_config)
 
         new_config = TeraServiceConfig()
         new_config.id_device = TeraDevice.get_device_by_name('Apple Watch #W05P1').id_device
-        new_config.id_service = TeraService.get_service_by_key('BureauActif').id_service
-        new_config.service_config_config = '{"Globals": {"delete_from_device": true}}'
+        new_config.id_service = TeraService.get_service_by_key('VideoRehabService').id_service
+        new_config.service_config_config = '{"delete_from_device": true}'
         db.session.add(new_config)
 
         db.session.commit()

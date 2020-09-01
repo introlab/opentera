@@ -20,10 +20,8 @@ get_parser.add_argument('id_user', type=int, help='ID of the user from which to 
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get the service specified with '
                                                     'id_service or all configs')
 get_parser.add_argument('id_specific', type=str, help='ID of the specific configuration to get.')
-get_parser.add_argument('with_schema', type=inputs.boolean, help='Also returns the expected config TeraForm schema.')
 get_parser.add_argument('with_empty', type=inputs.boolean, help='Also include empty configs for services without '
                                                                 'config.')
-get_parser.add_argument('full', type=inputs.boolean, help='Include the full configuration: Globals and Specifics.')
 get_parser.add_argument('list', type=inputs.boolean, help='Also includes a list of all available specifics configs.')
 
 
@@ -84,9 +82,7 @@ class UserQueryServiceConfig(Resource):
         try:
             configs_list = []
             for config in configs:
-                config_json = config.to_json(specific_id=args['id_specific'], raw_config=args['full'])
-                if args['with_schema']:
-                    config_json['service_config_schema'] = config.service_config_service.service_config_schema
+                config_json = config.to_json(specific_id=args['id_specific'])
                 if args['list']:
                     config_json['service_config_specifics'] = config.get_specific_ids_list()
 
