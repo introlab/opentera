@@ -75,6 +75,7 @@ __all__ = ['TeraAsset',
            'TeraTestType',
            'TeraUser',
            'TeraUserGroup',
+           'TeraUserPreference',
            'TeraUserUserGroup',
            'EventNameClassMap'
            ]

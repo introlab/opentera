@@ -35,7 +35,6 @@ get_parser.add_argument(name='type', type=str, help='Data type of the required f
                                                     'site\n'
                                                     'user\n'
                                                     'user_group\n'
-                                                    'user_profile\n'
                         )
 get_parser.add_argument(name='id', type=int, help='Specific id of subitem to query. Used with service_config.')
 
@@ -58,8 +57,8 @@ class UserQueryForms(Resource):
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        if args['type'] == 'user_profile':
-            return jsonify(TeraUserForm.get_user_profile_form())
+        # if args['type'] == 'user_profile':
+        #     return jsonify(TeraUserForm.get_user_profile_form())
 
         if args['type'] == 'user':
             return jsonify(TeraUserForm.get_user_form(user_access=user_access))

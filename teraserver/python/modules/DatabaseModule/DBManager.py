@@ -27,6 +27,7 @@ from libtera.db.models.TeraService import TeraService
 from libtera.db.models.TeraServiceRole import TeraServiceRole
 from libtera.db.models.TeraServiceProject import TeraServiceProject
 from libtera.db.models.TeraUserGroup import TeraUserGroup
+from libtera.db.models.TeraUserPreference import TeraUserPreference
 from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from libtera.db.models.TeraServiceAccess import TeraServiceAccess
 from libtera.db.models.TeraServiceConfig import TeraServiceConfig
@@ -183,6 +184,7 @@ class DBManager (BaseModule):
             print('No users - creating defaults')
             TeraUser.create_defaults()
             TeraUserUserGroup.create_defaults()
+            TeraUserPreference.create_defaults()
 
         if TeraDeviceType.get_count() == 0:
             print('No device types - creating defaults')

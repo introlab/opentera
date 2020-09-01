@@ -32,18 +32,18 @@ class TeraUserForm:
 
         return form.to_dict()
 
-    @staticmethod
-    def get_user_profile_form():
-        form = TeraForm("profile")
-
-        # Sections
-        section = TeraFormSection("main_prefs", gettext("Preferences"))
-        form.add_section(section)
-
-        section.add_item(TeraFormItem("language", gettext("Language"), "array", False,
-                                      [TeraFormValue("fr", gettext("Français")),
-                                       TeraFormValue("en", gettext("English"))]))
-        section.add_item(TeraFormItem("notify_sounds", gettext("Activate Notification Sounds"), "boolean", False))
+    # @staticmethod
+    # def get_user_profile_form():
+    #     form = TeraForm("profile")
+    #
+    #     # Sections
+    #     section = TeraFormSection("main_prefs", gettext("Preferences"))
+    #     form.add_section(section)
+    #
+    #     section.add_item(TeraFormItem("language", gettext("Language"), "array", False,
+    #                                   [TeraFormValue("fr", gettext("Français")),
+    #                                    TeraFormValue("en", gettext("English"))]))
+    #     section.add_item(TeraFormItem("notify_sounds", gettext("Activate Notification Sounds"), "boolean", False))
 
         # section1 = TeraFormSection("main_audio_video", gettext("Configuration audio-vidéo"))
         # form.add_section(section1)
