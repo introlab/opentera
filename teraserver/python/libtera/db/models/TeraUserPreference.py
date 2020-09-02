@@ -67,10 +67,16 @@ class TeraUserPreference(db.Model, BaseModel):
         if prefs:
             # Check if prefs is a valid json structure
             import json
-            try:
-                json.loads(prefs)
-            except ValueError as err:
-                raise err
+            if not isinstance(prefs, dict):
+                try:
+                    json.loads(prefs)
+                except ValueError as err:
+                    raise err
+            else:
+                try:
+                    prefs = json.dumps(prefs)
+                except ValueError as err:
+                    raise err
 
         # Check if we have an existing preference for that user
         existing_pref = TeraUserPreference.get_user_preferences_for_user_and_app(user_id=user_id, app_tag=app_tag)
