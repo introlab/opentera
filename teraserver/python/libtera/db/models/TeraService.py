@@ -6,7 +6,6 @@ import uuid
 
 class TeraService(db.Model, BaseModel):
     __tablename__ = 't_services'
-    default_config_schema = ''
 
     id_service = db.Column(db.Integer, db.Sequence('id_service_sequence'), primary_key=True, autoincrement=True)
     service_uuid = db.Column(db.String(36), nullable=False, unique=True)

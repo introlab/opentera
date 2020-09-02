@@ -190,6 +190,11 @@ class UserQueryServiceConfig(Resource):
             except (ValueError, jsonschema.exceptions.ValidationError) as err:
                 return str(err), 400
 
+            # Update specific config if required
+            if 'id_specific' in json_config:
+                new_sc.set_config_for_specific_id(specific_id=json_config['id_specific'],
+                                                  config=json_config['service_config_config'])
+
         update_config = TeraServiceConfig.get_service_config_by_id(s_id=json_config['id_service_config'])
         if 'id_specific' in json_config:
             return [update_config.to_json(specific_id=json_config['id_specific'])]

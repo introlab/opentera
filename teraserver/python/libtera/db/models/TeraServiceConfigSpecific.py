@@ -46,10 +46,10 @@ class TeraServiceConfigSpecific(db.Model, BaseModel):
         insertion = True
 
         if configs:
-            for config in configs:
-                if config.service_config_specific_id == specific_id:
+            for s_config in configs:
+                if s_config.service_config_specific_id == specific_id:
                     # Update
-                    config.service_config_specific_config = config
+                    s_config.service_config_specific_config = config
                     insertion = False
                     break
         if insertion:

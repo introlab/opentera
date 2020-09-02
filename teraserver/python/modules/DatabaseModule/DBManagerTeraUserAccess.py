@@ -283,12 +283,12 @@ class DBManagerTeraUserAccess:
 
         return ses_ids
 
-    def get_accessible_services(self, admin_only=False, include_system_services=False):
+    def get_accessible_services(self, admin_only=False, include_system_services=False, all_services=False):
         from libtera.db.models.TeraService import TeraService
         from libtera.db.models.TeraServiceRole import TeraServiceRole
         from libtera.db.models.TeraServiceProject import TeraServiceProject
 
-        if self.user.user_superadmin:
+        if self.user.user_superadmin or all_services:
             if include_system_services:
                 return TeraService.query.all()
             return TeraService.query.filter_by(service_system=False).all()
@@ -307,11 +307,12 @@ class DBManagerTeraUserAccess:
 
         return query.all()
 
-    def get_accessible_services_ids(self, admin_only=False, include_system_services=False):
+    def get_accessible_services_ids(self, admin_only=False, include_system_services=False, all_services=False):
         services_ids = []
 
         for service in self.get_accessible_services(admin_only=admin_only,
-                                                    include_system_services=include_system_services):
+                                                    include_system_services=include_system_services,
+                                                    all_services=all_services):
             services_ids.append(service.id_service)
 
         return services_ids
@@ -679,8 +680,8 @@ class DBManagerTeraUserAccess:
             .filter_by(id_project=project_id).all()
 
         if include_other_services:
-            # We must add the missing services in the list
-            services_ids = self.get_accessible_services_ids()
+            # We must add the missing services in the list, even if we don't have access to them
+            services_ids = self.get_accessible_services_ids(all_services=True)
             missing_services_ids = set(services_ids).difference([sp.id_service for sp in service_projects])
             for missing_service_id in missing_services_ids:
                 service_project = TeraServiceProject()

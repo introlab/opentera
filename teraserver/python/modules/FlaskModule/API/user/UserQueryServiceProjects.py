@@ -187,8 +187,8 @@ class UserQueryServiceProjects(Resource):
                 return '', 400
 
             # Check if current user can modify the posted information
-            if json_sp['id_service'] not in user_access.get_accessible_services_ids(admin_only=True):
-                return gettext('Access denied'), 403
+            # if json_sp['id_service'] not in user_access.get_accessible_services_ids(admin_only=True):
+            #     return gettext('Access denied'), 403
 
             from libtera.db.models.TeraProject import TeraProject
             project = TeraProject.get_project_by_id(json_sp['id_project'])

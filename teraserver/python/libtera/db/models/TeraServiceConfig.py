@@ -61,12 +61,13 @@ class TeraServiceConfig(db.Model, BaseModel):
         return json_config
 
     def from_json(self, json_values: dict):
-        super().from_json(json=json_values, ignore_fields=['service_config_config'])
+        super().from_json(json=json_values, ignore_fields=['service_config_config', 'id_specific'])
 
         if 'service_config_config' in json_values:
-            if 'id_specific' in json_values:
-                self.set_config_for_specific_id(json_values['id_specific'], json_values['service_config_config'])
-            else:
+            if 'id_specific' not in json_values:
+                # Specifc config can't be handled here, since id_service_config might be equal to 0...
+                #     self.set_config_for_specific_id(json_values['id_specific'], json_values['service_config_config'])
+                # else:
                 self.set_global_config(json_values['service_config_config'])
 
     @staticmethod
@@ -148,12 +149,24 @@ class TeraServiceConfig(db.Model, BaseModel):
         return config_json
 
     def set_config_for_specific_id(self, specific_id: str, config: str):
+        if isinstance(config, dict):
+            try:
+                config = json.dumps(config)
+            except ValueError as err:
+                raise err
+
         #  Set or update specific config
         from libtera.db.models.TeraServiceConfigSpecific import TeraServiceConfigSpecific
         TeraServiceConfigSpecific.insert_or_update_specific_config(service_config_id=self.id_service_config,
                                                                    specific_id=specific_id, config=config)
 
     def set_global_config(self, config: str):
+        if isinstance(config, dict):
+            try:
+                config = json.dumps(config)
+            except ValueError as err:
+                raise err
+
         self.service_config_config = config
 
     @staticmethod

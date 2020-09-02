@@ -17,6 +17,7 @@ get_parser.add_argument('id', type=int, help='Alias for "id_service"')
 get_parser.add_argument('uuid', type=str, help='Service UUID to query')
 get_parser.add_argument('key', type=str, help='Service Key to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('with_config', type=inputs.boolean, help='Only return services with editable configuration')
 
 
 # post_parser = reqparse.RequestParser()
@@ -68,12 +69,15 @@ class UserQueryServices(Resource):
                 services = [service]
         else:
             # No arguments - return all acceessible services
-            services = user_access.get_accessible_services()
+            services = user_access.get_accessible_services(include_system_services=args['with_config'])
 
         try:
             services_list = []
 
             for service in services:
+                if args['with_config']:
+                    if not service.service_editable_config:
+                        continue
                 service_json = service.to_json(minimal=args['list'])
                 services_list.append(service_json)
 
