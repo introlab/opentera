@@ -30,7 +30,7 @@ class Participant(MethodView):
         if response.status_code == 200:
             participant_info = response.json()
 
-            return render_template('participant.html', hostname=hostname, port=port,
+            return render_template('participant_en.html', hostname=hostname, port=port,
                                    backend_hostname=backend_hostname, backend_port=backend_port,
                                    participant_name=participant_info['participant_name'],
                                    participant_email=participant_info['participant_email'])
