@@ -12,6 +12,7 @@ from modules.DatabaseModule.DBManager import DBManager
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user to query')
 get_parser.add_argument('id_user_group', type=int, help='ID of the user group to get all users from')
+get_parser.add_argument('id_project', type=int, help='ID of the project to get all users that has access to it')
 get_parser.add_argument('user_uuid', type=str, help='User UUID to query')
 get_parser.add_argument('username', type=str, help='Username of the user to query')
 get_parser.add_argument('self', type=inputs.boolean, help='Query information about the currently logged user')
@@ -58,6 +59,9 @@ class UserQueryUsers(Resource):
         elif args['id_user']:
             if args['id_user'] in user_access.get_accessible_users_ids():
                 users.append(current_user.get_user_by_id(args['id_user']))
+        elif args['id_project']:
+            if args['id_project'] in user_access.get_accessible_projects_ids():
+                users = user_access.query_users_for_project(project_id=args['id_project'], enabled_only=True)
         elif args['self'] is not None:
             users.append(current_user)
         elif args['username'] is not None:

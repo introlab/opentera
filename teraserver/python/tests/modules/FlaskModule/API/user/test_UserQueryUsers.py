@@ -162,6 +162,20 @@ class UserQueryUsersTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item)
 
+    def test_query_specific_project(self):
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_project=1")
+        self.assertEqual(response.status_code, 200)
+        json_data = response.json()
+        self.assertEqual(len(json_data), 5)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+
+        response = self._request_with_http_auth(username='user4', password='user4', payload="id_project=1")
+        self.assertEqual(response.status_code, 200)
+        json_data = response.json()
+        self.assertEqual(len(json_data), 0)
+
     def test_query_specific_username_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="username=user3")
         self.assertEqual(response.status_code, 200)
