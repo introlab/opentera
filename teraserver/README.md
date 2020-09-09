@@ -46,16 +46,24 @@ git clone --recursive -b dev https://github.com/introlab/opentera.git
 ### Step1 : Create the database and database users (only once)
 This step needs to be done only once.
    ```
-sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"
-sudo -u postgres psql -c "create database test"
-sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"
-sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"
-sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"
-sudo -u postgres psql -c "create database videodispatch"
-sudo -u postgres psql -c "create user videodispatch with encrypted password 'videodispatch';"
-sudo -u postgres psql -c "grant all privileges on database videodispatch to videodispatch;"
-sudo -u postgres psql -c "ALTER USER videodispatch WITH PASSWORD 'videodispatch';"
-sudo -u postgres psql -c "\l"
+	sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"
+	sudo -u postgres psql -c "create database test;" 
+	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"
+	sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"
+	sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"
+	sudo -u postgres psql -c "create database openteralogs;"
+	sudo -u postgres psql -c "grant all privileges on database openteralogs to TeraAgent;"
+	sudo -u postgres psql -c "create database openterafiles;"
+	sudo -u postgres psql -c "grant all privileges on database openterafiles to TeraAgent;"
+	sudo -u postgres psql -c "create database videodispatch;"
+	sudo -u postgres psql -c "create user videodispatch with encrypted password 'videodispatch';"
+	sudo -u postgres psql -c "grant all privileges on database videodispatch to videodispatch;"
+	sudo -u postgres psql -c "ALTER USER videodispatch WITH PASSWORD 'videodispatch';"
+	sudo -u postgres psql -c "create database bureauactif;"
+	sudo -u postgres psql -c "create user bureauactif with encrypted password 'bureauactif';"
+	sudo -u postgres psql -c "grant all privileges on database bureauactif to bureauactif;"
+	sudo -u postgres psql -c "ALTER USER bureauactif WITH PASSWORD 'bureauactif';"
+	sudo -u postgres psql -c "\l"
    ```
 ### Step 2 : Open the root CMakeLists.txt in QtCreator (only once)
 1.  Opening the root teraserver/CMakeLists.txt will allow to create and build the project
