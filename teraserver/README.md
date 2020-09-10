@@ -76,17 +76,20 @@ This step needs to be done only once.
 1.  Using PyCharm, opening the directory "{PROJECT_ROOT}/python"
     1. Select the existing Python 3.6 environment in "{PROJECT_ROOT}/python/env/python-3.6" in the app menu: PyCharm->Preferences->Project:python->Project Interpreter
         
-### Step 4 : Run the nginx reverse proxy (every time)
+### Step 4: Generate the TLS certicates (only once)
+1. Using PyCharm, run the CreateCretificates.py script. This will generate the TLS certificates used by nginx.
+
+### Step 5 : Run the nginx reverse proxy (every time)
 1. Go to the **{PROJECT_ROOT}/teraserver/python/config** directory.
 2. Create the logs directory (only once) : ```mkdir logs```
 3. Run the script : ```./start_nginx.sh```
 
-### Step 5 : Run the application (every time)
+### Step 6 : Run the application (every time)
 1.  Run the TeraServer.py application from PyCharm
 2.  Edit the code as you would normally do in a python program.
 3.  Run tests in the tests directory
 
-### Step 6 : Try the API with swagger UI" (as needed)
+### Step 7 : Try the API with swagger UI" (as needed)
 1. Navigate to : [API](https://localhost:40075/doc)
 
 ### Notes
