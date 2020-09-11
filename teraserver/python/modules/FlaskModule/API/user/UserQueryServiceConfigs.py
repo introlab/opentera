@@ -13,6 +13,8 @@ from flask_babel import gettext
 get_parser = api.parser()
 get_parser.add_argument('id_service', type=int, help='ID of service to get all configs from. Use in combination with '
                                                      'another ID field to filter.')
+get_parser.add_argument('service_key', type=str, help='Service key to query. Can be used instead of id_service. If used'
+                                                      'with id_service, service_key will be ignored.')
 get_parser.add_argument('id_participant', type=int, help='ID of the participant from which to get the service specified'
                                                          ' with id_service or all configs')
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to get the service specified with '
@@ -56,6 +58,15 @@ class UserQueryServiceConfig(Resource):
         parser = get_parser
 
         args = parser.parse_args()
+
+        if args['service_key'] and not args['id_service']:
+            from libtera.db.models.TeraService import TeraService
+            # Get service id for that key
+            service = TeraService.get_service_by_key(args['service_key'])
+            if not service:
+                return gettext('Not found'), 400
+            args['id_service'] = service.id_service
+
         id_service = args['id_service']
         id_user = args['id_user']
         id_device = args['id_device']

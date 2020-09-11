@@ -57,6 +57,17 @@ class UserQueryServiceConfigsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
             self.assertEqual(data_item['id_service'], 1)
 
+        response = self._request_with_http_auth(username='admin', password='admin', payload="service_key="
+                                                                                            "VideoRehabService")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertGreaterEqual(len(json_data), 1)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            self.assertEqual(data_item['service_config_name'], 'Télé-réadaptation vidéo')
+
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=1&"
                                                                                             "with_schema=1")
         self.assertEqual(response.status_code, 200)
