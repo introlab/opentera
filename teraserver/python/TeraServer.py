@@ -22,6 +22,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import pathlib
 import sys
 
 from modules.LoginModule.LoginModule import LoginModule
@@ -125,6 +126,10 @@ def init_services(config: ConfigManager):
     # TODO: Manage redis password
     redis_client = redis.Redis(host=config.redis_config['hostname'], port=config.redis_config['port'],
                                db=config.redis_config['db'])
+
+    # Set python path to current folder so that import work from services
+    tera_python_dir = pathlib.Path(__file__).parent.absolute()
+    os.environ['PYTHONPATH'] = str(tera_python_dir)
 
     services = TeraService.query.all()
     for service in services:
