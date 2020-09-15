@@ -128,6 +128,8 @@ class FlaskModule(BaseModule):
         from .API.user.UserQueryUserGroups import UserQueryUserGroups
         from .API.user.UserQueryForms import UserQueryForms
         from .API.user.UserQueryOnlineUsers import UserQueryOnlineUsers
+        from .API.user.UserQueryOnlineParticipants import UserQueryOnlineParticipants
+        from .API.user.UserQueryOnlineDevices import UserQueryOnlineDevices
         from .API.user.UserQuerySites import UserQuerySites
         from .API.user.UserQueryProjects import UserQueryProjects
         from .API.user.UserQueryParticipants import UserQueryParticipants
@@ -159,14 +161,16 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserLogout, '/logout', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySites, '/sites', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUsers, '/users', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryOnlineUsers, '/users/online', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUserGroups, '/usergroups', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUserUserGroups, '/users/usergroups', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUserPreferences, '/users/preferences', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryForms, '/forms', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryOnlineUsers, '/online', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryProjects, '/projects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryParticipants, '/participants', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryOnlineParticipants, '/participants/online', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDevices, '/devices', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryOnlineDevices, '/devices/online', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceSites, '/devicesites', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceProjects, '/deviceprojects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceParticipants, '/deviceparticipants', resource_class_kwargs=kwargs)

@@ -13,14 +13,14 @@ from twisted.internet import defer
 import datetime
 
 
-class UserQueryOnlineUsers(Resource):
+class UserQueryOnlineDevices(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.flaskModule = kwargs.get('flaskModule', None)
         self.parser = reqparse.RequestParser()
 
     @user_multi_auth.login_required
-    @api.doc(description='Get online users uuids.',
+    @api.doc(description='Get online devices uuids.',
              responses={200: 'Success'})
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
@@ -29,12 +29,12 @@ class UserQueryOnlineUsers(Resource):
 
         try:
             rpc = RedisRPCClient(self.flaskModule.config.redis_config)
-            online_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
+            online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
 
-            # Filter users that are available to the querier
-            user_uuids = list(set(online_users).intersection(user_access.get_accessible_users_uuids()))
+            # Filter devices that are available to the querier
+            devices_uuids = list(set(online_devices).intersection(user_access.get_accessible_devices_uuids()))
 
-            return user_uuids
+            return devices_uuids
 
         except InvalidRequestError:
             return gettext('Internal server error when making RPC call.'), 500
