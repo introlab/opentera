@@ -8,6 +8,8 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from modules.DatabaseModule.DBManager import DBManager, TeraDeviceProject
 from flask_babel import gettext
+from libtera.redis.RedisRPCClient import RedisRPCClient
+from modules.BaseModule import ModuleNames
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -20,14 +22,16 @@ get_parser.add_argument('id_device_subtype', type=int, help='Device subtype id t
 get_parser.add_argument('name', type=str, help='Name of the device to query')
 get_parser.add_argument('available', type=inputs.boolean, help='Flag that indicates if only available (devices not '
                                                                'associated to a participant) should be returned')
+get_parser.add_argument('projects', type=inputs.boolean, help='Flag that indicates if associated project(s) information'
+                                                              'should be included in the returned device list')
+get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_participants', type=inputs.boolean, help='Flag that indicates if associated '
                                                                        'participant(s) information should be included '
                                                                        'in the returned device list')
 get_parser.add_argument('with_sites', type=inputs.boolean, help='Flag that indicates if associated site(s) information '
                                                                 'should be included in the returned device list')
-get_parser.add_argument('projects', type=inputs.boolean, help='Flag that indicates if associated project(s) information'
-                                                              'should be included in the returned device list')
-get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
+                                                                 'for each device')
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('device', type=str, location='json', help='Device to create / update', required=True)
@@ -93,6 +97,14 @@ class UserQueryDevices(Resource):
 
         try:
             device_list = []
+            online_devices = []
+            busy_devices = []
+            if args['with_status']:
+                # Query status
+                rpc = RedisRPCClient(self.module.config.redis_config)
+                online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
+                busy_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_devices')
+
             for device in devices:
                 if device is not None:
                     if args['list'] is None:
@@ -153,6 +165,15 @@ class UserQueryDevices(Resource):
 
                     if device.id_device_subtype is not None:
                         device_json['device_subtype'] = device.device_subtype.to_json()
+
+                    if args['with_status']:
+                        if device.device_uuid in busy_devices:
+                            device_json['device_status'] = 'busy'
+                        elif device.device_uuid in online_devices:
+                            device_json['device_status'] = 'online'
+                        else:
+                            device_json['device_status'] = 'offline'
+
                     device_list.append(device_json)
             return jsonify(device_list)
 

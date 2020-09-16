@@ -1,69 +1,15 @@
 from libtera.ConfigManager import ConfigManager
 from messages.python.TeraModuleMessage_pb2 import TeraModuleMessage
-from messages.python.RPCMessage_pb2 import RPCMessage
-from messages.python.CreateSession_pb2 import CreateSession
 from messages.python.UserEvent_pb2 import UserEvent
 from messages.python.ParticipantEvent_pb2 import ParticipantEvent
 from messages.python.DeviceEvent_pb2 import DeviceEvent
+from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
+from messages.python.StopSessionEvent_pb2 import StopSessionEvent
+from messages.python.LeaveSessionEvent_pb2 import LeaveSessionEvent
 from modules.BaseModule import BaseModule, ModuleNames
-from google.protobuf.any_pb2 import Any
-import datetime
-
-
-class OnlineUserRegistry:
-    def __init__(self):
-        self.user_list = list()
-
-    def user_online(self, uuid):
-        print('user_online: ', uuid)
-        if not self.user_list.__contains__(uuid):
-            self.user_list.append(uuid)
-
-    def user_offline(self, uuid):
-        print('user_offline', uuid)
-        if self.user_list.__contains__(uuid):
-            self.user_list.remove(uuid)
-
-    def online_users(self):
-        return self.user_list
-
-
-# TODO Should be moved somewhere else?
-class OnlineParticipantRegistry:
-    def __init__(self):
-        self.participant_list = list()
-
-    def participant_online(self, uuid):
-        print('participant_online: ', uuid)
-        if not self.participant_list.__contains__(uuid):
-            self.participant_list.append(uuid)
-
-    def participant_offline(self, uuid):
-        print('participant_offline', uuid)
-        if self.participant_list.__contains__(uuid):
-            self.participant_list.remove(uuid)
-
-    def online_participants(self):
-        return self.participant_list
-
-
-# TODO Should be moved somewhere else?
-class OnlineDeviceRegistry:
-    def __init__(self):
-        self.device_list = list()
-
-    def device_online(self, uuid):
-        print('device_online: ', uuid)
-        if not self.device_list.__contains__(uuid):
-            self.device_list.append(uuid)
-
-    def device_offline(self, uuid):
-        print('device_offline', uuid)
-        if self.device_list.__contains__(uuid):
-            self.device_list.remove(uuid)
-
-    def online_devices(self):
-        return self.device_list
+from modules.UserManagerModule.UserRegistry import UserRegistry
+from modules.UserManagerModule.ParticipantRegistry import ParticipantRegistry
+from modules.UserManagerModule.DeviceRegistry import DeviceRegistry
 
 
 class UserManagerModule(BaseModule):
@@ -71,10 +17,10 @@ class UserManagerModule(BaseModule):
     def __init__(self, config: ConfigManager):
         BaseModule.__init__(self, ModuleNames.USER_MANAGER_MODULE_NAME.value, config)
 
-        # Create user registry
-        self.user_registry = OnlineUserRegistry()
-        self.participant_registry = OnlineParticipantRegistry()
-        self.device_registry = OnlineDeviceRegistry()
+        # Create state registries
+        self.user_registry = UserRegistry()
+        self.participant_registry = ParticipantRegistry()
+        self.device_registry = DeviceRegistry()
         self.send_participant_event = True
         self.send_device_event = True
 
@@ -83,12 +29,16 @@ class UserManagerModule(BaseModule):
 
     def setup_rpc_interface(self):
         self.rpc_api['online_users'] = {'args': [], 'returns': 'list', 'callback': self.online_users_rpc_callback}
+        self.rpc_api['busy_users'] = {'args': [], 'returns': 'dict', 'callback': self.busy_users_rpc_callback}
 
         self.rpc_api['online_participants'] = {'args': [], 'returns': 'list',
                                                'callback': self.online_participants_rpc_callback}
+        self.rpc_api['busy_participants'] = {'args': [], 'returns': 'dict',
+                                             'callback': self.busy_participants_rpc_callback}
 
         self.rpc_api['online_devices'] = {'args': [], 'returns': 'list',
                                           'callback': self.online_devices_rpc_callback}
+        self.rpc_api['busy_devices'] = {'args': [], 'returns': 'dict', 'callback': self.busy_devices_rpc_callback}
 
     def online_users_rpc_callback(self, *args, **kwargs):
         print('online_users_rpc_callback', args, kwargs)
@@ -101,6 +51,18 @@ class UserManagerModule(BaseModule):
     def online_devices_rpc_callback(self, *args, **kwargs):
         print('online_devices_rpc_callback', args, kwargs)
         return self.device_registry.online_devices()
+
+    def busy_users_rpc_callback(self, *args, **kwargs):
+        print('busy_users_rpc_callback', args, kwargs)
+        return self.user_registry.busy_users()
+
+    def busy_participants_rpc_callback(self, *args, **kwargs):
+        print('busy_participants_rpc_callback', args, kwargs)
+        return self.participant_registry.busy_participants()
+
+    def busy_devices_rpc_callback(self, *args, **kwargs):
+        print('busy_devices_rpc_callback', args, kwargs)
+        return self.device_registry.busy_devices()
 
     def setup_module_pubsub(self):
         pass
@@ -141,6 +103,21 @@ class UserManagerModule(BaseModule):
                 elif device_event.type == device_event.DEVICE_DISCONNECTED:
                     self.handle_device_disconnected(tera_message.head, device_event)
 
+            # Test for JoinSessionEvent
+            join_session_event = JoinSessionEvent()
+            if any_msg.Unpack(join_session_event):
+                self.handle_join_session_event(join_session_event)
+
+            # Test for StopSessionEvent
+            stop_session_event = StopSessionEvent()
+            if any_msg.Unpack(stop_session_event):
+                self.handle_join_session_event(stop_session_event)
+
+            # Test for LeaveSessionEvent
+            leave_session_event = LeaveSessionEvent()
+            if any_msg.Unpack(leave_session_event):
+                self.handle_leave_session_event(leave_session_event)
+
     def handle_user_connected(self, header, user_event: UserEvent):
         self.user_registry.user_online(user_event.user_uuid)
 
@@ -176,3 +153,39 @@ class UserManagerModule(BaseModule):
 
         # Send message to event topic
         self.send_event_message(device_event, self.event_topic_name())
+
+    def handle_join_session_event(self, join_event: JoinSessionEvent):
+        for user in join_event.session_users:
+            self.user_registry.user_join_session(user, join_event.session_uuid)
+
+        for participant in join_event.session_participants:
+            self.participant_registry.participant_join_session(participant, join_event.session_uuid)
+
+        for device in join_event.session_devices:
+            self.device_registry.device_join_session(device, join_event.session_uuid)
+
+    def handle_stop_session_event(self, stop_event: StopSessionEvent):
+        for user_uuid, session_uuid in self.user_registry.busy_users().items():
+            if session_uuid == stop_event.session_uuid:
+                self.user_registry.user_leave_session(user_uuid, stop_event.session_uuid)
+
+        for participant_uuid, session_uuid in self.participant_registry.busy_participants().items():
+            if session_uuid == stop_event.session_uuid:
+                self.participant_registry.participant_leave_session(participant_uuid, stop_event.session_uuid)
+
+        for device_uuid, session_uuid in self.device_registry.busy_devices().items():
+            if session_uuid == stop_event.session_uuid:
+                self.device_registry.device_leave_session(device_uuid, stop_event.session_uuid)
+
+    def handle_leave_session_event(self, leave_event: LeaveSessionEvent):
+        for user_uuid, session_uuid in self.user_registry.busy_users().items():
+            if session_uuid == leave_event.session_uuid:
+                self.user_registry.user_leave_session(user_uuid, leave_event.session_uuid)
+
+        for participant_uuid, session_uuid in self.participant_registry.busy_participants().items():
+            if session_uuid == leave_event.session_uuid:
+                self.participant_registry.participant_leave_session(participant_uuid, leave_event.session_uuid)
+
+        for device_uuid, session_uuid in self.device_registry.busy_devices().items():
+            if session_uuid == leave_event.session_uuid:
+                self.device_registry.device_leave_session(device_uuid, leave_event.session_uuid)

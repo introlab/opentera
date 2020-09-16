@@ -176,6 +176,25 @@ class UserQueryUsersTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 0)
 
+    def test_query_with_status(self):
+        response = self._request_with_http_auth(username='admin', password='admin', payload="with_status=1")
+        self.assertEqual(response.status_code, 200)
+        json_data = response.json()
+        self.assertEqual(len(json_data), 6)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            self.assertTrue(data_item.__contains__('user_status'))
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="with_status=1&list=1")
+        self.assertEqual(response.status_code, 200)
+        json_data = response.json()
+        self.assertEqual(len(json_data), 6)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item, minimal=True)
+            self.assertTrue(data_item.__contains__('user_status'))
+
     def test_query_specific_username_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="username=user3")
         self.assertEqual(response.status_code, 200)

@@ -9,6 +9,8 @@ from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from flask_babel import gettext
+from libtera.redis.RedisRPCClient import RedisRPCClient
+from modules.BaseModule import ModuleNames
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -29,6 +31,8 @@ get_parser.add_argument('full', type=inputs.boolean, help='Flag that expands the
                                                           'information')
 get_parser.add_argument('no_group', type=inputs.boolean,
                         help='Flag that limits the returned data with only participants without a group')
+get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
+                                                                 'for each participant')
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('participant', type=str, location='json', help='Participant to create / update', required=True)
@@ -110,6 +114,14 @@ class UserQueryParticipants(Resource):
         try:
             if participants:
                 participant_list = []
+                online_participants = []
+                busy_participants = []
+                if args['with_status']:
+                    # Query status
+                    rpc = RedisRPCClient(self.module.config.redis_config)
+                    online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
+                    busy_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_participants')
+
                 for participant in participants:
                     if participant is not None:
                         # No group flag
@@ -117,8 +129,9 @@ class UserQueryParticipants(Resource):
                             if participant.id_participant_group is not None:
                                 continue
                         # List
+                        participant_json = participant.to_json(minimal=args['list'])
                         if args['list'] is None:
-                            participant_json = participant.to_json()
+
                             if args['id_participant']:
                                 # Adds project information to participant
                                 # participant_json['id_project'] = participant.participant_project.id_project
@@ -143,10 +156,15 @@ class UserQueryParticipants(Resource):
                                     devices.append(device.to_json())
                                 participant_json['participant_devices'] = devices
                                 participant_json['participant_project'] = participant.participant_project.to_json()
-                            participant_list.append(participant_json)
-                        else:
-                            participant_json = participant.to_json(minimal=True)
-                            participant_list.append(participant_json)
+
+                        if args['with_status']:
+                            if participant.participant_uuid in busy_participants:
+                                participant_json['participant_status'] = 'busy'
+                            elif participant.participant_uuid in online_participants:
+                                participant_json['participant_status'] = 'online'
+                            else:
+                                participant_json['participant_status'] = 'offline'
+                        participant_list.append(participant_json)
 
                 return jsonify(participant_list)
 

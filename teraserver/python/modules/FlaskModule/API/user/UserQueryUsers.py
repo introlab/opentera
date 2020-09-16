@@ -7,6 +7,8 @@ from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraUserGroup import TeraUserGroup
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
+from libtera.redis.RedisRPCClient import RedisRPCClient
+from modules.BaseModule import ModuleNames
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -19,6 +21,8 @@ get_parser.add_argument('self', type=inputs.boolean, help='Query information abo
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ID, name, enabled)')
 get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Include usergroups information for each user.')
+get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
+                                                                 'for each user')
 
 post_parser = reqparse.RequestParser()
 # post_parser.add_argument('user', type=str, location='json', help='User to create / update. If structure has a field '
@@ -77,6 +81,14 @@ class UserQueryUsers(Resource):
 
         if users:
             users_list = []
+            online_users = []
+            busy_users = []
+            if args['with_status']:
+                # Query users status
+                rpc = RedisRPCClient(self.module.config.redis_config)
+                online_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
+                busy_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_users')
+
             for user in users:
                 if user is not None:
                     user_json = user.to_json(minimal=args['list'])
@@ -108,6 +120,15 @@ class UserQueryUsers(Resource):
                         for user_group in user_access.query_usergroups_for_user(user.id_user):
                             user_groups_list.append(user_group.to_json(minimal=True))
                         user_json['user_user_groups'] = user_groups_list
+
+                    if args['with_status']:
+                        if user.user_uuid in busy_users:
+                            user_json['user_status'] = 'busy'
+                        elif user.user_uuid in online_users:
+                            user_json['user_status'] = 'online'
+                        else:
+                            user_json['user_status'] = 'offline'
+
                     users_list.append(user_json)
             return jsonify(users_list)
 
