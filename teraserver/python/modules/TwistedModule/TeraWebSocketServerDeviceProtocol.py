@@ -118,6 +118,7 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
         raise ConnectionDeny(ConnectionDeny.FORBIDDEN,
                              "TeraWebSocketServerDeviceProtocol - Websocket authentication failed (key, uuid).")
 
+    @defer.inlineCallbacks
     def onClose(self, wasClean, code, reason):
         if self.device:
             # Advertise that device leaved

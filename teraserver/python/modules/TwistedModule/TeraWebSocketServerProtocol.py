@@ -1,5 +1,6 @@
 # WebSockets
 from autobahn.twisted.websocket import WebSocketServerProtocol
+from autobahn.exception import Disconnected
 from autobahn.websocket.types import ConnectionDeny
 
 # OpenTera
@@ -29,6 +30,9 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
         # Moved handling code in redisConnectionMade...
         # because it always occurs after onOpen...
 
+    def onClose(self, wasClean, code, reason):
+        print(type(self).__name__, 'TeraWebSocketServerProtocol - onClose')
+
     def onPong(self, payload):
         # print('onPong', payload)
         # Should we do something?
@@ -36,6 +40,12 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
 
     def onOpenHandshakeTimeout(self):
         print('TeraWebSocketServerProtocol - onOpenHandshakeTimeout', self)
+
+    def onCloseHandshakeTimeout(self):
+        print('TeraWebSocketServerProtocol - onCloseHandshakeTimeout', self)
+
+    def onServerConnectionDropTimeout(self):
+        print('TeraWebSocketServerProtocol - onServerConnectionDropTimeout', self)
 
     def redis_tera_message_received(self, pattern, channel, message):
         print('TeraWebSocketServerProtocol - redis_tera_message_received', pattern, channel, message)
@@ -93,6 +103,8 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
             print('TeraWebSocketServerProtocol - DecodeError ', pattern, channel, message, d)
         except ParseError as e:
             print('TeraWebSocketServerProtocol - Failure in redisMessageReceived', e)
+        except Disconnected as e:
+            print('TeraWebSocketServerProtocol - Sending message on closed socket.', e)
 
     def create_tera_message(self, dest='', seq=0):
         tera_message = messages.TeraModuleMessage()

@@ -71,7 +71,6 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
 
             print(ret1, ret2, ret3)
 
-
     def onMessage(self, msg, binary):
         # Handle websocket communication
         # TODO use protobuf ?
@@ -122,6 +121,7 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
         raise ConnectionDeny(ConnectionDeny.FORBIDDEN,
                              "TeraWebSocketServerParticipantProtocol - Websocket authentication failed (key, uuid).")
 
+    @defer.inlineCallbacks
     def onClose(self, wasClean, code, reason):
         if self.participant:
             # Advertise that participant leaved
