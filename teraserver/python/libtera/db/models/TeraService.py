@@ -38,7 +38,7 @@ class TeraService(db.Model, BaseModel):
         ignore_fields.extend(['service_roles', 'service_system'])
 
         if minimal:
-            ignore_fields.extend(['service_config_schema'])
+            ignore_fields.extend(['service_default_config', 'service_editable_config'])
 
         json_service = super().to_json(ignore_fields=ignore_fields)
         if not minimal:

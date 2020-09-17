@@ -29,7 +29,8 @@ post_parser = reqparse.RequestParser()
 #                                                                '"user_groups", also update user groups for that user',
 #                          required=True)
 
-post_schema = api.schema_model('user_user', {'properties': TeraUser.get_json_schema(), 'type': 'object', 'location': 'json'})
+post_schema = api.schema_model('user_user', {'properties': TeraUser.get_json_schema(), 'type': 'object',
+                                             'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='User ID to delete', required=True)
