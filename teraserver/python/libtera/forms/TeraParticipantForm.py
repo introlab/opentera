@@ -30,6 +30,8 @@ class TeraParticipantForm:
                                       item_values=groups_list))
         section.add_item(TeraFormItem("participant_enabled", gettext("Participant Enabled"), "boolean", True,
                                       item_default=True))
+        section.add_item(TeraFormItem("participant_token_enabled", gettext("Participant Token Login Enabled"),
+                                      "boolean", True, item_default=False))
         section.add_item(TeraFormItem("participant_token", gettext("Participant Token"), "label", False,
                                       item_options={"readonly": False}))
         section.add_item(TeraFormItem("participant_login_enabled", gettext("Participant Login Enabled"),

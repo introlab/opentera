@@ -28,10 +28,16 @@ class TeraServiceForm:
         section.add_item(TeraFormItem("service_name", gettext("Service Name"), "text", item_required=True))
         section.add_item(TeraFormItem("service_key", gettext("Service Key"), "text", item_required=True))
         section.add_item(TeraFormItem("service_hostname", gettext("Service Hostname"), "text", item_required=True))
-        section.add_item(TeraFormItem("service_port", gettext("Service Port"), "numeric", item_required=True))
-        section.add_item(TeraFormItem("service_endpoint", gettext("Service URL"), "text", item_required=True))
-        section.add_item(TeraFormItem("service_clientendpoint", gettext("Service Client Endpoint"), "text",
+        section.add_item(TeraFormItem("service_port", gettext("Service Internal Port"), "numeric", item_required=True))
+        section.add_item(TeraFormItem("service_endpoint", gettext("Service Internal URL"), "text", item_required=True))
+        section.add_item(TeraFormItem("service_clientendpoint", gettext("Service External Endpoint"), "text",
                                       item_required=True))
+        section.add_item(TeraFormItem("service_endpoint_user", gettext("Service User Endpoint"), "text",
+                                      item_required=False))
+        section.add_item(TeraFormItem("service_endpoint_participant", gettext("Service Participant Endpoint"), "text",
+                                      item_required=False))
+        section.add_item(TeraFormItem("service_endpoint_device", gettext("Service Device Endpoint"), "text",
+                                      item_required=False))
         section.add_item(TeraFormItem("service_enabled", gettext("Service Enabled"), "boolean", item_required=True))
         section.add_item(TeraFormItem("service_editable_config", gettext("Service has editable config"), "boolean",
                                       item_required=False))

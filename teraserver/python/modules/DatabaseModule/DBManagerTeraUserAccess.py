@@ -671,7 +671,7 @@ class DBManagerTeraUserAccess:
         # Sort by project id
         return sorted(service_projects, key=lambda sp: sp.service_project_project.project_name)
 
-    def query_services_for_project(self, project_id: int, include_other_services=False):
+    def query_services_projects_for_project(self, project_id: int, include_other_services=False):
         from libtera.db.models.TeraServiceProject import TeraServiceProject
         from libtera.db.models.TeraService import TeraService
         services_ids = self.get_accessible_services_ids()
@@ -692,6 +692,11 @@ class DBManagerTeraUserAccess:
 
         # Sort by service name
         return sorted(service_projects, key=lambda sp: sp.service_project_service.service_name)
+
+    def query_services_for_project(self, project_id: int, include_other_services=False):
+        services_projects = self.query_services_projects_for_project(project_id, include_other_services)
+        services = [sp.service_project_service for sp in services_projects]
+        return services
 
     # def query_services_roles_for_project(self, project_id: int):
     #     from libtera.db.models.TeraServiceAccess import TeraServiceAccess

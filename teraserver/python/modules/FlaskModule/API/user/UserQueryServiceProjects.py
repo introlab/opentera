@@ -65,8 +65,8 @@ class UserQueryServiceProjects(Resource):
 
         if args['id_project']:
             if args['id_project'] in user_access.get_accessible_projects_ids():
-                service_projects = user_access.query_services_for_project(project_id=args['id_project'],
-                                                                          include_other_services=args['with_services'])
+                service_projects = user_access.query_services_projects_for_project(project_id=args['id_project'],
+                                                                                   include_other_services=args['with_services'])
         else:
             if args['id_service']:
                 if args['id_service'] in user_access.get_accessible_services_ids():

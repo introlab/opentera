@@ -13,6 +13,7 @@ from flask_babel import gettext
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_service', type=int, help='ID of the service to query')
+get_parser.add_argument('id_project', type=int, help='ID of the project to query services from')
 get_parser.add_argument('id', type=int, help='Alias for "id_service"')
 get_parser.add_argument('uuid', type=str, help='Service UUID to query')
 get_parser.add_argument('key', type=str, help='Service Key to query')
@@ -67,6 +68,8 @@ class UserQueryServices(Resource):
             service = TeraService.get_service_by_key(args['key'])
             if service and service.id_service in user_access.get_accessible_services_ids():
                 services = [service]
+        elif args['id_project']:
+            services = user_access.query_services_for_project(args['id_project'])
         else:
             # No arguments - return all acceessible services
             services = user_access.get_accessible_services(include_system_services=args['with_config'])

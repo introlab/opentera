@@ -254,7 +254,6 @@ class UserQueryParticipants(Resource):
             except NameError as e:
                 return e.args, 500
 
-        # TODO: Publish update to everyone who is subscribed to sites update...
         update_participant = TeraParticipant.get_participant_by_id(json_participant['id_participant'])
         update_participant_json = update_participant.to_json()
         # update_participant_json['id_site'] = update_participant.participant_project.id_site

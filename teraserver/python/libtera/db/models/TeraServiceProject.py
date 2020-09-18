@@ -50,7 +50,8 @@ class TeraServiceProject(db.Model, BaseModel):
         project2 = TeraProject.get_project_by_projectname('Default Project #2')
 
         servicebureau = TeraService.get_service_by_key('BureauActif')
-        serviceviddispatch = TeraService.get_service_by_key('VideoDispatch')
+        # serviceviddispatch = TeraService.get_service_by_key('VideoDispatch')
+        servicevideorehab = TeraService.get_service_by_key('VideoRehabService')
 
         service_project = TeraServiceProject()
         service_project.id_project = project1.id_project
@@ -59,7 +60,7 @@ class TeraServiceProject(db.Model, BaseModel):
 
         service_project = TeraServiceProject()
         service_project.id_project = project1.id_project
-        service_project.id_service = serviceviddispatch.id_service
+        service_project.id_service = servicevideorehab.id_service
         db.session.add(service_project)
 
         service_project = TeraServiceProject()

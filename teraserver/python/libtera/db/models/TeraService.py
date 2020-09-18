@@ -15,6 +15,9 @@ class TeraService(db.Model, BaseModel):
     service_port = db.Column(db.Integer, nullable=False)
     service_endpoint = db.Column(db.String, nullable=False)
     service_clientendpoint = db.Column(db.String, nullable=False)
+    service_endpoint_user = db.Column(db.String, nullable=True)
+    service_endpoint_participant = db.Column(db.String, nullable=True)
+    service_endpoint_device = db.Column(db.String, nullable=True)
     service_enabled = db.Column(db.Boolean, nullable=False, default=False)
     service_system = db.Column(db.Boolean, nullable=False, default=False)
     service_editable_config = db.Column(db.Boolean, nullable=False, default=False)
@@ -47,6 +50,15 @@ class TeraService(db.Model, BaseModel):
             for role in self.service_roles:
                 roles.append(role.to_json())
             json_service['service_roles'] = roles
+
+        if not self.service_endpoint_user:
+            del json_service['service_endpoint_user']
+
+        if not self.service_endpoint_participant:
+            del json_service['service_endpoint_participant']
+
+        if not self.service_endpoint_device:
+            del json_service['service_endpoint_device']
 
         return json_service
 
@@ -104,6 +116,9 @@ class TeraService(db.Model, BaseModel):
         new_service.service_port = 4040
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/'
+        new_service.service_endpoint_participant = '/participant'
+        new_service.service_endpoint_user = '/user'
+        new_service.service_endpoint_device = '/device'
         new_service.service_enabled = True
         new_service.service_system = True
         new_service.service_editable_config = True
@@ -162,6 +177,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_hostname = 'localhost'
         new_service.service_port = 4070
         new_service.service_endpoint = '/'
+        new_service.service_endpoint_participant = '/participant'
         new_service.service_clientendpoint = '/rehab'
         new_service.service_enabled = True
         new_service.service_editable_config = True

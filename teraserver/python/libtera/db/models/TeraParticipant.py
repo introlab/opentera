@@ -29,6 +29,7 @@ class TeraParticipant(db.Model, BaseModel):
     participant_username = db.Column(db.String(50), nullable=True)
     participant_email = db.Column(db.String, nullable=True)
     participant_password = db.Column(db.String, nullable=True)
+    participant_token_enabled = db.Column(db.Boolean, nullable=False, default=False)
     participant_token = db.Column(db.String, nullable=True, unique=True)
     participant_lastonline = db.Column(db.TIMESTAMP, nullable=True)
     participant_enabled = db.Column(db.Boolean, nullable=False, default=True)
@@ -243,22 +244,23 @@ class TeraParticipant(db.Model, BaseModel):
         participant1.participant_username = 'participant1'
         participant1.participant_password = TeraParticipant.encrypt_password('opentera')
         participant1.participant_login_enabled = True
+        participant1.participant_token_enabled = True
 
         db.session.add(participant1)
 
         participant2 = TeraParticipant()
         participant2.participant_name = 'Participant #2'
-        participant2.participant_enabled = True
+        participant2.participant_enabled = False
         participant2.participant_uuid = str(uuid.uuid4())
         participant2.participant_participant_group = None
         participant2.participant_project = project1
 
-        # participant2.create_token()
         db.session.add(participant2)
 
         participant2 = TeraParticipant()
         participant2.participant_name = 'Participant #3'
         participant2.participant_enabled = True
+        participant2.participant_token_enabled = True
         participant2.participant_uuid = str(uuid.uuid4())
         participant2.participant_participant_group = None
         participant2.participant_project = project1
@@ -290,6 +292,22 @@ class TeraParticipant(db.Model, BaseModel):
                 del values['participant_password']
             else:
                 values['participant_password'] = TeraParticipant.encrypt_password(values['participant_password'])
+
+        # Check if we need to generate or delete tokens
+        if 'participant_token_enabled' in values:
+            update_participant = TeraParticipant.get_participant_by_id(update_id)
+            if values['participant_token_enabled'] != update_participant.participant_token_enabled:
+                if 'participant_enabled' in values:
+                    participant_enabled = values['participant_enabled']
+                else:
+                    participant_enabled = update_participant.participant_enabled
+                # Value changed
+                if not values['participant_token_enabled'] or not participant_enabled:
+                    values['participant_token'] = None  # Remove token
+                else:
+                    values['participant_token'] = update_participant.create_token()  # Generate new token
+                    db.session.rollback()  # Don't save token here
+
         super().update(update_id, values)
 
     @classmethod
@@ -307,7 +325,8 @@ class TeraParticipant(db.Model, BaseModel):
         super().insert(participant)
 
         # Token must be created after being inserted, since we need to have a valid ID participant into it
-        participant.create_token()
+        if participant.participant_token_enabled and participant.participant_enabled:
+            participant.create_token()
         db.session.commit()
 
     @classmethod
