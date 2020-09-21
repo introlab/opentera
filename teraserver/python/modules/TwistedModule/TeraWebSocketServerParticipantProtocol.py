@@ -130,6 +130,9 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
             participant_disconnected = messages.ParticipantEvent()
             participant_disconnected.participant_uuid = str(self.participant.participant_uuid)
             participant_disconnected.type = messages.ParticipantEvent.PARTICIPANT_DISCONNECTED
+            participant_disconnected.participant_name = self.participant.participant_name
+            participant_disconnected.participant_project_name = self.participant.participant_project.project_name
+            participant_disconnected.participant_site_name = self.participant.participant_project.project_site.site_name
 
             # Need to use Any container
             any_message = Any()
