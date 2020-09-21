@@ -44,6 +44,7 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
                 create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
             device_connected = messages.DeviceEvent()
             device_connected.device_uuid = str(self.device.device_uuid)
+            device_connected.device_name = self.device.device_name
             device_connected.type = messages.DeviceEvent.DEVICE_CONNECTED
             # Need to use Any container
             any_message = messages.Any()
@@ -126,6 +127,7 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
                 create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
             device_disconnected = messages.DeviceEvent()
             device_disconnected.device_uuid = str(self.device.device_uuid)
+            device_disconnected.device_name = self.device.device_name
             device_disconnected.type = messages.DeviceEvent.DEVICE_DISCONNECTED
 
             # Need to use Any container
