@@ -59,7 +59,8 @@ class DeviceQueryDevices(Resource):
         return response
 
     @LoginModule.device_token_or_certificate_required
-    @api.doc(description='/Update the config of a device. A device can only update its own config.',
+    @api.doc(description='Update a device. A device can only update its own data. For now, only device_config can be '
+                         'updated with that API.',
              responses={200: 'Success',
                         403: 'Logged device can\'t update the specified device',
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
@@ -70,7 +71,7 @@ class DeviceQueryDevices(Resource):
 
         # Validate if we have an id
         if 'id_device' not in json_device:
-            return gettext('Missing id_device'), 400
+            json_device['id_device'] = current_device.id_device  # No id - we put the current device id by default
         # Validate if we have a config
         if 'device_config' not in json_device:
             return gettext('Missing config'), 400
@@ -78,6 +79,10 @@ class DeviceQueryDevices(Resource):
         # Validate the device is only updating its own info
         if json_device['id_device'] != current_device.id_device:
             return gettext('Forbidden'), 403
+
+        # Filter everything except device_config
+        unfiltered_keys = {'id_device', 'device_config'}
+        json_device = {x: json_device[x] for x in json_device if x in unfiltered_keys}
 
         try:
             TeraDevice.update(json_device['id_device'], json_device)
