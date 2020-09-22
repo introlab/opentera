@@ -18,6 +18,7 @@ get_parser.add_argument('id_participant', type=int, help='ID of the participant 
 get_parser.add_argument('id', type=int, help='Alias for "id_participant"')
 get_parser.add_argument('username', type=str, help='Username of the participant to query')
 get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the participant to query')
+get_parser.add_argument('uuid', type=str, help='Alias for "participant_uuid"')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all participants')
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all participants')
 get_parser.add_argument('id_group', type=int, help='ID of the participant groups from which to get all participants')
@@ -35,7 +36,6 @@ get_parser.add_argument('with_status', type=inputs.boolean, help='Include status
                                                                  'for each participant')
 
 # post_parser = reqparse.RequestParser()
-# post_parser.add_argument('participant', type=str, location='json', help='Participant to create / update', required=True)
 post_schema = api.schema_model('user_participant', {'properties': TeraParticipant.get_json_schema(),
                                                     'type': 'object',
                                                     'location': 'json'})
@@ -67,6 +67,8 @@ class UserQueryParticipants(Resource):
         participants = []
         if args['id']:
             args['id_participant'] = args['id']
+        if args['uuid']:
+            args['participant_uuid'] = args['uuid']
 
         # If we have no arguments, return nothing
         if not any(args.values()):

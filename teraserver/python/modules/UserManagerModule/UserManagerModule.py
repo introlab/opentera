@@ -157,35 +157,89 @@ class UserManagerModule(BaseModule):
     def handle_join_session_event(self, join_event: JoinSessionEvent):
         for user in join_event.session_users:
             self.user_registry.user_join_session(user, join_event.session_uuid)
+            # Send updated status
+            user_event = UserEvent()
+            user_event.user_uuid = user
+            user_event.type = UserEvent.USER_JOINED_SESSION
+            # TODO: Get full name
+            self.send_event_message(user_event, self.event_topic_name())
 
         for participant in join_event.session_participants:
             self.participant_registry.participant_join_session(participant, join_event.session_uuid)
+            # Send updated status
+            participant_event = ParticipantEvent()
+            participant_event.participant_uuid = participant
+            participant_event.type = ParticipantEvent.PARTICIPANT_JOINED_SESSION
+            # TODO: Get others infos for that participant
+            self.send_event_message(participant_event, self.event_topic_name())
 
         for device in join_event.session_devices:
             self.device_registry.device_join_session(device, join_event.session_uuid)
+            # Send updated status
+            device_event = DeviceEvent()
+            device_event.device_uuid = device
+            device_event.type = DeviceEvent.DEVICE_JOINED_SESSION
+            # TODO: Get others infos for that device
+            self.send_event_message(device_event, self.event_topic_name())
 
     def handle_stop_session_event(self, stop_event: StopSessionEvent):
         for user_uuid, session_uuid in self.user_registry.busy_users().items():
             if session_uuid == stop_event.session_uuid:
                 self.user_registry.user_leave_session(user_uuid, stop_event.session_uuid)
+                # Send updated status
+                user_event = UserEvent()
+                user_event.user_uuid = user_uuid
+                user_event.type = UserEvent.USER_LEFT_SESSION
+                # TODO: Get full name
+                self.send_event_message(user_event, self.event_topic_name())
 
         for participant_uuid, session_uuid in self.participant_registry.busy_participants().items():
             if session_uuid == stop_event.session_uuid:
                 self.participant_registry.participant_leave_session(participant_uuid, stop_event.session_uuid)
+                # Send updated status
+                participant_event = ParticipantEvent()
+                participant_event.participant_uuid = participant_uuid
+                participant_event.type = ParticipantEvent.PARTICIPANT_LEFT_SESSION
+                # TODO: Get others infos for that participant
+                self.send_event_message(participant_event, self.event_topic_name())
 
         for device_uuid, session_uuid in self.device_registry.busy_devices().items():
             if session_uuid == stop_event.session_uuid:
                 self.device_registry.device_leave_session(device_uuid, stop_event.session_uuid)
+                # Send updated status
+                device_event = DeviceEvent()
+                device_event.device_uuid = device_uuid
+                device_event.type = DeviceEvent.DEVICE_LEFT_SESSION
+                # TODO: Get others infos for that device
+                self.send_event_message(device_event, self.event_topic_name())
 
     def handle_leave_session_event(self, leave_event: LeaveSessionEvent):
         for user_uuid, session_uuid in self.user_registry.busy_users().items():
             if session_uuid == leave_event.session_uuid:
                 self.user_registry.user_leave_session(user_uuid, leave_event.session_uuid)
+                # Send updated status
+                user_event = UserEvent()
+                user_event.user_uuid = user_uuid
+                user_event.type = UserEvent.USER_LEFT_SESSION
+                # TODO: Get full name
+                self.send_event_message(user_event, self.event_topic_name())
 
         for participant_uuid, session_uuid in self.participant_registry.busy_participants().items():
             if session_uuid == leave_event.session_uuid:
                 self.participant_registry.participant_leave_session(participant_uuid, leave_event.session_uuid)
+                # Send updated status
+                participant_event = ParticipantEvent()
+                participant_event.participant_uuid = participant_uuid
+                participant_event.type = ParticipantEvent.PARTICIPANT_LEFT_SESSION
+                # TODO: Get others infos for that participant
+                self.send_event_message(participant_event, self.event_topic_name())
 
         for device_uuid, session_uuid in self.device_registry.busy_devices().items():
             if session_uuid == leave_event.session_uuid:
                 self.device_registry.device_leave_session(device_uuid, leave_event.session_uuid)
+                # Send updated status
+                device_event = DeviceEvent()
+                device_event.device_uuid = device_uuid
+                device_event.type = DeviceEvent.DEVICE_LEFT_SESSION
+                # TODO: Get others infos for that device
+                self.send_event_message(device_event, self.event_topic_name())

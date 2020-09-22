@@ -20,6 +20,9 @@
 <div class="container fluid align-items-center">
       <h3 class="pt-3 pb-2 text-center">Merci {{participant_name}}</h3>
         <label class="h5 text-center">Nous espérons que vous avez aimé votre séance.</label>
+    <p><button id="btnConnect" style="width:100%;color:black;" onclick="window.location.href='./participant?token={{participant_token}}'">
+        Cliquez ici pour vous reconnecter
+    </button></p>
 </div>
 
 {% include "footer.html" %}

@@ -14,6 +14,8 @@ from modules.BaseModule import ModuleNames
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_device', type=int, help='ID of the device to query')
+get_parser.add_argument('device_uuid', type=str, help='Device uuid of the device to query')
+get_parser.add_argument('uuid', type=str, help='Alias for "device_uuid"')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all associated devices')
 get_parser.add_argument('device_type', type=int, help='ID of device type from which to get all devices. Can be '
@@ -63,14 +65,20 @@ class UserQueryDevices(Resource):
 
         args = parser.parse_args()
 
+        if args['uuid']:
+            args['device_uuid'] = args['uuid']
+
         devices = []
         # If we have no arguments, return all accessible devices
         if not args['id_device'] and not args['id_site'] and not args['device_type'] and not args['id_project'] and \
-                not args['name']:
+                not args['name'] and not args['device_uuid']:
             devices = user_access.get_accessible_devices()
         elif args['id_device']:
             if args['id_device'] in user_access.get_accessible_devices_ids():
                 devices = [TeraDevice.get_device_by_id(args['id_device'])]
+        elif args['device_uuid']:
+            if args['device_uuid'] in user_access.get_accessible_devices_uuids():
+                devices = [TeraDevice.get_device_by_uuid(args['device_uuid'])]
         elif args['id_site']:
             # Check if has access to the requested site
             devices = user_access.query_devices_for_site(args['id_site'], args['device_type'])
