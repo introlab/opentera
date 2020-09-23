@@ -26,6 +26,9 @@ session_manager_schema = api.schema_model('session_manage', {
                 'id_service': {
                     'type': 'integer'
                 },
+                'id_session': {
+                    'type': 'integer'
+                },
                 'id_creator_user': {
                     'type': 'integer'
                 },
@@ -99,23 +102,31 @@ class UserSessionManager(Resource):
 
         json_session_manager = request.json['session_manage']
 
-        if 'id_service' not in json_session_manager:
-            return gettext('Missing session id'), 400
+        # if 'id_service' not in json_session_manager:
+        #     return gettext('Missing service id'), 400
 
         if 'id_creator_user' not in json_session_manager:
             json_session_manager['id_creator_user'] = current_user.id_user
+
+        if 'id_session' not in json_session_manager:
+            json_session_manager['id_session'] = 0
 
         # Validate user rights if user can access that service
         if json_session_manager['id_service'] not in user_access.get_accessible_services_ids():
             return gettext('User doesn\'t have access to that service.'), 403
 
         # Get Redis key for service
-        service = TeraService.get_service_by_id(json_session_manager['id_service'])
-        if not service:
-            return gettext('Service not found'), 500
+        answer = None
+        if 'id_service' in json_session_manager:
+            service = TeraService.get_service_by_id(json_session_manager['id_service'])
+            if not service:
+                return gettext('Service not found'), 500
 
-        rpc = RedisRPCClient(self.module.config.redis_config)
-        answer = rpc.call_service(service.service_key, 'session_manage', json.dumps(request.json))
+            rpc = RedisRPCClient(self.module.config.redis_config)
+            answer = rpc.call_service(service.service_key, 'session_manage', json.dumps(request.json))
+        else:
+            # TODO: Manage other session types
+            return gettext('Not implemented yet'), 501
 
         # TODO If session is of category "Service":
         # - Starts / stops / ... the service using RPC API:
@@ -131,10 +142,11 @@ class UserSessionManager(Resource):
             return answer, 200
         else:
             # Test and debug for now
-            if json_session_manager['action'] == 'start':
-                return {'status': 'started', 'id_session': 1}, 200
-            if json_session_manager['action'] == 'stop':
-                return {'status': 'stopped', 'id_session': 1}, 200
+            # if json_session_manager['action'] == 'start':
+            #     return {'status': 'started', 'id_session': 1}, 200
+            # if json_session_manager['action'] == 'stop':
+            #     return {'status': 'stopped', 'id_session': 1}, 200
             return gettext('No answer from service.'), 500
+
 
 

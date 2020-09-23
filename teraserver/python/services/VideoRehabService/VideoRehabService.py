@@ -339,15 +339,16 @@ class VideoRehabService(ServiceOpenTera):
 
             # Return response
             if api_response.status_code == 200:
-                return api_response.json()
+                return {'status': 'stopped', 'session': api_response.json()}
 
-        return None
+        return {'status': 'error', 'error_text': gettext('No matching session to stop')}
 
     def manage_start_session(self, session_manage_args: dict):
         # Get "useful" arguments
         id_service = session_manage_args['id_service']
         id_creator_user = session_manage_args['id_creator_user']
         id_session_type = session_manage_args['id_session_type']
+        id_session = session_manage_args['id_session']
 
         # Get additional "start" arguments
         parameters = session_manage_args['parameters']
@@ -357,20 +358,27 @@ class VideoRehabService(ServiceOpenTera):
         devices = []
 
         # Call service API to create session
-        api_req = {'create_session': {'id_service': id_service,
-                                      'id_creator_user': id_creator_user,
-                                      'id_session_type': id_session_type,
-                                      'participants': participants,
-                                      'users': users,
-                                      'devices': devices,
-                                      'parameters': parameters}
-                   }
+        api_response = None
+        if id_session == 0:  # New session request
+            api_req = {'session': {'id_session': 0,  # New session
+                                   'id_creator_user': id_creator_user,
+                                   'id_session_type': id_session_type,
+                                   'session_participants_uuids': participants,
+                                   'session_users_uuids': users,
+                                   'sessiom_devices_uuids': devices,
+                                   'session_parameters': parameters}
+                       }
 
-        api_response = self.post_to_opentera('/api/service/sessions', api_req)
+            api_response = self.post_to_opentera('/api/service/sessions', api_req)
+        else:
+            api_response = self.get_from_opentera('/api/service/sessions', 'id_session=' + str(id_session))
 
         if api_response.status_code == 200:
 
             session_info = api_response.json()
+
+            if isinstance(session_info, list):
+                session_info = session_info.pop()
 
             # Replace fields with uuids
             session_info['session_participants'] = participants
@@ -391,8 +399,8 @@ class VideoRehabService(ServiceOpenTera):
 
             if not retval or not process_info:
                 self.unsubscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
-                                                 self.nodejs_webrtc_message_callback)
-                return {'Error': 'Cannot create process'}
+                                                       self.nodejs_webrtc_message_callback)
+                return {'status': 'error', 'error_text': gettext('Cannot create process')}
 
             # Add URL to session_info
             session_info['session_url'] = process_info['url']
@@ -401,10 +409,10 @@ class VideoRehabService(ServiceOpenTera):
             self.sessions[session_info['id_session']] = session_info
 
             # Return session information
-            return session_info
+            return {'status': 'started', 'session': session_info}
 
         else:
-            return {'Error': 'Cannot create session'}
+            return {'status': 'error', 'error_text': gettext('Cannot create session')}
 
 
 if __name__ == '__main__':
