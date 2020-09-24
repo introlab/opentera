@@ -16,6 +16,7 @@ get_parser.add_argument('id_user', type=int, help='ID of the user to query')
 get_parser.add_argument('id_user_group', type=int, help='ID of the user group to get all users from')
 get_parser.add_argument('id_project', type=int, help='ID of the project to get all users that has access to it')
 get_parser.add_argument('user_uuid', type=str, help='User UUID to query')
+get_parser.add_argument('uuid', type=str, help='Alias for "user_uuid"')
 get_parser.add_argument('username', type=str, help='Username of the user to query')
 get_parser.add_argument('self', type=inputs.boolean, help='Query information about the currently logged user')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
@@ -56,6 +57,9 @@ class UserQueryUsers(Resource):
         user_access = DBManager.userAccess(current_user)
 
         users = []
+
+        if args['uuid']:
+            args['user_uuid'] = args['uuid']
 
         # If we have a user_uuid, query for that user if accessible
         if args['user_uuid']:

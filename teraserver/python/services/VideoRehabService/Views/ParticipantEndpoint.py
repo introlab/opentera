@@ -31,6 +31,7 @@ class ParticipantEndpoint(MethodView):
 
             return render_template('participant_endpoint.html', backend_hostname=backend_hostname,
                                    backend_port=backend_port,
-                                   participant_name=participant_name)
+                                   participant_name=participant_name,
+                                   participant_token=current_participant_client.participant_token)
         else:
             return 'Unauthorized', 403
