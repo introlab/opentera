@@ -24,6 +24,8 @@ get_parser.add_argument('available', type=inputs.boolean, help='Flag that indica
                                                                'associated to a participant) should be returned')
 get_parser.add_argument('projects', type=inputs.boolean, help='Flag that indicates if associated project(s) information'
                                                               'should be included in the returned device list')
+get_parser.add_argument('enabled', type=inputs.boolean, help='Flag that limits the returned data to the enabled '
+                                                             'devices')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_participants', type=inputs.boolean, help='Flag that indicates if associated '
                                                                        'participant(s) information should be included '
@@ -72,10 +74,15 @@ class UserQueryDevices(Resource):
             if args['id_device'] in user_access.get_accessible_devices_ids():
                 devices = [TeraDevice.get_device_by_id(args['id_device'])]
         elif args['id_site']:
-            # Check if has access to the requested site
-            devices = user_access.query_devices_for_site(args['id_site'], args['device_type'])
+            if args['enabled'] is not None:
+                devices = user_access.query_enabled_devices_for_site(args['id_site'], args['device_type'])
+            else:
+                devices = user_access.query_all_devices_for_site(args['id_site'], args['device_type'])
         elif args['id_project']:
-            devices = user_access.query_devices_for_project(args['id_project'], args['device_type'])
+            if args['enabled'] is not None:
+                devices = user_access.query_enabled_devices_for_project(args['id_project'], args['device_type'])
+            else:
+                devices = user_access.query_all_devices_for_project(args['id_project'], args['device_type'])
         elif args['device_type']:
             devices = user_access.query_devices_by_type(args['device_type'])
         elif args['id_device_subtype']:
