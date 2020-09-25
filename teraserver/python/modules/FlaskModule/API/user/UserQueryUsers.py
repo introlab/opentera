@@ -176,16 +176,15 @@ class UserQueryUsers(Resource):
         user_user_groups_ids = []
         update_user_groups = False
         if 'user_user_groups' in json_user:
-            if json_user['id_user'] > 0:
-                return gettext('User groups may be specified with that API only on a new user. Use '
-                               '"user_usergroups" instead'), 400
+            current_user_groups = user_access.get_accessible_users_groups_ids(admin_only=True)
+            # if json_user['id_user'] > 0:
+            #     return gettext('User groups may be specified with that API only on a new user. Use '
+            #                    '"user_usergroups" instead'), 400
             user_user_groups = json_user.pop('user_user_groups')
             # Check if the current user can modify each of the user groups
             user_user_groups_ids = [group['id_user_group'] for group in user_user_groups]
-            # if len(set(user_user_groups_ids).intersection(user_access.get_accessible_users_groups_ids(
-            #         admin_only=True))) != len(user_user_groups):
             for user_group_id in user_user_groups_ids:
-                if len(user_access.query_site_access_for_user_group(user_group_id=user_group_id, admin_only=True)) == 0:
+                if user_group_id not in current_user_groups:
                     return gettext('No access for at a least one user group in the list'), 403
             update_user_groups = True
 
@@ -211,6 +210,7 @@ class UserQueryUsers(Resource):
             json_user['user_superadmin'] = False
 
         # Do the update for user
+        new_user = None
         if json_user['id_user'] > 0:
             if 'user_username' in json_user:
                 return gettext('Username can\'t be modified'), 400
@@ -257,9 +257,29 @@ class UserQueryUsers(Resource):
         # Update user groups, if needed
         if update_user_groups:
             if not update_user.user_superadmin:  # Don't add groups if super admin!
-                update_user.user_user_groups = [TeraUserGroup.get_user_group_by_id(user_group_id)
-                                                for user_group_id in user_user_groups_ids]
-                update_user.commit()
+                if new_user:
+                    # New user - directly update the list
+                    update_user.user_user_groups = [TeraUserGroup.get_user_group_by_id(user_group_id)
+                                                    for user_group_id in user_user_groups_ids]
+                    update_user.commit()
+                else:
+                    # Updated user - first, we add groups not already there
+                    update_user_current_groups = [group.id_user_group for group in update_user.user_user_groups]
+                    user_groups_to_add = set(user_user_groups_ids).difference(update_user_current_groups)
+                    update_user.user_user_groups.extend([TeraUserGroup.get_user_group_by_id(user_group_id)
+                                                         for user_group_id in user_groups_to_add])
+
+                    # Then, we delete groups that the current user has access, but are not present in the posted list,
+                    # without touching groups already there
+                    current_user_groups = user_access.get_accessible_users_groups_ids(admin_only=True)
+                    update_user_current_groups.extend(list(user_groups_to_add))
+                    missing_user_groups = set(current_user_groups).difference(user_user_groups_ids)
+                    for user_group_id in missing_user_groups:
+                        if user_group_id in update_user_current_groups:
+                            update_user.user_user_groups.remove(TeraUserGroup.get_user_group_by_id(user_group_id))
+
+                    update_user.commit()
+
             # Check if there's some user groups for the updated user that we need to delete
             # id_groups_to_delete = set([group.id_user_group for group in update_user.user_user_groups])\
             #     .difference(user_user_groups_ids)

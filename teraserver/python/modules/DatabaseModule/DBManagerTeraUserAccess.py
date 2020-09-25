@@ -358,7 +358,7 @@ class DBManagerTeraUserAccess:
         #
         # return role_name
 
-    def query_all_devices_for_site(self, site_id: int, device_type_id: int):
+    def query_devices_for_site(self, site_id: int, device_type_id: int, enabled: bool = False):
         devices = []
         if site_id in self.get_accessible_sites_ids():
             query = TeraDevice.query.join(TeraDeviceProject).join(TeraProject) \
@@ -366,40 +366,20 @@ class DBManagerTeraUserAccess:
                 .order_by(TeraDevice.id_device.asc())
             if device_type_id:
                 query = query.filter(TeraDevice.device_type == device_type_id)
+            if enabled is not None:
+                query = query.filter(TeraDevice.device_enabled == enabled)
             devices = query.all()
         return devices
 
-    def query_enabled_devices_for_site(self, site_id: int, device_type_id: int):
-        devices = []
-        if site_id in self.get_accessible_sites_ids():
-            query = TeraDevice.query.join(TeraDeviceProject).join(TeraProject) \
-                .filter(TeraProject.id_site == site_id) \
-                .filter(TeraDevice.device_enabled == true()) \
-                .order_by(TeraDevice.id_device.asc())
-            if device_type_id:
-                query = query.filter(TeraDevice.device_type == device_type_id)
-            devices = query.all()
-        return devices
-
-    def query_all_devices_for_project(self, project_id: int, device_type_id: int):
+    def query_devices_for_project(self, project_id: int, device_type_id: int, enabled: bool = False):
         devices = []
         if project_id in self.get_accessible_projects_ids():
             query = TeraDevice.query.join(TeraDeviceProject).filter_by(id_project=project_id) \
                 .order_by(TeraDevice.id_device.asc())
             if device_type_id:
                 query = query.filter(TeraDevice.device_type == device_type_id)
-            devices = query.all()
-        return devices
-
-    def query_enabled_devices_for_project(self, project_id: int, device_type_id: int):
-        devices = []
-        if project_id in self.get_accessible_projects_ids():
-            query = TeraDevice.query.join(TeraDeviceProject) \
-                .filter_by(id_project=project_id) \
-                .filter(TeraDevice.device_enabled == true()) \
-                .order_by(TeraDevice.id_device.asc())
-            if device_type_id:
-                query = query.filter(TeraDevice.device_type == device_type_id)
+            if enabled is not None:
+                query = query.filter(TeraDevice.device_enabled == enabled)
             devices = query.all()
         return devices
 

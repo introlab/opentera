@@ -17,10 +17,12 @@ class BaseAPITest(unittest.TestCase):
         url = self._make_url(self.host, self.port, self.login_endpoint)
         return get(url=url, verify=False, auth=(username, password), params=payload)
 
-    def _request_with_http_auth(self, username, password, payload=None):
+    def _request_with_http_auth(self, username, password, payload=None, endpoint=None):
         if payload is None:
             payload = {}
-        url = self._make_url(self.host, self.port, self.test_endpoint)
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        url = self._make_url(self.host, self.port, endpoint)
         return get(url=url, verify=False, auth=(username, password), params=payload)
 
     def _request_with_token_auth(self, token, payload=None):

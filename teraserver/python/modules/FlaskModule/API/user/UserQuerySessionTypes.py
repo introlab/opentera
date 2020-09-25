@@ -128,9 +128,9 @@ class UserQuerySessionTypes(Resource):
         st_projects_ids = []
         update_st_projects = False
         if 'session_type_projects' in json_session_type:
-            if json_session_type['id_session_type'] > 0:
-                return gettext('Session type projects may be specified with that API only on a new session type. Use '
-                               '"sessiontypeproject" instead'), 400
+            # if json_session_type['id_session_type'] > 0:
+            #     return gettext('Session type projects may be specified with that API only on a new session type. Use '
+            #                    '"sessiontypeproject" instead'), 400
             session_type_projects = json_session_type.pop('session_type_projects')
             # Check if the current user is project admin in all of those projects
             st_projects_ids = [project['id_project'] for project in session_type_projects]
@@ -141,6 +141,7 @@ class UserQuerySessionTypes(Resource):
             update_st_projects = True
 
         # Do the update!
+        new_st = None
         if json_session_type['id_session_type'] > 0:
             # Already existing
             try:
@@ -167,9 +168,29 @@ class UserQuerySessionTypes(Resource):
         # Update session type projects, if needed
         if update_st_projects:
             from libtera.db.models.TeraProject import TeraProject
-            update_session_type.session_type_projects = [TeraProject.get_project_by_id(project_id)
-                                                         for project_id in st_projects_ids]
-            update_session_type.commit()
+            if new_st:
+                # New session type - directly update the list
+                update_session_type.session_type_projects = [TeraProject.get_project_by_id(project_id)
+                                                             for project_id in st_projects_ids]
+                update_session_type.commit()
+            else:
+                # Updated session type - first, we add projects not already there
+                update_st_current_projects = [project.id_project for project in
+                                              update_session_type.session_type_projects]
+                projects_to_add = set(st_projects_ids).difference(update_st_current_projects)
+                update_session_type.session_type_projects.extend([TeraProject.get_project_by_id(project_id)
+                                                                  for project_id in projects_to_add])
+
+                # Then, we delete groups that the current user has access, but are not present in the posted list,
+                # without touching groups already there
+                current_user_projects = user_access.get_accessible_projects_ids(admin_only=True)
+                update_st_current_projects.extend(list(projects_to_add))
+                missing_projects = set(current_user_projects).difference(st_projects_ids)
+                for project_id in missing_projects:
+                    if project_id in update_st_current_projects:
+                        update_session_type.session_type_projects.remove(TeraProject.get_project_by_id(project_id))
+
+                update_session_type.commit()
 
         return [update_session_type.to_json()]
 

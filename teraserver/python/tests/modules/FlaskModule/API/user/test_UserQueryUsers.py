@@ -292,23 +292,22 @@ class UserQueryUsersTest(BaseAPITest):
         response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
         self.assertEqual(response.status_code, 403, msg="Missing usergroups")
 
-        json_data['user']['user_user_groups'] = [{'id_user_group': 2}]
+        json_data['user']['user_user_groups'] = [{'id_user_group': 3}, {'id_user_group': 5}]
         response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
         self.assertEqual(response.status_code, 403, msg="No access to user groups!")
 
-        json_data['user']['user_user_groups'] = [{'id_user_group': 3}]
-        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 400, msg="Invalid password")
 
         json_data['user']['user_password'] = 'testtest'
-        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 409, msg="Username unavailable")
 
         json_data['user']['user_username'] = 'selftest'
         response = self._post_with_http_auth(username='user4', password='user4', payload=json_data)
         self.assertEqual(response.status_code, 403, msg="Post denied for user")  # Forbidden for that user to post that
 
-        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Post new")  # All ok now!
 
         json_data = response.json()[0]
@@ -319,18 +318,39 @@ class UserQueryUsersTest(BaseAPITest):
             'user': {
                 'id_user': current_id,
                 'user_enabled': False,
-                'user_user_groups': [3],
-                'user_username': 'selftest2'
+                'user_user_groups': [{'id_user_group': 3}, {'id_user_group': 1}]
             }
         }
 
         response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Can't change user groups on existing user")
+        self.assertEqual(response.status_code, 200, msg="Changed user groups")
 
-        del json_data['user']['user_user_groups']
+        # Check that the untouched user group is still there
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_user=" + str(current_id),
+                                                endpoint='/api/user/users/usergroups')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        reply_data = response.json()
+        self.assertEqual(len(reply_data), 3)
+
+        json_data['user']['user_user_groups'] = [{'id_user_group': 3}]
+        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
+        self.assertEqual(response.status_code, 200, msg="Changed user groups")
+
+        # Check that the untouched user group is still there
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_user=" + str(current_id),
+                                                endpoint='/api/user/users/usergroups')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        reply_data = response.json()
+        self.assertEqual(len(reply_data), 2)
+
         response = self._post_with_http_auth(username='user', password='user', payload=json_data)
         self.assertEqual(response.status_code, 403, msg="User can't modify that user")
 
+        json_data['user']['user_username'] = 'selftest2'
         response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
         self.assertEqual(response.status_code, 400, msg="Can't change user_username")
 
@@ -345,7 +365,10 @@ class UserQueryUsersTest(BaseAPITest):
         self.assertEqual(response.status_code, 403, msg="Delete denied")
 
         response = self._delete_with_http_auth(username='siteadmin', password='siteadmin', id_to_del=current_id)
-        self.assertEqual(response.status_code, 200, msg="Delete OK")
+        self.assertEqual(response.status_code, 200, msg="Deleted groups, but not user = OK")
+
+        response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=current_id)
+        self.assertEqual(response.status_code, 200, msg="Deleted user completely")
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

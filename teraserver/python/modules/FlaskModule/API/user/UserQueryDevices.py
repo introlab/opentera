@@ -27,7 +27,7 @@ get_parser.add_argument('available', type=inputs.boolean, help='Flag that indica
 get_parser.add_argument('projects', type=inputs.boolean, help='Flag that indicates if associated project(s) information'
                                                               'should be included in the returned device list')
 get_parser.add_argument('enabled', type=inputs.boolean, help='Flag that limits the returned data to the enabled '
-                                                             'devices')
+                                                             'devices. Used only with id_site and id_project for now.')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_participants', type=inputs.boolean, help='Flag that indicates if associated '
                                                                        'participant(s) information should be included '
@@ -82,15 +82,9 @@ class UserQueryDevices(Resource):
             if args['device_uuid'] in user_access.get_accessible_devices_uuids():
                 devices = [TeraDevice.get_device_by_uuid(args['device_uuid'])]
         elif args['id_site']:
-            if args['enabled'] is not None:
-                devices = user_access.query_enabled_devices_for_site(args['id_site'], args['device_type'])
-            else:
-                devices = user_access.query_all_devices_for_site(args['id_site'], args['device_type'])
+            devices = user_access.query_devices_for_site(args['id_site'], args['device_type'], args['enabled'])
         elif args['id_project']:
-            if args['enabled'] is not None:
-                devices = user_access.query_enabled_devices_for_project(args['id_project'], args['device_type'])
-            else:
-                devices = user_access.query_all_devices_for_project(args['id_project'], args['device_type'])
+            devices = user_access.query_devices_for_project(args['id_project'], args['device_type'], args['enabled'])
         elif args['device_type']:
             devices = user_access.query_devices_by_type(args['device_type'])
         elif args['id_device_subtype']:
@@ -220,9 +214,9 @@ class UserQueryDevices(Resource):
         device_projects_ids = []
         update_device_projects = False
         if 'device_projects' in json_device:
-            if json_device['id_device'] > 0:
-                return gettext('Device projects may be specified with that API only on a new device. Use '
-                               '"device_projects" instead'), 400
+            # if json_device['id_device'] > 0:
+            #     return gettext('Device projects may be specified with that API only on a new device. Use '
+            #                    '"device_projects" instead'), 400
             device_projects = json_device.pop('device_projects')
             # Check if the current user is site admin in all of those projects
             device_projects_ids = [project['id_project'] for project in device_projects]
@@ -260,6 +254,7 @@ class UserQueryDevices(Resource):
                 json_device = json_device2
 
         # Do the update!
+        new_device = None
         if json_device['id_device'] > 0:
             # Already existing
             try:
@@ -285,9 +280,27 @@ class UserQueryDevices(Resource):
 
         # Update device projects, if needed
         if update_device_projects:
-            update_device.device_projects = [TeraProject.get_project_by_id(project_id)
-                                             for project_id in device_projects_ids]
-            update_device.commit()
+            if new_device:
+                # New device - directly update the list
+                update_device.device_projects = [TeraProject.get_project_by_id(project_id)
+                                                 for project_id in device_projects_ids]
+                update_device.commit()
+            else:
+                # Updated device - first, we add projects not already there
+                update_device_current_projects = [project.id_project for project in update_device.device_projects]
+                projects_to_add = set(device_projects_ids).difference(update_device_current_projects)
+                update_device.device_projects.extend([TeraProject.get_project_by_id(project_id)
+                                                     for project_id in projects_to_add])
+
+                # Then, we delete projects that the current user has access, but are not present in the posted list,
+                # without touching projects already there
+                current_user_projects = user_access.get_accessible_projects_ids(admin_only=True)
+                update_device_current_projects.extend(list(projects_to_add))
+                missing_projects = set(current_user_projects).difference(device_projects_ids)
+                for project_id in missing_projects:
+                    if project_id in update_device_current_projects:
+                        update_device.device_projects.remove(TeraProject.get_project_by_id(project_id))
+                update_device.commit()
 
         return [update_device.to_json()]
 
