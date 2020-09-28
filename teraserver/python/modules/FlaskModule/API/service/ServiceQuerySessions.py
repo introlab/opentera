@@ -19,6 +19,7 @@ import json
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('with_events', type=inputs.boolean, help='Also includes session events')
 
 post_parser = api.parser()
 post_schema = api.schema_model('user_session', {'properties': TeraSession.get_json_schema(),
@@ -56,12 +57,17 @@ class ServiceQuerySessions(Resource):
         try:
             sessions_list = []
             for ses in sessions:
-                if args['list'] is None:
-                    session_json = ses.to_json()
-                    sessions_list.append(session_json)
-                else:
-                    session_json = ses.to_json(minimal=True)
-                    sessions_list.append(session_json)
+                session_json = ses.to_json(args['list'])
+
+                if args['with_events']:
+                    # Get events for session
+                    from libtera.db.models.TeraSessionEvent import TeraSessionEvent
+                    session_events = TeraSessionEvent.get_events_for_session(ses.id_session)
+                    session_events_json = []
+                    for event in session_events:
+                        session_events_json.append(event.to_json(args['list']))
+                    session_json['session_events'] = session_events_json
+                sessions_list.append(session_json)
 
             return sessions_list
 

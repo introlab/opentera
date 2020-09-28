@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-09-22 08:21-0400\n"
+"POT-Creation-Date: 2020-09-28 11:04-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -521,12 +521,12 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:106
 #: modules/FlaskModule/API/user/UserQueryDeviceSubTypes.py:102
 #: modules/FlaskModule/API/user/UserQueryDeviceSubTypes.py:151
-#: modules/FlaskModule/API/user/UserQueryDevices.py:224
-#: modules/FlaskModule/API/user/UserQueryDevices.py:228
-#: modules/FlaskModule/API/user/UserQueryDevices.py:303
+#: modules/FlaskModule/API/user/UserQueryDevices.py:233
+#: modules/FlaskModule/API/user/UserQueryDevices.py:237
+#: modules/FlaskModule/API/user/UserQueryDevices.py:331
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:106
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:154
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:283
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:285
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:200
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:271
 #: modules/FlaskModule/API/user/UserQueryProjects.py:136
@@ -569,9 +569,9 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryUserGroups.py:142
 #: modules/FlaskModule/API/user/UserQueryUserPreferences.py:48
 #: modules/FlaskModule/API/user/UserQueryUserPreferences.py:95
-#: modules/FlaskModule/API/user/UserQueryUsers.py:198
-#: modules/FlaskModule/API/user/UserQueryUsers.py:203
-#: modules/FlaskModule/API/user/UserQueryUsers.py:307
+#: modules/FlaskModule/API/user/UserQueryUsers.py:202
+#: modules/FlaskModule/API/user/UserQueryUsers.py:207
+#: modules/FlaskModule/API/user/UserQueryUsers.py:332
 msgid "Forbidden"
 msgstr ""
 
@@ -581,6 +581,9 @@ msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQueryDevices.py:92
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:174
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:69
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:115
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:145
 #: modules/FlaskModule/API/user/UserQueryAssets.py:145
 #: modules/FlaskModule/API/user/UserQueryDeviceData.py:202
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:152
@@ -593,9 +596,9 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryDeviceSubTypes.py:112
 #: modules/FlaskModule/API/user/UserQueryDeviceSubTypes.py:124
 #: modules/FlaskModule/API/user/UserQueryDeviceSubTypes.py:159
-#: modules/FlaskModule/API/user/UserQueryDevices.py:255
-#: modules/FlaskModule/API/user/UserQueryDevices.py:267
-#: modules/FlaskModule/API/user/UserQueryDevices.py:331
+#: modules/FlaskModule/API/user/UserQueryDevices.py:265
+#: modules/FlaskModule/API/user/UserQueryDevices.py:277
+#: modules/FlaskModule/API/user/UserQueryDevices.py:359
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:116
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:128
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:167
@@ -619,9 +622,9 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQuerySessionEvents.py:151
 #: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:150
 #: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:186
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:151
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:163
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:222
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:152
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:164
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:243
 #: modules/FlaskModule/API/user/UserQuerySessions.py:148
 #: modules/FlaskModule/API/user/UserQuerySessions.py:160
 #: modules/FlaskModule/API/user/UserQuerySessions.py:230
@@ -638,8 +641,8 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryUserPreferences.py:65
 #: modules/FlaskModule/API/user/UserQueryUserPreferences.py:107
 #: modules/FlaskModule/API/user/UserQueryUserUserGroups.py:172
-#: modules/FlaskModule/API/user/UserQueryUsers.py:249
-#: modules/FlaskModule/API/user/UserQueryUsers.py:332
+#: modules/FlaskModule/API/user/UserQueryUsers.py:254
+#: modules/FlaskModule/API/user/UserQueryUsers.py:357
 msgid "Database error"
 msgstr ""
 
@@ -678,7 +681,6 @@ msgstr ""
 #: modules/FlaskModule/API/participant/ParticipantQueryDevices.py:60
 #: modules/FlaskModule/API/participant/ParticipantQueryParticipants.py:51
 #: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:59
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:38
 msgid "Not implemented"
 msgstr ""
 
@@ -754,24 +756,23 @@ msgstr ""
 msgid "Invalid participant email"
 msgstr ""
 
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:63
-#: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:184
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:125
-#: modules/FlaskModule/API/user/UserQueryServices.py:116
-msgid "Missing id_service"
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:51
+msgid "Missing session id"
 msgstr ""
 
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:69
-msgid "Missing id_creator_user"
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:83
+#: modules/FlaskModule/API/user/UserQuerySessions.py:97
+msgid "Missing session"
 msgstr ""
 
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:75
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:89
+#: modules/FlaskModule/API/user/UserQuerySessions.py:103
+msgid "Missing id_session"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:119
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:92
 msgid "Missing id_session_type"
-msgstr ""
-
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:129
-msgid "Missing json fields"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserLogout.py:19
@@ -793,7 +794,7 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:70
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:58
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:56
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:73
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:75
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:52
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:64
 #: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:57
@@ -833,45 +834,39 @@ msgstr ""
 msgid "Device subtype not found"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:202
+#: modules/FlaskModule/API/user/UserQueryDevices.py:211
 msgid "Missing id_device"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:209
-msgid ""
-"Device projects may be specified with that API only on a new device. Use "
-"\"device_projects\" instead"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryDevices.py:218
+#: modules/FlaskModule/API/user/UserQueryDevices.py:227
 #: modules/FlaskModule/API/user/UserQueryUserGroups.py:172
 msgid "No site admin access for at a least one project in the list"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:298
-#: modules/FlaskModule/API/user/UserQueryUsers.py:302
+#: modules/FlaskModule/API/user/UserQueryDevices.py:326
+#: modules/FlaskModule/API/user/UserQueryUsers.py:327
 msgid "Invalid id"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:318
+#: modules/FlaskModule/API/user/UserQueryDevices.py:346
 msgid ""
 "Can't delete device: please delete all participants association before "
 "deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:321
+#: modules/FlaskModule/API/user/UserQueryDevices.py:349
 msgid ""
 "Can't delete device: please remove all sessions referring to that device "
 "before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:324
+#: modules/FlaskModule/API/user/UserQueryDevices.py:352
 msgid ""
 "Can't delete device: please remove all sessions created by that device "
 "before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:326
+#: modules/FlaskModule/API/user/UserQueryDevices.py:354
 msgid ""
 "Can't delete device: please delete all assets created by that device "
 "before deleting."
@@ -905,35 +900,35 @@ msgid ""
 "participants before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:189
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:191
 msgid "Missing participant"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:196
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:198
 msgid "Missing id_participant, id_project or id_participant_group"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:202
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:204
 msgid "No admin access to project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:210
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:212
 msgid "No admin access to group"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:219
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:221
 msgid "Participant group not found."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:222
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:224
 msgid "Mismatch between id_project and group's project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:295
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:297
 msgid "Can't delete participant: please delete all sessions before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:299
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:301
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:177
 msgid "Database Error"
 msgstr ""
@@ -1016,6 +1011,12 @@ msgstr ""
 msgid "Invalid config format provided"
 msgstr ""
 
+#: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:184
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:125
+#: modules/FlaskModule/API/user/UserQueryServices.py:116
+msgid "Missing id_service"
+msgstr ""
+
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:127
 msgid "Missing projects"
 msgstr ""
@@ -1082,36 +1083,22 @@ msgstr ""
 msgid "Missing id_service for session type of type service"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:132
-msgid ""
-"Session type projects may be specified with that API only on a new "
-"session type. Use \"sessiontypeproject\" instead"
-msgstr ""
-
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:140
 msgid "No project admin access for at a least one project in the list"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:199
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:220
 msgid "Cannot delete because you are not admin in all projects."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:204
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:225
 msgid "Unable to delete - not admin in at least one project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:217
+#: modules/FlaskModule/API/user/UserQuerySessionTypes.py:238
 msgid ""
 "Can't delete session type: please delete all sessions with that type "
 "before deleting."
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQuerySessions.py:97
-msgid "Missing session"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQuerySessions.py:103
-msgid "Missing id_session"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySessions.py:112
@@ -1182,7 +1169,7 @@ msgid "At least one id must be specified"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUserUserGroups.py:102
-#: modules/FlaskModule/API/user/UserQueryUsers.py:169
+#: modules/FlaskModule/API/user/UserQueryUsers.py:173
 msgid "Missing id_user"
 msgstr ""
 
@@ -1210,67 +1197,61 @@ msgstr ""
 msgid "No access to relationship's user group"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:176
-msgid ""
-"User groups may be specified with that API only on a new user. Use "
-"\"user_usergroups\" instead"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryUsers.py:185
+#: modules/FlaskModule/API/user/UserQueryUsers.py:188
 msgid "No access for at a least one user group in the list"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:212
+#: modules/FlaskModule/API/user/UserQueryUsers.py:217
 msgid "Username can't be modified"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:230
+#: modules/FlaskModule/API/user/UserQueryUsers.py:235
 msgid "Missing required fields: "
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:233
+#: modules/FlaskModule/API/user/UserQueryUsers.py:238
 msgid "Invalid password"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:237
+#: modules/FlaskModule/API/user/UserQueryUsers.py:242
 msgid "Username unavailable."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:295
+#: modules/FlaskModule/API/user/UserQueryUsers.py:320
 msgid "Sorry, you can't delete yourself!"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:322
+#: modules/FlaskModule/API/user/UserQueryUsers.py:347
 msgid ""
 "Can't delete user: please remove all sessions that this user is part of "
 "before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:325
+#: modules/FlaskModule/API/user/UserQueryUsers.py:350
 msgid ""
 "Can't delete user: please remove all sessions created by this user before"
 " deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUsers.py:327
+#: modules/FlaskModule/API/user/UserQueryUsers.py:352
 msgid ""
 "Can't delete user: please delete all assets created by this user before "
 "deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:103
-msgid "Missing session id"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserSessionManager.py:110
+#: modules/FlaskModule/API/user/UserSessionManager.py:116
 msgid "User doesn't have access to that service."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:115
+#: modules/FlaskModule/API/user/UserSessionManager.py:123
 msgid "Service not found"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:138
+#: modules/FlaskModule/API/user/UserSessionManager.py:129
+msgid "Not implemented yet"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserSessionManager.py:149
 msgid "No answer from service."
 msgstr "Pas de réponse du service."
 
@@ -1317,5 +1298,30 @@ msgstr "Jeton invalide"
 #~ msgstr ""
 
 #~ msgid "Service Client Endpoint"
+#~ msgstr ""
+
+#~ msgid "Missing id_creator_user"
+#~ msgstr ""
+
+#~ msgid "Missing json fields"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Device projects may be specified with"
+#~ " that API only on a new device."
+#~ " Use \"device_projects\" instead"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Session type projects may be specified"
+#~ " with that API only on a new"
+#~ " session type. Use \"sessiontypeproject\" "
+#~ "instead"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "User groups may be specified with "
+#~ "that API only on a new user. "
+#~ "Use \"user_usergroups\" instead"
 #~ msgstr ""
 

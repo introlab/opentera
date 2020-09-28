@@ -307,16 +307,45 @@ class VideoRehabService(ServiceOpenTera):
             self.unsubscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
                                                    self.nodejs_webrtc_message_callback)
 
-            from datetime import datetime
-            time_diff = datetime.now() - datetime.strptime(
-                session_info['session_start_datetime'], '%Y-%m-%dT%H:%M:%S.%f')
-            duration = int(time_diff.total_seconds())
-
             # Call service API for session changes...
+
+            # Create session stop event
+            from datetime import datetime
+            api_req = {'session_event': {'id_session_event': 0,
+                                         'id_session': id_session,
+                                         'id_session_event_type': 4,  # STOP session event
+                                         'session_event_datetime': str(datetime.now()),
+                                         'session_event_context': self.service_info['service_key']
+                                         }
+                       }
+
+            api_response = self.post_to_opentera('/api/service/sessions/events', api_req)
+
+            if api_response.status_code != 200:
+                return {'status': 'error', 'error_text': gettext('Cannot create STOP session event')}
+
+            # Compute session duration from last start event
+            duration = 0
+
+            for session_event in session_info['session_events']:
+                if session_event['id_session_event_type'] == 3:  # START event
+                    time_diff = datetime.now() - datetime.strptime(session_event['session_event_datetime'],
+                                                                   '%Y-%m-%dT%H:%M:%S.%f')
+                    duration = int(time_diff.total_seconds())
+
+            # Default duration
+            if duration == 0:
+                time_diff = datetime.now() - datetime.strptime(
+                    session_info['session_start_datetime'], '%Y-%m-%dT%H:%M:%S.%f')
+                duration = int(time_diff.total_seconds())
+
+            # Add current session duration to the total
+            duration += session_info['session_duration']
+
             # Call service API to create session
-            api_req = {'update_session': {'id_session': id_session,
-                                          'session_status': TeraSessionStatus.STATUS_COMPLETED.value,
-                                          'session_duration': duration}}
+            api_req = {'session': {'id_session': id_session,
+                                   'session_status': TeraSessionStatus.STATUS_COMPLETED.value,
+                                   'session_duration': duration}}
 
             api_response = self.post_to_opentera('/api/service/sessions', api_req)
 
@@ -339,7 +368,12 @@ class VideoRehabService(ServiceOpenTera):
 
             # Return response
             if api_response.status_code == 200:
-                return {'status': 'stopped', 'session': api_response.json()}
+                session_info = api_response.json()
+                if isinstance(session_info, list):
+                    session_info = session_info.pop()
+                return {'status': 'stopped', 'session': session_info}
+
+            return {'status': 'error', 'error_text': gettext('Error stopping session - check server logs. ')}
 
         return {'status': 'error', 'error_text': gettext('No matching session to stop')}
 
@@ -371,7 +405,8 @@ class VideoRehabService(ServiceOpenTera):
 
             api_response = self.post_to_opentera('/api/service/sessions', api_req)
         else:
-            api_response = self.get_from_opentera('/api/service/sessions', 'id_session=' + str(id_session))
+            api_response = self.get_from_opentera('/api/service/sessions', 'id_session=' + str(id_session) +
+                                                  '&with_events=1')
 
         if api_response.status_code == 200:
 
@@ -379,6 +414,31 @@ class VideoRehabService(ServiceOpenTera):
 
             if isinstance(session_info, list):
                 session_info = session_info.pop()
+
+            if 'session_events' not in session_info:
+                session_info['session_events'] = []
+
+            # Create start event in session events
+            from datetime import datetime
+            api_req = {'session_event': {'id_session_event': 0,
+                                         'id_session': session_info['id_session'],
+                                         'id_session_event_type': 3,  # START session event
+                                         'session_event_datetime': str(datetime.now()),
+                                         'session_event_context': self.service_info['service_key']
+                                         }
+                       }
+
+            api_response = self.post_to_opentera('/api/service/sessions/events', api_req)
+
+            if api_response.status_code != 200:
+                return {'status': 'error', 'error_text': gettext('Cannot create session event')}
+
+            # Add event to list
+            new_event = api_response.json()
+
+            if isinstance(new_event, list):
+                new_event = new_event.pop()
+            session_info['session_events'].append(new_event)
 
             # Replace fields with uuids
             session_info['session_participants'] = participants
