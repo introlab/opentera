@@ -75,7 +75,7 @@ class UserQueryUsers(Resource):
             users.append(current_user)
         elif args['username'] is not None:
             user = TeraUser.get_user_by_username(args['username'])
-            if user.id_user in user_access.get_accessible_users_ids():
+            if user is not None and user.id_user in user_access.get_accessible_users_ids():
                 users.append(user)
         elif args['id_user_group']:
             if args['id_user_group'] in user_access.get_accessible_users_groups_ids():
