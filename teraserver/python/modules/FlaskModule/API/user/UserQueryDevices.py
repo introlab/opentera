@@ -240,7 +240,7 @@ class UserQueryDevices(Resource):
             current_device = TeraDevice.get_device_by_id(json_device['id_device'])
             is_site_admin = current_user.user_superadmin
             for project in current_device.device_projects:
-                if user_access.get_site_role(project.device_project_project.project_site.id_site) == 'admin':
+                if user_access.get_site_role(project.project_site.id_site) == 'admin':
                     is_site_admin = True
                     break
 

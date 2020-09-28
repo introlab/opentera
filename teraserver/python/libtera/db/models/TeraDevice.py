@@ -245,7 +245,7 @@ class TeraDevice(db.Model, BaseModel):
         if 'device_uuid' in values:
             del values['device_uuid']
 
-        # Remove object device_subtype, since we can't update it from here
+        # Remove object device_subtype
         if 'device_subtype' in values:
             del values['device_subtype']
 
