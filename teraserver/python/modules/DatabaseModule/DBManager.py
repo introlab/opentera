@@ -16,7 +16,7 @@ from libtera.db.models.TeraDeviceSubType import TeraDeviceSubType
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraSessionType import TeraSessionType
-from libtera.db.models.TeraDeviceData import TeraDeviceData
+# from libtera.db.models.TeraDeviceData import TeraDeviceData
 from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from libtera.db.models.TeraServerSettings import TeraServerSettings
@@ -209,7 +209,7 @@ class DBManager (BaseModule):
         if TeraSession.get_count() == 0:
             print('No session - creating defaults')
             TeraSession.create_defaults()
-            TeraDeviceData.create_defaults(config.server_config['upload_path'])
+            # TeraDeviceData.create_defaults(config.server_config['upload_path'])
             TeraSessionEvent.create_defaults()
             # TeraAsset.create_defaults()
 
@@ -244,7 +244,7 @@ class DBManager (BaseModule):
         db.app = flask_app
 
         # Init tables
-        # db.drop_all()
+        db.drop_all()
         db.create_all()
 
         # Apply any database upgrade, if needed

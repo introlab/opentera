@@ -143,7 +143,7 @@ class FlaskModule(BaseModule):
         from .API.user.UserQuerySessions import UserQuerySessions
         from .API.user.UserQuerySessionTypes import UserQuerySessionTypes
         from .API.user.UserQuerySessionEvents import UserQuerySessionEvents
-        from .API.user.UserQueryDeviceData import UserQueryDeviceData
+        # from .API.user.UserQueryDeviceData import UserQueryDeviceData
         from .API.user.UserQuerySessionTypeProject import UserQuerySessionTypeProject
         from .API.user.UserQueryDeviceSubTypes import UserQueryDeviceSubTypes
         from .API.user.UserQueryAssets import UserQueryAssets
@@ -182,7 +182,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQuerySessionTypes, '/sessiontypes', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessionTypeProject, '/sessiontypeprojects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessionEvents,    '/sessions/events', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryDeviceData,       '/data', resource_class_kwargs=kwargs)
+        # user_api_ns.add_resource(UserQueryDeviceData,       '/data', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceSubTypes,   '/devicesubtypes', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryAssets,           '/assets', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServices,         '/services', resource_class_kwargs=kwargs)
@@ -200,7 +200,7 @@ class FlaskModule(BaseModule):
         # Devices
         from .API.device.DeviceLogin import DeviceLogin
         from .API.device.DeviceLogout import DeviceLogout
-        from .API.device.DeviceUpload import DeviceUpload
+        # from .API.device.DeviceUpload import DeviceUpload
         from .API.device.DeviceRegister import DeviceRegister
         from .API.device.DeviceQuerySessions import DeviceQuerySessions
         from .API.device.DeviceQuerySessionEvents import DeviceQuerySessionEvents
@@ -218,8 +218,8 @@ class FlaskModule(BaseModule):
         device_api_ns.add_resource(DeviceLogout, '/logout', resource_class_kwargs=kwargs)
 
         # TODO remove legacy endpoint 'device_upload'
-        device_api_ns.add_resource(DeviceUpload, '/device_upload', resource_class_kwargs=kwargs)
-        device_api_ns.add_resource(DeviceUpload, '/upload', resource_class_kwargs=kwargs)
+        # device_api_ns.add_resource(DeviceUpload, '/device_upload', resource_class_kwargs=kwargs)
+        # device_api_ns.add_resource(DeviceUpload, '/upload', resource_class_kwargs=kwargs)
 
         # TODO remove legacy endpoint 'device_register'
         device_api_ns.add_resource(DeviceRegister, '/device_register', resource_class_kwargs=kwargs)
@@ -241,7 +241,7 @@ class FlaskModule(BaseModule):
         # Participants
         from .API.participant.ParticipantLogin import ParticipantLogin
         from .API.participant.ParticipantLogout import ParticipantLogout
-        from .API.participant.ParticipantQueryDeviceData import ParticipantQueryDeviceData
+        # from .API.participant.ParticipantQueryDeviceData import ParticipantQueryDeviceData
         from .API.participant.ParticipantQueryDevices import ParticipantQueryDevices
         from .API.participant.ParticipantQueryParticipants import ParticipantQueryParticipants
         from .API.participant.ParticipantQuerySessions import ParticipantQuerySessions
@@ -249,7 +249,7 @@ class FlaskModule(BaseModule):
         # Resources
         participant_api_ns.add_resource(ParticipantLogin, '/login', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantLogout, '/logout', resource_class_kwargs=kwargs)
-        participant_api_ns.add_resource(ParticipantQueryDeviceData, '/data', resource_class_kwargs=kwargs)
+        # participant_api_ns.add_resource(ParticipantQueryDeviceData, '/data', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantQueryDevices, '/devices', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantQueryParticipants, '/participants', resource_class_kwargs=kwargs)
         participant_api_ns.add_resource(ParticipantQuerySessions, '/sessions', resource_class_kwargs=kwargs)

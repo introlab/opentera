@@ -90,8 +90,8 @@ class TeraSession(db.Model, BaseModel):
                 rval['session_creator_service_uuid'] = self.session_creator_service.service_uuid
 
             # Append session components
-            from libtera.db.models.TeraDeviceData import TeraDeviceData
-            rval['session_has_device_data'] = len(TeraDeviceData.get_data_for_session(self.id_session)) > 0
+            # from libtera.db.models.TeraDeviceData import TeraDeviceData
+            # rval['session_has_device_data'] = len(TeraDeviceData.get_data_for_session(self.id_session)) > 0
         return rval
 
     def to_json_create_event(self):
@@ -259,9 +259,8 @@ class TeraSession(db.Model, BaseModel):
 
     @classmethod
     def delete(cls, id_todel):
-        from libtera.db.models.TeraDeviceData import TeraDeviceData
-        TeraDeviceData.delete_files_for_session(id_todel)
-
+        # from libtera.db.models.TeraDeviceData import TeraDeviceData
+        # TeraDeviceData.delete_files_for_session(id_todel)
         super().delete(id_todel)
 
     @classmethod

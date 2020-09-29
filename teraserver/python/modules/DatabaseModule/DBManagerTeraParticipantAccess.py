@@ -8,7 +8,7 @@ from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraDeviceData import TeraDeviceData
+#from libtera.db.models.TeraDeviceData import TeraDeviceData
 from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 from libtera.db.models.TeraSession import TeraSession
 from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
@@ -32,10 +32,10 @@ class DBManagerTeraParticipantAccess:
             filter_by(id_participant=self.participant.id_participant).all()
         return result
 
-    def query_device_data(self, filters: dict):
-        # Make sure you filter results with id_participant to return TeraDeviceData
-        # that are accessible by current participant
-        result = TeraDeviceData.query.filter_by(**filters).join(TeraSession).join(TeraSessionParticipants).\
-            filter_by(id_participant=self.participant.id_participant).all()
-        return result
+    # def query_device_data(self, filters: dict):
+    #     # Make sure you filter results with id_participant to return TeraDeviceData
+    #     # that are accessible by current participant
+    #     result = TeraDeviceData.query.filter_by(**filters).join(TeraSession).join(TeraSessionParticipants).\
+    #         filter_by(id_participant=self.participant.id_participant).all()
+    #     return result
 

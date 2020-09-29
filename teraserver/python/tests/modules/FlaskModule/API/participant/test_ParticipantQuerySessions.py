@@ -97,7 +97,6 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
             self.assertTrue(data_item.__contains__('session_uuid'))
             self.assertTrue(data_item.__contains__('session_participants'))
             self.assertTrue(data_item.__contains__('session_users'))
-            self.assertTrue(data_item.__contains__('session_has_device_data'))
 
     def test_query_token_auth_no_params(self):
         # HTTP AUTH REQUIRED TO GET TOKEN
@@ -133,7 +132,6 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
             self.assertTrue(data_item.__contains__('session_uuid'))
             self.assertTrue(data_item.__contains__('session_participants'))
             self.assertTrue(data_item.__contains__('session_users'))
-            self.assertTrue(data_item.__contains__('session_has_device_data'))
 
     def test_query_base_token(self):
         token = self._get_base_token_with_login_http_auth('participant1', 'opentera')
