@@ -8,6 +8,7 @@ from modules.RedisVars import RedisVars
 from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 from google.protobuf.json_format import Parse, ParseError
 from google.protobuf.message import DecodeError
+from requests import Response
 
 # Twisted
 from twisted.application import internet, service
@@ -61,6 +62,46 @@ class VideoRehabService(ServiceOpenTera):
 
         print(ret1)
 
+    def send_join_message(self, session_info, join_msg: str = gettext('Join me!'), target_users: list = None,
+                          target_participants: list = None, target_devices: list = None):
+
+        users = session_info['session_users']
+        participants = session_info['session_participants']
+        devices = session_info['session_devices']
+        parameters = session_info['session_parameters']
+
+        join_message = messages.JoinSessionEvent()
+        join_message.session_url = session_info['session_url']
+        join_message.session_creator_name = session_info['session_creator_user']
+        join_message.session_uuid = session_info['session_uuid']
+        for user_uuid in users:
+            join_message.session_users.extend([user_uuid])
+        for participant_uuid in participants:
+            join_message.session_participants.extend([participant_uuid])
+        for device_uuid in devices:
+            join_message.session_devices.extend([device_uuid])
+        join_message.join_msg = join_msg
+        join_message.session_parameters = parameters
+        join_message.service_uuid = self.service_uuid
+
+        # Send invitations (as events) for users, participants and devices
+        if target_users is None:
+            target_users = users
+        if target_devices is None:
+            target_devices = devices
+        if target_participants is None:
+            target_participants = participants
+
+        for user_uuid in target_users:
+            self.send_event_message(join_message, 'websocket.user.'
+                                    + user_uuid + '.events')
+        for participant_uuid in target_participants:
+            self.send_event_message(join_message, 'websocket.participant.'
+                                    + participant_uuid + '.events')
+        for device_uuid in target_devices:
+            self.send_event_message(join_message, 'websocket.device.'
+                                    + device_uuid + '.events')
+
     def user_manager_event_received(self, pattern, channel, message):
         print('VideoRehabService - user_manager_event_received', pattern, channel, message)
         try:
@@ -101,21 +142,23 @@ class VideoRehabService(ServiceOpenTera):
                     # Resend invitation to newly connected user
                     print('Resending invitation to ', event, session_info)
 
-                    join_message = messages.JoinSessionEvent()
-
-                    # Fill information for join_message
-                    join_message.session_url = session_info['session_url']
-                    join_message.session_creator_name = session_info['session_creator_user']
-                    join_message.session_uuid = session_info['session_uuid']
-                    for user_uuid in session_info['session_users']:
-                        join_message.session_users.extend([user_uuid])
-                    for participant_uuid in session_info['session_participants']:
-                        join_message.session_participants.extend([participant_uuid])
-                    for device_uuid in session_info['session_devices']:
-                        join_message.session_devices.extend([device_uuid])
-
-                    # Send message
-                    self.send_event_message(join_message, 'websocket.user.' + event.user_uuid + '.events')
+                    self.send_join_message(session_info=session_info, target_devices=[], target_participants=[],
+                                           target_users=[event.user_uuid])
+                    # join_message = messages.JoinSessionEvent()
+                    #
+                    # # Fill information for join_message
+                    # join_message.session_url = session_info['session_url']
+                    # join_message.session_creator_name = session_info['session_creator_user']
+                    # join_message.session_uuid = session_info['session_uuid']
+                    # for user_uuid in session_info['session_users']:
+                    #     join_message.session_users.extend([user_uuid])
+                    # for participant_uuid in session_info['session_participants']:
+                    #     join_message.session_participants.extend([participant_uuid])
+                    # for device_uuid in session_info['session_devices']:
+                    #     join_message.session_devices.extend([device_uuid])
+                    #
+                    # # Send message
+                    # self.send_event_message(join_message, 'websocket.user.' + event.user_uuid + '.events')
 
                 elif event.type == messages.UserEvent.USER_DISCONNECTED:
                     # Terminate session if last user ?
@@ -139,21 +182,24 @@ class VideoRehabService(ServiceOpenTera):
                     # Resend invitation to newly connected user
                     print('Resending invitation to ', event, session_info)
 
-                    join_message = messages.JoinSessionEvent()
-
-                    # Fill information for join_message
-                    join_message.session_url = session_info['session_url']
-                    join_message.session_creator_name = session_info['session_creator_user']
-                    join_message.session_uuid = session_info['session_uuid']
-                    for user_uuid in session_info['session_users']:
-                        join_message.session_users.extend([user_uuid])
-                    for participant_uuid in session_info['session_participants']:
-                        join_message.session_participants.extend([participant_uuid])
-                    for device_uuid in session_info['session_devices']:
-                        join_message.session_devices.extend([device_uuid])
-
-                    # Send message
-                    self.send_event_message(join_message, 'websocket.participant.' + event.participant_uuid + '.events')
+                    self.send_join_message(session_info=session_info, target_devices=[],
+                                           target_participants=[event.participant_uuid], target_users=[])
+                    # join_message = messages.JoinSessionEvent()
+                    #
+                    # # Fill information for join_message
+                    # join_message.session_url = session_info['session_url']
+                    # join_message.session_creator_name = session_info['session_creator_user']
+                    # join_message.session_uuid = session_info['session_uuid']
+                    # for user_uuid in session_info['session_users']:
+                    #     join_message.session_users.extend([user_uuid])
+                    # for participant_uuid in session_info['session_participants']:
+                    #     join_message.session_participants.extend([participant_uuid])
+                    # for device_uuid in session_info['session_devices']:
+                    #     join_message.session_devices.extend([device_uuid])
+                    #
+                    # # Send message
+                    # self.send_event_message(join_message, 'websocket.participant.' +
+                    # event.participant_uuid + '.events')
 
                 elif event.type == messages.ParticipantEvent.PARTICIPANT_DISCONNECTED:
                     # Nothing to do?
@@ -172,21 +218,24 @@ class VideoRehabService(ServiceOpenTera):
                     # Resend invitation to newly connected user
                     print('Resending invitation to ', event, session_info)
 
-                    join_message = messages.JoinSessionEvent()
+                    self.send_join_message(session_info=session_info, target_devices=[event.device_uuid],
+                                           target_participants=[], target_users=[])
 
-                    # Fill information for join_message
-                    join_message.session_url = session_info['session_url']
-                    join_message.session_creator_name = session_info['session_creator_user']
-                    join_message.session_uuid = session_info['session_uuid']
-                    for user_uuid in session_info['session_users']:
-                        join_message.session_users.extend([user_uuid])
-                    for participant_uuid in session_info['session_participants']:
-                        join_message.session_participants.extend([participant_uuid])
-                    for device_uuid in session_info['session_devices']:
-                        join_message.session_devices.extend([device_uuid])
-
-                    # Send message
-                    self.send_event_message(join_message, 'websocket.device.' + event.device_uuid + '.events')
+                    # join_message = messages.JoinSessionEvent()
+                    #
+                    # # Fill information for join_message
+                    # join_message.session_url = session_info['session_url']
+                    # join_message.session_creator_name = session_info['session_creator_user']
+                    # join_message.session_uuid = session_info['session_uuid']
+                    # for user_uuid in session_info['session_users']:
+                    #     join_message.session_users.extend([user_uuid])
+                    # for participant_uuid in session_info['session_participants']:
+                    #     join_message.session_participants.extend([participant_uuid])
+                    # for device_uuid in session_info['session_devices']:
+                    #     join_message.session_devices.extend([device_uuid])
+                    #
+                    # # Send message
+                    # self.send_event_message(join_message, 'websocket.device.' + event.device_uuid + '.events')
 
                 elif event.type == messages.DeviceEvent.DEVICE_DISCONNECTED:
                     # Nothing to do?
@@ -213,37 +262,39 @@ class VideoRehabService(ServiceOpenTera):
         session_info = self.get_session_info_from_key(session_key)
 
         if session_info:
+            self.send_join_message(session_info=session_info)
 
-            users = session_info['session_users']
-            participants = session_info['session_participants']
-            devices = session_info['session_devices']
-            parameters = session_info['session_parameters']
-
-            # Create event
-            joinMessage = messages.JoinSessionEvent()
-            joinMessage.session_url = session_info['session_url']
-            joinMessage.session_creator_name = session_info['session_creator_user']
-            joinMessage.session_uuid = session_info['session_uuid']
-            for user_uuid in users:
-                joinMessage.session_users.extend([user_uuid])
-            for participant_uuid in participants:
-                joinMessage.session_participants.extend([participant_uuid])
-            for device_uuid in devices:
-                joinMessage.session_devices.extend([device_uuid])
-            joinMessage.join_msg = gettext('Join Session')
-            joinMessage.session_parameters = parameters
-            joinMessage.service_uuid = self.service_uuid
-
-            # Send invitations (as events) for users, participants and devices
-            for user_uuid in users:
-                self.send_event_message(joinMessage, 'websocket.user.'
-                                        + user_uuid + '.events')
-            for participant_uuid in participants:
-                self.send_event_message(joinMessage, 'websocket.participant.'
-                                        + participant_uuid + '.events')
-            for device_uuid in devices:
-                self.send_event_message(joinMessage, 'websocket.device.'
-                                        + device_uuid + '.events')
+            # users = session_info['session_users']
+            # participants = session_info['session_participants']
+            # devices = session_info['session_devices']
+            # parameters = session_info['session_parameters']
+            #
+            # # Create event
+            #
+            # joinMessage = messages.JoinSessionEvent()
+            # joinMessage.session_url = session_info['session_url']
+            # joinMessage.session_creator_name = session_info['session_creator_user']
+            # joinMessage.session_uuid = session_info['session_uuid']
+            # for user_uuid in users:
+            #     joinMessage.session_users.extend([user_uuid])
+            # for participant_uuid in participants:
+            #     joinMessage.session_participants.extend([participant_uuid])
+            # for device_uuid in devices:
+            #     joinMessage.session_devices.extend([device_uuid])
+            # joinMessage.join_msg = gettext('Join Session')
+            # joinMessage.session_parameters = parameters
+            # joinMessage.service_uuid = self.service_uuid
+            #
+            # # Send invitations (as events) for users, participants and devices
+            # for user_uuid in users:
+            #     self.send_event_message(joinMessage, 'websocket.user.'
+            #                             + user_uuid + '.events')
+            # for participant_uuid in participants:
+            #     self.send_event_message(joinMessage, 'websocket.participant.'
+            #                             + participant_uuid + '.events')
+            # for device_uuid in devices:
+            #     self.send_event_message(joinMessage, 'websocket.device.'
+            #                             + device_uuid + '.events')
 
     def setup_rpc_interface(self):
         # TODO Update rpc interface
@@ -262,6 +313,21 @@ class VideoRehabService(ServiceOpenTera):
         if response.status_code == 200:
             return response.json()
         return {}
+
+    def post_session_event(self, event_type: int, id_session: int, event_text: str = None) -> Response:
+        from datetime import datetime
+        api_req = {'session_event': {'id_session_event': 0,
+                                     'id_session': id_session,
+                                     'id_session_event_type': event_type,  # START session event
+                                     'session_event_datetime': str(datetime.now()),
+                                     'session_event_context': self.service_info['service_key']
+                                     }
+                   }
+
+        if event_text:
+            api_req['session_event']['session_event_text'] = event_text
+
+        return self.post_to_opentera('/api/service/sessions/events', api_req)
 
     def session_manage(self, json_str):
 
@@ -286,12 +352,104 @@ class VideoRehabService(ServiceOpenTera):
                     return self.manage_start_session(session_manage_args)
                 elif action == 'stop':
                     return self.manage_stop_session(session_manage_args)
+                elif action == 'invite':
+                    return self.manage_invite_to_session(session_manage_args)
+                elif action == 'remove':
+                    return self.manage_remove_from_session(session_manage_args)
 
         except json.JSONDecodeError as e:
             print('Error', e)
             return None
 
         return None
+
+    def manage_start_session(self, session_manage_args: dict):
+        # Get "useful" arguments
+        id_service = session_manage_args['id_service']
+        id_creator_user = session_manage_args['id_creator_user']
+        id_session_type = session_manage_args['id_session_type']
+        id_session = session_manage_args['id_session']
+
+        # Get additional "start" arguments
+        parameters = session_manage_args['parameters']
+        participants = session_manage_args['session_participants']
+        users = session_manage_args['session_users']
+        # TODO handle devices
+        devices = []
+
+        # Call service API to create session
+        api_response = None
+        if id_session == 0:  # New session request
+            api_req = {'session': {'id_session': 0,  # New session
+                                   'id_creator_user': id_creator_user,
+                                   'id_session_type': id_session_type,
+                                   'session_participants_uuids': participants,
+                                   'session_users_uuids': users,
+                                   'sessiom_devices_uuids': devices,
+                                   'session_parameters': parameters}
+                       }
+
+            api_response = self.post_to_opentera('/api/service/sessions', api_req)
+        else:
+            api_response = self.get_from_opentera('/api/service/sessions', 'id_session=' + str(id_session) +
+                                                  '&with_events=1')
+
+        if api_response.status_code == 200:
+
+            session_info = api_response.json()
+
+            if isinstance(session_info, list):
+                session_info = session_info.pop()
+
+            if 'session_events' not in session_info:
+                session_info['session_events'] = []
+
+            # Create start event in session events
+            api_response = self.post_session_event(event_type=3, id_session=session_info['id_session'])
+
+            if api_response.status_code != 200:
+                return {'status': 'error', 'error_text': gettext('Cannot create session event')}
+
+            # Add event to list
+            new_event = api_response.json()
+
+            if isinstance(new_event, list):
+                new_event = new_event.pop()
+            session_info['session_events'].append(new_event)
+
+            # Replace fields with uuids
+            session_info['session_participants'] = participants
+            session_info['session_users'] = users
+            session_info['session_devices'] = devices
+
+            # Add session key
+            session_info['session_key'] = str(uuid.uuid4())
+
+            # New WebRTC process with send events on this pattern
+            self.subscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
+                                                 self.nodejs_webrtc_message_callback)
+
+            # Start WebRTC process
+            # TODO do something with parameters
+            retval, process_info = self.webRTCModule.create_webrtc_session(
+                session_info['session_key'], id_creator_user, users, participants, devices)
+
+            if not retval or not process_info:
+                self.unsubscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
+                                                       self.nodejs_webrtc_message_callback)
+                return {'status': 'error', 'error_text': gettext('Cannot create process')}
+
+            # Add URL to session_info
+            session_info['session_url'] = process_info['url']
+
+            # Keep session info for future use
+            self.sessions[session_info['id_session']] = session_info
+
+            # Return session information
+            return {'status': 'started', 'session': session_info}
+
+        else:
+            return {'status': 'error', 'error_text': gettext('Cannot create session')}
 
     def manage_stop_session(self, session_manage_args: dict):
         id_session = session_manage_args['id_session']
@@ -310,21 +468,13 @@ class VideoRehabService(ServiceOpenTera):
             # Call service API for session changes...
 
             # Create session stop event
-            from datetime import datetime
-            api_req = {'session_event': {'id_session_event': 0,
-                                         'id_session': id_session,
-                                         'id_session_event_type': 4,  # STOP session event
-                                         'session_event_datetime': str(datetime.now()),
-                                         'session_event_context': self.service_info['service_key']
-                                         }
-                       }
-
-            api_response = self.post_to_opentera('/api/service/sessions/events', api_req)
+            api_response = self.post_session_event(event_type=4, id_session=session_info['id_session'])
 
             if api_response.status_code != 200:
                 return {'status': 'error', 'error_text': gettext('Cannot create STOP session event')}
 
             # Compute session duration from last start event
+            from datetime import datetime
             duration = 0
 
             for session_event in session_info['session_events']:
@@ -377,102 +527,153 @@ class VideoRehabService(ServiceOpenTera):
 
         return {'status': 'error', 'error_text': gettext('No matching session to stop')}
 
-    def manage_start_session(self, session_manage_args: dict):
-        # Get "useful" arguments
-        id_service = session_manage_args['id_service']
-        id_creator_user = session_manage_args['id_creator_user']
-        id_session_type = session_manage_args['id_session_type']
+    def manage_invite_to_session(self, session_manage_args: dict):
         id_session = session_manage_args['id_session']
+        # id_service = session_manage_args['id_service']
+        # id_creator_user = session_manage_args['id_creator_user']
 
-        # Get additional "start" arguments
-        parameters = session_manage_args['parameters']
-        participants = session_manage_args['session_participants']
-        users = session_manage_args['session_users']
-        # TODO handle devices
-        devices = []
+        if id_session in self.sessions:
+            session_info = self.sessions[id_session]
 
-        # Call service API to create session
-        api_response = None
-        if id_session == 0:  # New session request
-            api_req = {'session': {'id_session': 0,  # New session
-                                   'id_creator_user': id_creator_user,
-                                   'id_session_type': id_session_type,
-                                   'session_participants_uuids': participants,
-                                   'session_users_uuids': users,
-                                   'sessiom_devices_uuids': devices,
-                                   'session_parameters': parameters}
+            new_session_users = []
+            new_session_devices = []
+            new_session_participants = []
+
+            if 'session_users' in session_manage_args:
+                new_session_users = session_manage_args['session_users']
+                session_info['session_users'].extend(new_session_users)
+
+                for session_user in new_session_users:
+                    # Get names for log
+                    # TODO
+                    #     api_response = self.get_from_opentera('/api/service')
+                    api_response = self.post_session_event(event_type=12, id_session=id_session,
+                                                           event_text=gettext('User: ') + session_user)
+                    if api_response.status_code != 200:
+                        return {'status': 'error', 'error_text': gettext('Error creating user invited session event ')}
+
+            if 'session_participants' in session_manage_args:
+                new_session_participants = session_manage_args['session_participants']
+                session_info['session_participants'].extend(new_session_participants)
+                for session_participant in new_session_participants:
+                    # Get names for log
+                    # TODO
+                    #     api_response = self.get_from_opentera('/api/service')
+                    api_response = self.post_session_event(event_type=12, id_session=id_session,
+                                                           event_text=gettext('Participant: ') + session_participant)
+                    if api_response.status_code != 200:
+                        return {'status': 'error', 'error_text': gettext('Error creating participant invited '
+                                                                         'session event ')}
+
+            if 'session_devices' in session_manage_args:
+                new_session_devices = session_manage_args['session_devices']
+                session_info['session_devices'].extend(new_session_devices)
+                for session_device in new_session_devices:
+                    # Get names for log
+                    # TODO
+                    #     api_response = self.get_from_opentera('/api/service')
+                    api_response = self.post_session_event(event_type=12, id_session=id_session,
+                                                           event_text=gettext('Device: ') + session_device)
+                    if api_response.status_code != 200:
+                        return {'status': 'error', 'error_text': gettext('Error creating device invited '
+                                                                         'session event ')}
+
+            self.send_join_message(session_info=session_info, target_devices=new_session_devices,
+                                   target_participants=new_session_participants, target_users=new_session_users)
+
+            # Update session with new invitees
+            api_req = {'session': {'id_session': id_session,  # New session
+                                   'session_participants_uuids': session_info['session_participants'],
+                                   'session_users_uuids': session_info['session_users'],
+                                   'sessiom_devices_uuids': session_info['session_devices'],
+                                   }
                        }
-
             api_response = self.post_to_opentera('/api/service/sessions', api_req)
-        else:
-            api_response = self.get_from_opentera('/api/service/sessions', 'id_session=' + str(id_session) +
-                                                  '&with_events=1')
+            if api_response.status_code == 200:
+                return {'status': 'invited', 'session': session_info}
+            return {'status': 'error', 'error_text': gettext('Error updating session')}
 
-        if api_response.status_code == 200:
+    def manage_remove_from_session(self, session_manage_args: dict):
+        id_session = session_manage_args['id_session']
+        # id_service = session_manage_args['id_service']
+        # id_creator_user = session_manage_args['id_creator_user']
 
-            session_info = api_response.json()
+        if id_session in self.sessions:
+            session_info = self.sessions[id_session]
 
-            if isinstance(session_info, list):
-                session_info = session_info.pop()
+            removed_session_users = []
+            removed_session_devices = []
+            removed_session_participants = []
 
-            if 'session_events' not in session_info:
-                session_info['session_events'] = []
+            session_users = session_info['session_users']
+            session_devices = session_info['session_devices']
+            session_participants = session_info['session_participants']
 
-            # Create start event in session events
-            from datetime import datetime
-            api_req = {'session_event': {'id_session_event': 0,
-                                         'id_session': session_info['id_session'],
-                                         'id_session_event_type': 3,  # START session event
-                                         'session_event_datetime': str(datetime.now()),
-                                         'session_event_context': self.service_info['service_key']
-                                         }
-                       }
+            if 'session_users' in session_manage_args:
+                removed_session_users = session_manage_args['session_users']
+                session_info['session_users'] = [item for item in session_info['session_users']
+                                                 if item not in removed_session_users]
 
-            api_response = self.post_to_opentera('/api/service/sessions/events', api_req)
+                for session_user in removed_session_users:
+                    # Get names for log
+                    # TODO
+                    #     api_response = self.get_from_opentera('/api/service')
+                    api_response = self.post_session_event(event_type=13, id_session=id_session,
+                                                           event_text=gettext('User: ') + session_user)
+                    if api_response.status_code != 200:
+                        return {'status': 'error', 'error_text': gettext('Error creating user left session event ')}
 
-            if api_response.status_code != 200:
-                return {'status': 'error', 'error_text': gettext('Cannot create session event')}
+            if 'session_participants' in session_manage_args:
+                removed_session_participants = session_manage_args['session_participants']
+                session_info['session_participants'] = [item for item in session_info['session_participants']
+                                                        if item not in removed_session_participants]
+                for session_participant in removed_session_participants:
+                    # Get names for log
+                    # TODO
+                    #     api_response = self.get_from_opentera('/api/service')
+                    api_response = self.post_session_event(event_type=13, id_session=id_session,
+                                                           event_text=gettext('Participant: ') + session_participant)
+                    if api_response.status_code != 200:
+                        return {'status': 'error', 'error_text': gettext('Error creating participant left '
+                                                                         'session event ')}
 
-            # Add event to list
-            new_event = api_response.json()
+            if 'session_devices' in session_manage_args:
+                removed_session_devices = session_manage_args['session_devices']
+                session_info['session_devices'] = [item for item in session_info['session_devices']
+                                                   if item not in removed_session_devices]
+                for session_device in removed_session_devices:
+                    # Get names for log
+                    # TODO
+                    #     api_response = self.get_from_opentera('/api/service')
+                    api_response = self.post_session_event(event_type=13, id_session=id_session,
+                                                           event_text=gettext('Device: ') + session_device)
+                    if api_response.status_code != 200:
+                        return {'status': 'error', 'error_text': gettext('Error creating device left '
+                                                                         'session event ')}
 
-            if isinstance(new_event, list):
-                new_event = new_event.pop()
-            session_info['session_events'].append(new_event)
+            # Create and send leave session event message
+            leave_message = messages.LeaveSessionEvent()
+            leave_message.session_uuid = session_info['session_uuid']
+            leave_message.service_uuid = self.service_uuid
+            for user_uuid in removed_session_users:
+                leave_message.leaving_users.extend([user_uuid])
+            for participant_uuid in removed_session_participants:
+                leave_message.leaving_participants.extend([participant_uuid])
+            for device_uuid in removed_session_devices:
+                leave_message.leaving_devices.extend([device_uuid])
 
-            # Replace fields with uuids
-            session_info['session_participants'] = participants
-            session_info['session_users'] = users
-            session_info['session_devices'] = devices
+            # Broadcast to all
+            for user_uuid in session_users:
+                self.send_event_message(leave_message, 'websocket.user.' + user_uuid + '.events')
+            for participant_uuid in session_participants:
+                self.send_event_message(leave_message, 'websocket.participant.' + participant_uuid + '.events')
+            for device_uuid in session_devices:
+                self.send_event_message(leave_message, 'websocket.device.' + device_uuid + '.events')
 
-            # Add session key
-            session_info['session_key'] = str(uuid.uuid4())
+            # Don't update session with current list of users - participants... We need to keep a trace that they
+            # were part of that session at some point!
 
-            # New WebRTC process with send events on this pattern
-            self.subscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
-                                                 self.nodejs_webrtc_message_callback)
-
-            # Start WebRTC process
-            # TODO do something with parameters
-            retval, process_info = self.webRTCModule.create_webrtc_session(
-                session_info['session_key'], id_creator_user, users, participants, devices)
-
-            if not retval or not process_info:
-                self.unsubscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
-                                                       self.nodejs_webrtc_message_callback)
-                return {'status': 'error', 'error_text': gettext('Cannot create process')}
-
-            # Add URL to session_info
-            session_info['session_url'] = process_info['url']
-
-            # Keep session info for future use
-            self.sessions[session_info['id_session']] = session_info
-
-            # Return session information
-            return {'status': 'started', 'session': session_info}
-
-        else:
-            return {'status': 'error', 'error_text': gettext('Cannot create session')}
+            return {'status': 'removed', 'session': session_info}
 
 
 if __name__ == '__main__':

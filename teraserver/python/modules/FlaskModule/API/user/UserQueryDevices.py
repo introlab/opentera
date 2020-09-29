@@ -27,7 +27,7 @@ get_parser.add_argument('available', type=inputs.boolean, help='Flag that indica
 get_parser.add_argument('projects', type=inputs.boolean, help='Flag that indicates if associated project(s) information'
                                                               'should be included in the returned device list')
 get_parser.add_argument('enabled', type=inputs.boolean, help='Flag that limits the returned data to the enabled '
-                                                             'devices. Used only with id_site and id_project for now.')
+                                                             'devices.')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_participants', type=inputs.boolean, help='Flag that indicates if associated '
                                                                        'participant(s) information should be included '
@@ -116,6 +116,10 @@ class UserQueryDevices(Resource):
 
             for device in devices:
                 if device is not None:
+                    if args['enabled'] is not None:
+                        if device.device_enabled != args['enabled']:
+                            continue
+
                     if args['list'] is None:
                         device_json = device.to_json()
                     else:

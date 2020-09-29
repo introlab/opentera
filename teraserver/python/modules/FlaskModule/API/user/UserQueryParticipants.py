@@ -125,6 +125,10 @@ class UserQueryParticipants(Resource):
                     busy_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_participants')
 
                 for participant in participants:
+                    if args['enabled'] is not None:
+                        if participant.participant_enabled != args['enabled']:
+                            continue
+
                     if participant is not None:
                         # No group flag
                         if args['no_group'] is not None:

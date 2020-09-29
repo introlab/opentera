@@ -60,7 +60,7 @@ session_manager_schema = api.schema_model('session_manage', {
                     }
                 },
                 'action': {
-                    'type': 'string'  # 'start', 'stop', 'status', 'resume'
+                    'type': 'string'  # 'start', 'stop', 'invite', 'remove'
                 },
                 'parameters': {
                     'type': 'object'

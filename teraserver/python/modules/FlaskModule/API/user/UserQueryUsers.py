@@ -19,6 +19,7 @@ get_parser.add_argument('user_uuid', type=str, help='User UUID to query')
 get_parser.add_argument('uuid', type=str, help='Alias for "user_uuid"')
 get_parser.add_argument('username', type=str, help='Username of the user to query')
 get_parser.add_argument('self', type=inputs.boolean, help='Query information about the currently logged user')
+get_parser.add_argument('enabled', type=inputs.boolean, help='Only returns users with the specified enabled status')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ID, name, enabled)')
 get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Include usergroups information for each user.')
@@ -96,6 +97,11 @@ class UserQueryUsers(Resource):
 
             for user in users:
                 if user is not None:
+                    # Filter not enabled users
+                    if args['enabled'] is not None:
+                        if user.user_enabled != args['enabled']:
+                            continue
+
                     user_json = user.to_json(minimal=args['list'])
                     if args['list'] is None:
                         # If user is "self", append projects and sites roles

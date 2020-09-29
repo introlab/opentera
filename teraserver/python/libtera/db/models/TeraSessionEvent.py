@@ -20,6 +20,8 @@ class TeraSessionEvent(db.Model, BaseModel):
         DEVICE_STORAGE_FULL = 9
         DEVICE_EVENT = 10
         USER_EVENT = 11
+        SESSION_JOIN = 12
+        SESSION_LEAVE = 13
 
     __tablename__ = 't_sessions_events'
     id_session_event = db.Column(db.Integer, db.Sequence('id_session_events_sequence'), primary_key=True,
