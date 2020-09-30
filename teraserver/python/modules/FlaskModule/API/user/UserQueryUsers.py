@@ -133,12 +133,8 @@ class UserQueryUsers(Resource):
                         user_json['user_user_groups'] = user_groups_list
 
                     if args['with_status']:
-                        if user.user_uuid in busy_users:
-                            user_json['user_status'] = 'busy'
-                        elif user.user_uuid in online_users:
-                            user_json['user_status'] = 'online'
-                        else:
-                            user_json['user_status'] = 'offline'
+                        user_json['user_busy'] = user.user_uuid in busy_users
+                        user_json['user_online'] = user.user_uuid in online_users
 
                     users_list.append(user_json)
             return jsonify(users_list)

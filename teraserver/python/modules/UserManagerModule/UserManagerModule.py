@@ -243,11 +243,11 @@ class UserManagerModule(BaseModule):
 
     def handle_leave_session_event(self, leave_event: LeaveSessionEvent):
         self.set_users_in_session(session_uuid=leave_event.session_uuid, user_uuids=leave_event.leaving_users,
-                                  in_session=True)
+                                  in_session=False)
 
         self.set_participants_in_session(session_uuid=leave_event.session_uuid,
                                          participant_uuids=leave_event.leaving_participants,
-                                         in_session=True)
+                                         in_session=False)
         self.set_devices_in_session(session_uuid=leave_event.session_uuid,
                                     device_uuids=leave_event.leaving_devices,
-                                    in_session=True)
+                                    in_session=False)

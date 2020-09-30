@@ -180,12 +180,8 @@ class UserQueryDevices(Resource):
                         device_json['device_subtype'] = device.device_subtype.to_json()
 
                     if args['with_status']:
-                        if device.device_uuid in busy_devices:
-                            device_json['device_status'] = 'busy'
-                        elif device.device_uuid in online_devices:
-                            device_json['device_status'] = 'online'
-                        else:
-                            device_json['device_status'] = 'offline'
+                        device_json['device_busy'] = device.device_uuid in busy_devices
+                        device_json['device_online'] = device.device_uuid in online_devices
 
                     device_list.append(device_json)
             return jsonify(device_list)
