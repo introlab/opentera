@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-09-29 18:51-0400\n"
+"POT-Creation-Date: 2020-09-29 20:13-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -589,7 +589,6 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:121
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:151
 #: modules/FlaskModule/API/user/UserQueryAssets.py:145
-#: modules/FlaskModule/API/user/UserQueryDeviceData.py:202
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:152
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:166
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:202
@@ -659,20 +658,6 @@ msgstr ""
 msgid "Invalid content type"
 msgstr ""
 
-#: modules/FlaskModule/API/device/DeviceUpload.py:43
-#: modules/FlaskModule/API/device/DeviceUpload.py:104
-msgid "No ID Session specified"
-msgstr ""
-
-#: modules/FlaskModule/API/device/DeviceUpload.py:46
-#: modules/FlaskModule/API/device/DeviceUpload.py:108
-msgid "No file specified"
-msgstr ""
-
-#: modules/FlaskModule/API/device/DeviceUpload.py:122
-msgid "No filename specified"
-msgstr ""
-
 #: modules/FlaskModule/API/participant/ParticipantLogin.py:74
 msgid "Missing current_participant"
 msgstr ""
@@ -681,7 +666,6 @@ msgstr ""
 msgid "Participant logged out."
 msgstr ""
 
-#: modules/FlaskModule/API/participant/ParticipantQueryDeviceData.py:105
 #: modules/FlaskModule/API/participant/ParticipantQueryDevices.py:60
 #: modules/FlaskModule/API/participant/ParticipantQueryParticipants.py:51
 #: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:59
@@ -690,20 +674,16 @@ msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:48
 #: modules/FlaskModule/API/user/UserQueryAssets.py:59
-#: modules/FlaskModule/API/user/UserQueryDeviceData.py:55
-#: modules/FlaskModule/API/user/UserQueryDeviceData.py:194
 msgid "Device access denied"
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:52
 #: modules/FlaskModule/API/user/UserQueryAssets.py:63
-#: modules/FlaskModule/API/user/UserQueryDeviceData.py:59
 msgid "Session access denied"
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:56
 #: modules/FlaskModule/API/user/UserQueryAssets.py:67
-#: modules/FlaskModule/API/user/UserQueryDeviceData.py:63
 msgid "Participant access denied"
 msgstr ""
 
@@ -711,8 +691,6 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:65
 #: modules/FlaskModule/API/user/UserQueryAssets.py:74
 #: modules/FlaskModule/API/user/UserQueryAssets.py:76
-#: modules/FlaskModule/API/user/UserQueryDeviceData.py:69
-#: modules/FlaskModule/API/user/UserQueryDeviceData.py:71
 msgid "Permission denied"
 msgstr ""
 
@@ -1330,5 +1308,14 @@ msgstr "Jeton invalide"
 #~ "User groups may be specified with "
 #~ "that API only on a new user. "
 #~ "Use \"user_usergroups\" instead"
+#~ msgstr ""
+
+#~ msgid "No ID Session specified"
+#~ msgstr ""
+
+#~ msgid "No file specified"
+#~ msgstr ""
+
+#~ msgid "No filename specified"
 #~ msgstr ""
 

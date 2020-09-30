@@ -4,6 +4,7 @@ set (PYTHON_VERSION 3.8)
 # This will create environment from Anaconda
 add_subdirectory(env)
 
+
 set(PYTHON_ENV_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env/python-${PYTHON_VERSION})
 
 if(WIN32)
@@ -30,7 +31,7 @@ message(STATUS "PYBABEL EXECUTABLE : ${PYBABEL_EXECUTABLE}")
 
 # Will always be considered out of date...
 add_custom_target(
-    python_translations
+    python-translations
     COMMAND ${PYBABEL_EXECUTABLE} extract -F babel.cfg -o ${translation_pot_file} .
     # TO REINITIALIZE TRANSLATION FILES (comment the two lines, or the translations will be overwritten)
     # COMMAND ${PYBABEL_EXECUTABLE} init -i ${translation_pot_file} -d translations -l fr
@@ -42,10 +43,13 @@ add_custom_target(
     SOURCES babel.cfg
 )
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OpenTeraServerVersion.py.in ${CMAKE_CURRENT_SOURCE_DIR}/OpenTeraServerVersion.py)
+
+add_custom_target(python-server-version-file SOURCES OpenTeraServerVersion.py.in)
 
 # Will always be considered out of date...
 # Removed python-messages for now...
-add_custom_target(python-all DEPENDS  python-env python_translations python-messages)
+add_custom_target(python-all DEPENDS  python-env python-translations python-messages python-server-version OpenTeraServerVersion.py)
 
 # Docker
 add_subdirectory(docker)

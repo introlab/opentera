@@ -16,6 +16,7 @@ class TeraServerSettings(db.Model, BaseModel):
     ServerDeviceTokenKey = "TokenEncryptionKey"
     ServerParticipantTokenKey = "ParticipantTokenEncryptionKey"
     ServerUUID = "ServerUUID"
+    ServerVersion = "ServerVersion"
 
     @staticmethod
     def create_defaults():
