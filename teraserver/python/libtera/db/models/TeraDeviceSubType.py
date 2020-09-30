@@ -28,7 +28,7 @@ class TeraDeviceSubType(db.Model, BaseModel):
     @staticmethod
     def create_defaults():
         from libtera.db.models.TeraDeviceType import TeraDeviceType
-        bureau = TeraDeviceType.get_device_type(TeraDeviceType.DeviceTypeEnum.BUREAU_ACTIF.value)
+        bureau = TeraDeviceType.get_device_type_by_name('BUREAU_ACTIF')
         subtype = TeraDeviceSubType()
         subtype.device_subtype_type = bureau
         subtype.device_subtype_name = 'Bureau modèle #1'

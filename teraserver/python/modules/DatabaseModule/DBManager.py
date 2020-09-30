@@ -164,6 +164,14 @@ class DBManager (BaseModule):
             print("No projects - creating defaults")
             TeraProject.create_defaults()
 
+        if TeraDeviceType.get_count() == 0:
+            print('No device types - creating defaults')
+            TeraDeviceType.create_defaults()
+
+        if TeraDeviceSubType.get_count() == 0:
+            print("No device sub types - creating defaults")
+            TeraDeviceSubType.create_defaults()
+
         if TeraServiceProject.get_count() == 0:
             print('No service - project association - creating defaults')
             TeraServiceProject.create_defaults()
@@ -185,14 +193,6 @@ class DBManager (BaseModule):
             TeraUser.create_defaults()
             TeraUserUserGroup.create_defaults()
             TeraUserPreference.create_defaults()
-
-        if TeraDeviceType.get_count() == 0:
-            print('No device types - creating defaults')
-            TeraDeviceType.create_defaults()
-
-        if TeraDeviceSubType.get_count() == 0:
-            print("No device sub types - creating defaults")
-            TeraDeviceSubType.create_defaults()
 
         if TeraDevice.get_count() == 0:
             print('No device - creating defaults')

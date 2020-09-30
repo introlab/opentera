@@ -1,32 +1,46 @@
 from libtera.db.Base import db, BaseModel
-from enum import Enum, unique
 
 
 class TeraDeviceType(db.Model, BaseModel):
 
-    @unique
-    class DeviceTypeEnum(Enum):
-        VIDEOCONFERENCE = 1
-        ROBOT = 2
-        SENSOR = 3
-        BUREAU_ACTIF = 4
-
-        def describe(self):
-            return self.name, self.value
-
     __tablename__ = 't_devices_types'
     id_device_type = db.Column(db.Integer, db.Sequence('id_device_type_sequence'), primary_key=True, autoincrement=True)
-    device_type_name = db.Column(db.String, nullable=False)
+    device_type_name = db.Column(db.String, nullable=False, unique=True)
+    device_type_key = db.Column(db.String, nullable=False, unique=True)
+
+    def to_json(self, ignore_fields=None, minimal=False):
+        if ignore_fields is None:
+            ignore_fields = []
+
+        ignore_fields += ['DeviceTypeEnum']
+
+        device_type_json = super().to_json(ignore_fields=ignore_fields)
+
+        return device_type_json
 
     @staticmethod
     def create_defaults():
-        for name, member in TeraDeviceType.DeviceTypeEnum.__members__.items():
-            dev_type = TeraDeviceType()
-            dev_type.id_device_type = member.value
-            dev_type.device_type_name = name
-            db.session.add(dev_type)
+        # For now Defaults are hard coded
 
-        db.session.commit()
+        VIDEOCONFERENCE = TeraDeviceType()
+        VIDEOCONFERENCE.device_type_name = 'VIDEOCONFERENCE'
+        VIDEOCONFERENCE.device_type_key = 'Videoconference'
+        db.session.add(VIDEOCONFERENCE)
+
+        CAPTEUR = TeraDeviceType()
+        CAPTEUR.device_type_name = 'CAPTEUR'
+        CAPTEUR.device_type_key = 'capteur'
+        db.session.add(CAPTEUR)
+
+        ROBOT = TeraDeviceType()
+        ROBOT.device_type_name = 'ROBOT'
+        ROBOT.device_type_key = 'robot'
+        db.session.add(ROBOT)
+
+        BUREAU_ACTIF = TeraDeviceType()
+        BUREAU_ACTIF.device_type_name = 'BUREAU_ACTIF'
+        BUREAU_ACTIF.device_type_key = 'bureau_actif'
+        db.session.add(BUREAU_ACTIF)
 
     @staticmethod
     def get_devices_types():
@@ -36,15 +50,19 @@ class TeraDeviceType(db.Model, BaseModel):
     def get_device_type(dev_type: int):
         return TeraDeviceType.query.filter_by(id_device_type=dev_type).first()
 
-    def get_name(self):
-        name = 'Inconnu'
-        if self.id_device_type == TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value:
-            name = 'Vidéoconférence'
-        if self.id_device_type == TeraDeviceType.DeviceTypeEnum.SENSOR.value:
-            name = 'Capteur'
-        if self.id_device_type == TeraDeviceType.DeviceTypeEnum.ROBOT.value:
-            name = 'Robot'
-        if self.id_device_type == TeraDeviceType.DeviceTypeEnum.BUREAU_ACTIF.value:
-            name = 'Bureau Actif'
-        return name
+    @staticmethod
+    def get_device_type_by_id(dev_type: int):
+        return TeraDeviceType.query.filter_by(id_device_type=dev_type).first()
+
+    @staticmethod
+    def get_device_type_by_name(dev_type: str):
+        return TeraDeviceType.query.filter_by(device_type_name=dev_type).first()
+
+    @staticmethod
+    def get_device_type_by_type(dev_type: str):
+        return TeraDeviceType.query.filter_by(device_type_key=dev_type).first()
+
+    @staticmethod
+    def commit():
+        db.session.commit()
 
