@@ -5,6 +5,9 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraUser import TeraUser
 from libtera.db.models.TeraService import TeraService
 from modules.RedisVars import RedisVars
+from libtera.redis.RedisClient import RedisClient
+from modules.BaseModule import ModuleNames, create_module_message_topic_from_name
+import messages.python as messages
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
 from libtera.redis.RedisRPCClient import RedisRPCClient
@@ -60,7 +63,7 @@ session_manager_schema = api.schema_model('session_manage', {
                     }
                 },
                 'action': {
-                    'type': 'string'  # 'start', 'stop', 'invite', 'remove'
+                    'type': 'string'  # 'start', 'stop', 'invite', 'remove', 'invite_reply'
                 },
                 'parameters': {
                     'type': 'object'
@@ -102,6 +105,9 @@ class UserSessionManager(Resource):
 
         json_session_manager = request.json['session_manage']
 
+        if 'action' not in json_session_manager:
+            return gettext('Missing action', 400)
+
         # if 'id_service' not in json_session_manager:
         #     return gettext('Missing service id'), 400
 
@@ -117,11 +123,11 @@ class UserSessionManager(Resource):
 
         # Get Redis key for service
         answer = None
+
         if 'id_service' in json_session_manager:
             service = TeraService.get_service_by_id(json_session_manager['id_service'])
             if not service:
                 return gettext('Service not found'), 500
-
             rpc = RedisRPCClient(self.module.config.redis_config)
             answer = rpc.call_service(service.service_key, 'session_manage', json.dumps(request.json))
         else:
@@ -139,6 +145,47 @@ class UserSessionManager(Resource):
         # - Service will return id_session and status code as a result to the RPC call and this will be the reply of
         #   this query
         if answer:
+            # Update UserManager module
+            # TODO: Move to services!!!
+            if 'session' in answer:
+                if 'session_uuid' in answer['session']:
+                    session_uuid = answer['session']['session_uuid']
+
+                    dest_topic_name = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
+                    tera_message = self.module.create_tera_message(dest=dest_topic_name)
+                    if json_session_manager['action'] == 'start' or json_session_manager['action'] == 'invite':
+                        join_session_msg = messages.JoinSessionEvent()
+                        join_session_msg.session_uuid = session_uuid
+                        join_session_msg.session_users.extend(answer['session']['session_users'])
+                        join_session_msg.session_participants.extend(answer['session']['session_participants'])
+                        join_session_msg.session_devices.extend(answer['session']['session_devices'])
+                        any_message = messages.Any()
+                        any_message.Pack(join_session_msg)
+                        tera_message.data.extend([any_message])
+                        self.module.publish(dest_topic_name, tera_message.SerializeToString())
+
+                    if json_session_manager['action'] == 'stop':
+                        stop_session_msg = messages.StopSessionEvent()
+                        stop_session_msg.session_uuid = session_uuid
+                        any_message = messages.Any()
+                        any_message.Pack(stop_session_msg)
+                        tera_message.data.extend([any_message])
+                        self.module.publish(dest_topic_name, tera_message.SerializeToString())
+
+                    if json_session_manager['action'] == 'remove':
+                        leave_session_msg = messages.LeaveSessionEvent()
+                        leave_session_msg.session_uuid = session_uuid
+                        if 'session_users' in json_session_manager:
+                            leave_session_msg.leaving_users.extend(json_session_manager['session_users'])
+                        if 'session_participants' in json_session_manager:
+                            leave_session_msg.leaving_participants.extend(json_session_manager['session_participants'])
+                        if 'session_devices' in json_session_manager:
+                            leave_session_msg.leaving_devices.extend(json_session_manager['session_devices'])
+                        any_message = messages.Any()
+                        any_message.Pack(leave_session_msg)
+                        tera_message.data.extend([any_message])
+                        self.module.publish(dest_topic_name, tera_message.SerializeToString())
+
             return answer, 200
         else:
             # Test and debug for now

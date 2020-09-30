@@ -578,9 +578,6 @@ class VideoRehabService(ServiceOpenTera):
                         return {'status': 'error', 'error_text': gettext('Error creating device invited '
                                                                          'session event ')}
 
-            self.send_join_message(session_info=session_info, target_devices=new_session_devices,
-                                   target_participants=new_session_participants, target_users=new_session_users)
-
             # Update session with new invitees
             api_req = {'session': {'id_session': id_session,  # New session
                                    'session_participants_uuids': session_info['session_participants'],
@@ -590,7 +587,10 @@ class VideoRehabService(ServiceOpenTera):
                        }
             api_response = self.post_to_opentera('/api/service/sessions', api_req)
             if api_response.status_code == 200:
+                # Resend join session message to all invitees to let them update their list if needed
+                self.send_join_message(session_info=session_info)
                 return {'status': 'invited', 'session': session_info}
+
             return {'status': 'error', 'error_text': gettext('Error updating session')}
 
     def manage_remove_from_session(self, session_manage_args: dict):
@@ -707,11 +707,13 @@ if __name__ == '__main__':
     service_info = Globals.redis_client.redisGet(RedisVars.RedisVar_ServicePrefixKey +
                                                  Globals.config_man.service_config['name'])
     import sys
+
     if service_info is None:
         sys.stderr.write('Error: Unable to get service info from OpenTera Server - is the server running and config '
                          'correctly set in this service?')
         exit(1)
     import json
+
     service_info = json.loads(service_info)
     if 'service_uuid' not in service_info:
         sys.stderr.write('OpenTera Server didn\'t return a valid service UUID - aborting.')

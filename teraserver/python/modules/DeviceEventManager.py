@@ -1,5 +1,6 @@
 from modules.EventManager import EventManager
 from libtera.db.models.TeraDevice import TeraDevice
+from libtera.db.models.TeraSession import TeraSession
 from modules.DatabaseModule.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
 import messages.python as messages
 
@@ -21,6 +22,20 @@ class DeviceEventManager(EventManager):
     def filter_join_session_event(self, event: messages.JoinSessionEvent):
         # Check if we are invited
         if self.device.device_uuid in event.session_devices:
+            return True
+        # Not accessible
+        return False
+
+    def filter_leave_session_event(self, event: messages.LeaveSessionEvent):
+        # Check if we are in that session or not
+        if TeraSession.is_device_in_session(event.session_uuid, self.device.device_uuid):
+            return True
+        # Not accessible
+        return False
+
+    def filter_join_session_reply(self, event: messages.JoinSessionReply):
+        # Check if we are in that session or not
+        if TeraSession.is_device_in_session(event.session_uuid, self.device.device_uuid):
             return True
         # Not accessible
         return False

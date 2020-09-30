@@ -24,6 +24,20 @@ class UserEventManager(EventManager):
         # Not accessible
         return False
 
+    def filter_leave_session_event(self, event: messages.LeaveSessionEvent):
+        # Check if we are in that session or not
+        if models.TeraSession.is_user_in_session(event.session_uuid, self.user.user_uuid):
+            return True
+        # Not accessible
+        return False
+
+    def filter_join_session_reply(self, event: messages.JoinSessionReply):
+        # Check if we are in that session or not
+        if models.TeraSession.is_user_in_session(event.session_uuid, self.user.user_uuid):
+            return True
+        # Not accessible
+        return False
+
     def filter_participant_event(self, event: messages.ParticipantEvent):
         # If uuid is accessible, return true
         if event.participant_uuid in self.accessManager.get_accessible_participants_uuids():

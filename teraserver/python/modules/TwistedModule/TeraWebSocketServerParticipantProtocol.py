@@ -76,16 +76,16 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
         # TODO use protobuf ?
         print('TeraWebSocketServerParticipantProtocol onMessage', self, msg, binary)
 
-        if binary:
-            # Decode protobuf before parsing
-            pass
-
-        # Parse JSON (protobuf content)
-        try:
-            message = Parse(msg, messages.TeraModuleMessage())
-            # self.publish(message.head.dest, message)
-        except ParseError:
-            print('TeraWebSocketServerParticipantProtocol - TeraModuleMessage parse error...')
+        # if binary:
+        #     # Decode protobuf before parsing
+        #     pass
+        #
+        # # Parse JSON (protobuf content)
+        # try:
+        #     message = Parse(msg, messages.TeraModuleMessage())
+        #     # self.publish(message.head.dest, message)
+        # except ParseError:
+        #     print('TeraWebSocketServerParticipantProtocol - TeraModuleMessage parse error...')
 
     def onConnect(self, request):
         """
