@@ -45,7 +45,7 @@ add_custom_target(
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OpenTeraServerVersion.py.in ${CMAKE_CURRENT_SOURCE_DIR}/OpenTeraServerVersion.py)
 
-add_custom_target(python-server-version-file SOURCES OpenTeraServerVersion.py.in)
+add_custom_target(python-server-version SOURCES OpenTeraServerVersion.py.in)
 
 # Will always be considered out of date...
 # Removed python-messages for now...
