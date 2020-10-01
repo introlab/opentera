@@ -5,7 +5,7 @@ class TeraDeviceType(db.Model, BaseModel):
 
     __tablename__ = 't_devices_types'
     id_device_type = db.Column(db.Integer, db.Sequence('id_device_type_sequence'), primary_key=True, autoincrement=True)
-    device_type_name = db.Column(db.String, nullable=False, unique=True)
+    device_type_name = db.Column(db.String, nullable=False)
     device_type_key = db.Column(db.String, nullable=False, unique=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
@@ -24,7 +24,7 @@ class TeraDeviceType(db.Model, BaseModel):
 
         VIDEOCONFERENCE = TeraDeviceType()
         VIDEOCONFERENCE.device_type_name = 'VIDEOCONFERENCE'
-        VIDEOCONFERENCE.device_type_key = 'Videoconference'
+        VIDEOCONFERENCE.device_type_key = 'videoconference'
         db.session.add(VIDEOCONFERENCE)
 
         CAPTEUR = TeraDeviceType()
@@ -56,7 +56,11 @@ class TeraDeviceType(db.Model, BaseModel):
 
     @staticmethod
     def get_device_type_by_name(dev_type: str):
-        return TeraDeviceType.query.filter_by(device_type_name=dev_type).first()
+        return TeraDeviceType.query.filter_by(device_type_name=dev_type).all()
+
+    @staticmethod
+    def get_device_type_by_key(dev_type: str):
+        return TeraDeviceType.query.filter_by(device_type_key=dev_type).first()
 
     @staticmethod
     def get_device_type_by_type(dev_type: str):

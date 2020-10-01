@@ -244,7 +244,7 @@ class DBManager (BaseModule):
         db.app = flask_app
 
         # Init tables
-        # db.drop_all()
+        db.drop_all()
         db.create_all()
 
         # Apply any database upgrade, if needed

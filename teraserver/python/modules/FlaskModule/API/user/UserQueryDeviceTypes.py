@@ -23,7 +23,8 @@ post_schema = api.schema_model('id_device_type', {'properties': TeraDeviceType.g
                                                   'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
-delete_parser.add_argument('id', type=int, help='Device type ID to delete', required=True)
+delete_parser.add_argument('id_device_type', type=int, help='Device type ID to delete')
+delete_parser.add_argument('device_type_key', type=str, help='Unique device key')
 
 
 class UserQueryDeviceTypes(Resource):
@@ -49,7 +50,7 @@ class UserQueryDeviceTypes(Resource):
         device_types = []
 
         # If we have no arguments, return all accessible devices
-        if args['id_device_type'] is None and args['list'] is None and args['device_type_key']:
+        if args['id_device_type'] is None and args['list'] is None:
             return gettext('Missing parameters'), 400
 
         if args['list']:
@@ -144,29 +145,58 @@ class UserQueryDeviceTypes(Resource):
     @api.doc(description='Delete a specific device type',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete device type (can delete if site admin)',
-                        500: 'Device type not found or database error.'})
+                        500: 'Device type not found or database error.',
+                        501: 'Tried to delete two devices at the same time (Name != ID)'})
     def delete(self):
         parser = delete_parser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()
-        id_todel = args['id']
+        id_todel = args['id_device_type']
+        key_todel = args['device_type_key']
 
         # Check if current user can delete
-        todel = TeraDeviceType.get_device_type_by_id(id_todel)
-        if not todel:
+        TeraDevice_todel_1 = TeraDeviceType.get_device_type_by_id(id_todel)
+        TeraDevice_todel_2 = TeraDeviceType.get_device_type_by_key(key_todel)
+
+        # If not argument or both argument incorrect
+        if TeraDevice_todel_1 is None and TeraDevice_todel_2 is None:
             return gettext('Device type not found'), 500
 
-        if todel.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
-            return gettext('Forbidden'), 403
+        # ID present and name is blank
+        if TeraDevice_todel_2 is None:
+            if TeraDevice_todel_1.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
+                return gettext('Forbidden'), 403
+            try:
+                TeraDeviceType.delete(id_todel=TeraDevice_todel_1.id_device_type)
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return gettext('Database error'), 500
 
-        # If we are here, we are allowed to delete. Do so.
-        try:
-            TeraDeviceType.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
-            import sys
-            print(sys.exc_info())
-            return gettext('Database error'), 500
+        # ID absent, name present
+        elif TeraDevice_todel_1 is None:
+            if TeraDevice_todel_2.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
+                return gettext('Forbidden'), 403
+            try:
+                TeraDeviceType.delete(id_todel=TeraDevice_todel_2.id_device_type)
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return gettext('Database error'), 500
+
+        # both are present and are unequal
+        elif TeraDevice_todel_1.id_device_type != TeraDevice_todel_2.id_device_type:
+            return gettext('Tried to delete 2 different devices'), 501
+
+        # Both are the same device_type
+        elif TeraDevice_todel_1.id_device_type == TeraDevice_todel_2.id_device_type:
+            try:
+                TeraDeviceType.delete(id_todel=TeraDevice_todel_1.id_device_type)
+            except exc.SQLAlchemyError:
+                import sys
+                print(sys.exc_info())
+                return gettext('Database error'), 500
 
         return '', 200

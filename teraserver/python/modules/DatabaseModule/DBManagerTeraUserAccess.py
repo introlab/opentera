@@ -175,6 +175,13 @@ class DBManagerTeraUserAccess:
             device_types.append(dt.id_device_type)
         return device_types
 
+    def get_accessible_devices_types_names(self, admin_only=False):
+        device_types = []
+        accessible_dts = self.get_accessible_devices_types(admin_only=admin_only)
+        for dt in accessible_dts:
+            device_types.append(dt.device_type_name)
+        return device_types
+
     def get_accessible_devices_subtypes(self, admin_only=False):
         device_subtypes = []
         accessible_dts = self.get_accessible_devices_types(admin_only=admin_only)
