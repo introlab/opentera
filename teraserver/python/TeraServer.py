@@ -116,11 +116,10 @@ def init_shared_variables(config):
                                       TeraServerSettings.ServerParticipantTokenKey))
 
     # Set versions
-    from OpenTeraServerVersion import opentera_server_version_string
     versions = TeraVersions()
+
+    # Will update clients
     versions.load_from_db()
-    # Update version string
-    versions.server_version_string = opentera_server_version_string
     versions.save_to_db()
 
 
