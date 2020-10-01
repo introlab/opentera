@@ -146,45 +146,45 @@ class UserSessionManager(Resource):
         #   this query
         if answer:
             # Update UserManager module
-            # TODO: Move to services!!!
-            if 'session' in answer:
-                if 'session_uuid' in answer['session']:
-                    session_uuid = answer['session']['session_uuid']
-
-                    dest_topic_name = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
-                    tera_message = self.module.create_tera_message(dest=dest_topic_name)
-                    if json_session_manager['action'] == 'start' or json_session_manager['action'] == 'invite':
-                        join_session_msg = messages.JoinSessionEvent()
-                        join_session_msg.session_uuid = session_uuid
-                        join_session_msg.session_users.extend(answer['session']['session_users'])
-                        join_session_msg.session_participants.extend(answer['session']['session_participants'])
-                        join_session_msg.session_devices.extend(answer['session']['session_devices'])
-                        any_message = messages.Any()
-                        any_message.Pack(join_session_msg)
-                        tera_message.data.extend([any_message])
-                        self.module.publish(dest_topic_name, tera_message.SerializeToString())
-
-                    if json_session_manager['action'] == 'stop':
-                        stop_session_msg = messages.StopSessionEvent()
-                        stop_session_msg.session_uuid = session_uuid
-                        any_message = messages.Any()
-                        any_message.Pack(stop_session_msg)
-                        tera_message.data.extend([any_message])
-                        self.module.publish(dest_topic_name, tera_message.SerializeToString())
-
-                    if json_session_manager['action'] == 'remove':
-                        leave_session_msg = messages.LeaveSessionEvent()
-                        leave_session_msg.session_uuid = session_uuid
-                        if 'session_users' in json_session_manager:
-                            leave_session_msg.leaving_users.extend(json_session_manager['session_users'])
-                        if 'session_participants' in json_session_manager:
-                            leave_session_msg.leaving_participants.extend(json_session_manager['session_participants'])
-                        if 'session_devices' in json_session_manager:
-                            leave_session_msg.leaving_devices.extend(json_session_manager['session_devices'])
-                        any_message = messages.Any()
-                        any_message.Pack(leave_session_msg)
-                        tera_message.data.extend([any_message])
-                        self.module.publish(dest_topic_name, tera_message.SerializeToString())
+            # MANAGED IN SERVICES
+            # if 'session' in answer:
+            #     if 'session_uuid' in answer['session']:
+            #         session_uuid = answer['session']['session_uuid']
+            #
+            #         dest_topic_name = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
+            #         tera_message = self.module.create_tera_message(dest=dest_topic_name)
+            #         if json_session_manager['action'] == 'start' or json_session_manager['action'] == 'invite':
+            #             join_session_msg = messages.JoinSessionEvent()
+            #             join_session_msg.session_uuid = session_uuid
+            #             join_session_msg.session_users.extend(answer['session']['session_users'])
+            #             join_session_msg.session_participants.extend(answer['session']['session_participants'])
+            #             join_session_msg.session_devices.extend(answer['session']['session_devices'])
+            #             any_message = messages.Any()
+            #             any_message.Pack(join_session_msg)
+            #             tera_message.data.extend([any_message])
+            #             self.module.publish(dest_topic_name, tera_message.SerializeToString())
+            #
+            #         if json_session_manager['action'] == 'stop':
+            #             stop_session_msg = messages.StopSessionEvent()
+            #             stop_session_msg.session_uuid = session_uuid
+            #             any_message = messages.Any()
+            #             any_message.Pack(stop_session_msg)
+            #             tera_message.data.extend([any_message])
+            #             self.module.publish(dest_topic_name, tera_message.SerializeToString())
+            #
+            #         if json_session_manager['action'] == 'remove':
+            #             leave_session_msg = messages.LeaveSessionEvent()
+            #             leave_session_msg.session_uuid = session_uuid
+            #             if 'session_users' in json_session_manager:
+            #                 leave_session_msg.leaving_users.extend(json_session_manager['session_users'])
+            #             if 'session_participants' in json_session_manager:
+            #                 leave_session_msg.leaving_participants.extend(json_session_manager['session_participants'])
+            #             if 'session_devices' in json_session_manager:
+            #                 leave_session_msg.leaving_devices.extend(json_session_manager['session_devices'])
+            #             any_message = messages.Any()
+            #             any_message.Pack(leave_session_msg)
+            #             tera_message.data.extend([any_message])
+            #             self.module.publish(dest_topic_name, tera_message.SerializeToString())
 
             return answer, 200
         else:

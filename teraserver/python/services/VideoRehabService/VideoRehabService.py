@@ -102,6 +102,10 @@ class VideoRehabService(ServiceOpenTera):
             self.send_event_message(join_message, 'websocket.device.'
                                     + device_uuid + '.events')
 
+        # Send event to UserManager to change "busy" status
+        self.send_tera_message(join_message, 'service.VideoRehabService',
+                               create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+
     def user_manager_event_received(self, pattern, channel, message):
         print('VideoRehabService - user_manager_event_received', pattern, channel, message)
         try:
@@ -513,6 +517,10 @@ class VideoRehabService(ServiceOpenTera):
             for device_uuid in session_info['session_devices']:
                 self.send_event_message(stop_session_event, 'websocket.device.' + device_uuid + '.events')
 
+            # Send event to UserManager to change "busy" status
+            self.send_tera_message(stop_session_event, 'service.VideoRehabService',
+                                   create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+
             # Remove session from list
             del self.sessions[id_session]
 
@@ -669,6 +677,10 @@ class VideoRehabService(ServiceOpenTera):
                 self.send_event_message(leave_message, 'websocket.participant.' + participant_uuid + '.events')
             for device_uuid in session_devices:
                 self.send_event_message(leave_message, 'websocket.device.' + device_uuid + '.events')
+
+            # Send event to UserManager to change "busy" status
+            self.send_tera_message(leave_message, 'service.VideoRehabService',
+                                   create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
 
             # Don't update session with current list of users - participants... We need to keep a trace that they
             # were part of that session at some point!
