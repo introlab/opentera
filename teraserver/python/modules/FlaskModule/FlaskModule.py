@@ -155,6 +155,7 @@ class FlaskModule(BaseModule):
         from .API.user.UserQueryStats import UserQueryUserStats
         from .API.user.UserQueryUserUserGroups import UserQueryUserUserGroups
         from .API.user.UserRefreshToken import UserRefreshToken
+        from .API.user.UserQueryVersions import UserQueryVersions
 
         # Resources
         user_api_ns.add_resource(UserLogin, '/login', resource_class_kwargs=kwargs)
@@ -191,6 +192,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQueryServiceConfig,    '/services/configs', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUserStats,        '/stats', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserRefreshToken,          '/refresh_token', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryVersions,         '/versions', resource_class_kwargs=kwargs)
         api.add_namespace(user_api_ns)
 
     def init_device_api(self):
@@ -280,6 +282,7 @@ class FlaskModule(BaseModule):
         from .Views.Upload import Upload
         from .Views.Participant import Participant
         from .Views.DeviceRegistration import DeviceRegistration
+        from .Views.Versions import Versions
 
         # Default arguments
         args = []
@@ -290,6 +293,9 @@ class FlaskModule(BaseModule):
 
         # Participant test view
         flask_app.add_url_rule('/participant', view_func=Participant.as_view('participant', *args, **kwargs))
+
+        # Versions
+        flask_app.add_url_rule('/versions', view_func=Versions.as_view('versions', *args, **kwargs))
 
         # flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
         # flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
