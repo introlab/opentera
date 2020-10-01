@@ -121,8 +121,7 @@ def init_shared_variables(config):
     versions.load_from_db()
     # Update version string
     versions.server_version_string = opentera_server_version_string
-    # TODO fix has no attribute 'copy'
-    # versions.save_to_db()
+    versions.save_to_db()
 
 
 def init_services(config: ConfigManager):

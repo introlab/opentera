@@ -18,16 +18,9 @@ import uuid
 # Parser definition(s)
 # GET
 get_parser = api.parser()
-# get_parser.add_argument('id_asset', type=int, help='Specific ID of asset to query information.')
-# get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all assets')
-# get_parser.add_argument('id_session', type=int, help='ID of session from which to request all assets')
-# get_parser.add_argument('id_participant', type=int, help='ID of participant from which to request all assets')
-# get_parser.add_argument('service_uuid', type=str, help='Service UUID from which to request all assets')
-# get_parser.add_argument('all', type=str, help='return all assets accessible from user')
 
 # POST
 post_parser = api.parser()
-# post_parser.add_argument('id_session', type=int, help='ID of session to add the assets')
 
 
 class UserQueryVersions(Resource):
@@ -38,7 +31,7 @@ class UserQueryVersions(Resource):
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
-    @api.doc(description='Get asset information. Only one of the ID parameter is supported at once',
+    @api.doc(description='Get server versions',
              responses={200: 'Success - returns list of assets',
                         400: 'Required parameter is missing',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
@@ -46,7 +39,7 @@ class UserQueryVersions(Resource):
         return gettext('Not authorized'), 403
 
     @user_multi_auth.login_required
-    @api.doc(description='Post asset.',
+    @api.doc(description='Post server versions',
              responses={200: 'Success - asset posted',
                         500: 'Database error occurred',
                         403: 'Logged user doesn\'t have permission to delete the requested asset (must be an user of'

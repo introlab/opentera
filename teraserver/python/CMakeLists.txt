@@ -43,13 +43,27 @@ add_custom_target(
     SOURCES babel.cfg
 )
 
+# Will always be considered out of date...
+add_custom_target(
+    python-translations-compile-only
+    COMMAND ${PYBABEL_EXECUTABLE} extract -F babel.cfg -o ${translation_pot_file} .
+    # TO REINITIALIZE TRANSLATION FILES (comment the two lines, or the translations will be overwritten)
+    # COMMAND ${PYBABEL_EXECUTABLE} init -i ${translation_pot_file} -d translations -l fr
+    # COMMAND ${PYBABEL_EXECUTABLE} init -i ${translation_pot_file} -d translations -l en
+    # COMMAND ${PYBABEL_EXECUTABLE} update -i ${translation_pot_file} -d translations
+    COMMAND ${PYBABEL_EXECUTABLE} compile -d translations
+    DEPENDS python-env ${PYBABEL_EXECUTABLE}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    SOURCES babel.cfg
+)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OpenTeraServerVersion.py.in ${CMAKE_CURRENT_SOURCE_DIR}/OpenTeraServerVersion.py)
 
 # Generate version file
 add_custom_target(python-server-version SOURCES OpenTeraServerVersion.py.in)
 
 # Will always be considered out of date...
-add_custom_target(python-all DEPENDS python-env python-messages python-server-version OpenTeraServerVersion.py)
+add_custom_target(python-all DEPENDS python-env python-messages python-server-version python-translations-compile-only OpenTeraServerVersion.py)
 
 # Build this target if you want to update translations too...
 add_custom_target(python-all-with-translations DEPENDS python-all python-translations)
