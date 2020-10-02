@@ -121,5 +121,18 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
     def event_topic(self):
         return ''
 
+    def send_event_message(self, event, topic: str):
+        message = self.create_event_message(topic)
+        any_message = messages.Any()
+        any_message.Pack(event)
+        message.events.extend([any_message])
+        self.publish(message.header.topic, message.SerializeToString())
+
+    def create_event_message(self, topic):
+        event_message = messages.TeraEvent()
+        event_message.header.version = 1
+        event_message.header.time = datetime.datetime.now().timestamp()
+        event_message.header.topic = topic
+        return event_message
 
 

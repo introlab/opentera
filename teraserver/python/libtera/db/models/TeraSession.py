@@ -236,6 +236,36 @@ class TeraSession(db.Model, BaseModel):
     def get_sessions_for_type(session_type_id: int):
         return TeraSession.query.filter_by(id_session_type=session_type_id).all()
 
+    @staticmethod
+    def is_user_in_session(session_uuid: str, user_uuid: str) -> bool:
+        session = TeraSession.get_session_by_uuid(session_uuid)
+        user_uuids = [user.user_uuid for user in session.session_users]
+        return user_uuid in user_uuids
+
+    @staticmethod
+    def is_user_in_session(session_uuid: str, user_uuid: str) -> bool:
+        session = TeraSession.get_session_by_uuid(session_uuid)
+        user_uuids = [user.user_uuid for user in session.session_users]
+        return user_uuid in user_uuids
+
+    @staticmethod
+    def is_device_in_session(session_uuid: str, device_uuid: str) -> bool:
+        session = TeraSession.get_session_by_uuid(session_uuid)
+        device_uuids = [device.device_uuid for device in session.session_devices]
+        return device_uuid in device_uuids
+
+    @staticmethod
+    def is_participant_in_session(session_uuid: str, participant_uuid: str) -> bool:
+        session = TeraSession.get_session_by_uuid(session_uuid)
+        participant_uuids = [participant.participant_uuid for participant in session.session_participants]
+        return participant_uuid in participant_uuids
+
+    @staticmethod
+    def is_user_in_session(session_uuid: str, user_uuid: str) -> bool:
+        session = TeraSession.get_session_by_uuid(session_uuid)
+        user_uuids = [user.user_uuid for user in session.session_users]
+        return user_uuid in user_uuids
+
     # THIS SHOULD NOT BE USED ANYMORE, AS DELETES CAN'T OCCUR IF THERE'S STILL ASSOCIATED SESSIONS
     # @staticmethod
     # def delete_orphaned_sessions(commit_changes=True):

@@ -164,12 +164,9 @@ class UserQueryParticipants(Resource):
                                 participant_json['participant_project'] = participant.participant_project.to_json()
 
                         if args['with_status']:
-                            if participant.participant_uuid in busy_participants:
-                                participant_json['participant_status'] = 'busy'
-                            elif participant.participant_uuid in online_participants:
-                                participant_json['participant_status'] = 'online'
-                            else:
-                                participant_json['participant_status'] = 'offline'
+                            participant_json['participant_busy'] = participant.participant_uuid in busy_participants
+                            participant_json['participant_online'] = participant.participant_uuid in online_participants
+
                         participant_list.append(participant_json)
 
                 return jsonify(participant_list)

@@ -42,6 +42,7 @@ import os
 
 from sqlalchemy.exc import OperationalError
 import libtera.crypto.crypto_utils as crypto
+from libtera.utils.TeraVersions import TeraVersions
 
 
 def generate_certificates(config: ConfigManager):
@@ -113,6 +114,13 @@ def init_shared_variables(config):
     redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, participant_token_key)
     redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey, TeraServerSettings.get_server_setting_value(
                                       TeraServerSettings.ServerParticipantTokenKey))
+
+    # Set versions
+    versions = TeraVersions()
+
+    # Will update clients
+    versions.load_from_db()
+    versions.save_to_db()
 
 
 def init_services(config: ConfigManager):

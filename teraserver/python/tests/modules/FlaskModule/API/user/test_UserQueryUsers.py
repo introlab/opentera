@@ -184,7 +184,8 @@ class UserQueryUsersTest(BaseAPITest):
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
-            self.assertTrue(data_item.__contains__('user_status'))
+            self.assertTrue(data_item.__contains__('user_online'))
+            self.assertTrue(data_item.__contains__('user_busy'))
 
         response = self._request_with_http_auth(username='admin', password='admin', payload="with_status=1&list=1")
         self.assertEqual(response.status_code, 200)
@@ -193,7 +194,8 @@ class UserQueryUsersTest(BaseAPITest):
 
         for data_item in json_data:
             self._checkJson(json_data=data_item, minimal=True)
-            self.assertTrue(data_item.__contains__('user_status'))
+            self.assertTrue(data_item.__contains__('user_online'))
+            self.assertTrue(data_item.__contains__('user_busy'))
 
     def test_query_specific_username_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="username=user3")

@@ -102,6 +102,10 @@ class VideoRehabService(ServiceOpenTera):
             self.send_event_message(join_message, 'websocket.device.'
                                     + device_uuid + '.events')
 
+        # Send event to UserManager to change "busy" status
+        self.send_tera_message(join_message, 'service.VideoRehabService',
+                               create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+
     def user_manager_event_received(self, pattern, channel, message):
         print('VideoRehabService - user_manager_event_received', pattern, channel, message)
         try:
@@ -356,6 +360,8 @@ class VideoRehabService(ServiceOpenTera):
                     return self.manage_invite_to_session(session_manage_args)
                 elif action == 'remove':
                     return self.manage_remove_from_session(session_manage_args)
+                elif action == 'invite_reply':
+                    return self.manage_invite_reply(session_manage_args)
 
         except json.JSONDecodeError as e:
             print('Error', e)
@@ -513,6 +519,10 @@ class VideoRehabService(ServiceOpenTera):
             for device_uuid in session_info['session_devices']:
                 self.send_event_message(stop_session_event, 'websocket.device.' + device_uuid + '.events')
 
+            # Send event to UserManager to change "busy" status
+            self.send_tera_message(stop_session_event, 'service.VideoRehabService',
+                                   create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+
             # Remove session from list
             del self.sessions[id_session]
 
@@ -578,9 +588,6 @@ class VideoRehabService(ServiceOpenTera):
                         return {'status': 'error', 'error_text': gettext('Error creating device invited '
                                                                          'session event ')}
 
-            self.send_join_message(session_info=session_info, target_devices=new_session_devices,
-                                   target_participants=new_session_participants, target_users=new_session_users)
-
             # Update session with new invitees
             api_req = {'session': {'id_session': id_session,  # New session
                                    'session_participants_uuids': session_info['session_participants'],
@@ -590,7 +597,10 @@ class VideoRehabService(ServiceOpenTera):
                        }
             api_response = self.post_to_opentera('/api/service/sessions', api_req)
             if api_response.status_code == 200:
+                # Resend join session message to all invitees to let them update their list if needed
+                self.send_join_message(session_info=session_info)
                 return {'status': 'invited', 'session': session_info}
+
             return {'status': 'error', 'error_text': gettext('Error updating session')}
 
     def manage_remove_from_session(self, session_manage_args: dict):
@@ -670,10 +680,84 @@ class VideoRehabService(ServiceOpenTera):
             for device_uuid in session_devices:
                 self.send_event_message(leave_message, 'websocket.device.' + device_uuid + '.events')
 
+            # Send event to UserManager to change "busy" status
+            self.send_tera_message(leave_message, 'service.VideoRehabService',
+                                   create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+
             # Don't update session with current list of users - participants... We need to keep a trace that they
             # were part of that session at some point!
 
             return {'status': 'removed', 'session': session_info}
+
+    def manage_invite_reply(self, session_manage_args: dict):
+        id_session = session_manage_args['id_session']
+        parameters = session_manage_args['parameters']
+        reply_code = parameters['reply_code']
+
+        if id_session in self.sessions:
+            session_info = self.sessions[id_session]
+
+            join_session_reply = messages.JoinSessionReplyEvent()
+            join_session_reply.session_uuid = session_info['session_uuid']
+            join_session_reply.join_reply = parameters['reply_code']
+            if 'reply_msg' in parameters:
+                join_session_reply.reply_msg = parameters['reply_msg']
+            if 'user_uuid' in parameters:
+                join_session_reply.user_uuid = parameters['user_uuid']
+                if parameters['reply_code'] != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
+                    session_info['session_users'] = [item for item in session_info['session_users']
+                                                     if item != parameters['user_uuid']]
+                    # Create session join refused event
+                    # TODO: Get user name instead of user uuid
+                    api_response = self.post_session_event(event_type=14, id_session=session_info['id_session'],
+                                                           event_text=gettext('User ') + parameters['user_uuid'])
+
+                    if api_response.status_code != 200:
+                        return {'status': 'error', 'error_text': gettext('Cannot create refused session event')}
+
+            if 'participant_uuid' in parameters:
+                join_session_reply.user_uuid = parameters['participant_uuid']
+                if parameters['reply_code'] != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
+                    session_info['session_participants'] = [item for item in session_info['session_participants']
+                                                            if item != parameters['participant_uuid']]
+                    # Create session join refused event
+                    # TODO: Get  participant name instead of uuid
+                    api_response = self.post_session_event(event_type=14, id_session=session_info['id_session'],
+                                                           event_text=gettext('Participant ') +
+                                                                      parameters['participant_uuid'])
+
+                    if api_response.status_code != 200:
+                        return {'status': 'error', 'error_text': gettext('Cannot create refused session event')}
+
+            if 'device_uuid' in parameters:
+                join_session_reply.user_uuid = parameters['device_uuid']
+                if parameters['reply_code'] != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
+                    session_info['session_devices'] = [item for item in session_info['session_devices']
+                                                       if item != parameters['device_uuid']]
+                    # Create session join refused event
+                    # TODO: Get device name instead of uuid
+                    api_response = self.post_session_event(event_type=14, id_session=session_info['id_session'],
+                                                           event_text=gettext('Device ') + parameters['device_uuid'])
+
+                    if api_response.status_code != 200:
+                        return {'status': 'error', 'error_text': gettext('Cannot create refused session event')}
+
+            # Send reply message to everyone
+            session_users = session_info['session_users']
+            session_devices = session_info['session_devices']
+            session_participants = session_info['session_participants']
+            for user_uuid in session_users:
+                self.send_event_message(join_session_reply, 'websocket.user.' + user_uuid + '.events')
+            for participant_uuid in session_participants:
+                self.send_event_message(join_session_reply, 'websocket.participant.' + participant_uuid + '.events')
+            for device_uuid in session_devices:
+                self.send_event_message(join_session_reply, 'websocket.device.' + device_uuid + '.events')
+
+            # Send event to UserManager to change "busy" status
+            self.send_tera_message(join_session_reply, 'service.VideoRehabService',
+                                   create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+
+            return {'status': 'OK', 'session': session_info}
 
 
 if __name__ == '__main__':
@@ -707,11 +791,13 @@ if __name__ == '__main__':
     service_info = Globals.redis_client.redisGet(RedisVars.RedisVar_ServicePrefixKey +
                                                  Globals.config_man.service_config['name'])
     import sys
+
     if service_info is None:
         sys.stderr.write('Error: Unable to get service info from OpenTera Server - is the server running and config '
                          'correctly set in this service?')
         exit(1)
     import json
+
     service_info = json.loads(service_info)
     if 'service_uuid' not in service_info:
         sys.stderr.write('OpenTera Server didn\'t return a valid service UUID - aborting.')

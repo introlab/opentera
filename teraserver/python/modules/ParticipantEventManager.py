@@ -1,6 +1,7 @@
 from modules.EventManager import EventManager
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.db.models.TeraDevice import TeraDevice
+from libtera.db.models.TeraSession import TeraSession
 from modules.DatabaseModule.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
 import messages.python as messages
 
@@ -41,6 +42,21 @@ class ParticipantEventManager(EventManager):
     def filter_stop_session_event(self, event: messages.StopSessionEvent):
         # TODO How to we keep track of session ids?
         return True
+
+    def filter_leave_session_event(self, event: messages.LeaveSessionEvent):
+        # Check if we are in that session or not
+        if TeraSession.is_participant_in_session(event.session_uuid, self.participant.participant_uuid):
+            return True
+        # Not accessible
+        return False
+
+    def filter_join_session_reply_event(self, event: messages.JoinSessionReplyEvent):
+        # Check if we are in that session or not
+        if TeraSession.is_participant_in_session(event.session_uuid, self.participant.participant_uuid)  \
+                and event.participant != self.participant.participant_uuid_uuid:
+            return True
+        # Not accessible
+        return False
 
     def filter_user_event(self, event: messages.UserEvent):
         # Not accessible

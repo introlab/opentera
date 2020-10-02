@@ -73,16 +73,16 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
         # TODO use protobuf ?
         print('TeraWebSocketServerDeviceProtocol onMessage', self, msg, binary)
 
-        if binary:
-            # Decode protobuf before parsing
-            pass
-
-        # Parse JSON (protobuf content)
-        try:
-            message = Parse(msg, messages.TeraModuleMessage())
-            # self.publish(message.head.dest, message)
-        except ParseError:
-            print('TeraWebSocketServerDeviceProtocol - TeraModuleMessage parse error...')
+        # if binary:
+        #     # Decode protobuf before parsing
+        #     pass
+        #
+        # # Parse JSON (protobuf content)
+        # try:
+        #     message = Parse(msg, messages.TeraModuleMessage())
+        #     # self.publish(message.head.dest, message)
+        # except ParseError:
+        #     print('TeraWebSocketServerDeviceProtocol - TeraModuleMessage parse error...')
 
     def onConnect(self, request):
         """

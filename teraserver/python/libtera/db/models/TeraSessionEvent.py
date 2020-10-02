@@ -22,6 +22,7 @@ class TeraSessionEvent(db.Model, BaseModel):
         USER_EVENT = 11
         SESSION_JOIN = 12
         SESSION_LEAVE = 13
+        SESSION_JOIN_REFUSED = 14
 
     __tablename__ = 't_sessions_events'
     id_session_event = db.Column(db.Integer, db.Sequence('id_session_events_sequence'), primary_key=True,

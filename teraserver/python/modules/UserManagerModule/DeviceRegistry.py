@@ -12,18 +12,20 @@ class DeviceRegistry:
         print('device_offline', uuid)
         if self.device_list.__contains__(uuid):
             self.device_list.remove(uuid)
+        if uuid in self.device_sessions_list:
+            del self.device_sessions_list[uuid]
 
     def online_devices(self):
         return self.device_list
 
     def device_join_session(self, uuid, session_uuid):
-        if not self.device_sessions_list[uuid]:
+        if uuid not in self.device_sessions_list:
             self.device_sessions_list[uuid] = session_uuid
-        else:
-            print('Error: device ' + uuid + ' already in a session: ' + self.user_sessions_list[uuid] + '!')
+        # else:
+        #     print('Error: device ' + uuid + ' already in a session: ' + self.user_sessions_list[uuid] + '!')
 
     def device_leave_session(self, uuid, session_uuid):
-        if self.device_sessions_list[uuid]:
+        if uuid in self.device_sessions_list:
             if self.device_sessions_list[uuid] == session_uuid:
                 del self.device_sessions_list[uuid]
             else:

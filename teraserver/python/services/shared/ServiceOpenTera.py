@@ -162,3 +162,19 @@ class ServiceOpenTera(RedisClient):
         event_message.header.time = datetime.datetime.now().timestamp()
         event_message.header.topic = topic
         return event_message
+
+    def send_tera_message(self, event, src: str, topic: str):
+        message = self.create_tera_message(src, topic)
+        any_message = messages.Any()
+        any_message.Pack(event)
+        message.data.extend([any_message])
+        self.publish(topic, message.SerializeToString())
+
+    def create_tera_message(self, src='', dest='', seq=0):
+        tera_message = messages.TeraModuleMessage()
+        tera_message.head.version = 1
+        tera_message.head.time = datetime.datetime.now().timestamp()
+        tera_message.head.seq = seq
+        tera_message.head.source = src
+        tera_message.head.dest = dest
+        return tera_message
