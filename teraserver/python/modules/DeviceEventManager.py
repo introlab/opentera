@@ -35,7 +35,8 @@ class DeviceEventManager(EventManager):
 
     def filter_join_session_reply_event(self, event: messages.JoinSessionReplyEvent):
         # Check if we are in that session or not
-        if TeraSession.is_device_in_session(event.session_uuid, self.device.device_uuid):
+        if TeraSession.is_device_in_session(event.session_uuid, self.device.device_uuid)  \
+                and event.device_uuid != self.device.device_uuid:
             return True
         # Not accessible
         return False

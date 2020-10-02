@@ -69,7 +69,7 @@ class EventManager:
             # Test for LeaveSessionEvent
             leave_session_event = messages.LeaveSessionEvent()
             # Test for JoinSessionReply
-            join_session_reply = messages.JoinSessionReply()
+            join_session_reply = messages.JoinSessionReplyEvent()
 
             if any_msg.Unpack(device_event):
                 if not self.filter_device_event(device_event):
@@ -100,7 +100,7 @@ class EventManager:
                     print('removing', database_event)
                     filtered_message.events.remove(any_msg)
             elif any_msg.Unpack(join_session_reply):
-                if not self.filter_join_session_reply(join_session_reply):
+                if not self.filter_join_session_reply_event(join_session_reply):
                     print('removing', join_session_reply)
                     filtered_message.events.remove(any_msg)
             else:

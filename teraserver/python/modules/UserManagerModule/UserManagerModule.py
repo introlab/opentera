@@ -6,6 +6,7 @@ from messages.python.DeviceEvent_pb2 import DeviceEvent
 from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
 from messages.python.StopSessionEvent_pb2 import StopSessionEvent
 from messages.python.LeaveSessionEvent_pb2 import LeaveSessionEvent
+from messages.python.JoinSessionReplyEvent_pb2 import JoinSessionReplyEvent
 from modules.BaseModule import BaseModule, ModuleNames
 from modules.UserManagerModule.UserRegistry import UserRegistry
 from modules.UserManagerModule.ParticipantRegistry import ParticipantRegistry
@@ -118,10 +119,10 @@ class UserManagerModule(BaseModule):
             if any_msg.Unpack(leave_session_event):
                 self.handle_leave_session_event(leave_session_event)
 
-            # # Test for JoinSessionReply
-            # join_session_reply = JoinSessionReply()
-            # if any_msg.Unpack(join_session_reply):
-            #     print('UserManagerModule - JoinSessionReply message')
+            # Test for JoinSessionReplyEvent
+            join_session_reply = JoinSessionReplyEvent()
+            if any_msg.Unpack(join_session_reply):
+                self.handle_join_session_reply_event(join_session_reply)
 
     def handle_user_connected(self, header, user_event: UserEvent):
         self.user_registry.user_online(user_event.user_uuid)
@@ -250,3 +251,17 @@ class UserManagerModule(BaseModule):
         self.set_devices_in_session(session_uuid=leave_event.session_uuid,
                                     device_uuids=leave_event.leaving_devices,
                                     in_session=False)
+
+    def handle_join_session_reply_event(self, join_reply: JoinSessionReplyEvent):
+        # Clear busy states of elements that refused to join session
+        if join_reply.join_reply != JoinSessionReplyEvent.REPLY_ACCEPTED:
+            self.set_users_in_session(session_uuid=join_reply.session_uuid, user_uuids=[join_reply.user_uuid],
+                                      in_session=False)
+
+            self.set_participants_in_session(session_uuid=join_reply.session_uuid,
+                                             participant_uuids=[join_reply.participant_uuid],
+                                             in_session=False)
+
+            self.set_devices_in_session(session_uuid=join_reply.session_uuid,
+                                        device_uuids=[join_reply.device_uuid],
+                                        in_session=False)
