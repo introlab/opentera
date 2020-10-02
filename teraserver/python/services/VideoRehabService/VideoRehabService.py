@@ -707,13 +707,13 @@ class VideoRehabService(ServiceOpenTera):
                 if parameters['reply_code'] != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
                     session_info['session_users'] = [item for item in session_info['session_users']
                                                      if item != parameters['user_uuid']]
-                # Create session join refused event
-                # TODO: Get user name instead of user uuid
-                api_response = self.post_session_event(event_type=14, id_session=session_info['id_session'],
-                                                       event_text=gettext('User ') + parameters['user_uuid'])
+                    # Create session join refused event
+                    # TODO: Get user name instead of user uuid
+                    api_response = self.post_session_event(event_type=14, id_session=session_info['id_session'],
+                                                           event_text=gettext('User ') + parameters['user_uuid'])
 
-                if api_response.status_code != 200:
-                    return {'status': 'error', 'error_text': gettext('Cannot create refused session event')}
+                    if api_response.status_code != 200:
+                        return {'status': 'error', 'error_text': gettext('Cannot create refused session event')}
 
             if 'participant_uuid' in parameters:
                 join_session_reply.user_uuid = parameters['participant_uuid']
