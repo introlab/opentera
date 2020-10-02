@@ -31,7 +31,7 @@ class UserEventManager(EventManager):
         # Not accessible
         return False
 
-    def filter_join_session_reply(self, event: messages.JoinSessionReply):
+    def filter_join_session_reply_event(self, event: messages.JoinSessionReplyEvent):
         # Check if we are in that session or not
         if models.TeraSession.is_user_in_session(event.session_uuid, self.user.user_uuid):
             return True

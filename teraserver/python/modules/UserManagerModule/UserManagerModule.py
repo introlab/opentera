@@ -6,7 +6,6 @@ from messages.python.DeviceEvent_pb2 import DeviceEvent
 from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
 from messages.python.StopSessionEvent_pb2 import StopSessionEvent
 from messages.python.LeaveSessionEvent_pb2 import LeaveSessionEvent
-from messages.python.JoinSessionReply_pb2 import JoinSessionReply
 from modules.BaseModule import BaseModule, ModuleNames
 from modules.UserManagerModule.UserRegistry import UserRegistry
 from modules.UserManagerModule.ParticipantRegistry import ParticipantRegistry

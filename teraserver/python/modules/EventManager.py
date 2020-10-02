@@ -20,7 +20,7 @@ class EventManager:
         # Default = no access
         return False
 
-    def filter_join_session_reply(self, event: messages.JoinSessionReply):
+    def filter_join_session_reply_event(self, event: messages.JoinSessionReplyEvent):
         # Default = no access
         return False
 

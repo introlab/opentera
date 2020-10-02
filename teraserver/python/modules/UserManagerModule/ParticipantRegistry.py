@@ -21,8 +21,8 @@ class ParticipantRegistry:
     def participant_join_session(self, uuid, session_uuid):
         if uuid not in self.participant_sessions_list:
             self.participant_sessions_list[uuid] = session_uuid
-        else:
-            print('Error: participant ' + uuid + ' already in a session: ' + self.participant_sessions_list[uuid] + '!')
+        # else:
+        #     print('Error: participant ' + uuid + ' already in a session: ' + self.participant_sessions_list[uuid] + '!')
 
     def participant_leave_session(self, uuid, session_uuid):
         if uuid in self.participant_sessions_list:

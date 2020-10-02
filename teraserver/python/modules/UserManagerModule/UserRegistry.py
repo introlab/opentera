@@ -23,8 +23,8 @@ class UserRegistry:
     def user_join_session(self, uuid, session_uuid):
         if uuid not in self.user_sessions_list:
             self.user_sessions_list[uuid] = session_uuid
-        else:
-            print('Error: user ' + uuid + ' already in a session: ' + self.user_sessions_list[uuid] + '!')
+        # else:
+        #     print('Error: user ' + uuid + ' already in a session: ' + self.user_sessions_list[uuid] + '!')
 
     def user_leave_session(self, uuid, session_uuid):
         if uuid in self.user_sessions_list:

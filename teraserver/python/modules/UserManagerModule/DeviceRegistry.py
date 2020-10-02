@@ -21,8 +21,8 @@ class DeviceRegistry:
     def device_join_session(self, uuid, session_uuid):
         if uuid not in self.device_sessions_list:
             self.device_sessions_list[uuid] = session_uuid
-        else:
-            print('Error: device ' + uuid + ' already in a session: ' + self.user_sessions_list[uuid] + '!')
+        # else:
+        #     print('Error: device ' + uuid + ' already in a session: ' + self.user_sessions_list[uuid] + '!')
 
     def device_leave_session(self, uuid, session_uuid):
         if uuid in self.device_sessions_list:
