@@ -21,7 +21,7 @@ class TeraDeviceSubType(db.Model, BaseModel):
         device_subtype_json = super().to_json(ignore_fields=ignore_fields)
 
         # Add device type name as parent
-        device_subtype_json['device_subtype_parent'] = self.device_subtype_type.get_name()
+        device_subtype_json['device_subtype_parent'] = self.device_subtype_type.device_type_name
 
         return device_subtype_json
 
