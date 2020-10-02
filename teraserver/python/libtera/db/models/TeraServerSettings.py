@@ -61,7 +61,7 @@ class TeraServerSettings(db.Model, BaseModel):
         else:
             # Insert setting if not
             current_setting = TeraServerSettings()
-            current_setting.id_server_settings = 0
+            current_setting.id_server_settings = None
             current_setting.server_settings_name = setting_name
             current_setting.server_settings_value = setting_value
             db.session.add(current_setting)

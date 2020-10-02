@@ -162,7 +162,8 @@ class TeraVersions:
 
     def load_from_db(self):
         settings = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerVersions)
-        self.from_dict(json.loads(settings))
+        if settings:
+            self.from_dict(json.loads(settings))
 
     def __repr__(self):
         return '<TeraVersions: ' + json.dumps(self.to_dict()) + ' >'
