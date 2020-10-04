@@ -52,11 +52,11 @@ class TeraVersionsForm:
             section_clients.add_item(TeraFormItem("client_version", gettext("Client version"), "text",
                                                   item_required=True, item_options={"readonly": True}))
 
-            section_clients.add_item(TeraFormItem("client_documentation_url", gettext("Client documentation url"), "text",
-                                                  item_required=True, item_options={"readonly": True}))
+            section_clients.add_item(TeraFormItem("client_documentation_url", gettext("Client documentation url"),
+                                                  "text", item_required=True, item_options={"readonly": True}))
 
-            section_clients.add_item(TeraFormItem("client_windows_download_url", gettext("Client windows version"), "text",
-                                                  item_required=True, item_options={"readonly": True}))
+            section_clients.add_item(TeraFormItem("client_windows_download_url", gettext("Client windows version"),
+                                                  "text", item_required=True, item_options={"readonly": True}))
 
             section_clients.add_item(TeraFormItem("client_mac_download_url", gettext("Client mac version"), "text",
                                                   item_required=True, item_options={"readonly": True}))
