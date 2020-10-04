@@ -3,7 +3,8 @@ from flask_restx import Resource, reqparse, fields
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_http_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-
+from libtera.redis.RedisRPCClient import RedisRPCClient
+from modules.BaseModule import ModuleNames
 
 model = api.model('Login', {
     'websocket_url': fields.String,
@@ -45,8 +46,14 @@ class UserLogin(Resource):
         # Get token for user
         from libtera.db.models.TeraUser import TeraUser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-        current_user.update_last_online()
 
+        # Verify if user already logged in
+        rpc = RedisRPCClient(self.module.config.redis_config)
+        online_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
+        if current_user.user_uuid in online_users:
+            return gettext('User already logged in.'), 403
+
+        current_user.update_last_online()
         user_token = current_user.get_token(token_key)
 
         print('Login - setting key with expiration in 60s', session['_id'], session['_user_id'])

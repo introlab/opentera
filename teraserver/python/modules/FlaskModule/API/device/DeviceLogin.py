@@ -4,6 +4,9 @@ from modules.LoginModule.LoginModule import LoginModule
 from modules.Globals import db_man
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from libtera.db.models.TeraDevice import TeraDevice
+from libtera.redis.RedisRPCClient import RedisRPCClient
+from modules.BaseModule import ModuleNames
+from flask_babel import gettext
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -33,6 +36,12 @@ class DeviceLogin(Resource):
 
         current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
         args = get_parser.parse_args()
+
+        # Verify if device already logged in
+        rpc = RedisRPCClient(self.module.config.redis_config)
+        online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
+        if current_device.device_uuid in online_devices:
+            return gettext('Device already logged in.'), 403
 
         if 'X_EXTERNALHOST' in request.headers:
             if ':' in request.headers['X_EXTERNALHOST']:

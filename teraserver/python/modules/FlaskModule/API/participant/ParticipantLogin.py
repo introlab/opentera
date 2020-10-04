@@ -4,6 +4,8 @@ from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from modules.RedisVars import RedisVars
+from libtera.redis.RedisRPCClient import RedisRPCClient
+from modules.BaseModule import ModuleNames
 
 
 # Parser definition(s)
@@ -36,6 +38,13 @@ class ParticipantLogin(Resource):
     @api.marshal_with(model, mask=None)
     def get(self):
         if current_participant:
+
+            # Verify if participant already logged in
+            rpc = RedisRPCClient(self.module.config.redis_config)
+            online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
+            if current_participant.participant_uuid in online_participants:
+                return gettext('Participant already logged in.'), 403
+
             current_participant.update_last_online()
             session.permanent = True
 
