@@ -19,6 +19,7 @@ from libtera.forms.TeraDeviceSubTypeForm import TeraDeviceSubTypeForm
 from libtera.forms.TeraUserGroupForm import TeraUserGroupForm
 from libtera.forms.TeraServiceForm import TeraServiceForm
 from libtera.forms.TeraServiceConfigForm import TeraServiceConfigForm
+from libtera.forms.TeraVersionsForm import TeraVersionsForm
 
 get_parser = api.parser()
 get_parser.add_argument(name='type', type=str, help='Data type of the required form. Currently, the '
@@ -35,6 +36,7 @@ get_parser.add_argument(name='type', type=str, help='Data type of the required f
                                                     'site\n'
                                                     'user\n'
                                                     'user_group\n'
+                                                    'versions\n'
                         )
 get_parser.add_argument(name='id', type=int, help='Specific id of subitem to query. Used with service_config.')
 
@@ -105,5 +107,8 @@ class UserQueryForms(Resource):
 
             return TeraServiceConfigForm.get_service_config_config_form(user_access=user_access,
                                                                         service_key=service.service_key)
+
+        if args['type'] == 'versions':
+            return TeraVersionsForm.get_versions_form(user_access=user_access)
 
         return gettext('Unknown form type: ') + args['type'], 500
