@@ -4,16 +4,8 @@ from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraServerSettings import TeraServerSettings
+import json
 from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraAsset import TeraAsset, AssetType
-from libtera.db.models.TeraService import TeraService
-from werkzeug.utils import secure_filename
-
-from sqlalchemy import exc
-from modules.DatabaseModule.DBManager import DBManager
-from modules.RedisVars import RedisVars
-
-import uuid
 
 # Parser definition(s)
 # GET
@@ -36,7 +28,12 @@ class UserQueryVersions(Resource):
                         400: 'Required parameter is missing',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
-        return gettext('Not authorized'), 403
+        # As soon as we are authorized, we can output the server versions
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
+        args = get_parser.parse_args()
+
+        current_settings = json.loads(TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerVersions))
+        return current_settings
 
     @user_multi_auth.login_required
     @api.doc(description='Post server versions',
@@ -46,5 +43,16 @@ class UserQueryVersions(Resource):
                              'the related project)'})
     @api.expect(post_parser)
     def post(self):
-        # TODO What to do here exactly?
+
+        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
+        args = post_parser.parse_args()
+
+        # Only superuser can change the versions settings
+        # Only some fields can be changed.
+        if current_user.user_superadmin:
+            current_settings = json.loads(
+                TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerVersions))
+            return current_settings
+
+        # Not superadmin
         return gettext('Not authorized'), 403

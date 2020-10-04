@@ -118,7 +118,7 @@ def init_shared_variables(config):
     # Set versions
     versions = TeraVersions()
 
-    # Will update clients
+    # Will update clients versions (hard coded in TeraVersions)
     versions.load_from_db()
     versions.save_to_db()
 

@@ -71,31 +71,31 @@ class ClientVersions:
 
     def from_dict(self, value: dict):
         if 'client_name' in value:
-            self.name = value['client_name']
+            self.client_name = value['client_name']
         if 'client_description' in value:
-            self.description = value['client_description']
+            self.client_description = value['client_description']
         if 'client_version' in value:
-            self.version = value['client_version']
+            self.client_version = value['client_version']
         if 'client_documentation_url' in value:
-            self.documentation_url = value['client_documentation_url']
+            self.client_documentation_url = value['client_documentation_url']
         if 'client_windows_download_url' in value:
-            self.description = value['client_windows_download_url']
+            self.client_windows_download_url = value['client_windows_download_url']
         if 'client_mac_download_url' in value:
-            self.version = value['client_mac_download_url']
+            self.client_mac_download_url = value['client_mac_download_url']
         if 'client_linux_download_url' in value:
-            self.documentation_url = value['client_linux_download_url']
+            self.client_linux_download_url = value['client_linux_download_url']
 
     def to_dict(self):
-        return {'client_name': self.name,
-                'client_description': self.description,
-                'client_version': self.version,
-                'client_documentation_url': self.documentation_url,
-                'client_windows_download_url': self.windows_download_url,
-                'client_mac_download_url': self.mac_download_url,
-                'client_linux_download_url': self.linux_download_url}
+        return {'client_name': self.client_name,
+                'client_description': self.client_description,
+                'client_version': self.client_version,
+                'client_documentation_url': self.client_documentation_url,
+                'client_windows_download_url': self.client_windows_download_url,
+                'client_mac_download_url': self.client_mac_download_url,
+                'client_linux_download_url': self.client_linux_download_url}
 
     def __repr__(self):
-        return '<ClientVersions ' + self.name + str(self.version) + ' >'
+        return '<ClientVersions ' + json.dumps(self.to_dict()) + ' >'
 
 
 class TeraVersions:
@@ -104,11 +104,22 @@ class TeraVersions:
         self.server_major_version = OpenTeraServerVersion.opentera_server_major_version
         self.server_minor_version = OpenTeraServerVersion.opentera_server_minor_version
         self.server_patch_version = OpenTeraServerVersion.opentera_server_patch_version
-        self.clients = list()
+        self.clients = dict()
         # Hard coding OpenTeraPlus for now
-        self.clients.append(ClientVersions(client_name='OpenTeraPlus',
-                                           client_version='0.1.0',
-                                           client_documentation_url='https://github.com/introlab/openteraplus'))
+        # Will be overwritten if necessary
+        self.clients['OpenTeraPlus'] = ClientVersions(client_name='OpenTeraPlus',
+                                                      client_description='OpenTeraPlus Qt Client',
+                                                      client_version='0.1.0',
+                                                      client_documentation_url=
+                                                      'https://github.com/introlab/openteraplus')
+
+    def get_client_version_with_name(self, name: str):
+        if name in self.clients:
+            return self.clients[name]
+        return None
+
+    def set_client_version_with_name(self, name: str, client_version: ClientVersions):
+        self.clients[name] = client_version
 
     @property
     def version_string(self):
@@ -127,7 +138,7 @@ class TeraVersions:
         return self.server_patch_version
 
     @property
-    def client_list(self):
+    def client_dict(self):
         return self.clients
 
     def to_dict(self) -> dict:
@@ -135,14 +146,15 @@ class TeraVersions:
                   'version_major': self.server_major_version,
                   'version_minor': self.server_minor_version,
                   'version_patch': self.server_patch_version,
-                  'clients': []}
-        for client in self.clients:
-            output['clients'].append(client.to_dict())
+                  'clients': {}}
+        # Output clients dict
+        for client_name in self.clients:
+            output['clients'][client_name] = self.clients[client_name].to_dict()
         return output
 
     def from_dict(self, value: dict):
         # We do not want to load version from DB
-        # TODO can we do better
+        # TODO can we do better ?
         # if 'version_string' in value:
         #     self.server_version = value['version_string']
         # if 'version_major' in value:
@@ -152,10 +164,15 @@ class TeraVersions:
         # if 'version_patch' in value:
         #     self.server_patch_version = value['version_patch']
         if 'clients' in value:
-            for client_dict in value['clients']:
-                client = ClientVersions()
-                client.from_dict(client_dict)
-                self.clients.append(client)
+            # We have a list of clients dict in value['clients']
+            # Make sure we have a dict and not a list (in old implementation)
+            if isinstance(value['clients'], dict):
+                for client_name in value['clients']:
+                    client_version = ClientVersions()
+                    client_version.from_dict(value['clients'][client_name])
+                    # Put in the dict, overwriting if client have the same name
+                    # TODO can we do better?
+                    self.clients[client_version.client_name] = client_version
 
     def save_to_db(self):
         TeraServerSettings.set_server_setting(TeraServerSettings.ServerVersions, json.dumps(self.to_dict()))
@@ -176,5 +193,7 @@ class TeraVersions:
 #     versions_dict = versions.to_dict()
 #     versions2 = TeraVersions()
 #     versions2.from_dict(versions_dict)
+#     print(versions.get_client_version_with_name('OpenTeraPlus'))
+#     print(versions.get_client_version_with_name('Unknown'))
 #     print(versions)
 #     print(versions2)
