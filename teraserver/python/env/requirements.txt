@@ -19,6 +19,7 @@ flask-security
 flask-babel
 flask-migrate
 flask-swagger-ui
+flask-limiter
 # flask-jwt
 redis
 txredisapi
