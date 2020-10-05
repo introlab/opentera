@@ -15,6 +15,7 @@ from libtera.forms.TeraParticipantGroupForm import TeraParticipantGroupForm
 from libtera.forms.TeraParticipantForm import TeraParticipantForm
 from libtera.forms.TeraSessionTypeForm import TeraSessionTypeForm
 from libtera.forms.TeraSessionForm import TeraSessionForm
+from libtera.forms.TeraDeviceTypeForm import TeraDeviceTypeForm
 from libtera.forms.TeraDeviceSubTypeForm import TeraDeviceSubTypeForm
 from libtera.forms.TeraUserGroupForm import TeraUserGroupForm
 from libtera.forms.TeraServiceForm import TeraServiceForm
@@ -25,6 +26,7 @@ get_parser = api.parser()
 get_parser.add_argument(name='type', type=str, help='Data type of the required form. Currently, the '
                                                     'following data types are supported: \n '
                                                     'device\n'
+                                                    'device_type\n'
                                                     'device_subtype\n'
                                                     'group\n'
                                                     'participant\n'
@@ -85,6 +87,9 @@ class UserQueryForms(Resource):
 
         if args['type'] == 'session':
             return jsonify(TeraSessionForm.get_session_form(user_access=user_access))
+
+        if args['type'] == 'device_type':
+            return jsonify(TeraDeviceTypeForm.get_device_type_form(user_access=user_access))
 
         if args['type'] == 'device_subtype':
             return jsonify(TeraDeviceSubTypeForm.get_device_subtype_form(user_access=user_access))
