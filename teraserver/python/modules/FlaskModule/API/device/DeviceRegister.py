@@ -2,6 +2,8 @@ from flask_restx import Resource, reqparse
 from flask_babel import gettext
 from flask import jsonify
 from flask import request
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address, get_ipaddr
 import base64
 from libtera.crypto.crypto_utils import generate_device_certificate, load_private_pem_key, load_pem_certificate
 from cryptography import x509
@@ -15,6 +17,9 @@ from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraSessionType import TeraSessionType
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 import uuid
+from modules.FlaskModule.FlaskModule import flask_app
+
+limiter = Limiter(flask_app, key_func=get_ipaddr)
 
 
 class DeviceRegister(Resource):
@@ -23,6 +28,7 @@ class DeviceRegister(Resource):
     Will return the certificate with newly created device UUID, but disabled.
     Administrators will need to put the device in a site and enable it before use.
     """
+    decorators = [limiter.limit("1/minute", error_message='Rate Limited')]
 
     def __init__(self, _api, flaskModule=None):
         Resource.__init__(self, _api)
@@ -67,10 +73,12 @@ class DeviceRegister(Resource):
 
         return device
 
+    # @limiter.limit("1/day", error_message='Rate Limited')
     def get(self):
         print(request)
         return '', 403
 
+    # @limiter.limit("1/day", error_message='Rate Limited')
     def post(self):
         print(request)
 

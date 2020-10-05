@@ -33,7 +33,7 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
-        print('TeraWebSocketServerParticipantProtocol redisConnectionMade (redis)')
+        print('TeraWebSocketServerParticipantProtocol - redisConnectionMade (redis)', self)
 
         # This will wait until subscribe result is available...
         # ret = yield self.subscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
@@ -74,7 +74,7 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
     def onMessage(self, msg, binary):
         # Handle websocket communication
         # TODO use protobuf ?
-        print('TeraWebSocketServerParticipantProtocol onMessage', self, msg, binary)
+        print('TeraWebSocketServerParticipantProtocol - onMessage', self, msg, binary)
 
         # if binary:
         #     # Decode protobuf before parsing
@@ -91,29 +91,34 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
         """
         Cannot send message at this stage, needs to verify connection here.
         """
-        print('onConnect')
+        print('TeraWebSocketServerParticipantProtocol - onConnect')
 
         if request.params.__contains__('id'):
             # Look for session id in
             my_id = request.params['id']
-            print('TeraWebSocketServerParticipantProtocol - testing id: ', my_id)
+            print('TeraWebSocketServerParticipantProtocol - testing id: ', my_id, self)
 
             value = self.redisGet(my_id[0])
 
             if value is not None:
                 # Needs to be converted from bytes to string to work
                 participant_uuid = value.decode("utf-8")
-                print('TeraWebSocketServerParticipantProtocol - participant uuid ', participant_uuid)
+                print('TeraWebSocketServerParticipantProtocol - participant uuid ', participant_uuid, self)
 
                 # User verification
                 self.participant = TeraParticipant.get_participant_by_uuid(participant_uuid)
                 if self.participant is not None:
                     # Remove key
-                    print('TeraWebSocketServerParticipantProtocol - OK! removing key')
+                    print('TeraWebSocketServerParticipantProtocol - OK! removing key', self)
                     self.redisDelete(my_id[0])
 
                     # Set event manager
                     self.event_manager = ParticipantEventManager(self.participant)
+
+                    # log information
+                    self.logger.log_info(self, "Participant websocket connected",
+                                         self.participant.participant_name, self.participant.participant_uuid)
+
                     return
 
         # if we get here we need to close the websocket, auth failed.
@@ -154,6 +159,10 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
                 self.redis_event_message_received)
 
             ret3 = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            # log information
+            self.logger.log_info(self, "Participant websocket disconnected",
+                                 self.participant.participant_name, self.participant.participant_uuid)
 
             print(ret1, ret2, ret3)
 

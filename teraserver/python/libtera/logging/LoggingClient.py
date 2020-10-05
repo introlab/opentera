@@ -55,7 +55,7 @@ class LoggingClient:
         log_event = messages.LogEvent()
         log_event.level = level
         log_event.timestamp = datetime.datetime.now().timestamp()
-        log_event.sender = sender
+        log_event.sender = str(sender)
         log_event.message = str(args)
         return log_event
 

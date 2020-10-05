@@ -33,7 +33,7 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
-        print('TeraWebSocketServerDeviceProtocol redisConnectionMade (redis)')
+        print('TeraWebSocketServerDeviceProtocol - redisConnectionMade (redis)', self)
 
         # This will wait until subscribe result is available...
         # ret = yield self.subscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
@@ -71,7 +71,7 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
     def onMessage(self, msg, binary):
         # Handle websocket communication
         # TODO use protobuf ?
-        print('TeraWebSocketServerDeviceProtocol onMessage', self, msg, binary)
+        print('TeraWebSocketServerDeviceProtocol - onMessage', self, msg, binary)
 
         # if binary:
         #     # Decode protobuf before parsing
@@ -88,29 +88,33 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
         """
         Cannot send message at this stage, needs to verify connection here.
         """
-        print('onConnect')
+        print('TeraWebSocketServerDeviceProtocol - onConnect', self)
 
         if request.params.__contains__('id'):
             # Look for session id in
             my_id = request.params['id']
-            print('TeraWebSocketServerDeviceProtocol - testing id: ', my_id)
+            print('TeraWebSocketServerDeviceProtocol - testing id: ', my_id, self)
 
             value = self.redisGet(my_id[0])
 
             if value is not None:
                 # Needs to be converted from bytes to string to work
                 device_uuid = value.decode("utf-8")
-                print('TeraWebSocketServerDeviceProtocol - device uuid ', device_uuid)
+                print('TeraWebSocketServerDeviceProtocol - device uuid ', device_uuid, self)
 
                 # User verification
                 self.device = TeraDevice.get_device_by_uuid(device_uuid)
                 if self.device is not None:
                     # Remove key
-                    print('TeraWebSocketServerDeviceProtocol - OK! removing key')
+                    print('TeraWebSocketServerDeviceProtocol - OK! removing key', self)
                     self.redisDelete(my_id[0])
 
                     # Create event manager
                     self.event_manager = DeviceEventManager(self.device)
+
+                    # log information
+                    self.logger.log_info(self, "Device websocket connected",
+                                         self.device.device_name, self.device.device_uuid)
 
                     return
 
@@ -121,6 +125,7 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
 
     @defer.inlineCallbacks
     def onClose(self, wasClean, code, reason):
+        print('TeraWebSocketServerDeviceProtocol - onClose', self, wasClean, code, reason)
         if self.device:
             # Advertise that device leaved
             tera_message = self.create_tera_message(
@@ -150,13 +155,15 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
 
             ret3 = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
+            # log information
+            self.logger.log_info(self, "Device websocket disconnected",
+                                 self.device.device_name, self.device.device_uuid)
+
             print(ret1, ret2, ret3)
 
         # Unsubscribe to messages
         # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
         # print(ret)
-
-        print('TeraWebSocketServerDeviceProtocol - onClose', self, wasClean, code, reason)
 
     def answer_topic(self):
         if self.device:

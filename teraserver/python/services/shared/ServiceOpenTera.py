@@ -8,6 +8,7 @@ from services.shared.ServiceConfigManager import ServiceConfigManager
 import messages.python as messages
 from twisted.internet import defer
 import datetime
+from libtera.logging.LoggingClient import LoggingClient
 
 
 class ServiceOpenTera(RedisClient):
@@ -15,6 +16,9 @@ class ServiceOpenTera(RedisClient):
     def __init__(self, config_man: ServiceConfigManager, service_info):
         # First initialize redis
         RedisClient.__init__(self, config_man.redis_config)
+
+        # Initialize logger
+        self.logger = LoggingClient(config_man.redis_config)
 
         # Store service info
         self.service_info = service_info

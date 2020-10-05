@@ -5,6 +5,7 @@ from autobahn.websocket.types import ConnectionDeny
 
 # OpenTera
 from libtera.redis.RedisClient import RedisClient
+from libtera.logging.LoggingClient import LoggingClient
 
 # Messages
 import messages.python as messages
@@ -22,6 +23,7 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
         RedisClient.__init__(self, config=config)
         WebSocketServerProtocol.__init__(self)
 
+        self.logger = LoggingClient(config)
         self.event_manager = None
         self.registered_events = set()  # Collection of unique elements
 
@@ -49,30 +51,30 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
 
     def redis_tera_message_received(self, pattern, channel, message):
         print('TeraWebSocketServerProtocol - redis_tera_message_received', pattern, channel, message)
-
-        # TODO Should  be removed completely? We are using events
-        # Forward as JSON to websocket
-        try:
-            tera_module_message = messages.TeraModuleMessage()
-            if isinstance(message, str):
-                ret = tera_module_message.ParseFromString(message.encode('utf-8'))
-            elif isinstance(message, bytes):
-                ret = tera_module_message.ParseFromString(message)
-
-            # Conversion to generic message
-            tera_message = messages.TeraMessage()
-            tera_message.message.Pack(tera_module_message)
-
-            # Converting to JSON
-            json = MessageToJson(tera_message, including_default_value_fields=True)
-
-            # Send to websocket (not in binary form)
-            self.sendMessage(json.encode('utf-8'), False)
-
-        except DecodeError as d:
-            print('TeraWebSocketServerProtocol - DecodeError ', pattern, channel, message, d)
-        except ParseError as e:
-            print('TeraWebSocketServerProtocol - Failure in redisMessageReceived', e)
+        #
+        # # TODO Should  be removed completely? We are using events
+        # # Forward as JSON to websocket
+        # try:
+        #     tera_module_message = messages.TeraModuleMessage()
+        #     if isinstance(message, str):
+        #         ret = tera_module_message.ParseFromString(message.encode('utf-8'))
+        #     elif isinstance(message, bytes):
+        #         ret = tera_module_message.ParseFromString(message)
+        #
+        #     # Conversion to generic message
+        #     tera_message = messages.TeraMessage()
+        #     tera_message.message.Pack(tera_module_message)
+        #
+        #     # Converting to JSON
+        #     json = MessageToJson(tera_message, including_default_value_fields=True)
+        #
+        #     # Send to websocket (not in binary form)
+        #     self.sendMessage(json.encode('utf-8'), False)
+        #
+        # except DecodeError as d:
+        #     print('TeraWebSocketServerProtocol - DecodeError ', pattern, channel, message, d)
+        # except ParseError as e:
+        #     print('TeraWebSocketServerProtocol - Failure in redisMessageReceived', e)
 
     def redis_event_message_received(self, pattern, channel, message):
         print('TeraWebSocketServerProtocol - redis_event_message_received', pattern, channel, message)
