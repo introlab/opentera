@@ -41,24 +41,38 @@ class MyHTTPChannel(HTTPChannel):
         req = self.requests[-1]
 
         # SAFETY X-Device-UUID, X-Participant-UUID must not be set in header before testing certificate
-        if req.requestHeaders.hasHeader('X-Device-UUID'):
-            req.requestHeaders.removeHeader('X-Device-UUID')
-            # TODO raise error?
+        # if req.requestHeaders.hasHeader('X-Device-UUID'):
+        #     req.requestHeaders.removeHeader('X-Device-UUID')
+        #     # TODO raise error?
+        #
+        # if req.requestHeaders.hasHeader('X-Participant-UUID'):
+        #     req.requestHeaders.removeHeader('X-Participant-UUID')
+        #     # TODO raise error ?
+        #
+        # if cert is not None:
+        #     # Certificate found, add information in header
+        #     subject = cert.get_subject()
+        #     # Get UID if possible
+        #     if 'Device' in subject.CN and hasattr(subject, 'UID'):
+        #         user_id = subject.UID
+        #         req.requestHeaders.addRawHeader('X-Device-UUID', user_id)
+        #     if 'Participant' in subject.CN and hasattr(subject, 'UID'):
+        #         user_id = subject.UID
+        #         req.requestHeaders.addRawHeader('X-Participant-UUID', user_id)
 
-        if req.requestHeaders.hasHeader('X-Participant-UUID'):
-            req.requestHeaders.removeHeader('X-Participant-UUID')
-            # TODO raise error ?
-
-        if cert is not None:
-            # Certificate found, add information in header
-            subject = cert.get_subject()
-            # Get UID if possible
-            if 'Device' in subject.CN and hasattr(subject, 'UID'):
-                user_id = subject.UID
-                req.requestHeaders.addRawHeader('X-Device-UUID', user_id)
-            if 'Participant' in subject.CN and hasattr(subject, 'UID'):
-                user_id = subject.UID
-                req.requestHeaders.addRawHeader('X-Participant-UUID', user_id)
+        # Look for nginx headers (can contain a certificate)
+        if req.requestHeaders.hasHeader('x-ssl-client-dn'):
+            # TODO do better parsing. Working for now...
+            # Domain extracted by nginx (much faster)
+            client_dn = req.requestHeaders.getRawHeaders('x-ssl-client-dn')[0]
+            uuid = ''
+            for key in client_dn.split(','):
+                if 'UID' in key and len(key) == 40:
+                    uuid = key[4:]
+                if 'CN' in key and 'Device' in key:
+                    req.requestHeaders.addRawHeader('X-Device-UUID', uuid)
+                if 'CN' in key and 'Participant' in key:
+                    req.requestHeaders.addRawHeader('X-Participant-UUID', uuid)
 
         HTTPChannel.allHeadersReceived(self)
 

@@ -28,7 +28,7 @@ class DeviceRegister(Resource):
     Will return the certificate with newly created device UUID, but disabled.
     Administrators will need to put the device in a site and enable it before use.
     """
-    decorators = [limiter.limit("1/minute", error_message='Rate Limited')]
+    decorators = [limiter.limit("10/minute", error_message='Rate Limited')]
 
     def __init__(self, _api, flaskModule=None):
         Resource.__init__(self, _api)

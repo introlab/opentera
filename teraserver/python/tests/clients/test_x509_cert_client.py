@@ -127,7 +127,7 @@ class x509ClientTest(unittest.TestCase):
 
         d = agent.request(
             b'POST',
-            b'https://localhost:4040/api/device/device_register',
+            b'https://localhost:40075/api/device/device_register',
             Headers({'User-Agent': ['Twisted Web Client Example'],
                      'Content-Type': ['application/octet-stream'],
                      'Content-Transfer-Encoding': ['Base64']}),
@@ -173,7 +173,7 @@ class x509ClientTest(unittest.TestCase):
 
         d = self.agent.request(
             b'GET',
-            b'https://localhost:4040/api/device/device_login',
+            b'https://localhost:40075/api/device/login',
             Headers({'User-Agent': ['Twisted Web Client Example']}),
             None)
 
@@ -242,7 +242,7 @@ class x509ClientTest(unittest.TestCase):
 
         d = self.agent.request(
             b'POST',
-            b'https://localhost:4040/api/device/sessions',
+            b'https://localhost:40075/api/device/sessions',
             Headers({'User-Agent': ['Twisted Web Client Example'],
                      'Content-Type': ['application/json']}),
             body)
@@ -297,7 +297,7 @@ class x509ClientTest(unittest.TestCase):
 
         d = self.agent.request(
             b'POST',
-            b'https://localhost:4040/api/device/device_upload',
+            b'https://localhost:40075/api/device/device_upload',
             Headers({'User-Agent': ['Twisted Web Client Example'],
                      'Content-Type': ['multipart/form-data; boundary={}'.format(producer.boundary.decode('utf-8'))]
                      }),
