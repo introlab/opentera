@@ -62,7 +62,7 @@ WORKDIR /opentera/teraserver
 RUN ["/bin/bash", "-c", "cmake ."]
 RUN ["/bin/bash", "-c", "make python-all"]
 
-ENV PYTHON3_EXEC /opentera/teraserver/python/env/python-3.6/bin/python3
+ENV PYTHON3_EXEC /opentera/teraserver/python/env/python-3.8/bin/python3
 
 # Install nodejs package
 WORKDIR /opentera/teraserver/easyrtc
