@@ -36,7 +36,7 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
-        print('TeraWebSocketServerUserProtocol redisConnectionMade (redis)')
+        print('TeraWebSocketServerUserProtocol - redisConnectionMade (redis)', self)
 
         # This will wait until subscribe result is available...
         # Subscribe to messages to the websocket
@@ -81,7 +81,7 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
 
     def onMessage(self, msg, binary):
         # Handle websocket communication
-        print('TeraWebSocketServerUserProtocol onMessage (websocket in)', self, msg, binary)
+        print('TeraWebSocketServerUserProtocol - onMessage (websocket in)', self, msg, binary)
 
         # if binary:
         #     # Decode protobuf before parsing
@@ -163,30 +163,33 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
         """
         Cannot send message at this stage, needs to verify connection here.
         """
-        print('TeraWebSocketServerUserProtocol - onConnect')
+        print('TeraWebSocketServerUserProtocol - onConnect', self)
 
         if request.params.__contains__('id'):
 
             # Look for session id in
             my_id = request.params['id']
-            print('TeraWebSocketServerUserProtocol - testing id: ', my_id)
+            print('TeraWebSocketServerUserProtocol - testing id: ', my_id, self)
 
             value = self.redisGet(my_id[0])
 
             if value is not None:
                 # Needs to be converted from bytes to string to work
                 user_uuid = value.decode("utf-8")
-                print('TeraWebSocketServerUserProtocol - user uuid ', user_uuid)
+                print('TeraWebSocketServerUserProtocol - user uuid ', user_uuid, self)
 
                 # User verification
                 self.user = TeraUser.get_user_by_uuid(user_uuid)
                 if self.user is not None:
                     # Remove key
-                    print('TeraWebSocketServerUserProtocol - OK! removing key')
+                    print('TeraWebSocketServerUserProtocol - OK! removing key', self)
                     self.redisDelete(my_id[0])
 
                     # Create event manager
                     self.event_manager = UserEventManager(self.user)
+
+                    # log information
+                    self.logger.log_info(self, "User websocket connected", self.user.user_username, self.user.user_uuid)
 
                     return
 
@@ -197,6 +200,7 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
 
     @defer.inlineCallbacks
     def onClose(self, wasClean, code, reason):
+        print('TeraWebSocketServerUserProtocol - onClose', self, wasClean, code, reason)
         if self.user:
             # Advertise that user disconnected
             tera_message = self.create_tera_message(
@@ -230,11 +234,12 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
 
             ret = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
+            # log information
+            self.logger.log_info(self, "User websocket disconnected", self.user.user_username, self.user.user_uuid)
+
         # Unsubscribe to messages
         # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
         # print(ret)
-
-        print('onClose', self, wasClean, code, reason)
 
     def answer_topic(self):
         if self.user:

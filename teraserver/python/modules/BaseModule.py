@@ -2,7 +2,7 @@ from libtera.redis.RedisClient import RedisClient
 from libtera.ConfigManager import ConfigManager
 from enum import Enum, unique
 import messages.python as messages
-
+from libtera.logging.LoggingClient import LoggingClient
 
 import json
 import datetime
@@ -45,6 +45,9 @@ class BaseModule(RedisClient):
 
         # Store RPC API
         self.rpc_api = dict()
+
+        # Logger
+        self.logger = LoggingClient(config.redis_config)
 
         # Init redis with configuration
         RedisClient.__init__(self, config=config.redis_config)

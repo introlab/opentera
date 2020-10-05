@@ -81,24 +81,26 @@ class TwistedModule(BaseModule):
 
         # USERS
         wss_user_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % (self.config.server_config['hostname'],
-                                                          self.config.server_config['port']),
-                                                          redis_config=self.config.redis_config)
+                                                                                 self.config.server_config['port']),
+                                                               redis_config=self.config.redis_config)
 
         wss_user_factory.protocol = TeraWebSocketServerUserProtocol
         wss_user_resource = WebSocketResource(wss_user_factory)
 
         # PARTICIPANTS
-        wss_participant_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % (self.config.server_config['hostname'],
-                                                          self.config.server_config['port']),
-                                                          redis_config=self.config.redis_config)
+        wss_participant_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" %
+                                                                      (self.config.server_config['hostname'],
+                                                                       self.config.server_config['port']),
+                                                                      redis_config=self.config.redis_config)
 
         wss_participant_factory.protocol = TeraWebSocketServerParticipantProtocol
         wss_participant_resource = WebSocketResource(wss_participant_factory)
 
         # DEVICES
-        wss_device_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % (self.config.server_config['hostname'],
-                                                          self.config.server_config['port']),
-                                                          redis_config=self.config.redis_config)
+        wss_device_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" %
+                                                                 (self.config.server_config['hostname'],
+                                                                  self.config.server_config['port']),
+                                                                 redis_config=self.config.redis_config)
 
         wss_device_factory.protocol = TeraWebSocketServerDeviceProtocol
         wss_device_resource = WebSocketResource(wss_device_factory)
