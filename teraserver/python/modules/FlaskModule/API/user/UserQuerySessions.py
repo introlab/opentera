@@ -15,6 +15,7 @@ get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query')
 get_parser.add_argument('id_participant', type=int, help='ID of the participant from which to get all sessions')
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to get all sessions')
+get_parser.add_argument('session_uuid', type=str, help='Session UUID to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 # post_parser = reqparse.RequestParser()
@@ -60,6 +61,12 @@ class UserQuerySessions(Resource):
         elif args['id_user']:
             if args['id_user'] in user_access.get_accessible_users_ids():
                 sessions = TeraSession.get_sessions_for_user(args['id_user'])
+        elif args['session_uuid']:
+            sessions = TeraSession.get_session_by_uuid(args['session_uuid'])
+            if sessions and sessions.id_session not in user_access.get_accessible_sessions_ids():
+                sessions = []  # Current user doesn't have access to the requested session
+            else:
+                sessions = [sessions]
 
         try:
             sessions_list = []

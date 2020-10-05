@@ -203,7 +203,6 @@ class TeraSession(db.Model, BaseModel):
     @staticmethod
     def get_session_by_uuid(s_uuid):
         session = TeraSession.query.filter_by(session_uuid=s_uuid).first()
-
         if session:
             return session
 
