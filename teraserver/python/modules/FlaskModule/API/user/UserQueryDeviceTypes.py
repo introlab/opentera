@@ -1,19 +1,22 @@
 from flask import session, request
-from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
-from libtera.db.models import TeraDeviceType
-from modules.LoginModule.LoginModule import user_multi_auth
-from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraDeviceType import TeraDeviceType
-from sqlalchemy.exc import InvalidRequestError
+from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
+from sqlalchemy.exc import InvalidRequestError
+
+from libtera.db.models import TeraDeviceType
+from libtera.db.models.TeraDeviceType import TeraDeviceType
+from libtera.db.models.TeraUser import TeraUser
 from modules.DatabaseModule.DBManager import DBManager
+from modules.FlaskModule.FlaskModule import user_api_ns as api
+from modules.LoginModule.LoginModule import user_multi_auth
 
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_device_type', type=int, help='ID of the device type')
+get_parser.add_argument('device_type_key', type=str, help='Key of the device type')
 get_parser.add_argument('list', type=inputs.boolean, help='List of all device types')
+
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('device_type', type=str, location='json', help='Device type to create / update',
@@ -23,8 +26,9 @@ post_schema = api.schema_model('id_device_type', {'properties': TeraDeviceType.g
                                                   'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
-delete_parser.add_argument('id_device_type', type=int, help='Device type ID to delete')
-delete_parser.add_argument('device_type_key', type=str, help='Unique device key')
+delete_parser.add_argument('id', type=int, help='Device type ID to delete')
+delete_parser.add_argument('device_type_key', type=str, help='Unique device key to delete')
+
 
 
 class UserQueryDeviceTypes(Resource):
@@ -35,8 +39,8 @@ class UserQueryDeviceTypes(Resource):
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
-    @api.doc(description='Get devices types. Only one of the ID parameter is supported at once. If list True,'
-                         'return all the devices',
+    @api.doc(description='Get devices types. Only one of the ID parameter is supported at once.'
+                         ' The ID is dominant on the device_type_key',
              responses={200: 'Success - returns list of devices types',
                         400: 'No parameters specified at least one id must be used',
                         403: 'Forbidden access to the device type specified. Please check that the user has access to a'
@@ -45,31 +49,33 @@ class UserQueryDeviceTypes(Resource):
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
+
         parser = get_parser
         args = parser.parse_args()
-        device_types = []
+        device_type = []
 
         # If we have no arguments, return all accessible devices
-        if args['id_device_type'] is None and args['list'] is None:
-            return gettext('Missing parameters'), 400
-
-        if args['list']:
-            device_types = user_access.get_accessible_devices_types()
-
-        # elif args['device_type_key']
+        if args['id_device_type'] is None and args['device_type_key'] is None:
+            device_type = user_access.get_accessible_devices_types()
 
         elif args['id_device_type']:
-            device_types = TeraDeviceType.query.filter(TeraDeviceType.id_device_type.
-                                                       in_(user_access.get_accessible_devices_types_ids())). \
-                filter_by(id_device_type=args['id_device_type']).all()
-            if not args['id_device_type'] in user_access.get_accessible_devices_types_ids():
-                return gettext('No access to device type'), 403
+            if args['id_device_type'] in user_access.get_accessible_devices_types_ids():
+                device_type = [TeraDeviceType.get_device_type_by_id(args['id_device_type'])]
+            else:
+                return 'Unexisting ID/Forbidden access', 403
+        elif args['device_type_key']:
+            if args['device_type_key'] in user_access.get_accessible_devices_types_keys():
+                device_type = [TeraDeviceType.get_device_type_by_key(args['device_type_key'])]
+            else:
+                return 'Unexisting ID/Forbidden access', 403
         try:
-            device_types_list = []
-            for dt in device_types:
-                dt_json = dt.to_json()
-                device_types_list.append(dt_json)
-            return device_types_list
+            device_type_list = []
+            for dt in device_type:
+                if args['list']:
+                    device_type_list.append(dt.to_json(minimal=True))
+                else:
+                    device_type_list.append(dt.to_json())
+            return device_type_list
 
         except InvalidRequestError:
             return '', 500
@@ -82,11 +88,9 @@ class UserQueryDeviceTypes(Resource):
                         403: 'Logged user can\'t create/update the specified device type',
                         400: 'Badly formed JSON or missing fields(id_device_name or id_device_type) in the JSON '
                              'body',
-                        500: 'Internal error occured when saving device type',
-                        501: 'Device already created'})
+                        500: 'Internal error occured when saving device type',})
     def post(self):
         # parser = post_parser
-
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
@@ -97,21 +101,11 @@ class UserQueryDeviceTypes(Resource):
             return gettext('Missing id_device_type'), 400
 
         if json_device_type['id_device_type'] == 0:
-            try:
-                new_device_type = TeraDeviceType()
-                new_device_type.device_type_name = json_device_type['device_type_name']
-                new_device_type.device_type_key = json_device_type['device_type_key']
-                TeraDeviceType.insert(new_device_type)
-                return gettext('New device type created'), 200
-
-            except exc.SQLAlchemyError:
-                import sys
-                print(sys.exc_info())
-                return gettext('Device Already created'), 501
-
-        # Check if current user can modify the posted device
-        if json_device_type['id_device_type'] not in user_access.get_accessible_devices_types_ids(admin_only=True):
-            return gettext('Forbidden'), 403
+            if not current_user.user_superadmin:
+                return gettext('Forbidden'), 403
+        else:
+            if json_device_type['id_device_type'] not in user_access.get_accessible_devices_types_ids(admin_only=True):
+                return gettext('Forbidden'), 403
 
         # Do the update!
         if json_device_type['id_device_type'] > 0:
@@ -146,57 +140,37 @@ class UserQueryDeviceTypes(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete device type (can delete if site admin)',
                         500: 'Device type not found or database error.',
-                        501: 'Tried to delete two devices at the same time (Name != ID)'})
+                        501: 'Tried to delete with 2 parameters'})
     def delete(self):
         parser = delete_parser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
         args = parser.parse_args()
-        id_todel = args['id_device_type']
-        key_todel = args['device_type_key']
+        # if args['id'] is not None:
+        #     args['id_device_type'] = args['id']
 
         # Check if current user can delete
-        TeraDevice_todel_1 = TeraDeviceType.get_device_type_by_id(id_todel)
-        TeraDevice_todel_2 = TeraDeviceType.get_device_type_by_key(key_todel)
 
         # If not argument or both argument incorrect
-        if TeraDevice_todel_1 is None and TeraDevice_todel_2 is None:
+        if args['id'] and args['device_type_key']:
+            return gettext('Tried to delete with 2 parameters'), 501
+
+        elif args['id']:
+            device_type_to_del = TeraDeviceType.get_device_type_by_id(args['id'])
+
+        elif args['device_type_key']:
+            device_type_to_del = TeraDeviceType.get_device_type_by_key(args['device_type_key'])
+        else:
             return gettext('Device type not found'), 500
 
-        # ID present and name is blank
-        if TeraDevice_todel_2 is None:
-            if TeraDevice_todel_1.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
-                return gettext('Forbidden'), 403
+        if device_type_to_del.id_device_type in user_access.get_accessible_devices_types_ids():
             try:
-                TeraDeviceType.delete(id_todel=TeraDevice_todel_1.id_device_type)
+                TeraDeviceType.delete(id_todel=device_type_to_del.id_device_type)
             except exc.SQLAlchemyError:
                 import sys
                 print(sys.exc_info())
                 return gettext('Database error'), 500
-
-        # ID absent, name present
-        elif TeraDevice_todel_1 is None:
-            if TeraDevice_todel_2.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
-                return gettext('Forbidden'), 403
-            try:
-                TeraDeviceType.delete(id_todel=TeraDevice_todel_2.id_device_type)
-            except exc.SQLAlchemyError:
-                import sys
-                print(sys.exc_info())
-                return gettext('Database error'), 500
-
-        # both are present and are unequal
-        elif TeraDevice_todel_1.id_device_type != TeraDevice_todel_2.id_device_type:
-            return gettext('Tried to delete 2 different devices'), 501
-
-        # Both are the same device_type
-        elif TeraDevice_todel_1.id_device_type == TeraDevice_todel_2.id_device_type:
-            try:
-                TeraDeviceType.delete(id_todel=TeraDevice_todel_1.id_device_type)
-            except exc.SQLAlchemyError:
-                import sys
-                print(sys.exc_info())
-                return gettext('Database error'), 500
+        else:
+            return gettext('Forbidden'), 403
 
         return '', 200

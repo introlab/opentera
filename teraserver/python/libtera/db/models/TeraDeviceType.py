@@ -12,8 +12,6 @@ class TeraDeviceType(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields += ['DeviceTypeEnum']
-
         device_type_json = super().to_json(ignore_fields=ignore_fields)
 
         return device_type_json
@@ -23,22 +21,22 @@ class TeraDeviceType(db.Model, BaseModel):
         # For now Defaults are hard coded
 
         VIDEOCONFERENCE = TeraDeviceType()
-        VIDEOCONFERENCE.device_type_name = 'VIDEOCONFERENCE'
+        VIDEOCONFERENCE.device_type_name = 'Vidéoconférence'
         VIDEOCONFERENCE.device_type_key = 'videoconference'
         db.session.add(VIDEOCONFERENCE)
 
         CAPTEUR = TeraDeviceType()
-        CAPTEUR.device_type_name = 'CAPTEUR'
+        CAPTEUR.device_type_name = 'Capteur'
         CAPTEUR.device_type_key = 'capteur'
         db.session.add(CAPTEUR)
 
         ROBOT = TeraDeviceType()
-        ROBOT.device_type_name = 'ROBOT'
+        ROBOT.device_type_name = 'Robot'
         ROBOT.device_type_key = 'robot'
         db.session.add(ROBOT)
 
         BUREAU_ACTIF = TeraDeviceType()
-        BUREAU_ACTIF.device_type_name = 'BUREAU_ACTIF'
+        BUREAU_ACTIF.device_type_name = 'Bureau Actif'
         BUREAU_ACTIF.device_type_key = 'bureau_actif'
         db.session.add(BUREAU_ACTIF)
 
@@ -60,10 +58,6 @@ class TeraDeviceType(db.Model, BaseModel):
 
     @staticmethod
     def get_device_type_by_key(dev_type: str):
-        return TeraDeviceType.query.filter_by(device_type_key=dev_type).first()
-
-    @staticmethod
-    def get_device_type_by_type(dev_type: str):
         return TeraDeviceType.query.filter_by(device_type_key=dev_type).first()
 
     @staticmethod

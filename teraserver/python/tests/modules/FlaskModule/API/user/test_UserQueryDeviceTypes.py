@@ -1,4 +1,5 @@
 from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
+import random
 from libtera.db.models.TeraDeviceType import TeraDeviceType
 
 
@@ -26,7 +27,16 @@ class UserQueryDeviceTypesTest(BaseAPITest):
 
     def test_query_no_params_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
+        json_data = response.json()
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+
+    def _checkJson(self, json_data, minimal=False):
+        self.assertGreater(len(json_data), 0)
+        self.assertTrue(json_data.__contains__('id_device_type'))
+        self.assertTrue(json_data.__contains__('device_type_key'))
+        self.assertTrue(json_data.__contains__('device_type_name'))
 
     def test_query_get_as_admin(self):
         params = {'id_device_type': 0, 'list': False}
@@ -34,53 +44,61 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
+        self.assertEqual(len(json_data), 0)
 
-        params = {'id_device_type': 0, 'list': True}
+        # test an random device from the default values (1 through 4)
+        i = random.randint(1, 4)
+
+        params = {'id_device_type': i, 'list': False}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        self.assertEqual(len(json_data), 1)
+        self._checkJson(json_data=json_data[0])
 
-        for i in range(3):
-            params = {'id_device_type': i+1, 'list': False}
-            response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.headers['Content-Type'], 'application/json')
-            json_data = response.json()
-            self.assertEqual(len(json_data), 1)
-
-            params = {'id_device_type': i+1, 'list': True}
-            response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.headers['Content-Type'], 'application/json')
-            json_data = response.json()
-            self.assertEqual(len(json_data), 4)
+        params = {'id_device_type': i, 'list': True}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+        self._checkJson(json_data=json_data[0])
 
         params = {'id_device_type': 5, 'list': False}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 403)
 
-    def test_post_as_admin(self):
-        # This test should be run on a clean server (i.e. with only the defaults created)
-        # Else, the ID of the new devices created wont be aligned and the tests will fail
+    # @staticmethod
+    # def get_current_id(response):
+    #     json_data = response.json()[0]
+    #     current_id = json_data['id_device_type']
+    #     return current_id
 
+    # def test_query_get_as_user(self):
+    #     params = {'id_device_type': random.randint(1, 4), 'list': False}
+    #     response = self._request_with_http_auth(username='user1', password='user1', payload=params)
+    #     self.assertEqual(response.status_code, 200)
+
+    def test_query_post_as_admin(self):
+        new_id = []
         params = {'device_type': {'device_type_name': 'New_Device_Type',
                                   'id_device_type': 0,
                                   'device_type_key': 'new_device'}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
+        new_id.append(response.json()[0]['id_device_type'])
 
         # Create another instance of the same object - Fail Expected
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 501)
+        self.assertEqual(response.status_code, 500)
 
         # Create an instance of the same key - Fail expected
         params = {'device_type': {'device_type_name': 'New_Device_Type_2',
                                   'id_device_type': 0,
                                   'device_type_key': 'new_device'}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 501)
+        self.assertEqual(response.status_code, 500)
 
         # Create same name but different key ID = 8 - Pass expected
         params = {'device_type': {'device_type_name': 'New_Device_Type',
@@ -88,38 +106,63 @@ class UserQueryDeviceTypesTest(BaseAPITest):
                                   'device_type_key': 'new_device_2'}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
+        new_id.append(response.json()[0]['id_device_type'])
 
-        # update the key to key already created - Fail expected
+        # update the key to a already created key- Fail expected
         params = {'device_type': {'device_type_name': 'New_Device_Type',
-                                  'id_device_type': 8,
+                                  'id_device_type': new_id[1],
                                   'device_type_key': 'new_device'}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 500)
 
-        # update the key to key already created - pass expected
+        # update the key to available key - pass expected
         params = {'device_type': {'device_type_name': 'New_Device_Type',
-                                  'id_device_type': 8,
+                                  'id_device_type': new_id[1],
+                                  'device_type_key': 'new_device_3'}}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+        new_id[1] = response.json()[0]['id_device_type']
+
+        # update the name - Pass expected
+        params = {'device_type': {'device_type_name': 'NEW_DEVICE_TYPE',
+                                  'id_device_type': new_id[1],
                                   'device_type_key': 'new_device_3'}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
 
-        # update the name - Pass expexted
+        # Update the name of an unexisting device
         params = {'device_type': {'device_type_name': 'NEW_DEVICE_TYPE',
-                                  'id_device_type': 8,
+                                  'id_device_type': new_id[1]+1,
                                   'device_type_key': 'new_device_3'}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
+
+        # Update the name of an unexisting device (no ID)
+        params = {'device_type': {'device_type_name': 'NEW_DEVICE_TYPE',
+                                  'id_device_type': None,
+                                  'device_type_key': 'new_device_3'}}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
 
         # Delete the object created by the test
         params = {'device_type_key': 'new_device'}
-        response = self._delete_with_http_auth(username='admin', password='admin', payload=params)
+        response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
 
         params = {'device_type_key': 'new_device_3'}
-        response = self._delete_with_http_auth(username='admin', password='admin', payload=params)
+        response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
 
-    def test_delete_as_admin(self):
+    def test_query_post_as_user(self):
+        # create new device without admin auth
+        params = {'device_type': {'device_type_name': 'NEW_DEVICE_TYPE',
+                                  'id_device_type': 0,
+                                  'device_type_key': 'new_device'}}
+        response = self._post_with_http_auth(username='user1', password='user1', payload=params)
+        self.assertEqual(response.status_code, 401)
+
+    def test_query_delete_as_admin(self):
+        new_id = []
         # This test should be run on a clean server (i.e. with only the defaults created)
         # Else, the ID of the new devices created wont be aligned and the tests will fail
         # Create a new device type ID = 5
@@ -128,56 +171,54 @@ class UserQueryDeviceTypesTest(BaseAPITest):
                                   'device_type_key': 'new_device'}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
+        # new_id[0]
+        new_id.append(response.json()[0]['id_device_type'])
 
-        # ID = 6
         params = {'device_type': {'device_type_name': 'New_Device_Type',
                                   'id_device_type': 0,
                                   'device_type_key': 'new_device_1'}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
-
-        # ID = 7
-        params = {'device_type': {'device_type_name': 'New_Device_Type',
-                                  'id_device_type': 0,
-                                  'device_type_key': 'new_device_2'}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
+        # new_id[1]
+        new_id.append(response.json()[0]['id_device_type'])
 
         # Delete without params
         params = {}
-        response = self._delete_with_http_auth(username='admin', password='admin', payload=params)
+        response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 500)
 
         # Deleting the new device type
         params = {'device_type_key': 'new_device'}
-        response = self._delete_with_http_auth(username='admin', password='admin', payload=params)
+        response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
 
+        # Try deleting 2 devices at once
+        params = {'id': new_id[1], 'device_type_key': 'new_device_2'}
+        response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 501)
+
         # Deleting the new device 1 type
-        params = {'id_device_type': 6}
-        response = self._delete_with_http_auth(username='admin', password='admin', payload=params)
+        params = new_id[1]
+        response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=params)
         self.assertEqual(response.status_code, 200)
 
         # Try deleting again an unexisting Device type
-        params = {'id_device_type': 6}
-        response = self._delete_with_http_auth(username='admin', password='admin', payload=params)
+        params = {'id': new_id[1]}
+        response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 500)
 
-        # Try deleting 2 devices at once
-        params = {'id_device_type': 7, 'device_type_key': 'capteur'}
-        response = self._delete_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 501)
+    def test_query_delete_as_user(self):
 
-        # Deleting the same device with 2 parameters
-        params = {'id_device_type': 7, 'device_type_key': 'new_device_2'}
-        response = self._delete_with_http_auth(username='admin', password='admin', payload=params)
+        params = {'device_type': {'device_type_name': 'NEW_DEVICE_TYPE',
+                                  'id_device_type': 0,
+                                  'device_type_key': 'new_device'}}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
 
-    def _delete_with_http_auth(self, username, password, payload=None):
-        from requests import delete
-        if payload is None:
-            payload = {}
-        url = self._make_url(self.host, self.port, self.test_endpoint)
-        return delete(url=url, verify=False, auth=(username, password), params=payload)
+        params = {'device_type_key': 'new_device'}
+        response = self._delete_with_http_auth_plus(username='user1', password='user1', payload=params)
+        self.assertEqual(response.status_code, 401)
 
+        response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
 
