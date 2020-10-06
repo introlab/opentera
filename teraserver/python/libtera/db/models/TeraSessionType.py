@@ -115,15 +115,15 @@ class TeraSessionType(db.Model, BaseModel):
 
     @staticmethod
     def get_category_name(category: SessionCategoryEnum):
-        name = gettext('Inconue')
+        name = gettext('Unknown')
         if category == TeraSessionType.SessionCategoryEnum.SERVICE:
             name = gettext('Service')
         if category == TeraSessionType.SessionCategoryEnum.FILETRANSFER:
-            name = gettext('Envoi de fichiers')
+            name = gettext('File Transfer')
         if category == TeraSessionType.SessionCategoryEnum.DATACOLLECT:
-            name = gettext('Collecte de données')
+            name = gettext('Data Collect')
         if category == TeraSessionType.SessionCategoryEnum.PROTOCOL:
-            name = gettext('Protocole')
+            name = gettext('Protocol')
 
         return name
 

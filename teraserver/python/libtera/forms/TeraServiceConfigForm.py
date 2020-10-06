@@ -44,27 +44,27 @@ class TeraServiceConfigForm:
 
         if service_key == 'VideoRehabService':
             # Sections
-            section1 = TeraFormSection("main_audio_video", gettext("Configuration audio-vidéo"))
+            section1 = TeraFormSection("main_audio_video", gettext("Multimedia Configuration"))
             form.add_section(section1)
 
             # Items
-            section1.add_item(TeraFormItem("camera", gettext("Caméra"), "videoinputs", False))
-            item = TeraFormItem("teracam_type", gettext("Type de caméra"), "array", True,
-                                [TeraFormValue("0", gettext("Caméra réseau")),
-                                 TeraFormValue("1", gettext("Capture d'écran"))],
+            section1.add_item(TeraFormItem("camera", gettext("Camera"), "videoinputs", False))
+            item = TeraFormItem("teracam_type", gettext("Camera Type"), "array", True,
+                                [TeraFormValue("0", gettext("Network Camera")),
+                                 TeraFormValue("1", gettext("Screen Capture"))],
                                 "0", TeraFormItemCondition("camera", "=", "TeraCam"))
             section1.add_item(item)
 
-            item = TeraFormItem("teracam_src", gettext("Adresse du flux de la caméra"), "text", True,
+            item = TeraFormItem("teracam_src", gettext("RTSP URL"), "text", True,
                                 item_condition=TeraFormItemCondition("teracam_type", "=", 0))
             section1.add_item(item)
 
-            item = TeraFormItem("teracam_screen_fps", gettext("Trames par seconde"), "array", True,
+            item = TeraFormItem("teracam_screen_fps", gettext("Frames per second (FPS)"), "array", True,
                                 ["Maximum", "5", "10", "15",
                                  "20", "24", "30"],
                                 item_condition=TeraFormItemCondition("teracam_type", "=", 1))
             section1.add_item(item)
-            item = TeraFormItem("teracam_screen_res", gettext("Résolution"), "array", True,
+            item = TeraFormItem("teracam_screen_res", gettext("Resolution"), "array", True,
                                 ["Maximum", "160x120", "320x240",
                                  "640x480", "720x480", "800x600",
                                  "1024x768", "1280x720", "1440x900",
@@ -72,26 +72,26 @@ class TeraServiceConfigForm:
                                 item_condition=TeraFormItemCondition("teracam_type", "=", 1))
             section1.add_item(item)
 
-            section1.add_item(TeraFormItem("camera_ptz", gettext("Caméra contrôlable (PTZ)"), "boolean"))
-            item = TeraFormItem("camera_ptz_type", gettext("Type de contrôle"), "array", True,
+            section1.add_item(TeraFormItem("camera_ptz", gettext("Pan-Tilt-Zoom Camera"), "boolean"))
+            item = TeraFormItem("camera_ptz_type", gettext("Control Type"), "array", True,
                                 [TeraFormValue("0", gettext("Vivotek")),
-                                 TeraFormValue("1", gettext("ONVIF (générique)"))],
+                                 TeraFormValue("1", gettext("ONVIF (Generic)"))],
                                 item_condition=TeraFormItemCondition("camera_ptz", "=", True))
             section1.add_item(item)
-            item = TeraFormItem("camera_ptz_ip", gettext("Adresse réseau"), "text", True,
+            item = TeraFormItem("camera_ptz_ip", gettext("Network Address"), "text", True,
                                 item_condition=TeraFormItemCondition("camera_ptz", "=", True))
             section1.add_item(item)
             item = TeraFormItem("camera_ptz_port", gettext("Port"), "numeric", True,
                                 item_condition=TeraFormItemCondition("camera_ptz", "=", True))
             section1.add_item(item)
-            item = TeraFormItem("camera_ptz_username", gettext("Nom utilisateur"), "text", True,
+            item = TeraFormItem("camera_ptz_username", gettext("Username"), "text", True,
                                 item_condition=TeraFormItemCondition("camera_ptz", "=", True))
             section1.add_item(item)
-            item = TeraFormItem("camera_ptz_password", gettext("Mot de passe"), "password", True,
+            item = TeraFormItem("camera_ptz_password", gettext("Password"), "password", True,
                                 item_condition=TeraFormItemCondition("camera_ptz", "=", True))
             section1.add_item(item)
 
             section1.add_item(TeraFormItem("audio", gettext("Microphone"), "audioinputs", False))
-            section1.add_item(TeraFormItem("camera2", gettext("Caméra secondaire"), "videoinputs"))
+            section1.add_item(TeraFormItem("camera2", gettext("Secondary Camera"), "videoinputs"))
 
         return form.to_dict()

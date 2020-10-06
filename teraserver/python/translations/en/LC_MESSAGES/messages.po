@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-09-30 18:36-0400\n"
+"POT-Creation-Date: 2020-10-06 11:19-0400\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Generated-By: Babel 2.8.0\n"
 
 #: libtera/db/models/TeraSessionType.py:118
-msgid "Inconue"
+msgid "Unknown"
 msgstr ""
 
 #: libtera/db/models/TeraSessionType.py:120
@@ -28,15 +28,15 @@ msgid "Service"
 msgstr ""
 
 #: libtera/db/models/TeraSessionType.py:122
-msgid "Envoi de fichiers"
+msgid "File Transfer"
 msgstr ""
 
 #: libtera/db/models/TeraSessionType.py:124
-msgid "Collecte de données"
+msgid "Data Collect"
 msgstr ""
 
 #: libtera/db/models/TeraSessionType.py:126
-msgid "Protocole"
+msgid "Protocol"
 msgstr ""
 
 #: libtera/forms/TeraDeviceForm.py:24
@@ -85,6 +85,7 @@ msgid "Last Connection"
 msgstr ""
 
 #: libtera/forms/TeraDeviceForm.py:47 libtera/forms/TeraDeviceSubTypeForm.py:24
+#: libtera/forms/TeraDeviceTypeForm.py:17
 #: libtera/forms/TeraParticipantForm.py:19
 #: libtera/forms/TeraParticipantGroupForm.py:19
 #: libtera/forms/TeraProjectForm.py:19
@@ -92,6 +93,7 @@ msgstr ""
 #: libtera/forms/TeraServiceForm.py:18 libtera/forms/TeraSessionForm.py:50
 #: libtera/forms/TeraSessionTypeForm.py:33 libtera/forms/TeraSiteForm.py:12
 #: libtera/forms/TeraUserForm.py:13 libtera/forms/TeraUserGroupForm.py:18
+#: libtera/forms/TeraVersionsForm.py:18
 msgid "Information"
 msgstr ""
 
@@ -121,7 +123,16 @@ msgid "Device Sub-Type Name"
 msgstr ""
 
 #: libtera/forms/TeraDeviceSubTypeForm.py:32
+#: libtera/forms/TeraDeviceTypeForm.py:21
 msgid "Device Type ID"
+msgstr ""
+
+#: libtera/forms/TeraDeviceTypeForm.py:23
+msgid "Device Type Name"
+msgstr ""
+
+#: libtera/forms/TeraDeviceTypeForm.py:25
+msgid "Device Type Key"
 msgstr ""
 
 #: libtera/forms/TeraParticipantForm.py:23
@@ -229,43 +240,43 @@ msgid "Service Config"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:47
-msgid "Configuration audio-vidéo"
+msgid "Multimedia Configuration"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:51
-msgid "Caméra"
+msgid "Camera"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:52
-msgid "Type de caméra"
+msgid "Camera Type"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:53
-msgid "Caméra réseau"
+msgid "Network Camera"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:54
-msgid "Capture d'écran"
+msgid "Screen Capture"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:58
-msgid "Adresse du flux de la caméra"
+msgid "RTSP URL"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:62
-msgid "Trames par seconde"
+msgid "Frames per second (FPS)"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:67
-msgid "Résolution"
+msgid "Resolution"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:75
-msgid "Caméra contrôlable (PTZ)"
+msgid "Pan-Tilt-Zoom Camera"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:76
-msgid "Type de contrôle"
+msgid "Control Type"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:77
@@ -273,23 +284,23 @@ msgid "Vivotek"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:78
-msgid "ONVIF (générique)"
+msgid "ONVIF (Generic)"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:81
-msgid "Adresse réseau"
+msgid "Network Address"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:84
 msgid "Port"
 msgstr ""
 
-#: libtera/forms/TeraServiceConfigForm.py:87
-msgid "Nom utilisateur"
+#: libtera/forms/TeraServiceConfigForm.py:87 libtera/forms/TeraUserForm.py:20
+msgid "Username"
 msgstr ""
 
-#: libtera/forms/TeraServiceConfigForm.py:90
-msgid "Mot de passe"
+#: libtera/forms/TeraServiceConfigForm.py:90 libtera/forms/TeraUserForm.py:26
+msgid "Password"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:94
@@ -297,7 +308,7 @@ msgid "Microphone"
 msgstr ""
 
 #: libtera/forms/TeraServiceConfigForm.py:95
-msgid "Caméra secondaire"
+msgid "Secondary Camera"
 msgstr ""
 
 #: libtera/forms/TeraServiceForm.py:26
@@ -472,10 +483,6 @@ msgstr ""
 msgid "User Full Name"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:20
-msgid "Username"
-msgstr ""
-
 #: libtera/forms/TeraUserForm.py:21
 msgid "User Enabled"
 msgstr ""
@@ -492,10 +499,6 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: libtera/forms/TeraUserForm.py:26
-msgid "Password"
-msgstr ""
-
 #: libtera/forms/TeraUserForm.py:27
 msgid "User Is Super Administrator"
 msgstr ""
@@ -510,6 +513,58 @@ msgstr ""
 
 #: libtera/forms/TeraUserGroupForm.py:24
 msgid "User Group Name"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:22
+msgid "OpenTeraServer version string"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:25
+msgid "OpenTeraServer major version number"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:28
+msgid "OpenTeraServer minor version number"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:31
+msgid "OpenTeraServer patch version number"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:44
+msgid "Versions"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:46
+msgid "Client name"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:49
+msgid "Client description"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:52
+msgid "Client version"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:55
+msgid "Client documentation url"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:58
+msgid "Client windows version"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:61
+msgid "Client mac version"
+msgstr ""
+
+#: libtera/forms/TeraVersionsForm.py:64
+msgid "Client linux version"
+msgstr ""
+
+#: modules/FlaskModule/API/device/DeviceLogin.py:44
+msgid "Device already logged in."
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceLogout.py:18
@@ -628,9 +683,9 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:152
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:164
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:243
-#: modules/FlaskModule/API/user/UserQuerySessions.py:148
-#: modules/FlaskModule/API/user/UserQuerySessions.py:160
-#: modules/FlaskModule/API/user/UserQuerySessions.py:230
+#: modules/FlaskModule/API/user/UserQuerySessions.py:155
+#: modules/FlaskModule/API/user/UserQuerySessions.py:167
+#: modules/FlaskModule/API/user/UserQuerySessions.py:237
 #: modules/FlaskModule/API/user/UserQuerySiteAccess.py:237
 #: modules/FlaskModule/API/user/UserQuerySiteAccess.py:277
 #: modules/FlaskModule/API/user/UserQuerySites.py:133
@@ -653,12 +708,16 @@ msgstr ""
 msgid "Invalid request"
 msgstr ""
 
-#: modules/FlaskModule/API/device/DeviceRegister.py:123
-#: modules/FlaskModule/API/device/DeviceRegister.py:140
+#: modules/FlaskModule/API/device/DeviceRegister.py:131
+#: modules/FlaskModule/API/device/DeviceRegister.py:148
 msgid "Invalid content type"
 msgstr ""
 
-#: modules/FlaskModule/API/participant/ParticipantLogin.py:74
+#: modules/FlaskModule/API/participant/ParticipantLogin.py:46
+msgid "Participant already logged in."
+msgstr ""
+
+#: modules/FlaskModule/API/participant/ParticipantLogin.py:83
 msgid "Missing current_participant"
 msgstr ""
 
@@ -758,18 +817,22 @@ msgid "Missing session id"
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:89
-#: modules/FlaskModule/API/user/UserQuerySessions.py:97
+#: modules/FlaskModule/API/user/UserQuerySessions.py:104
 msgid "Missing session"
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:95
-#: modules/FlaskModule/API/user/UserQuerySessions.py:103
+#: modules/FlaskModule/API/user/UserQuerySessions.py:110
 msgid "Missing id_session"
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:125
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:92
 msgid "Missing id_session_type"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLogin.py:54
+msgid "User already logged in."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserLogout.py:19
@@ -785,6 +848,7 @@ msgid "Error uploading file"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryAssets.py:212
+#: modules/FlaskModule/API/user/UserQueryVersions.py:58
 msgid "Not authorized"
 msgstr ""
 
@@ -820,6 +884,7 @@ msgid "Missing id_device or id_site"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDeviceSubTypes.py:54
+#: modules/FlaskModule/API/user/UserSessionManager.py:151
 msgid "Missing parameters"
 msgstr ""
 
@@ -869,11 +934,11 @@ msgid ""
 "before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryForms.py:104
+#: modules/FlaskModule/API/user/UserQueryForms.py:111
 msgid "Invalid service id"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryForms.py:109
+#: modules/FlaskModule/API/user/UserQueryForms.py:119
 msgid "Unknown form type: "
 msgstr ""
 
@@ -1086,22 +1151,22 @@ msgid ""
 "before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:112
+#: modules/FlaskModule/API/user/UserQuerySessions.py:119
 msgid "Missing session participants and users"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:128
-#: modules/FlaskModule/API/user/UserQuerySessions.py:212
+#: modules/FlaskModule/API/user/UserQuerySessions.py:135
+#: modules/FlaskModule/API/user/UserQuerySessions.py:219
 msgid "User doesn't have access to at least one participant of that session."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:133
-#: modules/FlaskModule/API/user/UserQuerySessions.py:217
+#: modules/FlaskModule/API/user/UserQuerySessions.py:140
+#: modules/FlaskModule/API/user/UserQuerySessions.py:224
 msgid "User doesn't have access to at least one user of that session."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:138
-#: modules/FlaskModule/API/user/UserQuerySessions.py:222
+#: modules/FlaskModule/API/user/UserQuerySessions.py:145
+#: modules/FlaskModule/API/user/UserQuerySessions.py:229
 msgid "User doesn't have access to at least one device of that session."
 msgstr ""
 
@@ -1224,23 +1289,41 @@ msgid ""
 "deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:109
+#: modules/FlaskModule/API/user/UserSessionManager.py:112
 msgid "Missing action"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:122
+#: modules/FlaskModule/API/user/UserSessionManager.py:126
+#: modules/FlaskModule/API/user/UserSessionManager.py:139
+msgid "Invalid session"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserSessionManager.py:133
+msgid "User doesn't have access to that session"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserSessionManager.py:146
 msgid "User doesn't have access to that service."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:130
+#: modules/FlaskModule/API/user/UserSessionManager.py:154
+msgid "Missing reply code in parameters"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserSessionManager.py:167
+#: modules/FlaskModule/API/user/UserSessionManager.py:170
+msgid "Invalid reply code"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserSessionManager.py:178
 msgid "Service not found"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:135
+#: modules/FlaskModule/API/user/UserSessionManager.py:183
 msgid "Not implemented yet"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:196
+#: modules/FlaskModule/API/user/UserSessionManager.py:244
 msgid "No answer from service."
 msgstr "Pas de réponse du service."
 
@@ -1321,5 +1404,65 @@ msgstr "Jeton invalide"
 #~ msgstr ""
 
 #~ msgid "No filename specified"
+#~ msgstr ""
+
+#~ msgid "Inconue"
+#~ msgstr ""
+
+#~ msgid "Envoi de fichiers"
+#~ msgstr ""
+
+#~ msgid "Collecte de données"
+#~ msgstr ""
+
+#~ msgid "Protocole"
+#~ msgstr ""
+
+#~ msgid "Caméra"
+#~ msgstr ""
+
+#~ msgid "Caméra réseau"
+#~ msgstr ""
+
+#~ msgid "Capture d'écran"
+#~ msgstr ""
+
+#~ msgid "Adresse du flux de la caméra"
+#~ msgstr ""
+
+#~ msgid "Trames par seconde"
+#~ msgstr ""
+
+#~ msgid "Résolution"
+#~ msgstr ""
+
+#~ msgid "Caméra contrôlable (PTZ)"
+#~ msgstr ""
+
+#~ msgid "Type de contrôle"
+#~ msgstr ""
+
+#~ msgid "ONVIF (générique)"
+#~ msgstr ""
+
+#~ msgid "Adresse réseau"
+#~ msgstr ""
+
+#~ msgid "Nom utilisateur"
+#~ msgstr ""
+
+#~ msgid "Mot de passe"
+#~ msgstr ""
+
+#~ msgid "Caméra secondaire"
+#~ msgstr ""
+
+#~ msgid "RSTP URL"
+#~ msgstr ""
+
+#~ msgid "Configuration audio-vidéo"
+#~ msgstr ""
+
+#~ msgid "Type de caméra"
 #~ msgstr ""
 
