@@ -69,17 +69,6 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 403)
 
-    # @staticmethod
-    # def get_current_id(response):
-    #     json_data = response.json()[0]
-    #     current_id = json_data['id_device_type']
-    #     return current_id
-
-    # def test_query_get_as_user(self):
-    #     params = {'id_device_type': random.randint(1, 4), 'list': False}
-    #     response = self._request_with_http_auth(username='user1', password='user1', payload=params)
-    #     self.assertEqual(response.status_code, 200)
-
     def test_query_post_as_admin(self):
         new_id = []
         params = {'device_type': {'device_type_name': 'New_Device_Type',
@@ -144,7 +133,7 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 403)
 
-        # Delete the object created by the test
+        # Delete the objects created by the test
         params = {'device_type_key': 'new_device'}
         response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
@@ -165,7 +154,6 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         new_id = []
         # This test should be run on a clean server (i.e. with only the defaults created)
         # Else, the ID of the new devices created wont be aligned and the tests will fail
-        # Create a new device type ID = 5
         params = {'device_type': {'device_type_name': 'New_Device_Type',
                                   'id_device_type': 0,
                                   'device_type_key': 'new_device'}}

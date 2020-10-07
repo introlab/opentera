@@ -146,11 +146,7 @@ class UserQueryDeviceTypes(Resource):
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         args = parser.parse_args()
-        # if args['id'] is not None:
-        #     args['id_device_type'] = args['id']
-
-        # Check if current user can delete
-
+        # To accomodate the 'delete_with_http_auth' function which uses id as args, the id_device_type is rename as id
         # If not argument or both argument incorrect
         if args['id'] and args['device_type_key']:
             return gettext('Tried to delete with 2 parameters'), 501
