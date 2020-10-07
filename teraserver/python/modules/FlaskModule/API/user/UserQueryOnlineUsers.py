@@ -40,7 +40,7 @@ class UserQueryOnlineUsers(Resource):
             users = TeraUser.query.filter(TeraUser.user_uuid.in_(online_user_uuids)).all()
             users_json = [user.to_json(minimal=True) for user in users]
             for user in users_json:
-                user['user_status'] = 'online'
+                user['user_online'] = True
 
             # Also query busy users?
             if args['with_busy']:
@@ -53,7 +53,7 @@ class UserQueryOnlineUsers(Resource):
                 busy_users = TeraUser.query.filter(TeraUser.user_uuid.in_(busy_user_uuids)).all()
                 busy_users_json = [user.to_json(minimal=True) for user in busy_users]
                 for user in busy_users_json:
-                    user['user_status'] = 'busy'
+                    user['user_busy'] = True
                 users_json.extend(busy_users_json)
 
             return users_json

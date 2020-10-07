@@ -50,7 +50,7 @@ class UserQueryOnlineParticipants(Resource):
             participants = TeraParticipant.query.filter(TeraParticipant.participant_uuid.in_(online_part_uuids)).all()
             parts_json = [part.to_json(minimal=True) for part in participants]
             for part in parts_json:
-                part['participant_status'] = 'online'
+                part['participant_online'] = True
 
             # Also query busy participants?
             if args['with_busy']:
@@ -63,7 +63,7 @@ class UserQueryOnlineParticipants(Resource):
                 busy_parts = TeraParticipant.query.filter(TeraParticipant.participant_uuid.in_(busy_part_uuids)).all()
                 busy_parts_json = [part.to_json(minimal=True) for part in busy_parts]
                 for part in busy_parts_json:
-                    part['participant_status'] = 'busy'
+                    part['participant_busy'] = True
                 parts_json.extend(busy_parts_json)
 
             return parts_json
