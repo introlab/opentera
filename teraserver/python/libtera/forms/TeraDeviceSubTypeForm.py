@@ -17,7 +17,7 @@ class TeraDeviceSubTypeForm:
         device_types = TeraDeviceType.get_devices_types()
         device_types_list = []
         for dev_type in device_types:
-            name = gettext(dev_type.get_name())
+            name = gettext(dev_type.device_type_name)
             device_types_list.append(TeraFormValue(value_id=dev_type.id_device_type, value=name))
 
         # Sections
