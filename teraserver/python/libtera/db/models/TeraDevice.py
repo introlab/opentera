@@ -177,7 +177,7 @@ class TeraDevice(db.Model, BaseModel):
         device.device_name = 'Apple Watch #W05P1'
         # Forcing uuid for tests
         device.device_uuid = 'b707e0b2-e649-47e7-a938-2b949c423f73'  # str(uuid.uuid4())
-        device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
+        device.device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
         # device.create_token()
         device.device_enabled = True
         device.device_onlineable = True
@@ -188,7 +188,7 @@ class TeraDevice(db.Model, BaseModel):
         device2 = TeraDevice()
         device2.device_name = 'Kit Télé #1'
         device2.device_uuid = str(uuid.uuid4())
-        device2.device_type = TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value
+        device2.device_type = TeraDeviceType.get_device_type_by_key('videoconference').id_device_type
         # device2.create_token()
         device2.device_enabled = True
         device2.device_onlineable = True
@@ -200,7 +200,7 @@ class TeraDevice(db.Model, BaseModel):
         device3 = TeraDevice()
         device3.device_name = 'Robot A'
         device3.device_uuid = str(uuid.uuid4())
-        device3.device_type = TeraDeviceType.DeviceTypeEnum.ROBOT.value
+        device3.device_type = TeraDeviceType.get_device_type_by_key('robot').id_device_type
         # device3.create_token()
         device3.device_enabled = True
         device3.device_onlineable = True
