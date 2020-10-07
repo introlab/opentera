@@ -90,3 +90,14 @@ function calculateContainsWindow(image){
   }
   return coordinates;
 }
+
+function include(filename)
+{
+  let head = document.getElementsByTagName('head')[0];
+
+  let script = document.createElement('script');
+  script.src = filename;
+  script.type = 'text/javascript';
+
+  head.appendChild(script)
+}

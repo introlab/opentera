@@ -86,6 +86,15 @@ function showAllButtons(show){
     showButtons(false, show,4);
 }
 
+function showSecondaryLocalSourcesIcons(show_add_button, show_remove_button){
+    (show_add_button) ? showElement('imgAddLocalVideo2') : hideElement('imgAddLocalVideo2');
+    (show_remove_button) ? showElement('imgRemoveLocalVideo2') : hideElement('imgRemoveLocalVideo2');
+}
+
+function showLocalVideoMirror(mirror){
+    (mirror === true) ? $('#localVideo1').addClass('easyrtcMirror') : $('#localVideo1').removeClass('easyrtcMirror');
+}
+
 function hideElement(id){
     $("#"+id).hide();
 }
@@ -125,4 +134,64 @@ function updateStatusIconState(status, local, index, prefix){
 function swapViews(){
     console.warn('SwapViews: Feature not currently enabled.');
 
+}
+
+function setConfigDialogValues(audios, videos, config){
+    // Main video source selector
+    let videoSelect = $('#videoSelect')[0];
+    videoSelect.options.length = 0;
+
+    // Main audio source selector
+    let audioSelect = $('#audioSelect')[0];
+    audioSelect.options.length = 0;
+
+    // Secondary video source selector
+    let videoSelect2 = $('#videoSelect2')[0];
+    videoSelect2.options.length = 0;
+    videoSelect2.options[videoSelect2.options.length] = new Option("Aucune", "0");
+
+    // Secondary audio source selector
+    let audioSelect2 = $('#audioSelect2')[0];;
+    audioSelect2.options.length = 0;
+    audioSelect2.options[audioSelect2.options.length] = new Option("Aucune", "0");
+
+    // Mirror toggle
+    let mirrorCheck = $('#mirrorCheck')[0];
+    mirrorCheck.checked = currentConfig['video1Mirror'];
+
+    // Fill lists
+    audios.forEach(audio => {
+            let name = audio.label;
+            if (name === "") name = audio.deviceId;
+            audioSelect.options[audioSelect.options.length] = new Option(name.substr(0,50), audio.deviceId);
+            audioSelect2.options[audioSelect2.options.length] = new Option(name.substr(0,50), audio.deviceId);
+    });
+
+    videos.forEach(video => {
+        let name = video.label;
+        if (name === "") name = video.deviceId;
+        videoSelect.options[videoSelect.options.length] = new Option(name.substr(0,50), video.deviceId);
+        videoSelect2.options[videoSelect2.options.length] = new Option(name.substr(0,50), video.deviceId);
+    });
+
+    videoSelect.selectedIndex = config['currentVideoSourceIndex'];
+    videoSelect2.selectedIndex = config['currentVideoSource2Index']+1;
+    audioSelect.selectedIndex = config['currentAudioSourceIndex'];
+    audioSelect2.selectedIndex = config['currentAudioSource2Index']+1;
+
+}
+
+function showError(err_context, err_msg, ui_display){
+    console.error(err_context + ": " + err_msg);
+
+    // TODO: Display in UI
+}
+
+
+function setTitle(local, index, title){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let label = $('#' + view_prefix + 'ViewTitle' + index);
+    if (label.length){
+        label[0].innerText = title;
+    }
 }

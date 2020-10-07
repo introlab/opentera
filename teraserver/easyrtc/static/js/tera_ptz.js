@@ -1,4 +1,5 @@
 let debounceWheel = 0;
+var localPTZCapabilities = {'uuid':0, 'zoom':false,'presets':false,'settings':false};
 
 function managePTZMouseWheel(event, local, index){
     // Ignore events for 500 ms
