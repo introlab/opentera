@@ -71,22 +71,6 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
 
             print(ret1, ret2, ret3)
 
-    def onMessage(self, msg, binary):
-        # Handle websocket communication
-        # TODO use protobuf ?
-        print('TeraWebSocketServerParticipantProtocol - onMessage', self, msg, binary)
-
-        # if binary:
-        #     # Decode protobuf before parsing
-        #     pass
-        #
-        # # Parse JSON (protobuf content)
-        # try:
-        #     message = Parse(msg, messages.TeraModuleMessage())
-        #     # self.publish(message.head.dest, message)
-        # except ParseError:
-        #     print('TeraWebSocketServerParticipantProtocol - TeraModuleMessage parse error...')
-
     def onConnect(self, request):
         """
         Cannot send message at this stage, needs to verify connection here.

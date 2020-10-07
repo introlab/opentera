@@ -48,7 +48,7 @@ class UserQueryOnlineDevices(Resource):
             devices = TeraDevice.query.filter(TeraDevice.device_uuid.in_(online_device_uuids)).all()
             devices_json = [device.to_json(minimal=True) for device in devices]
             for device in devices_json:
-                device['device_status'] = 'online'
+                device['device_online'] = True
 
             # Also query busy devices?
             if args['with_busy']:
@@ -61,7 +61,7 @@ class UserQueryOnlineDevices(Resource):
                 busy_devices = TeraDevice.query.filter(TeraDevice.device_uuid.in_(busy_device_uuids)).all()
                 busy_devices_json = [device.to_json(minimal=True) for device in busy_devices]
                 for device in busy_devices_json:
-                    device['device_status'] = 'busy'
+                    device['device_busy'] = True
                 devices_json.extend(busy_devices_json)
 
             return devices_json

@@ -40,6 +40,11 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
         # Should we do something?
         pass
 
+    def onMessage(self, msg, binary):
+        # Handle websocket communication
+        print('TeraWebSocketServerProtocol - onMessage (websocket in)', self, msg, binary)
+        self.sendMessage(str('Not allowed to send message').encode('utf-8'), False)
+
     def onOpenHandshakeTimeout(self):
         print('TeraWebSocketServerProtocol - onOpenHandshakeTimeout', self)
 

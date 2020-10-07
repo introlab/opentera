@@ -20,22 +20,15 @@ from twisted.internet.ssl import ClientContextFactory
 
 class TeraDeviceWebsocketProtocol(WebSocketClientProtocol):
 
-    # def onOpen(self):
-    #     print('onOpen')
+    def onMessage(self, payload, isBinary):
+        print('onMessage', payload, isBinary)
+        pass
 
-    def onConnect(self, response):
-        print('onConnect', response)
+    def onOpen(self):
+        super().onOpen()
 
-    def connectionMade(self):
-        print('connectionMade')
-        super().connectionMade()
-
-    def connectionLost(self, reason):
-        print('connectionLost', reason)
-        super().connectionLost(reason)
-
-    def dataReceived(self, data):
-        print('dataReceived:', data)
+    def onClose(self, wasClean, code, reason):
+        super().onClose(wasClean, code, reason)
 
 
 def verify_callback(connection, x509, errnum, errdepth, ok):
@@ -129,6 +122,7 @@ def login_callback(response):
             connectWS(factory, context)
     else:
         print('Error login', response.code, response.phrase)
+
 
 if __name__ == '__main__':
     # Logging to stdout
