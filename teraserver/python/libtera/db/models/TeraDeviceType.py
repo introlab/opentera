@@ -16,6 +16,9 @@ class TeraDeviceType(db.Model, BaseModel):
 
         return device_type_json
 
+    def get_name(self) -> str:
+        return self.device_type_name
+
     @staticmethod
     def create_defaults():
         # For now Defaults are hard coded
