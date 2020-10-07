@@ -28,12 +28,45 @@ class TeraDeviceWebsocketProtocol(WebSocketClientProtocol):
 
     def connectionMade(self):
         print('connectionMade')
+        super().connectionMade()
 
     def connectionLost(self, reason):
         print('connectionLost', reason)
+        super().connectionLost(reason)
 
     def dataReceived(self, data):
         print('dataReceived:', data)
+
+
+def verify_callback(connection, x509, errnum, errdepth, ok):
+    print('verify_callback')
+
+    if not ok:
+        print('Invalid cert from subject:', connection, x509.get_subject(), errnum, errdepth, ok)
+        return True
+    else:
+        print("Certs are fine", connection, x509.get_subject(), errnum, errdepth, ok)
+
+    return True
+
+
+class TeraDeviceClientContextFactory(ClientContextFactory):
+    def __init__(self, key, cert, ca):
+        self.key = key
+        self.cert = cert
+        self.ca = ca
+
+    def getContext(self):
+        ctx = self._contextFactory(self.method)
+        # See comment in DefaultOpenSSLContextFactory about SSLv2.
+        ctx.use_certificate(self.cert)
+        ctx.use_privatekey(self.key)
+        ctx.add_client_ca(self.ca)
+        ctx.add_extra_chain_cert(self.ca)
+        # options = ssl.CertificateOptions(privateKey=self.key, certificate=self.cert, verify=False)
+        ctx.set_verify(OpenSSL.SSL.VERIFY_NONE, verify_callback)
+        ctx.set_options(OpenSSL.SSL.OP_NO_SSLv2)
+        return ctx
 
 
 @implementer(IPolicyForHTTPS)
@@ -75,13 +108,14 @@ def login_callback(response):
             print('Should connect to websocket URL : ', websocket_url)
             # factory = Factory.forProtocol(TeraDeviceWebsocketClient)
 
+            # factory = WebSocketClientFactory(websocket_url)
             factory = WebSocketClientFactory(websocket_url)
             factory.protocol = TeraDeviceWebsocketProtocol
 
             # Read CA certificate from file
-            with open('ca_certificate.pem') as ca_cert:
-                trust_root = ssl.Certificate.loadPEM(ca_cert.read())
-
+            with open('ca_certificate.pem') as f:
+                # trust_root = ssl.Certificate.loadPEM(f.read())
+                trust_root = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, f.read())
             # Read device cert & key from file
             with open('private_key.pem') as f:
                 key = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, f.read())
@@ -90,10 +124,11 @@ def login_callback(response):
 
             # We need to attach the client and server certificates to our websocket
             # factory so it can successfully connect to the remote API.
-            options = ssl.CertificateOptions(privateKey=key, certificate=cert)
-            context = ssl.ClientContextFactory()
-            connectWS(factory, context)
 
+            context = TeraDeviceClientContextFactory(key, cert, trust_root)
+            connectWS(factory, context)
+    else:
+        print('Error login', response.code, response.phrase)
 
 if __name__ == '__main__':
     # Logging to stdout

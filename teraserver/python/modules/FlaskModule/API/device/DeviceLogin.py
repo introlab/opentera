@@ -35,6 +35,7 @@ class DeviceLogin(Resource):
         port = self.module.config.server_config['port']
 
         current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
+        current_device.update_last_online()
         args = get_parser.parse_args()
 
         # Verify if device already logged in

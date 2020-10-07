@@ -139,11 +139,7 @@ class TeraDevice(db.Model, BaseModel):
     @staticmethod
     def get_device_by_uuid(dev_uuid):
         device = TeraDevice.query.filter_by(device_uuid=dev_uuid).first()
-        if device:
-            device.update_last_online()
-            return device
-
-        return None
+        return device
 
     @staticmethod
     def get_device_by_name(name):
