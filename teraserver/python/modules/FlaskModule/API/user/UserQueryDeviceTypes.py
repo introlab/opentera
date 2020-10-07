@@ -62,12 +62,12 @@ class UserQueryDeviceTypes(Resource):
             if args['id_device_type'] in user_access.get_accessible_devices_types_ids():
                 device_type = [TeraDeviceType.get_device_type_by_id(args['id_device_type'])]
             else:
-                return 'Unexisting ID/Forbidden access', 403
+                return gettext('Unexisting ID/Forbidden access'), 403
         elif args['device_type_key']:
             if args['device_type_key'] in user_access.get_accessible_devices_types_keys():
                 device_type = [TeraDeviceType.get_device_type_by_key(args['device_type_key'])]
             else:
-                return 'Unexisting ID/Forbidden access', 403
+                return gettext('Unexisting ID/Forbidden access'), 403
         try:
             device_type_list = []
             for dt in device_type:
@@ -78,7 +78,7 @@ class UserQueryDeviceTypes(Resource):
             return device_type_list
 
         except InvalidRequestError:
-            return '', 500
+            return gettext('Database Error'), 500
 
     @user_multi_auth.login_required
     @api.expect(post_schema)

@@ -49,16 +49,16 @@ class TeraDeviceType(db.Model, BaseModel):
         return TeraDeviceType.query.filter_by(id_device_type=dev_type).first()
 
     @staticmethod
-    def get_device_type_by_id(dev_type: int):
-        return TeraDeviceType.query.filter_by(id_device_type=dev_type).first()
+    def get_device_type_by_id(dev_id: int):
+        return TeraDeviceType.query.filter_by(id_device_type=dev_id).first()
 
     @staticmethod
-    def get_device_type_by_name(dev_type: str):
-        return TeraDeviceType.query.filter_by(device_type_name=dev_type).all()
+    def get_device_type_by_name(dev_name: str):
+        return TeraDeviceType.query.filter_by(device_type_name=dev_name).all()
 
     @staticmethod
-    def get_device_type_by_key(dev_type: str):
-        return TeraDeviceType.query.filter_by(device_type_key=dev_type).first()
+    def get_device_type_by_key(dev_key: str):
+        return TeraDeviceType.query.filter_by(device_type_key=dev_key).first()
 
     @staticmethod
     def commit():
