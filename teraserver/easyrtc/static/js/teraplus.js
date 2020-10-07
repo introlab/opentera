@@ -418,8 +418,6 @@ function fillDefaultSourceList(){
 	.catch(function(err) {
 		console.error(err.name + ": " + err.message);
 	});
-	
-
 }
 
 function fillVideoSourceList(list){
