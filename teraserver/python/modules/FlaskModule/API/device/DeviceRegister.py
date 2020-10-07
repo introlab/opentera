@@ -57,7 +57,7 @@ class DeviceRegister(Resource):
         device.device_onlineable = False
         # TODO WARNING - Should be disabled when created...
         device.device_enabled = False
-        device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
+        device.device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
         device.device_uuid = str(uuid.uuid4())
         device.create_token()
         device.update_last_online()

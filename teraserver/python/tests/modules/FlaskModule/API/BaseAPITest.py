@@ -58,6 +58,12 @@ class BaseAPITest(unittest.TestCase):
         url = self._make_url(self.host, self.port, self.test_endpoint)
         return delete(url=url, verify=False, auth=(username, password), params='id=' + str(id_to_del))
 
+    def _delete_with_http_auth_plus(self, username, password, payload=None):
+        if payload is None:
+            payload = {}
+        url = self._make_url(self.host, self.port, self.test_endpoint)
+        return delete(url=url, verify=False, auth=(username, password), params=payload)
+
     def _delete_with_no_auth(self, id_to_del: int):
         url = self._make_url(self.host, self.port, self.test_endpoint)
         return delete(url=url, verify=False, params='id=' + str(id_to_del))

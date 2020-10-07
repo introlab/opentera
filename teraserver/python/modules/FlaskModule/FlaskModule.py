@@ -145,6 +145,7 @@ class FlaskModule(BaseModule):
         from .API.user.UserQuerySessionEvents import UserQuerySessionEvents
         # from .API.user.UserQueryDeviceData import UserQueryDeviceData
         from .API.user.UserQuerySessionTypeProject import UserQuerySessionTypeProject
+        from .API.user.UserQueryDeviceTypes import UserQueryDeviceTypes
         from .API.user.UserQueryDeviceSubTypes import UserQueryDeviceSubTypes
         from .API.user.UserQueryAssets import UserQueryAssets
         from .API.user.UserQueryServices import UserQueryServices
@@ -184,6 +185,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQuerySessionTypeProject, '/sessiontypeprojects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessionEvents,    '/sessions/events', resource_class_kwargs=kwargs)
         # user_api_ns.add_resource(UserQueryDeviceData,       '/data', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryDeviceTypes, '/devicetypes', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceSubTypes,   '/devicesubtypes', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryAssets,           '/assets', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServices,         '/services', resource_class_kwargs=kwargs)
