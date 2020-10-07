@@ -1,45 +1,89 @@
-let timerHandle = 0;
+let localTimerHandles = [0, 0];
+let remoteTimerHandles = [0, 0, 0, 0];
 
-function resetInactiveTimer(){
-    stopInactiveTimer();
+function resetInactiveTimer(local, index){
+    stopInactiveTimer(local, index);
 
-    timerHandle = setTimeout(inactiveTimeout, 3000);
-}
-
-function stopInactiveTimer(){
-    if (timerHandle != 0){
-        clearTimeout(timerHandle);
-        timerHandle = 0;
+    let timerHandle = setTimeout(inactiveTimeout, 3000, local, index);
+    if (local === true){
+        localTimerHandles[index-1] = timerHandle;
+    }else{
+        remoteTimerHandles[index-1] = timerHandle;
     }
 }
 
-function showButtons(view_prefix, show){
-    let ptzControls = $("#" + view_prefix + "PtzControls");
-    let srcControls = $("#" + view_prefix + "SourcesControls");
+function stopInactiveTimer(local, index){
+    let timerHandle = (local===true) ? localTimerHandles[index-1] : remoteTimerHandles[index-1];
+    if (timerHandle !== 0){
+        clearTimeout(timerHandle);
+        (local===true) ? localTimerHandles[index-1] = 0 : remoteTimerHandles[index-1] = 0;
+    }
+}
+
+function showButtons(local, show, index){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let ptzControls = $("#" + view_prefix + "PtzControls" + index);
+    let srcControls = $("#" + view_prefix + "SourcesControls" + index);
+    let statusControls = $("#" + view_prefix + "ViewControls" + index)
 
     if (ptzControls.length){
-        if (show === true)
-            ptzControls.show();
-        else
-            ptzControls.hide();
+        (show === true) ? ptzControls.show() : ptzControls.hide();
     }
-
     if (srcControls.length){
-        if (show === true)
-            srcControls.show();
-        else
-            srcControls.hide();
+        (show === true) ? srcControls.show() : srcControls.hide();
+    }
+    if (statusControls.length){
+        // Must hide individual icons according to state
+        let micIcon = getStatusIcon(local, index, "Mic");
+        let videoIcon = getStatusIcon(local, index, "Video");
+        let configIcon = $("#" + view_prefix + "Config" + index);
+        let speakerIcon = getStatusIcon(local, index, "Speaker");
+
+        if (micIcon.length){
+            let iconActive = isStatusIconActive(local, index, "Mic");
+            if (iconActive === true){
+                (show === true) ? micIcon.show() : micIcon.hide();
+            }else{
+                micIcon.show();
+            }
+        }
+
+        if (videoIcon.length){
+            let iconActive = isStatusIconActive(local, index, "Video");
+            if (iconActive === true){
+                (show === true) ? videoIcon.show() : videoIcon.hide();
+            }else{
+                videoIcon.show();
+            }
+        }
+
+        if (speakerIcon.length){
+            let iconActive = isStatusIconActive(local, index, "Speaker");
+            if (iconActive === true){
+                (show === true) ? speakerIcon.show() : speakerIcon.hide();
+            }else{
+                speakerIcon.show();
+            }
+        }
+        if (configIcon.length){
+            (show === true) ? configIcon.show() : configIcon.hide();
+        }
     }
 
 }
 
-function inactiveTimeout(){
-    stopInactiveTimer();
-    showButtons('local', false);
-    showButtons('remote1', false);
-    showButtons('remote2', false);
-    showButtons('remote3', false);
-    showButtons('remote4', false);
+function inactiveTimeout(local, index){
+    stopInactiveTimer(local, index);
+    showButtons(local, false, index);
+}
+
+function showAllButtons(show){
+    showButtons(true, show, 1);
+    showButtons(true, show, 2);
+    showButtons(false, show, 1);
+    showButtons(false, show, 2);
+    showButtons(false, show,3);
+    showButtons(false, show,4);
 }
 
 function hideElement(id){
@@ -50,64 +94,35 @@ function showElement(id){
     $("#"+id).show();
 }
 
-// ***** MICROPHONE *****
-function getMicIcon(local, index){
-    let local_str = 'remote';
-    if (local === true)
-        local_str = 'local';
-    return $("#" + local_str + "MicStatus" + index);
+function getStatusIcon(local, index, prefix){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    return $("#" + view_prefix + prefix + "Status" + index);
 }
 
-function isMicIconActive(local, index){
-    let micIcon = getMicIcon(local, index);
-    return !micIcon.attr('src').includes("off");
-}
-
-function updateMicIconState(status, local, index){
-    let micIcon = getMicIcon(local, index);
-    let videoWidget = getVideoWidget(local, index);
-
-    videoWidget.micEnabled = status;
-
-    let micImgPath = micIcon.attr('src').split('/')
-
-    if (videoWidget.micEnabled){
-        micImgPath[micImgPath.length-1] = "micro.png";
-    }else{
-        micImgPath[micImgPath.length-1] = "micro_off.png";
-    }
-    micIcon.attr('src', pathJoin(micImgPath))
-}
-
-// ***** VIDEO *****
 function getVideoWidget(local, index){
-    let local_str = 'remote';
-    if (local === true)
-        local_str = 'local';
-    return $("#" + local_str + "Video" + index);
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    return $("#" + view_prefix + "Video" + index);
 }
 
-function getVideoIcon(local, index){
-    let local_str = 'remote';
-    if (local === true)
-        local_str = 'local';
-    return $("#" + local_str + "VideoStatus" + index);
+function isStatusIconActive(local, index, prefix){
+    let icon = getStatusIcon(local, index, prefix);
+    return !icon.attr('src').includes("off");
 }
 
-function isVideoIconActive(local, index){
-    let videoIcon = getVideoIcon(local, index);
-    return !videoIcon.attr('src').includes("off");
-}
+function updateStatusIconState(status, local, index, prefix){
+    let icon = getStatusIcon(local, index, prefix);
 
-function updateVideoIconState(status, local, index){
-    let videoIcon = getVideoIcon(local, index);
-
-    let videoImgPath = videoIcon.attr('src').split('/')
+    let iconImgPath = icon.attr('src').split('/')
 
     if (status === true){
-        videoImgPath[videoImgPath.length-1] = "video.png";
+        iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + ".png";
     }else{
-        videoImgPath[videoImgPath.length-1] = "video_off.png";
+        iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + "_off.png";
     }
-    videoIcon.attr('src', pathJoin(videoImgPath))
+    icon.attr('src', pathJoin(iconImgPath))
+}
+
+function swapViews(){
+    console.warn('SwapViews: Feature not currently enabled.');
+
 }

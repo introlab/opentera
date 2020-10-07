@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <meta charset="UTF-8">
 <head>
@@ -15,6 +15,8 @@
     <script src="../static/js/tera_ui.js"></script>
     <script src="../static/js/tera_webrtc.js"></script>
     <script src="../static/js/tera_utils.js"></script>
+    <script src="../static/js/tera_shared_object.js"></script>
+    <script src="../static/js/tera_ptz.js"></script>
 
 
 </head>
@@ -52,73 +54,149 @@
             <div class="row h-33" id="localView1Row">
                 <!------------------------------ LOCAL VIEW #1 -------------------------------------------------------->
                 <div class="col-12 videoView" id="localView1"
-                     onmousemove="resetInactiveTimer();showButtons('local', true);"
-                     onmouseleave="stopInactiveTimer();showButtons('local', false); return false;">
-                    <span class="badge badge-info" id="localView1Title">Self View #1</span>
+                     onmousemove="resetInactiveTimer(true, 1);showButtons(true, true, 1);"
+                     onmouseleave="stopInactiveTimer(true, 1);showButtons(true, false, 1); return false;"
+                     oncontextmenu="resetInactiveTimer(true, 1);showButtons(true, true, 1);">
+
+                    <span class="badge badge-info" id="localView1Title">Vue locale #1</span>
                     <!-- Micro, video, sensors, ... controls -->
-                    <div id="localViewControls1" class="overlay-bottom-center" >
-                        <input id="localConfig" type="image" alt="image" src="../static/images/config.png" height=32 onclick="" data-toggle="modal" data-target="#configDialog"/>
-                        <input id="localMicStatus1" type="image" alt="image" src="../static/images/micro.png" height=32 onclick="muteMicro(true,1);event.stopPropagation();" />
-                        <input id="localVideoStatus1" type="image" alt="image" src="../static/images/video.png" height=32 onclick="muteVideo(true,1);event.stopPropagation();" />
+                    <div id="localViewControls1" class="overlay-bottom-center">
+                        <input id="localConfig1" type="image" alt="image" src="../static/images/config.png" height=32 onclick="" data-toggle="modal" data-target="#configDialog" style="display: none;"/>
+                        <input id="localMicStatus1" type="image" alt="image" src="../static/images/mic.png" height=32 onclick="muteMicro(true,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localVideoStatus1" type="image" alt="image" src="../static/images/video.png" height=32 onclick="muteVideo(true,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localSpeakerStatus1" type="image" alt="image" src="../static/images/speaker.png" height=32 onclick="muteSpeaker(true,1);event.stopPropagation();" style="display: none;"/>
                     </div>
                     <!-- PTZ controls -->
-                    <div id="localPtzControls" class="overlay-left" oncontextmenu="" onclick="" onwheel="" style="display: none;">
+                    <div id="localPtzControls1" class="overlay-left" oncontextmenu="" onclick="" onwheel="" style="display: none;">
                         <div id="zoomButtons0">
-                            <input type="image" alt="image" src="../static/images/Zoom-max.png" height=22 onclick="zoomMax(0);closeButtons('navButtons');event.stopPropagation();"/>
-                            <input type="image" alt="image" src="../static/images/Zoom-in1.png" height=22 onclick="zoomIn(0);event.stopPropagation();event.stopPropagation();"/>
-                            <input type="image" alt="image" src="../static/images/Zoom-out1.png" height=22 onclick="zoomOut(0);event.stopPropagation();"/>
-                            <input type="image" alt="image" src="../static/images/Zoom-min.png" height=22 onclick="zoomMin(0);closeButtons('navButtons');event.stopPropagation();"/>
+                            <input type="image" alt="image" src="../static/images/Zoom-max.png" height=22 onclick="zoomMax(true, 1);;event.stopPropagation();"/>
+                            <input type="image" alt="image" src="../static/images/Zoom-in1.png" height=22 onclick="zoomIn(true, 1);event.stopPropagation();event.stopPropagation();"/>
+                            <input type="image" alt="image" src="../static/images/Zoom-out1.png" height=22 onclick="zoomOut(true, 1);event.stopPropagation();"/>
+                            <input type="image" alt="image" src="../static/images/Zoom-min.png" height=22 onclick="zoomMin(true, 1);event.stopPropagation();"/>
                         </div>
                         <div id="presetButtons0">
-                            <button class="button1" onclick="gotoPreset(event,0,1);closeButtons('navButtons');event.stopPropagation();">1</button>
-                            <button class="button1" onclick="gotoPreset(event,0,2);closeButtons('navButtons');event.stopPropagation();">2</button>
-                            <button class="button1" onclick="gotoPreset(event,0,3);closeButtons('navButtons');event.stopPropagation();">3</button>
+                            <button class="button1" onclick="gotoPreset(event, true, 1, 1);event.stopPropagation();">1</button>
+                            <button class="button1" onclick="gotoPreset(event,true, 1, 2);event.stopPropagation();">2</button>
+                            <button class="button1" onclick="gotoPreset(event,true, 1, 3);event.stopPropagation();">3</button>
                         </div>
                         <div id="settingsButton0">
-                            <input type="image" alt="image" src="../static/images/settings.png" height=22 onclick="camSettings(0);closeButtons('navButtons');event.stopPropagation();"/>
+                            <input type="image" alt="image" src="../static/images/settings.png" height=22 onclick="camSettings(true, 1);event.stopPropagation();"/>
                         </div>
                     </div>
                     <!-- Picture and sources controls -->
-                    <div id="localSourcesControls" onclick="if (!isButtonsClosed('enlargeButton')) selfVideo.onclick(event);event.stopPropagation();" class="overlay-bottom-right" style="display: none;">
+                    <div id="localSourcesControls1" class="overlay-bottom-right" style="display: none;">
                         <div style="padding-left:20px;padding-top:20px;background-color:rgba(0,0,0,0);">
-                            <input id="imgAddVid2" type="image" alt="image" src="../static/images/plus.png" height=32 onclick="addLocalSource2(0);event.stopPropagation();"/>
-                            <input id="imgRemoveVid2" type="image" alt="image" src="../static/images/minus.png" height=32 onclick="removeLocalSource2(0);event.stopPropagation();"/>
-                            <input id="largeBtn" type="image" alt="image" src="../static/images/pin.png" height=42 onclick="selectLargeView('#selfView');closeButtons('navButtons');event.stopPropagation();"/>
+                            <!--<input id="imgAddVid2" type="image" alt="image" src="../static/images/plus.png" height=32 onclick="addLocalSource2(0);event.stopPropagation();"/>
+                            <input id="imgRemoveVid2" type="image" alt="image" src="../static/images/minus.png" height=32 onclick="removeLocalSource2(0);event.stopPropagation();"/>-->
+                            <input id="largeBtn" type="image" alt="image" src="../static/images/pin.png" height=42 onclick="swapViews();event.stopPropagation();"/>
                         </div>
                     </div>
                     <!-- Video ! -->
-                    <video id="localVideo1" playsinline="true" muted="muted" micEnabled="true"
-                           oncontextmenu=""
-                           onclick=""
-                           onwheel="" class="easyrtcMirror"></video>
+                    <video id="localVideo1" playsinline muted="muted"
+                           oncontextmenu="return false;"
+                           onclick="managePTZClickEvent(event, true, 1);"
+                           onwheel="managePTZMouseWheel(event, true, 1);"
+                           class="easyrtcMirror"></video>
                 </div>
             </div>
             <div class="row h-33" id="localView2Row">
-                <div class="col-12 videoView" id="localView2">
-                    <span class="badge badge-info" id="localView2Title">Self View #2</span>
+                <div class="col-12 videoView" id="localView2"
+                     onmousemove="resetInactiveTimer(true, 2);showButtons(true, true, 2);"
+                     onmouseleave="stopInactiveTimer(true, 2);showButtons(true, false, 2); return false;"
+                     oncontextmenu="resetInactiveTimer(true, 2);showButtons(true, true, 2);">
+                    <span class="badge badge-info" id="localView2Title">Vue locale #2</span>
+
+                    <!-- Micro, video, sensors, ... controls -->
+                    <div id="localViewControls2" class="overlay-bottom-center" >
+                        <input id="localMicStatus2" type="image" alt="image" src="../static/images/mic.png" height=32 onclick="muteMicro(true,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="localVideoStatus2" type="image" alt="image" src="../static/images/video.png" height=32 onclick="muteVideo(true,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="localSpeakerStatus2" type="image" alt="image" src="../static/images/speaker.png" height=32 onclick="muteSpeaker(true,2);event.stopPropagation();" style="display: none;"/>
+                    </div>
+                    <!-- Video ! -->
+                    <video id="localVideo2" playsinline muted="muted"
+                           oncontextmenu="return false;"
+                           onclick=""
+                           onwheel="" class=""></video>
+
                 </div>
             </div>
             <div class="row h-33" id="toolsViewRow">
                 <div class="col-12" id="toolsView" style="background-color:black;">
-                    <span class="badge badge-warning" id="toolsViewTitle">Tools</span>
+                    <span class="badge badge-warning" id="toolsViewTitle">Outils</span>
                 </div>
             </div>
         </div>
         <div class="col-8 h-100" id="remoteViews">
             <div class="row h-50" id="remoteRows1">
-                <div class="col-6 videoView" id="remoteView1" >
-                    <span class="badge badge-primary" id="remoteView1Title">Remote View #1</span>
+                <div class="col-6 videoView" id="remoteView1"
+                     onmousemove="resetInactiveTimer(false, 1);showButtons(false, true, 1);"
+                     onmouseleave="stopInactiveTimer(false, 1);showButtons(false, false, 1); return false;"
+                     oncontextmenu="resetInactiveTimer(false, 1);showButtons(false, true, 1);">
+                    <span class="badge badge-primary" id="remoteView1Title">Participant #1</span>
+                    <!-- Micro, video, sensors, ... controls -->
+                    <div id="remoteViewControls1" class="overlay-bottom-center" >
+                        <input id="remoteMicStatus1" type="image" alt="image" src="../static/images/mic.png" height=32 onclick="muteMicro(false,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteVideoStatus1" type="image" alt="image" src="../static/images/video.png" height=32 onclick="muteVideo(false,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteSpeakerStatus1" type="image" alt="image" src="../static/images/speaker.png" height=32 onclick="muteSpeaker(false,1);event.stopPropagation();" style="display: none;"/>
+                    </div>
+                    <!-- Video ! -->
+                    <video id="remoteVideo1" playsinline muted="muted"
+                           oncontextmenu="return false;"
+                           onclick=""
+                           onwheel="" class=""></video>
                 </div>
-                <div class="col-6 videoView" id="remoteView3" >
-                    <span class="badge badge-primary" id="remoteView3Title">Remote View #3</span>
+                <div class="col-6 videoView" id="remoteView3"
+                     onmousemove="resetInactiveTimer(false, 3);showButtons(false, true, 3);"
+                     onmouseleave="stopInactiveTimer(false, 3);showButtons(false, false, 3); return false;"
+                     oncontextmenu="resetInactiveTimer(false, 3);showButtons(false, true, 3);">
+                    <span class="badge badge-primary" id="remoteView3Title">Participant #3</span>
+                    <!-- Micro, video, sensors, ... controls -->
+                    <div id="remoteViewControls3" class="overlay-bottom-center" >
+                        <input id="remoteMicStatus3" type="image" alt="image" src="../static/images/mic.png" height=32 onclick="muteMicro(false,3);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteVideoStatus3" type="image" alt="image" src="../static/images/video.png" height=32 onclick="muteVideo(false,3);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteSpeakerStatus3" type="image" alt="image" src="../static/images/speaker.png" height=32 onclick="muteSpeaker(false,3);event.stopPropagation();" style="display: none;"/>
+                    </div>
+                    <!-- Video ! -->
+                    <video id="remoteVideo3" playsinline muted="muted"
+                           oncontextmenu="return false;"
+                           onclick=""
+                           onwheel="" class=""></video>
                 </div>
             </div>
             <div class="row h-50" id="remoteRows2">
-                <div class="col-6 videoView" id="remoteView2" >
-                    <span class="badge badge-primary" id="remoteView2Title">Remote View #2</span>
+                <div class="col-6 videoView" id="remoteView2"
+                     onmousemove="resetInactiveTimer(false, 2);showButtons(false, true, 2);"
+                     onmouseleave="stopInactiveTimer(false, 2);showButtons(false, false, 2); return false;"
+                     oncontextmenu="resetInactiveTimer(false, 2);showButtons(false, true, 2);">
+                    <span class="badge badge-primary" id="remoteView2Title">Participant #2</span>
+                    <!-- Micro, video, sensors, ... controls -->
+                    <div id="remoteViewControls2" class="overlay-bottom-center" >
+                        <input id="remoteMicStatus2" type="image" alt="image" src="../static/images/mic.png" height=32 onclick="muteMicro(false,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteVideoStatus2" type="image" alt="image" src="../static/images/video.png" height=32 onclick="muteVideo(false,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteSpeakerStatus2" type="image" alt="image" src="../static/images/speaker.png" height=32 onclick="muteSpeaker(false,2);event.stopPropagation();" style="display: none;"/>
+                    </div>
+                    <!-- Video ! -->
+                    <video id="remoteVideo2" playsinline muted="muted"
+                           oncontextmenu="return false;"
+                           onclick=""
+                           onwheel="" class=""></video>
                 </div>
-                <div class="col-6 videoView" id="remoteView4" >
-                    <span class="badge badge-primary" id="remoteView4Title">Remote View #4</span>
+                <div class="col-6 videoView" id="remoteView4"
+                     onmousemove="resetInactiveTimer(false, 4);showButtons(false, true, 4);"
+                     onmouseleave="stopInactiveTimer(false, 4);showButtons(false, false, 4); return false;"
+                     oncontextmenu="resetInactiveTimer(true, 4);showButtons(false, true, 4);">
+                    <span class="badge badge-primary" id="remoteView4Title">Participant #4</span>
+                    <!-- Micro, video, sensors, ... controls -->
+                    <div id="remoteViewControls4" class="overlay-bottom-center" >
+                        <input id="remoteMicStatus4" type="image" alt="image" src="../static/images/mic.png" height=32 onclick="muteMicro(false,4);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteVideoStatus4" type="image" alt="image" src="../static/images/video.png" height=32 onclick="muteVideo(false,4);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteSpeakerStatus4" type="image" alt="image" src="../static/images/speaker.png" height=32 onclick="muteSpeaker(false,4);event.stopPropagation();" style="display: none;"/>
+                    </div>
+                    <!-- Video ! -->
+                    <video id="remoteVideo4" playsinline muted="muted"
+                           oncontextmenu="return false;"
+                           onclick=""
+                           onwheel="" class=""></video>
                 </div>
             </div>
         </div>

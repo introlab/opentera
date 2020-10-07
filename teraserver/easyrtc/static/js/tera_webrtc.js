@@ -1,26 +1,21 @@
-let peerids = ["0", "0", "0", "0", "0"]; //0 = Local, 1,2,3,4... = distants
+let local_peerid = "0";
+let peerids = ["0", "0", "0", "0"]; // Remote peer ids
 
 function muteMicro(local, index){
-    let new_state = !isMicIconActive(local, index);
+    let new_state = !isStatusIconActive(local, index, "Mic");
 
-    updateMicIconState(new_state, local, index);
+    updateStatusIconState(new_state, local, index, "Mic");
 
-    let micro_value = "false";
-    if (new_state === true)
-        micro_value = "true";
+    let micro_value = (new_state === true) ? "true" : "false";
 
     if (local === true){
         // Send display update request
-        let request = {"peerid": peerids[index], micro:micro_value};
-
-        if (index==0)
-            easyrtc.enableMicrophone(new_state);
-        else
-            easyrtc.enableMicrophone(new_state, "miniVideo");
+        let request = {"peerid": local_peerid, micro:micro_value};
+        easyrtc.enableMicrophone(new_state, "localStream" + index);
 
         //console.log(request);
         if (easyrtc.webSocketConnected) {
-            easyrtc.sendDataWS({"targetRoom": "default"}, 'updateStatus', request,
+            easyrtc.sendDataWS("default", 'updateStatus', request,
                 function (ackMesg) {
                 if (ackMesg.msgType === 'error') {
                     console.error(ackMesg.msgData.errorText);
@@ -29,9 +24,9 @@ function muteMicro(local, index){
         }
     }else{
         // Request mute to someone else
-        let request = {"index": index};
+        let request = {"index": 1}; // TODO: Manage multiple remote streams??
         if (easyrtc.webSocketConnected){
-            easyrtc.sendDataWS( peerids[index], 'muteMicro', request,
+            easyrtc.sendDataWS( peerids[index-1], 'muteMicro', request,
                 function(ackMesg) {
                 //console.error("ackMsg:",ackMesg);
                 if( ackMesg.msgType === 'error' ) {
@@ -42,40 +37,70 @@ function muteMicro(local, index){
     }
 }
 
-
 function muteVideo(local, index){
-    let new_state = !isVideoIconActive(local, index);
+    let new_state = !isStatusIconActive(local, index, "Video");
 
-    updateVideoIconState(new_state, local, index);
+    updateStatusIconState(new_state, local, index, "Video");
 
-    let video_value = "false";
-    if (new_state === true)
-        video_value = "true";
+    let video_value = (new_state === true) ? "true" : "false";
 
     if (local === true){
         // Send display update request
-        let request = {"peerid": peerids[index], video: video_value};
+        let request = {"peerid": local_peerid, video: video_value};
 
         // TODO
-        /*if (index==0)
-            easyrtc.enableMicrophone(new_state);
-        else
-            easyrtc.enableMicrophone(new_state, "miniVideo");
+        //easyrtc.enableMicrophone(new_state, "localStream" + index);
 
-        //console.log(request);
         if (easyrtc.webSocketConnected) {
-            easyrtc.sendDataWS({"targetRoom": "default"}, 'updateStatus', request,
+            easyrtc.sendDataWS("default", 'updateStatus', request,
                 function (ackMesg) {
                     if (ackMesg.msgType === 'error') {
                         console.error(ackMesg.msgData.errorText);
                     }
                 });
-        }*/
+        }
     }else{
         // Request video mute to someone else
-        let request = {"index": index};
+        let request = {"index": 1}; // TODO: Manage multiple remote streams??
         if (easyrtc.webSocketConnected){
-            easyrtc.sendDataWS( peerids[index], 'muteVideo', request,
+            easyrtc.sendDataWS( peerids[index-1], 'muteVideo', request,
+                function(ackMesg) {
+                    //console.error("ackMsg:",ackMesg);
+                    if( ackMesg.msgType === 'error' ) {
+                        console.error(ackMesg.msgData.errorText);
+                    }
+                });
+        }
+    }
+}
+
+function muteSpeaker(local, index){
+    let new_state = !isStatusIconActive(local, index, "Speaker");
+
+    updateStatusIconState(new_state, local, index, "Speaker");
+
+    let speaker_value = (new_state === true) ? "true" : "false";
+
+    if (local === true){
+        // Send display update request
+        let request = {"peerid": local_peerid, speaker: speaker_value};
+
+        // TODO
+        //easyrtc.enableMicrophone(new_state, "localStream" + index);
+
+        if (easyrtc.webSocketConnected) {
+            easyrtc.sendDataWS("default", 'updateStatus', request,
+                function (ackMesg) {
+                    if (ackMesg.msgType === 'error') {
+                        console.error(ackMesg.msgData.errorText);
+                    }
+                });
+        }
+    }else{
+        // Request video mute to someone else
+        let request = {"index": 1}; // TODO: Manage multiple remote streams??
+        if (easyrtc.webSocketConnected){
+            easyrtc.sendDataWS( peerids[index-1], 'muteSpeaker', request,
                 function(ackMesg) {
                     //console.error("ackMsg:",ackMesg);
                     if( ackMesg.msgType === 'error' ) {
