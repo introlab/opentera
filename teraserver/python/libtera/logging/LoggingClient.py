@@ -28,36 +28,61 @@ class LoggingClient:
         self.redis = Redis(host=config['hostname'], port=config['port'], password=config['password'], db=config['db'])
 
     def log_trace(self, sender: str, *args):
-        self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_TRACE, sender, *args))
+        try:
+            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_TRACE, sender, *args))
+        # TODO Can we do better than catch base Exception here
+        except Exception as e:
+            print('LoggingClient.log_trace', e)
 
     def log_debug(self, sender: str, *args):
-        self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_DEBUG, sender, *args))
+        try:
+            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_DEBUG, sender, *args))
+        # TODO Can we do better than catch base Exception here
+        except Exception as e:
+            print('LoggingClient.log_debug', e)
 
     def log_info(self, sender: str, *args):
-        self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_INFO, sender, *args))
+        try:
+            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_INFO, sender, *args))
+        # TODO Can we do better than catch base Exception here
+        except Exception as e:
+            print('LoggingClient.log_info', e)
 
     def log_warning(self, sender: str, *args):
-        self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_WARNING, sender, *args))
+        try:
+            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_WARNING, sender, *args))
+        # TODO Can we do better than catch base Exception here
+        except Exception as e:
+            print('LoggingClient.log_warning', e)
 
     def log_critical(self, sender: str, *args):
-        self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_CRITICAL, sender, *args))
+        try:
+            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_CRITICAL, sender, *args))
+        # TODO Can we do better than catch base Exception here
+        except Exception as e:
+            print('LoggingClient.log_critical', e)
 
     def log_error(self, sender: str, *args):
-        self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_ERROR, sender, *args))
+        try:
+            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_ERROR, sender, *args))
+        # TODO Can we do better than catch base Exception here
+        except Exception as e:
+            print('LoggingClient.log_error', e)
 
     def log_fatal(self, sender: str, *args):
-        self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_FATAL, sender, *args))
-
-    def log_debug(self, sender: str, *args):
-        self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_DEBUG, sender, *args))
+        try:
+            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_FATAL, sender, *args))
+        # TODO Can we do better than catch base Exception here
+        except Exception as e:
+            print('LoggingClient.log_fatal', e)
 
     def _create_log_event(self, level, sender, *args):
-        log_event = messages.LogEvent()
-        log_event.level = level
-        log_event.timestamp = datetime.datetime.now().timestamp()
-        log_event.sender = str(sender)
-        log_event.message = str(args)
-        return log_event
+            log_event = messages.LogEvent()
+            log_event.level = level
+            log_event.timestamp = datetime.datetime.now().timestamp()
+            log_event.sender = str(sender)
+            log_event.message = str(args)
+            return log_event
 
     def _send_tera_event_message(self, log_event: messages.LogEvent):
         event_message = messages.TeraEvent()
