@@ -53,6 +53,20 @@ video {
 	background-color: lightblue;
 }
 
+.modal-header-error{
+	background-color: #ab0909;
+	color: white;
+}
+
+.modal-body-error{
+	background-color: white;
+	color: black;
+}
+
+.modal-footer-error{
+	background-color: #ab0909;
+}
+
 .overlay-top-left {
 	position: relative;
 	/*width: 100%;

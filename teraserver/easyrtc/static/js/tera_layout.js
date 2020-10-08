@@ -148,3 +148,7 @@ function setRowHeight67(row){
 function setRowHeight100(row){
     row.removeClass('h-33 h-67 h-50').addClass('h-100');
 }
+
+function showLayout(show){
+    (show === true) ? $('#mainContainer').show() : $('#mainContainer').hide();
+}

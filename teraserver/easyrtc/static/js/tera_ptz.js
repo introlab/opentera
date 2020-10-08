@@ -1,5 +1,6 @@
 let debounceWheel = 0;
 var localPTZCapabilities = {'uuid':0, 'zoom':false,'presets':false,'settings':false};
+var remotePTZCapabilities = [{}];
 
 function managePTZMouseWheel(event, local, index){
     // Ignore events for 500 ms
@@ -22,7 +23,7 @@ function zoomIn(local, index){
     }else{
         let request = {"value":"in"};
         if (easyrtc.webSocketConnected) {
-            easyrtc.sendDataWS(peerids[index-1], 'ZoomRequest', request, function (ackMesg) {
+            easyrtc.sendDataWS(remoteStreams[index-1].peerid, 'ZoomRequest', request, function (ackMesg) {
                 //console.error("ackMsg:",ackMesg);
                 if (ackMesg.msgType === 'error') {
                     console.error(ackMesg.msgData.errorText);
@@ -41,7 +42,7 @@ function zoomOut(local, index){
     }else{
         let request = {"value":"out"};
         if (easyrtc.webSocketConnected) {
-            easyrtc.sendDataWS(peerids[index-1], 'ZoomRequest', request, function (ackMesg) {
+            easyrtc.sendDataWS(remoteStreams[index-1].peerid, 'ZoomRequest', request, function (ackMesg) {
                 //console.error("ackMsg:",ackMesg);
                 if (ackMesg.msgType === 'error') {
                     console.error(ackMesg.msgData.errorText);
@@ -60,7 +61,7 @@ function zoomMin(local, index){
     }else{
         let request = {"value":"min"};
         if (easyrtc.webSocketConnected) {
-            easyrtc.sendDataWS(peerids[index-1], 'ZoomRequest', request, function (ackMesg) {
+            easyrtc.sendDataWS(remoteStreams[index-1].peerid, 'ZoomRequest', request, function (ackMesg) {
                 //console.error("ackMsg:",ackMesg);
                 if (ackMesg.msgType === 'error') {
                     console.error(ackMesg.msgData.errorText);
@@ -77,7 +78,7 @@ function zoomMax(local, index){
     }else{
         let request = {"value":"max"};
         if (easyrtc.webSocketConnected) {
-            easyrtc.sendDataWS(peerids[index-1], 'ZoomRequest', request, function (ackMesg) {
+            easyrtc.sendDataWS(remoteStreams[index-1].peerid, 'ZoomRequest', request, function (ackMesg) {
                 //console.error("ackMsg:",ackMesg);
                 if (ackMesg.msgType === 'error') {
                     console.error(ackMesg.msgData.errorText);
@@ -98,12 +99,12 @@ function gotoPreset(event, local, index, preset){
                 SharedObject.gotoPresetClicked(localContact.uuid, preset);
         }
     }else{
-        let set = "false";
+        let set = false;
         if (event.shiftKey && event.ctrlKey)
-            set = "true";
+            set = true;
         let request = {"preset": preset, "set": set};
         if (easyrtc.webSocketConnected) {
-            easyrtc.sendDataWS(peerids[index-1], 'PresetRequest', request, function (ackMesg) {
+            easyrtc.sendDataWS(remoteStreams[index-1].peerid, 'PresetRequest', request, function (ackMesg) {
                 //console.error("ackMsg:",ackMesg);
                 if (ackMesg.msgType === 'error') {
                     console.error(ackMesg.msgData.errorText);
@@ -121,7 +122,7 @@ function camSettings(local, index){
     }else{
         let request = "";
         if (easyrtc.webSocketConnected) {
-            easyrtc.sendDataWS(peerids[index-1], 'CamSettingsRequest', request, function (ackMesg) {
+            easyrtc.sendDataWS(remoteStreams[index-1].peerid, 'CamSettingsRequest', request, function (ackMesg) {
                 //console.error("ackMsg:",ackMesg);
                 if (ackMesg.msgType === 'error') {
                     console.error(ackMesg.msgData.errorText);
@@ -159,12 +160,12 @@ function managePTZClickEvent(event, local, index){
         }
     }else{
         // Send message to the other client
-        console.log("PTZ request to :", peerids[index-1]);
+        console.log("PTZ request to :", remoteStreams[index-1].peerid);
         //send contact information to other users
         //request = {"x":event.clientX - offsets.left, "y": event.clientY - offsets.top, "w":video.clientWidth, "h": video.clientHeight};
         request = {"x": event.clientX - bar_width - offsets.left, "y": event.clientY - bar_height, "w": real_video_width, "h": real_video_height};
         if (easyrtc.webSocketConnected){
-            easyrtc.sendDataWS( peerids[index-1], 'PTZRequest', request, function(ackMesg) {
+            easyrtc.sendDataWS( remoteStreams[index-1].peerid, 'PTZRequest', request, function(ackMesg) {
                 //console.error("ackMsg:",ackMesg);
                 if( ackMesg.msgType === 'error' ) {
                     console.error(ackMesg.msgData.errorText);
@@ -173,4 +174,40 @@ function managePTZClickEvent(event, local, index){
         }
 
     }
+}
+
+function setPTZCapabilities(uuid, zoom, presets, settings){
+    let ptz = {'uuid':uuid, 'zoom':zoom,'presets':presets,'settings':settings};
+
+    console.log("Setting PTZ Capabilities: " + uuid + " = " + zoom + " " + presets + " " + settings);
+
+    if (uuid === 0){
+        showError("setPTZCapabilities", " -- UUID = 0, not valid!", false);
+        return;
+    }
+
+    if (uuid === localContact.uuid || (localContact.uuid === undefined && !isWeb)){
+        console.log(" -- Local UUID - settings values.");
+        // Setting local capabilities
+        localPTZCapabilities = ptz;
+
+        // Show buttons
+        showPTZControls(true, 1, zoom, presets, settings);
+
+        // Send to remotes
+        broadcastlocalPTZCapabilities();
+
+    }else{
+        console.log(" -- Remote UUID received: " + uuid + ", I am " + localContact.uuid);
+        // Find and update PTZ infos in remoteContacts
+        for (let i=0; i<remoteContacts.length; i++){
+            if (remoteContacts[i].uuid === uuid){
+                remoteContacts[i].ptz = ptz;
+                // Show buttons
+                showPTZControls(false, i+1, zoom, presets, settings);
+                break;
+            }
+        }
+    }
+
 }

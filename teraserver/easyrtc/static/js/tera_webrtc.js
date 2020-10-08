@@ -1,47 +1,16 @@
 // WebRTC ids
 var local_peerid = "0";
-var peerids = ["0", "0", "0", "0"]; // Remote peer ids
-var peers_uuids_mapping = {} // OpenTera UUID - Peer ID mapping
 
 // Contact cards
-var localContact = {};
-var remoteContacts = []; // Used to store informations about everyone that has connected (contactinfos)
+var localContact = {}; // {uuid, name, peerid}
+var remoteContacts = []; // Used to store information about everyone that has connected (contactinfos)
+                            // {uuid, name, peerid}
+let remoteStreams = []; // {peerid, streamname, stream: MediaStream}, order is important as it is linked to each view!
+let localStreams = []; // {peerid, streamname, stream: MediaStream}, order is important as it is linked to each local view!
 
 // Status / controls variables
 var connected = false;
 var needToCallOtherUsers = false;
-let remoteStreamsCount = 0;
-let localStreamsCount = 0;
-
-
-function initSystem(){
-    let urlParams = new URLSearchParams(window.location.search);
-    isWeb = (urlParams.get('source') == 'web');
-
-    let port = getTeraPlusPort(); // This function is rendered in the main html document
-    let websocket_path =  "/websocket/" + port
-    easyrtc.setSocketUrl(window.location.origin, {path: websocket_path});
-
-    deviceEnumCompleted = false;
-    initialSourceSelect	=false;
-
-    let local_uuid = urlParams.get('uuid');
-    if (local_uuid)
-        localContact.uuid = local_uuid;
-
-    let local_name = urlParams.get('name');
-    if (local_name)
-        localContact.name = local_name;
-
-    // Initialize
-    if (!isWeb){
-        // Connect Shared Object websocket
-        include("qrc:///qtwebchannel/qwebchannel.js");
-        connectSharedObject();
-    }
-    fillDefaultSourceList();
-    connect();
-}
 
 function connect() {
 
@@ -63,7 +32,6 @@ function connect() {
     });
 
     easyrtc.setStreamAcceptor(newStreamStarted);
-    // SB - TODO - REFACTORING HERE 07/10/2020
     easyrtc.setOnStreamClosed(streamDisconnected);
     easyrtc.setPeerListener(dataReception);
 
@@ -73,23 +41,27 @@ function connect() {
 
     connected = true;
     updateLocalAudioVideoSource();
+
+
+    clearStatusMsg();
+    showLayout(true);
 }
 
-function muteMicro(local, index){
-    let new_state = !isStatusIconActive(local, index, "Mic");
+function muteMicro(local, index, new_state){
+    if (new_state === undefined){ // Toggle is no state specified
+        new_state = !isStatusIconActive(local, index, "Mic");
+    }
 
     updateStatusIconState(new_state, local, index, "Mic");
 
-    let micro_value = (new_state === true) ? "true" : "false";
-
     if (local === true){
         // Send display update request
-        let request = {"peerid": local_peerid, micro:micro_value};
+        let request = {"peerid": local_peerid, micro: new_state};
         easyrtc.enableMicrophone(new_state, "localStream" + index);
 
         //console.log(request);
         if (easyrtc.webSocketConnected) {
-            easyrtc.sendDataWS("default", 'updateStatus', request,
+            easyrtc.sendDataWS({targetRoom: "default"}, 'updateStatus', request,
                 function (ackMesg) {
                 if (ackMesg.msgType === 'error') {
                     console.error(ackMesg.msgData.errorText);
@@ -98,9 +70,9 @@ function muteMicro(local, index){
         }
     }else{
         // Request mute to someone else
-        let request = {"index": 1}; // TODO: Manage multiple remote streams??
+        let request = {"micro": new_state, "index": 1}; // TODO: Manage multiple remote streams??
         if (easyrtc.webSocketConnected){
-            easyrtc.sendDataWS( peerids[index-1], 'muteMicro', request,
+            easyrtc.sendDataWS( remoteStreams[index-1].peerid, 'muteMicro', request,
                 function(ackMesg) {
                 //console.error("ackMsg:",ackMesg);
                 if( ackMesg.msgType === 'error' ) {
@@ -111,56 +83,19 @@ function muteMicro(local, index){
     }
 }
 
-function muteVideo(local, index){
-    let new_state = !isStatusIconActive(local, index, "Video");
+function muteVideo(local, index, new_state){
+    if (new_state === undefined) { // Toggle is no state specified
+        new_state = !isStatusIconActive(local, index, "Video");
+    }
 
     updateStatusIconState(new_state, local, index, "Video");
 
-    let video_value = (new_state === true) ? "true" : "false";
-
     if (local === true){
         // Send display update request
-        let request = {"peerid": local_peerid, video: video_value};
+        let request = {"peerid": local_peerid, video: new_state};
 
         // TODO
-        //easyrtc.enableMicrophone(new_state, "localStream" + index);
-
-        if (easyrtc.webSocketConnected) {
-            easyrtc.sendDataWS("default", 'updateStatus', request,
-                function (ackMesg) {
-                    if (ackMesg.msgType === 'error') {
-                        console.error(ackMesg.msgData.errorText);
-                    }
-                });
-        }
-    }else{
-        // Request video mute to someone else
-        let request = {"index": 1}; // TODO: Manage multiple remote streams??
-        if (easyrtc.webSocketConnected){
-            easyrtc.sendDataWS( peerids[index-1], 'muteVideo', request,
-                function(ackMesg) {
-                    //console.error("ackMsg:",ackMesg);
-                    if( ackMesg.msgType === 'error' ) {
-                        console.error(ackMesg.msgData.errorText);
-                    }
-                });
-        }
-    }
-}
-
-function muteSpeaker(local, index){
-    let new_state = !isStatusIconActive(local, index, "Speaker");
-
-    updateStatusIconState(new_state, local, index, "Speaker");
-
-    let speaker_value = (new_state === true) ? "true" : "false";
-
-    if (local === true){
-        // Send display update request
-        let request = {"peerid": local_peerid, speaker: speaker_value};
-
-        // TODO
-        //easyrtc.enableMicrophone(new_state, "localStream" + index);
+        console.warn('Video Muting not supported yet.');
 
         if (easyrtc.webSocketConnected) {
             easyrtc.sendDataWS({targetRoom: "default"}, 'updateStatus', request,
@@ -172,9 +107,50 @@ function muteSpeaker(local, index){
         }
     }else{
         // Request video mute to someone else
-        let request = {"index": 1}; // TODO: Manage multiple remote streams??
+        let request = {video: new_state, "index": 1}; // TODO: Manage multiple remote streams??
         if (easyrtc.webSocketConnected){
-            easyrtc.sendDataWS( peerids[index-1], 'muteSpeaker', request,
+            easyrtc.sendDataWS( remoteStreams[index-1].peerid, 'muteVideo', request,
+                function(ackMesg) {
+                    //console.error("ackMsg:",ackMesg);
+                    if( ackMesg.msgType === 'error' ) {
+                        console.error(ackMesg.msgData.errorText);
+                    }
+                });
+        }
+    }
+}
+
+function muteSpeaker(local, index, new_state){
+    if (new_state === undefined) { // Toggle is no state specified
+        new_state = !isStatusIconActive(local, index, "Speaker");
+    }
+
+    updateStatusIconState(new_state, local, index, "Speaker");
+
+
+    if (local === true){
+        // Send display update request
+        let request = {"peerid": local_peerid, speaker: new_state};
+
+        // Mute all remote streams
+        for (let i=1; i<=4; i++){
+            let video_widget = getVideoWidget(false, i);
+            video_widget.prop('muted', !new_state);
+        }
+
+        if (easyrtc.webSocketConnected) {
+            easyrtc.sendDataWS({targetRoom: "default"}, 'updateStatus', request,
+                function (ackMesg) {
+                    if (ackMesg.msgType === 'error') {
+                        console.error(ackMesg.msgData.errorText);
+                    }
+                });
+        }
+    }else{
+        // Request speaker mute to someone else
+        let request = { speaker: new_state, "index": 1}; // TODO: Manage multiple remote streams??
+        if (easyrtc.webSocketConnected){
+            easyrtc.sendDataWS( remoteStreams[index-1].peerid, 'muteSpeaker', request,
                 function(ackMesg) {
                     //console.error("ackMsg:",ackMesg);
                     if( ackMesg.msgType === 'error' ) {
@@ -186,13 +162,11 @@ function muteSpeaker(local, index){
 }
 
 function setMirror(mirror, local, index){
-    let mirror_value = (mirror === true) ? "true" : "false";
-
     if (local === true){
         // Send display update request
-        let request = {"peerid": local_peerid, mirror: mirror_value};
+        let request = {"peerid": local_peerid, mirror: mirror};
 
-        showLocalVideoMirror(mirror);
+        showVideoMirror(true, index, mirror);
 
         if (easyrtc.webSocketConnected) {
             easyrtc.sendDataWS({targetRoom: "default"}, 'updateStatus', request,
@@ -204,9 +178,9 @@ function setMirror(mirror, local, index){
         }
     }else{
         // Request mirror to someone else
-        let request = {"index": 1}; // TODO: Manage multiple remote streams??
+        let request = {"index": 1, "mirror": mirror}; // TODO: Manage multiple remote streams??
         if (easyrtc.webSocketConnected){
-            easyrtc.sendDataWS( peerids[index-1], 'setMirror', request,
+            easyrtc.sendDataWS(remoteStreams[index-1].peerid, 'setMirror', request,
                 function(ackMesg) {
                     //console.error("ackMsg:",ackMesg);
                     if( ackMesg.msgType === 'error' ) {
@@ -219,10 +193,9 @@ function setMirror(mirror, local, index){
 
 
 function updateLocalAudioVideoSource(){
-    console.log("updateLocalVideoSource");
     if (connected === true){
         console.log("Updating local video source...");
-        easyrtc.disconnect();
+        //easyrtc.disconnect();
 
         // TODO: If using defaults, add constraints for "front" facing
         easyrtc._presetMediaConstraints={audio:{
@@ -236,22 +209,49 @@ function updateLocalAudioVideoSource(){
         }
         easyrtc.enableAudio(true);
         easyrtc.enableVideo(true);
-        easyrtc.closeLocalMediaStream();
-        //easyrtc.renegotiate();
+
+        easyrtc.closeLocalMediaStream("localStream1"); // TODO: Use stream name to close the correct stream in case of multiple sources
+
         easyrtc.initMediaSource(
             localVideoStreamSuccess,
             localVideoStreamError,
             "localStream1");
+
     }else{
         console.warn("Not connected to WebRTC... Can't update!");
     }
 }
 
 function localVideoStreamSuccess(stream){
+    console.log("Got local video stream - " + stream.streamName);
     if (stream.active){
-        easyrtc.setVideoObjectSrc(getVideoWidget(local,1)[0], stream);
-        console.log("Connecting to session...");
-        easyrtc.connect("TeraPlus", loginSuccess, loginFailure);
+        easyrtc.setVideoObjectSrc(getVideoWidget(true,1)[0], stream);
+        let local_index = -1;
+        for (let i=0; i<localStreams.length; i++){
+            if (localStreams[i].streamname === stream.streamName){
+                local_index = i;
+                break;
+            }
+        }
+        let infos = {'peerid': local_peerid, 'streamname': stream.streamName, 'stream': stream};
+        if (local_index>=0){
+            // Existing stream
+            localStreams[local_index] = infos;
+            console.log("Existing stream - updating...");
+
+            for (let i=0; i<remoteStreams.length; i++){
+                easyrtc.addStreamToCall(remoteStreams[i].peerid, 'localStream1', function () {
+                    easyrtc.renegotiate(remoteStreams[i].peerid);
+                })
+                easyrtc.renegotiate(remoteStreams[i].peerid);
+            }
+        }else{
+            // New stream
+            localStreams.push(infos);
+            console.log("Connecting to session...");
+            easyrtc.connect("TeraPlus", signalingLoginSuccess, signalingLoginFailure);
+        }
+
     }else{
         console.log("Got local stream - waiting for it to become active...");
     }
@@ -268,8 +268,8 @@ function forwardData(data)
     let settings = JSON.parse(data);
 
     if (settings.uuid !== localContact.uuid){
-        if (settings.uuid in peers_uuids_mapping){
-            let peer_id = peers_uuids_mapping[settings.uuid];
+        let peer_id = getPeerIdForUuid(settings.uuid);
+        if (peer_id){
             console.log("Forwarding to peer id" + peer_id);
             if (easyrtc.webSocketConnected) {
                 easyrtc.sendDataWS(peer_id, 'DataForwarding', data, function (ackMesg) {
@@ -334,7 +334,6 @@ function sendContactInfo(peerid_target){
 }
 
 function updateRoomUsers(roomName, occupants, isPrimary) {
-    let shownVideos = 0;
     for(let peerid in occupants) {
         if (peerid !== local_peerid){
             if (needToCallOtherUsers) {
@@ -364,28 +363,36 @@ function newStreamStarted(callerid, stream, streamname) {
     }*/
 
     // Check if already have a stream with that name from that source
-    let slot = -1;
+    let slot = getStreamIndexForPeerId(callerid);
     //if (streamname=="default"){
-    for (let i = 0; i < 4; i++) {
-        if (peerids[i] === callerid) {
+    /*for (let i = 0; i < remoteStreams.length; i++) {
+        if (remoteStreams[i].peerid === callerid) {
             console.warn("Stream already present for that source. Replacing.");
             slot = i;
             break;
         }
-    }
+    }*/
     //}
 
     // Find first empty slot
-    if (slot === -1){
-        if (remoteStreamsCount+1 > 4) {
+    if (slot === undefined){
+        if (remoteStreams.length+1 > 4) {
             showError("newStreamStarted", "New stream received, but not slot available!", true);
             return;
         }
-        remoteStreamsCount += 1;
-        slot = remoteStreamsCount;
+        remoteStreams.push({'peerid': callerid, 'streamname': streamname, 'stream': stream})
+        slot = remoteStreams.length;
+    }else{
+        slot += 1; // Since views starts at 1, and arrays at 0
     }
 
     console.log ("Assigning to slot " + slot);
+
+    // Check if we have a remote contact info already for that source and rename if
+    let contact_index = getContactIndexForPeerId(callerid);
+    if (contact_index !== undefined){
+        setTitle(false, slot, remoteContacts[contact_index].name);
+    }
 
     /*if (isWeb){
         // Starts connected sound
@@ -399,12 +406,12 @@ function newStreamStarted(callerid, stream, streamname) {
         //}
     }
 
-    peerids[slot] = callerid;
     easyrtc.setVideoObjectSrc(getVideoWidget(false, slot)[0], stream);
 
     // Update display
-    updateUserRemoteViewsLayout(remoteStreamsCount);
-    updateUserLocalViewLayout(localStreamsCount, remoteStreamsCount);
+    updateUserRemoteViewsLayout(remoteStreams.length);
+    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    refreshRemoteStatusIcons(callerid);
 
     // Send self contact card
     sendContactInfo(callerid);
@@ -461,81 +468,339 @@ function newStreamStarted(callerid, stream, streamname) {
     }else{
     }*/
 
-    updateRemoteContactsInfos();
+    //updateRemoteContactsInfos();
 
 }
-
+/*
 function updateRemoteContactsInfos(){
+    console.log("updateRemoteContactsInfos");
     // Find target id to update
     // Count number of streams for each contacts
-    /*let streams = [];
+    // let streams = [];
+    // for (let i=0; i<remoteContacts.length; i++){
+    //     streams[i] = 0;
+    //     for (let j=0; j<4; j++){
+    //         if (peerids[j] === remoteContacts[i].peerid){
+    //             streams[i] = streams[i] + 1;
+    //         }
+    //     }
+    // }
+
     for (let i=0; i<remoteContacts.length; i++){
-        streams[i] = 0;
         for (let j=0; j<4; j++){
             if (peerids[j] === remoteContacts[i].peerid){
-                streams[i] = streams[i] + 1;
-            }
-        }
-    }*/
-    for (let i=0; i<remoteContacts.length; i++){
-        for (let j=0; j<4; j++){
-            if (peerids[j] === remoteContacts[i].peerid){
-                //console.log("Found at " + j);
-                peers_uuids_mapping[remoteContacts[i].uuid] = remoteContacts[i].peerid;
+                console.log("Found at " + j);
                 setTitle(false, j+1, remoteContacts[i].name);
 
                 // TODO: REVISE!
-               /* if (remoteContacts[i].ptz != undefined){
-                    // Set PTZ icon
-                    zoom_tag = "zoomButtons" + j;
-                    presets_tag = "presetButtons" + j;
-                    settings_tag = "settingsButton" + j;
-
-                    showElement(zoom_tag);
-                    showElement(settings_tag);
-
-                    // Update display
-                    if (remoteContacts[i].ptz.zoom)
-                        showElement(zoom_tag);
-                    else
-                        hideElement(zoom_tag);
-
-                    if (remoteContacts[i].ptz.presets)
-                        showElement(presets_tag);
-                    else
-                        hideElement(presets_tag);
-
-                    if (remoteContacts[i].ptz.settings)
-                        showElement(settings_tag);
-                    else
-                        hideElement(settings_tag);
-                }
-
-                var addIcon = getAddVideoIconId(j);
-                var removeIcon = getRemoveVideoIconId(j);
-
-                if (streams[i]==1){
-
-                    if (remoteContacts[i].capabilities != undefined){
-                        // Set secondary camera capability
-                        if (remoteContacts[i].capabilities.video2){
-                            if (!isElementVisible(removeIcon)){
-                                showElement(addIcon);
-                            }else{
-                                hideElement(addIcon);
-                            }
-                        }else{
-                            hideElement(addIcon);
-                        }
-                    }else{
-                        hideElement(addIcon);
-                        hideElement(removeIcon);
-                    }
-                }else{
-                    hideElement(addIcon);
-                }*/
+                // if (remoteContacts[i].ptz != undefined){
+                //     // Set PTZ icon
+                //     zoom_tag = "zoomButtons" + j;
+                //     presets_tag = "presetButtons" + j;
+                //     settings_tag = "settingsButton" + j;
+                //
+                //     showElement(zoom_tag);
+                //     showElement(settings_tag);
+                //
+                //     // Update display
+                //     if (remoteContacts[i].ptz.zoom)
+                //         showElement(zoom_tag);
+                //     else
+                //         hideElement(zoom_tag);
+                //
+                //     if (remoteContacts[i].ptz.presets)
+                //         showElement(presets_tag);
+                //     else
+                //         hideElement(presets_tag);
+                //
+                //     if (remoteContacts[i].ptz.settings)
+                //         showElement(settings_tag);
+                //     else
+                //         hideElement(settings_tag);
+                // }
+                //
+                // var addIcon = getAddVideoIconId(j);
+                // var removeIcon = getRemoveVideoIconId(j);
+                //
+                // if (streams[i]==1){
+                //
+                //     if (remoteContacts[i].capabilities != undefined){
+                //         // Set secondary camera capability
+                //         if (remoteContacts[i].capabilities.video2){
+                //             if (!isElementVisible(removeIcon)){
+                //                 showElement(addIcon);
+                //             }else{
+                //                 hideElement(addIcon);
+                //             }
+                //         }else{
+                //             hideElement(addIcon);
+                //         }
+                //     }else{
+                //         hideElement(addIcon);
+                //         hideElement(removeIcon);
+                //     }
+                // }else{
+                //     hideElement(addIcon);
+                // }
 
             }
         }
     }
+}*/
+
+function streamDisconnected(callerid, mediaStream, streamName){
+    // Find video slot used by that caller
+    let slot = getStreamIndexForPeerId(callerid);
+
+    if (slot === undefined){
+        showError("Stream disconnected", callerid  + " currently not displayed. Aborting.", false);
+        return;
+    }
+
+    console.log ("Stream disconnected: " + callerid + " - Slot " + (slot+1));
+
+    /*if (isWeb){
+        // Starts connected sound
+        document.getElementById("audioDisconnected").play()
+    }*/
+
+    // Remove stream
+    for (let i=0; i<remoteStreams.length; i++){
+        if (remoteStreams[i].peerid === callerid && remoteStreams[i].streamname === streamName){
+            remoteStreams.splice(i,1);
+            break;
+        }
+    }
+
+    // Remove contact info
+    // Keep them all for now...
+    /*let contact_index = getContactIndexForPeerId(callerid);
+    if (contact_index !== undefined){
+        remoteContacts.splice(contact_index, 1);
+    }*/
+
+    // Update views
+    for (let i=0; i<remoteStreams.length; i++){
+        easyrtc.setVideoObjectSrc(getVideoWidget(false,i+1)[0], remoteStreams[i].stream);
+        setTitle(false, i+1, remoteContacts[i].name)
+    }
+
+    updateUserRemoteViewsLayout(remoteStreams.length);
+    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+}
+
+function getUuidForPeerId(peerid){
+    remoteContacts.forEach( contact =>
+        {
+            if (contact.peerid === peerid){
+                return contact.uuid;
+            }
+        }
+    )
+    return undefined;
+}
+
+function getPeerIdForUuid(uuid){
+    remoteContacts.forEach( contact =>
+        {
+            if (contact.uuid === uuid){
+                return contact.peerid;
+            }
+        }
+    )
+    return undefined;
+}
+
+function getContactIndexForUuid(uuid){
+    for (let i=0; i<remoteContacts.length; i++){
+        if (remoteContacts[i].uuid === uuid)
+            return i;
+    }
+    return undefined;
+}
+
+function getContactIndexForPeerId(peerid){
+    for (let i=0; i<remoteContacts.length; i++){
+        if (remoteContacts[i].peerid === peerid)
+            return i;
+    }
+    return undefined;
+}
+
+function getStreamIndexForPeerId(peerid){
+    for (let i=0; i<remoteStreams.length; i++){
+        if (remoteStreams[i].peerid === peerid)
+            return i;
+    }
+    return undefined;
+}
+
+function dataReception(sendercid, msgType, msgData, targeting) {
+    console.log("dataReception : src=" + sendercid + " type=" + msgType + " data=" + JSON.stringify(msgData) + " target=" + targeting.targetEasyrtcid);
+
+    if (msgType === "contactInfo"){
+        // Save contact info
+        let contact_card_index = getContactIndexForPeerId(sendercid);
+        if (contact_card_index !== undefined){
+            console.log("ContactInfo: Remote contact found - updating!");
+            remoteContacts[contact_card_index] = msgData;
+        }else{
+            console.log("ContactInfo: Remote contact not found - adding!");
+            remoteContacts.push(msgData);
+        }
+        // Update title
+        let stream_index = getStreamIndexForPeerId(sendercid);
+        if (stream_index !== undefined) {
+            setTitle(false, stream_index+1, msgData.name);
+        }
+    }
+
+    if (msgType === "PTZRequest"){
+        //console.error("PTZRequest");
+        //console.error(msgData);
+        if (teraConnected)
+            SharedObject.imageClicked(localContact.uuid, msgData.x, msgData.y, msgData.w, msgData.h);
+        else
+            console.error("Not connected to client.");
+    }
+
+    if (msgType === "ZoomRequest"){
+        //console.error("ZoomRequest");
+        //console.error(msgData);
+        if (teraConnected){
+            if (msgData.value === "in")
+                SharedObject.zoomInClicked(localContact.uuid);
+            if (msgData.value === "out")
+                SharedObject.zoomOutClicked(localContact.uuid);
+            if (msgData.value === "min")
+                SharedObject.zoomMinClicked(localContact.uuid);
+            if (msgData.value === "max")
+                SharedObject.zoomMaxClicked(localContact.uuid);
+        }else
+            console.error("Not connected to client.");
+    }
+
+    if (msgType === "PresetRequest"){
+        let event =[];
+
+        if (msgData.set === true){
+            event.shiftKey = true;
+            event.ctrlKey = true;
+        }
+        gotoPreset(event, 0, msgData.preset);
+    }
+
+    if (msgType === "CamSettingsRequest"){
+        if (teraConnected){
+            let uuid = getUuidForPeerId(sendercid);
+            if (uuid){
+                SharedObject.camSettingsClicked(uuid);
+            }else{
+                showError("dataReception/CamSettingsRequest", "Uuid not found.", false);
+            }
+
+        }else
+            showError("dataReception/CamSettingsRequest", "Not connected to client.", false);
+    }
+
+    if (msgType === "DataForwarding"){
+        if (teraConnected)
+            SharedObject.dataForwardReceived(msgData);
+        else
+            console.error("Not connected to client.");
+    }
+
+    if (msgType === "muteMicro"){
+        muteMicro(true, msgData.index, msgData.micro);
+        /*if (msgData.subindex=="")
+            muteMicro(0);
+        else
+            muteMicro(-1);*/
+    }
+
+    if (msgType === "muteSpeaker"){
+        muteSpeaker(true, msgData.index, msgData.speaker);
+    }
+
+    if (msgType === "muteVideo"){
+        muteVideo(true, msgData.index, msgData.video);
+    }
+
+    if (msgType === "setMirror"){
+        showVideoMirror(true, msgData.index, msgData.mirror); // TODO: handle index
+    }
+
+    if (msgType === "addVideo"){
+        //addLocalSource2(0);
+        console.warn("dataReception/addVideo - not implemented yet!");
+    }
+
+    if (msgType === "removeVideo"){
+        //removeLocalSource2(0);
+        console.warn("dataReception/removeVideo - not implemented yet!");
+    }
+
+    if (msgType === "updatePTZCapabilities"){
+        setPTZCapabilities(msgData.uuid, msgData.zoom, msgData.presets, msgData.settings);
+    }
+
+    if (msgType === "updateCapabilities"){
+        setCapabilities(sendercid, msgData.video2);
+    }
+
+    if (msgType === "updateStatus"){
+        //console.log(msgData);
+        let index = getStreamIndexForPeerId(sendercid);
+        let contact_index = getContactIndexForPeerId(sendercid);
+        if (contact_index === undefined){
+            console.log("No contact card yet for that peer - creating one.");
+            remoteContacts.push({peerid: sendercid});
+            contact_index = remoteContacts.length-1;
+        }
+
+        remoteContacts[contact_index].status = msgData;
+        if (index === undefined){
+            // Got status before stream... must "buf" that status
+            console.log("Got updateStatus, but no stream yet - buffering.");
+        }else {
+            refreshRemoteStatusIcons(sendercid);
+
+            if (msgData.mirror !== undefined){
+                showVideoMirror(false, index, msgData.mirror);
+            }
+        }
+    }
+}
+
+function signalingLoginSuccess(peerid,  roomOwner) {
+    console.log("Login success! peerid = " + peerid);
+    local_peerid = peerid;
+    localContact.peerid = peerid;
+
+    // Ensure id is set correctly on each local stream!
+    for (let i=0; i<localStreams.length; i++){
+        localStreams[i].peerid = peerid;
+    }
+
+    /*easyrtc.getVideoSourceList(fillVideoSourceList);
+    easyrtc.getAudioSourceList(fillAudioSourceList);*/
+
+    // Sends PTZ capabilities
+    broadcastlocalPTZCapabilities();
+
+    // Sends other capabilities
+    broadcastlocalCapabilities();
+
+    /*if (isWeb){
+        // Starts calling sounds
+        document.getElementById("audioCalling").play();
+    }*/
+
+
+}
+
+function signalingLoginFailure(errorCode, message) {
+
+    showError("signalingLoginFailure", "Can't connect to signaling server! Code: " + errorCode +" - " + message);
+    //easyrtc.showError(errorCode, message);
 }
