@@ -39,6 +39,7 @@ class ServiceLauncherModule(BaseModule):
 
     def launch_service(self, service: TeraService):
         print('Launching service: ', service.service_key)
+        self.logger.log_info(self.module_name, 'Launching service', service.service_key)
         # First argument will be python executable
         executable_args = [sys.executable]
         working_directory = os.getcwd()
@@ -65,6 +66,7 @@ class ServiceLauncherModule(BaseModule):
             working_directory = os.path.join(os.getcwd(), 'services', 'VideoRehabService')
         else:
             print('Unable to start :', service.service_key)
+            self.logger.log_error(self.module_name, 'Unable to start', service.service_key)
             return
 
         # Start process
@@ -74,4 +76,5 @@ class ServiceLauncherModule(BaseModule):
             'service': service.to_json()
         }
         self.processList.append(process_dict)
+        self.logger.log_info(self.module_name, 'service started', process_dict)
         print('ServiceLauncherModule.launch_service, service started:', process_dict)

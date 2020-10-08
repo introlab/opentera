@@ -126,41 +126,43 @@ class UserManagerModule(BaseModule):
 
     def handle_user_connected(self, header, user_event: UserEvent):
         self.user_registry.user_online(user_event.user_uuid)
-
+        self.logger.log_info(self.module_name, 'user online', user_event.user_uuid)
         # Send message to event topic
         self.send_event_message(user_event, self.event_topic_name())
 
     def handle_user_disconnected(self, header, user_event: UserEvent):
         self.user_registry.user_offline(user_event.user_uuid)
-
+        self.logger.log_info(self.module_name, 'user offline', user_event.user_uuid)
         # Send message to event topic
         self.send_event_message(user_event, self.event_topic_name())
 
     def handle_participant_connected(self, header, participant_event: ParticipantEvent):
         self.participant_registry.participant_online(participant_event.participant_uuid)
-
+        self.logger.log_info(self.module_name, 'participant online', participant_event.participant_uuid)
         # Send message to event topic
         self.send_event_message(participant_event, self.event_topic_name())
 
     def handle_participant_disconnected(self, header, participant_event: ParticipantEvent):
         self.participant_registry.participant_offline(participant_event.participant_uuid)
-
+        self.logger.log_info(self.module_name, 'participant offline', participant_event.participant_uuid)
         # Send message to event topic
         self.send_event_message(participant_event, self.event_topic_name())
 
     def handle_device_connected(self, header, device_event: DeviceEvent):
         self.device_registry.device_online(device_event.device_uuid)
-
+        self.logger.log_info(self.module_name, 'device online', device_event.device_uuid)
         # Send message to event topic
         self.send_event_message(device_event, self.event_topic_name())
 
     def handle_device_disconnected(self, header, device_event: DeviceEvent):
         self.device_registry.device_offline(device_event.device_uuid)
-
+        self.logger.log_info(self.module_name, 'device offline', device_event.device_uuid)
         # Send message to event topic
         self.send_event_message(device_event, self.event_topic_name())
 
     def set_users_in_session(self, session_uuid: str, user_uuids: list, in_session: bool):
+        self.logger.log_info(self.module_name, 'set_users_in_session', session_uuid, user_uuids, in_session)
+
         for user in user_uuids:
             user_event = UserEvent()
             user_event.user_uuid = user
@@ -175,6 +177,9 @@ class UserManagerModule(BaseModule):
             self.send_event_message(user_event, self.event_topic_name())
 
     def set_participants_in_session(self, session_uuid: str, participant_uuids: list, in_session: bool):
+        self.logger.log_info(self.module_name, 'set_participants_in_session', session_uuid,
+                             participant_uuids, in_session)
+
         for participant in participant_uuids:
             participant_event = ParticipantEvent()
             participant_event.participant_uuid = participant
@@ -189,6 +194,9 @@ class UserManagerModule(BaseModule):
             self.send_event_message(participant_event, self.event_topic_name())
 
     def set_devices_in_session(self, session_uuid: str, device_uuids: list, in_session: bool):
+        self.logger.log_info(self.module_name, 'set_devices_in_session', session_uuid,
+                             device_uuids, in_session)
+
         for device in device_uuids:
             device_event = DeviceEvent()
             device_event.device_uuid = device
@@ -203,6 +211,7 @@ class UserManagerModule(BaseModule):
             self.send_event_message(device_event, self.event_topic_name())
 
     def handle_join_session_event(self, join_event: JoinSessionEvent):
+        self.logger.log_info(self.module_name, 'JoinSessionEvent', 'session', join_event.session_uuid)
         self.set_users_in_session(session_uuid=join_event.session_uuid, user_uuids=join_event.session_users,
                                   in_session=True)
 
@@ -214,6 +223,7 @@ class UserManagerModule(BaseModule):
                                     in_session=True)
 
     def handle_stop_session_event(self, stop_event: StopSessionEvent):
+        self.logger.log_info(self.module_name, 'StopSessionEvent', 'session', stop_event.session_uuid)
         session_users = []
         session_devices = []
         session_participants = []
@@ -242,6 +252,7 @@ class UserManagerModule(BaseModule):
                                     in_session=False)
 
     def handle_leave_session_event(self, leave_event: LeaveSessionEvent):
+        self.logger.log_info(self.module_name, 'LeaveSessionEvent', 'session', leave_event.session_uuid)
         self.set_users_in_session(session_uuid=leave_event.session_uuid, user_uuids=leave_event.leaving_users,
                                   in_session=False)
 
@@ -254,6 +265,7 @@ class UserManagerModule(BaseModule):
 
     def handle_join_session_reply_event(self, join_reply: JoinSessionReplyEvent):
         # Clear busy states of elements that refused to join session
+        self.logger.log_info(self.module_name, 'JoinSessionReplyEvent', 'session', join_reply.session_uuid)
         if join_reply.join_reply != JoinSessionReplyEvent.REPLY_ACCEPTED:
             self.set_users_in_session(session_uuid=join_reply.session_uuid, user_uuids=[join_reply.user_uuid],
                                       in_session=False)

@@ -15,6 +15,7 @@ from twisted.internet.ssl import ClientContextFactory
 import messages.python as messages
 from google.protobuf.json_format import ParseDict, ParseError
 
+
 @implementer(IPolicyForHTTPS)
 class WithCertificatePolicy(client.BrowserLikePolicyForHTTPS):
     def creatorForNetloc(self, hostname, port):

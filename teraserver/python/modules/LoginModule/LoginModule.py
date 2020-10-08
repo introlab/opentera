@@ -95,7 +95,9 @@ class DisabledTokenStorage:
 
 class LoginModule(BaseModule):
 
+    # This client is required for static functions
     redis_client = None
+
     # Only user & participant tokens expire (for now)
     __user_disabled_token_storage = DisabledTokenStorage()
     __participant_disabled_token_storage = DisabledTokenStorage()
@@ -205,6 +207,8 @@ class LoginModule(BaseModule):
             # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
             # self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
+
+        self.logger.log_warning(self.module_name, 'Invalid password for user', username)
         return False
 
     @staticmethod
@@ -229,6 +233,7 @@ class LoginModule(BaseModule):
                                     algorithms='HS256')
         except jwt.exceptions.PyJWTError as e:
             print(e)
+            self.logger.log_error(self.module_name, 'User Token exception occurred')
             return False
 
         if token_dict['user_uuid'] and token_dict['exp']:
@@ -237,6 +242,7 @@ class LoginModule(BaseModule):
 
             # Expiration date in the past?
             if expiration_date < datetime.datetime.now():
+                self.logger.log_warning(self.module_name, 'Token expired for user', token_dict['user_uuid'])
                 return False
 
             _request_ctx_stack.top.current_user = TeraUser.get_user_by_uuid(token_dict['user_uuid'])
@@ -266,6 +272,8 @@ class LoginModule(BaseModule):
             # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
             # self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
+
+        self.logger.log_warning(self.module_name, 'Invalid password for participant', username)
         return False
 
     @staticmethod
@@ -305,6 +313,7 @@ class LoginModule(BaseModule):
                                     algorithms='HS256')
         except jwt.exceptions.PyJWTError as e:
             print(e)
+            self.logger.log_error(self.module_name, 'Participant Token exception occurred')
             return False
 
         if token_dict['participant_uuid'] and token_dict['exp']:
@@ -314,6 +323,8 @@ class LoginModule(BaseModule):
 
             # Expiration date in the past?
             if expiration_date < datetime.datetime.now():
+                self.logger.log_warning(self.module_name, 'Token expired for participant',
+                                        token_dict['participant_uuid'])
                 return False
 
             _request_ctx_stack.top.current_participant = \
