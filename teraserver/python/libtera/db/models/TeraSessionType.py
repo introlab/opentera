@@ -107,6 +107,18 @@ class TeraSessionType(db.Model, BaseModel):
         #     int(TeraDeviceType.DeviceTypeEnum.ROBOT.value))]
         db.session.add(robot_session)
 
+        bureau_session = TeraSessionType()
+        bureau_session.session_type_name = "Bureau Actif"
+        bureau_session.session_type_online = False
+        bureau_session.session_type_multi = False
+        bureau_session.session_type_config = ""
+        bureau_session.session_type_color = "#FF00FF"
+        bureau_session.session_type_category = TeraSessionType.SessionCategoryEnum.SERVICE.value
+        # robot_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
+        #     int(TeraDeviceType.DeviceTypeEnum.ROBOT.value))]
+        bureau_session.id_service = TeraService.get_service_by_key('BureauActif').id_service
+        db.session.add(bureau_session)
+
         db.session.commit()
 
     @staticmethod
