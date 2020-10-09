@@ -57,7 +57,7 @@ function selectVideoSource(source){
         if (videoSources[i].label.includes(video.name)){
             console.log("Found source at: " + i);
             currentConfig.currentVideoSourceIndex = i;
-            updateLocalAudioVideoSource();
+            updateLocalAudioVideoSource(1);
             found = true;
             break;
         }
@@ -66,7 +66,7 @@ function selectVideoSource(source){
         if (video.index !== undefined){
             console.log("Selected by index.");
             currentConfig.currentVideoSourceIndex = video.index;
-            updateLocalAudioVideoSource();
+            updateLocalAudioVideoSource(1);
         }
     }
 
@@ -93,7 +93,7 @@ function selectAudioSource(source){
             console.log("Found source at: " + i);
 
             currentConfig.currentAudioSourceIndex = i;
-            updateLocalAudioVideoSource();
+            updateLocalAudioVideoSource(1);
             found = true;
             break;
         }
@@ -154,7 +154,7 @@ function selectSecondarySources(source){
         localCapabilities.video2 = false;
     }
     broadcastlocalCapabilities();
-    updateLocalAudioVideoSource();
+    updateLocalAudioVideoSource(2);
 }
 
 function selectDefaultSources(){

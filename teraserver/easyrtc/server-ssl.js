@@ -67,7 +67,7 @@ httpApp).listen(myport);
 // Start Socket.io so it attaches itself to Express server
 var websocket_path = "/websocket/" + myport + '/'
 console.log('websocket path:', websocket_path)
-var socketServer = io.listen(webServer, {"log level":1, "path": websocket_path });
+var socketServer = io.listen(webServer, {"log level":1, "path": websocket_path, "cookie": false});
 
 
 //TODO Set options here (ice servers)

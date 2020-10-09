@@ -102,7 +102,7 @@ function showSecondaryLocalSourcesIcons(show_add_button, show_remove_button){
 function showVideoMirror(local, index, mirror){
     let video_widget = getVideoWidget(local, index);
     if (video_widget !== undefined){
-        (mirror === true) ? video_widget.addClass('easyrtcMirror') : video_widget.removeClass('easyrtcMirror');
+        (mirror === true) ? video_widget.addClass('videoMirror') : video_widget.removeClass('videoMirror');
     }
 }
 
@@ -217,7 +217,7 @@ function setConfigDialogValues(audios, videos, config){
     audioSelect2.selectedIndex = config['currentAudioSource2Index'];
 }
 
-function configDialogClosed(e){
+function configDialogClosed(){
     // Compare values with current config and apply changes if needed
     let videoSelect = $('#videoSelect')[0];
     let audioSelect = $('#audioSelect')[0];
@@ -230,7 +230,7 @@ function configDialogClosed(e){
         // Video and/or audio source changed
         currentConfig['currentVideoSourceIndex'] = videoSelect.selectedIndex;
         currentConfig['currentAudioSourceIndex'] = audioSelect.selectedIndex;
-        updateLocalAudioVideoSource();
+        updateLocalAudioVideoSource(1);
     }
 
     if (mirrorCheck.checked !== currentConfig['video1Mirror']){
@@ -253,6 +253,7 @@ function configDialogClosed(e){
 function setTitle(local, index, title){
     let view_prefix = ((local === true) ? 'local' : 'remote');
     let label = $('#' + view_prefix + 'ViewTitle' + index);
+    if (title === undefined) title = "Participant #" + index;
     if (label.length){
         label[0].innerText = title;
     }

@@ -40,7 +40,7 @@ function connect() {
     //easyrtc.setOnCall(newStreamStarted);
 
     connected = true;
-    updateLocalAudioVideoSource();
+    updateLocalAudioVideoSource(1);
 
 
     clearStatusMsg();
@@ -57,7 +57,7 @@ function muteMicro(local, index, new_state){
     if (local === true){
         // Send display update request
         let request = {"peerid": local_peerid, micro: new_state};
-        easyrtc.enableMicrophone(new_state, "localStream" + index);
+        easyrtc.enableMicrophone(new_state);  // Fix me: doesn't seem to work if specifying stream name....
 
         //console.log(request);
         if (easyrtc.webSocketConnected) {
@@ -94,8 +94,14 @@ function muteVideo(local, index, new_state){
         // Send display update request
         let request = {"peerid": local_peerid, video: new_state};
 
-        // TODO
-        console.warn('Video Muting not supported yet.');
+        if (index <= localStreams.length){
+            let videoTracks = localStreams[index-1].stream.getVideoTracks();
+            for (let i=0; i<videoTracks.length; i++){
+                videoTracks[i].enabled = new_state;
+            }
+        }else{
+            showError("muteVideo", "Trying to mute video on a local stream not present: index = " + (index-1), false);
+        }
 
         if (easyrtc.webSocketConnected) {
             easyrtc.sendDataWS({targetRoom: "default"}, 'updateStatus', request,
@@ -192,10 +198,17 @@ function setMirror(mirror, local, index){
 }
 
 
-function updateLocalAudioVideoSource(){
+function updateLocalAudioVideoSource(streamindex){
     if (connected === true){
-        console.log("Updating local video source...");
-        //easyrtc.disconnect();
+        let streamname = "localStream" + streamindex;
+        if (streamindex === 1)
+            streamname = "";
+        if (streamindex < localStreams.length){
+            console.log("Updating audio/video source: " + streamname);
+
+        }else {
+            console.log("Creating audio/video source: " + streamname);
+        }
 
         // TODO: If using defaults, add constraints for "front" facing
         easyrtc._presetMediaConstraints={audio:{
@@ -210,12 +223,14 @@ function updateLocalAudioVideoSource(){
         easyrtc.enableAudio(true);
         easyrtc.enableVideo(true);
 
-        easyrtc.closeLocalMediaStream("localStream1"); // TODO: Use stream name to close the correct stream in case of multiple sources
+        easyrtc.closeLocalMediaStream(streamname); // This is needed, especially if we are switching to a mic owned by a
+                                                   // video device, otherwise an error will occur... This cause some
+                                                   // lag though...
 
         easyrtc.initMediaSource(
             localVideoStreamSuccess,
             localVideoStreamError,
-            "localStream1");
+            streamname);
 
     }else{
         console.warn("Not connected to WebRTC... Can't update!");
@@ -238,12 +253,37 @@ function localVideoStreamSuccess(stream){
             // Existing stream
             localStreams[local_index] = infos;
             console.log("Existing stream - updating...");
-
+            let videoTrack = stream.getVideoTracks()[0];
+            let audioTrack = stream.getAudioTracks()[0];
             for (let i=0; i<remoteStreams.length; i++){
-                easyrtc.addStreamToCall(remoteStreams[i].peerid, 'localStream1', function () {
-                    easyrtc.renegotiate(remoteStreams[i].peerid);
-                })
+                let pc = easyrtc.getPeerConnectionByUserId(remoteStreams[i].peerid);
+                let video_sender = pc.getSenders().find(function(s) {
+                    if (s.track)
+                        return s.track.kind === videoTrack.kind;
+                    return undefined;
+                });
+                let audio_sender = pc.getSenders().find(function(s) {
+                    if (s.track)
+                        return s.track.kind === audioTrack.kind;
+                    return undefined;
+                });
+                if (video_sender !== undefined){
+                    video_sender.replaceTrack(videoTrack);
+                }else{
+                    console.log("No sender for video track found...");
+
+                }
+                if (audio_sender !== undefined) {
+                    audio_sender.replaceTrack(audioTrack);
+                }else{
+                    console.log("No sender for audio track found...");
+                }
+                if (audio_sender === undefined || video_sender === undefined){
+                    // Must re-add the stream to the call!
+                    easyrtc.addStreamToCall(remoteStreams[i].peerid, stream.streamname);
+                }
                 easyrtc.renegotiate(remoteStreams[i].peerid);
+
             }
         }else{
             // New stream
@@ -334,6 +374,7 @@ function sendContactInfo(peerid_target){
 }
 
 function updateRoomUsers(roomName, occupants, isPrimary) {
+    console.log("updateRoomUsers: " + JSON.stringify(occupants));
     for(let peerid in occupants) {
         if (peerid !== local_peerid){
             if (needToCallOtherUsers) {
@@ -351,6 +392,14 @@ function updateRoomUsers(roomName, occupants, isPrimary) {
             }
         }
     }
+
+    remoteStreams.forEach(remote_stream => {
+        if (!(remote_stream.peerid in occupants)) {
+            console.log('Peer id ' + remote_stream.peerid + ' left, but still has hanging stream. Cleaning up...');
+            streamDisconnected(remote_stream.peerid, remote_stream.stream, remote_stream.streamname);
+        }
+    });
+
     needToCallOtherUsers = false;
 }
 

@@ -7,7 +7,6 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" type="text/css" href="css/teraplus.css" />
     <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
 
     <!-- Javascripts -->
     <script src="js/jquery/jquery-3.5.1.min.js"></script>
@@ -103,7 +102,7 @@
                         <input id="localConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="setConfigDialogValues(audioSources, videoSources, currentConfig);" data-toggle="modal" data-target="#configDialog" style="display: none;"/>
                         <input id="localMicStatus1" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(true,1);event.stopPropagation();" style="display: none;"/>
                         <input id="localVideoStatus1" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(true,1);event.stopPropagation();" style="display: none;"/>
-                        <input id="localSpeakerStatus1" type="image" alt="image" src="images/speaker.png" height=32 onclick="/*muteSpeaker(true,1);event.stopPropagation();*/" style="display: none;"/>
+                        <input id="localSpeakerStatus1" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(true,1);event.stopPropagation();" style="display: none;"/>
                     </div>
                     <!-- PTZ controls -->
                     <div id="localPtzControls1" class="overlay-left" oncontextmenu="" onclick="" onwheel="" style="display: none;">
@@ -135,7 +134,7 @@
                            oncontextmenu="return false;"
                            onclick="managePTZClickEvent(event, true, 1);"
                            onwheel="managePTZMouseWheel(event, true, 1);"
-                           class="easyrtcMirror"></video>
+                           class="videoMirror"></video>
                 </div>
             </div>
             <div class="row h-33" id="localView2Row">
