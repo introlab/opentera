@@ -21,6 +21,8 @@ class LoggingClient:
         string sender = 3;
         string message = 4;
     }
+
+    This client will send messages to queues. Logging Service is responsible of reading the queues.
     """
 
     def __init__(self, config):
@@ -29,62 +31,64 @@ class LoggingClient:
 
     def log_trace(self, sender: str, *args):
         try:
-            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_TRACE, sender, *args))
+            self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_TRACE, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
             print('LoggingClient.log_trace', e)
 
     def log_debug(self, sender: str, *args):
         try:
-            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_DEBUG, sender, *args))
+            self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_DEBUG, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
             print('LoggingClient.log_debug', e)
 
     def log_info(self, sender: str, *args):
         try:
-            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_INFO, sender, *args))
+            self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_INFO, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
             print('LoggingClient.log_info', e)
 
     def log_warning(self, sender: str, *args):
         try:
-            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_WARNING, sender, *args))
+            self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_WARNING, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
             print('LoggingClient.log_warning', e)
 
     def log_critical(self, sender: str, *args):
         try:
-            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_CRITICAL, sender, *args))
+            self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_CRITICAL, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
             print('LoggingClient.log_critical', e)
 
     def log_error(self, sender: str, *args):
         try:
-            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_ERROR, sender, *args))
+            self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_ERROR, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
             print('LoggingClient.log_error', e)
 
     def log_fatal(self, sender: str, *args):
         try:
-            self._send_tera_event_message(self._create_log_event(messages.LogEvent.LOGLEVEL_FATAL, sender, *args))
+            self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_FATAL, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
             print('LoggingClient.log_fatal', e)
 
-    def _create_log_event(self, level, sender, *args):
-            log_event = messages.LogEvent()
-            log_event.level = level
-            log_event.timestamp = datetime.datetime.now().timestamp()
-            log_event.sender = str(sender)
-            log_event.message = str(args)
-            return log_event
+    @staticmethod
+    def _create_log_event(level, sender, *args):
+        log_event = messages.LogEvent()
+        log_event.level = level
+        log_event.timestamp = datetime.datetime.now().timestamp()
+        log_event.sender = str(sender)
+        log_event.message = str(args)
+        return log_event
 
-    def _send_tera_event_message(self, log_event: messages.LogEvent):
+    @staticmethod
+    def _create_tera_event_message(log_event: messages.LogEvent):
         event_message = messages.TeraEvent()
         event_message.header.version = 1
         # Duplicated time, useful?
@@ -114,9 +118,11 @@ class LoggingClient:
         any_message.Pack(log_event)
         event_message.events.extend([any_message])
 
-        # Publish message
-        self.redis.publish(event_message.header.topic, event_message.SerializeToString())
+        return event_message
 
+    def _push_tera_event_message(self, log_event: messages.LogEvent):
+        event_message = LoggingClient._create_tera_event_message(log_event)
+        self.redis.rpush(event_message.header.topic, event_message.SerializeToString())
         return event_message
 
 

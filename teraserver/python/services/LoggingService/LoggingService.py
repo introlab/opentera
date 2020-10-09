@@ -10,7 +10,7 @@ from google.protobuf.message import DecodeError
 
 # Twisted
 from twisted.application import internet, service
-from twisted.internet import reactor, ssl, defer
+from twisted.internet import reactor, ssl, defer, task
 from twisted.python import log
 import messages.python as messages
 import sys
@@ -36,16 +36,48 @@ class LoggingService(ServiceOpenTera):
         # self.application = service.Application(self.config['name'])
 
         # TODO update log level according to configuration
+        # TODO will log everything for now
         self.loglevel = messages.LogEvent.LOGLEVEL_TRACE
 
     def notify_service_messages(self, pattern, channel, message):
         pass
+
+    def read_queues(self, queue_name: str):
+        # print('read_queues', queue_name)
+        # Reading queue
+        while self.redis.llen(queue_name) > 0:
+            message = self.redis.lpop(queue_name)
+            self.log_event_received(queue_name, queue_name, message)
+
+    def cbLoopDone(self, result):
+        """
+        Called when loop was stopped with success.
+        """
+        print('cbLoopDone', result)
+
+    def ebLoopFailed(self, failure):
+        """
+        Called when loop execution failed.
+        """
+        print('ebLoopFailed', failure)
 
     @defer.inlineCallbacks
     def register_to_events(self):
         # Need to register to events produced by UserManagerModule
         ret1 = yield self.subscribe_pattern_with_callback('log.*', self.log_event_received)
         print(ret1)
+
+        log_levels = ['log.trace', 'log.debug', 'log.info', 'log.warning', 'log.critical', 'log.error', 'log.fatal']
+
+        for level in log_levels:
+            loop = task.LoopingCall(self.read_queues, level)
+
+            # Start looping every 1 second.
+            d = loop.start(1.0)
+
+            # Add callbacks for stop and failure.
+            d.addCallback(self.cbLoopDone)
+            d.addErrback(self.ebLoopFailed)
 
     def log_event_received(self, pattern, channel, message):
         print('LoggingService - user_manager_event_received', pattern, channel, message)

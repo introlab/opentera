@@ -65,6 +65,13 @@ class VideoRehabService(ServiceOpenTera):
     def send_join_message(self, session_info, join_msg: str = gettext('Join me!'), target_users: list = None,
                           target_participants: list = None, target_devices: list = None):
 
+        self.logger.log_info(self.config['name'],
+                             'send_join_message',
+                             session_info['session_uuid'],
+                             target_users,
+                             target_participants,
+                             target_devices)
+
         users = session_info['session_users']
         participants = session_info['session_participants']
         devices = session_info['session_devices']
