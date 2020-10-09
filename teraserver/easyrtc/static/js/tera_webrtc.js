@@ -223,9 +223,22 @@ function updateLocalAudioVideoSource(streamindex){
         easyrtc.enableAudio(true);
         easyrtc.enableVideo(true);
 
-        easyrtc.closeLocalMediaStream(streamname); // This is needed, especially if we are switching to a mic owned by a
+        //easyrtc.closeLocalMediaStream(streamname); // This is needed, especially if we are switching to a mic owned by a
                                                    // video device, otherwise an error will occur... This cause some
                                                    // lag though...
+
+        // Disable all tracks before creating, if needed
+        if (streamindex <= localStreams.length){
+            let stream = localStreams[streamindex-1].stream;
+            let videoTracks = stream.getVideoTracks();
+            let audioTracks = stream.getAudioTracks();
+
+            for (let i=0; i<videoTracks.length; i++)
+                videoTracks[i].enabled = false;
+
+            for (let i=0; i<audioTracks.length; i++)
+                audioTracks[i].enabled = false;
+        }
 
         easyrtc.initMediaSource(
             localVideoStreamSuccess,
@@ -413,15 +426,6 @@ function newStreamStarted(callerid, stream, streamname) {
 
     // Check if already have a stream with that name from that source
     let slot = getStreamIndexForPeerId(callerid);
-    //if (streamname=="default"){
-    /*for (let i = 0; i < remoteStreams.length; i++) {
-        if (remoteStreams[i].peerid === callerid) {
-            console.warn("Stream already present for that source. Replacing.");
-            slot = i;
-            break;
-        }
-    }*/
-    //}
 
     // Find first empty slot
     if (slot === undefined){
