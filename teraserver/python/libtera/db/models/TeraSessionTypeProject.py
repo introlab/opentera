@@ -32,6 +32,7 @@ class TeraSessionTypeProject(db.Model, BaseModel):
         sensor_session = TeraSessionType.get_session_type_by_id(2)
         data_session = TeraSessionType.get_session_type_by_id(3)
         exerc_session = TeraSessionType.get_session_type_by_id(4)
+        bureau_session = TeraSessionType.get_session_type_by_id(5)
 
         project = TeraProject.get_project_by_projectname('Default Project #1')
 
@@ -52,6 +53,11 @@ class TeraSessionTypeProject(db.Model, BaseModel):
 
         stp = TeraSessionTypeProject()
         stp.session_type_project_session_type = exerc_session
+        stp.session_type_project_project = project
+        db.session.add(stp)
+
+        stp = TeraSessionTypeProject()
+        stp.session_type_project_session_type = bureau_session
         stp.session_type_project_project = project
         db.session.add(stp)
 
