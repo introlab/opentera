@@ -303,7 +303,12 @@ function localVideoStreamSuccess(stream){
             localStreams.push(infos);
             console.log("Connecting to session...");
             easyrtc.connect("TeraPlus", signalingLoginSuccess, signalingLoginFailure);
+            local_index = 0;
         }
+
+        // Clear status icons
+        updateStatusIconState(true, true, local_index+1, 'Mic');
+        updateStatusIconState(true, true, local_index+1, 'Video');
 
     }else{
         console.log("Got local stream - waiting for it to become active...");
@@ -635,6 +640,7 @@ function streamDisconnected(callerid, mediaStream, streamName){
     // Update views
     for (let i=0; i<remoteStreams.length; i++){
         easyrtc.setVideoObjectSrc(getVideoWidget(false,i+1)[0], remoteStreams[i].stream);
+        refreshRemoteStatusIcons(remoteStreams[i].peerid);
         setTitle(false, i+1, remoteContacts[i].name)
     }
 
