@@ -424,7 +424,7 @@ class DBManagerTeraUserAccess:
                                                                                                in_(proj_ids)).first()
         return session_type
 
-    def query_projects_for_site(self, site_id: int, service_id: int):
+    def query_projects_for_site(self, site_id: int, service_id: int = None):
         proj_ids = self.get_accessible_projects_ids()
         projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids))
 
