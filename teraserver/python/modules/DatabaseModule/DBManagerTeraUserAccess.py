@@ -424,10 +424,17 @@ class DBManagerTeraUserAccess:
                                                                                                in_(proj_ids)).first()
         return session_type
 
-    def query_projects_for_site(self, site_id: int):
+    def query_projects_for_site(self, site_id: int, service_id: int):
         proj_ids = self.get_accessible_projects_ids()
-        projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids)).all()
-        return projects
+        projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids))
+
+        if site_id:
+            projects = projects.filter(TeraProject.id_site == site_id)
+        if service_id:
+            from libtera.db.models.TeraServiceProject import TeraServiceProject
+            projects = projects.join(TeraServiceProject).filter(TeraServiceProject.id_service == service_id)
+
+        return projects.all()
 
     def query_projects_for_session_type(self, session_type_id: int):
         from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject

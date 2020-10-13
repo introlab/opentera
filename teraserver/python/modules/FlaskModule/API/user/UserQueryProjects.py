@@ -67,7 +67,7 @@ class UserQueryProjects(Resource):
                 projects = user_access.get_accessible_projects()
         elif args['id_site']:
             # If we have a site id, query for projects of that site
-            projects = user_access.query_projects_for_site(site_id=args['id_site'])
+            projects = user_access.query_projects_for_site(site_id=args['id_site'], service_id=args['id_service'])
         elif args['name']:
             projects = [TeraProject.get_project_by_projectname(projectname=args['name'])]
             for project in projects:
