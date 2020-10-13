@@ -184,7 +184,7 @@ function setMirror(mirror, local, index){
         }
     }else{
         // Request mirror to someone else
-        let request = {"index": 1, "mirror": mirror}; // TODO: Manage multiple remote streams??
+        let request = {"index": 1, "mirror": mirror};
         if (easyrtc.webSocketConnected){
             easyrtc.sendDataWS(remoteStreams[index-1].peerid, 'setMirror', request,
                 function(ackMesg) {
@@ -430,7 +430,7 @@ function newStreamStarted(callerid, stream, streamname) {
     }*/
 
     // Check if already have a stream with that name from that source
-    let slot = getStreamIndexForPeerId(callerid);
+    let slot = getStreamIndexForPeerId(callerid, streamname);
 
     // Find first empty slot
     if (slot === undefined){
@@ -449,7 +449,10 @@ function newStreamStarted(callerid, stream, streamname) {
     // Check if we have a remote contact info already for that source and rename if
     let contact_index = getContactIndexForPeerId(callerid);
     if (contact_index !== undefined){
-        setTitle(false, slot, remoteContacts[contact_index].name);
+        let title =  remoteContacts[contact_index].name;
+        if (streamname === 'ScreenShare')
+            title = "Écran de " + title;
+        setTitle(false, slot, title);
     }
 
     /*if (isWeb){
@@ -471,46 +474,48 @@ function newStreamStarted(callerid, stream, streamname) {
     updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
     refreshRemoteStatusIcons(callerid);
 
-    // Send self contact card
-    sendContactInfo(callerid);
+    if (streamname === "default"){
+        // Send self contact card
+        sendContactInfo(callerid);
 
-    // Update video
-    //var videoId = getVideoId(0);
-    /*var videoId = getVideoId(slot);
-    var video = document.getElementById(videoId);
+        // Update video
+        //var videoId = getVideoId(0);
+        /*var videoId = getVideoId(slot);
+        var video = document.getElementById(videoId);
 
-    // Send status update to all
-    var micEnabled = "false";
-    //if (video.micEnabled || video.micEnabled==undefined)
-    if (isMicActive(0,0))
-        micEnabled="true";
-    var mic2Enabled = "false";
-    if (isMicActive(0,1))
-        mic2Enabled="true";
+        // Send status update to all
+        var micEnabled = "false";
+        //if (video.micEnabled || video.micEnabled==undefined)
+        if (isMicActive(0,0))
+            micEnabled="true";
+        var mic2Enabled = "false";
+        if (isMicActive(0,1))
+            mic2Enabled="true";
 
-    var spkEnabled = "false";
-    if (video.volume=="1")
-        spkEnabled = "true";*/
+        var spkEnabled = "false";
+        if (video.volume=="1")
+            spkEnabled = "true";*/
 
-    // Sends PTZ capabilities
-    broadcastlocalPTZCapabilities();
+        // Sends PTZ capabilities
+        broadcastlocalPTZCapabilities();
 
-    // Sends other capabilities
-    broadcastlocalCapabilities();
+        // Sends other capabilities
+        broadcastlocalCapabilities();
 
-    let request = {"peerid": local_peerid,
-        "micro": isStatusIconActive(true, 1, "Mic"),
-        "micro2":isStatusIconActive(true, 2, "Mic"),
-        "speaker": isStatusIconActive(true, 1, "Speaker"),
-        "video": isStatusIconActive(true, 1, "Video")};
+        let request = {"peerid": local_peerid,
+            "micro": isStatusIconActive(true, 1, "Mic"),
+            "micro2":isStatusIconActive(true, 2, "Mic"),
+            "speaker": isStatusIconActive(true, 1, "Speaker"),
+            "video": isStatusIconActive(true, 1, "Video")};
 
-    if (easyrtc.webSocketConnected){
-        easyrtc.sendDataWS(callerid, 'updateStatus', request, function(ackMesg) {
-            //console.error("ackMsg:",ackMesg);
-            if( ackMesg.msgType === 'error' ) {
-                console.error(ackMesg.msgData.errorText);
-            }
-        });
+        if (easyrtc.webSocketConnected){
+            easyrtc.sendDataWS(callerid, 'updateStatus', request, function(ackMesg) {
+                //console.error("ackMsg:",ackMesg);
+                if( ackMesg.msgType === 'error' ) {
+                    console.error(ackMesg.msgData.errorText);
+                }
+            });
+        }
     }
 
     // Add second video, if present
@@ -608,7 +613,7 @@ function updateRemoteContactsInfos(){
 
 function streamDisconnected(callerid, mediaStream, streamName){
     // Find video slot used by that caller
-    let slot = getStreamIndexForPeerId(callerid);
+    let slot = getStreamIndexForPeerId(callerid, streamName);
 
     if (slot === undefined){
         showError("Stream disconnected", callerid  + " currently not displayed. Aborting.", false);
@@ -686,9 +691,9 @@ function getContactIndexForPeerId(peerid){
     return undefined;
 }
 
-function getStreamIndexForPeerId(peerid){
+function getStreamIndexForPeerId(peerid, streamname){
     for (let i=0; i<remoteStreams.length; i++){
-        if (remoteStreams[i].peerid === peerid)
+        if (remoteStreams[i].peerid === peerid && remoteStreams[i].streamname === streamname)
             return i;
     }
     return undefined;
@@ -708,7 +713,7 @@ function dataReception(sendercid, msgType, msgData, targeting) {
             remoteContacts.push(msgData);
         }
         // Update title
-        let stream_index = getStreamIndexForPeerId(sendercid);
+        let stream_index = getStreamIndexForPeerId(sendercid, 'default');
         if (stream_index !== undefined) {
             setTitle(false, stream_index+1, msgData.name);
         }
@@ -809,7 +814,7 @@ function dataReception(sendercid, msgType, msgData, targeting) {
 
     if (msgType === "updateStatus"){
         //console.log(msgData);
-        let index = getStreamIndexForPeerId(sendercid);
+        let index = getStreamIndexForPeerId(sendercid, 'default');
         let contact_index = getContactIndexForPeerId(sendercid);
         if (contact_index === undefined){
             console.log("No contact card yet for that peer - creating one.");
@@ -862,4 +867,46 @@ function signalingLoginFailure(errorCode, message) {
 
     showError("signalingLoginFailure", "Can't connect to signaling server! Code: " + errorCode +" - " + message);
     //easyrtc.showError(errorCode, message);
+}
+
+async function shareScreen(local, start){
+    if (start === true){
+        // Start screen sharing
+        let screenStream = undefined;
+        try {
+            screenStream = await navigator.mediaDevices.getDisplayMedia({video: true});
+            easyrtc.register3rdPartyLocalMediaStream(screenStream, 'ScreenShare');
+
+            console.log("Starting screen sharing...");
+
+            // Then to add to existing connections
+            for (let i=0; i<remoteStreams.length; i++){
+                easyrtc.addStreamToCall(remoteStreams[i].peerid, 'ScreenShare', function (caller, streamName) {
+                    //console.log("Started screen sharing with " + caller + " - " + streamName);
+                });
+            }
+            easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], screenStream);
+            localStreams.push({"peerid": local_peerid, "streamname": "ScreenShare", "stream":screenStream});
+
+        } catch(err) {
+            showError("shareScreen", "Impossible de partager l'écran.<br/><br/>Le message d'erreur est le suivant: <br/>" + err, true, false);
+            return Promise.Reject(err)
+        }
+
+    }else{
+        // Stop screen sharing
+        for (let i=0; i<remoteStreams.length; i++) {
+            easyrtc.removeStreamFromCall(remoteStreams[i].peerid, "ScreenShare");
+        }
+
+        // Stop local stream
+        localStreams[1].stream.getVideoTracks()[0].stop();   // Screen sharing is always index 1 of localStreams,
+                                                             // video track index = 0, since we always have just one.
+        easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], null);
+
+        // Remove stream
+        localStreams.pop();
+    }
+
+    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
 }

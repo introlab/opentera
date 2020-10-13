@@ -3,12 +3,24 @@ html,body {
 	overflow: hidden;
 }
 
+.h-20 {
+	height: 20%;
+}
+
 .h-33 {
 	height: 33%;
 }
 
+.h-40 {
+	height: 40%;
+}
+
 .h-67 {
 	height: 67%;
+}
+
+.h-80 {
+	height: 80%;
 }
 
 .videoView{
@@ -111,6 +123,7 @@ video {
 	max-height: 64px;
 	bottom: 0;
 	right: 0;
+	margin-right: 10px;
 	/*background-color: rgba(0,0,0,0.5);
 	padding-right: 20px;
 	width: 64px;

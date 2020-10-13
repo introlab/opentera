@@ -1,6 +1,9 @@
 let localTimerHandles = [0, 0];
 let remoteTimerHandles = [0, 0, 0, 0];
 
+let localScreenSharing = false;
+let localSecondSource = false;
+
 function initUI(){
     $('#configDialog').on('hidden.bs.modal', configDialogClosed);
 }
@@ -38,7 +41,28 @@ function showButtons(local, show, index){
         }
     }
     if (srcControls.length){
-        (show === true) ? srcControls.show() : srcControls.hide();
+        // Must hide individual icons according to state
+        //(show === true) ? srcControls.show() : srcControls.hide();
+        let screenIcon = getButtonIcon(local, index, "ShareScreen");
+        let secondSourceIcon = getButtonIcon(local, index, "Show2ndVideo");
+
+        if (screenIcon.length){
+            let iconActive = isButtonActive(local, index, "ShareScreen");
+            if (iconActive === true){
+                screenIcon.show();
+            }else{
+                (show === true && !localSecondSource) ? screenIcon.show() : screenIcon.hide();
+            }
+        }
+
+        if (secondSourceIcon.length){
+            let iconActive = isButtonActive(local, index, "Show2ndVideo");
+            if (iconActive === true){
+                secondSourceIcon.show();
+            }else{
+                (show === true && !localScreenSharing) ? secondSourceIcon.show() : secondSourceIcon.hide();
+            }
+        }
     }
     if (statusControls.length){
         // Must hide individual icons according to state
@@ -150,17 +174,98 @@ function updateStatusIconState(status, local, index, prefix){
     icon.attr('src', pathJoin(iconImgPath))
 }
 
+function getButtonIcon(local, index, prefix){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    return $("#" + view_prefix + "Btn" + prefix + index);
+}
+
+function isButtonActive(local, index, prefix){
+    let icon = getButtonIcon(local, index, prefix);
+    return icon.attr('src').includes("on");
+}
+
+function updateButtonIconState(status, local, index, prefix){
+    let icon = getButtonIcon(local, index, prefix);
+
+    let iconImgPath = icon.attr('src').split('/')
+
+    if (status === true){
+        iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + "_on.png";
+        let must_show = false;
+        if (local){
+            if (localTimerHandles[index-1] !== 0) must_show = true;
+        }else{
+            if (remoteTimerHandles[index-1] !== 0) must_show = true;
+        }
+        (!must_show) ? icon.hide() : icon.show();
+    }else{
+        iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + ".png";
+        icon.show();
+    }
+    icon.attr('src', pathJoin(iconImgPath))
+}
+
 function swapViews(){
     console.warn('SwapViews: Feature not currently enabled.');
 
 }
 
-function showError(err_context, err_msg, ui_display){
+function btnShareScreenClicked(){
+    if (localSecondSource === true){
+        console.warn("Trying to share screen while already having a second video source");
+        return;
+    }
+    localScreenSharing = !localScreenSharing;
+
+    // Do the screen sharing
+    shareScreen(true, localScreenSharing).then(function (){
+
+        updateButtonIconState(localScreenSharing, true, 1, "ShareScreen");
+
+        // Show / Hide share screen button
+        let btn = getButtonIcon(true, 1, "ShareScreen");
+        if (localScreenSharing)
+            btn.show();
+
+        // Show / Hide second source button
+        btn = getButtonIcon(true, 1, "Show2ndVideo");
+        (localScreenSharing) ? btn.hide() : btn.show();
+
+        // Show / hide mic-video-speaker icons
+        let viewControls = $('#localViewControls2');
+        (localScreenSharing) ? viewControls.hide() : viewControls.show();
+
+    }).catch(function (){
+        // Revert state
+        localScreenSharing = !localScreenSharing;
+    });
+
+
+
+
+}
+
+function btnShow2ndLocalVideoClicked(){
+    if (localScreenSharing === true){
+        console.warn("Trying to add second source while already having a screen sharing source");
+        return;
+    }
+
+    localSecondSource = ! localSecondSource;
+    updateButtonIconState(localSecondSource, true, 1, "Show2ndVideo");
+
+    // Show / Hide screen sharing button
+    let btn = getButtonIcon(true, 1, "ShareScreen");
+    (localSecondSource) ? btn.hide() : btn.show();
+}
+
+function showError(err_context, err_msg, ui_display, show_retry=true){
     console.error(err_context + ": " + err_msg);
 
     if (ui_display === true){
         $('#errorDialogText')[0].innerHTML = err_msg;
-        $('#errorDialog').modal('show')
+        $('#errorDialog').modal('show');
+        (show_retry) ? $('#errorRefresh').show() : $('#errorRefresh').hide();
     }
 }
 
@@ -239,13 +344,12 @@ function configDialogClosed(){
         setMirror(currentConfig['video1Mirror'], true, 1);
     }
 
-    if (videoSelect2.selectedIndex !== currentConfig['currentVideoSource2Index']){
-        // Video source changed
+    if (videoSelect2.selectedIndex !== currentConfig['currentVideoSource2Index'] ||
+        audioSelect2.selectedIndex !== currentConfig['currentAudioSource2Index']
+    ){
+        // Secondary audio/video source changed
     }
 
-    if (audioSelect2.selectedIndex !== currentConfig['currentAudioSource2Index']){
-        // Audio source changed
-    }
 
 
 }

@@ -93,8 +93,8 @@ function updateUserLocalViewLayout(local_num, remote_num){
     switch(local_num){
         case 1:
             if (remote_num>0){
-                setRowHeight67(selfViewRow1);
-                setRowHeight33(toolsView);
+                setRowHeight80(selfViewRow1);
+                setRowHeight20(toolsView);
                 toolsView.show();
             }else{
                 setRowHeight100(selfViewRow1);
@@ -104,9 +104,9 @@ function updateUserLocalViewLayout(local_num, remote_num){
             break;
         case 2:
             if (remote_num>0){
-                setRowHeight33(selfViewRow1);
-                setRowHeight33(selfViewRow2);
-                setRowHeight33(toolsView);
+                setRowHeight40(selfViewRow1);
+                setRowHeight40(selfViewRow2);
+                setRowHeight20(toolsView);
                 toolsView.show();
             }else{
                 setRowHeight50(selfViewRow1);
@@ -133,20 +133,32 @@ function setRowWidth4(row){
     row.removeClass('col-6 col-12').addClass('col-4');
 }
 
+function setRowHeight20(row){
+    row.removeClass('h-33 h-40 h-50 h-67 h-80 h-100').addClass('h-20');
+}
+
 function setRowHeight33(row){
-    row.removeClass('h-50 h-67 h-100').addClass('h-33');
+    row.removeClass('h-20 h-40 h-50 h-67 h-80 h-100').addClass('h-33');
+}
+
+function setRowHeight40(row){
+    row.removeClass('h-20 h-33 h-50 h-67 h-80 h-100').addClass('h-40');
 }
 
 function setRowHeight50(row){
-    row.removeClass('h-33 h-67 h-100').addClass('h-50');
+    row.removeClass('h-20 h-33 h-40 h-67 h-80 h-100').addClass('h-50');
 }
 
 function setRowHeight67(row){
-    row.removeClass('h-33 h-50 h-100').addClass('h-67');
+    row.removeClass('h-20 h-33 h-40 h-50 h-80 h-100').addClass('h-67');
+}
+
+function setRowHeight80(row){
+    row.removeClass('h-20 h-33 h-40 h-50 h-67 h-100').addClass('h-80');
 }
 
 function setRowHeight100(row){
-    row.removeClass('h-33 h-67 h-50').addClass('h-100');
+    row.removeClass('h-20 h-33 h-40 h-67 h-50 h-80').addClass('h-100');
 }
 
 function showLayout(show){
