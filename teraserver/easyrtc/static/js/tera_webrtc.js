@@ -197,11 +197,10 @@ function setMirror(mirror, local, index){
     }
 }
 
-
 function updateLocalAudioVideoSource(streamindex){
     if (connected === true){
         let streamname = "localStream" + streamindex;
-        if (streamindex === 1)
+        if (streamindex === 1) // Default stream = no name.
             streamname = "";
         if (streamindex < localStreams.length){
             console.log("Updating audio/video source: " + streamname);
@@ -223,21 +222,10 @@ function updateLocalAudioVideoSource(streamindex){
         easyrtc.enableAudio(true);
         easyrtc.enableVideo(true);
 
-        //easyrtc.closeLocalMediaStream(streamname); // This is needed, especially if we are switching to a mic owned by a
-                                                   // video device, otherwise an error will occur... This cause some
-                                                   // lag though...
-
         // Disable all tracks before creating, if needed
         if (streamindex <= localStreams.length){
             let stream = localStreams[streamindex-1].stream;
-            let videoTracks = stream.getVideoTracks();
-            let audioTracks = stream.getAudioTracks();
-
-            for (let i=0; i<videoTracks.length; i++)
-                videoTracks[i].enabled = false;
-
-            for (let i=0; i<audioTracks.length; i++)
-                audioTracks[i].enabled = false;
+            enableAllTracks(stream, false);
         }
 
         easyrtc.initMediaSource(
@@ -253,7 +241,6 @@ function updateLocalAudioVideoSource(streamindex){
 function localVideoStreamSuccess(stream){
     console.log("Got local video stream - " + stream.streamName);
     if (stream.active){
-        easyrtc.setVideoObjectSrc(getVideoWidget(true,1)[0], stream);
         let local_index = -1;
         for (let i=0; i<localStreams.length; i++){
             if (localStreams[i].streamname === stream.streamName){
@@ -301,10 +288,24 @@ function localVideoStreamSuccess(stream){
         }else{
             // New stream
             localStreams.push(infos);
-            console.log("Connecting to session...");
-            easyrtc.connect("TeraPlus", signalingLoginSuccess, signalingLoginFailure);
-            local_index = 0;
+            if (stream.streamName === "default"){
+                local_index = 0;
+                console.log("Connecting to session...");
+                easyrtc.connect("TeraPlus", signalingLoginSuccess, signalingLoginFailure);
+            }else{
+                // Other stream - must add to call
+                console.log("Adding stream to session...");
+                local_index = 1; // Secondary stream in the call
+                for (let i=0; i<remoteStreams.length; i++){
+                    easyrtc.addStreamToCall(remoteStreams[i].peerid, stream.streamName, function (caller, streamName) {
+                        //console.log("Added stream to " + caller + " - " + streamName);
+                        updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+                    });
+                }
+            }
+
         }
+        easyrtc.setVideoObjectSrc(getVideoWidget(true, local_index+1)[0], stream);
 
         // Clear status icons
         updateStatusIconState(true, true, local_index+1, 'Mic');
@@ -452,10 +453,19 @@ function newStreamStarted(callerid, stream, streamname) {
         let title =  remoteContacts[contact_index].name;
         if (title === undefined) title = "Participant #" + (contact_index+1);
         if (streamname === 'ScreenShare') {
-
             title = "Écran de " + title;
         }
         setTitle(false, slot, title);
+    }
+
+    // Enable-disable status controls
+    if (streamname !== "default"){
+        if (streamname === "ScreenShare"){
+            // Screen sharing = no controls
+            showStatusControls(false, slot, false);
+        }
+    }else{
+        showStatusControls(false, slot, true);
     }
 
     /*if (isWeb){
@@ -914,4 +924,79 @@ async function shareScreen(local, start){
     }
 
     updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+}
+
+function share2ndStream(local, start){
+
+    if (connected !== true) {
+        showError("share2ndStream", "Impossible de démarrer une deuxième source: non-connecté", true, false);
+        return;
+    }
+    let streamname = "2ndStream";
+
+    if (start === true){
+        // Start second stream
+        let media_constraints = {};
+
+        // Check if we need to add a video track
+        if (currentConfig.currentVideoSource2Index >= 0) {
+            media_constraints.video = {deviceId: {exact: videoSources[currentConfig.currentVideoSource2Index].deviceId}};
+            easyrtc.enableVideo(true);
+        }else {
+            easyrtc.enableVideo(false);
+        }
+
+        // Check if we need to add an audio track
+        if (currentConfig.currentAudioSource2Index >= 0) {
+            media_constraints.audio = {deviceId: {exact: audioSources[currentConfig.currentAudioSource2Index].deviceId}};
+            easyrtc.enableAudio(true);
+        }else {
+            easyrtc.enableAudio(false);
+        }
+
+        //console.log(media_constraints);
+        easyrtc._presetMediaConstraints = media_constraints;
+
+        // Disable all tracks before creating, if needed
+        if (localStreams.length > 1){
+            let stream = localStreams[1].stream;
+            enableAllTracks(stream, false);
+        }
+
+        easyrtc.initMediaSource(
+            localVideoStreamSuccess,
+            localVideoStreamError,
+            streamname);
+
+        }
+    else{
+        // Stop 2nd source sharing
+        for (let i=0; i<remoteStreams.length; i++) {
+            easyrtc.removeStreamFromCall(remoteStreams[i].peerid, streamname);
+        }
+        console.log("Stopping second local stream...");
+
+        // Stop local stream
+        let stream = localStreams[1].stream;
+        enableAllTracks(stream, false);   // Screen sharing is always index 1 of localStreams,
+                                                             // video track index = 0, since we always have just one.
+
+        easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], null);
+
+        // Remove stream
+        localStreams.pop();
+    }
+
+    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+}
+
+function enableAllTracks(stream, enable){
+    let videoTracks = stream.getVideoTracks();
+    let audioTracks = stream.getAudioTracks();
+
+    for (let i=0; i<videoTracks.length; i++)
+        videoTracks[i].enabled = enable;
+
+    for (let i=0; i<audioTracks.length; i++)
+        audioTracks[i].enabled = enable;
 }

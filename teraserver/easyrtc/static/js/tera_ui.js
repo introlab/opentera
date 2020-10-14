@@ -104,6 +104,12 @@ function showButtons(local, show, index){
 
 }
 
+function showStatusControls(local, index, show){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let statusControls = $("#" + view_prefix + "ViewControls" + index);
+    (show === true) ? statusControls.show() : statusControls.hide();
+}
+
 function inactiveTimeout(local, index){
     stopInactiveTimer(local, index);
     showButtons(local, false, index);
@@ -118,10 +124,10 @@ function showAllButtons(show){
     showButtons(false, show,4);
 }
 
-function showSecondaryLocalSourcesIcons(show_add_button, show_remove_button){
+/*function showSecondaryLocalSourcesIcons(show_add_button, show_remove_button){
     (show_add_button) ? showElement('imgAddLocalVideo2') : hideElement('imgAddLocalVideo2');
     (show_remove_button) ? showElement('imgRemoveLocalVideo2') : hideElement('imgRemoveLocalVideo2');
-}
+}*/
 
 function showVideoMirror(local, index, mirror){
     let video_widget = getVideoWidget(local, index);
@@ -155,6 +161,9 @@ function isStatusIconActive(local, index, prefix){
 
 function updateStatusIconState(status, local, index, prefix){
     let icon = getStatusIcon(local, index, prefix);
+
+    if (icon.length === 0)
+        return;
 
     let iconImgPath = icon.attr('src').split('/')
 
@@ -215,6 +224,12 @@ function btnShareScreenClicked(){
         console.warn("Trying to share screen while already having a second video source");
         return;
     }
+
+    if (remoteStreams.length >= 4){
+        showError("btnShareScreenClicked", "Impossible de partager l'écran: trop de sources dans la séance", true, false);
+        return;
+    }
+
     localScreenSharing = !localScreenSharing;
 
     // Do the screen sharing
@@ -232,16 +247,12 @@ function btnShareScreenClicked(){
         (localScreenSharing) ? btn.hide() : btn.show();
 
         // Show / hide mic-video-speaker icons
-        let viewControls = $('#localViewControls2');
-        (localScreenSharing) ? viewControls.hide() : viewControls.show();
+        showStatusControls(true, 2, !localScreenSharing);
 
     }).catch(function (){
         // Revert state
         localScreenSharing = !localScreenSharing;
     });
-
-
-
 
 }
 
@@ -251,7 +262,15 @@ function btnShow2ndLocalVideoClicked(){
         return;
     }
 
+    if (remoteStreams.length >= 4){
+        showError("btnShow2ndLocalVideoClicked", "Impossible d'ajouter une deuxième source vidéo: trop de sources dans la séance.'", true, false);
+        return;
+    }
+
     localSecondSource = ! localSecondSource;
+
+    share2ndStream(true, localSecondSource);
+
     updateButtonIconState(localSecondSource, true, 1, "Show2ndVideo");
 
     // Show / Hide screen sharing button
@@ -348,6 +367,8 @@ function configDialogClosed(){
         audioSelect2.selectedIndex !== currentConfig['currentAudioSource2Index']
     ){
         // Secondary audio/video source changed
+        currentConfig['currentVideoSource2Index'] = videoSelect2.selectedIndex-1;
+        currentConfig['currentAudioSource2Index'] = audioSelect2.selectedIndex-1;
     }
 
 
@@ -388,10 +409,10 @@ function hasPTZControls(local, index){
 
 function refreshRemoteStatusIcons(peerid){
     let card_index = getContactIndexForPeerId(peerid);
-    let index = getStreamIndexForPeerId(peerid);
+    let index = getStreamIndexForPeerId(peerid, 'default'); // Get default stream id
 
     if (card_index === undefined){
-        console.log('refreshRemoteStatusIcons - no contact information for ' + peerid);
+        console.log('refreshRemoteStatusIcons - no contact information for ' + peerid );
         return;
     }
 
@@ -406,11 +427,11 @@ function refreshRemoteStatusIcons(peerid){
         updateStatusIconState(status.micro, false, index + 1, "Mic");
     }
 
-    /*if (msgData.micro2 !== undefined){
-        let index = getStreamIndexForPeerId(sendercid);
-        if (index)
-            updateStatusIconState(msgData.micro === "true", false, index, "Mic");
-    }*/
+    if (status.micro2 !== undefined){
+        let index2 = getStreamIndexForPeerId(peerid, "2ndStream");
+        if (index2)
+            updateStatusIconState(status.micro2, false, index2+1, "Mic");
+    }
 
     if (status.speaker !== undefined) {
         updateStatusIconState(status.speaker, false, index + 1, "Speaker");
