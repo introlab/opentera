@@ -21,16 +21,20 @@ class RedisClient:
         # Fill config
         if config is None:
             print('RedisClient - Warning, using default redis configuration')
-            config = {'hostname': 'localhost', 'port': 6379, 'db': 0}
+            config = {'hostname': 'localhost', 'port': 6379, 'db': 0, 'username': '', 'password': ''}
 
         self.redisConfig = config
 
         # Redis client (synchronous)
-        self.redis = redis.Redis(host=config['hostname'], port=config['port'], db=config['db'])
+        self.redis = redis.Redis(host=config['hostname'],
+                                 port=config['port'],
+                                 db=config['db'],
+                                 username=config['username'],
+                                 password=config['password'])
 
         # Redis client (async)
         self.conn = reactor.connectTCP(config['hostname'], config['port'],
-                                       RedisProtocolFactory(parent=self, protocol=redisProtocol))
+                                       RedisProtocolFactory(parent=self, protocol=redisProtocol, config=config))
         print(self.conn)
 
     def getConfig(self):

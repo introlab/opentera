@@ -54,9 +54,9 @@ if __name__ == '__main__':
     }
 
     try:
-        Globals.db_man.open(POSTGRES, True)
-    except OperationalError:
-        print("Unable to connect to database - please check settings in config file!")
+        Globals.db_man.open(POSTGRES, config_man.service_config['debug_mode'])
+    except OperationalError as e:
+        print("Unable to connect to database - please check settings in config file!", e)
         quit()
 
     with flask_app.app_context():

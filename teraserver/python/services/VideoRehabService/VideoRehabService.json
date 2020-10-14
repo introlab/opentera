@@ -2,7 +2,8 @@
 	"Service": {
 		"name": "VideoRehabService",
 		"hostname": "localhost",
-		"port": 4070
+		"port": 4070,
+		"debug_mode": false
 	},
 	"Backend": {
 		"hostname": "localhost",

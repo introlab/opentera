@@ -20,7 +20,11 @@ class RedisRPCClient:
         print('RedisRPCClient - current thread', threading.current_thread())
         print(self.pattern, ' calling:', topic, function_name, args)
         # Get redis instance
-        r = redis.StrictRedis(host=self.config['hostname'], port=self.config['port'], db=self.config['db'])
+        r = redis.StrictRedis(host=self.config['hostname'],
+                              port=self.config['port'],
+                              db=self.config['db'],
+                              username=self.config['username'],
+                              password=self.config['password'])
         p = r.pubsub()
 
         message = RPCMessage()

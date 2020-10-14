@@ -2,7 +2,8 @@
   "Service": {
     "name": "LoggingService",
     "hostname": "localhost",
-    "port": 4041
+    "port": 4041,
+    "debug_mode": false
   },
   "Backend": {
     "hostname": "localhost",

@@ -1,7 +1,7 @@
 """
 Project OpenTera (https://github.com/introlab/opentera)
 
-Copyright (C) 2019
+Copyright (C) 2020
 IntRoLab / ESTRAD, Université de Sherbrooke, Centre de Recherche sur le Vieillissement de Sherbrooke
 
 Authors:
@@ -91,9 +91,12 @@ def init_shared_variables(config):
 
     # Create redis client
     import redis
-    # TODO: Manage redis password
-    redis_client = redis.Redis(host=config.redis_config['hostname'], port=config.redis_config['port'],
-                               db=config.redis_config['db'])
+
+    redis_client = redis.Redis(host=config.redis_config['hostname'],
+                               port=config.redis_config['port'],
+                               db=config.redis_config['db'],
+                               username=config.redis_config['username'],
+                               password=config.redis_config['password'])
 
     # Set API Token Keys
     from modules.RedisVars import RedisVars
@@ -131,9 +134,11 @@ def init_services(config: ConfigManager):
     import json
     # Create redis client
     import redis
-    # TODO: Manage redis password
-    redis_client = redis.Redis(host=config.redis_config['hostname'], port=config.redis_config['port'],
-                               db=config.redis_config['db'])
+    redis_client = redis.Redis(host=config.redis_config['hostname'],
+                               port=config.redis_config['port'],
+                               db=config.redis_config['db'],
+                               username=config.redis_config['username'],
+                               password=config.redis_config['password'])
 
     # Set python path to current folder so that import work from services
     tera_python_dir = pathlib.Path(__file__).parent.absolute()
@@ -184,7 +189,8 @@ if __name__ == '__main__':
     generate_certificates(config_man)
 
     # Verify file upload path, create if does not exist
-    verify_file_upload_directory(config_man, True)
+    # TODO Remove this, not needed. Now handled by FileTransferService
+    # verify_file_upload_directory(config_man, True)
 
     # DATABASE CONFIG AND OPENING
     #############################
@@ -198,9 +204,11 @@ if __name__ == '__main__':
     Globals.db_man = DBManager(config_man)
 
     try:
-        Globals.db_man.open(True)
-    except OperationalError:
-        print("Unable to connect to database - please check settings in config file!")
+        # Echo will be set by "debug_mode" flag
+        Globals.db_man.open(config_man.server_config['debug_mode'])
+
+    except OperationalError as e:
+        print("Unable to connect to database - please check settings in config file!", e)
         quit()
 
     # Create default values, if required

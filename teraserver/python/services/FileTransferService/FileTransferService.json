@@ -2,7 +2,8 @@
   "Service": {
     "name": "FileTransferService",
     "hostname": "localhost",
-    "port": 4042
+    "port": 4042,
+    "debug_mode": false
   },
   "Backend": {
     "hostname": "localhost",

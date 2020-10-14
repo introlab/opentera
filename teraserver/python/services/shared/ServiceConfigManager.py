@@ -90,6 +90,11 @@ class ServiceConfig:
                     print('ERROR: Service Config - missing field ' + field)
                     return False
             self.service_config = config['Service']
+
+            # Optional fields
+            if 'debug_mode' not in self.service_config:
+                self.service_config['debug_mode'] = False
+
             return True
         # Invalid
         return False

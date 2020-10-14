@@ -27,7 +27,11 @@ class LoggingClient:
 
     def __init__(self, config):
         # Setup connection with redis
-        self.redis = Redis(host=config['hostname'], port=config['port'], password=config['password'], db=config['db'])
+        self.redis = Redis(host=config['hostname'],
+                           port=config['port'],
+                           username=config['username'],
+                           password=config['password'],
+                           db=config['db'])
 
     def log_trace(self, sender: str, *args):
         try:

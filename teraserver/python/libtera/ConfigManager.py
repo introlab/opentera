@@ -15,8 +15,8 @@ class ConfigManager:
             config_file = open(filename, mode='rt', encoding='utf8')
             config_json = json.load(config_file)
             config_file.close()
-        except IOError:
-            print("Error loading file: " + filename)
+        except IOError as e:
+            print("Error loading file: " + filename, e)
             return
 
         except json.JSONDecodeError as e:
@@ -67,6 +67,11 @@ class ConfigManager:
             if field not in config:
                 print('ERROR: Server Config - missing server ' + field)
                 rval = False
+
+        # Add optional debug flag
+        if 'debug_mode' not in config:
+            config['debug_mode'] = False
+
         return rval
 
     @staticmethod

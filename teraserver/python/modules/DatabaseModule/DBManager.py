@@ -230,7 +230,6 @@ class DBManager (BaseModule):
             self.setup_events_for_class(EventNameClassMap[name], name)
 
     def open(self, echo=False):
-        # self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
         self.db_uri = 'postgresql://%(username)s:%(password)s@%(url)s:%(port)s/%(name)s' % self.config.db_config
 
         flask_app.config.update({

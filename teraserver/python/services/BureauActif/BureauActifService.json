@@ -8,7 +8,8 @@
 		"site_private_key": "site_key.pem",
 		"ca_certificate": "ca_cert.pem",
 		"ca_private_key": "ca_key.pem",
-		"upload_path": "uploads"
+		"upload_path": "uploads",
+		"debug_mode": false
 	},
 	"Backend": {
 		"hostname": "localhost",
