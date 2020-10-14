@@ -450,8 +450,11 @@ function newStreamStarted(callerid, stream, streamname) {
     let contact_index = getContactIndexForPeerId(callerid);
     if (contact_index !== undefined){
         let title =  remoteContacts[contact_index].name;
-        if (streamname === 'ScreenShare')
+        if (title === undefined) title = "Participant #" + (contact_index+1);
+        if (streamname === 'ScreenShare') {
+
             title = "Écran de " + title;
+        }
         setTitle(false, slot, title);
     }
 
@@ -702,6 +705,12 @@ function getStreamIndexForPeerId(peerid, streamname){
 function dataReception(sendercid, msgType, msgData, targeting) {
     console.log("dataReception : src=" + sendercid + " type=" + msgType + " data=" + JSON.stringify(msgData) + " target=" + targeting.targetEasyrtcid);
 
+    if (msgType === "__closingMediaStream"){
+        // Forcing stream disconnect, since it's not always called when using Firefox / Safari
+        streamDisconnected(sendercid, null, msgData["streamName"]);
+        // src=xDkLJqPLqeaRnzpx type=__closingMediaStream data={"streamId":"BDcFqqiGFjiYgMbWmw59ykytKMnIPnbd72zl","streamName":"ScreenShare"} target=QbKHfQer6rhc5ugW
+    }
+
     if (msgType === "contactInfo"){
         // Save contact info
         let contact_card_index = getContactIndexForPeerId(sendercid);
@@ -895,9 +904,11 @@ async function shareScreen(local, start){
 
     }else{
         // Stop screen sharing
-        for (let i=0; i<remoteStreams.length; i++) {
+        /*for (let i=0; i<remoteStreams.length; i++) {
             easyrtc.removeStreamFromCall(remoteStreams[i].peerid, "ScreenShare");
-        }
+        }*/
+        console.log("Stopping screen sharing...");
+        easyrtc.closeLocalMediaStream("ScreenShare");
 
         // Stop local stream
         localStreams[1].stream.getVideoTracks()[0].stop();   // Screen sharing is always index 1 of localStreams,
