@@ -56,11 +56,16 @@ function showButtons(local, show, index){
         }
 
         if (secondSourceIcon.length){
-            let iconActive = isButtonActive(local, index, "Show2ndVideo");
-            if (iconActive === true){
-                secondSourceIcon.show();
-            }else{
-                (show === true && !localScreenSharing) ? secondSourceIcon.show() : secondSourceIcon.hide();
+            // Always hide if no secondary stream selected
+            if (currentConfig.currentVideoSource2Index <=0 && currentConfig.currentAudioSource2Index <=0)
+                secondSourceIcon.hide();
+            else{
+                let iconActive = isButtonActive(local, index, "Show2ndVideo");
+                if (iconActive === true){
+                    secondSourceIcon.show();
+                }else{
+                    (show === true && !localScreenSharing) ? secondSourceIcon.show() : secondSourceIcon.hide();
+                }
             }
         }
     }
@@ -336,9 +341,9 @@ function setConfigDialogValues(audios, videos, config){
     });
 
     videoSelect.selectedIndex = config['currentVideoSourceIndex'];
-    videoSelect2.selectedIndex = config['currentVideoSource2Index'];
+    videoSelect2.selectedIndex = config['currentVideoSource2Index']+1;
     audioSelect.selectedIndex = config['currentAudioSourceIndex'];
-    audioSelect2.selectedIndex = config['currentAudioSource2Index'];
+    audioSelect2.selectedIndex = config['currentAudioSource2Index']+1;
 }
 
 function configDialogClosed(){
@@ -370,9 +375,6 @@ function configDialogClosed(){
         currentConfig['currentVideoSource2Index'] = videoSelect2.selectedIndex-1;
         currentConfig['currentAudioSource2Index'] = audioSelect2.selectedIndex-1;
     }
-
-
-
 }
 
 function setTitle(local, index, title){

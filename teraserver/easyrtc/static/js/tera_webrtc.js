@@ -56,7 +56,11 @@ function muteMicro(local, index, new_state){
 
     if (local === true){
         // Send display update request
-        let request = {"peerid": local_peerid, micro: new_state};
+        let request = {"peerid": local_peerid};
+        if (index === 1)
+            request.micro = new_state;
+        else
+            request.micro2 = new_state;
         easyrtc.enableMicrophone(new_state);  // Fix me: doesn't seem to work if specifying stream name....
 
         //console.log(request);
@@ -977,14 +981,16 @@ function share2ndStream(local, start){
         console.log("Stopping second local stream...");
 
         // Stop local stream
-        let stream = localStreams[1].stream;
-        enableAllTracks(stream, false);   // Screen sharing is always index 1 of localStreams,
-                                                             // video track index = 0, since we always have just one.
+        if (localStreams.length > 1){
+            let stream = localStreams[1].stream;
+            enableAllTracks(stream, false);   // Screen sharing is always index 1 of localStreams,
+                                                                 // video track index = 0, since we always have just one.
 
-        easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], null);
+            easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], null);
 
-        // Remove stream
-        localStreams.pop();
+            // Remove stream
+            localStreams.pop();
+        }
     }
 
     updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
