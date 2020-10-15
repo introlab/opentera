@@ -46,11 +46,9 @@ class UserQueryServices(Resource):
              responses={200: 'Success - returns list of services',
                         500: 'Database error'})
     def get(self):
-        parser = get_parser
-
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         services = []
         # If we have no arguments, return all accessible projects

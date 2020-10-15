@@ -39,7 +39,7 @@ class TeraService(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend(['service_roles', 'service_system'])
+        ignore_fields.extend(['service_roles', 'service_projects', 'service_system'])
 
         if minimal:
             ignore_fields.extend(['service_default_config'])

@@ -59,6 +59,17 @@ class UserQueryServicesTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item, minimal=True)
 
+    def test_query_list_with_project_as_as_admin(self):
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload={"list": True, 'with_projects': True})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertGreater(len(json_data), 0)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item, minimal=True)
+
     def test_query_specific_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=1")
         self.assertEqual(response.status_code, 200)
