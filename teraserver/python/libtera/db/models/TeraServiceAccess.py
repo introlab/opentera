@@ -167,7 +167,7 @@ class TeraServiceAccess(db.Model, BaseModel):
                 break
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraService import TeraService
         from libtera.db.models.TeraUserGroup import TeraUserGroup
         from libtera.db.models.TeraDevice import TeraDevice

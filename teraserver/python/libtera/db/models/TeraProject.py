@@ -73,7 +73,7 @@ class TeraProject(db.Model, BaseModel):
         return users
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraSite import TeraSite
         base_project = TeraProject()
         base_project.project_name = 'Default Project #1'

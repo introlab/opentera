@@ -19,7 +19,7 @@ class TeraServerSettings(db.Model, BaseModel):
     ServerVersions = "ServerVersions"
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         # Create defaults settings
         # Token Encryption Key
         TeraServerSettings.set_server_setting(TeraServerSettings.ServerDeviceTokenKey,

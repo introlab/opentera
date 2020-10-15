@@ -55,7 +55,7 @@ class TeraAsset(db.Model, BaseModel):
         return {'id_asset': self.id_asset, 'asset_uuid': self.asset_uuid}
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraSession import TeraSession
         from libtera.db.models.TeraDevice import TeraDevice
         from libtera.db.models.TeraParticipant import TeraParticipant

@@ -46,7 +46,7 @@ class TeraParticipantGroup(db.Model, BaseModel):
         return TeraParticipantGroup.query.filter_by(id_project=project_id).all()
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         base_pgroup = TeraParticipantGroup()
         base_pgroup.participant_group_name = 'Default Participant Group A'
         base_pgroup.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project

@@ -22,7 +22,7 @@ class TeraDeviceProject(db.Model, BaseModel):
         return rval
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraDevice import TeraDevice
         from libtera.db.models.TeraProject import TeraProject
         device1 = TeraDevice.get_device_by_name('Apple Watch #W05P1')

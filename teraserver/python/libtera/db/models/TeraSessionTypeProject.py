@@ -24,7 +24,7 @@ class TeraSessionTypeProject(db.Model, BaseModel):
         return rval
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraSessionType import TeraSessionType
         from libtera.db.models.TeraProject import TeraProject
 

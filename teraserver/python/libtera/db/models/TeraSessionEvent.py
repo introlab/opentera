@@ -48,7 +48,7 @@ class TeraSessionEvent(db.Model, BaseModel):
         return rval
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraSession import TeraSession
 
         base_session = TeraSession.get_session_by_name('Séance #1')

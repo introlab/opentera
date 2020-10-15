@@ -29,7 +29,7 @@ class TeraSite(db.Model, BaseModel):
         return {'id_site': self.id_site}
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         base_site = TeraSite()
         base_site.site_name = 'Default Site'
         TeraSite.insert(base_site)

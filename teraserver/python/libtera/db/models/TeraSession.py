@@ -105,7 +105,7 @@ class TeraSession(db.Model, BaseModel):
         return {'id_session': self.id_session, 'session_uuid': self.session_uuid}
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraUser import TeraUser
         from libtera.db.models.TeraDevice import TeraDevice
         from libtera.db.models.TeraSessionType import TeraSessionType

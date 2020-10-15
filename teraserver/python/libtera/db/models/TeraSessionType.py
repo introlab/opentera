@@ -52,7 +52,7 @@ class TeraSessionType(db.Model, BaseModel):
         return rval
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         # from libtera.db.models.TeraProject import TeraProject
         # from libtera.db.models.TeraDeviceType import TeraDeviceType
         from libtera.db.models.TeraService import TeraService

@@ -160,7 +160,7 @@ def init_services(config: ConfigManager):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='OpenTera Server')
-    parser.add_argument('--enable_tests', help='Test mode for server.', default=False)
+    parser.add_argument('--enable_tests', help='Test mode for server.', default=True)
     args = parser.parse_args()
 
     config_man = ConfigManager()
@@ -214,12 +214,12 @@ if __name__ == '__main__':
             Globals.db_man.open_local(None, echo=True, ram=True)
 
             # Create default values, if required
-            Globals.db_man.create_defaults(config=config_man, minimal=False)
+            Globals.db_man.create_defaults(config=config_man, test=False)
         else:
             Globals.db_man.open(config_man.server_config['debug_mode'])
 
             # Create minimal values, if required
-            Globals.db_man.create_defaults(config=config_man, minimal=True)
+            Globals.db_man.create_defaults(config=config_man, test=True)
 
     except OperationalError as e:
         print("Unable to connect to database - please check settings in config file!", e)

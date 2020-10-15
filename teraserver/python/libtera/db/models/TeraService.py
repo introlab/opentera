@@ -113,7 +113,7 @@ class TeraService(db.Model, BaseModel):
         return TeraService.get_service_by_key('OpenTeraServer')
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         new_service = TeraService()
         new_service.service_uuid = '00000000-0000-0000-0000-000000000001'
         new_service.service_key = 'OpenTeraServer'

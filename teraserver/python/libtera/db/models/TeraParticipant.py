@@ -228,7 +228,7 @@ class TeraParticipant(db.Model, BaseModel):
         return TeraParticipant.query.filter_by(participant_username=username).first() is None
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraProject import TeraProject
         project1 = TeraProject.get_project_by_projectname('Default Project #1')
 

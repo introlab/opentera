@@ -38,7 +38,7 @@ class TeraUserPreference(db.Model, BaseModel):
         return TeraUserPreference.query.filter_by(id_user=user_id, user_preference_app_tag=app_tag).first()
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraUser import TeraUser
 
         super_admin = TeraUser.get_user_by_username('admin')

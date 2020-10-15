@@ -42,7 +42,7 @@ class TeraServiceProject(db.Model, BaseModel):
         return TeraServiceProject.query.filter_by(id_project=project_id, id_service=service_id).first()
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraService import TeraService
         from libtera.db.models.TeraProject import TeraProject
 

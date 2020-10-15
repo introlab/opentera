@@ -178,7 +178,7 @@ class TeraServiceConfig(db.Model, BaseModel):
         return [specific_config.service_config_specific_id for specific_config in self.service_config_specifics]
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from .TeraUser import TeraUser
         from .TeraDevice import TeraDevice
         from .TeraService import TeraService

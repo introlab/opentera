@@ -23,7 +23,7 @@ class TeraDeviceParticipant(db.Model, BaseModel):
         return rval
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraParticipant import TeraParticipant
         from libtera.db.models.TeraDevice import TeraDevice
         participant1 = TeraParticipant.get_participant_by_id(1)

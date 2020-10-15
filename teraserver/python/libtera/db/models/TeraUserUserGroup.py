@@ -23,7 +23,7 @@ class TeraUserUserGroup(db.Model, BaseModel):
         return rval
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraUser import TeraUser
         from libtera.db.models.TeraUserGroup import TeraUserGroup
         user1 = TeraUser.get_user_by_username('siteadmin')

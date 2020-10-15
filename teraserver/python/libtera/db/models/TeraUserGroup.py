@@ -75,7 +75,7 @@ class TeraUserGroup(db.Model, BaseModel):
         return TeraUserGroup.query.filter_by(id_user_group=group_id).first()
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraProject import TeraProject
         from libtera.db.models.TeraServiceAccess import TeraServiceAccess
         from libtera.db.models.TeraServiceRole import TeraServiceRole

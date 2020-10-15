@@ -26,7 +26,7 @@ class TeraDeviceSubType(db.Model, BaseModel):
         return device_subtype_json
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraDeviceType import TeraDeviceType
         bureau = TeraDeviceType.get_device_type_by_key('bureau_actif')
         subtype = TeraDeviceSubType()

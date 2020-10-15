@@ -167,7 +167,7 @@ class TeraDevice(db.Model, BaseModel):
             return TeraDevice.query.filter_by(device_enabled=True).join(TeraDevice.device_participants).all()
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         device = TeraDevice()
         device.device_name = 'Apple Watch #W05P1'
         # Forcing uuid for tests

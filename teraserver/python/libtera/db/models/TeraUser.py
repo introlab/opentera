@@ -240,7 +240,7 @@ class TeraUser(db.Model, BaseModel):
         super().insert(user)
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraUserGroup import TeraUserGroup
         # Admin
         admin = TeraUser()
