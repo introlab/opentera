@@ -15,7 +15,7 @@ class BureauActifData(db.Model, BaseModel):
     data_participant_uuid = db.Column(db.String(36), nullable=False)
     data_name = db.Column(db.String, nullable=True)
     data_original_filename = db.Column(db.String, nullable=False)
-    data_saved_date = db.Column(db.TIMESTAMP, nullable=False)
+    data_saved_date = db.Column(db.TIMESTAMP(timezone=True), nullable=False)
     data_uuid = db.Column(db.String(36), nullable=False, unique=True)
     data_filesize = db.Column(db.Integer, nullable=False)
 

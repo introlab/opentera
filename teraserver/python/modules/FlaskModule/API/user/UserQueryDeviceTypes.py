@@ -19,16 +19,15 @@ get_parser.add_argument('list', type=inputs.boolean, help='List of all device ty
 
 
 # post_parser = reqparse.RequestParser()
-# post_parser.add_argument('device_type', type=str, location='json', help='Device type to create / update',
+# post_parser.add_argument('id_device_type', type=str, location='json', help='Device type to create / update',
 #                          required=True)
-post_schema = api.schema_model('id_device_type', {'properties': TeraDeviceType.get_json_schema(),
+post_schema = api.schema_model('device_type', {'properties': TeraDeviceType.get_json_schema(),
                                                   'type': 'object',
                                                   'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Device type ID to delete')
 delete_parser.add_argument('device_type_key', type=str, help='Unique device key to delete')
-
 
 
 class UserQueryDeviceTypes(Resource):

@@ -49,7 +49,6 @@ class TeraSessionTypeForm:
                          )
         section.add_item(TeraFormItem("session_type_service_key", gettext("Session Type Service Key"), "hidden", False))
         section.add_item(TeraFormItem("session_type_online", gettext("Session Type Online"), "boolean", True))
-        section.add_item(TeraFormItem("session_type_multi", gettext("Session Type Multiuser"), "boolean", True))
         section.add_item(TeraFormItem("session_type_color", gettext("Session Type Display Color"), "color", True))
         section.add_item(TeraFormItem("session_type_config", gettext("Session Type Configuration"), "longtext", False))
 

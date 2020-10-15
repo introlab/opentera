@@ -29,7 +29,7 @@ class TeraSessionEvent(db.Model, BaseModel):
                                  autoincrement=True)
     id_session = db.Column(db.Integer, db.ForeignKey('t_sessions.id_session', ondelete='cascade'), nullable=False)
     id_session_event_type = db.Column(db.Integer, nullable=False)
-    session_event_datetime = db.Column(db.TIMESTAMP, nullable=False)
+    session_event_datetime = db.Column(db.TIMESTAMP(timezone=True), nullable=False)
     session_event_text = db.Column(db.String, nullable=True)
     session_event_context = db.Column(db.String, nullable=True)
 

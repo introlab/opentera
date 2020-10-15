@@ -17,8 +17,8 @@ class TeraDevice(db.Model, BaseModel):
     #                                                       ondelete='set null'), nullable=True)
     device_uuid = db.Column(db.String(36), nullable=False, unique=True)
     device_name = db.Column(db.String, nullable=False)
-    device_type = db.Column(db.Integer, db.ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
-                            nullable=False)
+    id_device_type = db.Column(db.Integer, db.ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
+                               nullable=False)
     id_device_subtype = db.Column(db.Integer, db.ForeignKey('t_devices_subtypes.id_device_subtype',
                                                             ondelete='set null'), nullable=True)
     device_token = db.Column(db.String, nullable=True, unique=True)
@@ -28,7 +28,7 @@ class TeraDevice(db.Model, BaseModel):
     device_config = db.Column(db.String, nullable=True)
     device_infos = db.Column(db.String, nullable=True)
     device_notes = db.Column(db.String, nullable=True)
-    device_lastonline = db.Column(db.TIMESTAMP, nullable=True)
+    device_lastonline = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
 
     # device_sites = db.relationship("TeraDeviceSite")
     # device_projects = db.relationship('TeraDeviceProject', cascade='delete')
@@ -57,7 +57,7 @@ class TeraDevice(db.Model, BaseModel):
                           'device_subtype', 'authenticated', 'device_assets']
 
         if minimal:
-            ignore_fields += ['device_type', 'device_onlineable', 'device_config', 'device_notes',
+            ignore_fields += ['id_device_type', 'device_onlineable', 'device_config', 'device_notes',
                               'device_lastonline', 'device_infos',  'device_token']
 
         device_json = super().to_json(ignore_fields=ignore_fields)
@@ -173,7 +173,7 @@ class TeraDevice(db.Model, BaseModel):
         device.device_name = 'Apple Watch #W05P1'
         # Forcing uuid for tests
         device.device_uuid = 'b707e0b2-e649-47e7-a938-2b949c423f73'  # str(uuid.uuid4())
-        device.device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
+        device.id_device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
         # device.create_token()
         device.device_enabled = True
         device.device_onlineable = True
@@ -184,7 +184,7 @@ class TeraDevice(db.Model, BaseModel):
         device2 = TeraDevice()
         device2.device_name = 'Kit Télé #1'
         device2.device_uuid = str(uuid.uuid4())
-        device2.device_type = TeraDeviceType.get_device_type_by_key('videoconference').id_device_type
+        device2.id_device_type = TeraDeviceType.get_device_type_by_key('videoconference').id_device_type
         # device2.create_token()
         device2.device_enabled = True
         device2.device_onlineable = True
@@ -196,7 +196,7 @@ class TeraDevice(db.Model, BaseModel):
         device3 = TeraDevice()
         device3.device_name = 'Robot A'
         device3.device_uuid = str(uuid.uuid4())
-        device3.device_type = TeraDeviceType.get_device_type_by_key('robot').id_device_type
+        device3.id_device_type = TeraDeviceType.get_device_type_by_key('robot').id_device_type
         # device3.create_token()
         device3.device_enabled = True
         device3.device_onlineable = True

@@ -81,7 +81,8 @@ class ParticipantQueryDevicesTest(unittest.TestCase):
             self.assertTrue(data_item.__contains__('device_name'))
             self.assertTrue(data_item.__contains__('device_notes'))
             self.assertTrue(data_item.__contains__('device_onlineable'))
-            self.assertTrue(data_item.__contains__('device_type'))
+            self.assertTrue(data_item.__contains__('id_device_type'))
+            self.assertTrue(data_item.__contains__('id_device_subtype'))
             self.assertTrue(data_item.__contains__('device_uuid'))
             self.assertTrue(data_item.__contains__('id_device'))
 
@@ -103,7 +104,8 @@ class ParticipantQueryDevicesTest(unittest.TestCase):
             self.assertTrue(data_item.__contains__('device_name'))
             self.assertTrue(data_item.__contains__('device_notes'))
             self.assertTrue(data_item.__contains__('device_onlineable'))
-            self.assertTrue(data_item.__contains__('device_type'))
+            self.assertTrue(data_item.__contains__('id_device_type'))
+            self.assertTrue(data_item.__contains__('id_device_subtype'))
             self.assertTrue(data_item.__contains__('device_uuid'))
             self.assertTrue(data_item.__contains__('id_device'))
 
