@@ -130,7 +130,7 @@ class UserQueryDeviceParticipants(Resource):
                 device_id=json_device_part['id_device'], participant_id=json_device_part['id_participant'])
 
             if device_part:
-                json_device_part['id_device_participant'] = device_part.id_device_site
+                json_device_part['id_device_participant'] = device_part.id_device_participant
             else:
                 json_device_part['id_device_participant'] = 0
 

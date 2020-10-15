@@ -28,10 +28,10 @@ class TeraDeviceForm:
         section.add_item(TeraFormItem("id_device", gettext("Device ID"), "hidden", item_required=True))
         section.add_item(TeraFormItem("device_uuid", gettext("Device UUID"), "hidden", item_required=True))
         section.add_item(TeraFormItem("device_name", gettext("Device Name"), "text", item_required=True))
-        section.add_item(TeraFormItem("device_type", gettext("Device Type"), "array", item_required=True,
+        section.add_item(TeraFormItem("id_device_type", gettext("Device Type ID"), "array", item_required=True,
                                       item_values=device_types_list))
         section.add_item(TeraFormItem("id_device_subtype", gettext("Device Sub-Type"), "array", item_required=False,
-                                      item_condition=TeraFormItemCondition("device_type", "=", "changed",
+                                      item_condition=TeraFormItemCondition("id_device_type", "=", "changed",
                                                                            "/api/user/devicesubtypes?id_device_type=")))
         section.add_item(TeraFormItem("device_token", gettext("Access Token"), "label",
                                       item_options={"readonly": False}))

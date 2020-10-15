@@ -8,7 +8,7 @@ class LogEntry(db.Model, BaseModel):
     log_level = db.Column(db.Integer, nullable=False)
     sender = db.Column(db.String(), nullable=False)
     message = db.Column(db.String(), nullable=False)
-    timestamp = db.Column(db.TIMESTAMP, nullable=False)
+    timestamp = db.Column(db.TIMESTAMP(timezone=True), nullable=False)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:

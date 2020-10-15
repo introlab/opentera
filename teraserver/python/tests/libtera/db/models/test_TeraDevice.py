@@ -1,6 +1,7 @@
 import unittest
 from modules.DatabaseModule.DBManager import DBManager
 from libtera.db.models.TeraDevice import TeraDevice
+from libtera.db.models.TeraDeviceType import TeraDeviceType
 import os
 from libtera.ConfigManager import ConfigManager
 

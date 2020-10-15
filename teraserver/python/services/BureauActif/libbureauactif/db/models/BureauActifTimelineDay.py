@@ -11,7 +11,7 @@ class BureauActifTimelineDay(db.Model, BaseModel):
     id_timeline_day = db.Column(db.Integer, db.Sequence('id_timeline_day_sequence'), primary_key=True,
                                 autoincrement=True)
     participant_uuid = db.Column(db.String(36), nullable=True)
-    name = db.Column(db.TIMESTAMP, nullable=False)
+    name = db.Column(db.TIMESTAMP(timezone=True), nullable=False)
 
     series = db.relationship('BureauActifTimelineDayEntry')
 

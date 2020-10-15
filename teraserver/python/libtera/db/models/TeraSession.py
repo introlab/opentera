@@ -27,7 +27,7 @@ class TeraSession(db.Model, BaseModel):
                                    nullable=True)
 
     session_name = db.Column(db.String, nullable=False)
-    session_start_datetime = db.Column(db.TIMESTAMP, nullable=False)
+    session_start_datetime = db.Column(db.TIMESTAMP(timezone=True), nullable=False)
     session_duration = db.Column(db.Integer, nullable=False, default=0)
     session_status = db.Column(db.Integer, nullable=False)
     session_comments = db.Column(db.String, nullable=True)

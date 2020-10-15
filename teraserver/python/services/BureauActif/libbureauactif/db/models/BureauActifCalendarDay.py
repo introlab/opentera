@@ -10,7 +10,7 @@ class BureauActifCalendarDay(db.Model, BaseModel):
     id_calendar_day = db.Column(db.Integer, db.Sequence('id_calendar_day_sequence'), primary_key=True,
                                 autoincrement=True)
     participant_uuid = db.Column(db.String(36), nullable=True)
-    date = db.Column(db.TIMESTAMP, nullable=False)
+    date = db.Column(db.TIMESTAMP(timezone=True), nullable=False)
 
     seating = db.relationship("BureauActifCalendarData",
                               primaryjoin="and_(BureauActifCalendarDay.id_calendar_day==BureauActifCalendarData"

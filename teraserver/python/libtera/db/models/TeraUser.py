@@ -33,7 +33,7 @@ class TeraUser(db.Model, BaseModel):
     user_enabled = db.Column(db.Boolean, nullable=False)
     user_profile = db.Column(db.String, nullable=False) # Used to store "extra" informations, if needed.
     user_notes = db.Column(db.String, nullable=True)
-    user_lastonline = db.Column(db.TIMESTAMP, nullable=True)
+    user_lastonline = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     user_superadmin = db.Column(db.Boolean, nullable=False, default=False)
 
     # user_sites_access = db.relationship('TeraSiteAccess', cascade="all,delete")

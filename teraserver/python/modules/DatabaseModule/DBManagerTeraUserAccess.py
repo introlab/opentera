@@ -379,7 +379,7 @@ class DBManagerTeraUserAccess:
                 .filter(TeraProject.id_site == site_id) \
                 .order_by(TeraDevice.id_device.asc())
             if device_type_id:
-                query = query.filter(TeraDevice.device_type == device_type_id)
+                query = query.filter(TeraDevice.id_device_type == device_type_id)
             if enabled is not None:
                 query = query.filter(TeraDevice.device_enabled == enabled)
             devices = query.all()
@@ -391,7 +391,7 @@ class DBManagerTeraUserAccess:
             query = TeraDevice.query.join(TeraDeviceProject).filter_by(id_project=project_id) \
                 .order_by(TeraDevice.id_device.asc())
             if device_type_id:
-                query = query.filter(TeraDevice.device_type == device_type_id)
+                query = query.filter(TeraDevice.id_device_type == device_type_id)
             if enabled is not None:
                 query = query.filter(TeraDevice.device_enabled == enabled)
             devices = query.all()
@@ -399,7 +399,7 @@ class DBManagerTeraUserAccess:
 
     def query_devices_by_type(self, id_type_device: int):
         accessibles_devices = self.get_accessible_devices_ids()
-        devices = TeraDevice.query.filter_by(device_type=id_type_device).filter(TeraDevice
+        devices = TeraDevice.query.filter_by(id_device_type=id_type_device).filter(TeraDevice
                                                                                 .id_device.in_(accessibles_devices)) \
             .order_by(TeraDevice.device_name.asc()).all()
         return devices
@@ -424,15 +424,12 @@ class DBManagerTeraUserAccess:
                                                                                                in_(proj_ids)).first()
         return session_type
 
-    def query_projects_for_site(self, site_id: int, service_id: int = None):
+    def query_projects_for_site(self, site_id: int):
         proj_ids = self.get_accessible_projects_ids()
         projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids))
 
         if site_id:
             projects = projects.filter(TeraProject.id_site == site_id)
-        if service_id:
-            from libtera.db.models.TeraServiceProject import TeraServiceProject
-            projects = projects.join(TeraServiceProject).filter(TeraServiceProject.id_service == service_id)
 
         return projects.all()
 
@@ -621,7 +618,7 @@ class DBManagerTeraUserAccess:
 
     def query_device_participants_by_type(self, id_device_type: int, participant_id: int):
         device_parts = TeraDeviceParticipant.query.join(TeraDevice) \
-            .filter(TeraDevice.device_type == id_device_type, TeraDeviceParticipant.id_participant == participant_id) \
+            .filter(TeraDevice.id_device_type == id_device_type, TeraDeviceParticipant.id_participant == participant_id) \
             .order_by(TeraDeviceParticipant.id_device_participant.asc()).all()
         return device_parts
 
@@ -675,13 +672,17 @@ class DBManagerTeraUserAccess:
             .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None)) \
             .filter(TeraAsset.asset_service_uuid == uuid_service).all()
 
-    def query_projects_for_service(self, service_id: int, include_other_projects):
+    def query_projects_for_service(self, service_id: int, site_id: int, include_other_projects=False):
         from libtera.db.models.TeraServiceProject import TeraServiceProject
         projects_ids = self.get_accessible_projects_ids()
 
-        service_projects = TeraServiceProject.query.filter(TeraServiceProject.id_project.in_(projects_ids)) \
-            .filter_by(id_service=service_id).all()
+        query = TeraServiceProject.query.filter(TeraServiceProject.id_project.in_(projects_ids)) \
+            .filter_by(id_service=service_id)
 
+        if site_id:
+            query = query.join(TeraProject).filter(TeraProject.id_site == site_id)
+
+        service_projects = query.all()
         if include_other_projects:
             # We must add the missing projects in the list
             projects_ids = self.get_accessible_projects_ids()

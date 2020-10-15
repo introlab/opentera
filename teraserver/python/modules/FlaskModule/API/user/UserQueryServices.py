@@ -1,5 +1,7 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
+
+from libtera.db.models import TeraServiceProject
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
@@ -19,6 +21,7 @@ get_parser.add_argument('uuid', type=str, help='Service UUID to query')
 get_parser.add_argument('key', type=str, help='Service Key to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_config', type=inputs.boolean, help='Only return services with editable configuration')
+get_parser.add_argument('with_projects', type=inputs.boolean, help='Return services with service projects')
 
 
 # post_parser = reqparse.RequestParser()
@@ -43,11 +46,9 @@ class UserQueryServices(Resource):
              responses={200: 'Success - returns list of services',
                         500: 'Database error'})
     def get(self):
-        parser = get_parser
-
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         services = []
         # If we have no arguments, return all accessible projects
@@ -81,6 +82,12 @@ class UserQueryServices(Resource):
                 if args['with_config']:
                     if not service.service_editable_config:
                         continue
+                if args['with_projects']:
+                    # Get all current association for service
+                    current_projects = TeraServiceProject.get_projects_for_service(id_service=service.id_service)
+                    service_projects = []
+                    for project in current_projects:
+                        service_projects.append(project.to_json())
                 service_json = service.to_json(minimal=args['list'])
                 services_list.append(service_json)
 

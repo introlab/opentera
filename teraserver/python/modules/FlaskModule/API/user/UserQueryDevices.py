@@ -18,7 +18,7 @@ get_parser.add_argument('device_uuid', type=str, help='Device uuid of the device
 get_parser.add_argument('uuid', type=str, help='Alias for "device_uuid"')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all associated devices')
-get_parser.add_argument('device_type', type=int, help='ID of device type from which to get all devices. Can be '
+get_parser.add_argument('id_device_type', type=int, help='ID of device type from which to get all devices. Can be '
                                                       'combined with id_site or id_project.')
 get_parser.add_argument('id_device_subtype', type=int, help='Device subtype id to get all devices of that subtype.')
 get_parser.add_argument('name', type=str, help='Name of the device to query')
@@ -72,7 +72,7 @@ class UserQueryDevices(Resource):
 
         devices = []
         # If we have no arguments, return all accessible devices
-        if not args['id_device'] and not args['id_site'] and not args['device_type'] and not args['id_project'] and \
+        if not args['id_device'] and not args['id_site'] and not args['id_device_type'] and not args['id_project'] and \
                 not args['name'] and not args['device_uuid']:
             devices = user_access.get_accessible_devices()
         elif args['id_device']:
@@ -82,11 +82,11 @@ class UserQueryDevices(Resource):
             if args['device_uuid'] in user_access.get_accessible_devices_uuids():
                 devices = [TeraDevice.get_device_by_uuid(args['device_uuid'])]
         elif args['id_site']:
-            devices = user_access.query_devices_for_site(args['id_site'], args['device_type'], args['enabled'])
+            devices = user_access.query_devices_for_site(args['id_site'], args['id_device_type'], args['enabled'])
         elif args['id_project']:
-            devices = user_access.query_devices_for_project(args['id_project'], args['device_type'], args['enabled'])
-        elif args['device_type']:
-            devices = user_access.query_devices_by_type(args['device_type'])
+            devices = user_access.query_devices_for_project(args['id_project'], args['id_device_type'], args['enabled'])
+        elif args['id_device_type']:
+            devices = user_access.query_devices_by_type(args['id_device_type'])
         elif args['id_device_subtype']:
             devices = user_access.query_devices_by_subtype(args['id_device_subtype'])
         elif args['name']:
