@@ -24,6 +24,7 @@ class TeraService(db.Model, BaseModel):
     service_default_config = db.Column(db.String, nullable=True, default='{}')
 
     service_roles = db.relationship('TeraServiceRole')
+    service_projects = db.relationship('TeraServiceProject')
 
     def __init__(self):
         pass
@@ -50,6 +51,11 @@ class TeraService(db.Model, BaseModel):
             for role in self.service_roles:
                 roles.append(role.to_json())
             json_service['service_roles'] = roles
+            # Add projects for that service
+            service_projects = []
+            for sp in self.service_projects:
+                service_projects.append(sp.to_json())
+            json_service['service_projects'] = service_projects
 
         if not self.service_endpoint_user:
             del json_service['service_endpoint_user']
