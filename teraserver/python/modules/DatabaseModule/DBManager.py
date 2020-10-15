@@ -140,10 +140,10 @@ class DBManager (BaseModule):
 
     @staticmethod
     def serviceAccess(service: TeraService):
-        access = DBManagerTeraServiceAccess(service = service)
+        access = DBManagerTeraServiceAccess(service=service)
         return access
 
-    def create_defaults(self, config: ConfigManager):
+    def create_defaults(self, config: ConfigManager, minimal=False):
         if TeraServerSettings.get_count() == 0:
             print('No server settings - creating defaults')
             TeraServerSettings.create_defaults()

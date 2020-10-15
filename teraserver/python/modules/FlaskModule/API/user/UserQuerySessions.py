@@ -170,9 +170,8 @@ class UserQuerySessions(Resource):
 
         # Manage session participants
         if 'session_participants_ids' in json_session:
-            new_parts = [TeraParticipant.get_participant_by_id(part_id)
-                         for part_id in json_session['session_participants_ids']]
-            update_session.session_participants = new_parts
+            update_session.session_participants = [TeraParticipant.get_participant_by_id(part_id)
+                                                   for part_id in json_session['session_participants_ids']]
 
         # Manage session users
         if 'session_users_ids' in json_session:

@@ -10,7 +10,6 @@ import datetime
 
 class TeraDevice(db.Model, BaseModel):
     __tablename__ = 't_devices'
-    secret = None
     id_device = db.Column(db.Integer, db.Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
     # id_site = db.Column(db.Integer, db.ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=True)
     # id_session_type = db.Column(db.Integer, db.ForeignKey("t_sessions_types.id_session_type",
@@ -43,17 +42,17 @@ class TeraDevice(db.Model, BaseModel):
 
     authenticated = False
 
-    def __init__(self):
-        self.secret = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerDeviceTokenKey)
-        if self.secret is None:
-            # Fallback - should not happen
-            self.secret = 'TeraDeviceSecret'
+    # def __init__(self):
+    #     self.secret = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerDeviceTokenKey)
+    #     if self.secret is None:
+    #         # Fallback - should not happen
+    #         self.secret = 'TeraDeviceSecret'
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields += ['device_projects', 'device_participants', 'device_sessions', 'device_certificate', 'secret',
+        ignore_fields += ['device_projects', 'device_participants', 'device_sessions', 'device_certificate',
                           'device_subtype', 'authenticated', 'device_assets']
 
         if minimal:

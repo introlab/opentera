@@ -3,6 +3,7 @@ import inspect
 import datetime
 # import uuid
 import time
+import sqlalchemy.sql.sqltypes
 
 db = SQLAlchemy()
 
@@ -37,7 +38,13 @@ class BaseModel:
         for name in json:
             if name not in ignore_fields:
                 if hasattr(self, name):
-                    setattr(self, name, json[name])
+                    # print('type ', type(getattr(self, name)))
+                    # Test for datetime as string
+                    # This is a fix for SQLITE that does not convert str to datetime automatically
+                    if isinstance(self.__table__.columns[name].type, sqlalchemy.sql.sqltypes.TIMESTAMP):
+                        setattr(self, name, datetime.datetime.fromisoformat(json[name]))
+                    else:
+                        setattr(self, name, json[name])
                 else:
                     print('Attribute ' + name + ' not found.')
 

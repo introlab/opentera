@@ -172,14 +172,14 @@ class DeviceQuerySessions(Resource):
                     new_ses.session_participants.append(participant)
 
                 if len(participants) > 0:
-                    new_ses.commit() # Commits added participants
+                    new_ses.commit()   # Commits added participants
 
                 # Update ID for further use
                 json_session['id_session'] = new_ses.id_session
 
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
-                print(sys.exc_info())
+                print(sys.exc_info(), e)
                 return '', 500
 
         update_session = TeraSession.get_session_by_id(json_session['id_session'])
