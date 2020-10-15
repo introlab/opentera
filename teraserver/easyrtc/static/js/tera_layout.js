@@ -1,3 +1,6 @@
+let currentLayoutId = 0;
+let currentLargeViewId = "";
+
 function initialUserLayout(){
     updateUserRemoteViewsLayout(0);
     updateUserLocalViewLayout(1, 0);
@@ -10,74 +13,58 @@ function updateUserRemoteViewsLayout(remote_num){
     let remoteView2 = $("#remoteView2");
     let remoteView3 = $("#remoteView3");
     let remoteView4 = $("#remoteView4");
-    let remoteRows1 = $("#remoteRows1");
-    let remoteRows2 = $("#remoteRows2");
     let remoteViews = $("#remoteViews");
+    //let largeView = $("#largeView");
     let localViews = $("#localViews");
 
 
     if (remote_num === 0){
         remoteViews.hide();
-        setRowWidth12(localViews);
+        setCurrentUserLayout(0, false);
+        setColWidth(localViews, 12);
         return;
     }else {
         remoteViews.show();
-        setRowWidth4(localViews);
+        if (currentLayoutId === 0) setColWidth(localViews, 3);
+        if (currentLayoutId === 1) setColWidth(localViews, 2);
     }
 
     switch(remote_num){
         case 1:
             remoteView1.show();
+            remoteView2.hide();
             remoteView3.hide();
-            setRowWidth12(remoteView1);
-
-            setRowHeight100(remoteRows1);
-            remoteRows1.show();
-            remoteRows2.hide();
+            remoteView4.hide();
+            if (!remoteView1[0].classList.contains('col') && currentLargeViewId !== 'remoteView1')
+                setColWidth(remoteView1, 12);
             break;
         case 2:
             remoteView1.show();
-            remoteView3.hide();
-            setRowWidth12(remoteView1);
-            setRowHeight50(remoteRows1);
-
             remoteView2.show();
-            setRowWidth12(remoteView2);
-            setRowHeight50(remoteRows2);
+            remoteView3.hide();
             remoteView4.hide();
-            remoteRows1.show();
-            remoteRows2.show();
+            if (!remoteView1[0].classList.contains('col') && currentLargeViewId !== 'remoteView1')
+                setColWidth(remoteView1, 6);
             break;
         case 3:
             remoteView1.show();
-            remoteView3.show();
-            setRowWidth6(remoteView1);
-            setRowWidth6(remoteView3);
-            setRowHeight50(remoteRows1);
-
             remoteView2.show();
+            remoteView3.show();
             remoteView4.hide();
-            setRowWidth12(remoteView2);
-            setRowHeight50(remoteRows2);
-
-            remoteRows1.show();
-            remoteRows2.show();
+            if (!remoteView1[0].classList.contains('col') && currentLargeViewId !== 'remoteView1')
+                setColWidth(remoteView1,6);
+            if (!remoteView3[0].classList.contains('col') && currentLargeViewId !== 'remoteView3')
+                setColWidth(remoteView3, 12);
             break;
         case 4:
             remoteView1.show();
             remoteView3.show();
-            setRowWidth6(remoteView1);
-            setRowWidth6(remoteView3);
-            setRowHeight50(remoteRows1);
-
             remoteView2.show();
             remoteView4.show();
-            setRowWidth6(remoteView2);
-            setRowWidth6(remoteView4);
-            setRowHeight50(remoteRows2);
-
-            remoteRows1.show();
-            remoteRows2.show();
+            if (!remoteView1[0].classList.contains('col') && currentLargeViewId !== 'remoteView1')
+                setColWidth(remoteView1,6);
+            if (!remoteView3[0].classList.contains('col') && currentLargeViewId !== 'remoteView3')
+                setColWidth(remoteView3,6);
             break;
         default:
             console.error('Too many views, don\'t know how to set the layout!');
@@ -93,24 +80,24 @@ function updateUserLocalViewLayout(local_num, remote_num){
     switch(local_num){
         case 1:
             if (remote_num>0){
-                setRowHeight80(selfViewRow1);
-                setRowHeight20(toolsView);
+                setRowHeight(selfViewRow1, 80);
+                setRowHeight(toolsView, 20);
                 toolsView.show();
             }else{
-                setRowHeight100(selfViewRow1);
+                setRowHeight(selfViewRow1, 100);
                 toolsView.hide();
             }
             selfViewRow2.hide();
             break;
         case 2:
             if (remote_num>0){
-                setRowHeight40(selfViewRow1);
-                setRowHeight40(selfViewRow2);
-                setRowHeight20(toolsView);
+                setRowHeight(selfViewRow1, 40);
+                setRowHeight(selfViewRow2, 40);
+                setRowHeight(toolsView,20);
                 toolsView.show();
             }else{
-                setRowHeight50(selfViewRow1);
-                setRowHeight50(selfViewRow2);
+                setRowHeight(selfViewRow1,50);
+                setRowHeight(selfViewRow2,50);
                 toolsView.hide();
             }
 
@@ -121,46 +108,102 @@ function updateUserLocalViewLayout(local_num, remote_num){
     }
 }
 
-function setRowWidth12(row){
-    row.removeClass('col-4 col-6').addClass('col-12');
+function setCurrentUserLayout(layout_id, update_views= true){
+    currentLayoutId = layout_id;
+
+    let largeView = $('#largeView');
+    let remoteViews = $("#remoteViews");
+    let remoteRows = $("#remoteRows1");
+    let localViews = $("#localViews");
+
+    switch (currentLayoutId){
+        case 0:
+            largeView.hide();
+            setColWidth(localViews, 3);
+            setColWidth(remoteViews, 9);
+            remoteRows.attr("style","");
+            for (let i=1; i<=4; i++){
+                setColWidth($('#remoteView' + i), 6);
+            }
+            if (update_views === true)
+                updateUserRemoteViewsLayout(remoteStreams.length);
+
+            // Move current large view to its position
+            setLargeView("");
+            break;
+        case 1:
+            largeView.show();
+            setColWidth(localViews, 2);
+            setColWidth(remoteViews, 2);
+            remoteRows.attr("style","flex-flow: column;");
+            for (let i=1; i<=4; i++){
+                setColWidth($('#remoteView' + i), 0);
+            }
+
+            // Set remote 1 as default view
+            setLargeView("remoteView1");
+            break;
+
+        default:
+            showError("setCurrentUserLayout", "Unknown user layout ID", false);
+    }
 }
 
-function setRowWidth6(row){
-    row.removeClass('col-4 col-12').addClass('col-6');
+function setLargeView(view_id){
+    /*if (currentLayoutId !== 1){
+        console.warn("Trying to set large view, but wrong layout!");
+        return;
+    }*/
+
+    // Remove current view
+    let largeView = $("#largeView");
+    if (largeView.children('div').length > 0){
+        let view_id = largeView.children('div')[0].id;
+        if (view_id.startsWith("local")){
+            let localViews = $('#localViews');
+            setColWidth(largeView.children('div'),12);
+            localViews.append(largeView.children('div')[0]);
+        }else{
+            let remoteViews = $('#remoteRows1');
+            setColWidth(largeView.children('div'),0);
+            remoteViews.append(largeView.children('div')[0]);
+        }
+    }
+
+    // Swap view
+    currentLargeViewId = view_id;
+    if (view_id !== ""){
+        let view = $("#" + view_id);
+        removeClassByPrefix(view[0], 'col');
+        largeView.append(view);
+    }
+
 }
 
-function setRowWidth4(row){
-    row.removeClass('col-6 col-12').addClass('col-4');
+function setColWidth(col, width){
+    removeClassByPrefix(col[0], 'col');
+    if (width>0) {
+        col.addClass('col-' + width);
+    }else{
+        col.addClass('col');
+    }
 }
 
-function setRowHeight20(row){
-    row.removeClass('h-33 h-40 h-50 h-67 h-80 h-100').addClass('h-20');
-}
+function setRowHeight(row, height){
+    removeClassByPrefix(row[0], 'h-');
+    row.addClass('h-' + height);
 
-function setRowHeight33(row){
-    row.removeClass('h-20 h-40 h-50 h-67 h-80 h-100').addClass('h-33');
-}
-
-function setRowHeight40(row){
-    row.removeClass('h-20 h-33 h-50 h-67 h-80 h-100').addClass('h-40');
-}
-
-function setRowHeight50(row){
-    row.removeClass('h-20 h-33 h-40 h-67 h-80 h-100').addClass('h-50');
-}
-
-function setRowHeight67(row){
-    row.removeClass('h-20 h-33 h-40 h-50 h-80 h-100').addClass('h-67');
-}
-
-function setRowHeight80(row){
-    row.removeClass('h-20 h-33 h-40 h-50 h-67 h-100').addClass('h-80');
-}
-
-function setRowHeight100(row){
-    row.removeClass('h-20 h-33 h-40 h-67 h-50 h-80').addClass('h-100');
 }
 
 function showLayout(show){
-    (show === true) ? $('#mainContainer').show() : $('#mainContainer').hide();
+    let mainContainer = $('#mainContainer');
+    (show === true) ? mainContainer.show() : mainContainer.hide();
+}
+
+function removeClassByPrefix(el, prefix) {
+    for(let i = el.classList.length - 1; i >= 0; i--) {
+        if(el.classList[i].startsWith(prefix)) {
+            el.classList.remove(el.classList[i]);
+        }
+    }
 }
