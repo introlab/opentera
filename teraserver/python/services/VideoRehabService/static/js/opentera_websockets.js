@@ -68,7 +68,7 @@ function ws_MessageReceived(evt){
         hideElement('btnLogout');
         // Join video session event - redirect to session url
         //document.getElementById('mainview').src = json_msg.data[0]["sessionUrl"];
-        window.parent.document.getElementById('mainview').contentWindow.document.getElementById("dialogWait").style.display="inline";
+        //window.parent.document.getElementById('mainview').contentWindow.document.getElementById("dialogWait").style.display="inline";
         current_session_url = json_msg.message.events[0]["sessionUrl"];
         testCurrentSessionUrlValid();
 

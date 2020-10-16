@@ -53,7 +53,7 @@ class ParticipantEventManager(EventManager):
     def filter_join_session_reply_event(self, event: messages.JoinSessionReplyEvent):
         # Check if we are in that session or not
         if TeraSession.is_participant_in_session(event.session_uuid, self.participant.participant_uuid)  \
-                and event.participant != self.participant.participant_uuid_uuid:
+                and event.participant_uuid != self.participant.participant_uuid:
             return True
         # Not accessible
         return False
