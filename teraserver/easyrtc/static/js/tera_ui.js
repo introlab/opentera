@@ -204,7 +204,8 @@ function updateStatusIconState(status, local, index, prefix){
         if (local){
             if (localTimerHandles[index-1] !== 0) must_show = true;
         }else{
-            if (remoteTimerHandles[index-1] !== 0) must_show = true;
+            if (!isParticipant)
+                if (remoteTimerHandles[index-1] !== 0) must_show = true;
         }
         (!must_show) ? icon.hide() : icon.show();
     }else{
@@ -250,13 +251,17 @@ function enlargeView(local, index){
     let view_id = getVideoViewId(local, index);
     let already_large = (view_id === currentLargeViewId);
 
-    if (already_large){
-        // Minimize the current large view
-        // Ensure we have the right layout
-        setCurrentUserLayout(layouts.GRID, false);
+    if (typeof(setCurrentUserLayout) !== "undefined"){
+        if (already_large){
+            // Minimize the current large view
+            // Ensure we have the right layout
+            setCurrentUserLayout(layouts.GRID, false);
+        }else{
+            // Maximize the selected view
+            setCurrentUserLayout(layouts.LARGEVIEW, false, view_id);
+        }
     }else{
-        // Maximize the selected view
-        setCurrentUserLayout(layouts.LARGEVIEW, false, view_id);
+        setLargeView(view_id);
     }
 
 

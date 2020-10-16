@@ -5,6 +5,7 @@ const layouts = {
 
 let currentLayoutId = layouts.GRID;
 let currentLargeViewId = "";
+let isParticipant = false;
 
 function initialUserLayout(){
     updateUserRemoteViewsLayout(0);
@@ -13,7 +14,6 @@ function initialUserLayout(){
 
 function updateUserRemoteViewsLayout(remote_num){
     // TODO: Improve.
-
     let remoteView1 = $("#remoteView1");
     let remoteView2 = $("#remoteView2");
     let remoteView3 = $("#remoteView3");

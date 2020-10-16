@@ -28,7 +28,7 @@ httpApp.use('/teraplus', function(req, res){
         //res.send('key: ' + req.query.key);
         if (req.query.key == mykey || mykey == ""){
                 // Authorized
-                res.render('index.html', {teraplus_port: myport})
+                res.render('index_users.html', {teraplus_port: myport})
                 //res.render('/index.html',{ root: __dirname + "/protected/"});
         }else{
                 // Not authorized
@@ -36,6 +36,20 @@ httpApp.use('/teraplus', function(req, res){
         }
         //res.sendFile('/index.html',{ root: __dirname + "/protected/"});
 });
+
+httpApp.use('/participants', function(req, res){
+        //res.send('key: ' + req.query.key);
+        if (req.query.key == mykey || mykey == ""){
+                // Authorized
+                res.render('index_participants.html', {teraplus_port: myport})
+                //res.render('/index.html',{ root: __dirname + "/protected/"});
+        }else{
+                // Not authorized
+                res.sendFile('/denied.html',{ root: __dirname + "/static/"});
+        }
+        //res.sendFile('/index.html',{ root: __dirname + "/protected/"});
+});
+
 
 httpApp.use('/status', function(req,res) {
   //Query server status

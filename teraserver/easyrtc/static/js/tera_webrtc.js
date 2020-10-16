@@ -645,9 +645,11 @@ function streamDisconnected(callerid, mediaStream, streamName){
     }*/
 
     // Is that stream displayed in large view? If so, we must also switch the layout
-    if (currentLayoutId === layouts.LARGEVIEW){
-        if (getVideoViewId(false, slot) === currentLargeViewId){
-            setCurrentUserLayout(layouts.GRID, false);
+    if (typeof(currentLayoutId) !== 'undefined'){
+        if (currentLayoutId === layouts.LARGEVIEW){
+            if (getVideoViewId(false, slot) === currentLargeViewId){
+                setCurrentUserLayout(layouts.GRID, false);
+            }
         }
     }
 
