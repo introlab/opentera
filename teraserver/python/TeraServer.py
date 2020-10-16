@@ -214,7 +214,7 @@ if __name__ == '__main__':
             Globals.db_man.open_local(None, echo=True, ram=True)
 
             # Create default values, if required
-            Globals.db_man.create_defaults(config=config_man, test=False)
+            Globals.db_man.create_defaults(config=config_man, test=True)
         else:
             Globals.db_man.open(config_man.server_config['debug_mode'])
 
