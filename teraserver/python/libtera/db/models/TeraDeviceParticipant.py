@@ -24,30 +24,31 @@ class TeraDeviceParticipant(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults(test=False):
-        from libtera.db.models.TeraParticipant import TeraParticipant
-        from libtera.db.models.TeraDevice import TeraDevice
-        participant1 = TeraParticipant.get_participant_by_id(1)
-        participant2 = TeraParticipant.get_participant_by_id(2)
-        device1 = TeraDevice.get_device_by_name('Apple Watch #W05P1')
-        device2 = TeraDevice.get_device_by_name('Kit Télé #1')
-        device3 = TeraDevice.get_device_by_name('Robot A')
+        if test:
+            from libtera.db.models.TeraParticipant import TeraParticipant
+            from libtera.db.models.TeraDevice import TeraDevice
+            participant1 = TeraParticipant.get_participant_by_id(1)
+            participant2 = TeraParticipant.get_participant_by_id(2)
+            device1 = TeraDevice.get_device_by_name('Apple Watch #W05P1')
+            device2 = TeraDevice.get_device_by_name('Kit Télé #1')
+            device3 = TeraDevice.get_device_by_name('Robot A')
 
-        dev_participant = TeraDeviceParticipant()
-        dev_participant.device_participant_device = device1
-        dev_participant.device_participant_participant = participant1
-        db.session.add(dev_participant)
+            dev_participant = TeraDeviceParticipant()
+            dev_participant.device_participant_device = device1
+            dev_participant.device_participant_participant = participant1
+            db.session.add(dev_participant)
 
-        dev_participant = TeraDeviceParticipant()
-        dev_participant.device_participant_device = device1
-        dev_participant.device_participant_participant = participant2
-        db.session.add(dev_participant)
+            dev_participant = TeraDeviceParticipant()
+            dev_participant.device_participant_device = device1
+            dev_participant.device_participant_participant = participant2
+            db.session.add(dev_participant)
 
-        dev_participant = TeraDeviceParticipant()
-        dev_participant.device_participant_device = device2
-        dev_participant.device_participant_participant = participant2
-        db.session.add(dev_participant)
+            dev_participant = TeraDeviceParticipant()
+            dev_participant.device_participant_device = device2
+            dev_participant.device_participant_participant = participant2
+            db.session.add(dev_participant)
 
-        db.session.commit()
+            db.session.commit()
 
     @staticmethod
     def get_device_participant_by_id(device_participant_id: int):

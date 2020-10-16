@@ -22,7 +22,6 @@ class TeraDeviceType(db.Model, BaseModel):
     @staticmethod
     def create_defaults(test=False):
         # For now Defaults are hard coded
-
         VIDEOCONFERENCE = TeraDeviceType()
         VIDEOCONFERENCE.device_type_name = 'Vidéoconférence'
         VIDEOCONFERENCE.device_type_key = 'videoconference'

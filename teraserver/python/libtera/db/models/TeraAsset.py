@@ -56,38 +56,39 @@ class TeraAsset(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults(test=False):
-        from libtera.db.models.TeraSession import TeraSession
-        from libtera.db.models.TeraDevice import TeraDevice
-        from libtera.db.models.TeraParticipant import TeraParticipant
-        from libtera.db.models.TeraUser import TeraUser
+        if test:
+            from libtera.db.models.TeraSession import TeraSession
+            from libtera.db.models.TeraDevice import TeraDevice
+            from libtera.db.models.TeraParticipant import TeraParticipant
+            from libtera.db.models.TeraUser import TeraUser
 
-        session2 = TeraSession.get_session_by_name("Séance #2")
-        session3 = TeraSession.get_session_by_name("Séance #3")
+            session2 = TeraSession.get_session_by_name("Séance #2")
+            session3 = TeraSession.get_session_by_name("Séance #3")
 
-        for i in range(3):
+            for i in range(3):
+                new_asset = TeraAsset()
+                new_asset.asset_name = "Asset #" + str(i)
+                new_asset.asset_session = session2
+                new_asset.asset_uuid = str(uuid.uuid4())
+                new_asset.asset_service_uuid = '00000000-0000-0000-0000-000000000001'
+                new_asset.asset_type = AssetType.RAW_FILE.value
+                if i == 0:
+                    new_asset.id_participant = TeraParticipant.get_participant_by_name('Participant #1').id_participant
+                if i == 1:
+                    new_asset.id_user = TeraUser.get_user_by_id(1).id_user
+                db.session.add(new_asset)
+
+            asset_device = TeraDevice.get_device_by_name('Apple Watch #W05P1')
             new_asset = TeraAsset()
-            new_asset.asset_name = "Asset #" + str(i)
-            new_asset.asset_session = session2
+            new_asset.asset_name = "Device Asset"
+            new_asset.asset_session = session3
+            new_asset.asset_device = asset_device
             new_asset.asset_uuid = str(uuid.uuid4())
             new_asset.asset_service_uuid = '00000000-0000-0000-0000-000000000001'
-            new_asset.asset_type = AssetType.RAW_FILE.value
-            if i == 0:
-                new_asset.id_participant = TeraParticipant.get_participant_by_name('Participant #1').id_participant
-            if i == 1:
-                new_asset.id_user = TeraUser.get_user_by_id(1).id_user
+            new_asset.asset_type = AssetType.PROCESSED_DATA.value
             db.session.add(new_asset)
 
-        asset_device = TeraDevice.get_device_by_name('Apple Watch #W05P1')
-        new_asset = TeraAsset()
-        new_asset.asset_name = "Device Asset"
-        new_asset.asset_session = session3
-        new_asset.asset_device = asset_device
-        new_asset.asset_uuid = str(uuid.uuid4())
-        new_asset.asset_service_uuid = '00000000-0000-0000-0000-000000000001'
-        new_asset.asset_type = AssetType.PROCESSED_DATA.value
-        db.session.add(new_asset)
-
-        db.session.commit()
+            db.session.commit()
 
     @staticmethod
     def get_asset_by_id(asset_id: int):

@@ -74,21 +74,22 @@ class TeraProject(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults(test=False):
-        from libtera.db.models.TeraSite import TeraSite
-        base_project = TeraProject()
-        base_project.project_name = 'Default Project #1'
-        base_project.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        TeraProject.insert(base_project)
+        if test:
+            from libtera.db.models.TeraSite import TeraSite
+            base_project = TeraProject()
+            base_project.project_name = 'Default Project #1'
+            base_project.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
+            TeraProject.insert(base_project)
 
-        base_project2 = TeraProject()
-        base_project2.project_name = 'Default Project #2'
-        base_project2.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        TeraProject.insert(base_project2)
+            base_project2 = TeraProject()
+            base_project2.project_name = 'Default Project #2'
+            base_project2.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
+            TeraProject.insert(base_project2)
 
-        secret_project = TeraProject()
-        secret_project.project_name = "Secret Project #1"
-        secret_project.id_site = TeraSite.get_site_by_sitename('Top Secret Site').id_site
-        TeraProject.insert(secret_project)
+            secret_project = TeraProject()
+            secret_project.project_name = "Secret Project #1"
+            secret_project.id_site = TeraSite.get_site_by_sitename('Top Secret Site').id_site
+            TeraProject.insert(secret_project)
 
     @staticmethod
     def get_project_by_projectname(projectname):
