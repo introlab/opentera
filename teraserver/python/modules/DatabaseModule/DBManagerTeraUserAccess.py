@@ -672,7 +672,7 @@ class DBManagerTeraUserAccess:
             .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None)) \
             .filter(TeraAsset.asset_service_uuid == uuid_service).all()
 
-    def query_projects_for_service(self, service_id: int, site_id: int, include_other_projects=False):
+    def query_projects_for_service(self, service_id: int, site_id: int = None, include_other_projects=False):
         from libtera.db.models.TeraServiceProject import TeraServiceProject
         projects_ids = self.get_accessible_projects_ids()
 

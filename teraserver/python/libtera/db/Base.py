@@ -41,7 +41,7 @@ class BaseModel:
                     # Test for datetime as string
                     # This is a fix for SQLITE that does not convert str to datetime automatically
                     if isinstance(self.__table__.columns[name].type, sqlalchemy.sql.sqltypes.TIMESTAMP) \
-                            and isinstance(json[name], str):
+                            and isinstance(json[name], str) and len(json[name]) > 0:
                         setattr(self, name, datetime.datetime.fromisoformat(json[name]))
                     else:
                         setattr(self, name, json[name])
