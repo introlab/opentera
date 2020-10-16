@@ -1,4 +1,9 @@
-let currentLayoutId = 0;
+const layouts = {
+    GRID: 0,
+    LARGEVIEW: 1
+}
+
+let currentLayoutId = layouts.GRID;
 let currentLargeViewId = "";
 
 function initialUserLayout(){
@@ -14,19 +19,27 @@ function updateUserRemoteViewsLayout(remote_num){
     let remoteView3 = $("#remoteView3");
     let remoteView4 = $("#remoteView4");
     let remoteViews = $("#remoteViews");
-    //let largeView = $("#largeView");
+    let largeView = $("#largeView");
     let localViews = $("#localViews");
 
 
     if (remote_num === 0){
         remoteViews.hide();
-        setCurrentUserLayout(0, false);
+        setCurrentUserLayout(layouts.GRID, false);
         setColWidth(localViews, 12);
         return;
     }else {
-        remoteViews.show();
-        if (currentLayoutId === 0) setColWidth(localViews, 3);
-        if (currentLayoutId === 1) setColWidth(localViews, 2);
+
+        if (currentLayoutId === layouts.GRID){
+            setColWidth(localViews, 3);
+            remoteViews.show();
+            largeView.hide();
+        }
+        if (currentLayoutId === layouts.LARGEVIEW){
+            setColWidth(localViews, 2);
+            largeView.show();
+            (remote_num > 1 || (currentLargeViewId.startsWith('local') && remote_num >0)) ? remoteViews.show() : remoteViews.hide();
+        }
     }
 
     switch(remote_num){
@@ -108,7 +121,7 @@ function updateUserLocalViewLayout(local_num, remote_num){
     }
 }
 
-function setCurrentUserLayout(layout_id, update_views= true){
+function setCurrentUserLayout(layout_id, update_views= true, largeViewId = ""){
     currentLayoutId = layout_id;
 
     let largeView = $('#largeView');
@@ -117,7 +130,9 @@ function setCurrentUserLayout(layout_id, update_views= true){
     let localViews = $("#localViews");
 
     switch (currentLayoutId){
-        case 0:
+        case layouts.GRID:
+            // Move current large view to its position
+            setLargeView("");
             largeView.hide();
             setColWidth(localViews, 3);
             setColWidth(remoteViews, 9);
@@ -125,13 +140,8 @@ function setCurrentUserLayout(layout_id, update_views= true){
             for (let i=1; i<=4; i++){
                 setColWidth($('#remoteView' + i), 6);
             }
-            if (update_views === true)
-                updateUserRemoteViewsLayout(remoteStreams.length);
-
-            // Move current large view to its position
-            setLargeView("");
             break;
-        case 1:
+        case layouts.LARGEVIEW:
             largeView.show();
             setColWidth(localViews, 2);
             setColWidth(remoteViews, 2);
@@ -140,33 +150,48 @@ function setCurrentUserLayout(layout_id, update_views= true){
                 setColWidth($('#remoteView' + i), 0);
             }
 
-            // Set remote 1 as default view
-            setLargeView("remoteView1");
+            if (largeViewId === "")
+                // Set remote 1 as default view
+                setLargeView("remoteView1");
+            else{
+                setLargeView(largeViewId);
+            }
             break;
 
         default:
             showError("setCurrentUserLayout", "Unknown user layout ID", false);
     }
+    if (update_views === true)
+        updateUserRemoteViewsLayout(remoteStreams.length);
 }
 
 function setLargeView(view_id){
-    /*if (currentLayoutId !== 1){
+    /*if (currentLayoutId !== 1 && view_id !== ""){
         console.warn("Trying to set large view, but wrong layout!");
         return;
     }*/
 
     // Remove current view
     let largeView = $("#largeView");
-    if (largeView.children('div').length > 0){
-        let view_id = largeView.children('div')[0].id;
-        if (view_id.startsWith("local")){
-            let localViews = $('#localViews');
+    if (currentLargeViewId !== ""){
+        let view_index = Number(currentLargeViewId.substr(-1));
+        if (currentLargeViewId.startsWith("local")){
+            //let localViews = $('#localViews');
             setColWidth(largeView.children('div'),12);
-            localViews.append(largeView.children('div')[0]);
+            // Insert at the right place
+            let prev_el = $('#localView' + view_index + 'Row');
+            prev_el.append($('#' + currentLargeViewId));
+            //localViews.append(largeView.children('div')[0]);
+
         }else{
-            let remoteViews = $('#remoteRows1');
             setColWidth(largeView.children('div'),0);
-            remoteViews.append(largeView.children('div')[0]);
+            if (view_index === 1){
+                $('#' + currentLargeViewId).insertBefore($('#remoteView2'));
+            }else {
+                //remoteViews.append(largeView.children('div')[0]);
+                let prev_el = $('#remoteView' + (view_index-1));
+                $('#' + currentLargeViewId).insertAfter(prev_el);
+            }
         }
     }
 

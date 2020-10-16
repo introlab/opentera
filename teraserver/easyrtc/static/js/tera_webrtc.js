@@ -644,6 +644,13 @@ function streamDisconnected(callerid, mediaStream, streamName){
         document.getElementById("audioDisconnected").play()
     }*/
 
+    // Is that stream displayed in large view? If so, we must also switch the layout
+    if (currentLayoutId === layouts.LARGEVIEW){
+        if (getVideoViewId(false, slot) === currentLargeViewId){
+            setCurrentUserLayout(layouts.GRID, false);
+        }
+    }
+
     // Remove stream
     for (let i=0; i<remoteStreams.length; i++){
         if (remoteStreams[i].peerid === callerid && remoteStreams[i].streamname === streamName){

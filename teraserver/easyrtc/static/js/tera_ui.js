@@ -32,6 +32,11 @@ function showButtons(local, show, index){
     let ptzControls = $("#" + view_prefix + "PtzControls" + index);
     let srcControls = $("#" + view_prefix + "SourcesControls" + index);
     let statusControls = $("#" + view_prefix + "ViewControls" + index)
+    let videoControls = $("#" + view_prefix + "VideoControls" + index);
+
+    if (videoControls.length){
+        (show) ? videoControls.show() : videoControls.hide();
+    }
 
     if (ptzControls.length){
         if (show === true){
@@ -57,7 +62,7 @@ function showButtons(local, show, index){
 
         if (secondSourceIcon.length){
             // Always hide if no secondary stream selected
-            if (currentConfig.currentVideoSource2Index <=0 && currentConfig.currentAudioSource2Index <=0)
+            if (currentConfig.currentVideoSource2Index <0 && currentConfig.currentAudioSource2Index <0)
                 secondSourceIcon.hide();
             else{
                 let iconActive = isButtonActive(local, index, "Show2ndVideo");
@@ -219,8 +224,24 @@ function updateButtonIconState(status, local, index, prefix){
     icon.attr('src', pathJoin(iconImgPath))
 }
 
-function swapViews(){
-    console.warn('SwapViews: Feature not currently enabled.');
+function enlargeView(local, index){
+
+    let view_id = getVideoViewId(local, index);
+    let already_large = (view_id === currentLargeViewId);
+
+    if (already_large){
+        // Minimize the current large view
+        // Ensure we have the right layout
+        setCurrentUserLayout(layouts.GRID, false);
+    }else{
+        // Maximize the selected view
+        setCurrentUserLayout(layouts.LARGEVIEW, false, view_id);
+    }
+
+
+    // Update layouts
+    updateUserRemoteViewsLayout(remoteStreams.length);
+    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
 
 }
 
@@ -442,4 +463,9 @@ function refreshRemoteStatusIcons(peerid){
     if (status.video !== undefined) {
         updateStatusIconState(status.video, false, index + 1, "Video");
     }
+}
+
+function getVideoViewId(local, index){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    return view_prefix + "View" + index;
 }

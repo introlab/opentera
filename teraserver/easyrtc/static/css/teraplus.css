@@ -95,14 +95,16 @@ video {
 	position: relative;
 	/*width: 10%;
 	max-width:48px;
-	left: -40px;*/
-	height: 100%;
+	left: -40px;
 	max-height: 24px;
 	top:24px;
 	background-color: rgba(0,0,0,0.5);
+	padding-right: 20px;
+	*/
+	margin-top: 10px;
+	height: 100%;
 	float: right;
 	z-index: 3;
-	padding-right: 20px;
 }
 
 .overlay-left {
