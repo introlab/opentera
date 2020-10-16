@@ -404,8 +404,8 @@ class VideoRehabService(ServiceOpenTera):
 
             api_response = self.post_to_opentera('/api/service/sessions', api_req)
         else:
-            api_response = self.get_from_opentera('/api/service/sessions', 'id_session=' + str(id_session) +
-                                                  '&with_events=1')
+            api_response = self.get_from_opentera('/api/service/sessions', {'id_session': str(id_session),
+                                                                            'with_events': True})
 
         if api_response.status_code == 200:
 

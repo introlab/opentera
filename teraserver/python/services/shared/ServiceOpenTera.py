@@ -158,7 +158,7 @@ class ServiceOpenTera(RedisClient):
         any_message = messages.Any()
         any_message.Pack(event)
         message.events.extend([any_message])
-        self.publish(message.header.topic, message.SerializeToString())
+        return self.publish(message.header.topic, message.SerializeToString())
 
     def create_event_message(self, topic):
         event_message = messages.TeraEvent()
@@ -172,7 +172,7 @@ class ServiceOpenTera(RedisClient):
         any_message = messages.Any()
         any_message.Pack(event)
         message.data.extend([any_message])
-        self.publish(topic, message.SerializeToString())
+        return self.publish(topic, message.SerializeToString())
 
     def create_tera_message(self, src='', dest='', seq=0):
         tera_message = messages.TeraModuleMessage()
