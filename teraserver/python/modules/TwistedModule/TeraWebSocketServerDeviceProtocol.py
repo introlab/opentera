@@ -40,6 +40,19 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
         # print(ret)
 
         if self.device:
+            # This will wait until subscribe result is available...
+            # Register only once to events from modules, will be filtered after
+            ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+                ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
+
+            ret2 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+                ModuleNames.DATABASE_MODULE_NAME), self.redis_event_message_received)
+
+            # Direct events
+            ret3 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            print(ret1, ret2, ret3)
+            # MAKE SURE TO SUBSCRIBE TO EVENTS BEFORE SENDING ONLINE MESSAGE
             tera_message = self.create_tera_message(
                 create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
             device_connected = messages.DeviceEvent()
@@ -54,19 +67,6 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
             # Publish to login module (bytes)
             self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
-
-            # This will wait until subscribe result is available...
-            # Register only once to events from modules, will be filtered after
-            ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
-                ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
-
-            ret2 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
-                ModuleNames.DATABASE_MODULE_NAME), self.redis_event_message_received)
-
-            # Direct events
-            ret3 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
-
-            print(ret1, ret2, ret3)
 
     def onConnect(self, request):
         """
