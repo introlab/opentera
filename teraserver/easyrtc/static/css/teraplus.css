@@ -133,20 +133,28 @@ video {
 	float: right;
 	z-index: 3;
 
-	/*position: absolute;
-    bottom: 0px;
-    height: 10%;
-    max-height: 48px;
-    width: 100%;
-    padding: 5px;
-    background-color: rgba(0,0,0,0.5);
-
-    float: right;
-    z-index: 3;
-    display: inline;*/
-
 }
 
+.overlay-top-center {
+	position: relative;
+	margin: auto;
+	text-align: center;
+	z-index: 3;
+}
+
+.tool-icon{
+	padding: 10px;
+	text-align: center;
+}
+
+.chrono{
+	background-color: rgba(100,100,100,0.75);
+	color: white;
+	font-size: 1.5vw;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-radius: 10px;
+}
 
 		.overlay {
 			height: 0;
@@ -191,22 +199,7 @@ video {
 			top: 50%;
 		}
 		
-		.overlay-top-center {
-			position: absolute;
-			left: 50%;
-			top: 26px;
 
-			max-height: 48px;			
-			/*padding: 5px;
-			background-color: rgba(0,0,0,0.5);
-			height: 10%;
-			 */
-			transform: translate(-50%, 0%);
-			margin: auto;
-			height: 48px;
-			width: 100%;
-			text-align: center;
-		}
 		
 		.overlay-bottom-center {
 			position: absolute;

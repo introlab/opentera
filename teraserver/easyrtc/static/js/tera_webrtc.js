@@ -715,7 +715,7 @@ function getContactIndexForPeerId(peerid){
     return undefined;
 }
 
-function getStreamIndexForPeerId(peerid, streamname){
+function getStreamIndexForPeerId(peerid, streamname = 'default'){
     for (let i=0; i<remoteStreams.length; i++){
         if (remoteStreams[i].peerid === peerid && remoteStreams[i].streamname === streamname)
             return i;
@@ -856,6 +856,15 @@ function dataReception(sendercid, msgType, msgData, targeting) {
             if (msgData.mirror !== undefined){
                 showVideoMirror(false, index, msgData.mirror);
             }
+        }
+    }
+
+    if (msgType === "Chrono"){
+        // Start - stop local chrono
+        if (msgData.state === true){
+            startChrono(true, 1, msgData.duration, msgData.title);
+        }else{
+            stopChrono(true, 1);
         }
     }
 }
@@ -1012,4 +1021,26 @@ function enableAllTracks(stream, enable){
 
     for (let i=0; i<audioTracks.length; i++)
         audioTracks[i].enabled = enable;
+}
+
+function sendChronoMessage(target_peerids, state, msg = undefined, duration=undefined){
+
+    let request = {"state": state};
+    if (msg !== undefined)
+        request.title = msg;
+
+    if (duration !== undefined)
+        request.duration = duration;
+
+    if (easyrtc.webSocketConnected){
+        for (let i=0; i<target_peerids.length; i++){
+            easyrtc.sendDataWS( target_peerids[i], 'Chrono', request,
+                function(ackMesg) {
+                    //console.error("ackMsg:",ackMesg);
+                    if( ackMesg.msgType === 'error' ) {
+                        console.error(ackMesg.msgData.errorText);
+                    }
+                });
+        }
+    }
 }

@@ -169,6 +169,27 @@ function isStatusIconActive(local, index, prefix){
     return !icon.attr('src').includes("off");
 }
 
+function isIconActive(icon_id){
+    let icon = $("#" + icon_id);
+    return !icon.attr('src').includes("off");
+}
+
+function setIconState(icon_id, prefix, state){
+    let icon = $("#" + icon_id);
+
+    if (icon.length === 0)
+        return;
+
+    let iconImgPath = icon.attr('src').split('/')
+
+    if (state === true){
+        iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + ".png";
+    }else{
+        iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + "_off.png";
+    }
+    icon.attr('src', pathJoin(iconImgPath))
+}
+
 function updateStatusIconState(status, local, index, prefix){
     let icon = getStatusIcon(local, index, prefix);
 
@@ -407,6 +428,16 @@ function setTitle(local, index, title){
     }
 }
 
+function getTitle(local, index){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let label = $('#' + view_prefix + 'ViewTitle' + index);
+    let title = "Participant #" + index;
+    if (label.length){
+        title =  label[0].innerText;
+    }
+    return title;
+}
+
 function showPTZControls(local, index, zoom, presets, settings){
     let view_prefix = ((local === true) ? 'local' : 'remote');
     let zoomControls = $("#" + view_prefix + "ZoomButtons" + index);
@@ -468,4 +499,60 @@ function refreshRemoteStatusIcons(peerid){
 function getVideoViewId(local, index){
     let view_prefix = ((local === true) ? 'local' : 'remote');
     return view_prefix + "View" + index;
+}
+
+function muteMicroAll(){
+    let mute = !isIconActive("btnMicAll");
+    for (let i=1; i<=remoteStreams.length; i++){
+        muteMicro(false, i, mute);
+    }
+    setIconState("btnMicAll", 'Mic', mute);
+}
+
+function muteSpeakerAll(){
+    let mute = !isIconActive("btnSpeakerAll");
+    for (let i=1; i<=remoteStreams.length; i++){
+        muteSpeaker(false, i, mute);
+    }
+    setIconState("btnSpeakerAll", 'Speaker', mute);
+}
+
+function showChronosDialog(){
+    let partSelect = $('#chronosPartSelect')[0];
+    partSelect.options.length = 0;
+    partSelect.options[partSelect.options.length] = new Option("Tous", "0");
+
+    for (let i=0; i<remoteContacts.length; i++){
+        let index = getStreamIndexForPeerId(remoteContacts[i].peerid, 'default');
+        if (index !== undefined){
+            partSelect.options[partSelect.options.length] = new Option(getTitle(false, index+1), index+1);
+        }
+    }
+
+    $('#chronosDialog').modal('show');
+
+}
+
+function showTextDisplay(local, index, show){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let display = $('#' + view_prefix + 'Display' + index);
+    if (display.length){
+        (show) ? display.show() : display.hide();
+    }
+}
+
+function setTextDisplay(local, index, text){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let display = $('#' + view_prefix + 'Text' + index);
+    if (display.length){
+        display[0].innerHTML = text;
+    }
+}
+
+function getTextDisplay(local, index){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let display = $('#' + view_prefix + 'Text' + index);
+    if (display.length){
+        return display[0].innerHTML;
+    }
 }

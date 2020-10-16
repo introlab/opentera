@@ -22,6 +22,7 @@
     <script src="js/tera_shared_object.js"></script>
     <script src="js/tera_ptz.js"></script>
     <script src="js/tera_medias.js"></script>
+    <script src="js/tera_tools.js"></script>
 
     <script>
         function getTeraPlusPort() {
@@ -45,8 +46,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p>Source vidéo principale:</p><p> <select id="videoSelect" ></select></p>
-                <p>Source audio principale:</p><p> <select id="audioSelect" ></select></p>
+                <p><label for="videoSelect">Source vidéo principale: </label></p><p><select id="videoSelect" ></select></p>
+                <p><label for="audioSelect">Source audio principale: </label></p><p><select id="audioSelect" ></select></p>
                 <p>Source vidéo secondaire:</p><p> <select id="videoSelect2" ></select></p>
                 <p>Source audio secondaire:</p><p> <select id="audioSelect2" ></select></p>
                 <p><input type="checkbox" id="mirrorCheck" name="mirrorCheck" value="Mirror">
@@ -54,6 +55,41 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Appliquer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ChronoDialog -->
+<div class="modal fade" id="chronosDialog" tabindex="-1" role="dialog" aria-labelledby="chronosDialogCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chronosDialogLongTitle">Chronomètres</h5>
+
+            </div>
+            <div class="modal-body">
+                <p><label for="chronosPartSelect">Participant(s): </label><select id="chronosPartSelect" ></select></p>
+                <p><label for="chronosTitleSelect">Type: </label> <select id="chronosTitleSelect" >
+                    <option value="Exercices">Exercices</option>
+                    <option value="Repos">Repos</option>
+                </select></p>
+                <p><label for="chronosDurationSelect">Durée: </label><select id="chronosDurationSelect" >
+                    <option value="15">00:15</option>
+                    <option value="30">00:30</option>
+                    <option value="60">01:00</option>
+                    <option value="120">02:00</option>
+                    <option value="300">05:00</option>
+                    <option value="600">10:00</option>
+                    <option value="900">15:00</option>
+                </select></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="chronosStart" class="btn btn-success" data-dismiss="modal"
+                        onclick="startChronosFromDialog();">
+                    Activer</button>
+                <button type="button" id="chronosCancel" class="btn btn-primary" data-dismiss="modal">Annuler</button>
             </div>
         </div>
     </div>
@@ -101,6 +137,12 @@
                     <div id="localVideoControls1" class="overlay-top-right" style="display: none;">
                         <input id="localBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(true,1);event.stopPropagation();" />
                     </div>
+
+                    <!-- Text display -->
+                    <div id="localDisplay1" class="overlay-top-center" style="display:none">
+                        <label class="chrono" id="localText1">Temps restant: xx:xx</label>
+                    </div>
+
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="localViewControls1" class="overlay-bottom-center">
                         <input id="localConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="setConfigDialogValues(audioSources, videoSources, currentConfig);" data-toggle="modal" data-target="#configDialog" style="display: none;"/>
@@ -170,6 +212,24 @@
             <div class="row h-33" id="toolsViewRow">
                 <div class="col-12" id="toolsView" style="background-color:black;">
                     <span class="badge badge-warning" id="toolsViewTitle">Outils</span>
+                    <div class="d-flex" style="margin-top: 10px;">
+                        <div class="tool-icon">
+                            <input id="btnMicAll" type="image" alt="image" src="images/mic.png" height=32
+                                   onclick="muteMicroAll();"/>
+                            <p><label class="text-secondary">Tous</label></p>
+                        </div>
+                        <div class="tool-icon">
+                            <input id="btnSpeakerAll" type="image" alt="image" src="images/speaker.png" height=32
+                                   onclick="muteSpeakerAll();"/>
+                            <p><label class="text-secondary">Tous</label></p>
+                        </div>
+                        <div class="tool-icon">
+                            <input id="btnChronos" type="image" alt="image" src="images/timer.png" height=32
+                                   onclick="showChronosDialog();"/>
+                            <p><label class="text-secondary">Chronos</label></p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -189,12 +249,18 @@
                         <input id="remoteBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,1);event.stopPropagation();" />
                     </div>
 
+                    <!-- Text display -->
+                    <div id="remoteDisplay1" class="overlay-top-center" style="display:none">
+                        <label class="chrono" id="remoteText1" onclick="stopChrono(false, 1);">Temps restant: xx:xx</label>
+                    </div>
+
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteViewControls1" class="overlay-bottom-center" >
                         <input id="remoteMicStatus1" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(false,1);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteVideoStatus1" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(false,1);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteSpeakerStatus1" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,1);event.stopPropagation();" style="display: none;"/>
                     </div>
+
                     <!-- PTZ controls -->
                     <div id="remotePtzControls1" class="overlay-left" oncontextmenu="" onclick="" onwheel="" style="display: none;">
                         <div id="remoteZoomButtons1" style="display: none;">
@@ -212,6 +278,7 @@
                             <input type="image" alt="image" src="images/settings.png" height=22 onclick="camSettings(true, 1);event.stopPropagation();"/>
                         </div>
                     </div>
+
                     <!-- Video ! -->
                     <video id="remoteVideo1" playsinline
                            oncontextmenu="return false;"
@@ -227,6 +294,11 @@
                     <!-- Video controls -->
                     <div id="remoteVideoControls2" class="overlay-top-right" style="display: none;">
                         <input id="remoteBtnSwapVideo2" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,2);event.stopPropagation();" />
+                    </div>
+
+                    <!-- Text display -->
+                    <div id="remoteDisplay2" class="overlay-top-center" style="display:none">
+                        <label class="chrono" id="remoteText2" onclick="stopChrono(false, 1);">Temps restant: xx:xx</label>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
@@ -266,6 +338,11 @@
                     <!-- Video controls -->
                     <div id="remoteVideoControls3" class="overlay-top-right" style="display: none;">
                         <input id="remoteBtnSwapVideo3" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,3);event.stopPropagation();" />
+                    </div>
+
+                    <!-- Text display -->
+                    <div id="remoteDisplay3" class="overlay-top-center" style="display:none">
+                        <label class="chrono" id="remoteText3" onclick="stopChrono(false, 1);">Temps restant: xx:xx</label>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
@@ -310,6 +387,11 @@
                         <input id="remoteBtnSwapVideo4" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,4);event.stopPropagation();" />
                     </div>
 
+                    <!-- Text display -->
+                    <div id="remoteDisplay4" class="overlay-top-center" style="display:none">
+                        <label class="chrono" id="remoteText4" onclick="stopChrono(false, 1);">Temps restant: xx:xx</label>
+                    </div>
+
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteViewControls4" class="overlay-bottom-center" >
                         <input id="remoteMicStatus4" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(false,4);event.stopPropagation();" style="display: none;"/>
@@ -334,7 +416,7 @@
                             <input type="image" alt="image" src="images/settings.png" height=22 onclick="camSettings(true, 1);event.stopPropagation();"/>
                         </div>
                     </div>
-                    
+
                     <!-- Video ! -->
                     <video id="remoteVideo4" playsinline
                            oncontextmenu="return false;"
