@@ -34,9 +34,10 @@ class TeraSite(db.Model, BaseModel):
         base_site.site_name = 'Default Site'
         TeraSite.insert(base_site)
 
-        base_site = TeraSite()
-        base_site.site_name = 'Top Secret Site'
-        TeraSite.insert(base_site)
+        if test:
+            base_site = TeraSite()
+            base_site.site_name = 'Top Secret Site'
+            TeraSite.insert(base_site)
 
     @staticmethod
     def get_site_by_sitename(sitename):

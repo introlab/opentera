@@ -254,69 +254,70 @@ class TeraUser(db.Model, BaseModel):
         admin.user_uuid = str(uuid.uuid4())
         db.session.add(admin)
 
-        # Site admin
-        admin = TeraUser()
-        admin.user_enabled = True
-        admin.user_firstname = "Site"
-        admin.user_lastname = "Admin"
-        admin.user_profile = ""
-        admin.user_password = TeraUser.encrypt_password("siteadmin")
-        admin.user_superadmin = False
-        admin.user_username = "siteadmin"
-        admin.user_uuid = str(uuid.uuid4())
-        # admin.user_user_group = TeraUserGroup.get_user_group_by_group_name("Admins - Default Site")
-        db.session.add(admin)
+        if test:
+            # Site admin
+            admin = TeraUser()
+            admin.user_enabled = True
+            admin.user_firstname = "Site"
+            admin.user_lastname = "Admin"
+            admin.user_profile = ""
+            admin.user_password = TeraUser.encrypt_password("siteadmin")
+            admin.user_superadmin = False
+            admin.user_username = "siteadmin"
+            admin.user_uuid = str(uuid.uuid4())
+            # admin.user_user_group = TeraUserGroup.get_user_group_by_group_name("Admins - Default Site")
+            db.session.add(admin)
 
-        # Site User
-        user = TeraUser()
-        user.user_enabled = True
-        user.user_firstname = "Site"
-        user.user_lastname = "User"
-        user.user_profile = ""
-        user.user_password = TeraUser.encrypt_password("user")
-        user.user_superadmin = False
-        user.user_username = "user"
-        user.user_uuid = str(uuid.uuid4())
-        # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Project 1")
-        db.session.add(user)
+            # Site User
+            user = TeraUser()
+            user.user_enabled = True
+            user.user_firstname = "Site"
+            user.user_lastname = "User"
+            user.user_profile = ""
+            user.user_password = TeraUser.encrypt_password("user")
+            user.user_superadmin = False
+            user.user_username = "user"
+            user.user_uuid = str(uuid.uuid4())
+            # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Project 1")
+            db.session.add(user)
 
-        # Site User
-        user = TeraUser()
-        user.user_enabled = True
-        user.user_firstname = "MultiSite"
-        user.user_lastname = "User"
-        user.user_profile = ""
-        user.user_password = TeraUser.encrypt_password("user2")
-        user.user_superadmin = False
-        user.user_username = "user2"
-        user.user_uuid = str(uuid.uuid4())
-        # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
-        db.session.add(user)
+            # Site User
+            user = TeraUser()
+            user.user_enabled = True
+            user.user_firstname = "MultiSite"
+            user.user_lastname = "User"
+            user.user_profile = ""
+            user.user_password = TeraUser.encrypt_password("user2")
+            user.user_superadmin = False
+            user.user_username = "user2"
+            user.user_uuid = str(uuid.uuid4())
+            # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
+            db.session.add(user)
 
-        # Project admin
-        user = TeraUser()
-        user.user_enabled = True
-        user.user_firstname = "Project"
-        user.user_lastname = "Admin"
-        user.user_profile = ""
-        user.user_password = TeraUser.encrypt_password("user3")
-        user.user_superadmin = False
-        user.user_username = "user3"
-        user.user_uuid = str(uuid.uuid4())
-        # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
-        db.session.add(user)
+            # Project admin
+            user = TeraUser()
+            user.user_enabled = True
+            user.user_firstname = "Project"
+            user.user_lastname = "Admin"
+            user.user_profile = ""
+            user.user_password = TeraUser.encrypt_password("user3")
+            user.user_superadmin = False
+            user.user_username = "user3"
+            user.user_uuid = str(uuid.uuid4())
+            # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
+            db.session.add(user)
 
-        # No access user!
-        user = TeraUser()
-        user.user_enabled = True
-        user.user_firstname = "No Access"
-        user.user_lastname = "User!"
-        user.user_profile = ""
-        user.user_password = TeraUser.encrypt_password("user4")
-        user.user_superadmin = False
-        user.user_username = "user4"
-        user.user_uuid = str(uuid.uuid4())
-        # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
-        db.session.add(user)
+            # No access user!
+            user = TeraUser()
+            user.user_enabled = True
+            user.user_firstname = "No Access"
+            user.user_lastname = "User!"
+            user.user_profile = ""
+            user.user_password = TeraUser.encrypt_password("user4")
+            user.user_superadmin = False
+            user.user_username = "user4"
+            user.user_uuid = str(uuid.uuid4())
+            # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
+            db.session.add(user)
 
         db.session.commit()

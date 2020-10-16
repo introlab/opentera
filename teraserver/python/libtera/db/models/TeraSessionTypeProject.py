@@ -25,43 +25,44 @@ class TeraSessionTypeProject(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults(test=False):
-        from libtera.db.models.TeraSessionType import TeraSessionType
-        from libtera.db.models.TeraProject import TeraProject
+        if test:
+            from libtera.db.models.TeraSessionType import TeraSessionType
+            from libtera.db.models.TeraProject import TeraProject
 
-        video_session = TeraSessionType.get_session_type_by_id(1)
-        sensor_session = TeraSessionType.get_session_type_by_id(2)
-        data_session = TeraSessionType.get_session_type_by_id(3)
-        exerc_session = TeraSessionType.get_session_type_by_id(4)
-        bureau_session = TeraSessionType.get_session_type_by_id(5)
+            video_session = TeraSessionType.get_session_type_by_id(1)
+            sensor_session = TeraSessionType.get_session_type_by_id(2)
+            data_session = TeraSessionType.get_session_type_by_id(3)
+            exerc_session = TeraSessionType.get_session_type_by_id(4)
+            bureau_session = TeraSessionType.get_session_type_by_id(5)
 
-        project = TeraProject.get_project_by_projectname('Default Project #1')
+            project = TeraProject.get_project_by_projectname('Default Project #1')
 
-        stp = TeraSessionTypeProject()
-        stp.session_type_project_session_type = video_session
-        stp.session_type_project_project = project
-        db.session.add(stp)
+            stp = TeraSessionTypeProject()
+            stp.session_type_project_session_type = video_session
+            stp.session_type_project_project = project
+            db.session.add(stp)
 
-        stp = TeraSessionTypeProject()
-        stp.session_type_project_session_type = sensor_session
-        stp.session_type_project_project = project
-        db.session.add(stp)
+            stp = TeraSessionTypeProject()
+            stp.session_type_project_session_type = sensor_session
+            stp.session_type_project_project = project
+            db.session.add(stp)
 
-        stp = TeraSessionTypeProject()
-        stp.session_type_project_session_type = data_session
-        stp.session_type_project_project = project
-        db.session.add(stp)
+            stp = TeraSessionTypeProject()
+            stp.session_type_project_session_type = data_session
+            stp.session_type_project_project = project
+            db.session.add(stp)
 
-        stp = TeraSessionTypeProject()
-        stp.session_type_project_session_type = exerc_session
-        stp.session_type_project_project = project
-        db.session.add(stp)
+            stp = TeraSessionTypeProject()
+            stp.session_type_project_session_type = exerc_session
+            stp.session_type_project_project = project
+            db.session.add(stp)
 
-        stp = TeraSessionTypeProject()
-        stp.session_type_project_session_type = bureau_session
-        stp.session_type_project_project = project
-        db.session.add(stp)
+            stp = TeraSessionTypeProject()
+            stp.session_type_project_session_type = bureau_session
+            stp.session_type_project_project = project
+            db.session.add(stp)
 
-        db.session.commit()
+            db.session.commit()
 
     @staticmethod
     def get_session_type_project_by_id(stp_id: int):

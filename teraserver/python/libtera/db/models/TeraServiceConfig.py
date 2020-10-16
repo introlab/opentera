@@ -179,44 +179,45 @@ class TeraServiceConfig(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults(test=False):
-        from .TeraUser import TeraUser
-        from .TeraDevice import TeraDevice
-        from .TeraService import TeraService
-        from .TeraParticipant import TeraParticipant
-        from .TeraServiceConfigSpecific import TeraServiceConfigSpecific
+        if test:
+            from .TeraUser import TeraUser
+            from .TeraDevice import TeraDevice
+            from .TeraService import TeraService
+            from .TeraParticipant import TeraParticipant
+            from .TeraServiceConfigSpecific import TeraServiceConfigSpecific
 
-        new_config = TeraServiceConfig()
-        new_config.id_user = TeraUser.get_user_by_id(1).id_user
-        new_config.id_service = TeraService.get_openteraserver_service().id_service
-        new_config.service_config_config = '{"notification_sounds": true}'
-        db.session.add(new_config)
+            new_config = TeraServiceConfig()
+            new_config.id_user = TeraUser.get_user_by_id(1).id_user
+            new_config.id_service = TeraService.get_openteraserver_service().id_service
+            new_config.service_config_config = '{"notification_sounds": true}'
+            db.session.add(new_config)
 
-        new_config = TeraServiceConfig()
-        new_config.id_participant = TeraParticipant.get_participant_by_name('Participant #1').id_participant
-        new_config.id_service = TeraService.get_service_by_key('VideoRehabService').id_service
-        new_config.service_config_config = '{"default_muted": false, "view_local": true}'
-        db.session.add(new_config)
-        db.session.commit()
+            new_config = TeraServiceConfig()
+            new_config.id_participant = TeraParticipant.get_participant_by_name('Participant #1').id_participant
+            new_config.id_service = TeraService.get_service_by_key('VideoRehabService').id_service
+            new_config.service_config_config = '{"default_muted": false, "view_local": true}'
+            db.session.add(new_config)
+            db.session.commit()
 
-        new_specific_config = TeraServiceConfigSpecific()
-        new_specific_config.id_service_config = new_config.id_service_config
-        new_specific_config.service_config_specific_id = 'pc-001'
-        new_specific_config.service_config_specific_config = '{"default_muted": true}'
-        db.session.add(new_specific_config)
+            new_specific_config = TeraServiceConfigSpecific()
+            new_specific_config.id_service_config = new_config.id_service_config
+            new_specific_config.service_config_specific_id = 'pc-001'
+            new_specific_config.service_config_specific_config = '{"default_muted": true}'
+            db.session.add(new_specific_config)
 
-        new_specific_config = TeraServiceConfigSpecific()
-        new_specific_config.id_service_config = new_config.id_service_config
-        new_specific_config.service_config_specific_id = 'pc-002'
-        new_specific_config.service_config_specific_config = '{"default_muted": true, "view_local": false}'
-        db.session.add(new_specific_config)
+            new_specific_config = TeraServiceConfigSpecific()
+            new_specific_config.id_service_config = new_config.id_service_config
+            new_specific_config.service_config_specific_id = 'pc-002'
+            new_specific_config.service_config_specific_config = '{"default_muted": true, "view_local": false}'
+            db.session.add(new_specific_config)
 
-        new_config = TeraServiceConfig()
-        new_config.id_device = TeraDevice.get_device_by_name('Apple Watch #W05P1').id_device
-        new_config.id_service = TeraService.get_service_by_key('VideoRehabService').id_service
-        new_config.service_config_config = '{"delete_from_device": true}'
-        db.session.add(new_config)
+            new_config = TeraServiceConfig()
+            new_config.id_device = TeraDevice.get_device_by_name('Apple Watch #W05P1').id_device
+            new_config.id_service = TeraService.get_service_by_key('VideoRehabService').id_service
+            new_config.service_config_config = '{"delete_from_device": true}'
+            db.session.add(new_config)
 
-        db.session.commit()
+            db.session.commit()
 
     @classmethod
     def update(cls, update_id: int, values: dict):
