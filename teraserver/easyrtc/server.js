@@ -8,14 +8,18 @@ var easyrtc = require("open-easyrtc");   // EasyRTC external module
 var ejs = require("ejs");
 var redis = require('redis')
 
-var myport = 8080;
-var mykey = "";
+const minimist = require('minimist');
 
-if (process.argv[2])
-    myport = process.argv[2];
+let args = minimist(process.argv.slice(2), {
+    default: {
+        port: 8080,
+        key: "",
+        local_ssl: false,
+        debug: false
+    },
+});
 
-if (process.argv[3])
-    mykey = process.argv[3];
+console.log('args:', args);
 
 // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
 var httpApp = express();
@@ -24,11 +28,13 @@ httpApp.use(express.static(__dirname + "/static/"));
 httpApp.set('view engine', 'html');
 httpApp.set('views', __dirname + '/protected');
 
-httpApp.use('/teraplus', function(req, res){
+httpApp.use('/users', function(req, res){
         //res.send('key: ' + req.query.key);
-        if (req.query.key == mykey || mykey == ""){
+        console.log(req.query.key);
+        console.log(args.key);
+        if (req.query.key == args.key || args.key == ""){
                 // Authorized
-                res.render('index_users.html', {teraplus_port: myport})
+                res.render('index_users.html', {teraplus_port: args.port})
                 //res.render('/index.html',{ root: __dirname + "/protected/"});
         }else{
                 // Not authorized
@@ -39,9 +45,9 @@ httpApp.use('/teraplus', function(req, res){
 
 httpApp.use('/participants', function(req, res){
         //res.send('key: ' + req.query.key);
-        if (req.query.key == mykey || mykey == ""){
+        if (req.query.key == args.key || args.key == ""){
                 // Authorized
-                res.render('index_participants.html', {teraplus_port: myport})
+                res.render('index_participants.html', {teraplus_port: args.port})
                 //res.render('/index.html',{ root: __dirname + "/protected/"});
         }else{
                 // Not authorized
@@ -50,9 +56,22 @@ httpApp.use('/participants', function(req, res){
         //res.sendFile('/index.html',{ root: __dirname + "/protected/"});
 });
 
+httpApp.use('/devices', function(req, res){
+    //res.send('key: ' + req.query.key);
+    if (req.query.key == args.key || args.key == ""){
+        // Authorized
+        res.render('index_participants.html', {teraplus_port: args.port}) // Same as participants for now.
+        //res.render('/index.html',{ root: __dirname + "/protected/"});
+    }else{
+        // Not authorized
+        res.sendFile('/denied.html',{ root: __dirname + "/static/"});
+    }
+    //res.sendFile('/index.html',{ root: __dirname + "/protected/"});
+});
+
 httpApp.use('/status', function(req,res) {
   //Query server status
-  if (req.query.key == mykey || mykey == "") {
+  if (req.query.key == args.key || args.key == "") {
     //Send the status of the server
     //TODO: add connected user information?
     //TODO: add active sessions informations?
@@ -65,55 +84,51 @@ httpApp.use('/status', function(req,res) {
 });
 
 // Start Express https server on port 8443
-/*
-var webServer = https.createServer(
-{
-    key:  fs.readFileSync("ssl/privkey.pem"),
-    cert: fs.readFileSync("ssl/cert.pem")
-},
-httpApp).listen(myport);
-*/
-
-var webServer = http.createServer(httpApp).listen(myport);
-
+if (args.local_ssl == false){
+    var webServer = http.createServer(httpApp).listen(args.port);
+}else{
+    var webServer = https.createServer(
+        {
+            key:  fs.readFileSync("../python/certificates/site_key.pem"),
+            cert: fs.readFileSync("../python/certificates/site_cert.pem")
+        },
+        httpApp).listen(args.port);
+}
 
 // Start Socket.io so it attaches itself to Express server
-var websocket_path = "/websocket/" + myport + '/'
-console.log('websocket path:', websocket_path)
+var websocket_path = "/websocket/" + args.port + '/'
+//console.log('websocket path:', websocket_path)
 var socketServer = io.listen(webServer, {"log level":1, "path": websocket_path, "cookie": false});
 
 
 //TODO Set options here (ice servers)
+const ice_file = './ice_servers.json'
+var appIceServers = [];
 
-var appIceServers = [
-  {
-    "url":"stun:telesante.3it.usherbrooke.ca:3478"
-  },
-  {
-    "url":"turn:telesante.3it.usherbrooke.ca:50000", 
-    "username":"teraplus",
-    "credential":"teraplus"
-  },
-  {
-    "url":"turn:telesante.3it.usherbrooke.ca:50000?transport=tcp",
-    "username":"teraplus",
-    "credential":"teraplus"
-  }
-];
+try {
+    if (fs.existsSync(ice_file)) {
+        appIceServers = JSON.parse(fs.readFileSync(ice_file, "utf8"));
+    }else{
+        // Defaults to Google servers
+        console.log('Using default ICE Servers...');
+        appIceServers = [
+            {urls: "stun:stun.l.google.com:19302"},
+            {urls: "stun:stun.sipgate.net"},
+            {urls: "stun:217.10.68.152"},
+            {urls: "stun:stun.sipgate.net:10000"},
+            {urls: "stun:217.10.68.152:10000"}
+        ];
+    }
+} catch(err) {
+    console.error(err)
+}
 
-
-/*
-var appIceServers = [
-    {urls: "stun:stun.l.google.com:19302"},
-    {urls: "stun:stun.sipgate.net"},
-    {urls: "stun:217.10.68.152"},
-    {urls: "stun:stun.sipgate.net:10000"},
-    {urls: "stun:217.10.68.152:10000"}
-];
-*/
+console.log('Using ICE Servers: ' + appIceServers);
 easyrtc.setOption("appIceServers", appIceServers);
-easyrtc.setOption("logLevel", "debug");
-easyrtc.setOption("demosEnable", true);
+if (args.debug == true){
+    easyrtc.setOption("logLevel", "debug");
+    easyrtc.setOption("demosEnable", true);
+}
 //easyrtc.setOption("updateCheckEnable",false);
 
 //Setup redis client (default configuration)
@@ -123,7 +138,7 @@ client.on("connect", function() {
   console.log("Redis now connected");
 
   //Publish message that we are ready
-  client.publish("webrtc." + mykey, "Ready!", 
+  client.publish("webrtc." + args.key, "Ready!",
   function(){
     console.log("Message published");
    });

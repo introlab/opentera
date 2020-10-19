@@ -128,6 +128,9 @@ function setLargeView(view_id){
         removeClassByPrefix(view[0], 'col');
         largeView.append(view);
     }
+
+    updateUserRemoteViewsLayout(remoteStreams.length);
+    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
 }
 
 function setColWidth(col, width){

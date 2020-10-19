@@ -182,7 +182,7 @@ function setPTZCapabilities(uuid, zoom, presets, settings){
     console.log("Setting PTZ Capabilities: " + uuid + " = " + zoom + " " + presets + " " + settings);
 
     if (uuid === 0){
-        showError("setPTZCapabilities", " -- UUID = 0, not valid!", false);
+        console.warn("setPTZCapabilities -- UUID = 0, not valid!", false);
         return;
     }
 
