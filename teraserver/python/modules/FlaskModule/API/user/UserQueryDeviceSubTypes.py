@@ -47,30 +47,40 @@ class UserQueryDeviceSubTypes(Resource):
         parser = get_parser
 
         args = parser.parse_args()
+        as_list = args.pop('list')
 
         device_subtypes = []
         # If we have no arguments, return all accessible devices
-        if args['id_device_subtype'] is None and args['id_device_type'] is None and args['list'] is None:
-            return gettext('Missing parameters'), 400
-
-        if args['id_device_subtype']:
-            device_subtypes = TeraDeviceSubType.query.filter(TeraDeviceSubType.id_device_type.
-                                                             in_(user_access.get_accessible_devices_types_ids())).\
-                filter_by(id_device_subtype=args['id_device_subtype']).all()
-        elif args['id_device_type']:
-            # Check if has access to the id_device_type
-            if not args['id_device_type'] in user_access.get_accessible_devices_types_ids():
-                return 'No access to device type', 403
-            device_subtypes = TeraDeviceSubType.get_device_subtypes_for_type(args['id_device_type'])
-        elif args['list']:
+        if not any(args.values()):
             device_subtypes = user_access.get_accessible_devices_subtypes()
 
+        #if we have 2 IDs, return error
+        if args['id_device_subtype'] is not None and args['id_device_type'] is not None:
+            return gettext('Too Many IDs'), 400
+
+        if args['id_device_subtype']:
+            if args['id_device_subtype'] in user_access.get_accessible_devices_subtypes_ids():
+                device_subtypes = TeraDeviceSubType.query.filter(TeraDeviceSubType.id_device_type.
+                                                                 in_(user_access.get_accessible_devices_types_ids())).\
+                    filter_by(id_device_subtype=args['id_device_subtype']).all()
+            else:
+                return gettext('No access to device subtype'), 403
+        elif args['id_device_type']:
+            # Check if has access to the id_device_type
+            if args['id_device_type'] in user_access.get_accessible_devices_types_ids():
+                device_subtypes = TeraDeviceSubType.get_device_subtypes_for_type(args['id_device_type'])
+            else:
+                return gettext('No access to device type'), 403
         try:
             device_subtypes_list = []
             for dst in device_subtypes:
                 if dst is not None:
-                    dst_json = dst.to_json()
-                    device_subtypes_list.append(dst_json)
+                    if as_list:
+                        dst_json = dst.to_json(minimal=True)
+                        device_subtypes_list.append(dst_json)
+                    else:
+                        dst_json = dst.to_json()
+                        device_subtypes_list.append(dst_json)
             return device_subtypes_list
 
         except InvalidRequestError:
