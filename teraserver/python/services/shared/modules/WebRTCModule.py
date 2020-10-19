@@ -143,8 +143,9 @@ class WebRTCModule(BaseModule):
     def launch_node(self, port, key, owner, users, participants, devices):
         executable_args = [self.config.webrtc_config['executable'],
                            self.config.webrtc_config['script'],
-                           str(port),
-                           str(key)]
+                           '--port=' + str(port),
+                           '--key=' + str(key),
+                           '--debug=' + str(1)]
 
         # stdout=os.subprocess.PIPE, stderr=os.subprocess.PIPE)
         try:
