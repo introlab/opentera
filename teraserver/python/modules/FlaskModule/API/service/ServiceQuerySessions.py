@@ -134,7 +134,8 @@ class ServiceQuerySessions(Resource):
                 if not isinstance(session_date, datetime.datetime):
                     import dateutil.parser as parser
                     session_date = parser.parse(json_session['session_start_datetime'])
-                session_name += ' [' + session_date.strftime('%d-%m-%Y %H:%M') + ']'
+                # session_name += ' [' + session_date.strftime('%d-%m-%Y %H:%M') + ']'
+                session_name += ' [' + str(session_date.year) + '.' + str(TeraSession.get_count()) + ']'
                 json_session['session_name'] = session_name
 
             if 'session_status' not in json_session:

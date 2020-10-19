@@ -36,15 +36,30 @@ class WebRTCModule(BaseModule):
         print(self.module_name + ' - Should create WebRTC session with name:', room_name, port, key)
 
         if port:
-            url = 'https://' + self.config.webrtc_config['hostname'] + ':' \
-                  + str(self.config.webrtc_config['external_port']) \
-                  + '/teraplus/' + str(port) + '/teraplus?key=' + key
+            url_users = 'https://' + self.config.webrtc_config['hostname'] + ':' \
+                        + str(self.config.webrtc_config['external_port']) \
+                        + '/webrtc/' + str(port) + '/users?key=' + key
+
+            url_participants = 'https://' + self.config.webrtc_config['hostname'] + ':' \
+                               + str(self.config.webrtc_config['external_port']) \
+                               + '/webrtc/' + str(port) + '/participants?key=' + key
+
+            url_devices = 'https://' + self.config.webrtc_config['hostname'] + ':' \
+                          + str(self.config.webrtc_config['external_port']) \
+                          + '/webrtc/' + str(port) + '/devices?key=' + key
 
             if self.launch_node(port=port, key=key, owner=owner_uuid,
                                 users=users, participants=participants, devices=devices):
                 # Return url
-                return True, {'url': url, 'key': key, 'port': port, 'owner': owner_uuid, 'users': users,
-                              'participants': participants, 'devices': devices}
+                return True, {'url_users': url_users,
+                              'url_participants': url_participants,
+                              'url_devices': url_devices,
+                              'key': key,
+                              'port': port,
+                              'owner': owner_uuid,
+                              'users': users,
+                              'participants': participants,
+                              'devices': devices}
             else:
                 return False, {'error': 'Process not launched.'}
         else:
@@ -63,7 +78,7 @@ class WebRTCModule(BaseModule):
             if process_dict['key'] == room_name:
                 url = 'https://' + self.config.webrtc_config['hostname'] + ':' \
                       + str(self.config.webrtc_config['external_port']) \
-                      + '/teraplus/' + str(process_dict['port']) + '/status?key=' + room_name
+                      + '/webrtc/' + str(process_dict['port']) + '/status?key=' + room_name
                 response = get(url, timeout=5, verify=False)
                 if response.status_code == 200:
                     return response.json()
