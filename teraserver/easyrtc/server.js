@@ -125,7 +125,7 @@ try {
 
 console.log('Using ICE Servers: ' + appIceServers);
 easyrtc.setOption("appIceServers", appIceServers);
-if (args.debug == true){
+if (args.debug != false){
     easyrtc.setOption("logLevel", "debug");
     easyrtc.setOption("demosEnable", true);
 }
