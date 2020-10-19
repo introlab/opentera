@@ -109,7 +109,7 @@ class TeraVersions:
         # Will be overwritten if necessary
         self.clients['OpenTeraPlus'] = ClientVersions(client_name='OpenTeraPlus',
                                                       client_description='OpenTeraPlus Qt Client',
-                                                      client_version='0.1.0',
+                                                      client_version='1.0.0',
                                                       client_documentation_url=
                                                       'https://github.com/introlab/openteraplus')
 

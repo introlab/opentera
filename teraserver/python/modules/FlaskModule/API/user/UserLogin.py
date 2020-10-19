@@ -6,11 +6,14 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.redis.RedisRPCClient import RedisRPCClient
 from modules.BaseModule import ModuleNames
 
-model = api.model('Login', {
-    'websocket_url': fields.String,
-    'user_uuid': fields.String,
-    'user_token': fields.String
-})
+# model = api.model('Login', {
+#     'websocket_url': fields.String,
+#     'user_uuid': fields.String,
+#     'user_token': fields.String
+# })
+# Parser definition(s)
+
+get_parser = api.parser()
 
 
 class UserLogin(Resource):
@@ -21,8 +24,8 @@ class UserLogin(Resource):
         self.parser = reqparse.RequestParser()
 
     @user_http_auth.login_required
+    @api.expect(get_parser)
     @api.doc(description='Login to the server using HTTP Basic Authentification (HTTPAuth)')
-    @api.marshal_with(model, mask=None)
     def get(self):
 
         session.permanent = True
@@ -63,5 +66,40 @@ class UserLogin(Resource):
         reply = {"websocket_url": "wss://" + servername + ":" + str(port) + "/wss/user?id=" + session['_id'],
                  "user_uuid": session['_user_id'],
                  "user_token": user_token}
+
+        # Verify client version (optional for now)
+        # And add info to reply
+        if 'X-Client-Name' in request.headers and 'X-Client-Version' in request.headers:
+            try:
+                # Extract information
+                client_name = request.headers['X-Client-Name']
+                client_version = request.headers['X-Client-Version']
+
+                client_version_parts = client_version.split('.')
+
+                # Load known version from database.
+                from libtera.utils.TeraVersions import TeraVersions
+                versions = TeraVersions()
+                versions.load_from_db()
+
+                # Verify if we have client information in DB
+                client_info = versions.get_client_version_with_name(client_name)
+                if client_info:
+                    # We have something stored for this client, let's verify version numbers
+                    # For now, we still allow login even when version mismatch
+                    # Reply full version information
+                    reply['version_latest'] = client_info.to_dict()
+                    if client_info.version != client_version:
+                        reply['version_error'] = gettext('Client version mismatch')
+                        # If major version mismatch, kill client, first part of the version
+                        stored_client_version_parts = client_info.version.split('.')
+                        if len(stored_client_version_parts) and len(client_version_parts):
+                            if stored_client_version_parts[0] != client_version_parts[0]:
+                                # return 426 = upgrade required
+                                return gettext('Client major version too old, not accepting login'), 426
+                else:
+                    return gettext('Invalid client name :') + client_name, 403
+            except BaseException as e:
+                return gettext('Invalid client version handler') + str(e), 500
 
         return reply
