@@ -53,9 +53,7 @@ class UserQueryDevices(Resource):
     def _value_counter(args):
         res = 0
         for value in args.values():
-            if value is None:
-                res += 0
-            else:
+            if value is not None:
                 res += 1
         return res
 
