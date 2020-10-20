@@ -77,13 +77,13 @@ class UserQueryDevices(Resource):
 
         args = parser.parse_args()
 
-        # as_available = args.pop('available')
-        as_projects = args.pop('projects')
-        as_enabled = args.pop('enabled')
-        as_list = args.pop('list')
-        as_with_participants = args.pop('with_participants')
-        as_with_sites = args.pop('with_sites')
-        as_with_status = args.pop('with_status')
+        # has_available = args.pop('available')
+        has_projects = args.pop('projects')
+        has_enabled = args.pop('enabled')
+        has_list = args.pop('list')
+        has_with_participants = args.pop('with_participants')
+        has_with_sites = args.pop('with_sites')
+        has_with_status = args.pop('with_status')
 
         devices = []
         # If we have no arguments, return all accessible devices
@@ -100,9 +100,9 @@ class UserQueryDevices(Resource):
                 if args['uuid'] in user_access.get_accessible_devices_uuids():
                     devices = [TeraDevice.get_device_by_uuid(args['uuid'])]
             if args['id_site']:
-                devices = user_access.query_devices_for_site(args['id_site'], args['id_device_type'], as_enabled)
+                devices = user_access.query_devices_for_site(args['id_site'], args['id_device_type'], has_enabled)
             if args['id_project']:
-                devices = user_access.query_devices_for_project(args['id_project'], args['id_device_type'], as_enabled)
+                devices = user_access.query_devices_for_project(args['id_project'], args['id_device_type'], has_enabled)
             if args['id_device_type']:
                 devices = user_access.query_devices_by_type(args['id_device_type'])
             if args['id_device_subtype']:
@@ -130,7 +130,7 @@ class UserQueryDevices(Resource):
             device_list = []
             online_devices = []
             busy_devices = []
-            if as_with_status:
+            if has_with_status:
                 # Query status
                 rpc = RedisRPCClient(self.module.config.redis_config)
                 online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
@@ -138,16 +138,16 @@ class UserQueryDevices(Resource):
 
             for device in devices:
                 if device is not None:
-                    if as_enabled:
-                        if device.device_enabled != as_enabled:
+                    if has_enabled:
+                        if device.device_enabled != has_enabled:
                             continue
 
-                    if not as_list:
+                    if not has_list:
                         device_json = device.to_json()
                     else:
                         device_json = device.to_json(minimal=True)
 
-                    if as_with_participants:
+                    if has_with_participants:
                         # Add participants information to the device, is available
                         dev_participants = user_access.query_participants_for_device(device.id_device)
                         parts = []
@@ -160,40 +160,40 @@ class UserQueryDevices(Resource):
                             #    part_info['participant_name'] = part.participant_name
                             # part_info['id_project'] = part.participant_participant_group.participant_group_project.\
                             #     id_project
-                            if not as_list:
+                            if not has_list:
                                 part_info['project_name'] = part.participant_project.project_name
                             parts.append(part_info)
                         device_json['device_participants'] = parts
 
-                    if as_with_sites:
+                    if has_with_sites:
                         # Add sites
                         sites_list = []
                         device_sites = user_access.query_sites_for_device(device.id_device)
                         for device_site in device_sites:
                             ignore_site_fields = []
-                            if as_list:
+                            if has_list:
                                 ignore_site_fields = ['site_name']
                             site_json = device_site.to_json(ignore_fields=ignore_site_fields)
                             sites_list.append(site_json)
 
                         device_json['device_sites'] = sites_list
 
-                    if as_projects:
+                    if has_projects:
                         # Add projects
                         projects_list = []
                         device_projects = TeraDeviceProject.query_projects_for_device(device.id_device)
                         for device_project in device_projects:
                             ignore_project_fields = []
-                            if as_list:
+                            if has_list:
                                 ignore_project_fields = ['project_name']
                             project_json = device_project.to_json(ignore_fields=ignore_project_fields)
-                            if not as_list:
+                            if not has_list:
                                 project_json['project'] = device_project.device_project_project.to_json()
                             projects_list.append(project_json)
 
                         device_json['device_projects'] = projects_list
-                    # if as_available:
-                    #     if not as_available:
+                    # if has_available:
+                    #     if not has_available:
                     #         device_json['id_kit'] = device.device_kits[0].id_kit
                     #         device_json['kit_name'] = device.device_kits[0].kit_device_kit.kit_name
                     #         device_json['kit_device_optional'] = device.device_kits[0].kit_device_optional
@@ -201,7 +201,7 @@ class UserQueryDevices(Resource):
                     if device.id_device_subtype is not None:
                         device_json['device_subtype'] = device.device_subtype.to_json()
 
-                    if as_with_status:
+                    if has_with_status:
                         device_json['device_busy'] = device.device_uuid in busy_devices
                         device_json['device_online'] = device.device_uuid in online_devices
 
