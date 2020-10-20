@@ -1,14 +1,27 @@
+let isWeb = true;
+
+function preInitSystem(){
+    console.log("Pre-initializing system...");
+    let urlParams = new URLSearchParams(window.location.search);
+    let sourceParam = urlParams.get('source');
+    if (sourceParam !== null)
+        isWeb = (sourceParam === 'web');
+
+    if (isWeb === false) {
+        // Load QWebChannel library
+        include("qrc:///qtwebchannel/qwebchannel.js");
+    }
+
+}
+
 function initSystem(){
     console.log("Initializing system...");
     let urlParams = new URLSearchParams(window.location.search);
-    isWeb = (urlParams.get('source') === 'web');
-
     let port = getTeraPlusPort(); // This function is rendered in the main html document
     let websocket_path =  "/websocket/" + port
     easyrtc.setSocketUrl(window.location.origin, {path: websocket_path});
 
     deviceEnumCompleted = false;
-    initialSourceSelect	=false;
 
     let local_uuid = urlParams.get('uuid');
     if (local_uuid)
@@ -22,14 +35,19 @@ function initSystem(){
         setTitle(true, 2, local_name);
     }
 
-    // Initialize
-    if (!isWeb){
-        // Connect Shared Object websocket
-        include("qrc:///qtwebchannel/qwebchannel.js");
-        connectSharedObject();
-    }
-
-    fillDefaultSourceList().then(connect).catch(err => {
+    // Initialize video and audio sources
+    fillDefaultSourceList().then(initSystemDone).catch(err => {
         showStatusMsg("Impossible de continuer. Veuillez réessayer.")
     })
+}
+
+function initSystemDone(){
+
+    if (isWeb){
+        // Connect to signaling server
+        connect();
+    }else{
+        // Connect Shared Object websocket, which will connect to system when ready
+        connectSharedObject();
+    }
 }

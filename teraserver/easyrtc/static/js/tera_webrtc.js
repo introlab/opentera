@@ -254,7 +254,7 @@ function updateLocalAudioVideoSource(streamindex){
             streamname);
 
     }else{
-        console.warn("Not connected to WebRTC... Can't update!");
+        console.log("Updated audio/video source - not connected, selection will take effect when connected.");
     }
 }
 
