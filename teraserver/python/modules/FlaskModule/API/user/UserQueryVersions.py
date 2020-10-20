@@ -4,6 +4,7 @@ from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from libtera.db.models.TeraServerSettings import TeraServerSettings
+from libtera.utils.TeraVersions import TeraVersions, ClientVersions
 import json
 from libtera.db.models.TeraUser import TeraUser
 
@@ -12,7 +13,8 @@ from libtera.db.models.TeraUser import TeraUser
 get_parser = api.parser()
 
 # POST
-post_parser = api.parser()
+post_schema = api.schema_model('ClientVersions',
+                               {'properties': ClientVersions.get_json_schema(), 'type': 'object', 'location': 'json'})
 
 
 class UserQueryVersions(Resource):
@@ -36,23 +38,38 @@ class UserQueryVersions(Resource):
         return current_settings
 
     @user_multi_auth.login_required
+    @api.expect(post_schema)
     @api.doc(description='Post server versions',
              responses={200: 'Success - asset posted',
                         500: 'Database error occurred',
                         403: 'Logged user doesn\'t have permission to delete the requested asset (must be an user of'
                              'the related project)'})
-    @api.expect(post_parser)
     def post(self):
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-        args = post_parser.parse_args()
 
         # Only superuser can change the versions settings
         # Only some fields can be changed.
         if current_user.user_superadmin:
-            current_settings = json.loads(
-                TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerVersions))
-            return current_settings
+            versions = TeraVersions()
+            versions.load_from_db()
+
+            if 'ClientVersions' in request.json:
+                try:
+                    client_version = ClientVersions()
+                    client_version.from_dict(request.json['ClientVersions'])
+
+                    # Update / add versions for the client
+                    versions.set_client_version_with_name(client_version.client_name, client_version)
+
+                    # Save to db
+                    versions.save_to_db()
+
+                except BaseException as e:
+                    return gettext('Wrong ClientVersions') + str(e), 404
+
+            # Return global config
+            return versions.to_dict()
 
         # Not superadmin
         return gettext('Not authorized'), 403
