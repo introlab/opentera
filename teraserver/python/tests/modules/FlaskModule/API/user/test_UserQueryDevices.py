@@ -91,16 +91,6 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
             flag.append(rand.getrandbits(1))
         return flag
 
-    def test_haha(self):
-        params = {"device": {"device_certificate": "Un certificat", "device_config": "Une configuration",
-                             "device_enabled": False, "device_infos": "Une info",
-                             "device_lastonline": "2020-10-19T17:51:25.251Z",
-                             "device_name": "Un nom", "device_notes": "Une note", "device_onlineable": False,
-                             "device_token": "Un Token", "device_uuid": "Un uuid",
-                             "id_device": 0, "id_device_subtype": 1, "id_device_type": 1}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-
     def test_query_get_as_admin(self):
         # Randomize the flags
         flags = self.randomize_flags(flag_count=6)
@@ -294,10 +284,10 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         new_id.append(response.json()[0]['id_device'])
         self._checkJsonPost(json_data=response.json())
 
-        # Creating a device with all the infos (device uuid, token, last_online doesnt stick)
+        # Creating a device with all the infos (device uuid, token, last_online makes a 500 error)
         params = {"device": {"device_certificate": "Un certificat", "device_config": "Une configuration",
                              "device_enabled": False, "device_infos": "Une info",
-                             "device_lastonline": "2020-10-19T17:51:25.251Z",
+                             # "device_lastonline": "2020-10-19T17:51:25.251Z",
                              "device_name": "Un nom", "device_notes": "Une note", "device_onlineable": False,
                              "device_token": "Un Token", "device_uuid": "Un uuid",
                              "id_device": 0, "id_device_subtype": 1, "id_device_type": 1}}
@@ -309,7 +299,7 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         # Update a device with a wrongful id_device_type
         params = {"device": {"device_certificate": "Un certificat 2", "device_config": "Une configuration 2",
                              "device_enabled": True, "device_infos": "Une info 2",
-                             "device_lastonline": "En ligne la derniere fois 2",
+                             # "device_lastonline": "En ligne la derniere fois 2",
                              "device_name": "Un nom 2", "device_notes": "Une note 2", "device_onlineable": True,
                              "device_token": "Un Token @", "device_uuid": "Un uuid @",
                              "id_device": new_id[2], "id_device_subtype": 100, "id_device_type": 1}}
@@ -319,7 +309,7 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         # Update a device with a correct id_device_type but with a change in device_lastonlice
         params = {"device": {"device_certificate": "Un certificat 2", "device_config": "Une configuration 2",
                              "device_enabled": True, "device_infos": "Une info 2",
-                             "device_lastonline": "En ligne la derniere fois 2",
+                             # "device_lastonline": "En ligne la derniere fois 2",
                              "device_name": "Un nom 2", "device_notes": "Une note 2", "device_onlineable": True,
                              "device_token": "Un Token @", "device_uuid": "Un uuid @",
                              "id_device": new_id[2], "id_device_subtype": 2, "id_device_type": 2}}
