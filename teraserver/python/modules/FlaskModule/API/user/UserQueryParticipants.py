@@ -171,7 +171,10 @@ class UserQueryParticipants(Resource):
 
                 return jsonify(participant_list)
 
-        except InvalidRequestError:
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryParticipants.__name__,
+                                         'get', 500, 'Database error', str(e))
             return '', 500
 
     @user_multi_auth.login_required
@@ -219,7 +222,7 @@ class UserQueryParticipants(Resource):
                 participant_group = TeraParticipantGroup.get_participant_group_by_id(
                     json_participant['id_participant_group'])
                 if participant_group is None:
-                    return gettext('Participant group not found.'), 500
+                    return gettext('Participant group not found.'), 400
                 if participant_group.id_project != json_participant['id_project'] \
                         and json_participant['id_project'] > 0:
                     return gettext('Mismatch between id_project and group\'s project'), 400
@@ -239,8 +242,14 @@ class UserQueryParticipants(Resource):
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryParticipants.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return e.args, 500
             except NameError as e:
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryParticipants.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return e.args, 500
         else:
             # New
@@ -253,8 +262,14 @@ class UserQueryParticipants(Resource):
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryParticipants.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return e.args, 500
             except NameError as e:
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryParticipants.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return e.args, 500
 
         update_participant = TeraParticipant.get_participant_by_id(json_participant['id_participant'])
@@ -295,10 +310,16 @@ class UserQueryParticipants(Resource):
             # - Assets by that participant
             # In all case, deleting associated sessions will clear that all, since a participant cannot create sessions
             # or assets not for itself.
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryParticipants.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Can\'t delete participant: please delete all sessions before deleting.'), 500
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryParticipants.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database Error'), 500
 
         return '', 200

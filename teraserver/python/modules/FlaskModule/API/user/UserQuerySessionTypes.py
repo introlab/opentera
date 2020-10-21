@@ -67,7 +67,10 @@ class UserQuerySessionTypes(Resource):
             return jsonify(sessions_types_list)
 
         except InvalidRequestError:
-            return '', 500
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessionTypes.__name__,
+                                         'get', 500, 'InvalidRequestError', e)
+            return gettext('Invalid request'), 500
 
     @user_multi_auth.login_required
     @api.expect(post_schema)
@@ -146,9 +149,12 @@ class UserQuerySessionTypes(Resource):
             # Already existing
             try:
                 TeraSessionType.update(json_session_type['id_session_type'], json_session_type)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQuerySessionTypes.__name__,
+                                             'post', 500, 'Database error', e)
                 return gettext('Database error'), 500
         else:
             # New
@@ -158,9 +164,12 @@ class UserQuerySessionTypes(Resource):
                 TeraSessionType.insert(new_st)
                 # Update ID for further use
                 json_session_type['id_session_type'] = new_st.id_session_type
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQuerySessionTypes.__name__,
+                                             'post', 500, 'Database error', e)
                 return gettext('Database error'), 500
 
         update_session_type = TeraSessionType.get_session_type_by_id(json_session_type['id_session_type'])
@@ -238,11 +247,17 @@ class UserQuerySessionTypes(Resource):
         except exc.IntegrityError as e:
             # Causes that could make an integrity error when deleting:
             # - Associated sessions of that session type
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessionTypes.__name__,
+                                         'delete', 500, 'Database error', e)
             return gettext('Can\'t delete session type: please delete all sessions with that type before deleting.'
                            ), 500
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessionTypes.__name__,
+                                         'delete', 500, 'Database error', e)
             return gettext('Database error'), 500
 
         return '', 200

@@ -42,6 +42,11 @@ class DeviceLogin(Resource):
         rpc = RedisRPCClient(self.module.config.redis_config)
         online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
         if current_device.device_uuid in online_devices:
+            self.module.logger.log_warning(self.module.module_name,
+                                           DeviceLogin.__name__,
+                                           'get', 403,
+                                           'Device already logged in', current_device.to_json(minimal=True))
+
             return gettext('Device already logged in.'), 403
 
         if 'X_EXTERNALHOST' in request.headers:

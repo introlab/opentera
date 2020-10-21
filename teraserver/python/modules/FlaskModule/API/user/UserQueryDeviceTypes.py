@@ -76,7 +76,10 @@ class UserQueryDeviceTypes(Resource):
                     device_type_list.append(dt.to_json())
             return device_type_list
 
-        except InvalidRequestError:
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryDeviceTypes.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
             return gettext('Database Error'), 500
 
     @user_multi_auth.login_required
@@ -111,9 +114,12 @@ class UserQueryDeviceTypes(Resource):
             # Already existing
             try:
                 TeraDeviceType.update(json_device_type['id_device_type'], json_device_type)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryDeviceTypes.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             # New
@@ -123,9 +129,12 @@ class UserQueryDeviceTypes(Resource):
                 TeraDeviceType.insert(new_device_type)
                 # Update ID for further use
                 json_device_type['id_device_type'] = new_device_type.id_device_type
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryDeviceTypes.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to devices update...
@@ -147,8 +156,11 @@ class UserQueryDeviceTypes(Resource):
         args = parser.parse_args()
         # To accomodate the 'delete_with_http_auth' function which uses id as args, the id_device_type is rename as id
         # If not argument or both argument incorrect
+        if not any([args['id'], args['device_type_key']]):
+            return gettext('Missing arguments'), 400
+
         if args['id'] and args['device_type_key']:
-            return gettext('Tried to delete with 2 parameters'), 501
+            return gettext('Tried to delete with 2 parameters'), 400
 
         elif args['id']:
             device_type_to_del = TeraDeviceType.get_device_type_by_id(args['id'])
@@ -156,14 +168,17 @@ class UserQueryDeviceTypes(Resource):
         elif args['device_type_key']:
             device_type_to_del = TeraDeviceType.get_device_type_by_key(args['device_type_key'])
         else:
-            return gettext('Device type not found'), 500
+            return gettext('Device type not found'), 400
 
         if device_type_to_del.id_device_type in user_access.get_accessible_devices_types_ids():
             try:
                 TeraDeviceType.delete(id_todel=device_type_to_del.id_device_type)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryDeviceTypes.__name__,
+                                             'delete', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             return gettext('Forbidden'), 403

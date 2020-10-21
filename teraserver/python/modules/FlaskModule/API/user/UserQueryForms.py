@@ -123,4 +123,7 @@ class UserQueryForms(Resource):
         if args['type'] == 'versions':
             return TeraVersionsForm.get_versions_form(user_access=user_access)
 
+        self.module.logger.log_error(self.module.module_name,
+                                     UserQueryForms.__name__,
+                                     'get', 500, 'Unknown form type: ' + args['type'])
         return gettext('Unknown form type: ') + args['type'], 500

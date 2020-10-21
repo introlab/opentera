@@ -101,7 +101,10 @@ class UserQueryServiceConfig(Resource):
 
             return configs_list
 
-        except InvalidRequestError:
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryServiceConfig.__name__,
+                                         'get', 500, 'InvalidRequestError', e)
             return '', 500
 
     @user_multi_auth.login_required
@@ -176,9 +179,12 @@ class UserQueryServiceConfig(Resource):
             try:
                 if not TeraServiceConfig.update(json_config['id_service_config'], json_config):
                     return gettext('Invalid config format provided'), 400
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryServiceConfig.__name__,
+                                             'post', 500, 'Database error', e)
                 return gettext('Database Error'), 500
             except (ValueError, jsonschema.exceptions.ValidationError) as err:
                 return str(err), 400
@@ -199,9 +205,12 @@ class UserQueryServiceConfig(Resource):
 
                 # Update ID for further use
                 json_config['id_service_config'] = new_sc.id_service_config
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryServiceConfig.__name__,
+                                             'post', 500, 'Database error', e)
                 return gettext('Database error'), 500
             except (ValueError, jsonschema.exceptions.ValidationError) as err:
                 return str(err), 400
@@ -255,9 +264,12 @@ class UserQueryServiceConfig(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraServiceConfig.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryServiceConfig.__name__,
+                                         'delete', 500, 'Database error', e)
             return gettext('Database error'), 500
 
         return '', 200

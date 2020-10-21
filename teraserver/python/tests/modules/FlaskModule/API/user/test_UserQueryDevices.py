@@ -261,7 +261,7 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         self.assertEqual(response.status_code, 500)
 
         # Creating a device without a good device type
-        params = {"device": {"device_name": "Test", "id_device": 0, 'id_device_type': 10}}
+        params = {"device": {"device_name": "Test", "id_device": 0, 'id_device_type': 100}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 500)
 

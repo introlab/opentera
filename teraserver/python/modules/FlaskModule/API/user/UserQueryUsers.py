@@ -195,7 +195,7 @@ class UserQueryUsers(Resource):
             # Existing user
             update_user = TeraUser.get_user_by_id(json_user['id_user'])
             if not update_user:
-                return '', 500
+                return '', 400
             if not current_user.user_superadmin:
                 site_roles = update_user.get_sites_roles()
                 user_sites_ids = [site.id_site for site in site_roles]
@@ -221,10 +221,13 @@ class UserQueryUsers(Resource):
             # Already existing user
             try:
                 TeraUser.update(json_user['id_user'], json_user)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryUsers.__name__,
+                                             'post', 500, 'Database error', str(e))
+                return gettext('Database error'), 500
         else:
             # New user, check if password is set
             # if 'user_password' not in json_user:
@@ -250,9 +253,12 @@ class UserQueryUsers(Resource):
                 TeraUser.insert(new_user)
                 # Update ID User for further use
                 json_user['id_user'] = new_user.id_user
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryUsers.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
         update_user = TeraUser.get_user_by_id(json_user['id_user'])
@@ -345,6 +351,9 @@ class UserQueryUsers(Resource):
                 # - Associated sessions in which the user is part of
                 # - Sessions that the user created
                 # - Assets that the user created
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryUsers.__name__,
+                                             'delete', 500, 'Database error', str(e))
                 if 't_sessions_users' in str(e.args):
                     return gettext('Can\'t delete user: please remove all sessions that this user is part of before '
                                    'deleting.'), 500
@@ -353,9 +362,12 @@ class UserQueryUsers(Resource):
                                    'deleting.'), 500
                 return gettext('Can\'t delete user: please delete all assets created by this user before deleting.')\
                     , 500
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryUsers.__name__,
+                                             'delete', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             # Only remove usergroups from that user so that user is "apparently" deleted to the site admin

@@ -43,6 +43,11 @@ class ParticipantLogin(Resource):
             rpc = RedisRPCClient(self.module.config.redis_config)
             online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
             if current_participant.participant_uuid in online_participants:
+                self.module.logger.log_warning(self.module.module_name,
+                                               ParticipantLogin.__name__,
+                                               'get', 403,
+                                               'Participant already logged in',
+                                               current_participant.to_json(minimal=True))
                 return gettext('Participant already logged in.'), 403
 
             current_participant.update_last_online()
@@ -80,6 +85,9 @@ class ParticipantLogin(Resource):
 
             return reply
         else:
+            self.module.logger.log_error(self.module.module_name,
+                                         ParticipantLogin.__name__,
+                                         'get', 501, 'Missing current_participant')
             return gettext('Missing current_participant'), 501
 
 

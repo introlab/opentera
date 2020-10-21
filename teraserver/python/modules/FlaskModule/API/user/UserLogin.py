@@ -54,6 +54,10 @@ class UserLogin(Resource):
         rpc = RedisRPCClient(self.module.config.redis_config)
         online_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
         if current_user.user_uuid in online_users:
+            self.module.logger.log_warning(self.module.module_name,
+                                           UserLogin.__name__,
+                                           'get', 403,
+                                           'User already logged in', current_user.to_json(minimal=True))
             return gettext('User already logged in.'), 403
 
         current_user.update_last_online()
@@ -96,10 +100,19 @@ class UserLogin(Resource):
                         if len(stored_client_version_parts) and len(client_version_parts):
                             if stored_client_version_parts[0] != client_version_parts[0]:
                                 # return 426 = upgrade required
+                                self.module.logger.log_warning(self.module.module_name,
+                                                               UserLogin.__name__,
+                                                               'get', 426,
+                                                               'Client major version too old, not accepting login',
+                                                               stored_client_version_parts[0],
+                                                               client_version_parts[0])
                                 return gettext('Client major version too old, not accepting login'), 426
                 else:
                     return gettext('Invalid client name :') + client_name, 403
             except BaseException as e:
+                self.module.logger.log_error(self.module.module_name,
+                                             UserLogin.__name__,
+                                             'get', 500, 'Invalid client version handler', str(e))
                 return gettext('Invalid client version handler') + str(e), 500
 
         return reply

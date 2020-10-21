@@ -173,7 +173,7 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         # Delete without params
         params = {}
         response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
 
         # Deleting the new device type
         params = {'device_type_key': 'new_device'}
@@ -183,7 +183,7 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         # Try deleting 2 devices at once
         params = {'id': new_id[1], 'device_type_key': 'new_device_2'}
         response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 501)
+        self.assertEqual(response.status_code, 400)
 
         # Deleting the new device 1 type
         params = new_id[1]

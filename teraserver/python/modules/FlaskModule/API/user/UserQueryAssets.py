@@ -132,16 +132,19 @@ class UserQueryAssets(Resource):
         projects_ids = user_access.get_accessible_participants_ids()
 
         # Check if current user can delete
-        if len(TeraAsset.query.join(TeraSession).join(TeraSession.session_participants)
-                       .filter(TeraParticipant.id_project.in_(projects_ids)).all()) == 0:
+        if len(TeraAsset.query.join(TeraSession).join(TeraSession.session_participants).filter(
+                TeraParticipant.id_project.in_(projects_ids)).all()) == 0:
             return '', 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraAsset.delete(id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryAssets.__name__,
+                                         'get', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200
@@ -208,5 +211,8 @@ class UserQueryAssets(Resource):
                 else:
                     # Remove asset, was not able to upload
                     TeraAsset.delete(new_asset.id_asset)
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryAssets.__name__,
+                                                 'post', 500, 'Error uploading file(s)', files)
                     return gettext('Error uploading file'), 500
         return gettext('Not authorized'), 403

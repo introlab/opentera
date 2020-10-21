@@ -75,7 +75,10 @@ class UserQueryDeviceProjects(Resource):
 
             return jsonify(device_project_list)
 
-        except InvalidRequestError:
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryDeviceProjects.__name__,
+                                         'get', 500, 'Database error', str(e))
             return '', 500
 
     @user_multi_auth.login_required
@@ -121,9 +124,12 @@ class UserQueryDeviceProjects(Resource):
                 # Already existing
                 try:
                     TeraDeviceProject.update(json_device_project['id_device_project'], json_device_project)
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryDeviceProjects.__name__,
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
             else:
                 try:
@@ -132,9 +138,12 @@ class UserQueryDeviceProjects(Resource):
                     TeraDeviceProject.insert(new_device_project)
                     # Update ID for further use
                     json_device_project['id_device_project'] = new_device_project.id_device_project
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryDeviceProjects.__name__,
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
 
         update_device_project = json_device_projects
@@ -159,7 +168,7 @@ class UserQueryDeviceProjects(Resource):
         # Check if current user can delete
         device_project = TeraDeviceProject.get_device_project_by_id(id_todel)
         if not device_project:
-            return gettext('Not found'), 500
+            return gettext('Not found'), 400
 
         if device_project.id_project not in user_access.get_accessible_projects_ids(admin_only=True) or \
                 device_project.device_project_device.id_device not in \
@@ -179,9 +188,12 @@ class UserQueryDeviceProjects(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraDeviceProject.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryDeviceProjects.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

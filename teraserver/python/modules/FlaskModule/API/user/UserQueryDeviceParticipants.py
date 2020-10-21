@@ -96,7 +96,10 @@ class UserQueryDeviceParticipants(Resource):
 
             return jsonify(device_part_list)
 
-        except InvalidRequestError:
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryDeviceParticipants.__name__,
+                                         'get', 500, 'Database error', str(e))
             return '', 500
 
     @user_multi_auth.login_required
@@ -146,9 +149,12 @@ class UserQueryDeviceParticipants(Resource):
                 # Already existing
                 try:
                     TeraDeviceParticipant.update_(json_device_part['id_device_participant'], json_device_part)
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryDeviceParticipants.__name__,
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
             else:
                 try:
@@ -160,9 +166,12 @@ class UserQueryDeviceParticipants(Resource):
                     json_device_part['participant_name'] = new_device_part.device_participant_participant.\
                         participant_name
                     json_device_part['device_name'] = new_device_part.device_participant_device.device_name
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryDeviceParticipants.__name__,
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to devices update...
@@ -187,7 +196,7 @@ class UserQueryDeviceParticipants(Resource):
         # Check if current user can delete
         device_part = TeraDeviceParticipant.get_device_participant_by_id(id_todel)
         if not device_part:
-            return gettext('Not found'), 500
+            return gettext('Not found'), 400
 
         if device_part.id_participant not in user_access.get_accessible_participants_ids(admin_only=True) or \
                 device_part.id_device not in user_access.get_accessible_devices_ids(admin_only=True):
@@ -196,9 +205,12 @@ class UserQueryDeviceParticipants(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraDeviceParticipant.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryDeviceParticipants.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

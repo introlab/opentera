@@ -87,6 +87,10 @@ class WebRTCModule(BaseModule):
     def terminate_webrtc_session_with_room_name(self, room_name):
         for process_dict in self.processList:
             if process_dict['key'] == room_name:
+
+                self.logger.log_info(self.module_name, 'terminate_webrtc_session_with_room_name',  room_name,
+                                     process_dict, 'pid', str(process_dict['process'].pid))
+
                 # Terminate process
                 process_dict['process'].kill()
                 # Wait for process return
@@ -107,6 +111,10 @@ class WebRTCModule(BaseModule):
     def terminate_webrtc_session_with_owner_uuid(self, owner_uuid):
         for process_dict in self.processList:
             if process_dict['owner'] == owner_uuid:
+
+                self.logger.log_info(self.module_name, 'terminate_webrtc_session_with_owner_uuid',  owner_uuid,
+                                     process_dict, 'pid', str(process_dict['process'].pid))
+
                 # Terminate process
                 process_dict['process'].kill()
                 # Wait for process return
@@ -160,6 +168,8 @@ class WebRTCModule(BaseModule):
                                      'users': users,
                                      'participants': participants,
                                      'devices': devices})
+
+            self.logger.log_info(self.module_name, 'launch_node', executable_args, 'pid', str(process.pid))
 
             print(self.module_name + ' - started process', process)
             return True
