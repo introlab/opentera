@@ -47,11 +47,11 @@ class UserQueryDeviceSubTypes(Resource):
         parser = get_parser
 
         args = parser.parse_args()
-        as_list = args.pop('list')
+        has_list = args.pop('list')
 
         device_subtypes = []
         # If we have no arguments, return all accessible devices
-        if not any(args.values()):
+        if args['id_device_type'] is None and args['id_device_subtype'] is None:
             device_subtypes = user_access.get_accessible_devices_subtypes()
 
         #if we have 2 IDs, return error
@@ -71,11 +71,15 @@ class UserQueryDeviceSubTypes(Resource):
                 device_subtypes = TeraDeviceSubType.get_device_subtypes_for_type(args['id_device_type'])
             else:
                 return gettext('No access to device type'), 403
+
+        else:
+            return gettext('ID can\'t be 0'), 400
+
         try:
             device_subtypes_list = []
             for dst in device_subtypes:
                 if dst is not None:
-                    if as_list:
+                    if has_list:
                         dst_json = dst.to_json(minimal=True)
                         device_subtypes_list.append(dst_json)
                     else:
@@ -97,15 +101,18 @@ class UserQueryDeviceSubTypes(Resource):
                         500: 'Internal error occured when saving device subtype'})
     def post(self):
         # parser = post_parser
-
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_device_subtype = request.json['device_subtype']
 
         # Validate if we have an id
-        if 'id_device_type' not in json_device_subtype or 'id_device_subtype' not in json_device_subtype:
-            return gettext('Missing id_device_type or id_device_subtype'), 400
+        if 'id_device_subtype' not in json_device_subtype:
+            return gettext('Missing id_device_subtype'), 400
+
+        if json_device_subtype['id_device_subtype'] == 0:
+            if not current_user.user_superadmin:
+                return gettext('Forbidden'), 403
 
         # Check if current user can modify the posted device
         if json_device_subtype['id_device_type'] not in user_access.get_accessible_devices_types_ids(admin_only=True):
@@ -168,4 +175,4 @@ class UserQueryDeviceSubTypes(Resource):
             print(sys.exc_info())
             return gettext('Database error'), 500
 
-        return '', 200
+        return gettext('Device subtype successfully deleted'), 200
