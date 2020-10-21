@@ -22,10 +22,10 @@ get_parser.add_argument('id_device_type', type=int, help='ID of device type from
                                                       'combined with id_site or id_project.')
 get_parser.add_argument('id_device_subtype', type=int, help='Device subtype id to get all devices of that subtype.')
 get_parser.add_argument('name', type=str, help='Name of the device to query')
-get_parser.add_argument('available', type=inputs.boolean, help='Flag that indicates if only available (devices not '
-                                                               'associated to a participant) should be returned')
+# get_parser.add_argument('available', type=inputs.boolean, help='Flag that indicates if only available (devices not '
+#                                                                'associated to a participant) should be returned')
 get_parser.add_argument('projects', type=inputs.boolean, help='Flag that indicates if associated project(s) information'
-                                                              'should be included in the returned device list')
+                                                              ' should be included in the returned device list')
 get_parser.add_argument('enabled', type=inputs.boolean, help='Flag that limits the returned data to the enabled '
                                                              'devices.')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
@@ -49,6 +49,14 @@ delete_parser.add_argument('id', type=int, help='Device ID to delete', required=
 
 class UserQueryDevices(Resource):
 
+    @staticmethod
+    def _value_counter(args):
+        res = 0
+        for value in args.values():
+            if value is not None:
+                res += 1
+        return res
+
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
@@ -58,6 +66,8 @@ class UserQueryDevices(Resource):
     @api.doc(description='Get devices information. Only one of the ID parameter is supported at once. If no ID is '
                          'specified, returns all accessible devices for the logged user.',
              responses={200: 'Success - returns list of devices',
+                        400: 'User Error : Too Many IDs',
+                        403: 'Forbidden access',
                         500: 'Database error'})
     def get(self):
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
@@ -67,37 +77,49 @@ class UserQueryDevices(Resource):
 
         args = parser.parse_args()
 
-        if args['uuid']:
-            args['device_uuid'] = args['uuid']
+        # has_available = args.pop('available')
+        has_projects = args.pop('projects')
+        has_enabled = args.pop('enabled')
+        has_list = args.pop('list')
+        has_with_participants = args.pop('with_participants')
+        has_with_sites = args.pop('with_sites')
+        has_with_status = args.pop('with_status')
 
         devices = []
         # If we have no arguments, return all accessible devices
-        if not args['id_device'] and not args['id_site'] and not args['id_device_type'] and not args['id_project'] and \
-                not args['name'] and not args['device_uuid']:
+        if self._value_counter(args=args) == 0:
             devices = user_access.get_accessible_devices()
-        elif args['id_device']:
-            if args['id_device'] in user_access.get_accessible_devices_ids():
-                devices = [TeraDevice.get_device_by_id(args['id_device'])]
-        elif args['device_uuid']:
-            if args['device_uuid'] in user_access.get_accessible_devices_uuids():
-                devices = [TeraDevice.get_device_by_uuid(args['device_uuid'])]
-        elif args['id_site']:
-            devices = user_access.query_devices_for_site(args['id_site'], args['id_device_type'], args['enabled'])
-        elif args['id_project']:
-            devices = user_access.query_devices_for_project(args['id_project'], args['id_device_type'], args['enabled'])
-        elif args['id_device_type']:
-            devices = user_access.query_devices_by_type(args['id_device_type'])
-        elif args['id_device_subtype']:
-            devices = user_access.query_devices_by_subtype(args['id_device_subtype'])
-        elif args['name']:
-            devices = [TeraDevice.get_device_by_name(args['name'])]
-            for device in devices:
-                if device is None and len(devices) == 1:
-                    devices = []
-                    break
-                if device.id_device not in user_access.get_accessible_devices_ids():
-                    devices = []
+        elif self._value_counter(args=args) == 1:
+            if args['id_device']:
+                if args['id_device'] in user_access.get_accessible_devices_ids():
+                    devices = [TeraDevice.get_device_by_id(args['id_device'])]
+            if args['device_uuid']:
+                if args['device_uuid'] in user_access.get_accessible_devices_uuids():
+                    devices = [TeraDevice.get_device_by_uuid(args['device_uuid'])]
+            if args['uuid']:
+                if args['uuid'] in user_access.get_accessible_devices_uuids():
+                    devices = [TeraDevice.get_device_by_uuid(args['uuid'])]
+            if args['id_site']:
+                devices = user_access.query_devices_for_site(args['id_site'], args['id_device_type'], has_enabled)
+            if args['id_project']:
+                devices = user_access.query_devices_for_project(args['id_project'], args['id_device_type'], has_enabled)
+            if args['id_device_type']:
+                devices = user_access.query_devices_by_type(args['id_device_type'])
+            if args['id_device_subtype']:
+                devices = user_access.query_devices_by_subtype(args['id_device_subtype'])
+            if args['name']:
+                devices = [TeraDevice.get_device_by_name(args['name'])]
+                for device in devices:
+                    if device is None and len(devices) == 1:
+                        devices = []
+                        break
+                    if device.id_device not in user_access.get_accessible_devices_ids():
+                        devices = []
+        else:
+            return gettext('To many ID'), 400
 
+        if not devices:
+            return gettext('Forbidden access'), 403
         # if args['available'] is not None:
         #     if args['available']:
         #         devices = TeraDevice.get_available_devices()
@@ -108,7 +130,7 @@ class UserQueryDevices(Resource):
             device_list = []
             online_devices = []
             busy_devices = []
-            if args['with_status']:
+            if has_with_status:
                 # Query status
                 rpc = RedisRPCClient(self.module.config.redis_config)
                 online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
@@ -116,16 +138,16 @@ class UserQueryDevices(Resource):
 
             for device in devices:
                 if device is not None:
-                    if args['enabled'] is not None:
-                        if device.device_enabled != args['enabled']:
+                    if has_enabled:
+                        if device.device_enabled != has_enabled:
                             continue
 
-                    if args['list'] is None:
+                    if not has_list:
                         device_json = device.to_json()
                     else:
                         device_json = device.to_json(minimal=True)
 
-                    if args['with_participants'] is not None:
+                    if has_with_participants:
                         # Add participants information to the device, is available
                         dev_participants = user_access.query_participants_for_device(device.id_device)
                         parts = []
@@ -138,40 +160,40 @@ class UserQueryDevices(Resource):
                             #    part_info['participant_name'] = part.participant_name
                             # part_info['id_project'] = part.participant_participant_group.participant_group_project.\
                             #     id_project
-                            if args['list'] is None:
+                            if not has_list:
                                 part_info['project_name'] = part.participant_project.project_name
                             parts.append(part_info)
                         device_json['device_participants'] = parts
 
-                    if args['with_sites'] is not None:
+                    if has_with_sites:
                         # Add sites
                         sites_list = []
                         device_sites = user_access.query_sites_for_device(device.id_device)
                         for device_site in device_sites:
                             ignore_site_fields = []
-                            if args['list'] is not None:
+                            if has_list:
                                 ignore_site_fields = ['site_name']
                             site_json = device_site.to_json(ignore_fields=ignore_site_fields)
                             sites_list.append(site_json)
 
                         device_json['device_sites'] = sites_list
 
-                    if args['projects'] is not None:
+                    if has_projects:
                         # Add projects
                         projects_list = []
                         device_projects = TeraDeviceProject.query_projects_for_device(device.id_device)
                         for device_project in device_projects:
                             ignore_project_fields = []
-                            if args['list'] is not None:
+                            if has_list:
                                 ignore_project_fields = ['project_name']
                             project_json = device_project.to_json(ignore_fields=ignore_project_fields)
-                            if not args['list']:
+                            if not has_list:
                                 project_json['project'] = device_project.device_project_project.to_json()
                             projects_list.append(project_json)
 
                         device_json['device_projects'] = projects_list
-                    # if args['available'] is not None:
-                    #     if not args['available']:
+                    # if has_available:
+                    #     if not has_available:
                     #         device_json['id_kit'] = device.device_kits[0].id_kit
                     #         device_json['kit_name'] = device.device_kits[0].kit_device_kit.kit_name
                     #         device_json['kit_device_optional'] = device.device_kits[0].kit_device_optional
@@ -179,7 +201,7 @@ class UserQueryDevices(Resource):
                     if device.id_device_subtype is not None:
                         device_json['device_subtype'] = device.device_subtype.to_json()
 
-                    if args['with_status']:
+                    if has_with_status:
                         device_json['device_busy'] = device.device_uuid in busy_devices
                         device_json['device_online'] = device.device_uuid in online_devices
 
@@ -308,6 +330,7 @@ class UserQueryDevices(Resource):
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific device',
              responses={200: 'Success',
+                        400: 'Wrong ID/ No ID',
                         403: 'Logged user can\'t delete device (can delete if superadmin)',
                         500: 'Device not found or database error.'})
     def delete(self):
@@ -365,4 +388,4 @@ class UserQueryDevices(Resource):
                     device_to_del.device_projects.remove(project)
             device_to_del.commit()
 
-        return '', 200
+        return gettext('Device successfully deleted'), 200

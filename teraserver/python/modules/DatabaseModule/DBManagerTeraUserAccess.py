@@ -380,7 +380,7 @@ class DBManagerTeraUserAccess:
                 .order_by(TeraDevice.id_device.asc())
             if device_type_id:
                 query = query.filter(TeraDevice.id_device_type == device_type_id)
-            if enabled is not None:
+            if enabled:
                 query = query.filter(TeraDevice.device_enabled == enabled)
             devices = query.all()
         return devices
