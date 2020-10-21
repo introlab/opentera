@@ -146,8 +146,11 @@ class UserQueryDeviceSubTypes(Resource):
         todel = TeraDeviceSubType.get_device_subtype(id_todel)
         if not todel:
             return gettext('Device subtype not found'), 500
-        
-        if todel.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
+
+        # if todel.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
+        #     return gettext('Forbidden'), 403
+
+        if not user_access.user.user_superadmin:
             return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
