@@ -149,7 +149,6 @@ class UserQuerySessionTypeProject(Resource):
                     print(sys.exc_info())
                     return gettext('Database error'), 500
 
-        # TODO: Publish update to everyone who is subscribed to devices update...
         update_stp = json_stps
 
         return jsonify(update_stp)

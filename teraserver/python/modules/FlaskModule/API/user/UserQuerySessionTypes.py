@@ -191,6 +191,9 @@ class UserQuerySessionTypes(Resource):
                         update_session_type.session_type_projects.remove(TeraProject.get_project_by_id(project_id))
 
                 update_session_type.commit()
+            # Ensure that the newly added session types projects have a correct service project association, if required
+            for stp in update_session_type.session_type_session_type_projects:
+                stp.check_integrity()
 
         return [update_session_type.to_json()]
 

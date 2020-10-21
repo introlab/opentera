@@ -24,7 +24,7 @@ class TeraSessionType(db.Model, BaseModel):
     session_type_color = db.Column(db.String(7), nullable=False)
     session_type_category = db.Column(db.Integer, nullable=False)
 
-    # session_type_projects = db.relationship("TeraSessionTypeProject")
+    session_type_session_type_projects = db.relationship("TeraSessionTypeProject", passive_deletes=True)
     session_type_projects = db.relationship("TeraProject", secondary="t_sessions_types_projects",
                                             back_populates="project_session_types")
 
@@ -36,7 +36,7 @@ class TeraSessionType(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
         ignore_fields.extend(['session_type_projects', 'session_type_devices_types', 'SessionCategoryEnum',
-                              'session_type_service', 'session_type_sessions'])
+                              'session_type_service', 'session_type_sessions', 'session_type_session_type_projects'])
         if minimal:
             ignore_fields.extend(['session_type_online',
                                   'session_type_profile',
@@ -120,6 +120,10 @@ class TeraSessionType(db.Model, BaseModel):
     @staticmethod
     def get_session_type_by_id(ses_type_id: int):
         return TeraSessionType.query.filter_by(id_session_type=ses_type_id).first()
+
+    @staticmethod
+    def get_session_types_for_service(id_service: int):
+        return TeraSessionType.query.filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_category_name(category: SessionCategoryEnum):
