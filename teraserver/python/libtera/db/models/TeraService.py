@@ -183,8 +183,11 @@ class TeraService(db.Model, BaseModel):
         new_service.service_hostname = 'localhost'
         new_service.service_port = 4070
         new_service.service_endpoint = '/'
-        new_service.service_endpoint_participant = '/participant'
         new_service.service_clientendpoint = '/rehab'
+        new_service.service_endpoint_participant = '/participant'
+        # Not yet implemented...
+        # new_service.service_endpoint_user = '/user'
+        # new_service.service_endpoint_device = '/device'
         new_service.service_enabled = True
         new_service.service_editable_config = True
         db.session.add(new_service)

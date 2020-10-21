@@ -30,9 +30,18 @@
         }
     </script>
 
+    <script>
+        preInitSystem();
+    </script>
+
 
 </head>
 <body onload = "initialUserLayout();initUI();initSystem();" style="background-color: black;">
+
+<!-- Audio for browsers -->
+<audio id="audioConnected" src="sounds/OpenTera_CallConnected.mp3" type="audio/mpeg"></audio>
+<audio id="audioDisconnected" src="sounds/OpenTera_CallDisconnected.mp3" type="audio/mpeg"></audio>
+<audio id="audioCalling" src="sounds/OpenTera_Calling.mp3" type="audio/mpeg" loop="true"></audio>
 
 <!-- ConfigDialog -->
 <div class="modal fade" id="configDialog" tabindex="-1" role="dialog" aria-labelledby="configDialogCenterTitle"
@@ -134,7 +143,8 @@
 
                     <span class="badge badge-info" id="localViewTitle1">Vue locale #1</span>
                     <!-- Video controls -->
-                    <div id="localVideoControls1" class="overlay-top-right" style="display: none;">
+                    <div id="localVideoControls1" class="overlay-top-right" style="">
+                        <input id="localBtnStar1" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(true, 1);event.stopPropagation();" />
                         <input id="localBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(true,1);event.stopPropagation();" />
                     </div>
 
@@ -190,7 +200,8 @@
                     <span class="badge badge-info" id="localViewTitle2">Vue locale #2</span>
 
                     <!-- Video controls -->
-                    <div id="localVideoControls2" class="overlay-top-right" style="display: none;">
+                    <div id="localVideoControls2" class="overlay-top-right" style="">
+                        <input id="localBtnStar2" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(true, 2);event.stopPropagation();" />
                         <input id="localBtnSwapVideo2" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(true,2);event.stopPropagation();" />
                     </div>
 
@@ -210,23 +221,29 @@
                 </div>
             </div>
             <div class="row h-33" id="toolsViewRow">
-                <div class="col-12" id="toolsView" style="background-color:black;">
-                    <span class="badge badge-warning" id="toolsViewTitle">Outils</span>
+                <div class="col-6" id="controlsView" style="background-color:#0f0524;">
+                    <span class="badge badge-warning" id="controlsViewTitle">Contrôles</span>
                     <div class="d-flex" style="margin-top: 10px;">
                         <div class="tool-icon">
                             <input id="btnMicAll" type="image" alt="image" src="images/mic.png" height=32
                                    onclick="muteMicroAll();"/>
-                            <p><label class="text-secondary">Tous</label></p>
+                            <p><label class="text-white">Tous</label></p>
                         </div>
                         <div class="tool-icon">
                             <input id="btnSpeakerAll" type="image" alt="image" src="images/speaker.png" height=32
                                    onclick="muteSpeakerAll();"/>
-                            <p><label class="text-secondary">Tous</label></p>
+                            <p><label class="text-white">Tous</label></p>
                         </div>
+                    </div>
+
+                </div>
+                <div class="col-6" id="toolsView" style="background-color:#06193c;">
+                    <span class="badge badge-warning" id="toolsViewTitle">Outils</span>
+                    <div class="d-flex" style="margin-top: 10px;">
                         <div class="tool-icon">
                             <input id="btnChronos" type="image" alt="image" src="images/timer.png" height=32
                                    onclick="showChronosDialog();"/>
-                            <p><label class="text-secondary">Chronos</label></p>
+                            <p><label class="text-white">Chronos</label></p>
                         </div>
                     </div>
 
@@ -245,7 +262,8 @@
                     <span class="badge badge-primary" id="remoteViewTitle1">Participant #1</span>
 
                     <!-- Video controls -->
-                    <div id="remoteVideoControls1" class="overlay-top-right" style="display: none;">
+                    <div id="remoteVideoControls1" class="overlay-top-right" style="">
+                        <input id="remoteBtnStar1" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(false, 1);event.stopPropagation();" />
                         <input id="remoteBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,1);event.stopPropagation();" />
                     </div>
 
@@ -292,7 +310,8 @@
                     <span class="badge badge-primary" id="remoteViewTitle2">Participant #2</span>
 
                     <!-- Video controls -->
-                    <div id="remoteVideoControls2" class="overlay-top-right" style="display: none;">
+                    <div id="remoteVideoControls2" class="overlay-top-right" style="">
+                        <input id="remoteBtnStar2" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(false, 2);event.stopPropagation();" />
                         <input id="remoteBtnSwapVideo2" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,2);event.stopPropagation();" />
                     </div>
 
@@ -336,7 +355,8 @@
                      oncontextmenu="resetInactiveTimer(false, 3);showButtons(false, true, 3);">
                     <span class="badge badge-primary" id="remoteViewTitle3">Participant #3</span>
                     <!-- Video controls -->
-                    <div id="remoteVideoControls3" class="overlay-top-right" style="display: none;">
+                    <div id="remoteVideoControls3" class="overlay-top-right" style="">
+                        <input id="remoteBtnStar3" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(false, 3);event.stopPropagation();" />
                         <input id="remoteBtnSwapVideo3" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,3);event.stopPropagation();" />
                     </div>
 
@@ -383,7 +403,8 @@
                     <span class="badge badge-primary" id="remoteViewTitle4">Participant #4</span>
 
                     <!-- Video controls -->
-                    <div id="remoteVideoControls4" class="overlay-top-right" style="display: none;">
+                    <div id="remoteVideoControls4" class="overlay-top-right" style="">
+                        <input id="remoteBtnStar4" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(false, 4);event.stopPropagation();" />
                         <input id="remoteBtnSwapVideo4" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,4);event.stopPropagation();" />
                     </div>
 

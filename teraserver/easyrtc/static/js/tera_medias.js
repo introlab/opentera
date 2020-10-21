@@ -5,7 +5,6 @@ var localCapabilities = {'video2':false};
 
 // Control flags
 var deviceEnumCompleted = false;
-var initialSourceSelect = false;
 
 async function fillDefaultSourceList(){
     console.log("fillDefaultSourceList()");
@@ -41,8 +40,6 @@ async function fillDefaultSourceList(){
 
     selectDefaultSources();
 
-    /*if (!connected && (!teraConnected || (teraConnected && initialSourceSelect)))
-        connect();*/
 }
 
 function selectVideoSource(source){
@@ -69,12 +66,6 @@ function selectVideoSource(source){
             updateLocalAudioVideoSource(1);
         }
     }
-
-    /*if (teraConnected && !connected && deviceEnumCompleted)
-        connect();*/
-
-    initialSourceSelect = true;
-
 }
 
 function selectAudioSource(source){
@@ -147,14 +138,14 @@ function selectSecondarySources(source){
     }
 
     if (sources.audio !== "" || sources.video !== ""){
-        showSecondaryLocalSourcesIcons(true, false);
+        //showSecondaryLocalSourcesIcons(true, false);
         localCapabilities.video2 = true;
     }else{
-        showSecondaryLocalSourcesIcons(false, false);
+        //showSecondaryLocalSourcesIcons(false, false);
         localCapabilities.video2 = false;
     }
     broadcastlocalCapabilities();
-    updateLocalAudioVideoSource(2);
+    //updateLocalAudioVideoSource(2);
 }
 
 function selectDefaultSources(){

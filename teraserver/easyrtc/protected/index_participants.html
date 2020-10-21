@@ -34,6 +34,11 @@
 </head>
 <body onload = "initialUserLayout();initUI();initSystem();" style="background-color: black;">
 
+<!-- Audio for browsers -->
+<audio id="audioConnected" src="sounds/OpenTera_CallConnected.mp3" type="audio/mpeg"></audio>
+<audio id="audioDisconnected" src="sounds/OpenTera_CallDisconnected.mp3" type="audio/mpeg"></audio>
+<audio id="audioCalling" src="sounds/OpenTera_Calling.mp3" type="audio/mpeg" loop="true"></audio>
+
 <!-- ConfigDialog -->
 <div class="modal fade" id="configDialog" tabindex="-1" role="dialog" aria-labelledby="configDialogCenterTitle"
      aria-hidden="true">
@@ -98,7 +103,7 @@
 
                     <span class="badge badge-info" id="localViewTitle1">Vue locale #1</span>
                     <!-- Video controls -->
-                    <div id="localVideoControls1" class="overlay-top-right" style="display: none;">
+                    <div id="localVideoControls1" class="overlay-top-right" style="">
                         <input id="localBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(true,1);event.stopPropagation();" />
                     </div>
 
@@ -149,7 +154,7 @@
                     <span class="badge badge-info" id="localViewTitle2">Vue locale #2</span>
 
                     <!-- Video controls -->
-                    <div id="localVideoControls2" class="overlay-top-right" style="display: none;">
+                    <div id="localVideoControls2" class="overlay-top-right" style="">
                         <input id="localBtnSwapVideo2" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(true,2);event.stopPropagation();" />
                     </div>
 
@@ -170,7 +175,10 @@
             </div>
         </div>
         <div class="col-8 h-100" id="largeView">
-
+            <!-- Text display -->
+            <div id="localDisplay1" class="overlay-top-center" style="display:none">
+                <label class="chrono-large" id="localText1">Temps restant: xx:xx</label>
+            </div>
         </div>
         <div class="col-2 h-100" id="remoteViews">
             <div class="row h-100" id="remoteRows1" style="flex-flow: column;">
@@ -181,13 +189,8 @@
                     <span class="badge badge-primary" id="remoteViewTitle1">Participant #1</span>
 
                     <!-- Video controls -->
-                    <div id="remoteVideoControls1" class="overlay-top-right" style="display: none;">
+                    <div id="remoteVideoControls1" class="overlay-top-right" style="">
                         <input id="remoteBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,1);event.stopPropagation();" />
-                    </div>
-
-                    <!-- Text display -->
-                    <div id="localDisplay1" class="overlay-top-center" style="display:none">
-                        <label class="chrono-large" id="localText1">Temps restant: xx:xx</label>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
@@ -207,7 +210,7 @@
                     <span class="badge badge-primary" id="remoteViewTitle2">Participant #2</span>
 
                     <!-- Video controls -->
-                    <div id="remoteVideoControls2" class="overlay-top-right" style="display: none;">
+                    <div id="remoteVideoControls2" class="overlay-top-right" style="">
                         <input id="remoteBtnSwapVideo2" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,2);event.stopPropagation();" />
                     </div>
 
@@ -232,7 +235,7 @@
                 <div class="col videoView" id="remoteView3">
                     <span class="badge badge-primary" id="remoteViewTitle3">Participant #3</span>
                     <!-- Video controls -->
-                    <div id="remoteVideoControls3" class="overlay-top-right" style="display: none;">
+                    <div id="remoteVideoControls3" class="overlay-top-right" style="">
                         <input id="remoteBtnSwapVideo3" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,3);event.stopPropagation();" />
                     </div>
 
@@ -258,7 +261,7 @@
                     <span class="badge badge-primary" id="remoteViewTitle4">Participant #4</span>
 
                     <!-- Video controls -->
-                    <div id="remoteVideoControls4" class="overlay-top-right" style="display: none;">
+                    <div id="remoteVideoControls4" class="overlay-top-right" style="">
                         <input id="remoteBtnSwapVideo4" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,4);event.stopPropagation();" />
                     </div>
 

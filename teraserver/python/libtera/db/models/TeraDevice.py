@@ -56,7 +56,7 @@ class TeraDevice(db.Model, BaseModel):
                           'device_subtype', 'authenticated', 'device_assets']
 
         if minimal:
-            ignore_fields += ['id_device_type', 'device_onlineable', 'device_config', 'device_notes',
+            ignore_fields += ['device_onlineable', 'device_config', 'device_notes',
                               'device_lastonline', 'device_infos',  'device_token']
 
         device_json = super().to_json(ignore_fields=ignore_fields)

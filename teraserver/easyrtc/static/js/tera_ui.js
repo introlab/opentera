@@ -4,6 +4,8 @@ let remoteTimerHandles = [0, 0, 0, 0];
 let localScreenSharing = false;
 let localSecondSource = false;
 
+let primaryView = {peerid: 0, streamName: 'default'};
+
 function initUI(){
     $('#configDialog').on('hidden.bs.modal', configDialogClosed);
 }
@@ -35,7 +37,25 @@ function showButtons(local, show, index){
     let videoControls = $("#" + view_prefix + "VideoControls" + index);
 
     if (videoControls.length){
-        (show) ? videoControls.show() : videoControls.hide();
+        // Must hide individual icons according to state
+        let swapButton = getButtonIcon(local, index, "SwapVideo");
+        let starButton = getButtonIcon(local, index, "Star");
+
+        if (isParticipant){
+            if (primaryView.peerid === 0){
+                (show) ? swapButton.show() : swapButton.hide();
+            }else{
+                swapButton.hide();
+            }
+        }else{
+            (show) ? swapButton.show() : swapButton.hide();
+        }
+
+        if (!isButtonActive(local, index, "Star")){
+            (show) ? starButton.show() : starButton.hide();
+        }else{
+            starButton.show();
+        }
     }
 
     if (ptzControls.length){
@@ -222,28 +242,34 @@ function getButtonIcon(local, index, prefix){
 
 function isButtonActive(local, index, prefix){
     let icon = getButtonIcon(local, index, prefix);
-    return icon.attr('src').includes("on");
+    if (icon !== undefined  && icon.length)
+        return icon.attr('src').includes("on");
+    return false;
 }
 
 function updateButtonIconState(status, local, index, prefix){
     let icon = getButtonIcon(local, index, prefix);
 
-    let iconImgPath = icon.attr('src').split('/')
+    if (icon !== undefined){
+        if (icon.attr('src')){
+            let iconImgPath = icon.attr('src').split('/')
 
-    if (status === true){
-        iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + "_on.png";
-        let must_show = false;
-        if (local){
-            if (localTimerHandles[index-1] !== 0) must_show = true;
-        }else{
-            if (remoteTimerHandles[index-1] !== 0) must_show = true;
+            if (status === true){
+                iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + "_on.png";
+                let must_show = false;
+                if (local){
+                    if (localTimerHandles[index-1] !== 0) must_show = true;
+                }else{
+                    if (remoteTimerHandles[index-1] !== 0) must_show = true;
+                }
+                (!must_show) ? icon.hide() : icon.show();
+            }else{
+                iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + ".png";
+                //icon.show();
+            }
+            icon.attr('src', pathJoin(iconImgPath))
         }
-        (!must_show) ? icon.hide() : icon.show();
-    }else{
-        iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + ".png";
-        icon.show();
     }
-    icon.attr('src', pathJoin(iconImgPath))
 }
 
 function enlargeView(local, index){
@@ -300,6 +326,12 @@ function btnShareScreenClicked(){
 
         // Show / hide mic-video-speaker icons
         showStatusControls(true, 2, !localScreenSharing);
+
+        // Force views on new screen share
+        if (!isParticipant){
+            setPrimaryView(local_peerid, "ScreenShare");
+            setPrimaryViewIcon(local_peerid, "ScreenShare");
+        }
 
     }).catch(function (){
         // Revert state
@@ -499,6 +531,27 @@ function refreshRemoteStatusIcons(peerid){
     if (status.video !== undefined) {
         updateStatusIconState(status.video, false, index + 1, "Video");
     }
+
+    if (status.primaryView !== undefined){
+        if (isParticipant){
+            if (status.primaryView.peerid !== 0){
+                index = getStreamIndexForPeerId(peerid, status.primaryView.streamName);
+            }
+
+            if (index !== undefined){
+                let local = (status.primaryView.peerid === local_peerid);
+                let view_id = getVideoViewId(local, index+1);
+                setLargeView(view_id);
+
+            }else{
+                // Defaults to first remote view
+                setLargeView('remoteView1');
+
+            }
+       }
+        primaryView = status.primaryView;
+        setPrimaryViewIcon(status.primaryView.peerid, status.primaryView.streamName);
+    }
 }
 
 function getVideoViewId(local, index){
@@ -560,4 +613,56 @@ function getTextDisplay(local, index){
     if (display.length){
         return display[0].innerHTML;
     }
+}
+
+function selectPrimaryView(local, index){
+    // Get stream name
+    let streamName = 'default';
+    let btnSelected = isButtonActive(local, index, 'Star');
+    let peer_id = 0;
+    if (local === true){
+        streamName = localStreams[index-1].streamname;
+        if (!btnSelected){
+            peer_id = local_peerid;
+        }
+    }else{
+        streamName = remoteStreams[index-1].streamname;
+        if (!btnSelected){
+            peer_id = remoteStreams[index-1].peerid;
+        }
+    }
+    setPrimaryView(peer_id, streamName);
+    setPrimaryViewIcon(peer_id, streamName);
+}
+
+function setPrimaryViewIcon(peer_id, streamName){
+    let local = (peer_id === local_peerid);
+    // Browse all streams, and set icon accordingly
+    for (let i=0; i<localStreams.length; i++){
+        if (local === true && localStreams[i].streamname === streamName){
+            updateButtonIconState(true, true, i+1, 'Star');
+        }else{
+            updateButtonIconState(false, true, i+1, 'Star');
+        }
+    }
+
+    for (let i=0; i<remoteStreams.length; i++){
+        if (local === false && remoteStreams[i].peerid === peer_id && remoteStreams[i].streamname === streamName){
+            updateButtonIconState(true, false, i+1, 'Star');
+        }else{
+            updateButtonIconState(false, false, i+1, 'Star');
+        }
+    }
+}
+
+function playSound(soundname){
+    if (isWeb){
+        document.getElementById(soundname).play();
+    }
+}
+
+function stopSounds(){
+    document.getElementById("audioConnected").pause();
+    document.getElementById("audioDisconnected").pause();
+    document.getElementById("audioCalling").pause();
 }
