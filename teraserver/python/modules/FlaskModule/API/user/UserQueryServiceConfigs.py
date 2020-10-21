@@ -129,6 +129,11 @@ class UserQueryServiceConfig(Resource):
         if 'id_service_config' not in json_config:
             return 'Missing id_service_config', 400
 
+        if 'service_key' in json_config:
+            from libtera.db.models.TeraService import TeraService
+            json_config['id_service'] = TeraService.get_service_by_key(json_config['service_key']).id_service
+            del json_config['service_key']
+
         # Filter invalid (0) id_user, id_device and id_participant
         if 'id_user' in json_config and json_config['id_user'] == 0:
             del json_config['id_user']
