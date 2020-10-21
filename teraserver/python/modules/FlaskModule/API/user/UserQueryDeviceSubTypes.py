@@ -55,10 +55,10 @@ class UserQueryDeviceSubTypes(Resource):
             device_subtypes = user_access.get_accessible_devices_subtypes()
 
         #if we have 2 IDs, return error
-        if args['id_device_subtype'] is not None and args['id_device_type'] is not None:
+        elif args['id_device_subtype'] is not None and args['id_device_type'] is not None:
             return gettext('Too Many IDs'), 400
 
-        if args['id_device_subtype']:
+        elif args['id_device_subtype']:
             if args['id_device_subtype'] in user_access.get_accessible_devices_subtypes_ids():
                 device_subtypes = TeraDeviceSubType.query.filter(TeraDeviceSubType.id_device_type.
                                                                  in_(user_access.get_accessible_devices_types_ids())).\
@@ -110,18 +110,15 @@ class UserQueryDeviceSubTypes(Resource):
         if 'id_device_subtype' not in json_device_subtype:
             return gettext('Missing id_device_subtype'), 400
 
-        if json_device_subtype['id_device_subtype'] == 0:
-            if not current_user.user_superadmin:
-                return gettext('Forbidden'), 403
-
-        # Check if current user can modify the posted device
-        if json_device_subtype['id_device_type'] not in user_access.get_accessible_devices_types_ids(admin_only=True):
+        if not current_user.user_superadmin:
             return gettext('Forbidden'), 403
 
         # Do the update!
         if json_device_subtype['id_device_subtype'] > 0:
             # Already existing
             try:
+                json_device_subtype['id_device_type'] = TeraDeviceSubType.\
+                    get_device_subtype(json_device_subtype['id_device_subtype']).id_device_type
                 TeraDeviceSubType.update(json_device_subtype['id_device_subtype'], json_device_subtype)
             except exc.SQLAlchemyError:
                 import sys

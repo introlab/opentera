@@ -68,7 +68,6 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)
         self._checkJson(json_data=json_data)
 
     def test_query_post_as_admin(self):
@@ -95,16 +94,16 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         new_id.append(response.json()[0]['id_device_subtype'])
         self._checkJson(json_data=response.json())
 
-        # Create id_device_type wrong - 403 expected
+        # Create id_device_type wrong - 500 expected
         params = {'device_subtype': {'device_subtype_name': 'New_Device_Subtype', 'id_device_subtype': 0,
                                      'id_device_type': 10}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 500)
 
-        # update name without id_device_type, refused
+        # update name without id_device_type, accepted
         params = {'device_subtype': {'device_subtype_name': 'New_Device_Subtype_2', 'id_device_subtype': new_id[0]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
 
         # update the name - Pass expected
         params = {'device_subtype': {'id_device_subtype': new_id[0], 'id_device_type': 2,
