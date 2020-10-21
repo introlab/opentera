@@ -13,6 +13,7 @@ from flask_babel import gettext
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_session_type', type=int, help='ID of the session type to query')
+get_parser.add_argument('id_project', type=int, help='ID of the project to get session type for')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 # post_parser = reqparse.RequestParser()
@@ -51,6 +52,9 @@ class UserQuerySessionTypes(Resource):
 
         if args['id_session_type']:
             session_types = [user_access.query_session_type_by_id(args['id_session_type'])]
+        elif args['id_project']:
+            session_types_projects = user_access.query_session_types_for_project(args['id_project'])
+            session_types = [stp.session_type_project_session_type for stp in session_types_projects]
         else:
             session_types = user_access.get_accessible_session_types()
 
