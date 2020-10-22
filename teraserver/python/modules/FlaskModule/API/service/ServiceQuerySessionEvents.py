@@ -42,7 +42,7 @@ class ServiceQuerySessionEvents(Resource):
 
         # Can't query sessions event, unless we have a parameter - id_session
         if not any(args.values()):
-            return gettext('No arguments'), 400
+            return gettext('Missing arguments'), 400
         elif args['id_session']:
             sessions_events = TeraSessionEvent.get_events_for_session(args['id_session'])
 
@@ -54,8 +54,11 @@ class ServiceQuerySessionEvents(Resource):
 
             return events_list
 
-        except InvalidRequestError:
-            return gettext('Database error'), 500
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         ServiceQuerySessionEvents.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
+            return gettext('Invalid request'), 500
 
     @LoginModule.service_token_or_certificate_required
     @api.expect(post_schema)
@@ -86,9 +89,12 @@ class ServiceQuerySessionEvents(Resource):
             # Already existing
             try:
                 TeraSessionEvent.update(json_event['id_session_event'], json_event)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             ServiceQuerySessionEvents.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             # New
@@ -98,9 +104,12 @@ class ServiceQuerySessionEvents(Resource):
                 TeraSessionEvent.insert(new_event)
                 # Update ID for further use
                 json_event['id_session_event'] = new_event.id_session_event
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             ServiceQuerySessionEvents.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
         update_event = TeraSessionEvent.get_session_event_by_id(json_event['id_session_event'])

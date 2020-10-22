@@ -42,7 +42,7 @@ class ServiceQueryAssets(Resource):
 
         # If we have no arguments, don't do anything!
         if not any(args.values()):
-            return '', 500
+            return gettext('Missing arguments'), 400
         elif args['id_device']:
             if args['id_device'] not in service_access.get_accessible_devices_ids():
                 return gettext('Device access denied'), 403
@@ -123,10 +123,13 @@ class ServiceQueryAssets(Resource):
                 TeraAsset.insert(new_asset)
                 # Update ID for further use
                 asset_info['id_asset'] = new_asset.id_asset
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                self.module.logger.log_error(self.module.module_name,
+                                             ServiceQueryAssets.__name__,
+                                             'post', 500, 'Database error', str(e))
+                return gettext('Database error'), 500
         else:
             # Update asset
             try:
@@ -134,10 +137,13 @@ class ServiceQueryAssets(Resource):
                     # Prevent identity theft!
                     asset_info['asset_service_uuid'] = current_service.service_uuid
                 TeraAsset.update(asset_info['id_asset'], asset_info)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                self.module.logger.log_error(self.module.module_name,
+                                             ServiceQueryAssets.__name__,
+                                             'post', 500, 'Database error', str(e))
+                return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to assets updates
         update_asset = TeraAsset.get_asset_by_id(asset_info['id_asset'])
@@ -160,7 +166,7 @@ class ServiceQueryAssets(Resource):
         asset = TeraAsset.get_asset_by_id(id_todel)
 
         if not asset:
-            return '', 500
+            return gettext('Missing arguments'), 400
 
         if asset.id_session not in service_access.get_accessible_sessions_ids(True):
             return gettext('Service can\'t delete assets for that session'), 403
@@ -168,9 +174,12 @@ class ServiceQueryAssets(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraAsset.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         ServiceQueryAssets.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

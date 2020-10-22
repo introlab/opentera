@@ -66,7 +66,7 @@ class ServiceQueryParticipants(Resource):
             if participant:
                 return participant.to_json()
 
-        return gettext('Missing parameter'), 500
+        return gettext('Missing arguments'), 400
 
     @LoginModule.service_token_or_certificate_required
     # @api.expect(post_parser)
@@ -82,7 +82,7 @@ class ServiceQueryParticipants(Resource):
 
         # Using request.json instead of parser, since parser messes up the json!
         if 'participant' not in request.json:
-            return '', 400
+            return gettext('Missing arguments'), 400
 
         participant_info = request.json['participant']
 
