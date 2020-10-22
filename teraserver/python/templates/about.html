@@ -13,15 +13,54 @@
 
 <body>
 
-<div class="container-fluid">
-    <h1>Versions</h1>
+<div class="jumbotron ml-2 mr-2 mb-0 mt-0 text-center">
+    <a href="https://www.telereadaptation.com" target="_blank"><img src="./static/img/logos/Estrad.png" class="img-fluid img-logo" /></a>
+    <a href="https://introlab.3it.usherbrooke.ca" target="_blank"><img src="./static/img/logos/IntRoLab.png" class="img-fluid img-logo" /></a>
+    <a href="https://regroupementinter.com" target="_blank"><img src="./static/img/logos/INTER.png" class="img-fluid img-logo" /></a>
+    <a href="https://agewell-nce.ca" target="_blank"><img src="./static/img/logos/AgeWell.png" class="img-fluid img-logo" /></a>
+    <a href="https://www.usherbrooke.ca/3it" target="_blank"><img src="./static/img/logos/3IT.png" class="img-fluid img-logo" /></a>
+    <a href="https://www.cdrv.ca" target="_blank"><img src="./static/img/logos/logo_CDRV.png" class="img-fluid img-logo" /></a>
+</div>
+
+<div class="jumbotron ml-2 mr-2 mb-0">
+    <h1>{% trans %}Versions{% endtrans%}</h1>
     <a href="https://github.com/introlab/opentera"> Project OpenTera on GitHub</a><br>
     Server URL : https://{{hostname}}:{{port}} <br>
     Version: {{server_version}} <br>
 </div>
 
-<div class="container-fluid">
-    <h1>License</h1>
+<div class="jumbotron ml-2 mr-2 mb-0 mt-0">
+    <h1>{% trans %}Downloads{% endtrans%}</h1>
+    <div class="row">
+        <div class="card col-4 text-center align-center mt-2" style="width: 18rem;">
+            <img src="./static/img/logos/Windows-icon.png" class="card-img-top" alt="Windows logo">
+            <div class="card-body">
+                <h5 class="card-title">Windows</h5>
+                <p class="card-text">{% trans %}Latest version: {% endtrans%}{{openteraplus_version.client_version}}</p>
+                <a href="{{openteraplus_version.client_windows_download_url}}" class="btn btn-primary">Download</a>
+            </div>
+        </div>
+        <div class="card col-4 text-center mt-2" style="width: 18rem;">
+            <img src="./static/img/logos/Mac-icon.png" class="card-img-top" alt="Mac logo">
+            <div class="card-body">
+                <h5 class="card-title">Mac</h5>
+                <p class="card-text">{% trans %}Latest version: {% endtrans%}{{openteraplus_version.client_version}}</p>
+                <a href="{{openteraplus_version.client_mac_download_url}}" class="btn btn-primary align-center">Download</a>
+            </div>
+        </div>
+        <div class="card col-4 text-center mt-2" style="width: 18rem;">
+            <img src="./static/img/logos/Linux-icon.png" class="card-img-top" alt="Linux logo">
+            <div class="card-body">
+                <h5 class="card-title">Linux</h5>
+                <p class="card-text">{% trans %}Latest version: {% endtrans%}{{openteraplus_version.client_version}}</p>
+                <a href="{{openteraplus_version.client_linux_download_url}}" class="btn btn-primary">Download</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="jumbotron ml-2 mr-2 mb-0 mt-0">
+    <h1>{% trans %}License{% endtrans%}</h1>
     <p class="lead">
         OpenTera is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0.</a>
         Unless required by applicable law or agreed to in writing, software
@@ -32,53 +71,27 @@
     </p>
 </div>
 
-<div class="container-fluid">
-    <h1>Downloads</h1>
-    <div class="row">
-        <div class="card" style="width: 18rem;">
-            <img src="./static/img/logos/IntRoLab.png" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Windows</h5>
-                <p class="card-text">Latest version {{openteraplus_version.client_version}}.</p>
-                <a href="{{openteraplus_version.client_windows_download_url}}" class="btn btn-primary">Download</a>
-            </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-            <img src="./static/img/logos/IntRoLab.png" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Mac</h5>
-                <p class="card-text">Latest version {{openteraplus_version.client_version}}</p>
-                <a href="{{openteraplus_version.client_mac_download_url}}" class="btn btn-primary">Download</a>
-            </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-            <img src="./static/img/logos/IntRoLab.png" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Linux</h5>
-                <p class="card-text">Latest version {{openteraplus_version.client_version}}</p>
-                <a href="{{openteraplus_version.client_linux_download_url}}" class="btn btn-primary">Download</a>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="container-fluid">
-    <h1>Authors</h1>
+
+<div class="jumbotron ml-2 mr-2 mb-0 mt-0">
+    <h1>{% trans %}Authors{% endtrans%}</h1>
     <ul class="list-group">
-        <li class="list-group-item">Simon Brière, ing., M.Sc.A. (simon.briere@usherbrooke.ca)</li>
-        <li class="list-group-item">Dominic Létourneau, ing., M.Sc.A (dominic.letourneau@usherbrooke.ca)</li>
+        <li class="list-group-item">Simon Brière, ing., M.Sc.A. (Simon.Briere@USherbrooke.ca)</li>
+        <li class="list-group-item">Dominic Létourneau, ing., M.Sc.A (Dominic.Letourneau@USherbrooke.ca)</li>
+        <li class="list-group-item">François Michaud, ing., Ph.D (Francois.Michaud@USherbrooke.ca)</li>
+        <li class="list-group-item">Michel Tousignant, Pht, Ph.D (Michel.Tousignant@USherbrooke.ca)</li>
     </ul>
 </div>
 
-<div class="container-fluid">
-    <h1>Contributors</h1>
+<div class="jumbotron ml-2 mr-2 mb-0 mt-0">
+    <h1>{% trans %}Contributors{% endtrans%}</h1>
     <ul class="list-group">
-        <li class="list-group-item">Marc-Antoine Maheux</li>
-        <li class="list-group-item">Cédric Godin</li>
         <li class="list-group-item">Philippe Arsenault</li>
+        <li class="list-group-item">Cédric Godin</li>
+        <li class="list-group-item">Marc-Antoine Maheux</li>
+        <li class="list-group-item">Cynthia Vilanova</li>
     </ul>
 </div>
 
-{% include "footer.html" %}
 </body>
 </html>

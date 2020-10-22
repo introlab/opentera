@@ -1,5 +1,18 @@
 .img-logo{
-    max-width: 160px;
+    max-width: 250px;
     max-height: 20%;
     padding-right: 30px;
 }
+
+.img-logo-download{
+    max-width: 200px;
+    max-height: 200px;
+    padding-right: 10px;
+    padding-left: 10px;
+    text-align: center;
+}
+
+ .jumbotron{
+     padding:10px 10px 10px 10px;
+     margin-bottom:10px;
+ }

@@ -286,32 +286,15 @@ class FlaskModule(BaseModule):
         api.add_namespace(service_api_ns)
 
     def init_views(self):
-        from .Views.User import User
-        from .Views.Upload import Upload
-        from .Views.Participant import Participant
-        from .Views.DeviceRegistration import DeviceRegistration
-        from .Views.Versions import Versions
+
         from .Views.About import About
 
         # Default arguments
         args = []
         kwargs = {'flaskModule': self}
 
-        # User test view
-        flask_app.add_url_rule('/user', view_func=User.as_view('user', *args, **kwargs))
-
-        # Participant test view
-        flask_app.add_url_rule('/participant', view_func=Participant.as_view('participant', *args, **kwargs))
-
-        # Versions
-        flask_app.add_url_rule('/versions', view_func=Versions.as_view('versions', *args, **kwargs))
-
         # About
         flask_app.add_url_rule('/about', view_func=About.as_view('about', *args, **kwargs))
-
-        # flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
-        # flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
-        #                                                                                    **kwargs))
 
 
 @flask_app.after_request
