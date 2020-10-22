@@ -50,8 +50,9 @@ class UserQueryDeviceSubTypes(Resource):
 
         device_subtypes = []
         # If we have no arguments, return all accessible devices
-        if args['id_device_subtype'] is None and args['id_device_type'] is None and args['list'] is None:
-            return gettext('Missing parameters'), 400
+        # If we have no arguments, return error
+        if not any(args.values()):
+            return gettext('Missing arguments'), 400
 
         if args['id_device_subtype']:
             device_subtypes = TeraDeviceSubType.query.filter(TeraDeviceSubType.id_device_type.

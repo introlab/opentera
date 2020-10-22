@@ -53,7 +53,7 @@ class UserQueryDeviceTypes(Resource):
         args = parser.parse_args()
         device_type = []
 
-        # If we have no arguments, return all accessible devices
+        # If we have no arguments, return all accessible device types
         if args['id_device_type'] is None and args['device_type_key'] is None:
             device_type = user_access.get_accessible_devices_types()
 

@@ -64,6 +64,9 @@ class UserQueryForms(Resource):
 
         # if args['type'] == 'user_profile':
         #     return jsonify(TeraUserForm.get_user_profile_form())
+        # If we have no arguments, return error
+        if not any(args.values()):
+            return gettext('Missing arguments'), 400
 
         if args['type'] == 'user':
             return jsonify(TeraUserForm.get_user_form(user_access=user_access))

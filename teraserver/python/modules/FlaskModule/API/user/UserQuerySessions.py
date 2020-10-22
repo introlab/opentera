@@ -51,7 +51,7 @@ class UserQuerySessions(Resource):
         sessions = []
         # Can't query sessions, unless we have a parameter!
         if not any(args.values()):
-            return '', 400
+            return gettext('Missing arguments'), 400
 
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():

@@ -78,7 +78,7 @@ class UserQuerySiteAccess(Resource):
         access = None
         # If we have no arguments, return bad request
         if not any(args.values()):
-            return gettext("SiteAccess: missing argument."), 400
+            return gettext('Missing arguments'), 400
 
         # Query access for user id
         if args['id_user']:

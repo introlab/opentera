@@ -47,7 +47,7 @@ class UserQuerySessionEvents(Resource):
         sessions_events = []
         # Can't query sessions event, unless we have a parameter - id_session
         if not any(args.values()):
-            return gettext('No arguments'), 400
+            return gettext('Missing arguments'), 400
         elif args['id_session']:
             sessions_events = user_access.query_session_events(args['id_session'])
 

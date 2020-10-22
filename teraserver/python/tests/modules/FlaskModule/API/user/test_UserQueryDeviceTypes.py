@@ -46,24 +46,24 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 0)
 
-        # test an random device from the default values (1 through 4)
-        i = random.randint(1, 4)
+        # Loop through device types
+        for i in range(1, 4):
 
-        params = {'id_device_type': i, 'list': False}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self._checkJson(json_data=json_data[0])
+            params = {'id_device_type': i, 'list': False}
+            response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.headers['Content-Type'], 'application/json')
+            json_data = response.json()
+            self.assertEqual(len(json_data), 1)
+            self._checkJson(json_data=json_data[0])
 
-        params = {'id_device_type': i, 'list': True}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self._checkJson(json_data=json_data[0])
+            params = {'id_device_type': i, 'list': True}
+            response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.headers['Content-Type'], 'application/json')
+            json_data = response.json()
+            self.assertEqual(len(json_data), 1)
+            self._checkJson(json_data=json_data[0])
 
         params = {'id_device_type': 5, 'list': False}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
