@@ -22,7 +22,7 @@ class TeraParticipantGroupForm:
         # Items
         section.add_item(TeraFormItem("id_participant_group", gettext("Participant Group ID"), "hidden", True))
         section.add_item(TeraFormItem("participant_group_name", gettext("Participant Group Name"), "text", True))
-        section.add_item(TeraFormItem("id_project", gettext("Project ID"), "array", True, item_values=project_list))
+        section.add_item(TeraFormItem("id_project", gettext("Project"), "array", True, item_values=project_list))
         section.add_item(TeraFormItem("project_name", gettext("Project Name"), "hidden"))
 
         return form.to_dict()
