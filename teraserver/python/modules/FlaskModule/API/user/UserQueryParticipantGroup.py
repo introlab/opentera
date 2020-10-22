@@ -74,7 +74,10 @@ class UserQueryParticipantGroup(Resource):
                     group_list.append(group_json)
             return jsonify(group_list)
 
-        except InvalidRequestError:
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryParticipantGroup.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
             return '', 500
 
     @user_multi_auth.login_required
@@ -110,9 +113,12 @@ class UserQueryParticipantGroup(Resource):
             # Already existing
             try:
                 TeraParticipantGroup.update(json_group['id_participant_group'], json_group)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryParticipantGroup.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             # New
@@ -122,9 +128,12 @@ class UserQueryParticipantGroup(Resource):
                 TeraParticipantGroup.insert(new_group)
                 # Update ID for further use
                 json_group['id_participant_group'] = new_group.id_participant_group
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryParticipantGroup.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to sites update...
@@ -159,11 +168,18 @@ class UserQueryParticipantGroup(Resource):
         except exc.IntegrityError as e:
             # Causes that could make an integrity error when deleting a participant:
             # - Participants with associated sessions
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryParticipantGroup.__name__,
+                                         'delete', 500, 'Database error', str(e))
+
             return gettext('Can\'t delete participant group: please delete all sessions from all '
                            'participants before deleting.'), 500
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryParticipantGroup.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

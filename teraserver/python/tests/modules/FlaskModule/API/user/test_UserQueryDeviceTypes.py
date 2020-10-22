@@ -46,24 +46,24 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 0)
 
-        # test an random device from the default values (1 through 4)
-        i = random.randint(1, 4)
+        # Loop through device types
+        for i in range(1, 4):
 
-        params = {'id_device_type': i, 'list': False}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self._checkJson(json_data=json_data[0])
+            params = {'id_device_type': i, 'list': False}
+            response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.headers['Content-Type'], 'application/json')
+            json_data = response.json()
+            self.assertEqual(len(json_data), 1)
+            self._checkJson(json_data=json_data[0])
 
-        params = {'id_device_type': i, 'list': True}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self._checkJson(json_data=json_data[0])
+            params = {'id_device_type': i, 'list': True}
+            response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.headers['Content-Type'], 'application/json')
+            json_data = response.json()
+            self.assertEqual(len(json_data), 1)
+            self._checkJson(json_data=json_data[0])
 
         params = {'id_device_type': 5, 'list': False}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
@@ -173,7 +173,7 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         # Delete without params
         params = {}
         response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
 
         # Deleting the new device type
         params = {'device_type_key': 'new_device'}
@@ -183,7 +183,7 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         # Try deleting 2 devices at once
         params = {'id': new_id[1], 'device_type_key': 'new_device_2'}
         response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 501)
+        self.assertEqual(response.status_code, 400)
 
         # Deleting the new device 1 type
         params = new_id[1]

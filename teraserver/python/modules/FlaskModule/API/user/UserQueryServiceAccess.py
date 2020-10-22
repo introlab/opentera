@@ -73,8 +73,11 @@ class UserQueryServiceAccess(Resource):
                 sa_list.append(json_sa)
             return sa_list
 
-        except InvalidRequestError:
-            return '', 500
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryServiceAccess.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
+            return gettext('Invalid request'), 500
 
     @user_multi_auth.login_required
     @api.expect(post_schema)
@@ -139,18 +142,24 @@ class UserQueryServiceAccess(Resource):
                     # We must remove the specified access
                     try:
                         TeraServiceAccess.delete(id_todel=json_sa['id_service_access'])
-                    except exc.SQLAlchemyError:
+                    except exc.SQLAlchemyError as e:
                         import sys
                         print(sys.exc_info())
+                        self.module.logger.log_error(self.module.module_name,
+                                                     UserQueryServiceAccess.__name__,
+                                                     'post', 500, 'Database error', str(e))
                         return gettext('Database error'), 500
                     continue
 
                 # Updating
                 try:
                     TeraServiceAccess.update(json_sa['id_service_access'], json_sa)
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryServiceAccess.__name__,
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
             else:
                 # New
@@ -167,9 +176,12 @@ class UserQueryServiceAccess(Resource):
                     TeraServiceAccess.insert(new_sa)
                     # Update ID for further use
                     json_sa['id_service_access'] = new_sa.id_service_access
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryServiceAccess.__name__,
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
 
         return json_sa_list
@@ -211,9 +223,12 @@ class UserQueryServiceAccess(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraServiceAccess.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryServiceAccess.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

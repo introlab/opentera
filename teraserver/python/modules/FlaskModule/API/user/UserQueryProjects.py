@@ -101,8 +101,11 @@ class UserQueryProjects(Resource):
                     projects_list.append(project_json)
 
             return jsonify(projects_list)
-        except InvalidRequestError:
-            return '', 500
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryProjects.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
+            return gettext('Invalid request'), 500
 
     @user_multi_auth.login_required
     @api.expect(post_schema)
@@ -141,9 +144,12 @@ class UserQueryProjects(Resource):
             # Already existing
             try:
                 TeraProject.update(json_project['id_project'], json_project)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryProjects.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             # New
@@ -153,9 +159,12 @@ class UserQueryProjects(Resource):
                 TeraProject.insert(new_project)
                 # Update ID for further use
                 json_project['id_project'] = new_project.id_project
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryProjects.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to sites update...
@@ -191,10 +200,16 @@ class UserQueryProjects(Resource):
             # Causes that could make an integrity error when deleting:
             # - Associated participant groups with participants with sessions
             # - Associated participants with sessions
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryProjects.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Can\'t delete project: please delete all participants with sessions before deleting.'), 500
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryProjects.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

@@ -51,7 +51,7 @@ class UserQuerySessions(Resource):
         sessions = []
         # Can't query sessions, unless we have a parameter!
         if not any(args.values()):
-            return '', 400
+            return gettext('Missing arguments'), 400
 
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
@@ -80,8 +80,11 @@ class UserQuerySessions(Resource):
 
             return jsonify(sessions_list)
 
-        except InvalidRequestError:
-            return '', 500
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessions.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
+            return gettext('Invalid request'), 500
 
     @user_multi_auth.login_required
     @api.doc(description='Create / update session. id_session must be set to "0" to create a new '
@@ -149,9 +152,12 @@ class UserQuerySessions(Resource):
             # Already existing
             try:
                 TeraSession.update(json_session['id_session'], json_session)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQuerySessions.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             # New
@@ -161,9 +167,12 @@ class UserQuerySessions(Resource):
                 TeraSession.insert(new_ses)
                 # Update ID for further use
                 json_session['id_session'] = new_ses.id_session
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQuerySessions.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
         update_session = TeraSession.get_session_by_id(json_session['id_session'])
@@ -230,9 +239,12 @@ class UserQuerySessions(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraSession.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessions.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

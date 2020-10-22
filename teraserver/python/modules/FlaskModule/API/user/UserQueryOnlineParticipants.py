@@ -33,7 +33,7 @@ class UserQueryOnlineParticipants(Resource):
             # rpc = RedisRPCClient(self.flaskModule.config.redis_config)
             # online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
             #
-            # # Filter participants that are available to the querier
+            # # Filter participants that are available to the query
             # participant_uuids = list(set(online_participants).intersection(user_access.
             #                                                                get_accessible_participants_uuids()))
             #
@@ -43,10 +43,10 @@ class UserQueryOnlineParticipants(Resource):
             rpc = RedisRPCClient(self.flaskModule.config.redis_config)
             online_parts = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
 
-            # Filter participants that are available to the querier
+            # Filter participants that are available to the query
             online_part_uuids = list(set(online_parts).intersection(accessible_participants))
 
-            # Query user informations
+            # Query user information
             participants = TeraParticipant.query.filter(TeraParticipant.participant_uuid.in_(online_part_uuids)).all()
             parts_json = [part.to_json(minimal=True) for part in participants]
             for part in parts_json:
@@ -56,10 +56,10 @@ class UserQueryOnlineParticipants(Resource):
             if args['with_busy']:
                 busy_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_participants')
 
-                # Filter participants that are available to the querier
+                # Filter participants that are available to the query
                 busy_part_uuids = list(set(busy_participants).intersection(accessible_participants))
 
-                # Query user informations
+                # Query user information
                 busy_parts = TeraParticipant.query.filter(TeraParticipant.participant_uuid.in_(busy_part_uuids)).all()
                 busy_parts_json = [part.to_json(minimal=True) for part in busy_parts]
                 for part in busy_parts_json:
@@ -68,7 +68,10 @@ class UserQueryOnlineParticipants(Resource):
 
             return parts_json
 
-        except InvalidRequestError:
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryOnlineParticipants.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
             return gettext('Internal server error when making RPC call.'), 500
 
     # def post(self):

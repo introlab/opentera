@@ -61,8 +61,11 @@ class UserQueryUserPreferences(Resource):
                     user_prefs_list.append(pref_json)
             return user_prefs_list
 
-        except InvalidRequestError:
-            return gettext('Database error'), 500
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryUserPreferences.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
+            return gettext('Invalid request'), 500
 
     @user_multi_auth.login_required
     @api.expect(post_schema)
@@ -101,12 +104,15 @@ class UserQueryUserPreferences(Resource):
                                                                           json_user_pref['user_preference_app_tag'],
                                                                           prefs=
                                                                           json_user_pref['user_preference_preference'])
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryUserPreferences.__name__,
+                                         'post', 500, 'Database error', str(e))
             return gettext('Database error'), 500
-        except ValueError as err:
-            return str(err), 400
+        except ValueError as e:
+            return str(e), 400
 
         updated_pref = TeraUserPreference.get_user_preferences_for_user_and_app(user_id=json_user_pref['id_user'],
                                                                                 app_tag=

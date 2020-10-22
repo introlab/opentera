@@ -92,8 +92,11 @@ class UserQuerySites(Resource):
                         site_json['id_device'] = args['id_device']
                     sites_list.append(site_json)
             return jsonify(sites_list)
-        except InvalidRequestError:
-            return '', 500
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySites.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
+            return gettext('Invalid request'), 500
 
     @user_multi_auth.login_required
     @api.expect(post_schema)
@@ -127,9 +130,12 @@ class UserQuerySites(Resource):
             # Already existing
             try:
                 TeraSite.update(json_site['id_site'], json_site)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQuerySites.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             # New
@@ -139,9 +145,12 @@ class UserQuerySites(Resource):
                 TeraSite.insert(new_site)
                 # Update ID for further use
                 json_site['id_site'] = new_site.id_site
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQuerySites.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to sites update...
@@ -175,10 +184,16 @@ class UserQuerySites(Resource):
             # Causes that could make an integrity error when deleting:
             # - Associated projects with particiapnts with sessions
             # - Associated projects with participant groups with participants with sessions
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySites.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Can\'t delete site: please delete all participants with sessions before deleting.'), 500
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySites.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

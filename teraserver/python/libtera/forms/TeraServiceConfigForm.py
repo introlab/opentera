@@ -49,6 +49,7 @@ class TeraServiceConfigForm:
 
             # Items
             section1.add_item(TeraFormItem("camera", gettext("Camera"), "videoinputs", False))
+            section1.add_item(TeraFormItem("mirror", gettext("Mirrored image"), "boolean", False, item_default=True))
             item = TeraFormItem("teracam_type", gettext("Camera Type"), "array", True,
                                 [TeraFormValue("0", gettext("Network Camera")),
                                  TeraFormValue("1", gettext("Screen Capture"))],

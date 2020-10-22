@@ -131,10 +131,13 @@ class UserQueryUserUserGroups(Resource):
                     TeraUserUserGroup.insert(new_uug)
                     # Update ID User Group for further use
                     json_user_group['id_user_user_group'] = new_uug.id_user_user_group
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryUserUserGroups.__name__,
+                                                 'post', 500, 'Database error', str(e))
+                    return gettext('Database error'), 500
 
         return json_user_groups
 
@@ -156,7 +159,7 @@ class UserQueryUserUserGroups(Resource):
         # Check if current user can delete
         uug = TeraUserUserGroup.get_user_user_group_by_id(id_todel)
         if not uug:
-            return gettext('Can\'t delete specified relationship'), 500
+            return gettext('Can\'t delete specified relationship'), 400
 
         if uug.id_user not in user_access.get_accessible_users_ids(admin_only=True):
             return gettext('No access to relationship\'s user'), 403
@@ -166,9 +169,12 @@ class UserQueryUserUserGroups(Resource):
         # If we are here, we are allowed to delete that relationship. Do so.
         try:
             TeraUserUserGroup.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryUserUserGroups.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

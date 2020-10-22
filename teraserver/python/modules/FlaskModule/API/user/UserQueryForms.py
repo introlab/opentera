@@ -41,6 +41,7 @@ get_parser.add_argument(name='type', type=str, help='Data type of the required f
                                                     'versions\n'
                         )
 get_parser.add_argument(name='id', type=int, help='Specific id of subitem to query. Used with service_config.')
+get_parser.add_argument(name='key', type=str, help='Specific key of subitem to query. Used with service_config.')
 
 
 class UserQueryForms(Resource):
@@ -63,6 +64,9 @@ class UserQueryForms(Resource):
 
         # if args['type'] == 'user_profile':
         #     return jsonify(TeraUserForm.get_user_profile_form())
+        # If we have no arguments, return error
+        if not any(args.values()):
+            return gettext('Missing arguments'), 400
 
         if args['type'] == 'user':
             return jsonify(TeraUserForm.get_user_form(user_access=user_access))
@@ -101,14 +105,20 @@ class UserQueryForms(Resource):
             return TeraServiceForm.get_service_form(user_access=user_access)
 
         if args['type'] == 'service_config':
-            if not args['id']:
+            if not args['id'] and not args['key']:
                 return TeraServiceConfigForm.get_service_config_form()
 
-            from libtera.db.models.TeraService import TeraService
-            service = TeraService.get_service_by_id(args['id'])
+            service = None
+            if args['id']:
+                from libtera.db.models.TeraService import TeraService
+                service = TeraService.get_service_by_id(args['id'])
+
+            if args['key']:
+                from libtera.db.models.TeraService import TeraService
+                service = TeraService.get_service_by_key(args['key'])
 
             if not service:
-                return gettext('Invalid service id'), 400
+                return gettext('Invalid service specified'), 400
 
             return TeraServiceConfigForm.get_service_config_config_form(user_access=user_access,
                                                                         service_key=service.service_key)
@@ -116,4 +126,7 @@ class UserQueryForms(Resource):
         if args['type'] == 'versions':
             return TeraVersionsForm.get_versions_form(user_access=user_access)
 
+        self.module.logger.log_error(self.module.module_name,
+                                     UserQueryForms.__name__,
+                                     'get', 500, 'Unknown form type: ' + args['type'])
         return gettext('Unknown form type: ') + args['type'], 500
