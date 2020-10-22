@@ -170,8 +170,7 @@ class UserQueryDeviceSubTypes(Resource):
         if not todel:
             return gettext('Device subtype not found'), 400
         
-        if todel.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
-
+        if not user_access.user.user_superadmin:
             return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.

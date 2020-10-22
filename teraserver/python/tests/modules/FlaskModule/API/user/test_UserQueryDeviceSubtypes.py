@@ -27,8 +27,7 @@ class UserQueryDeviceTypesTest(BaseAPITest):
 
     def test_query_no_params_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin')
-        self.assertEqual(response.status_code, 200)
-        self._checkJson(json_data=response.json())
+        self.assertEqual(response.status_code, 400)
 
     def _checkJson(self, json_data, minimal=False):
         for js in json_data:
@@ -140,7 +139,7 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         # Delete without param
         params = {}
         response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=new_id+1)
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
 
         # Deleting the new device type
         response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=new_id)
