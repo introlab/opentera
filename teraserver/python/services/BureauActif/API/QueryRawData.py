@@ -107,7 +107,6 @@ class QueryRawData(Resource):
                 print('Error sending asset to OpenTera: : Code=' + str(post_result.status_code) + ', Message=' +
                       post_result.content.decode())
 
-            # TODO: Process data
             # Data is in raw_data and stored in the "t_data" table.
             # Format is a dict with:
             # data -> A list of list which each item is a row in the raw data file:
