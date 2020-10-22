@@ -75,8 +75,11 @@ class UserQueryDeviceSites(Resource):
 
             return jsonify(device_site_list)
 
-        except InvalidRequestError:
-            return '', 500
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryDeviceSites.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
+            return gettext('Invalid request'), 500
 
     @user_multi_auth.login_required
     @api.expect(post_schema)
@@ -123,19 +126,25 @@ class UserQueryDeviceSites(Resource):
                     # Already existing
                     try:
                         TeraDeviceProject.update(json_device_site['id_device_project'], json_device_site)
-                    except exc.SQLAlchemyError:
+                    except exc.SQLAlchemyError as e:
                         import sys
                         print(sys.exc_info())
-                        return '', 500
+                        self.module.logger.log_error(self.module.module_name,
+                                                     UserQueryDeviceSites.__name__,
+                                                     'post', 500, 'Database error', str(e))
+                        return gettext('Database error'), 500
                 else:
                     try:
                         new_device_proj = TeraDeviceProject()
                         json_device_site['id_project'] = project.id_project
                         new_device_proj.from_json(json_device_site)
                         TeraDeviceProject.insert(new_device_proj)
-                    except exc.SQLAlchemyError:
+                    except exc.SQLAlchemyError as e:
                         import sys
                         print(sys.exc_info())
+                        self.module.logger.log_error(self.module.module_name,
+                                                     UserQueryDeviceSites.__name__,
+                                                     'post', 500, 'Database error', str(e))
                         return gettext('Database error'), 500
                 del json_device_site['id_device_project']
 

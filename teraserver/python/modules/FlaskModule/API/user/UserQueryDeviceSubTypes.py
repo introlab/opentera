@@ -50,9 +50,9 @@ class UserQueryDeviceSubTypes(Resource):
         has_list = args.pop('list')
 
         device_subtypes = []
-        # If we have no arguments, return all accessible devices
-        if args['id_device_type'] is None and args['id_device_subtype'] is None:
-            device_subtypes = user_access.get_accessible_devices_subtypes()
+        # If we have no arguments, return error
+        if not any(args.values()):
+            return gettext('Missing arguments'), 400
 
         #if we have 2 IDs, return error
         elif args['id_device_subtype'] is not None and args['id_device_type'] is not None:
@@ -87,7 +87,10 @@ class UserQueryDeviceSubTypes(Resource):
                         device_subtypes_list.append(dst_json)
             return device_subtypes_list
 
-        except InvalidRequestError:
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryDeviceSubTypes.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
             return '', 500
 
     @user_multi_auth.login_required
@@ -120,9 +123,12 @@ class UserQueryDeviceSubTypes(Resource):
                 json_device_subtype['id_device_type'] = TeraDeviceSubType.\
                     get_device_subtype(json_device_subtype['id_device_subtype']).id_device_type
                 TeraDeviceSubType.update(json_device_subtype['id_device_subtype'], json_device_subtype)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryDeviceSubTypes.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             # New
@@ -132,9 +138,12 @@ class UserQueryDeviceSubTypes(Resource):
                 TeraDeviceSubType.insert(new_device_subtype)
                 # Update ID for further use
                 json_device_subtype['id_device_subtype'] = new_device_subtype.id_device_subtype
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryDeviceSubTypes.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to devices update...
@@ -159,20 +168,21 @@ class UserQueryDeviceSubTypes(Resource):
         # Check if current user can delete
         todel = TeraDeviceSubType.get_device_subtype(id_todel)
         if not todel:
-            return gettext('Device subtype not found'), 500
+            return gettext('Device subtype not found'), 400
+        
+        if todel.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
 
-        # if todel.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
-        #     return gettext('Forbidden'), 403
-
-        if not user_access.user.user_superadmin:
             return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraDeviceSubType.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryDeviceSubTypes.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return gettext('Device subtype successfully deleted'), 200

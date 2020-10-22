@@ -168,7 +168,7 @@ class UserQueryUserGroups(Resource):
             from libtera.db.models.TeraProject import TeraProject
             for proj_id in project_ids:
                 proj = TeraProject.get_project_by_id(proj_id)
-                if user_access.get_site_role(proj.id_site) != 'admin':
+                if proj and user_access.get_site_role(proj.id_site) != 'admin':
                     return gettext('No site admin access for at a least one project in the list'), 403
 
         # Do the update!
@@ -176,9 +176,12 @@ class UserQueryUserGroups(Resource):
             # Already existing user group
             try:
                 TeraUserGroup.update(json_user_group['id_user_group'], json_user_group)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryUserGroups.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             # Creates a new user group
@@ -188,9 +191,12 @@ class UserQueryUserGroups(Resource):
                 TeraUserGroup.insert(new_user_group)
                 # Update ID User Group for further use
                 json_user_group['id_user_group'] = new_user_group.id_user_group
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryUserGroups.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
         update_user_group = TeraUserGroup.get_user_group_by_id(json_user_group['id_user_group'])
@@ -213,9 +219,12 @@ class UserQueryUserGroups(Resource):
                     TeraServiceAccess.update_service_access_for_user_group_for_site(
                         id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
                         id_service_role=site_service_role.id_service_role, id_site=int(site['id_site']))
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryUserGroups.__name__,
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
 
         if json_projects:
@@ -237,9 +246,12 @@ class UserQueryUserGroups(Resource):
                         id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
                         id_service_role=project_service_role.id_service_role, id_project=int(project['id_project']))
 
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryUserGroups.__name__,
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
             # Returns full list in reply
             json_user_group['user_group_projects_access'] = UserQueryUserGroups.get_projects_roles_json(
@@ -280,11 +292,17 @@ class UserQueryUserGroups(Resource):
         except exc.IntegrityError as e:
             # Causes that could make an integrity error when deleting:
             # - Associated users with that user group
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryUserGroups.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Can\'t delete user group: please delete all users part of that user group before deleting.'
                            ), 500
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryUserGroups.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

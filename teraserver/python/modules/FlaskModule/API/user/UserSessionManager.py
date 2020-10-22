@@ -175,7 +175,7 @@ class UserSessionManager(Resource):
         if 'id_service' in json_session_manager:
             service = TeraService.get_service_by_id(json_session_manager['id_service'])
             if not service:
-                return gettext('Service not found'), 500
+                return gettext('Service not found'), 400
             rpc = RedisRPCClient(self.module.config.redis_config)
             answer = rpc.call_service(service.service_key, 'session_manage', json.dumps(request.json))
         else:

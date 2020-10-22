@@ -81,7 +81,7 @@ class UserQueryProjectAccess(Resource):
         access = None
         # If we have no arguments, return bad request
         if not any(args.values()):
-            return gettext("ProjectAccess: missing argument."), 400
+            return gettext('Missing arguments'), 400
 
         # Query access for user id
         if args['id_user']:
@@ -232,9 +232,12 @@ class UserQueryProjectAccess(Resource):
                 access = TeraServiceAccess.update_service_access_for_user_group_for_project(
                     id_service=Globals.opentera_service_id, id_user_group=json_project['id_user_group'],
                     id_service_role=project_service_role.id_service_role, id_project=json_project['id_project'])
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryProjectAccess.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
             if access:
@@ -264,7 +267,7 @@ class UserQueryProjectAccess(Resource):
 
         project_access = TeraServiceAccess.get_service_access_by_id(id_todel)
         if not project_access:
-            return gettext('No project access to delete.'), 500
+            return gettext('No project access to delete.'), 400
 
         # Check if current user can delete
         if user_access.get_project_role(project_access.service_access_role.id_project) != 'admin':
@@ -273,9 +276,12 @@ class UserQueryProjectAccess(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraServiceAccess.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryProjectAccess.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

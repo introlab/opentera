@@ -102,8 +102,11 @@ class UserQueryServiceProjects(Resource):
                 sp_list.append(json_sp)
             return sp_list
 
-        except InvalidRequestError:
-            return '', 500
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryServiceProjects.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
+            return gettext('Invalid request'), 500
 
     @user_multi_auth.login_required
     @api.expect(post_schema)
@@ -210,9 +213,12 @@ class UserQueryServiceProjects(Resource):
                 # Already existing
                 try:
                     TeraServiceProject.update(int(json_sp['id_service_project']), json_sp)
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryServiceProjects.__name__,
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
             else:
                 try:
@@ -221,9 +227,12 @@ class UserQueryServiceProjects(Resource):
                     TeraServiceProject.insert(new_sp)
                     # Update ID for further use
                     json_sp['id_service_project'] = new_sp.id_service_project
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQueryServiceProjects.__name__,
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
 
         update_sp = json_sps
@@ -246,7 +255,7 @@ class UserQueryServiceProjects(Resource):
         # Check if current user can delete
         sp = TeraServiceProject.get_service_project_by_id(id_todel)
         if not sp:
-            return gettext('Not found'), 500
+            return gettext('Not found'), 400
 
         if sp.service_project_project.id_site not in user_access.get_accessible_sites_ids(admin_only=True):
             return gettext('Operation not completed'), 403
@@ -254,9 +263,12 @@ class UserQueryServiceProjects(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraServiceProject.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryServiceProjects.__name__,
+                                         'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
         return '', 200

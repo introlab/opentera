@@ -59,6 +59,24 @@ class UserQuerySessionTypesTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item)
 
+    def test_query_specific_project_as_admin(self):
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_project=2")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 0)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_project=1&list=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item, minimal=True)
+
     def test_post_and_delete(self):
         # New with minimal infos
         json_data = {

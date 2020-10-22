@@ -98,7 +98,7 @@ class DeviceQuerySessions(Resource):
         #
         # except InvalidRequestError:
         #     return '', 500
-        return '', 403
+        return gettext('Forbidden for security reasons'), 403
 
     @LoginModule.device_token_or_certificate_required
     @api.expect(session_schema, validate=True)
@@ -115,7 +115,7 @@ class DeviceQuerySessions(Resource):
 
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:
-            return '', 400
+            return gettext('Missing arguments'), 400
 
         json_session = request.json['session']
 
@@ -123,16 +123,16 @@ class DeviceQuerySessions(Resource):
 
         # Validate if we have an id
         if 'id_session' not in json_session:
-            return '', 400
+            return  gettext('Missing arguments'), 400
 
         # Validate if we have an id
         if 'id_session_type' not in json_session:
-            return '', 400
+            return  gettext('Missing arguments'), 400
 
         # Validate that we have session participants or users for new sessions
         if ('session_participants' not in json_session and 'session_users' not in json_session) \
                 and json_session['id_session'] == 0:
-            return '', 400
+            return  gettext('Missing arguments'), 400
 
         # We know we have a device
         # Avoid identity thief
@@ -142,7 +142,7 @@ class DeviceQuerySessions(Resource):
         session_types = device_access.get_accessible_session_types_ids()
 
         if not json_session['id_session_type'] in session_types:
-            return '', 403
+            return gettext('Unauthorized'), 403
 
         # Do the update!
         if json_session['id_session'] > 0:
@@ -154,10 +154,13 @@ class DeviceQuerySessions(Resource):
                     print('removing participants', participants)
 
                 TeraSession.update(json_session['id_session'], json_session)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                self.module.logger.log_error(self.module.module_name,
+                                             DeviceQuerySessions.__name__,
+                                             'post', 500, 'Database error', str(e))
+                return gettext('Database error'), 500
         else:
             # New
             try:
@@ -180,6 +183,9 @@ class DeviceQuerySessions(Resource):
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info(), e)
+                self.module.logger.log_error(self.module.module_name,
+                                             DeviceQuerySessions.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return '', 500
 
         update_session = TeraSession.get_session_by_id(json_session['id_session'])
@@ -188,4 +194,4 @@ class DeviceQuerySessions(Resource):
 
     @LoginModule.device_token_or_certificate_required
     def delete(self):
-        return '', 403
+        return gettext('Forbidden for security reasons'), 403

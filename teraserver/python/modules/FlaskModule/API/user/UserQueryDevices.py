@@ -208,7 +208,10 @@ class UserQueryDevices(Resource):
                     device_list.append(device_json)
             return jsonify(device_list)
 
-        except InvalidRequestError:
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryDevices.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
             return '', 500
 
     @user_multi_auth.login_required
@@ -281,9 +284,12 @@ class UserQueryDevices(Resource):
             # Already existing
             try:
                 TeraDevice.update(json_device['id_device'], json_device)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryDevices.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             # New
@@ -293,9 +299,12 @@ class UserQueryDevices(Resource):
                 TeraDevice.insert(new_device)
                 # Update ID for further use
                 json_device['id_device'] = new_device.id_device
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryDevices.__name__,
+                                             'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
         update_device = TeraDevice.get_device_by_id(json_device['id_device'])
@@ -361,6 +370,11 @@ class UserQueryDevices(Resource):
             try:
                 TeraDevice.delete(id_todel=id_todel)
             except exc.IntegrityError as e:
+
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryDevices.__name__,
+                                             'delete', 500, 'Database error', str(e))
+
                 # Causes that could make an integrity error when deleting:
                 # - Associated with sessions
                 # - Associated with assets
@@ -376,9 +390,12 @@ class UserQueryDevices(Resource):
                                    'deleting.'), 500
                 return gettext('Can\'t delete device: please delete all assets created by that device before deleting.'
                                ), 500
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryDevices.__name__,
+                                             'delete', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
         else:
             # Only remove projects from that device so that device is "apparently" deleted to the user

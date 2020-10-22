@@ -13,6 +13,7 @@ from flask_babel import gettext
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_session_type', type=int, help='ID of the session type to query')
+get_parser.add_argument('id_project', type=int, help='ID of the project to get session type for')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 # post_parser = reqparse.RequestParser()
@@ -51,6 +52,9 @@ class UserQuerySessionTypes(Resource):
 
         if args['id_session_type']:
             session_types = [user_access.query_session_type_by_id(args['id_session_type'])]
+        elif args['id_project']:
+            session_types_projects = user_access.query_session_types_for_project(args['id_project'])
+            session_types = [stp.session_type_project_session_type for stp in session_types_projects]
         else:
             session_types = user_access.get_accessible_session_types()
 
@@ -67,7 +71,10 @@ class UserQuerySessionTypes(Resource):
             return jsonify(sessions_types_list)
 
         except InvalidRequestError:
-            return '', 500
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessionTypes.__name__,
+                                         'get', 500, 'InvalidRequestError', e)
+            return gettext('Invalid request'), 500
 
     @user_multi_auth.login_required
     @api.expect(post_schema)
@@ -146,9 +153,12 @@ class UserQuerySessionTypes(Resource):
             # Already existing
             try:
                 TeraSessionType.update(json_session_type['id_session_type'], json_session_type)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQuerySessionTypes.__name__,
+                                             'post', 500, 'Database error', e)
                 return gettext('Database error'), 500
         else:
             # New
@@ -158,9 +168,12 @@ class UserQuerySessionTypes(Resource):
                 TeraSessionType.insert(new_st)
                 # Update ID for further use
                 json_session_type['id_session_type'] = new_st.id_session_type
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQuerySessionTypes.__name__,
+                                             'post', 500, 'Database error', e)
                 return gettext('Database error'), 500
 
         update_session_type = TeraSessionType.get_session_type_by_id(json_session_type['id_session_type'])
@@ -191,6 +204,9 @@ class UserQuerySessionTypes(Resource):
                         update_session_type.session_type_projects.remove(TeraProject.get_project_by_id(project_id))
 
                 update_session_type.commit()
+            # Ensure that the newly added session types projects have a correct service project association, if required
+            for stp in update_session_type.session_type_session_type_projects:
+                stp.check_integrity()
 
         return [update_session_type.to_json()]
 
@@ -235,11 +251,17 @@ class UserQuerySessionTypes(Resource):
         except exc.IntegrityError as e:
             # Causes that could make an integrity error when deleting:
             # - Associated sessions of that session type
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessionTypes.__name__,
+                                         'delete', 500, 'Database error', e)
             return gettext('Can\'t delete session type: please delete all sessions with that type before deleting.'
                            ), 500
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessionTypes.__name__,
+                                         'delete', 500, 'Database error', e)
             return gettext('Database error'), 500
 
         return '', 200

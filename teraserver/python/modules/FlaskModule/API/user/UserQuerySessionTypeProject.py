@@ -74,7 +74,10 @@ class UserQuerySessionTypeProject(Resource):
 
             return jsonify(stp_list)
 
-        except InvalidRequestError:
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessionTypeProject.__name__,
+                                         'get', 500, 'InvalidRequestError', e)
             return '', 500
 
     @user_multi_auth.login_required
@@ -133,10 +136,13 @@ class UserQuerySessionTypeProject(Resource):
                 # Already existing
                 try:
                     TeraSessionTypeProject.update(json_stp['id_session_type_project'], json_stp)
-                except exc.SQLAlchemyError:
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
-                    return '', 500
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQuerySessionTypeProject.__name__,
+                                                 'post', 500, 'Database error', e)
+                    return gettext('Database error'), 500
             else:
                 try:
                     new_stp = TeraSessionTypeProject()
@@ -149,7 +155,6 @@ class UserQuerySessionTypeProject(Resource):
                     print(sys.exc_info())
                     return gettext('Database error'), 500
 
-        # TODO: Publish update to everyone who is subscribed to devices update...
         update_stp = json_stps
 
         return jsonify(update_stp)
@@ -180,9 +185,12 @@ class UserQuerySessionTypeProject(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraSessionTypeProject.delete(id_todel=id_todel)
-        except exc.SQLAlchemyError:
+        except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessionTypeProject.__name__,
+                                         'delete', 500, 'Database error', e)
             return gettext('Database error'), 500
 
         return '', 200

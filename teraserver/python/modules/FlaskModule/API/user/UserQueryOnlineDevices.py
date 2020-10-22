@@ -33,7 +33,7 @@ class UserQueryOnlineDevices(Resource):
             # rpc = RedisRPCClient(self.flaskModule.config.redis_config)
             # online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
             #
-            # # Filter devices that are available to the querier
+            # # Filter devices that are available to the query
             # devices_uuids = list(set(online_devices).intersection(user_access.get_accessible_devices_uuids()))
             #
             # return devices_uuids
@@ -41,10 +41,10 @@ class UserQueryOnlineDevices(Resource):
             rpc = RedisRPCClient(self.flaskModule.config.redis_config)
             online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
 
-            # Filter devices that are available to the querier
+            # Filter devices that are available to the query
             online_device_uuids = list(set(online_devices).intersection(accessible_devices))
 
-            # Query device informations
+            # Query device information
             devices = TeraDevice.query.filter(TeraDevice.device_uuid.in_(online_device_uuids)).all()
             devices_json = [device.to_json(minimal=True) for device in devices]
             for device in devices_json:
@@ -54,10 +54,10 @@ class UserQueryOnlineDevices(Resource):
             if args['with_busy']:
                 busy_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_devices')
 
-                # Filter devices that are available to the querier
+                # Filter devices that are available to the query
                 busy_device_uuids = list(set(busy_devices).intersection(accessible_devices))
 
-                # Query device informations
+                # Query device information
                 busy_devices = TeraDevice.query.filter(TeraDevice.device_uuid.in_(busy_device_uuids)).all()
                 busy_devices_json = [device.to_json(minimal=True) for device in busy_devices]
                 for device in busy_devices_json:
@@ -66,7 +66,10 @@ class UserQueryOnlineDevices(Resource):
 
             return devices_json
 
-        except InvalidRequestError:
+        except InvalidRequestError as e:
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryOnlineDevices.__name__,
+                                         'get', 500, 'InvalidRequestError', str(e))
             return gettext('Internal server error when making RPC call.'), 500
 
     # def post(self):
