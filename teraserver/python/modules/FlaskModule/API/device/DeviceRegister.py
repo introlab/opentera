@@ -37,8 +37,8 @@ class DeviceRegister(Resource):
         self.ca_info = dict()
 
         # Load CA private key
-        self.ca_info['private_key'] = load_private_pem_key(self.module.config.server_config['ssl_path']
-                                                           + '/' + self.module.config.server_config['ca_private_key'])
+        self.ca_info['private_key'] = load_private_pem_key(self.module.config.server_config['ssl_path'] + '/'
+                                                           + self.module.config.server_config['ca_private_key'])
 
         # Load CA certificate
         self.ca_info['certificate'] = load_pem_certificate(self.module.config.server_config['ssl_path'] + '/'
@@ -57,28 +57,14 @@ class DeviceRegister(Resource):
         device.device_onlineable = False
         # TODO WARNING - Should be disabled when created...
         device.device_enabled = False
+        # TODO FORCING 'capteur' as default?
         device.id_device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
         device.device_uuid = str(uuid.uuid4())
         device.create_token()
         device.update_last_online()
 
-        # Test participant assignation
-        # from libtera.db.models.TeraParticipant import TeraParticipant
-        # from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
-        # participant1 = TeraParticipant.get_participant_by_id(1)
-        # device_partipant = TeraDeviceParticipant()
-        # device_partipant.device_participant_participant = participant1
-        # device_partipant.device_participant_device = device
-        # db.session.add(device_partipant)
-
         return device
 
-    # @limiter.limit("1/day", error_message='Rate Limited')
-    def get(self):
-        print(request)
-        return '', 403
-
-    # @limiter.limit("1/day", error_message='Rate Limited')
     def post(self):
         print(request)
 
@@ -110,19 +96,25 @@ class DeviceRegister(Resource):
                 result['ca_info'] = self.ca_info['certificate'].public_bytes(serialization.Encoding.PEM).decode('utf-8')
                 result['token'] = device.device_token
 
-                test = jsonify(result)
+                self.module.logger.log_info(self.module.module_name, DeviceRegister.__name__,
+                                            'post', 'Device registered (certificate)',
+                                            device.device_uuid, result['certificate'])
 
                 # Return certificate...
                 return jsonify(result)
             else:
-                return 'Invalid CSR signature', 400
+                self.module.logger.log_error(self.module.module_name,
+                                             DeviceRegister.__name__,
+                                             'post', 400, 'Invalid CSR signature', request.data)
+
+                return gettext('Invalid CSR signature'), 400
                 # except:
                 #     return 'Error processing request', 400
 
         elif request.content_type == 'application/json':
 
             if 'device_info' not in request.json:
-                return 'Invalid content type', 400
+                return gettext('Invalid content type'), 400
 
             device_info = request.json['device_info']
 
@@ -141,6 +133,9 @@ class DeviceRegister(Resource):
 
             result = dict()
             result['token'] = device.device_token
+
+            self.module.logger.log_info(self.module.module_name, DeviceRegister.__name__,
+                                        'post', 'Device registered (token)', device.device_uuid, result['token'])
 
             # Return token
             return jsonify(result)
