@@ -1,5 +1,4 @@
 from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
-import random as rand
 
 
 class UserQueryDeviceDeviceProjectTest(BaseAPITest):
@@ -84,166 +83,144 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
             self.assertTrue(js.__contains__('id_device_subtype'))
             self.assertTrue(js.__contains__('id_device_type'))
 
-    @staticmethod
-    def randomize_flags(flag_count):
-        flag = []
-        for i in range(0, flag_count):
-            flag.append(rand.getrandbits(1))
-        return flag
-
     def test_query_get_as_admin(self):
-        # Randomize the flags
         pass
-        # # Tests must not be randomized.
-        # flags = self.randomize_flags(flag_count=6)
         # # Get all the devices
-        # params = {'projects': flags[0], 'enabled': flags[1], 'list': flags[2], 'with_participants': flags[3],
-        #           'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 200)
-        # self._checkJson(json_data=response.json(), params=params)
+        params = {'projects': 1, 'enabled': 1, 'list': 1, 'with_participants': 1,
+                  'with_sites': 1, 'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+        self._checkJson(json_data=response.json(), params=params)
         #
-        # params = {'id_device': 0, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
+        params = {'id_device': 0, 'projects': 0, 'enabled': 1, 'list': 1,
+                  'with_participants': 1, 'with_sites': 1, 'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
         #
-        # params = {'id_device': 1, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 200)
-        # self._checkJson(json_data=response.json(), params=params)
+        params = {'id_device': 1, 'projects': 1, 'enabled': 0, 'list': 1,
+                  'with_participants': 1, 'with_sites': 1, 'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+        self._checkJson(json_data=response.json(), params=params)
         #
-        # params = {'id_device': 100, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
+        params = {'id_device': 100, 'projects': 1, 'enabled': 1, 'list': 0,
+                  'with_participants': 1, 'with_sites': 1, 'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
         #
-        # params = {'id_device': 1, "device_uuid": "b707e0b2-e649-47e7-a938-2b949c423f73", 'projects': flags[0],
-        #           'enabled': flags[1], 'list': flags[2], 'with_participants': flags[3], 'with_sites': flags[4],
-        #           'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 400)
+        params = {'id_device': 1, "device_uuid": "b707e0b2-e649-47e7-a938-2b949c423f73", 'projects': 1,
+                  'enabled': 1, 'list': 1, 'with_participants': 0, 'with_sites': 1,
+                  'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 400)
+
+        params = {"device_uuid": "b707e0b2-e649-47e7-a938-2b949c423f73", 'projects': 1,
+                  'enabled': 1, 'list': 1, 'with_participants': 1, 'with_sites': 1,
+                  'with_status': 0}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+        self._checkJson(json_data=response.json(), params=params)
         #
-        # flags = self.randomize_flags(flag_count=6)
-        #
-        # params = {"device_uuid": "b707e0b2-e649-47e7-a938-2b949c423f73", 'projects': flags[0],
-        #           'enabled': flags[1], 'list': flags[2], 'with_participants': flags[3], 'with_sites': flags[4],
-        #           'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 200)
-        # self._checkJson(json_data=response.json(), params=params)
-        #
-        # params = {"uuid": "b707e0b2-e649-47e7-a938-2b949c423f73", 'projects': flags[0],
-        #           'enabled': flags[1], 'list': flags[2], 'with_participants': flags[3], 'with_sites': flags[4],
-        #           'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 200)
-        # self._checkJson(json_data=response.json(), params=params)
-        #
-        # # There is an error in the uuid
-        # params = {"uuid": "b707e0b2-e649-47e7-a938-2b949e423f73", 'projects': flags[0],
-        #           'enabled': flags[1], 'list': flags[2], 'with_participants': flags[3], 'with_sites': flags[4],
-        #           'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
-        #
-        # params = {"device_uuid": "b707e0b2-e649-47e7-a938-2b949c423f73", "uuid": "b707e0b2-e649-47e7-a938-2b949e423f73",
-        #           'projects': flags[0], 'enabled': flags[1], 'list': flags[2], 'with_participants': flags[3],
-        #           'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 400)
-        #
-        # flags = self.randomize_flags(flag_count=6)
-        #
-        # params = {'id_site': 0, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
-        #
-        # params = {'id_site': 1, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 200)
-        # self._checkJson(json_data=response.json(), params=params)
-        #
-        # params = {'id_site': 100, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
-        #
-        # flags = self.randomize_flags(flag_count=6)
-        #
-        # params = {'id_project': 0, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
-        #
-        # params = {'id_project': 1, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 200)
-        # self._checkJson(json_data=response.json(), params=params)
-        #
-        # params = {'id_project': 100, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
-        #
-        # flags = self.randomize_flags(flag_count=6)
-        #
-        # params = {'id_device_type': 0, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
-        #
-        # params = {'id_device_type': 1, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 200)
-        # self._checkJson(json_data=response.json(), params=params)
-        #
-        # params = {'id_device_type': 100, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
-        #
-        # flags = self.randomize_flags(flag_count=6)
-        #
-        # params = {'id_device_subtype': 0, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
-        #
-        # # Can't test because no id_device_subtypes available in DB
-        # # params = {'id_device_subtype': 'Null', 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        # #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # # self.assertEqual(response.status_code, 200)
-        # # self._checkJson(json_data=response.json(), params=params)
-        #
-        # params = {'id_device_subtype': 100, 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
-        #
-        # flags = self.randomize_flags(flag_count=6)
-        #
-        # params = {'name': " ", 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
-        #
-        # params = {'name': "Apple Watch #W05P1", 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
+        params = {"uuid": "b707e0b2-e649-47e7-a938-2b949c423f73", 'projects': 1,
+                  'enabled': 0, 'list': 1, 'with_participants': 0, 'with_sites': 1,
+                  'with_status': 0}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+        self._checkJson(json_data=response.json(), params=params)
+
+        # There is an error in the uuid
+        params = {"uuid": "b707e0b2-e649-47e7-a938-2b949e423f73", 'projects': 0,
+                  'enabled': 1, 'list':0, 'with_participants': 1, 'with_sites': 0,
+                  'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
+
+        params = {"device_uuid": "b707e0b2-e649-47e7-a938-2b949c423f73", "uuid": "b707e0b2-e649-47e7-a938-2b949e423f73",
+                  'projects': 1, 'enabled': 1, 'list': 1, 'with_participants': 0,
+                  'with_sites': 0, 'with_status': 0}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 400)
+
+        params = {'id_site': 0, 'projects': 0, 'enabled': 0, 'list': 0,
+                  'with_participants': 1, 'with_sites': 1, 'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
+
+        params = {'id_site': 1, 'projects': 1, 'enabled': 1, 'list': 0,
+                  'with_participants': 0, 'with_sites': 1, 'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+        self._checkJson(json_data=response.json(), params=params)
+
+        params = {'id_site': 100, 'projects': 0, 'enabled': 0, 'list': 1,
+                  'with_participants': 1, 'with_sites': 0, 'with_status': 0}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
+
+        params = {'id_project': 0, 'projects': 1, 'enabled': 0, 'list': 1,
+                  'with_participants': 1, 'with_sites': 1, 'with_status': 0}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
+
+        params = {'id_project': 1, 'projects': 1, 'enabled': 1, 'list': 1,
+                  'with_participants': 1, 'with_sites': 0, 'with_status': 0}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+        self._checkJson(json_data=response.json(), params=params)
+
+        params = {'id_project': 100, 'projects': 1, 'enabled': 0, 'list': 0,
+                  'with_participants': 1, 'with_sites': 1, 'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
+
+        params = {'id_device_type': 0, 'projects': 1, 'enabled': 0, 'list': 0,
+                  'with_participants': 1, 'with_sites': 1, 'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
+
+        params = {'id_device_type': 1, 'projects': 1, 'enabled': 0, 'list': 0,
+                  'with_participants': 1, 'with_sites': 0, 'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+        self._checkJson(json_data=response.json(), params=params)
+
+        params = {'id_device_type': 100, 'projects': 0, 'enabled': 0, 'list': 1,
+                  'with_participants': 1, 'with_sites': 1, 'with_status': 0}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
+
+        params = {'id_device_subtype': 0, 'projects': 1, 'enabled': 0, 'list': 0,
+                  'with_participants': 1, 'with_sites': 1, 'with_status': 0}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
+
+        # Can't test because no id_device_subtypes available in DB
+        # params = {'id_device_subtype': 'Null', 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
         #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
         # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
         # self.assertEqual(response.status_code, 200)
         # self._checkJson(json_data=response.json(), params=params)
-        #
-        # params = {'name': "Apple Watch", 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
-        #           'with_participants': flags[3], 'with_sites': flags[4], 'with_status': flags[5]}
-        # response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        # self.assertEqual(response.status_code, 403)
+
+        params = {'id_device_subtype': 100, 'projects': 0, 'enabled': 1, 'list': 0,
+                  'with_participants': 0, 'with_sites': 0, 'with_status': 0}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
+
+        params = {'name': " ", 'projects': 1, 'enabled': None, 'list': None,
+                  'with_participants': None, 'with_sites': 1, 'with_status': 0}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
+
+        params = {'name': "Apple Watch #W05P1", 'projects': None, 'enabled': 0, 'list': 1,
+                  'with_participants': 0, 'with_sites': None, 'with_status': None}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+        self._checkJson(json_data=response.json(), params=params)
+
+        params = {'name': "Apple Watch", 'projects': 0, 'enabled': 0, 'list': 0,
+                  'with_participants': 1, 'with_sites': 0, 'with_status': 1}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 403)
 
     def test_query_post_as_admin(self):
         new_id = []
