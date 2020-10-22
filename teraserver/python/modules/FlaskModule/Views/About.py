@@ -4,7 +4,7 @@ from modules.LoginModule.LoginModule import user_multi_auth
 from libtera.utils.TeraVersions import TeraVersions
 
 
-class Versions(MethodView):
+class About(MethodView):
 
     def __init__(self, *args, **kwargs):
         self.flaskModule = kwargs.get('flaskModule', None)
@@ -27,7 +27,5 @@ class Versions(MethodView):
         versions = TeraVersions()
         versions.load_from_db()
 
-        return render_template('versions.html', hostname=hostname, port=port,
+        return render_template('about.html', hostname=hostname, port=port,
                                server_version=versions.version_string)
-
-

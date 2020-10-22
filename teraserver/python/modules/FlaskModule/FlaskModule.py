@@ -291,6 +291,7 @@ class FlaskModule(BaseModule):
         from .Views.Participant import Participant
         from .Views.DeviceRegistration import DeviceRegistration
         from .Views.Versions import Versions
+        from .Views.About import About
 
         # Default arguments
         args = []
@@ -304,6 +305,9 @@ class FlaskModule(BaseModule):
 
         # Versions
         flask_app.add_url_rule('/versions', view_func=Versions.as_view('versions', *args, **kwargs))
+
+        # About
+        flask_app.add_url_rule('/about', view_func=About.as_view('about', *args, **kwargs))
 
         # flask_app.add_url_rule('/upload/', view_func=Upload.as_view('upload', *args, **kwargs))
         # flask_app.add_url_rule('/device_registration', view_func=DeviceRegistration.as_view('device_register', *args,
