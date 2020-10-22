@@ -1,7 +1,5 @@
-from sqlalchemy import and_
-
-from services.BureauActif.libbureauactif.db.Base import db
-from libtera.db.Base import BaseModel
+from sqlalchemy import and_, func
+from services.BureauActif.libbureauactif.db.Base import db, BaseModel
 import datetime
 
 
@@ -43,7 +41,7 @@ class BureauActifCalendarDay(db.Model, BaseModel):
     @staticmethod
     def get_calendar_day(uuid_participant, date):
         entry = BureauActifCalendarDay.query.filter(
-            and_(BureauActifCalendarDay.date == date,
+            and_(func.DATE(BureauActifCalendarDay.date) == date,
                  BureauActifCalendarDay.participant_uuid == uuid_participant)).first()
         if entry:
             return entry

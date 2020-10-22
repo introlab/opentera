@@ -1,7 +1,5 @@
-from sqlalchemy import and_
-
-from services.BureauActif.libbureauactif.db.Base import db
-from libtera.db.Base import BaseModel
+from sqlalchemy import and_, func
+from services.BureauActif.libbureauactif.db.Base import db, BaseModel
 import datetime
 import os
 
@@ -32,7 +30,7 @@ class BureauActifTimelineDay(db.Model, BaseModel):
     @staticmethod
     def get_timeline_day(uuid_participant, date):
         entry = BureauActifTimelineDay.query.filter(
-            and_(BureauActifTimelineDay.name == date,
+            and_(func.DATE(BureauActifTimelineDay.name) == date,
                  BureauActifTimelineDay.participant_uuid == uuid_participant)).first()
         if entry:
             return entry
