@@ -124,14 +124,14 @@ class UserQueryDeviceTypesTest(BaseAPITest):
                                   'id_device_type': new_id[1]+1,
                                   'device_type_key': 'new_device_3'}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 500)
 
         # Update the name of an unexisting device (no ID)
         params = {'device_type': {'device_type_name': 'NEW_DEVICE_TYPE',
                                   'id_device_type': None,
                                   'device_type_key': 'new_device_3'}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 500)
 
         # Delete the objects created by the test
         params = {'device_type_key': 'new_device'}
@@ -147,8 +147,8 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         params = {'device_type': {'device_type_name': 'NEW_DEVICE_TYPE',
                                   'id_device_type': 0,
                                   'device_type_key': 'new_device'}}
-        response = self._post_with_http_auth(username='user1', password='user1', payload=params)
-        self.assertEqual(response.status_code, 401)
+        response = self._post_with_http_auth(username='user4', password='user4', payload=params)
+        self.assertEqual(response.status_code, 403)
 
     def test_query_delete_as_admin(self):
         new_id = []
@@ -204,8 +204,8 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         params = {'device_type_key': 'new_device'}
-        response = self._delete_with_http_auth_plus(username='user1', password='user1', payload=params)
-        self.assertEqual(response.status_code, 401)
+        response = self._delete_with_http_auth_plus(username='user4', password='user4', payload=params)
+        self.assertEqual(response.status_code, 403)
 
         response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)

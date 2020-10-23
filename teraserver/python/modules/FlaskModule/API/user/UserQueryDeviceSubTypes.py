@@ -47,31 +47,44 @@ class UserQueryDeviceSubTypes(Resource):
         parser = get_parser
 
         args = parser.parse_args()
+        has_list = args.pop('list')
 
         device_subtypes = []
-        # If we have no arguments, return all accessible devices
         # If we have no arguments, return error
         if not any(args.values()):
             return gettext('Missing arguments'), 400
 
-        if args['id_device_subtype']:
-            device_subtypes = TeraDeviceSubType.query.filter(TeraDeviceSubType.id_device_type.
-                                                             in_(user_access.get_accessible_devices_types_ids())).\
-                filter_by(id_device_subtype=args['id_device_subtype']).all()
+        #if we have 2 IDs, return error
+        elif args['id_device_subtype'] is not None and args['id_device_type'] is not None:
+            return gettext('Too Many IDs'), 400
+
+        elif args['id_device_subtype']:
+            if args['id_device_subtype'] in user_access.get_accessible_devices_subtypes_ids():
+                device_subtypes = TeraDeviceSubType.query.filter(TeraDeviceSubType.id_device_type.
+                                                                 in_(user_access.get_accessible_devices_types_ids())).\
+                    filter_by(id_device_subtype=args['id_device_subtype']).all()
+            else:
+                return gettext('No access to device subtype'), 403
         elif args['id_device_type']:
             # Check if has access to the id_device_type
-            if not args['id_device_type'] in user_access.get_accessible_devices_types_ids():
-                return 'No access to device type', 403
-            device_subtypes = TeraDeviceSubType.get_device_subtypes_for_type(args['id_device_type'])
-        elif args['list']:
-            device_subtypes = user_access.get_accessible_devices_subtypes()
+            if args['id_device_type'] in user_access.get_accessible_devices_types_ids():
+                device_subtypes = TeraDeviceSubType.get_device_subtypes_for_type(args['id_device_type'])
+            else:
+                return gettext('No access to device type'), 403
+
+        else:
+            return gettext('ID can\'t be 0'), 400
 
         try:
             device_subtypes_list = []
             for dst in device_subtypes:
                 if dst is not None:
-                    dst_json = dst.to_json()
-                    device_subtypes_list.append(dst_json)
+                    if has_list:
+                        dst_json = dst.to_json(minimal=True)
+                        device_subtypes_list.append(dst_json)
+                    else:
+                        dst_json = dst.to_json()
+                        device_subtypes_list.append(dst_json)
             return device_subtypes_list
 
         except InvalidRequestError as e:
@@ -91,24 +104,24 @@ class UserQueryDeviceSubTypes(Resource):
                         500: 'Internal error occured when saving device subtype'})
     def post(self):
         # parser = post_parser
-
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_device_subtype = request.json['device_subtype']
 
         # Validate if we have an id
-        if 'id_device_type' not in json_device_subtype or 'id_device_subtype' not in json_device_subtype:
-            return gettext('Missing id_device_type or id_device_subtype'), 400
+        if 'id_device_subtype' not in json_device_subtype:
+            return gettext('Missing id_device_subtype'), 400
 
-        # Check if current user can modify the posted device
-        if json_device_subtype['id_device_type'] not in user_access.get_accessible_devices_types_ids(admin_only=True):
+        if not current_user.user_superadmin:
             return gettext('Forbidden'), 403
 
         # Do the update!
         if json_device_subtype['id_device_subtype'] > 0:
             # Already existing
             try:
+                json_device_subtype['id_device_type'] = TeraDeviceSubType.\
+                    get_device_subtype(json_device_subtype['id_device_subtype']).id_device_type
                 TeraDeviceSubType.update(json_device_subtype['id_device_subtype'], json_device_subtype)
             except exc.SQLAlchemyError as e:
                 import sys
@@ -157,7 +170,7 @@ class UserQueryDeviceSubTypes(Resource):
         if not todel:
             return gettext('Device subtype not found'), 400
         
-        if todel.id_device_type not in user_access.get_accessible_devices_types_ids(admin_only=True):
+        if not user_access.user.user_superadmin:
             return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
@@ -171,4 +184,4 @@ class UserQueryDeviceSubTypes(Resource):
                                          'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
 
-        return '', 200
+        return gettext('Device subtype successfully deleted'), 200

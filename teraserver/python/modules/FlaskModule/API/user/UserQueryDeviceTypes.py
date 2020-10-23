@@ -102,12 +102,8 @@ class UserQueryDeviceTypes(Resource):
         if 'id_device_type' not in json_device_type:
             return gettext('Missing id_device_type'), 400
 
-        if json_device_type['id_device_type'] == 0:
-            if not current_user.user_superadmin:
-                return gettext('Forbidden'), 403
-        else:
-            if json_device_type['id_device_type'] not in user_access.get_accessible_devices_types_ids(admin_only=True):
-                return gettext('Forbidden'), 403
+        if not current_user.user_superadmin:
+            return gettext('Forbidden'), 403
 
         # Do the update!
         if json_device_type['id_device_type'] > 0:
@@ -170,7 +166,8 @@ class UserQueryDeviceTypes(Resource):
         else:
             return gettext('Device type not found'), 400
 
-        if device_type_to_del.id_device_type in user_access.get_accessible_devices_types_ids():
+        # if device_type_to_del.id_device_type in user_access.get_accessible_devices_types_ids():
+        if user_access.user.user_superadmin:
             try:
                 TeraDeviceType.delete(id_todel=device_type_to_del.id_device_type)
             except exc.SQLAlchemyError as e:
@@ -183,4 +180,4 @@ class UserQueryDeviceTypes(Resource):
         else:
             return gettext('Forbidden'), 403
 
-        return '', 200
+        return gettext('Device type successfully deleted'), 200
