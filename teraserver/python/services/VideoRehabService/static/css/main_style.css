@@ -72,3 +72,11 @@ video {
     max-height: 20%;
     padding-right: 30px;
 }
+
+.iframe-with-footer{
+    height: calc(100% - 50px - 65px);
+}
+
+.iframe-without-footer{
+    height: calc(100% - 50px);
+}

@@ -17,7 +17,7 @@
 
 </head>
 <body onload="init_dashboard('{{ backend_hostname }}', {{ backend_port }});
-initLocalVideo('#selfVideo');" style="background-color:black;">
+initLocalVideo('#selfVideo');" style="background-color:black;overflow: hidden;">
 <div class="container-fluid" id="mainContainer">
 		<div id="selfView" title="Vidéo locale" onmousemove="resetInactiveTimer();openButtons('navButtons');return false;" width="100%" onmouseleave="closeButtons('navButtons');return false;"  style="overflow: hidden;">
 

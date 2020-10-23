@@ -2,7 +2,7 @@
 <html>
    <head>
       <meta charset="UTF-8" />
-      <title>OpenTera - Dashboard</title>
+      <title>OpenTera - VideoRehab service - Participant</title>
 
        <script src="./static/js/opentera.js"></script> <!-- Always include first -->
 	   <script src="./static/js/opentera_websockets.js"></script>
@@ -24,6 +24,8 @@
 			var backend_hostname = "{{ backend_hostname }}";
 			var backend_port = {{ backend_port }};
 			var participant_token = "{{ participant_token }}";
+			var participant_name = "{{ participant_name }}";
+			var participant_uuid = "{{ participant_uuid }}";
 	   </script>
    </head>
    <body onload = "init_dashboard('{{ backend_hostname }}', {{ backend_port }});
@@ -35,7 +37,7 @@
 		<div style="display:block;position:absolute;top:10px;right:0px;padding-right:12.5px;">
 			<button id="btnStopSession" name="none" onclick="doStopCurrentSession(this.name);" style="display:none;" class="bg-primary">Terminer la séance</button>
 			<button id="btnLogout" onclick="doLogout(backend_hostname, backend_port);">Déconnexion</button>
-			<img id="imgStatus" src="./static/images/grey_button.png" width="24px" style="transform: translateY(30%);" />
+			<img id="imgStatus" src="./static/images/grey_button.png" width="24px"/>
 			<!--<label id="socketUrl" style="display:none;">
 				<out value="#{socket.getServerUrl}"/>
 			</label>
@@ -44,10 +46,10 @@
 			</label>-->
 		</div>
 		<div align="center" style="line-height:50px;display:block;vertical-align:middle;height:50px;margin:auto;">
-			<label id="displayname">{{ participant_name }}</label>
+			<label id="displayname">{{ participant_name }}</label>
 		</div>
 	</div>
-	<iframe id="mainview" src="participant_localview?token={{ participant_token }}" style="position:absolute;top:50px;left:0;width:100%;height:calc(100% - 50px);border:0;" allow="camera; microphone;">Frames not supported in this browser!</iframe>
+	<iframe id="mainview" class = "iframe-with-footer" src="participant_localview?token={{ participant_token }}" style="position:absolute;top:50px;left:0;width:100%;border:0;" allow="camera; microphone;">Frames not supported in this browser!</iframe>
    {% include "footer.html" %}
     </body>
 </html>

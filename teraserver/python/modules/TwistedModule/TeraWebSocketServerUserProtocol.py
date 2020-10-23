@@ -128,6 +128,7 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
                 create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
             user_disconnected = messages.UserEvent()
             user_disconnected.user_uuid = str(self.user.user_uuid)
+            user_disconnected.user_fullname = self.user.get_fullname()
             user_disconnected.type = messages.UserEvent.USER_DISCONNECTED
 
             # Need to use Any container

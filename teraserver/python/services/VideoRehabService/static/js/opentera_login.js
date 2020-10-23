@@ -104,8 +104,6 @@ function loginReply(response, status, request){
 		$('#txtmessage').css('color','green');
 		clearInterval(timerId);
 		timerId=-1;
-		// Set cookie with the access token for 30 minutes
-        setCookie("VideoDispatchToken", response["user_token"], 30);
 
         // Get websocket url
         sessionStorage.setItem("websocket_url", response["websocket_url"]);

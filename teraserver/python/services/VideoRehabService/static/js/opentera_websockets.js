@@ -43,12 +43,9 @@ function ws_Closed(){
 
 	console.log("Websocket closed.");
 
-	// TODO: Manage reconnect, since the first URL will not be valid anymore...
 	// Must make a new "login" request?
-	/*
 	// Retry to connect...
-	WebSocketConnect();
-	*/
+	//webSocketConnect();
 
 	// Redirect to login for now...
 	//window.location.replace("login");
@@ -66,17 +63,30 @@ function ws_MessageReceived(evt){
     // Join session
     if (msg_type == "type.googleapis.com/opentera.protobuf.JoinSessionEvent"){
         hideElement('btnLogout');
+        hideElement('logos');
+        $('#mainview').removeClass('iframe-with-footer');
+        $('#mainview').addClass('iframe-without-footer');
         // Join video session event - redirect to session url
         //document.getElementById('mainview').src = json_msg.data[0]["sessionUrl"];
         //window.parent.document.getElementById('mainview').contentWindow.document.getElementById("dialogWait").style.display="inline";
         current_session_url = json_msg.message.events[0]["sessionUrl"];
+        // Append name and uuid
+        current_session_url += "&name=" + participant_name.replace("#", "") + "&uuid=" + participant_uuid;
+        console.log ("Joining session at " + current_session_url)
         testCurrentSessionUrlValid();
 
     }
 
-    // Stop session
-    if (msg_type == "type.googleapis.com/opentera.protobuf.StopSessionEvent"){
+    // Stop or leave session
+    if (msg_type === "type.googleapis.com/opentera.protobuf.StopSessionEvent" ||
+    (msg_type === "type.googleapis.com/opentera.protobuf.ParticipantEvent") &&
+    json_msg.message.events[0]["TYPE"] === "PARTICIPANT_LEFT_SESSION")
+    {
         showElement('btnLogout');
-        window.location.replace("participant_endpoint?token=" + sessionStorage.getItem("participant_token"));
+        showElement('logos');
+        $('#mainview').removeClass('iframe-with-footer');
+        $('#mainview').addClass('iframe-without-footer');
+        //window.location.replace("participant_endpoint?token=" + sessionStorage.getItem("participant_token"));
+        document.getElementById('mainview').src = "participant_localview?token=" + sessionStorage.getItem("participant_token");
     }
 }

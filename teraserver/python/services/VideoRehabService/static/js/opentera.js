@@ -64,10 +64,10 @@ function doGetRequest(request_url, request_port, request_path, success_response,
         });
 
      // Refresh cookies
-     if (getCookie('VideoDispatchToken'))
+     /*if (getCookie('VideoDispatchToken'))
         setCookie('VideoDispatchToken', getCookie('VideoDispatchToken', 30));
      if (getCookie('VideoDispatchTokenParticipant'))
-        setCookie('VideoDispatchTokenParticipant', getCookie('VideoDispatchTokenParticipant', 30));
+        setCookie('VideoDispatchTokenParticipant', getCookie('VideoDispatchTokenParticipant', 30));*/
 }
 
 function getRequestSuccess(response, status, request){
