@@ -27,7 +27,7 @@ class UserQueryDeviceTypesTest(BaseAPITest):
 
     def test_query_no_params_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
 
     def _checkJson(self, json_data, minimal=False):
         for js in json_data:
@@ -40,7 +40,7 @@ class UserQueryDeviceTypesTest(BaseAPITest):
     def test_query_get_as_admin(self):
         params = {'id_device_type': 0, 'list': False}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 403)
 
         params = {'id_device_subtype': 1, 'list': False}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
