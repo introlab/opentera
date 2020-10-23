@@ -118,8 +118,8 @@ class UserQueryDevices(Resource):
         else:
             return gettext('To many ID'), 400
 
-        if not devices:
-            return gettext('Forbidden access'), 403
+        # if not devices:
+        #     return gettext('Forbidden access'), 403
         # if args['available'] is not None:
         #     if args['available']:
         #         devices = TeraDevice.get_available_devices()

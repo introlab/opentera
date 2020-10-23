@@ -56,7 +56,7 @@ class TeraSessionForm:
         section.add_item(TeraFormItem("session_name", gettext("Session Name"), "text", True))
         section.add_item(TeraFormItem("id_session_type", gettext("Session Type"), "array", True, item_values=st_list))
         section.add_item(TeraFormItem('session_creator_user', gettext('Session User Creator'), 'hidden', False))
-        section.add_item(TeraFormItem("id_creator_user", gettext("Session User Creator ID"), "array", True,
+        section.add_item(TeraFormItem("id_creator_user", gettext("Session User Creator"), "array", True,
                                       item_values=users_list, item_options={"readonly": True},
                                       item_condition=TeraFormItemCondition(condition_item='session_creator_user',
                                                                            condition_operator='NOT NULL',
@@ -70,14 +70,14 @@ class TeraSessionForm:
                                       ))
         section.add_item(TeraFormItem('session_creator_participant', gettext('Session Creator Participant'), 'hidden',
                                       False))
-        section.add_item(TeraFormItem("id_creator_participant", gettext("Session Creator Participant ID"), "array", True,
+        section.add_item(TeraFormItem("id_creator_participant", gettext("Session Creator Participant"), "array", True,
                                       item_values=parts_list, item_options={"readonly": True},
                                       item_condition=TeraFormItemCondition(condition_item='session_creator_participant',
                                                                            condition_operator='NOT NULL',
                                                                            condition_condition=None)))
         section.add_item(TeraFormItem('session_creator_service', gettext('Session Creator Service'), 'hidden',
                                       False))
-        section.add_item(TeraFormItem("id_creator_service", gettext("Session Creator Service ID"), "array", True,
+        section.add_item(TeraFormItem("id_creator_service", gettext("Session Creator Service"), "array", True,
                                       item_values=services_list, item_options={"readonly": True},
                                       item_condition=TeraFormItemCondition(condition_item='session_creator_service',
                                                                            condition_operator='NOT NULL',
