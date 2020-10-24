@@ -62,21 +62,20 @@ class UserQuerySessions(Resource):
             if args['id_user'] in user_access.get_accessible_users_ids():
                 sessions = TeraSession.get_sessions_for_user(args['id_user'])
         elif args['session_uuid']:
-            sessions = TeraSession.get_session_by_uuid(args['session_uuid'])
-            if (sessions and sessions.id_session not in user_access.get_accessible_sessions_ids()) or not sessions:
-                sessions = []  # Current user doesn't have access to the requested session
-            else:
-                sessions = [sessions]
+            session_info = TeraSession.get_session_by_uuid(args['session_uuid'])
+            if session_info:
+                sessions = [user_access.query_session(session_info.id_session)]
 
         try:
             sessions_list = []
             for ses in sessions:
-                if args['list'] is None:
-                    session_json = ses.to_json()
-                    sessions_list.append(session_json)
-                else:
-                    session_json = ses.to_json(minimal=True)
-                    sessions_list.append(session_json)
+                if ses is not None:  # Could be none if no access to specified session
+                    if args['list'] is None:
+                        session_json = ses.to_json()
+                        sessions_list.append(session_json)
+                    else:
+                        session_json = ses.to_json(minimal=True)
+                        sessions_list.append(session_json)
 
             return jsonify(sessions_list)
 

@@ -129,7 +129,8 @@ class UserSessionManager(Resource):
                 json_session_manager['id_session'] = 0
 
         if json_session_manager['id_session'] != 0:
-            if json_session_manager['id_session'] not in user_access.get_accessible_sessions_ids():
+            ses = user_access.query_session(json_session_manager['id_session'])
+            if not ses:
                 return gettext('User doesn\'t have access to that session'), 403
             if 'id_service' not in json_session_manager:
                 # Check if there's a service for that session, and, if so, adds its id.

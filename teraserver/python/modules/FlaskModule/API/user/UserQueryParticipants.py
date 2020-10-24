@@ -120,8 +120,8 @@ class UserQueryParticipants(Resource):
                 if args['with_status']:
                     # Query status
                     rpc = RedisRPCClient(self.module.config.redis_config)
-                    online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
-                    busy_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_participants')
+                    # online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
+                    # busy_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_participants')
 
                 for participant in participants:
                     if args['enabled'] is not None:
