@@ -292,9 +292,14 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_sessions(self, admin_only=False):
         from libtera.db.models.TeraSession import TeraSession
+        from libtera.db.models.TeraSessionUsers import TeraSessionUsers
+        from libtera.db.models.TeraSessionParticipants import TeraSessionParticipants
         part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
-        return TeraSession.query.join(TeraSession.session_participants). \
-            filter(TeraParticipant.id_participant.in_(part_ids)).all()
+        sessions = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users). \
+            filter(or_(TeraSessionParticipants.id_participant.in_(part_ids),
+                       TeraSessionUsers.id_user == self.user.id_user,
+                       TeraSession.id_creator_user == self.user.id_user)).all()
+        return sessions
 
     def get_accessible_sessions_ids(self, admin_only=False):
         ses_ids = []
@@ -633,8 +638,11 @@ class DBManagerTeraUserAccess:
         from libtera.db.models.TeraParticipant import TeraParticipant
         from libtera.db.models.TeraSession import TeraSession
 
-        session = TeraSession.query.join(TeraSession.session_participants).filter(TeraSession.id_session == session_id) \
-            .filter(TeraParticipant.id_participant.in_(self.get_accessible_participants_ids())).first()
+        session = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users)\
+            .filter(TeraSession.id_session == session_id)\
+            .filter(or_(TeraParticipant.id_participant.in_(self.get_accessible_participants_ids()),
+                        TeraUser.id_user == self.user.id_user,
+                        TeraSession.id_creator_user == self.user.id_user)).first()
 
         return session
 

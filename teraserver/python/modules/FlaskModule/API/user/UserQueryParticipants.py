@@ -112,7 +112,6 @@ class UserQueryParticipants(Resource):
                     break
                 if participant.id_participant not in user_access.get_accessible_participants_ids():
                     participants = []
-
         try:
             if participants:
                 participant_list = []

@@ -64,7 +64,8 @@ class TeraSession(db.Model, BaseModel):
         if not minimal:
             # Append list of participants ids and names
             rval['session_participants'] = [{'id_participant': part.id_participant,
-                                             'participant_name': part.participant_name}
+                                             'participant_name': part.participant_name,
+                                             'id_project': part.id_project}
                                             for part in self.session_participants]
 
             # Append list of users ids and names

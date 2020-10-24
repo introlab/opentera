@@ -63,7 +63,7 @@ class UserQuerySessions(Resource):
                 sessions = TeraSession.get_sessions_for_user(args['id_user'])
         elif args['session_uuid']:
             sessions = TeraSession.get_session_by_uuid(args['session_uuid'])
-            if sessions and sessions.id_session not in user_access.get_accessible_sessions_ids():
+            if (sessions and sessions.id_session not in user_access.get_accessible_sessions_ids()) or not sessions:
                 sessions = []  # Current user doesn't have access to the requested session
             else:
                 sessions = [sessions]

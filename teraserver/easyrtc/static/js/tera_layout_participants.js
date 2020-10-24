@@ -96,7 +96,8 @@ function updateUserLocalViewLayout(local_num, remote_num){
             selfViewRow2.show();
             break;
         default:
-            console.error('Unknown local view number, don\'t know how to set the layout!');
+            if (local_num > 0)
+                console.error('Unknown local view number, don\'t know how to set the layout!');
     }
 }
 

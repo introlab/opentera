@@ -309,10 +309,18 @@ class VideoRehabService(ServiceOpenTera):
 
         # Get additional "start" arguments
         parameters = session_manage_args['parameters']
-        participants = session_manage_args['session_participants']
-        users = session_manage_args['session_users']
-        # TODO handle devices
-        devices = []
+        if 'session_participants' in session_manage_args:
+            participants = session_manage_args['session_participants']
+        else:
+            participants = []
+        if 'session_users' in session_manage_args:
+            users = session_manage_args['session_users']
+        else:
+            users = []
+        if 'session_devices' in session_manage_args:
+            devices = session_manage_args['session_devices']
+        else:
+            devices = []
 
         # Call service API to create session
         api_response = None
