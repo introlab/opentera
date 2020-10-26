@@ -95,8 +95,6 @@ class DBManagerBureauActifDataProcess:
         entries_before_position_change = 0  # Counter of loops before a change of position
         is_standing = False
         for index, val in enumerate(self.data):
-            if index != entries_before_position_change:
-                print(index, entries_before_position_change)
             desk_height = float(val[1])
             button_state = val[2]
             was_standing = is_standing  # Save previous position to check if it changed
