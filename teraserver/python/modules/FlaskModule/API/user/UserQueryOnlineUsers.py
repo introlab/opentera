@@ -10,7 +10,6 @@ from modules.BaseModule import ModuleNames
 from modules.DatabaseModule.DBManager import DBManager
 
 get_parser = api.parser()
-get_parser.add_argument('with_busy', type=inputs.boolean, help='Also return users that are busy.')
 
 
 class UserQueryOnlineUsers(Resource):
@@ -31,30 +30,18 @@ class UserQueryOnlineUsers(Resource):
         try:
             accessible_users = user_access.get_accessible_users_uuids()
             rpc = RedisRPCClient(self.flaskModule.config.redis_config)
-            online_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
+            status_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_users')
 
+            users_uuids = [user_uuid for user_uuid in status_users]
             # Filter users that are available to the query
-            online_user_uuids = list(set(online_users).intersection(accessible_users))
+            filtered_user_uuids = list(set(users_uuids).intersection(accessible_users))
 
             # Query user information
-            users = TeraUser.query.filter(TeraUser.user_uuid.in_(online_user_uuids)).all()
+            users = TeraUser.query.filter(TeraUser.user_uuid.in_(filtered_user_uuids)).all()
             users_json = [user.to_json(minimal=True) for user in users]
             for user in users_json:
-                user['user_online'] = True
-
-            # Also query busy users?
-            if args['with_busy']:
-                busy_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_users')
-
-                # Filter users that are available to the query
-                busy_user_uuids = list(set(busy_users).intersection(accessible_users))
-
-                # Query user information
-                busy_users = TeraUser.query.filter(TeraUser.user_uuid.in_(busy_user_uuids)).all()
-                busy_users_json = [user.to_json(minimal=True) for user in busy_users]
-                for user in busy_users_json:
-                    user['user_busy'] = True
-                users_json.extend(busy_users_json)
+                user['user_online'] = status_users[user['user_uuid']]['online']
+                user['user_busy'] = status_users[user['user_uuid']]['busy']
 
             return users_json
 
