@@ -84,7 +84,6 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
             self.assertTrue(js.__contains__('id_device_type'))
 
     def test_query_get_as_admin(self):
-        pass
         # # Get all the devices
         params = {'projects': 1, 'enabled': 1, 'list': 1, 'with_participants': 1,
                   'with_sites': 1, 'with_status': 1}
