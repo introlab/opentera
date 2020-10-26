@@ -657,7 +657,7 @@ class DBManagerTeraUserAccess:
             return session
 
         # Check if we are parts of the users of that session
-        if session.has(self.user.id_user):
+        if session.has_user(self.user.id_user):
             return session
 
         # Check if we have access to the project of that session
