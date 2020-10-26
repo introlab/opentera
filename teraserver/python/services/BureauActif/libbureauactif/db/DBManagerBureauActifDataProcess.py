@@ -116,9 +116,9 @@ class DBManagerBureauActifDataProcess:
             absent_time = self.get_absent_time(index)
 
             self.check_if_config_is_respected(was_standing)
-            if self.is_last_data(index):  # Check if it's the last entry
-                self.update_position(was_standing, index, entries_before_position_change)
-            elif was_standing != is_standing or absent_time != 0 or previous_button_state != self.button_pressed:  # If position changed or gap in the timestamp
+            # Check if last entry or position changed or gap in the timeline (absence)
+            if self.is_last_data(index) or was_standing != is_standing or \
+                    absent_time != 0 or previous_button_state != self.button_pressed:
                 self.position_changes.done += 1
                 self.update_position(was_standing, index, entries_before_position_change)
                 self.update_last_timeline_entry(absent_time, 4)
@@ -133,7 +133,7 @@ class DBManagerBureauActifDataProcess:
             past_data = self.get_time(current_index - 1)
             current_data = self.get_time(current_index)
             delta = current_data - past_data
-            if delta.seconds > 300:
+            if delta.seconds > 60:
                 delta_in_hour = delta.seconds / 3600
                 return delta_in_hour
         return 0
