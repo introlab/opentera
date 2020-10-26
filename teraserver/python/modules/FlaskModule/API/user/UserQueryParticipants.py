@@ -117,11 +117,11 @@ class UserQueryParticipants(Resource):
                 participant_list = []
                 online_participants = []
                 busy_participants = []
+                status_participants = []
                 if args['with_status']:
                     # Query status
                     rpc = RedisRPCClient(self.module.config.redis_config)
-                    # online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
-                    # busy_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_participants')
+                    status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
 
                 for participant in participants:
                     if args['enabled'] is not None:
@@ -162,9 +162,11 @@ class UserQueryParticipants(Resource):
                                 participant_json['participant_devices'] = devices
                                 participant_json['participant_project'] = participant.participant_project.to_json()
 
-                        if args['with_status']:
-                            participant_json['participant_busy'] = participant.participant_uuid in busy_participants
-                            participant_json['participant_online'] = participant.participant_uuid in online_participants
+                        if args['with_status'] and participant.participant_uuid in status_participants:
+                            participant_json['participant_busy'] = \
+                                status_participants[participant.participant_uuid]['busy']
+                            participant_json['participant_online'] = \
+                                status_participants[participant.participant_uuid]['online']
 
                         participant_list.append(participant_json)
 
