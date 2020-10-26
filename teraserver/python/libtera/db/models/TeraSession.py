@@ -244,12 +244,6 @@ class TeraSession(db.Model, BaseModel):
         return user_uuid in user_uuids
 
     @staticmethod
-    def is_user_in_session(session_uuid: str, user_uuid: str) -> bool:
-        session = TeraSession.get_session_by_uuid(session_uuid)
-        user_uuids = [user.user_uuid for user in session.session_users]
-        return user_uuid in user_uuids
-
-    @staticmethod
     def is_device_in_session(session_uuid: str, device_uuid: str) -> bool:
         session = TeraSession.get_session_by_uuid(session_uuid)
         device_uuids = [device.device_uuid for device in session.session_devices]
@@ -261,11 +255,25 @@ class TeraSession(db.Model, BaseModel):
         participant_uuids = [participant.participant_uuid for participant in session.session_participants]
         return participant_uuid in participant_uuids
 
-    @staticmethod
-    def is_user_in_session(session_uuid: str, user_uuid: str) -> bool:
-        session = TeraSession.get_session_by_uuid(session_uuid)
-        user_uuids = [user.user_uuid for user in session.session_users]
-        return user_uuid in user_uuids
+    def has_user(self, id_user: int) -> bool:
+        user_ids = [user.id_user for user in self.session_users]
+        return id_user in user_ids
+
+    def has_device(self, id_device: int) -> bool:
+        device_ids = [device.id_device for device in self.session_devices]
+        return id_device in device_ids
+
+    def has_participant(self, id_participant: int) -> bool:
+        participant_ids = [participant.id_participant for participant in self.session_participants]
+        return id_participant in participant_ids
+
+    def get_associated_project_id(self):
+        project_id = None
+        if self.session_participants:
+            # Return project id for the first participant, since they should all be the same...
+            project_id = self.session_participants[0].id_project
+
+        return project_id
 
     # THIS SHOULD NOT BE USED ANYMORE, AS DELETES CAN'T OCCUR IF THERE'S STILL ASSOCIATED SESSIONS
     # @staticmethod

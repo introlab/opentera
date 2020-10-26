@@ -295,6 +295,8 @@ class DBManagerTeraUserAccess:
         from libtera.db.models.TeraSessionUsers import TeraSessionUsers
         from libtera.db.models.TeraSessionParticipants import TeraSessionParticipants
         part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
+        # TODO: CONSIDER SESSIONS CREATED BY USERS AND DEVICES ONLY WITHOUT ANY PARTICIPANT
+        # THIS JOIN TAKES A LONG TIME TO PROCESS... IMPROVE!
         # sessions = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users). \
         #     filter(or_(TeraSessionParticipants.id_participant.in_(part_ids),
         #                TeraSessionUsers.id_user == self.user.id_user,
@@ -309,7 +311,6 @@ class DBManagerTeraUserAccess:
 
         # for ses in self.get_accessible_sessions(admin_only=admin_only):
         #     ses_ids.append(ses.id_session)
-
 
         return ses_ids
 
@@ -643,13 +644,28 @@ class DBManagerTeraUserAccess:
         from libtera.db.models.TeraSession import TeraSession
         from libtera.db.models.TeraSessionUsers import TeraSessionUsers
 
-        session = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users)\
-            .filter(and_(TeraSession.id_session == session_id),
-                    or_(TeraParticipant.id_participant.in_(self.get_accessible_participants_ids()),
-                        TeraSessionUsers.id_user == self.user.id_user,
-                        TeraSession.id_creator_user == self.user.id_user)).first()
+        # session = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users)\
+        #     .filter(and_(TeraSession.id_session == session_id),
+        #             or_(TeraParticipant.id_participant.in_(self.get_accessible_participants_ids()),
+        #                 TeraSessionUsers.id_user == self.user.id_user,
+        #                 TeraSession.id_creator_user == self.user.id_user)).first()
 
-        return session
+        session = TeraSession.get_session_by_id(session_id)
+
+        # Check if we are the creator of that session
+        if session.id_creator_user == self.user.id_user:
+            return session
+
+        # Check if we are parts of the users of that session
+        if session.has(self.user.id_user):
+            return session
+
+        # Check if we have access to the project of that session
+        accessible_projects = self.get_accessible_projects_ids()
+        if session.get_associated_project_id() in accessible_projects:
+            return session
+
+        return None
 
     def query_session_events(self, session_id: int):
         from libtera.db.models.TeraSessionEvent import TeraSessionEvent

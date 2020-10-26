@@ -91,7 +91,7 @@ class UserEventManager(EventManager):
                     if obj.id_user_group in self.accessManager.get_accessible_users_groups_ids():
                         return True
                 elif event.object_type == models.TeraSession.get_model_name():
-                    if obj.id_session in self.accessManager.get_accessible_sessions_ids():
+                    if self.accessManager.query_session(obj.id_session):
                         return True
                 elif event.object_type == models.TeraProject.get_model_name():
                     if obj.id_project in self.accessManager.get_accessible_projects_ids():

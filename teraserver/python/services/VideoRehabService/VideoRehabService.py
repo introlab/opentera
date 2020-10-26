@@ -657,7 +657,7 @@ class VideoRehabService(ServiceOpenTera):
                         return {'status': 'error', 'error_text': gettext('Cannot create refused session event')}
 
             if 'participant_uuid' in parameters:
-                join_session_reply.user_uuid = parameters['participant_uuid']
+                join_session_reply.participant_uuid = parameters['participant_uuid']
                 if parameters['reply_code'] != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
                     session_info['session_participants'] = [item for item in session_info['session_participants']
                                                             if item != parameters['participant_uuid']]
@@ -671,7 +671,7 @@ class VideoRehabService(ServiceOpenTera):
                         return {'status': 'error', 'error_text': gettext('Cannot create refused session event')}
 
             if 'device_uuid' in parameters:
-                join_session_reply.user_uuid = parameters['device_uuid']
+                join_session_reply.device_uuid = parameters['device_uuid']
                 if parameters['reply_code'] != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
                     session_info['session_devices'] = [item for item in session_info['session_devices']
                                                        if item != parameters['device_uuid']]
