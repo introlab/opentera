@@ -115,9 +115,7 @@ class UserQueryParticipants(Resource):
         try:
             if participants:
                 participant_list = []
-                online_participants = []
-                busy_participants = []
-                status_participants = []
+                status_participants = {}
                 if args['with_status']:
                     # Query status
                     rpc = RedisRPCClient(self.module.config.redis_config)
