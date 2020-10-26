@@ -235,6 +235,10 @@ class UserQuerySessions(Resource):
             # At least one session user is not accessible to the user
             return gettext('User doesn\'t have access to at least one device of that session.'), 403
 
+        from libtera.db.models.TeraSession import TeraSessionStatus
+        if todel_session.session_status == TeraSessionStatus.STATUS_INPROGRESS.value:
+            return gettext('Session is in progress: can\'t delete that session.'), 403
+
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraSession.delete(id_todel=id_todel)
