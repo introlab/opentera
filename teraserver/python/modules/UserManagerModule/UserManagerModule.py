@@ -31,15 +31,21 @@ class UserManagerModule(BaseModule):
     def setup_rpc_interface(self):
         self.rpc_api['online_users'] = {'args': [], 'returns': 'list', 'callback': self.online_users_rpc_callback}
         self.rpc_api['busy_users'] = {'args': [], 'returns': 'dict', 'callback': self.busy_users_rpc_callback}
+        self.rpc_api['status_users'] = {'args': [], 'returns': 'dict', 'callback': self.status_users_rpc_callback}
 
         self.rpc_api['online_participants'] = {'args': [], 'returns': 'list',
                                                'callback': self.online_participants_rpc_callback}
         self.rpc_api['busy_participants'] = {'args': [], 'returns': 'dict',
                                              'callback': self.busy_participants_rpc_callback}
 
+        self.rpc_api['status_participants'] = {'args': [], 'returns': 'dict',
+                                               'callback': self.status_participants_rpc_callback}
+
         self.rpc_api['online_devices'] = {'args': [], 'returns': 'list',
                                           'callback': self.online_devices_rpc_callback}
         self.rpc_api['busy_devices'] = {'args': [], 'returns': 'dict', 'callback': self.busy_devices_rpc_callback}
+
+        self.rpc_api['status_devices'] = {'args': [], 'returns': 'dict', 'callback': self.status_devices_rpc_callback}
 
     def online_users_rpc_callback(self, *args, **kwargs):
         print('online_users_rpc_callback', args, kwargs)
@@ -64,6 +70,66 @@ class UserManagerModule(BaseModule):
     def busy_devices_rpc_callback(self, *args, **kwargs):
         print('busy_devices_rpc_callback', args, kwargs)
         return self.device_registry.busy_devices()
+
+    def status_users_rpc_callback(self, *args, **kwargs):
+        # Get online users
+        online_users = self.user_registry.online_users()
+        # Get busy users
+        busy_users = self.user_registry.busy_users()
+        # Get unique uuids (merge lists)
+        all_uuids = set(online_users.extend(busy_users))
+
+        result = {}
+        for user_uuid in all_uuids:
+            online_flag = False
+            busy_flag = False
+            if user_uuid in online_users:
+                online_flag = True
+            if user_uuid in busy_users:
+                busy_flag = True
+
+            result[user_uuid] = {'online': online_flag, 'busy': busy_flag}
+        return result
+
+    def status_participants_rpc_callback(self, *args, **kwargs):
+        # Get online participants
+        online_participants = self.participant_registry.online_participants()
+        # Get busy participants
+        busy_participants = self.participant_registry.busy_participants()
+        # Get unique uuids (merge lists)
+        all_uuids = set(online_participants.extend(busy_participants))
+
+        result = {}
+        for participant_uuid in all_uuids:
+            online_flag = False
+            busy_flag = False
+            if participant_uuid in online_participants:
+                online_flag = True
+            if participant_uuid in busy_participants:
+                busy_flag = True
+
+            result[participant_uuid] = {'online': online_flag, 'busy': busy_flag}
+        return result
+
+    def status_devices_rpc_callback(self, *args, **kwargs):
+        # Get online devices
+        online_devices = self.device_registry.online_devices()
+        # Get busy devices
+        busy_devices = self.device_registry.busy_devices()
+        # Get unique uuids (merge lists)
+        all_uuids = set(online_devices.extend(busy_devices))
+
+        result = {}
+        for device_uuid in all_uuids:
+            online_flag = False
+            busy_flag = False
+            if device_uuid in online_devices:
+                online_flag = True
+            if device_uuid in busy_devices:
+                busy_flag = True
+
+            result[device_uuid] = {'online': online_flag, 'busy': busy_flag}
+        return result
 
     def setup_module_pubsub(self):
         pass
