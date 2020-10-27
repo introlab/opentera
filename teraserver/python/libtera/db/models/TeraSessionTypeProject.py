@@ -24,38 +24,45 @@ class TeraSessionTypeProject(db.Model, BaseModel):
         return rval
 
     @staticmethod
-    def create_defaults():
-        from libtera.db.models.TeraSessionType import TeraSessionType
-        from libtera.db.models.TeraProject import TeraProject
+    def create_defaults(test=False):
+        if test:
+            from libtera.db.models.TeraSessionType import TeraSessionType
+            from libtera.db.models.TeraProject import TeraProject
 
-        video_session = TeraSessionType.get_session_type_by_prefix('VIDEO')
-        sensor_session = TeraSessionType.get_session_type_by_prefix('SENSOR')
-        vsensor_session = TeraSessionType.get_session_type_by_prefix('STREAM')
-        robot_session = TeraSessionType.get_session_type_by_prefix('ROBOT')
+            video_session = TeraSessionType.get_session_type_by_id(1)
+            sensor_session = TeraSessionType.get_session_type_by_id(2)
+            data_session = TeraSessionType.get_session_type_by_id(3)
+            exerc_session = TeraSessionType.get_session_type_by_id(4)
+            bureau_session = TeraSessionType.get_session_type_by_id(5)
 
-        project = TeraProject.get_project_by_projectname('Default Project #1')
+            project = TeraProject.get_project_by_projectname('Default Project #1')
 
-        stp = TeraSessionTypeProject()
-        stp.session_type_project_session_type = video_session
-        stp.session_type_project_project = project
-        db.session.add(stp)
+            stp = TeraSessionTypeProject()
+            stp.session_type_project_session_type = video_session
+            stp.session_type_project_project = project
+            db.session.add(stp)
 
-        stp = TeraSessionTypeProject()
-        stp.session_type_project_session_type = sensor_session
-        stp.session_type_project_project = project
-        db.session.add(stp)
+            stp = TeraSessionTypeProject()
+            stp.session_type_project_session_type = sensor_session
+            stp.session_type_project_project = project
+            db.session.add(stp)
 
-        stp = TeraSessionTypeProject()
-        stp.session_type_project_session_type = vsensor_session
-        stp.session_type_project_project = project
-        db.session.add(stp)
+            stp = TeraSessionTypeProject()
+            stp.session_type_project_session_type = data_session
+            stp.session_type_project_project = project
+            db.session.add(stp)
 
-        stp = TeraSessionTypeProject()
-        stp.session_type_project_session_type = robot_session
-        stp.session_type_project_project = project
-        db.session.add(stp)
+            stp = TeraSessionTypeProject()
+            stp.session_type_project_session_type = exerc_session
+            stp.session_type_project_project = project
+            db.session.add(stp)
 
-        db.session.commit()
+            stp = TeraSessionTypeProject()
+            stp.session_type_project_session_type = bureau_session
+            stp.session_type_project_project = project
+            db.session.add(stp)
+
+            db.session.commit()
 
     @staticmethod
     def get_session_type_project_by_id(stp_id: int):
@@ -72,3 +79,30 @@ class TeraSessionTypeProject(db.Model, BaseModel):
     @staticmethod
     def query_session_type_project_for_session_type_project(project_id: int, session_type_id: int):
         return TeraSessionTypeProject.query.filter_by(id_project=project_id, id_session_type=session_type_id).first()
+
+    def check_integrity(self):
+        from libtera.db.models.TeraSessionType import TeraSessionType
+        # If that session type is related to a service, make sure that the service is associated to that project
+        if self.session_type_project_session_type.session_type_category == \
+                TeraSessionType.SessionCategoryEnum.SERVICE.value:
+            service_projects = [proj.id_project for proj in
+                                self.session_type_project_session_type.session_type_service.service_projects]
+            if self.id_project not in service_projects:
+                # We must also associate that service to that project!
+                from libtera.db.models.TeraServiceProject import TeraServiceProject
+                new_service_project = TeraServiceProject()
+                new_service_project.service_project_service = self.session_type_project_session_type \
+                    .session_type_service
+                new_service_project.service_project_project = self.session_type_project_project
+                TeraServiceProject.insert(new_service_project)
+
+    @classmethod
+    def insert(cls, stp):
+        super().insert(stp)
+        stp.check_integrity()
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        super().update(update_id, values)
+        stp = TeraSessionTypeProject.get_session_type_project_by_id(update_id)
+        stp.check_integrity()

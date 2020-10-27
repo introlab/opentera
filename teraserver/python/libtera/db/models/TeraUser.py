@@ -1,13 +1,24 @@
 from libtera.db.Base import db, BaseModel
-from libtera.db.models.TeraProjectAccess import TeraProjectAccess
-from libtera.db.models.TeraSiteAccess import TeraSiteAccess
 from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
+from flask_sqlalchemy import event
 
 from passlib.hash import bcrypt
 import uuid
 import datetime
 import json
+
+
+# Generator for jti
+def infinite_jti_sequence():
+    num = 0
+    while True:
+        yield num
+        num += 1
+
+
+# Initialize generator, call next(user_jti_generator) to get next sequence number
+user_jti_generator = infinite_jti_sequence()
 
 
 class TeraUser(db.Model, BaseModel):
@@ -20,20 +31,24 @@ class TeraUser(db.Model, BaseModel):
     user_lastname = db.Column(db.String, nullable=False)
     user_password = db.Column(db.String, nullable=False)
     user_enabled = db.Column(db.Boolean, nullable=False)
-    user_profile = db.Column(db.String, nullable=False)
+    user_profile = db.Column(db.String, nullable=False) # Used to store "extra" informations, if needed.
     user_notes = db.Column(db.String, nullable=True)
-    user_lastonline = db.Column(db.TIMESTAMP, nullable=True)
-    user_superadmin = db.Column(db.Boolean, nullable=False)
+    user_lastonline = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+    user_superadmin = db.Column(db.Boolean, nullable=False, default=False)
 
-    user_sites_access = db.relationship('TeraSiteAccess', cascade="all,delete")
-    user_projects_access = db.relationship("TeraProjectAccess", cascade="all,delete")
+    # user_sites_access = db.relationship('TeraSiteAccess', cascade="all,delete")
+    # user_projects_access = db.relationship("TeraProjectAccess", cascade="all,delete")
+    user_user_groups = db.relationship("TeraUserGroup", secondary="t_users_users_groups",
+                                       back_populates="user_group_users")
+    user_sessions = db.relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users",
+                                    passive_deletes=True)
 
     authenticated = False
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['authenticated', 'user_password', 'user_sites_access', 'user_projects_access'])
+        ignore_fields.extend(['authenticated', 'user_password', 'user_user_groups', 'user_sessions'])
         if minimal:
             ignore_fields.extend(['user_username', 'user_email', 'user_profile', 'user_notes', 'user_lastonline',
                                   'user_superadmin'])
@@ -41,17 +56,33 @@ class TeraUser(db.Model, BaseModel):
         rval['user_name'] = self.get_fullname()
         return rval
 
-    def get_token(self, token_key: str):
-        return TeraUser.get_token_for_user(self.user_uuid, token_key)
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
 
-    @staticmethod
-    def get_token_for_user(user_uuid: uuid, token_key: str):
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_user': self.id_user, 'user_uuid': self.user_uuid}
+
+    def get_token(self, token_key: str, expiration=3600):
         import time
         import jwt
+        import random
+
         # Creating token with user info
+        now = time.time()
+
         payload = {
-            'iat': int(time.time()),
-            'user_uuid': user_uuid
+            'iat': int(now),
+            'exp': int(now) + expiration,
+            'iss': 'TeraServer',
+            'jti': next(user_jti_generator),
+            'user_uuid': self.user_uuid,
+            'id_user': self.id_user,
+            'user_fullname': self.get_fullname(),
+            'user_superadmin': self.user_superadmin
         }
 
         return jwt.encode(payload, token_key, algorithm='HS256').decode('utf-8')
@@ -81,13 +112,57 @@ class TeraUser(db.Model, BaseModel):
     def __repr__(self):
         return self.__str__()
 
+    def get_sites_roles(self) -> dict:
+        sites_roles = {}
+
+        if self.user_superadmin:
+            # Super admin - admin role in all sites
+            sites = TeraSite.query.all()
+            for site in sites:
+                sites_roles[site] = {'site_role': 'admin', 'inherited': True}
+            return sites_roles
+
+        # Browse all user groups to get roles for those sites
+        for user_group in self.user_user_groups:
+            user_group_roles = user_group.get_sites_roles()
+            for site, site_role in user_group_roles.items():
+                if site not in sites_roles:
+                    # Site not already present
+                    sites_roles[site] = site_role
+                else:
+                    # Site present - check if we have an "admin" role to overwrite an "user" role
+                    if site_role['site_role'] == 'admin':
+                        sites_roles[site] = site_role
+
+        return sites_roles
+
+    def get_projects_roles(self) -> dict:
+        projects_roles = {}
+
+        if self.user_superadmin:
+            # Super admin - admin role in all projects
+            projects = TeraProject.query.all()
+            for project in projects:
+                projects_roles[project] = {'project_role': 'admin', 'inherited': True}
+            return projects_roles
+
+        # Browse all user groups to get roles for those projects
+        for user_group in self.user_user_groups:
+            user_group_roles = user_group.get_projects_roles()
+            for project, project_role in user_group_roles.items():
+                if project not in projects_roles:
+                    # Project not already present
+                    projects_roles[project] = project_role
+                else:
+                    # Project present - check if we have an "admin" role to overwrite an "user" role
+                    if project_role['project_role'] == 'admin':
+                        projects_roles[project] = project_role
+
+        return projects_roles
+
     @staticmethod
     def encrypt_password(password):
         return bcrypt.hash(password)
-
-    # @staticmethod
-    # def is_anonymous():
-    #     return False
 
     @staticmethod
     def verify_password(username, password):
@@ -123,6 +198,10 @@ class TeraUser(db.Model, BaseModel):
         user = TeraUser.query.filter_by(id_user=id_user).first()
         return user
 
+    @staticmethod
+    def get_superadmins():
+        return TeraUser.query.filter_by(user_superadmin=True).all()
+
     @classmethod
     def update(cls, id_user: int, values: dict):
         # Remove the password field is present and if empty
@@ -136,6 +215,10 @@ class TeraUser(db.Model, BaseModel):
         if 'user_profile' in values:
             if isinstance(values['user_profile'], dict):
                 values['user_profile'] = json.dumps(values['user_profile'])
+
+        # Prevent changes on UUID
+        if 'user_uuid' in values:
+            del values['user_uuid']
 
         super().update(id_user, values)
 
@@ -157,8 +240,8 @@ class TeraUser(db.Model, BaseModel):
         super().insert(user)
 
     @staticmethod
-    def create_defaults():
-
+    def create_defaults(test=False):
+        from libtera.db.models.TeraUserGroup import TeraUserGroup
         # Admin
         admin = TeraUser()
         admin.user_enabled = True
@@ -169,87 +252,72 @@ class TeraUser(db.Model, BaseModel):
         admin.user_superadmin = True
         admin.user_username = "admin"
         admin.user_uuid = str(uuid.uuid4())
-        # admin.user_usergroups.append(TeraUserGroup.get_usergroup_by_name('Administrateurs'))
         db.session.add(admin)
 
-        # Site admin
-        admin = TeraUser()
-        admin.user_enabled = True
-        admin.user_firstname = "Site"
-        admin.user_lastname = "Admin"
-        admin.user_profile = ""
-        admin.user_password = TeraUser.encrypt_password("siteadmin")
-        admin.user_superadmin = False
-        admin.user_username = "siteadmin"
-        admin.user_uuid = str(uuid.uuid4())
-        db.session.add(admin)
+        if test:
+            # Site admin
+            admin = TeraUser()
+            admin.user_enabled = True
+            admin.user_firstname = "Site"
+            admin.user_lastname = "Admin"
+            admin.user_profile = ""
+            admin.user_password = TeraUser.encrypt_password("siteadmin")
+            admin.user_superadmin = False
+            admin.user_username = "siteadmin"
+            admin.user_uuid = str(uuid.uuid4())
+            # admin.user_user_group = TeraUserGroup.get_user_group_by_group_name("Admins - Default Site")
+            db.session.add(admin)
 
-        # Site User
-        user = TeraUser()
-        user.user_enabled = True
-        user.user_firstname = "Site"
-        user.user_lastname = "User"
-        user.user_profile = ""
-        user.user_password = TeraUser.encrypt_password("user")
-        user.user_superadmin = False
-        user.user_username = "user"
-        user.user_uuid = str(uuid.uuid4())
-        db.session.add(user)
+            # Site User
+            user = TeraUser()
+            user.user_enabled = True
+            user.user_firstname = "Site"
+            user.user_lastname = "User"
+            user.user_profile = ""
+            user.user_password = TeraUser.encrypt_password("user")
+            user.user_superadmin = False
+            user.user_username = "user"
+            user.user_uuid = str(uuid.uuid4())
+            # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Project 1")
+            db.session.add(user)
 
-        # Site User
-        user = TeraUser()
-        user.user_enabled = True
-        user.user_firstname = "MultiSite"
-        user.user_lastname = "User"
-        user.user_profile = ""
-        user.user_password = TeraUser.encrypt_password("user2")
-        user.user_superadmin = False
-        user.user_username = "user2"
-        user.user_uuid = str(uuid.uuid4())
-        db.session.add(user)
+            # Site User
+            user = TeraUser()
+            user.user_enabled = True
+            user.user_firstname = "MultiSite"
+            user.user_lastname = "User"
+            user.user_profile = ""
+            user.user_password = TeraUser.encrypt_password("user2")
+            user.user_superadmin = False
+            user.user_username = "user2"
+            user.user_uuid = str(uuid.uuid4())
+            # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
+            db.session.add(user)
 
-        # Project Access
-        # admin_access = TeraProjectAccess()
-        # admin_access.id_user = TeraUser.get_user_by_username('siteadmin').id_user
-        # admin_access.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
-        # admin_access.project_access_role = 'admin'
-        # db.session.add(admin_access)
+            # Project admin
+            user = TeraUser()
+            user.user_enabled = True
+            user.user_firstname = "Project"
+            user.user_lastname = "Admin"
+            user.user_profile = ""
+            user.user_password = TeraUser.encrypt_password("user3")
+            user.user_superadmin = False
+            user.user_username = "user3"
+            user.user_uuid = str(uuid.uuid4())
+            # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
+            db.session.add(user)
 
-        user_access = TeraProjectAccess()
-        user_access.id_user = TeraUser.get_user_by_username('user').id_user
-        user_access.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
-        user_access.project_access_role = 'user'
-        db.session.add(user_access)
-
-        user2_access = TeraProjectAccess()
-        user2_access.id_user = TeraUser.get_user_by_username('user2').id_user
-        user2_access.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
-        user2_access.project_access_role = 'user'
-        db.session.add(user2_access)
-
-        user2_access_admin = TeraProjectAccess()
-        user2_access_admin.id_user = TeraUser.get_user_by_username('user2').id_user
-        user2_access_admin.id_project = TeraProject.get_project_by_projectname('Default Project #2').id_project
-        user2_access_admin.project_access_role = 'admin'
-        db.session.add(user2_access_admin)
-
-        # Site Access
-        admin_access = TeraSiteAccess()
-        admin_access.id_user = TeraUser.get_user_by_username('siteadmin').id_user
-        admin_access.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        admin_access.site_access_role = 'admin'
-        db.session.add(admin_access)
-
-        user_access = TeraSiteAccess()
-        user_access.id_user = TeraUser.get_user_by_username('user').id_user
-        user_access.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        user_access.site_access_role = 'user'
-        db.session.add(user_access)
-
-        user2_access = TeraSiteAccess()
-        user2_access.id_user = TeraUser.get_user_by_username('user2').id_user
-        user2_access.id_site = TeraSite.get_site_by_sitename('Default Site').id_site
-        user2_access.site_access_role = 'user'
-        db.session.add(user2_access)
+            # No access user!
+            user = TeraUser()
+            user.user_enabled = True
+            user.user_firstname = "No Access"
+            user.user_lastname = "User!"
+            user.user_profile = ""
+            user.user_password = TeraUser.encrypt_password("user4")
+            user.user_superadmin = False
+            user.user_username = "user4"
+            user.user_uuid = str(uuid.uuid4())
+            # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
+            db.session.add(user)
 
         db.session.commit()

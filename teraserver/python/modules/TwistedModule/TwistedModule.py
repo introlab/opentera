@@ -26,6 +26,8 @@ from OpenSSL import SSL
 import sys
 import os
 
+from flask import session
+
 
 class MyHTTPChannel(HTTPChannel):
     def allHeadersReceived(self):
@@ -46,17 +48,31 @@ class MyHTTPChannel(HTTPChannel):
         if req.requestHeaders.hasHeader('X-Participant-UUID'):
             req.requestHeaders.removeHeader('X-Participant-UUID')
             # TODO raise error ?
+        #
+        # if cert is not None:
+        #     # Certificate found, add information in header
+        #     subject = cert.get_subject()
+        #     # Get UID if possible
+        #     if 'Device' in subject.CN and hasattr(subject, 'UID'):
+        #         user_id = subject.UID
+        #         req.requestHeaders.addRawHeader('X-Device-UUID', user_id)
+        #     if 'Participant' in subject.CN and hasattr(subject, 'UID'):
+        #         user_id = subject.UID
+        #         req.requestHeaders.addRawHeader('X-Participant-UUID', user_id)
 
-        if cert is not None:
-            # Certificate found, add information in header
-            subject = cert.get_subject()
-            # Get UID if possible
-            if 'Device' in subject.CN and hasattr(subject, 'UID'):
-                user_id = subject.UID
-                req.requestHeaders.addRawHeader('X-Device-UUID', user_id)
-            if 'Participant' in subject.CN and hasattr(subject, 'UID'):
-                user_id = subject.UID
-                req.requestHeaders.addRawHeader('X-Participant-UUID', user_id)
+        # Look for nginx headers (can contain a certificate)
+        if req.requestHeaders.hasHeader('x-ssl-client-dn'):
+            # TODO do better parsing. Working for now...
+            # Domain extracted by nginx (much faster)
+            client_dn = req.requestHeaders.getRawHeaders('x-ssl-client-dn')[0]
+            uuid = ''
+            for key in client_dn.split(','):
+                if 'UID' in key and len(key) == 40:
+                    uuid = key[4:]
+                if 'CN' in key and 'Device' in key:
+                    req.requestHeaders.addRawHeader('X-Device-UUID', uuid)
+                if 'CN' in key and 'Participant' in key:
+                    req.requestHeaders.addRawHeader('X-Participant-UUID', uuid)
 
         HTTPChannel.allHeadersReceived(self)
 
@@ -79,24 +95,26 @@ class TwistedModule(BaseModule):
 
         # USERS
         wss_user_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % (self.config.server_config['hostname'],
-                                                          self.config.server_config['port']),
-                                                          redis_config=self.config.redis_config)
+                                                                                 self.config.server_config['port']),
+                                                               redis_config=self.config.redis_config)
 
         wss_user_factory.protocol = TeraWebSocketServerUserProtocol
         wss_user_resource = WebSocketResource(wss_user_factory)
 
         # PARTICIPANTS
-        wss_participant_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % (self.config.server_config['hostname'],
-                                                          self.config.server_config['port']),
-                                                          redis_config=self.config.redis_config)
+        wss_participant_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" %
+                                                                      (self.config.server_config['hostname'],
+                                                                       self.config.server_config['port']),
+                                                                      redis_config=self.config.redis_config)
 
         wss_participant_factory.protocol = TeraWebSocketServerParticipantProtocol
         wss_participant_resource = WebSocketResource(wss_participant_factory)
 
         # DEVICES
-        wss_device_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" % (self.config.server_config['hostname'],
-                                                          self.config.server_config['port']),
-                                                          redis_config=self.config.redis_config)
+        wss_device_factory = TwistedModuleWebSocketServerFactory(u"wss://%s:%d" %
+                                                                 (self.config.server_config['hostname'],
+                                                                  self.config.server_config['port']),
+                                                                 redis_config=self.config.redis_config)
 
         wss_device_factory.protocol = TeraWebSocketServerDeviceProtocol
         wss_device_resource = WebSocketResource(wss_device_factory)

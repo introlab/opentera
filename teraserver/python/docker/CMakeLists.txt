@@ -1,7 +1,4 @@
 # Automate docker setup here
-add_custom_target(docker-Dockerfile
-    SOURCES Dockerfile
-)
 
 # WORKDIR /opentera/teraserver/python
 # Generate translations
@@ -25,15 +22,16 @@ add_custom_target(
 )
 
 FILE(GLOB_RECURSE protofiles RELATIVE "${MESSAGES_PATH}" "${MESSAGES_PATH}/*.proto")
-message(STATUS "Protofiles: ${protofiles}")
-message(STATUS "Message path: ${MESSAGES_PATH}")
+message(STATUS "Docker Protofiles: ${protofiles}")
+message(STATUS "Docker Message path: ${MESSAGES_PATH}")
 
 # Targets
 set(docker_protobuf_python_targets)
 
 foreach(file ${protofiles})
-    message(STATUS "Processing ${file}")
+    message(STATUS "Docker Processing ${file}")
     get_filename_component (name_without_extension ${file} NAME_WE)
+    message(STATUS "Docker name_without_extension = ${name_without_extension}")
     #Add target
     set(output_target docker_${name_without_extension}.proto.target)
     list(APPEND docker_protobuf_python_targets ${output_target})
@@ -53,5 +51,5 @@ add_custom_target(
 
 
 add_custom_target(docker-all
-    DEPENDS docker-Dockerfile docker-translations docker-messages
+    DEPENDS docker-translations docker-messages
 )

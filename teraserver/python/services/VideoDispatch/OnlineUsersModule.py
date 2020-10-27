@@ -1,12 +1,14 @@
 from modules.BaseModule import BaseModule, ModuleNames
 from services.VideoDispatch.ConfigManager import ConfigManager
-from messages.python.TeraMessage_pb2 import TeraMessage
+from messages.python.TeraModuleMessage_pb2 import TeraModuleMessage
 from messages.python.UserEvent_pb2 import UserEvent
 from messages.python.ParticipantEvent_pb2 import ParticipantEvent
 from messages.python.DeviceEvent_pb2 import DeviceEvent
 from enum import Enum, unique
 from datetime import datetime
 from uuid import uuid4
+from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
+from twisted.internet import reactor, ssl, defer
 
 
 @unique
@@ -117,15 +119,17 @@ class OnlineUsersModule(BaseModule):
         BaseModule.__init__(self, "VideoDispatchService.OnlineUsersModule", config)
         self.dispatch = ParticipantDispatch()
 
+    @defer.inlineCallbacks
     def setup_module_pubsub(self):
         # Additional subscribe
-        self.subscribe_pattern_with_callback('module.TeraServer.UserManagerModule.messages.events',
-                                             self.notify_user_manager_event)
+        ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+            ModuleNames.USER_MANAGER_MODULE_NAME), self.notify_user_manager_event)
 
     def setup_rpc_interface(self):
         self.rpc_api['participant_dispatch'] = {'args': [bool],
                                                 'returns': 'dict',
                                                 'callback': self.participant_dispatch}
+
         self.rpc_api['participant_rank'] = {'args': [str],
                                             'returns': 'dict',
                                             'callback': self.participant_rank}
@@ -157,7 +161,7 @@ class OnlineUsersModule(BaseModule):
         We have received a published message from redis
         """
         print('VideoDispatchService.OnlineUsersModule - notify_user_manager_event', pattern, channel, message)
-        tera_message = TeraMessage()
+        tera_message = TeraModuleMessage()
         tera_message.ParseFromString(message)
 
         # We have a repeated Any field look for message type

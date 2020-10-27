@@ -1,15 +1,17 @@
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse, fields, inputs
+from flask import request
+from flask_restx import Resource
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
-from libtera.db.DBManager import DBManager, db
+from modules.DatabaseModule.DBManager import db
 import uuid
 from datetime import datetime
 
 # Parser definition(s)
 get_parser = api.parser()
+get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the participant to query')
+
 post_parser = api.parser()
 
 
@@ -55,8 +57,16 @@ class ServiceQueryParticipants(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
-        print('hello')
-        return 'Not implemented', 501
+
+        args = get_parser.parse_args()
+
+        # args['participant_uuid'] Will be None if not specified in args
+        if args['participant_uuid']:
+            participant = TeraParticipant.get_participant_by_uuid(args['participant_uuid'])
+            if participant:
+                return participant.to_json()
+
+        return gettext('Missing arguments'), 400
 
     @LoginModule.service_token_or_certificate_required
     # @api.expect(post_parser)
@@ -72,19 +82,19 @@ class ServiceQueryParticipants(Resource):
 
         # Using request.json instead of parser, since parser messes up the json!
         if 'participant' not in request.json:
-            return '', 400
+            return gettext('Missing arguments'), 400
 
         participant_info = request.json['participant']
 
         # All fields validation
         if participant_info['id_project'] < 1:
-            return 'Unknown project', 403
+            return gettext('Unknown project'), 403
 
         if not participant_info['participant_name']:
-            return 'Invalid participant name', 403
+            return gettext('Invalid participant name'), 403
 
         if not participant_info['participant_email']:
-            return 'Invalid participant email', 403
+            return gettext('Invalid participant email'), 403
 
         # Everything ok...
         # Create a new participant?

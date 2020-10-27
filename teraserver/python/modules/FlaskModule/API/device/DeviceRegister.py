@@ -1,6 +1,9 @@
 from flask_restx import Resource, reqparse
+from flask_babel import gettext
 from flask import jsonify
 from flask import request
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address, get_ipaddr
 import base64
 from libtera.crypto.crypto_utils import generate_device_certificate, load_private_pem_key, load_pem_certificate
 from cryptography import x509
@@ -14,6 +17,9 @@ from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraSessionType import TeraSessionType
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 import uuid
+from modules.FlaskModule.FlaskModule import flask_app
+
+limiter = Limiter(flask_app, key_func=get_ipaddr)
 
 
 class DeviceRegister(Resource):
@@ -22,6 +28,7 @@ class DeviceRegister(Resource):
     Will return the certificate with newly created device UUID, but disabled.
     Administrators will need to put the device in a site and enable it before use.
     """
+    decorators = [limiter.limit("10/minute", error_message='Rate Limited')]
 
     def __init__(self, _api, flaskModule=None):
         Resource.__init__(self, _api)
@@ -30,8 +37,8 @@ class DeviceRegister(Resource):
         self.ca_info = dict()
 
         # Load CA private key
-        self.ca_info['private_key'] = load_private_pem_key(self.module.config.server_config['ssl_path']
-                                                           + '/' + self.module.config.server_config['ca_private_key'])
+        self.ca_info['private_key'] = load_private_pem_key(self.module.config.server_config['ssl_path'] + '/'
+                                                           + self.module.config.server_config['ca_private_key'])
 
         # Load CA certificate
         self.ca_info['certificate'] = load_pem_certificate(self.module.config.server_config['ssl_path'] + '/'
@@ -50,25 +57,13 @@ class DeviceRegister(Resource):
         device.device_onlineable = False
         # TODO WARNING - Should be disabled when created...
         device.device_enabled = False
-        device.device_type = TeraDeviceType.DeviceTypeEnum.SENSOR.value
+        # TODO FORCING 'capteur' as default?
+        device.id_device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
         device.device_uuid = str(uuid.uuid4())
         device.create_token()
         device.update_last_online()
 
-        # Test participant assignation
-        # from libtera.db.models.TeraParticipant import TeraParticipant
-        # from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
-        # participant1 = TeraParticipant.get_participant_by_id(1)
-        # device_partipant = TeraDeviceParticipant()
-        # device_partipant.device_participant_participant = participant1
-        # device_partipant.device_participant_device = device
-        # db.session.add(device_partipant)
-
         return device
-
-    def get(self):
-        print(request)
-        return '', 403
 
     def post(self):
         print(request)
@@ -101,25 +96,31 @@ class DeviceRegister(Resource):
                 result['ca_info'] = self.ca_info['certificate'].public_bytes(serialization.Encoding.PEM).decode('utf-8')
                 result['token'] = device.device_token
 
-                test = jsonify(result)
+                self.module.logger.log_info(self.module.module_name, DeviceRegister.__name__,
+                                            'post', 'Device registered (certificate)',
+                                            device.device_uuid, result['certificate'])
 
                 # Return certificate...
                 return jsonify(result)
             else:
-                return 'Invalid CSR signature', 400
+                self.module.logger.log_error(self.module.module_name,
+                                             DeviceRegister.__name__,
+                                             'post', 400, 'Invalid CSR signature', request.data)
+
+                return gettext('Invalid CSR signature'), 400
                 # except:
                 #     return 'Error processing request', 400
 
         elif request.content_type == 'application/json':
 
             if 'device_info' not in request.json:
-                return 'Invalid content type', 400
+                return gettext('Invalid content type'), 400
 
             device_info = request.json['device_info']
 
             # Check if we have device name
             if 'device_name' not in device_info:
-                return 'Invalid content type', 400
+                return gettext('Invalid content type'), 400
 
             device_name = device_info['device_name']
             device = self.create_device(device_name)
@@ -133,7 +134,10 @@ class DeviceRegister(Resource):
             result = dict()
             result['token'] = device.device_token
 
+            self.module.logger.log_info(self.module.module_name, DeviceRegister.__name__,
+                                        'post', 'Device registered (token)', device.device_uuid, result['token'])
+
             # Return token
             return jsonify(result)
         else:
-            return 'Invalid content type', 400
+            return gettext('Invalid content type'), 400

@@ -1,10 +1,12 @@
 from flask import Flask, request, g
 from flask_session import Session
 from flask_restx import Api
+
 from .ConfigManager import ConfigManager
 from flask_babel import Babel
 
 from modules.BaseModule import BaseModule
+import redis
 
 
 flask_app = Flask("BureauActifService")
@@ -60,18 +62,19 @@ class FlaskModule(BaseModule):
 
         BaseModule.__init__(self, "BureauActifService.FlaskModule", config)
 
-        flask_app.debug = True
-        # flask_app.secret_key = 'development'
-        # This is used for session encryption
-        # TODO Change secret key
-        # TODO STORE SECRET IN DB?
-        flask_app.secret_key = 'BureauActifSecret'
+        flask_app.debug = config.service_config['debug_mode']
+        flask_app.secret_key = config.service_config['ServiceUUID']
 
         flask_app.config.update({'SESSION_TYPE': 'redis'})
+        redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
+                                   % self.config.redis_config)
+
+        flask_app.config.update({'SESSION_REDIS': redis_url})
+
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
-        # flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
+        flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
 
         # Not sure.
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
@@ -99,10 +102,18 @@ class FlaskModule(BaseModule):
         # Default arguments
         kwargs = {'flaskModule': self}
 
-        from .API.Upload import Upload
+        from .API.QueryRawData import QueryRawData
+        from .API.QueryCalendarData import QueryCalendarData
+        from .API.QueryTimelineData import QueryTimelineData
+        from .API.QueryLoginType import QueryLoginType
+        from .API.QueryServiceInfos import QueryServiceInfos
 
         # Resources
-        default_api_ns.add_resource(Upload, '/upload', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryRawData, '/rawdata', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryCalendarData, '/calendardata', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryTimelineData, '/timelinedata', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryLoginType, '/me', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryServiceInfos, '/serviceinfos', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from .Views.Index import Index

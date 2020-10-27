@@ -105,13 +105,13 @@ class TwistedModule(BaseModule):
         # # Certificate verification callback
         # ctx.set_verify(SSL.VERIFY_NONE, self.verifyCallback)
         #
-        # # With self-signed certs we have to explicitely tell the server to trust certificates
+        # # With self-signed certs we have to explicitly tell the server to trust certificates
         # ctx.load_verify_locations(os.path.join(
         #     os.path.abspath(self.config.server_config['ssl_path']),
         #     self.config.server_config['ca_certificate']))
 
         # reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
-        reactor.listenTCP(self.config.server_config['port'], site)
+        reactor.listenTCP(self.config.service_config['port'], site)
 
     def __del__(self):
         pass
@@ -134,10 +134,6 @@ class TwistedModule(BaseModule):
         """
         print('VideoDispatchService.TwistedModule - Received message ', pattern, channel, message)
         pass
-
-    def run(self):
-        log.startLogging(sys.stdout)
-        reactor.run()
 
 
 

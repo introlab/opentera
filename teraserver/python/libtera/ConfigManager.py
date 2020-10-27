@@ -6,7 +6,6 @@ class ConfigManager:
     server_config = {}  # name, port, ssl_path
     db_config = {}      # name, url, port, username, password
     redis_config = {}
-    service_config = {}
 
     def __init__(self):
         pass
@@ -16,8 +15,8 @@ class ConfigManager:
             config_file = open(filename, mode='rt', encoding='utf8')
             config_json = json.load(config_file)
             config_file.close()
-        except IOError:
-            print("Error loading file: " + filename)
+        except IOError as e:
+            print("Error loading file: " + filename, e)
             return
 
         except json.JSONDecodeError as e:
@@ -33,14 +32,10 @@ class ConfigManager:
         if self.validate_redis_config(config_json['Redis']):
             self.redis_config = config_json["Redis"]
 
-        for service in config_json['Services']:
-            if self.validate_service_config(service, config_json['Services'][service]):
-                self.service_config[service] = config_json['Services'][service]
-
     def create_defaults(self):
         # Server fake config
-        server_required_fields = ['name', 'port', 'use_ssl', 'ssl_path', 'hostname',
-                           'site_certificate', 'site_private_key', 'ca_certificate', 'ca_private_key', 'upload_path']
+        server_required_fields = ['name', 'port', 'use_ssl', 'ssl_path', 'hostname', 'site_certificate',
+                                  'site_private_key', 'ca_certificate', 'ca_private_key', 'upload_path']
         for field in server_required_fields:
             self.server_config[field] = ''
         self.server_config['upload_path'] = 'uploads'
@@ -54,6 +49,13 @@ class ConfigManager:
         redis_required_fields = ['hostname', 'port', 'db', 'username', 'password']
         for field in redis_required_fields:
             self.redis_config[field] = ''
+        # Default redis configuration
+        self.redis_config['hostname'] = 'localhost'
+        self.redis_config['port'] = 6379
+        # Already set to empty string previously
+        self.redis_config['username'] = ''
+        self.redis_config['password'] = ''
+        self.redis_config['db'] = 0
 
     @staticmethod
     def validate_server_config(config):
@@ -65,6 +67,11 @@ class ConfigManager:
             if field not in config:
                 print('ERROR: Server Config - missing server ' + field)
                 rval = False
+
+        # Add optional debug flag
+        if 'debug_mode' not in config:
+            config['debug_mode'] = False
+
         return rval
 
     @staticmethod

@@ -22,32 +22,33 @@ class TeraDeviceProject(db.Model, BaseModel):
         return rval
 
     @staticmethod
-    def create_defaults():
-        from libtera.db.models.TeraDevice import TeraDevice
-        from libtera.db.models.TeraProject import TeraProject
-        device1 = TeraDevice.get_device_by_name('Apple Watch #W05P1')
-        device2 = TeraDevice.get_device_by_name('Kit Télé #1')
-        device3 = TeraDevice.get_device_by_name('Robot A')
-        project1 = TeraProject.get_project_by_projectname('Default Project #1')
-        project2 = TeraProject.get_project_by_projectname('Default Project #2')
-        project3 = TeraProject.get_project_by_projectname('Secret Project #1')
+    def create_defaults(test=False):
+        if test:
+            from libtera.db.models.TeraDevice import TeraDevice
+            from libtera.db.models.TeraProject import TeraProject
+            device1 = TeraDevice.get_device_by_name('Apple Watch #W05P1')
+            device2 = TeraDevice.get_device_by_name('Kit Télé #1')
+            device3 = TeraDevice.get_device_by_name('Robot A')
+            project1 = TeraProject.get_project_by_projectname('Default Project #1')
+            project2 = TeraProject.get_project_by_projectname('Default Project #2')
+            project3 = TeraProject.get_project_by_projectname('Secret Project #1')
 
-        dev_proj = TeraDeviceProject()
-        dev_proj.device_project_device = device1
-        dev_proj.device_project_project = project1
-        db.session.add(dev_proj)
+            dev_proj = TeraDeviceProject()
+            dev_proj.device_project_device = device1
+            dev_proj.device_project_project = project1
+            db.session.add(dev_proj)
 
-        dev_proj = TeraDeviceProject()
-        dev_proj.device_project_device = device2
-        dev_proj.device_project_project = project1
-        db.session.add(dev_proj)
+            dev_proj = TeraDeviceProject()
+            dev_proj.device_project_device = device2
+            dev_proj.device_project_project = project1
+            db.session.add(dev_proj)
 
-        dev_proj = TeraDeviceProject()
-        dev_proj.device_project_device = device1
-        dev_proj.device_project_project = project3
-        db.session.add(dev_proj)
+            dev_proj = TeraDeviceProject()
+            dev_proj.device_project_device = device1
+            dev_proj.device_project_project = project3
+            db.session.add(dev_proj)
 
-        db.session.commit()
+            db.session.commit()
 
     @staticmethod
     def get_device_project_by_id(device_project_id: int):

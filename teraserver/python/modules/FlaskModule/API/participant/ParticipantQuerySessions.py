@@ -1,10 +1,10 @@
-from flask import jsonify, session
-from flask_restx import Resource, reqparse, fields, inputs
+from flask import session
+from flask_restx import Resource, inputs
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_multi_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -20,7 +20,7 @@ class ParticipantQuerySessions(Resource):
         self.module = flaskModule
         Resource.__init__(self, _api)
 
-    @participant_multi_auth.login_required
+    @participant_multi_auth.login_required(role='full')
     @api.expect(get_parser)
     @api.doc(description='Get session associated with participant.',
              responses={200: 'Success',
@@ -47,7 +47,7 @@ class ParticipantQuerySessions(Resource):
 
         return sessions_list
 
-    @participant_multi_auth.login_required
+    @participant_multi_auth.login_required(role='full')
     @api.expect(post_parser)
     @api.doc(description='To be documented '
                          'To be documented',
@@ -56,4 +56,4 @@ class ParticipantQuerySessions(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def post(self):
-        return '', 501
+        return gettext('Not implemented'), 501

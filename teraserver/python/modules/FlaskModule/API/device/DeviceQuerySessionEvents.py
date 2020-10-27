@@ -1,14 +1,12 @@
-from flask import jsonify, session, request
+from flask import jsonify, request, session
 from flask_restx import Resource, reqparse
-from libtera.db.models.TeraUser import TeraUser
+from flask_babel import gettext
 from libtera.db.models.TeraSessionEvent import TeraSessionEvent
 from modules.LoginModule.LoginModule import LoginModule
-from libtera.db.DBManager import DBManager
-from sqlalchemy.exc import InvalidRequestError
+from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy import exc
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from libtera.db.models.TeraDevice import TeraDevice
-
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -27,34 +25,32 @@ class DeviceQuerySessionEvents(Resource):
     @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)
     @api.doc(description='Get session events',
-             responses={200: 'Success',
-                        500: 'Required parameter is missing',
-                        501: 'Not implemented',
-                        403: 'Logged device doesn\'t have permission to access the requested data'})
+             responses={403: 'Forbidden for security reasons.'})
     def get(self):
 
-        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
-        device_access = DBManager.deviceAccess(current_device)
-        args = get_parser.parse_args()
-
-        sessions_events = []
-
-        parent_session = device_access.query_session(args['id_session'])
-        if not parent_session:
-            return '', 403
-
-        sessions_events = TeraSessionEvent.get_events_for_session(args['id_session'])
-
-        try:
-            events_list = []
-            for event in sessions_events:
-                event_json = event.to_json(minimal=False)
-                events_list.append(event_json)
-
-            return jsonify(events_list)
-
-        except InvalidRequestError:
-            return '', 500
+        # current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
+        # device_access = DBManager.deviceAccess(current_device)
+        # args = get_parser.parse_args()
+        #
+        # sessions_events = []
+        #
+        # parent_session = device_access.query_session(args['id_session'])
+        # if not parent_session:
+        #     return '', 403
+        #
+        # sessions_events = TeraSessionEvent.get_events_for_session(args['id_session'])
+        #
+        # try:
+        #     events_list = []
+        #     for event in sessions_events:
+        #         event_json = event.to_json(minimal=False)
+        #         events_list.append(event_json)
+        #
+        #     return jsonify(events_list)
+        #
+        # except InvalidRequestError:
+        #     return '', 500
+        return gettext('Forbidden for security reasons'), 403
 
     @LoginModule.device_token_or_certificate_required
     def post(self):
@@ -62,17 +58,18 @@ class DeviceQuerySessionEvents(Resource):
         parser.add_argument('session_event', type=str, location='json', help='Event to create / update',
                             required=True)
 
+        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
         device_access = DBManager.deviceAccess(current_device)
 
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_event' not in request.json:
-            return '', 400
+            return gettext('Missing arguments'), 400
 
         json_event = request.json['session_event']
 
         # Validate if we have an id
         if 'id_session' not in json_event or 'id_session_event' not in json_event:
-            return '', 400
+            return gettext('Missing arguments'), 400
 
         # Check if current user can modify the posted event
         # User can modify or add an event if they have access to the parent session
@@ -80,17 +77,20 @@ class DeviceQuerySessionEvents(Resource):
         parent_session = device_access.query_session(json_event['id_session'])
 
         if not parent_session:
-            return '', 403
+            return gettext('Unauthorized'), 403
 
         # Do the update!
         if json_event['id_session_event'] > 0:
             # Already existing
             try:
                 TeraSessionEvent.update(json_event['id_session_event'], json_event)
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                self.module.logger.log_error(self.module.module_name,
+                                             DeviceQuerySessionEvents.__name__,
+                                             'post', 500, 'Database error', str(e))
+                return gettext('Database error'), 500
         else:
             # New
             try:
@@ -99,10 +99,13 @@ class DeviceQuerySessionEvents(Resource):
                 TeraSessionEvent.insert(new_event)
                 # Update ID for further use
                 json_event['id_session_event'] = new_event.id_session
-            except exc.SQLAlchemyError:
+            except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
-                return '', 500
+                self.module.logger.log_error(self.module.module_name,
+                                             DeviceQuerySessionEvents.__name__,
+                                             'post', 500, 'Database error', str(e))
+                return gettext('Database error'), 500
 
         # TODO: Publish update to everyone who is subscribed to sites update...
         update_event = TeraSessionEvent.get_session_event_by_id(json_event['id_session_event'])
@@ -111,4 +114,4 @@ class DeviceQuerySessionEvents(Resource):
 
     @LoginModule.device_token_or_certificate_required
     def delete(self):
-        return '', 403
+        return gettext('Forbidden for security reasons'), 403

@@ -9,12 +9,14 @@
     "start_nginx_test": "node server.js 8080 ca8cc0c5-216f-4fc8-a13b-a664cdee364d"
   },
   "dependencies": {
-    "open-easyrtc": "git+https://github.com/open-easyrtc/open-easyrtc",
+    "ejs": "^3.1.5",
     "express": "^4.17.1",
+    "html": "^1.0.0",
+    "minimist": "^1.2.5",
+    "open-easyrtc": "git+https://github.com/open-easyrtc/open-easyrtc.git",
+    "redis": "^3.0.2",
     "serve-static": "^1.14.1",
-    "socket.io": "^2.3.0",
-    "ejs": "^3.0.2",
-    "html": "^1.0.0"
+    "socket.io": "^2.3.0"
   },
   "license": "BSD3",
   "engines": {

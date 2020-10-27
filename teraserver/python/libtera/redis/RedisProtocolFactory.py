@@ -3,9 +3,9 @@ import txredisapi as txredis
 
 
 class redisProtocol(txredis.SubscriberProtocol):
-    def __init__(self, charset=None, errors="strict", parent=None):
-        print('redisProtocol init with args', charset, errors, parent)
-        super().__init__(charset, errors)
+    def __init__(self, charset=None, errors="strict", parent=None, *args, **kwargs):
+        # print('redisProtocol init with args', charset, errors, parent, args, kwargs)
+        super().__init__(charset, errors, *args, **kwargs)
         self.parent = parent
         if self.parent:
             self.parent.setProtocol(self)
@@ -41,12 +41,13 @@ class RedisProtocolFactory(txredis.SubscriberFactory):
     continueTrying = True
     protocol = None
 
-    def __init__(self, parent, protocol):
+    def __init__(self, parent, protocol, config):
         super().__init__()
-        print('setting arg', parent)
-        print('setting protocol', protocol)
+        # print('setting arg', parent)
+        # print('setting protocol', protocol)
         self.parent = parent
         self.protocol = protocol
+        self.redis_config = config
 
     def buildProtocol(self, addr):
         """
@@ -55,13 +56,18 @@ class RedisProtocolFactory(txredis.SubscriberFactory):
         :param addr:
         :return:
         """
-        print('build Protocol addr:', addr)
+        # print('build Protocol addr:', addr)
         if hasattr(self, 'charset'):
             # p = self.protocol(parent=self.parent)
-            p = self.protocol(self.charset, parent=self.parent)
+            p = self.protocol(self.charset,
+                              parent=self.parent,
+                              password=self.redis_config['password'],
+                              dbid=self.redis_config['db'])
         else:
             # Forcing no encoding
-            p = self.protocol(parent=self.parent)
+            p = self.protocol(parent=self.parent,
+                              password=self.redis_config['password'],
+                              dbid=self.redis_config['db'])
         p.factory = self
         p.timeOut = self.replyTimeout
         return p

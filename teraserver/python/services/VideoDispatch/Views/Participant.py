@@ -14,8 +14,8 @@ class Participant(MethodView):
     def get(self):
         # print('get')
 
-        hostname = self.flaskModule.config.server_config['hostname']
-        port = self.flaskModule.config.server_config['port']
+        hostname = self.flaskModule.config.service_config['hostname']
+        port = self.flaskModule.config.service_config['port']
         backend_hostname = self.flaskModule.config.backend_config['hostname']
         backend_port = self.flaskModule.config.backend_config['port']
         if 'X_EXTERNALHOST' in request.headers:
@@ -30,7 +30,7 @@ class Participant(MethodView):
         if response.status_code == 200:
             participant_info = response.json()
 
-            return render_template('participant.html', hostname=hostname, port=port,
+            return render_template('participant_en.html', hostname=hostname, port=port,
                                    backend_hostname=backend_hostname, backend_port=backend_port,
                                    participant_name=participant_info['participant_name'],
                                    participant_email=participant_info['participant_email'])

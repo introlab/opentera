@@ -9,12 +9,12 @@ class TeraSiteForm:
         form = TeraForm("site")
 
         # Sections
-        section = TeraFormSection("informations", gettext("Informations"))
+        section = TeraFormSection("informations", gettext("Information"))
         form.add_section(section)
 
         # Items
-        section.add_item(TeraFormItem("id_site", gettext("ID Site"), "hidden", True))
-        section.add_item(TeraFormItem("site_name", gettext("Nom du site"), "text", True))
-        section.add_item(TeraFormItem("site_role", gettext("Rôle dans ce site"), "hidden", False))
+        section.add_item(TeraFormItem("id_site", gettext("Site ID"), "hidden", True))
+        section.add_item(TeraFormItem("site_name", gettext("Site Name"), "text", True))
+        section.add_item(TeraFormItem("site_role", gettext("Site Role"), "hidden", False))
 
         return form.to_dict()

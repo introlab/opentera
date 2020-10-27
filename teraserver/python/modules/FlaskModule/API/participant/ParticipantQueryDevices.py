@@ -1,13 +1,10 @@
-from flask import jsonify, session
-from flask_restx import Resource, reqparse, fields, inputs
+from flask import session
+from flask_restx import Resource, inputs
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_multi_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
-from libtera.db.DBManager import DBManager
-import zipfile
-from io import BytesIO
-from slugify import slugify
+from modules.DatabaseModule.DBManager import DBManager
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -24,7 +21,7 @@ class ParticipantQueryDevices(Resource):
         self.module = flaskModule
         Resource.__init__(self, _api)
 
-    @participant_multi_auth.login_required
+    @participant_multi_auth.login_required(role='full')
     @api.expect(get_parser)
     @api.doc(description='Query devices associated with a participant.',
              responses={200: 'Success',
@@ -51,7 +48,7 @@ class ParticipantQueryDevices(Resource):
 
         return devices_list
 
-    @participant_multi_auth.login_required
+    @participant_multi_auth.login_required(role='full')
     @api.expect(post_parser)
     @api.doc(description='To be documented '
                          'To be documented',
@@ -60,4 +57,4 @@ class ParticipantQueryDevices(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def post(self):
-        return '', 501
+        return gettext('Not implemented'), 501

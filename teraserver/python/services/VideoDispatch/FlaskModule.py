@@ -100,14 +100,15 @@ class FlaskModule(BaseModule):
 
         BaseModule.__init__(self, "VideoDispatchService.FlaskModule", config)
 
-        flask_app.debug = True
-        # flask_app.secret_key = 'development'
-        # This is used for session encryption
-        # TODO Change secret key
-        # TODO STORE SECRET IN DB?
-        flask_app.secret_key = 'VideoDispatchSecret'
-
+        flask_app.debug = config.service_config['debug_mode']
         flask_app.config.update({'SESSION_TYPE': 'redis'})
+        import redis
+        redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
+                                   % self.config.redis_config)
+
+        flask_app.config.update({'SESSION_REDIS': redis_url})
+        # This is used for session encryption
+        flask_app.secret_key = config.service_config['ServiceUUID']
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?

@@ -2,12 +2,14 @@ import unittest
 import os
 from requests import get, post
 import json
+import libtera.crypto.crypto_utils as crypto
+from cryptography.hazmat.primitives import hashes, serialization
 
 
 class DeviceRegisterTest(unittest.TestCase):
 
     host = 'localhost'
-    port = 4040
+    port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
     device_register_endpoint = '/api/device/register'
@@ -26,6 +28,16 @@ class DeviceRegisterTest(unittest.TestCase):
         request_headers = {'Authorization': 'OpenTera ' + token}
         return get(url=url, verify=False, headers=request_headers)
 
+    def _certificate_auth(self, cert, key):
+        url = self._make_url(self.host, self.port, self.device_login_endpoint)
+        with open('cert.pem', 'wb') as f:
+            f.write(cert)
+
+        with open('key.pem', 'wb') as f:
+            f.write(key)
+
+        return get(url=url, verify=False, cert=('cert.pem', 'key.pem'))
+
     def _token_auth_logout(self, token):
         url = self._make_url(self.host, self.port, self.device_logout_endpoint)
         request_headers = {'Authorization': 'OpenTera ' + token}
@@ -43,6 +55,16 @@ class DeviceRegisterTest(unittest.TestCase):
         # post will convert dict to json automatically
         return post(url=url, verify=False, headers=request_headers, json=kwargs)
 
+    def _device_api_certificate_post(self, cert, endpoint, **kwargs):
+        url = self._make_url(self.host, self.port, endpoint)
+        request_headers = {'Content-Type': 'application/octet-stream'}
+
+    def _device_api_register_certificate_post(self, csr, endpoint, **kwargs):
+        url = self._make_url(self.host, self.port, endpoint)
+        request_headers = {'Content-Type': 'application/octet-stream',
+                           'Content-Transfer-Encoding': 'Base64'}
+        return post(url=url, verify=False, headers=request_headers, data=csr)
+
     def test_device_register_wrong_args_post(self):
         response = self._device_api_post(None, self.device_register_endpoint)
         self.assertEqual(response.status_code, 400)
@@ -58,5 +80,30 @@ class DeviceRegisterTest(unittest.TestCase):
 
         # Validate that we cannot authenticate (device should be disabled)
         response = self._token_auth(token_dict['token'])
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
+
+    def test_device_register_with_certificate_csr(self):
+        # This will generate private key and signing request for the CA
+        client_info = crypto.create_certificate_signing_request('Test Device with Certificate')
+
+        # Encode in PEM format
+        encoded_csr = client_info['csr'].public_bytes(serialization.Encoding.PEM)
+
+        response = self._device_api_register_certificate_post(encoded_csr, self.device_register_endpoint)
+        self.assertEqual(response.status_code, 200)
+
+        result = response.json()
+        self.assertTrue('ca_info' in result)
+        self.assertTrue('certificate' in result)
+
+        certificate = result['certificate'].encode('utf-8')
+        private_key = client_info['private_key'].private_bytes(serialization.Encoding.PEM,
+                                                               serialization.PrivateFormat.TraditionalOpenSSL,
+                                                               serialization.NoEncryption())
+
+        # print(certificate, private_key)
+        response = self._certificate_auth(certificate, private_key)
+        self.assertTrue(response.status_code, 200)
+
+
 

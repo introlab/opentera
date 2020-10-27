@@ -9,6 +9,18 @@ import datetime
 from passlib.hash import bcrypt
 
 
+# Generator for jti
+def infinite_jti_sequence():
+    num = 0
+    while True:
+        yield num
+        num += 1
+
+
+# Initialize generator, call next(participant_jti_generator) to get next sequence number
+participant_jti_generator = infinite_jti_sequence()
+
+
 class TeraParticipant(db.Model, BaseModel):
     __tablename__ = 't_participants'
     id_participant = db.Column(db.Integer, db.Sequence('id_participant_sequence'), primary_key=True, autoincrement=True)
@@ -17,8 +29,9 @@ class TeraParticipant(db.Model, BaseModel):
     participant_username = db.Column(db.String(50), nullable=True)
     participant_email = db.Column(db.String, nullable=True)
     participant_password = db.Column(db.String, nullable=True)
-    participant_token = db.Column(db.String, nullable=False, unique=True)
-    participant_lastonline = db.Column(db.TIMESTAMP, nullable=True)
+    participant_token_enabled = db.Column(db.Boolean, nullable=False, default=False)
+    participant_token = db.Column(db.String, nullable=True, unique=True)
+    participant_lastonline = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     participant_enabled = db.Column(db.Boolean, nullable=False, default=True)
     participant_login_enabled = db.Column(db.Boolean, nullable=False, default=False)
     id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group',
@@ -30,13 +43,14 @@ class TeraParticipant(db.Model, BaseModel):
                                           back_populates="device_participants")
 
     participant_sessions = db.relationship("TeraSession", secondary="t_sessions_participants",
-                                           back_populates="session_participants")
+                                           back_populates="session_participants", passive_deletes=True)
 
     participant_participant_group = db.relationship("TeraParticipantGroup")
 
     participant_project = db.relationship("TeraProject")
 
     authenticated = False
+    fullAccess = False
 
     def __init__(self):
         pass
@@ -47,11 +61,32 @@ class TeraParticipant(db.Model, BaseModel):
     def __repr__(self):
         return self.__str__()
 
+    def dynamic_token(self, token_key: str, expiration=3600):
+        import time
+        import jwt
+
+        # Creating token with participant info
+        now = time.time()
+        payload = {
+            'iat': int(now),
+            'exp': int(now) + expiration,
+            'iss': 'TeraServer',
+            'jti': next(participant_jti_generator),
+            'participant_uuid': self.participant_uuid,
+            'id_participant': self.id_participant,
+            'user_fullname': self.participant_name
+        }
+
+        return jwt.encode(payload, token_key, algorithm='HS256').decode('utf-8')
+
     def create_token(self):
+        import random
         # Creating token with user info
         payload = {
-            'iat': int(time.time()),
-            'participant_uuid': self.participant_uuid
+            'iss': 'TeraServer',
+            'jti': next(participant_jti_generator),
+            'participant_uuid': self.participant_uuid,
+            'id_participant': self.id_participant
         }
 
         self.participant_token = jwt.encode(payload, TeraServerSettings.get_server_setting_value(
@@ -69,12 +104,23 @@ class TeraParticipant(db.Model, BaseModel):
 
         ignore_fields.extend(['authenticated', 'participant_devices',
                               'participant_sessions', 'participant_password',
-                              'participant_project', 'participant_participant_group'])
+                              'participant_project', 'participant_participant_group', 'fullAccess'
+                              ])
         if minimal:
-            ignore_fields.extend(['participant_uuid', 'participant_username', 'participant_lastonline',
+            ignore_fields.extend(['participant_username', 'participant_lastonline',
                                   'participant_login_enabled', 'participant_token'])
 
         return super().to_json(ignore_fields=ignore_fields)
+
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_participant': self.id_participant, 'participant_uuid': self.participant_uuid}
 
     def is_authenticated(self):
         return self.authenticated
@@ -90,6 +136,18 @@ class TeraParticipant(db.Model, BaseModel):
 
     def get_id(self):
         return self.participant_uuid
+
+    def get_first_session(self):
+        sessions = sorted(self.participant_sessions, key=lambda session: session.session_start_datetime)
+        if sessions:
+            return sessions[0]
+        return None
+
+    def get_last_session(self):
+        sessions = sorted(self.participant_sessions, key=lambda session: session.session_start_datetime)
+        if sessions:
+            return sessions[-1]
+        return None
 
     @staticmethod
     def encrypt_password(password):
@@ -170,36 +228,53 @@ class TeraParticipant(db.Model, BaseModel):
         return TeraParticipant.query.filter_by(participant_username=username).first() is None
 
     @staticmethod
-    def create_defaults():
-        from libtera.db.models.TeraProject import TeraProject
-        project1 = TeraProject.get_project_by_projectname('Default Project #1')
+    def create_defaults(test=False):
+        if test:
+            from libtera.db.models.TeraProject import TeraProject
+            project1 = TeraProject.get_project_by_projectname('Default Project #1')
 
-        participant1 = TeraParticipant()
-        participant1.participant_name = 'Participant #1'
-        participant1.participant_enabled = True
-        participant1.participant_uuid = str(uuid.uuid4())
-        participant1.participant_participant_group = \
-            TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
-        participant1.participant_project = project1
+            participant1 = TeraParticipant()
+            participant1.participant_name = 'Participant #1'
+            participant1.participant_enabled = True
+            participant1.participant_uuid = str(uuid.uuid4())
+            participant1.participant_participant_group = \
+                TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
+            participant1.participant_project = project1
 
-        participant1.create_token()
-        participant1.participant_username = 'participant1'
-        participant1.participant_password = TeraParticipant.encrypt_password('opentera')
-        participant1.participant_login_enabled = True
+            # participant1.create_token()
+            participant1.participant_username = 'participant1'
+            participant1.participant_password = TeraParticipant.encrypt_password('opentera')
+            participant1.participant_login_enabled = True
+            participant1.participant_token_enabled = True
 
-        db.session.add(participant1)
+            db.session.add(participant1)
 
-        participant2 = TeraParticipant()
-        participant2.participant_name = 'Participant #2'
-        participant2.participant_enabled = True
-        participant2.participant_uuid = str(uuid.uuid4())
-        participant2.participant_participant_group = None
-        participant2.participant_project = project1
+            participant2 = TeraParticipant()
+            participant2.participant_name = 'Participant #2'
+            participant2.participant_enabled = False
+            participant2.participant_uuid = str(uuid.uuid4())
+            participant2.participant_participant_group = None
+            participant2.participant_project = project1
 
-        participant2.create_token()
-        db.session.add(participant2)
+            db.session.add(participant2)
 
-        db.session.commit()
+            participant2 = TeraParticipant()
+            participant2.participant_name = 'Participant #3'
+            participant2.participant_enabled = True
+            participant2.participant_token_enabled = True
+            participant2.participant_uuid = str(uuid.uuid4())
+            participant2.participant_participant_group = None
+            participant2.participant_project = project1
+
+            # participant2.create_token()
+            db.session.add(participant2)
+
+            db.session.commit()
+
+            # Create token with added participants, since we need to have the id_participant field set
+            participant1.create_token()
+            participant2.create_token()
+            db.session.commit()
 
     @classmethod
     def update(cls, update_id: int, values: dict):
@@ -208,33 +283,59 @@ class TeraParticipant(db.Model, BaseModel):
             if not TeraParticipant.is_participant_username_available(values['participant_username']):
                 raise NameError('Participant username already in use.')
 
+        # Prevent changes on UUID
+        if 'participant_uuid' in values:
+            del values['participant_uuid']
+
         # Remove the password field is present and if empty
         if 'participant_password' in values:
             if values['participant_password'] == '':
                 del values['participant_password']
             else:
                 values['participant_password'] = TeraParticipant.encrypt_password(values['participant_password'])
+
+        # Check if we need to generate or delete tokens
+        if 'participant_token_enabled' in values:
+            update_participant = TeraParticipant.get_participant_by_id(update_id)
+            if values['participant_token_enabled'] != update_participant.participant_token_enabled:
+                if 'participant_enabled' in values:
+                    participant_enabled = values['participant_enabled']
+                else:
+                    participant_enabled = update_participant.participant_enabled
+                # Value changed
+                if not values['participant_token_enabled'] or not participant_enabled:
+                    values['participant_token'] = None  # Remove token
+                else:
+                    values['participant_token'] = update_participant.create_token()  # Generate new token
+                    db.session.rollback()  # Don't save token here
+
         super().update(update_id, values)
 
     @classmethod
     def insert(cls, participant):
         # Encrypts password
-        participant.participant_password = TeraParticipant.encrypt_password(participant.participant_password)
+        if participant.participant_password:
+            participant.participant_password = TeraParticipant.encrypt_password(participant.participant_password)
 
         participant.participant_lastonline = None
         participant.participant_uuid = str(uuid.uuid4())
-        participant.create_token()
+        participant.participant_token = None
+        # participant.create_token()
         # Check if username is available
         if not TeraParticipant.is_participant_username_available(participant.participant_username):
             raise NameError('Participant username already in use.')
         super().insert(participant)
 
+        # Token must be created after being inserted, since we need to have a valid ID participant into it
+        if participant.participant_token_enabled and participant.participant_enabled:
+            participant.create_token()
+        db.session.commit()
+
     @classmethod
     def delete(cls, id_todel: int):
         super().delete(id_todel)
-
         # Check if we need to delete orphan sessions (sessions that have no more participants left
-        from libtera.db.models.TeraSession import TeraSession
-        TeraSession.delete_orphaned_sessions(False)
-
-        db.session.commit()
+        # from libtera.db.models.TeraSession import TeraSession
+        # TeraSession.delete_orphaned_sessions(False)
+        #
+        # db.session.commit()

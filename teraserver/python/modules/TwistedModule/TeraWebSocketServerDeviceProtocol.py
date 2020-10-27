@@ -5,14 +5,11 @@ from autobahn.websocket.types import ConnectionRequest, ConnectionResponse, Conn
 # OpenTera
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.redis.RedisClient import RedisClient
-from modules.BaseModule import ModuleNames, create_module_topic_from_name
+from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 
 
 # Messages
-from messages.python.TeraMessage_pb2 import TeraMessage
-from messages.python.DeviceEvent_pb2 import DeviceEvent
-from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
-from google.protobuf.any_pb2 import Any
+import messages.python as messages
 import datetime
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.json_format import Parse, ParseError
@@ -21,101 +18,88 @@ from google.protobuf.message import DecodeError
 # Twisted
 from twisted.internet import defer
 
+# Event manager
+from modules.DeviceEventManager import DeviceEventManager
 
-class TeraWebSocketServerDeviceProtocol(RedisClient, WebSocketServerProtocol):
+# Base class
+from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
+
+
+class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
 
     def __init__(self, config):
-        RedisClient.__init__(self, config=config)
-        WebSocketServerProtocol.__init__(self)
+        TeraWebSocketServerProtocol.__init__(self, config=config)
         self.device = None
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
-        print('TeraWebSocketServerDeviceProtocol redisConnectionMade (redis)')
+        print('TeraWebSocketServerDeviceProtocol - redisConnectionMade (redis)', self)
 
         # This will wait until subscribe result is available...
-        ret = yield self.subscribe(self.answer_topic())
+        # ret = yield self.subscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
+        # print(ret)
 
         if self.device:
-            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            device_connected = DeviceEvent()
+            # This will wait until subscribe result is available...
+            # Register only once to events from modules, will be filtered after
+            ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+                ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
+
+            ret2 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+                ModuleNames.DATABASE_MODULE_NAME), self.redis_event_message_received)
+
+            # Direct events
+            ret3 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            print(ret1, ret2, ret3)
+            # MAKE SURE TO SUBSCRIBE TO EVENTS BEFORE SENDING ONLINE MESSAGE
+            tera_message = self.create_tera_message(
+                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            device_connected = messages.DeviceEvent()
             device_connected.device_uuid = str(self.device.device_uuid)
-            device_connected.type = DeviceEvent.DEVICE_CONNECTED
+            device_connected.device_name = self.device.device_name
+            device_connected.type = messages.DeviceEvent.DEVICE_CONNECTED
             # Need to use Any container
-            any_message = Any()
+            any_message = messages.Any()
             any_message.Pack(device_connected)
             tera_message.data.extend([any_message])
 
             # Publish to login module (bytes)
-            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+            self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
-
-    def onMessage(self, msg, binary):
-        # Handle websocket communication
-        # TODO use protobuf ?
-        print('TeraWebSocketServerDeviceProtocol onMessage', self, msg, binary)
-
-        if binary:
-            # Decode protobuf before parsing
-            pass
-
-        # Parse JSON (protobuf content)
-        try:
-            message = Parse(msg, TeraMessage)
-            self.publish(message.head.dest, message)
-        except ParseError:
-            print('TeraWebSocketServerDeviceProtocol - TeraMessage parse error...')
-
-        # Echo for debug
-        self.sendMessage(msg, binary)
-
-    def redisMessageReceived(self, pattern, channel, message):
-        print('TeraWebSocketServerDeviceProtocol redis message received', pattern, channel, message)
-
-        # Forward as JSON to websocket
-        try:
-            tera_message = TeraMessage()
-            if isinstance(message, str):
-                tera_message.ParseFromString(message.encode('utf-8'))
-            elif isinstance(message, bytes):
-                tera_message.ParseFromString(message)
-
-            # Test message to JSON
-            json = MessageToJson(tera_message, including_default_value_fields=True)
-
-            # Send to websocket (in binary form)
-            self.sendMessage(json.encode('utf-8'), False)
-
-        except DecodeError:
-            print('TeraWebSocketServerDeviceProtocol - DecodeError ', pattern, channel, message)
-            self.sendMessage(message.encode('utf-8'), False)
-        except:
-            print('TeraWebSocketServerDeviceProtocol - Failure in redisMessageReceived')
 
     def onConnect(self, request):
         """
         Cannot send message at this stage, needs to verify connection here.
         """
-        print('onConnect')
+        print('TeraWebSocketServerDeviceProtocol - onConnect', self)
 
         if request.params.__contains__('id'):
             # Look for session id in
             my_id = request.params['id']
-            print('TeraWebSocketServerDeviceProtocol - testing id: ', my_id)
+            print('TeraWebSocketServerDeviceProtocol - testing id: ', my_id, self)
 
             value = self.redisGet(my_id[0])
 
             if value is not None:
                 # Needs to be converted from bytes to string to work
                 device_uuid = value.decode("utf-8")
-                print('TeraWebSocketServerDeviceProtocol - device uuid ', device_uuid)
+                print('TeraWebSocketServerDeviceProtocol - device uuid ', device_uuid, self)
 
                 # User verification
                 self.device = TeraDevice.get_device_by_uuid(device_uuid)
                 if self.device is not None:
                     # Remove key
-                    print('TeraWebSocketServerDeviceProtocol - OK! removing key')
+                    print('TeraWebSocketServerDeviceProtocol - OK! removing key', self)
                     self.redisDelete(my_id[0])
+
+                    # Create event manager
+                    self.event_manager = DeviceEventManager(self.device)
+
+                    # log information
+                    self.logger.log_info(self, "Device websocket connected",
+                                         self.device.device_name, self.device.device_uuid)
+
                     return
 
         # if we get here we need to close the websocket, auth failed.
@@ -123,45 +107,55 @@ class TeraWebSocketServerDeviceProtocol(RedisClient, WebSocketServerProtocol):
         raise ConnectionDeny(ConnectionDeny.FORBIDDEN,
                              "TeraWebSocketServerDeviceProtocol - Websocket authentication failed (key, uuid).")
 
-    def onOpen(self):
-        print(type(self).__name__, 'TeraWebSocketServerDeviceProtocol - onOpen')
-        # Moved handling code in redisConnectionMade...
-        # because it always occurs after onOpen...
-
+    @defer.inlineCallbacks
     def onClose(self, wasClean, code, reason):
+        print('TeraWebSocketServerDeviceProtocol - onClose', self, wasClean, code, reason)
         if self.device:
             # Advertise that device leaved
-            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            device_disconnected = DeviceEvent()
+            tera_message = self.create_tera_message(
+                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            device_disconnected = messages.DeviceEvent()
             device_disconnected.device_uuid = str(self.device.device_uuid)
-            device_disconnected.type = DeviceEvent.DEVICE_DISCONNECTED
+            device_disconnected.device_name = self.device.device_name
+            device_disconnected.type = messages.DeviceEvent.DEVICE_DISCONNECTED
 
             # Need to use Any container
-            any_message = Any()
+            any_message = messages.Any()
             any_message.Pack(device_disconnected)
             tera_message.data.extend([any_message])
 
             # Publish to login module (bytes)
-            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+            self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
 
-        print('TeraWebSocketServerDeviceProtocol - onClose', self, wasClean, code, reason)
+            # Unsubscribe to events
+            ret1 = yield self.unsubscribe_pattern_with_callback(
+                create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+                self.redis_event_message_received)
 
-    def onOpenHandshakeTimeout(self):
-        print('TeraWebSocketServerDeviceProtocol - onOpenHandshakeTimeout', self)
+            ret2 = yield self.unsubscribe_pattern_with_callback(
+                create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
+                self.redis_event_message_received)
+
+            ret3 = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            # log information
+            self.logger.log_info(self, "Device websocket disconnected",
+                                 self.device.device_name, self.device.device_uuid)
+
+            print(ret1, ret2, ret3)
+
+        # Unsubscribe to messages
+        # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
+        # print(ret)
 
     def answer_topic(self):
         if self.device:
             return 'websocket.device.' + self.device.device_uuid
+        super().answer_topic()
 
-        return ""
-
-    def create_tera_message(self, dest='', seq=0):
-        tera_message = TeraMessage()
-        tera_message.head.version = 1
-        tera_message.head.time = datetime.datetime.now().timestamp()
-        tera_message.head.seq = seq
-        tera_message.head.source = self.answer_topic()
-        tera_message.head.dest = dest
-        return tera_message
+    def event_topic(self):
+        if self.device:
+            return 'websocket.device.' + self.device.device_uuid + '.events'
+        super().event_topic()
 

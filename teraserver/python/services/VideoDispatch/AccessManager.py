@@ -3,10 +3,11 @@ from functools import wraps
 from flask import _request_ctx_stack, request, redirect
 from flask_restx import reqparse
 
-from services.VideoDispatch.Globals import api_user_token_key, api_participant_token_key, UserTokenCookieName, \
-    ParticipantTokenCookieName
-from services.VideoDispatch.TeraUserClient import TeraUserClient
-from services.VideoDispatch.TeraParticipantClient import TeraParticipantClient
+from services.VideoDispatch.Globals import UserTokenCookieName, ParticipantTokenCookieName, config_man
+from services.VideoDispatch.Globals import redis_client
+from modules.RedisVars import RedisVars
+from services.shared.TeraUserClient import TeraUserClient
+from services.shared.TeraParticipantClient import TeraParticipantClient
 
 # Current client identity, stacked
 current_user_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_user_client', None))
@@ -46,14 +47,15 @@ class AccessManager:
                 # Verify token from redis
                 import jwt
                 try:
-                    token_dict = jwt.decode(token_value, api_participant_token_key)
+                    token_dict = jwt.decode(token_value,
+                                            redis_client.get(RedisVars.RedisVar_ParticipantStaticTokenAPIKey))
                 except jwt.exceptions.InvalidSignatureError as e:
                     print(e)
                     return 'Unauthorized', 403
 
                 if token_dict['participant_uuid']:
                     _request_ctx_stack.top.current_participant_client = \
-                        TeraParticipantClient(token_dict['participant_uuid'], token_value)
+                        TeraParticipantClient(token_dict, token_value, config_man)
                     return f(*args, **kwargs)
 
                 # Default, not authorized
@@ -74,13 +76,13 @@ class AccessManager:
                 # Verify token from redis
                 import jwt
                 try:
-                    token_dict = jwt.decode(token_value, api_user_token_key)
+                    token_dict = jwt.decode(token_value, redis_client.get(RedisVars.RedisVar_UserTokenAPIKey))
                 except jwt.exceptions.InvalidSignatureError as e:
                     print(e)
                     return redirect(login_path)
 
                 if token_dict['user_uuid']:
-                    _request_ctx_stack.top.current_user_client = TeraUserClient(token_dict['user_uuid'], token_value)
+                    _request_ctx_stack.top.current_user_client = TeraUserClient(token_dict, token_value, config_man)
                     return f(*args, **kwargs)
 
                 # Any other case, do not call function

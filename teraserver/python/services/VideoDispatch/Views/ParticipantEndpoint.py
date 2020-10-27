@@ -21,13 +21,15 @@ class ParticipantEndpoint(MethodView):
         if 'X_EXTERNALPORT' in request.headers:
             backend_port = request.headers['X_EXTERNALPORT']
 
-        # Get participant information
-        response = current_participant_client.do_get_request_to_backend('/api/participant/participants')
+        # Get information from service API
+        from services.VideoDispatch.Globals import service
+        params = {'participant_uuid': current_participant_client.participant_uuid}
+        response = service.get_from_opentera('/api/service/participants', params)
 
         if response.status_code == 200:
             participant_info = response.json()
 
-            return render_template('participant_endpoint.html', backend_hostname=backend_hostname,
+            return render_template('participant_endpoint_en.html', backend_hostname=backend_hostname,
                                    backend_port=backend_port,
                                    participant_name=participant_info['participant_name'])
         else:

@@ -1,37 +1,34 @@
 import unittest
 import os
 
-from libtera.db.Base import db
-from libtera.db.DBManager import DBManager
+from modules.DatabaseModule.DBManager import DBManager
 
-from libtera.db.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 from libtera.db.models.TeraUser import TeraUser
 from libtera.ConfigManager import ConfigManager
 
 
 class DBManagerTeraUserAccessTest(unittest.TestCase):
 
-    filename = 'DBManagerTeraUserAccessTest.db'
+    filename = os.path.join(os.path.dirname(__file__), 'DBManagerTeraUserAccessTest.db')
 
     SQLITE = {
         'filename': filename
     }
-
-    db_man = DBManager()
-
-    admin_user = None
-    test_user = None
-
-    config = ConfigManager()
 
     def setUp(self):
         if os.path.isfile(self.filename):
             print('removing database')
             os.remove(self.filename)
 
-        self.db_man.open_local(self.SQLITE)
+        self.admin_user = None
+        self.test_user = None
 
+        self.config = ConfigManager()
         self.config.create_defaults()
+
+        self.db_man = DBManager(self.config)
+
+        self.db_man.open_local(self.SQLITE)
 
         # Creating default users / tests.
         self.db_man.create_defaults(self.config)
@@ -51,7 +48,7 @@ class DBManagerTeraUserAccessTest(unittest.TestCase):
 
     def test_admin_get_accessible_users_ids(self):
         users = DBManager.userAccess(self.admin_user).get_accessible_users()
-        self.assertEqual(len(users), 4)
+        self.assertEqual(len(users), 6)
 
     def test_admin_accessible_sites(self):
         sites = DBManager.userAccess(self.admin_user).get_accessible_sites()

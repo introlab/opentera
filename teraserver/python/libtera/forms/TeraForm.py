@@ -2,7 +2,6 @@ import string
 
 
 class TeraForm:
-
     def __init__(self, object_name):
         self.sections = []
         self.object_name = object_name
@@ -12,8 +11,10 @@ class TeraForm:
 
     def to_dict(self):
         sections = []
+        order = 1
         for section in self.sections:
-            sections.append(section.to_dict())
+            sections.append(section.to_dict(order))
+            order += 1
         object_dict = {'objecttype': self.object_name,
                        'sections': sections}
         return object_dict
@@ -29,12 +30,17 @@ class TeraFormSection:
     def add_item(self, item):
         self.items.append(item)
 
-    def to_dict(self):
+    def to_dict(self, order: int = -1):
         section = {"id": self.id,
                    "label": self.label}
+
+        if order >= 0:
+            section['_order'] = order
         items = []
+        item_order = 1
         for item in self.items:
-            items.append(item.to_dict())
+            items.append(item.to_dict(item_order))
+            item_order += 1
         section["items"] = items
         return section
 
@@ -90,7 +96,7 @@ class TeraFormItem:
     def set_condition(self, condition: TeraFormItemCondition):
         self.condition = condition
 
-    def to_dict(self):
+    def to_dict(self, order: int = -1):
         item = {"id": self.id,
                 "label": self.label,
                 "type": self.type,
@@ -115,6 +121,9 @@ class TeraFormItem:
 
         if self.condition:
             item["condition"] = self.condition.to_dict()
+
+        if order >= 0:
+            item['_order'] = order
 
         if len(self.options) > 0:
             for option in self.options:

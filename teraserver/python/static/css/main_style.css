@@ -1,0 +1,15 @@
+.img-logo{
+    max-width: 250px;
+    max-height: 20%;
+    padding-right: 30px;
+}
+
+.img-logo-download{
+    max-width: 100px;
+    max-height: 100px;
+}
+
+ .jumbotron{
+     padding:10px 10px 10px 10px;
+     margin-bottom:10px;
+ }

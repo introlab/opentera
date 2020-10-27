@@ -418,8 +418,6 @@ function fillDefaultSourceList(){
 	.catch(function(err) {
 		console.error(err.name + ": " + err.message);
 	});
-	
-
 }
 
 function fillVideoSourceList(list){
@@ -1663,7 +1661,7 @@ function muteSpeaker(index){
 function muteVideo(){
 	alert("TODO");
 }
-
+/*
 function resetVideosPos(){
 	if (accessDenied)
 		return;
@@ -1714,7 +1712,7 @@ function resetVideosPos(){
 	$( smallViewIds[3] ).dialog( "option", "height", h / 2);
 	$( smallViewIds[3] ).dialog( "option", "width",  ((w-1) / 3)/2);
 	$( smallViewIds[3] ).dialog( "option", "position",  {my: "left top", at: "right bottom+3", of: smallViewIds[0]});
-}
+}*/
 
 function setTitle(id, title){
 	//console.error("Setting title " + id + ": " + title);

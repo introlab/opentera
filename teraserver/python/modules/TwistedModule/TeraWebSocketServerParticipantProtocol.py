@@ -5,14 +5,10 @@ from autobahn.websocket.types import ConnectionRequest, ConnectionResponse, Conn
 # OpenTera
 from libtera.db.models.TeraParticipant import TeraParticipant
 from libtera.redis.RedisClient import RedisClient
-from modules.BaseModule import ModuleNames, create_module_topic_from_name
-
+from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 
 # Messages
-from messages.python.TeraMessage_pb2 import TeraMessage
-from messages.python.ParticipantEvent_pb2 import ParticipantEvent
-from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
-from messages.python.StopSessionEvent_pb2 import StopSessionEvent
+import messages.python as messages
 
 from google.protobuf.any_pb2 import Any
 import datetime
@@ -23,132 +19,110 @@ from google.protobuf.message import DecodeError
 # Twisted
 from twisted.internet import defer
 
+# Event manager
+from modules.ParticipantEventManager import ParticipantEventManager
 
-class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtocol):
+from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
+
+
+class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
 
     def __init__(self, config):
-        RedisClient.__init__(self, config=config)
-        WebSocketServerProtocol.__init__(self)
+        TeraWebSocketServerProtocol.__init__(self, config=config)
         self.participant = None
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
-        print('TeraWebSocketServerParticipantProtocol redisConnectionMade (redis)')
+        print('TeraWebSocketServerParticipantProtocol - redisConnectionMade (redis)', self)
 
         # This will wait until subscribe result is available...
-        ret = yield self.subscribe(self.answer_topic())
+        # ret = yield self.subscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
+        # print(ret)
 
         if self.participant:
-            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            participant_connected = ParticipantEvent()
+            # This will wait until subscribe result is available...
+            # Register only once to events from modules, will be filtered after
+            # ret = yield self.subscribe(create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+                ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
+
+            ret2 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+                ModuleNames.DATABASE_MODULE_NAME), self.redis_event_message_received)
+
+            # Direct events
+            ret3 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            print(ret1, ret2, ret3)
+
+            # MAKE SURE TO SUBSCRIBE TO EVENTS BEFORE SENDING ONLINE MESSAGE
+            tera_message = self.create_tera_message(
+                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            participant_connected = messages.ParticipantEvent()
             participant_connected.participant_uuid = str(self.participant.participant_uuid)
-            participant_connected.type = ParticipantEvent.PARTICIPANT_CONNECTED
+            participant_connected.type = messages.ParticipantEvent.PARTICIPANT_CONNECTED
+            participant_connected.participant_name = self.participant.participant_name
+            participant_connected.participant_project_name = self.participant.participant_project.project_name
+            participant_connected.participant_site_name = self.participant.participant_project.project_site.site_name
             # Need to use Any container
             any_message = Any()
             any_message.Pack(participant_connected)
             tera_message.data.extend([any_message])
 
             # Publish to login module (bytes)
-            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+            self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
-
-    def onMessage(self, msg, binary):
-        # Handle websocket communication
-        # TODO use protobuf ?
-        print('TeraWebSocketServerParticipantProtocol onMessage', self, msg, binary)
-
-        if binary:
-            # Decode protobuf before parsing
-            pass
-
-        # Parse JSON (protobuf content)
-        try:
-            message = Parse(msg, TeraMessage)
-            self.publish(message.head.dest, message)
-        except ParseError:
-            print('TeraWebSocketServerParticipantProtocol - TeraMessage parse error...')
-
-        # Echo for debug
-        self.sendMessage(msg, binary)
-
-    def redisMessageReceived(self, pattern, channel, message):
-        print('TeraWebSocketServerParticipantProtocol redis message received', pattern, channel, message)
-
-        # Forward as JSON to websocket
-        try:
-            tera_message = TeraMessage()
-            if isinstance(message, str):
-                tera_message.ParseFromString(message.encode('utf-8'))
-            elif isinstance(message, bytes):
-                tera_message.ParseFromString(message)
-
-            # Test message to JSON
-            json = MessageToJson(tera_message, including_default_value_fields=True)
-
-            # Send to websocket (in binary form)
-            self.sendMessage(json.encode('utf-8'), False)
-
-        except DecodeError:
-            print('TeraWebSocketServerParticipantProtocol - DecodeError ', pattern, channel, message)
-            self.sendMessage(message.encode('utf-8'), False)
-        except:
-            print('TeraWebSocketServerParticipantProtocol - Failure in redisMessageReceived')
 
     def onConnect(self, request):
         """
         Cannot send message at this stage, needs to verify connection here.
         """
-        print('onConnect')
+        print('TeraWebSocketServerParticipantProtocol - onConnect')
 
         if request.params.__contains__('id'):
             # Look for session id in
             my_id = request.params['id']
-            print('TeraWebSocketServerParticipantProtocol - testing id: ', my_id)
+            print('TeraWebSocketServerParticipantProtocol - testing id: ', my_id, self)
 
             value = self.redisGet(my_id[0])
 
             if value is not None:
                 # Needs to be converted from bytes to string to work
                 participant_uuid = value.decode("utf-8")
-                print('TeraWebSocketServerParticipantProtocol - participant uuid ', participant_uuid)
+                print('TeraWebSocketServerParticipantProtocol - participant uuid ', participant_uuid, self)
 
                 # User verification
                 self.participant = TeraParticipant.get_participant_by_uuid(participant_uuid)
                 if self.participant is not None:
                     # Remove key
-                    print('TeraWebSocketServerParticipantProtocol - OK! removing key')
+                    print('TeraWebSocketServerParticipantProtocol - OK! removing key', self)
                     self.redisDelete(my_id[0])
-                    return
 
-        # if request.params.__contains__('token'):
-        #
-        #     # Look for token
-        #     token = request.params['token']
-        #     print('TeraWebSocketServerParticipantProtocol - testing token: ', token)
-        #
-        #     self.participant = TeraParticipant.get_participant_by_token(token[0])
-        #
-        #     if self.participant is not None:
-        #         print('TeraWebSocketServerParticipantProtocol - Participant connected ', self.participant)
-        #         return
+                    # Set event manager
+                    self.event_manager = ParticipantEventManager(self.participant)
+
+                    # log information
+                    self.logger.log_info(self, "Participant websocket connected",
+                                         self.participant.participant_name, self.participant.participant_uuid)
+
+                    return
 
         # if we get here we need to close the websocket, auth failed.
         # To deny a connection, raise an Exception
         raise ConnectionDeny(ConnectionDeny.FORBIDDEN,
                              "TeraWebSocketServerParticipantProtocol - Websocket authentication failed (key, uuid).")
 
-    def onOpen(self):
-        print(type(self).__name__, 'TeraWebSocketServerParticipantProtocol - onOpen')
-        # Moved handling code in redisConnectionMade...
-        # because it always occurs after onOpen...
-
+    @defer.inlineCallbacks
     def onClose(self, wasClean, code, reason):
         if self.participant:
             # Advertise that participant leaved
-            tera_message = self.create_tera_message(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
-            participant_disconnected = ParticipantEvent()
+            tera_message = self.create_tera_message(
+                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            participant_disconnected = messages.ParticipantEvent()
             participant_disconnected.participant_uuid = str(self.participant.participant_uuid)
-            participant_disconnected.type = ParticipantEvent.PARTICIPANT_DISCONNECTED
+            participant_disconnected.type = messages.ParticipantEvent.PARTICIPANT_DISCONNECTED
+            participant_disconnected.participant_name = self.participant.participant_name
+            participant_disconnected.participant_project_name = self.participant.participant_project.project_name
+            participant_disconnected.participant_site_name = self.participant.participant_project.project_site.site_name
 
             # Need to use Any container
             any_message = Any()
@@ -156,26 +130,41 @@ class TeraWebSocketServerParticipantProtocol(RedisClient, WebSocketServerProtoco
             tera_message.data.extend([any_message])
 
             # Publish to login module (bytes)
-            self.publish(create_module_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+            self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
 
-        print('TeraWebSocketServerParticipantProtocol - onClose', self, wasClean, code, reason)
+            # Unsubscribe to events
+            # ret = yield self.unsubscribe(create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+            ret1 = yield self.unsubscribe_pattern_with_callback(
+                create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
+                self.redis_event_message_received)
 
-    def onOpenHandshakeTimeout(self):
-        print('TeraWebSocketServerParticipantProtocol - onOpenHandshakeTimeout', self)
+            ret2 = yield self.unsubscribe_pattern_with_callback(
+                create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
+                self.redis_event_message_received)
+
+            ret3 = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+
+            # log information
+            self.logger.log_info(self, "Participant websocket disconnected",
+                                 self.participant.participant_name, self.participant.participant_uuid)
+
+            print(ret1, ret2, ret3)
+
+        # Unsubscribe to messages
+        # ret = yield self.unsubscribe(self.answer_topic())
+        # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
+        # print(ret)
+
+        print('TeraWebSocketServerParticipantProtocol - onClose', self, wasClean, code, reason)
 
     def answer_topic(self):
         if self.participant:
             return 'websocket.participant.' + self.participant.participant_uuid
+        return super().answer_topic()
 
-        return ""
-
-    def create_tera_message(self, dest='', seq=0):
-        tera_message = TeraMessage()
-        tera_message.head.version = 1
-        tera_message.head.time = datetime.datetime.now().timestamp()
-        tera_message.head.seq = seq
-        tera_message.head.source = self.answer_topic()
-        tera_message.head.dest = dest
-        return tera_message
+    def event_topic(self):
+        if self.participant:
+            return 'websocket.participant.' + self.participant.participant_uuid + '.events'
+        return super().event_topic()
 

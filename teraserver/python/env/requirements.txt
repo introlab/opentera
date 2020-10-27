@@ -3,6 +3,8 @@ treq
 cryptography
 autobahn
 sqlalchemy
+sqlalchemy_schemadisplay
+pydot
 psycopg2-binary
 python-oauth2
 flask
@@ -17,6 +19,7 @@ flask-security
 flask-babel
 flask-migrate
 flask-swagger-ui
+flask-limiter
 # flask-jwt
 redis
 txredisapi
@@ -32,3 +35,6 @@ pypiwin32; sys_platform == 'win32'
 pylzma
 bz2file
 python-slugify
+websocket_client
+pytest
+jsonschema

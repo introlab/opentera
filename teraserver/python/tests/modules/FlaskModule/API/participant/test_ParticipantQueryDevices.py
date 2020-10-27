@@ -6,7 +6,7 @@ import json
 
 class ParticipantQueryDevicesTest(unittest.TestCase):
     host = 'localhost'
-    port = 4040
+    port = 40075
     login_endpoint = '/api/participant/login'
     devices_endpoint = '/api/participant/devices'
 
@@ -28,6 +28,16 @@ class ParticipantQueryDevicesTest(unittest.TestCase):
         json_auth = auth_response.json()
         self.assertTrue(json_auth.__contains__('participant_token'))
         return json_auth['participant_token']
+
+    def _get_base_token_with_login_http_auth(self, username, password):
+        url = self._make_url(self.host, self.port, self.login_endpoint)
+        auth_response = get(url=url, verify=False, auth=(username, password))
+        # HTTP AUTH REQUIRED TO GET TOKEN
+        self.assertEqual(auth_response.status_code, 200)
+        self.assertEqual(auth_response.headers['Content-Type'], 'application/json')
+        json_auth = auth_response.json()
+        self.assertTrue(json_auth.__contains__('base_token'))
+        return json_auth['base_token']
 
     def _request_with_http_auth(self, username, password, payload=None):
         if payload is None:
@@ -71,8 +81,8 @@ class ParticipantQueryDevicesTest(unittest.TestCase):
             self.assertTrue(data_item.__contains__('device_name'))
             self.assertTrue(data_item.__contains__('device_notes'))
             self.assertTrue(data_item.__contains__('device_onlineable'))
-            self.assertTrue(data_item.__contains__('device_optional'))
-            self.assertTrue(data_item.__contains__('device_type'))
+            self.assertTrue(data_item.__contains__('id_device_type'))
+            self.assertTrue(data_item.__contains__('id_device_subtype'))
             self.assertTrue(data_item.__contains__('device_uuid'))
             self.assertTrue(data_item.__contains__('id_device'))
 
@@ -94,7 +104,13 @@ class ParticipantQueryDevicesTest(unittest.TestCase):
             self.assertTrue(data_item.__contains__('device_name'))
             self.assertTrue(data_item.__contains__('device_notes'))
             self.assertTrue(data_item.__contains__('device_onlineable'))
-            self.assertTrue(data_item.__contains__('device_optional'))
-            self.assertTrue(data_item.__contains__('device_type'))
+            self.assertTrue(data_item.__contains__('id_device_type'))
+            self.assertTrue(data_item.__contains__('id_device_subtype'))
             self.assertTrue(data_item.__contains__('device_uuid'))
             self.assertTrue(data_item.__contains__('id_device'))
+
+    def test_query_base_token(self):
+        token = self._get_base_token_with_login_http_auth('participant1', 'opentera')
+        response = self._request_with_token_auth(token)
+        # Should not be allowed
+        self.assertEqual(response.status_code, 403)

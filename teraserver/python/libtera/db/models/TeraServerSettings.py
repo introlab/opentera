@@ -16,9 +16,10 @@ class TeraServerSettings(db.Model, BaseModel):
     ServerDeviceTokenKey = "TokenEncryptionKey"
     ServerParticipantTokenKey = "ParticipantTokenEncryptionKey"
     ServerUUID = "ServerUUID"
+    ServerVersions = "ServerVersions"
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         # Create defaults settings
         # Token Encryption Key
         TeraServerSettings.set_server_setting(TeraServerSettings.ServerDeviceTokenKey,
@@ -57,11 +58,12 @@ class TeraServerSettings(db.Model, BaseModel):
         # Update setting if already exists
         if current_setting is not None:
             current_setting.server_settings_value = setting_value
-            TeraServerSettings.update(current_setting.id_server_settings, current_setting)
         else:
             # Insert setting if not
             current_setting = TeraServerSettings()
-            current_setting.id_server_settings = 0
+            current_setting.id_server_settings = None
             current_setting.server_settings_name = setting_name
             current_setting.server_settings_value = setting_value
-            TeraServerSettings.insert(current_setting)
+            db.session.add(current_setting)
+        # Store object
+        current_setting.commit()

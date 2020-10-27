@@ -15,7 +15,7 @@ class TeraTest(db.Model, BaseModel):
                              nullable=False)
     id_session = db.Column(db.Integer, db.ForeignKey('t_sessions.id_session', ondelete='cascade'), nullable=False)
     test_name = db.Column(db.String, nullable=False)
-    test_datetime = db.Column(db.TIMESTAMP, nullable=False)
+    test_datetime = db.Column(db.TIMESTAMP(timezone=True), nullable=False)
     test_status = db.Column(db.Integer, nullable=False)
     test_answers = db.Column(db.String, nullable=True)
 

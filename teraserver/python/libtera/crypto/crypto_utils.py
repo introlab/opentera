@@ -26,6 +26,10 @@ def load_pem_certificate(filename):
     return None
 
 
+def load_pem_certificate_from_data(data: bytes):
+    return x509.load_pem_x509_certificate(data, default_backend())
+
+
 # info at https://cryptography.io
 def generate_ca_certificate(common_name=socket.gethostname(), country_name=u'CA',
                             state_or_province=u'Québec', locality_name=u'Sherbrooke',

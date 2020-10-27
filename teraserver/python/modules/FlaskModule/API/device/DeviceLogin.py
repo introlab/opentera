@@ -4,6 +4,9 @@ from modules.LoginModule.LoginModule import LoginModule
 from modules.Globals import db_man
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from libtera.db.models.TeraDevice import TeraDevice
+from libtera.redis.RedisRPCClient import RedisRPCClient
+from modules.BaseModule import ModuleNames
+from flask_babel import gettext
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -32,7 +35,19 @@ class DeviceLogin(Resource):
         port = self.module.config.server_config['port']
 
         current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
+        current_device.update_last_online()
         args = get_parser.parse_args()
+
+        # Verify if device already logged in
+        rpc = RedisRPCClient(self.module.config.redis_config)
+        online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
+        if current_device.device_uuid in online_devices:
+            self.module.logger.log_warning(self.module.module_name,
+                                           DeviceLogin.__name__,
+                                           'get', 403,
+                                           'Device already logged in', current_device.to_json(minimal=True))
+
+            return gettext('Device already logged in.'), 403
 
         if 'X_EXTERNALHOST' in request.headers:
             if ':' in request.headers['X_EXTERNALHOST']:
@@ -44,7 +59,7 @@ class DeviceLogin(Resource):
             port = request.headers['X_EXTERNALPORT']
 
         # Reply device information
-        response = {'device_info': current_device.to_json(minimal=True)}
+        response = {'device_info': current_device.to_json(minimal=False)}
 
         device_access = db_man.deviceAccess(current_device)
 
@@ -53,8 +68,9 @@ class DeviceLogin(Resource):
         response['participants_info'] = list()
 
         for participant in participants:
-            # Needs to be false for AppleWatch App to work...
-            response['participants_info'].append(participant.to_json(minimal=False))
+            participant_info = {'participant_name': participant.participant_name,
+                                'participant_uuid': participant.participant_uuid}
+            response['participants_info'].append(participant_info)
 
         # Reply accessible sessions type ids
         session_types = device_access.get_accessible_session_types()

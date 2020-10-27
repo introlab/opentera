@@ -62,34 +62,15 @@ class QuerySessionDispatch(Resource):
             except:
                 pass
 
+            from services.VideoDispatch.Globals import WebRTC_module
+
             from uuid import uuid4
-            session_name = str(uuid4())
-            result = client.call('VideoDispatchService.WebRTCModule',
-                                 'create_session',
-                                 session_name,
-                                 owner_uuid,
-                                 participant_uuid)
+            room_name = str(uuid4())
 
-            if result and not result.__contains__('error'):
-                reply['participant_name'] = participant_name
-                reply['participant_uuid'] = participant_uuid
-                reply['session_url'] = result['url']
-                reply['session_key'] = result['key']
-                reply['session_port'] = result['port']
-                reply['owner_uuid'] = owner_uuid
+            # def create_webrtc_session(self, room_name, owner_uuid, users: list, participants: list, devices: list):
+            result = WebRTC_module.create_webrtc_session(room_name, owner_uuid, [owner_uuid], [participant_uuid], [])
 
-                # Invite participant via websocket
-                topic = 'websocket.participant.' + participant_uuid
-                event = JoinSessionEvent()
-                event.session_url = result['url']
-
-                message = self.module.create_tera_message(dest=topic)
-                any_message = Any()
-                any_message.Pack(event)
-                message.data.extend([any_message])
-                self.module.publish(message.head.dest, message.SerializeToString())
-            else:
-                reply['error'] = 'Unable to create session'
+            print(result)
 
         return reply
 

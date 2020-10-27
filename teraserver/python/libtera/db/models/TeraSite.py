@@ -1,4 +1,5 @@
 from libtera.db.Base import db, BaseModel
+from flask_sqlalchemy import event
 
 
 class TeraSite(db.Model, BaseModel):
@@ -7,7 +8,7 @@ class TeraSite(db.Model, BaseModel):
     site_name = db.Column(db.String, nullable=False, unique=True)
 
     # site_devices = db.relationship("TeraDeviceSite")
-    site_projects = db.relationship("TeraProject")
+    site_projects = db.relationship("TeraProject", cascade="delete", passive_deletes=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -17,16 +18,26 @@ class TeraSite(db.Model, BaseModel):
 
         return super().to_json(ignore_fields=ignore_fields)
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_site': self.id_site}
+
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         base_site = TeraSite()
         base_site.site_name = 'Default Site'
-        db.session.add(base_site)
+        TeraSite.insert(base_site)
 
-        base_site2 = TeraSite()
-        base_site2.site_name = 'Top Secret Site'
-        db.session.add(base_site2)
-        db.session.commit()
+        if test:
+            base_site = TeraSite()
+            base_site.site_name = 'Top Secret Site'
+            TeraSite.insert(base_site)
 
     @staticmethod
     def get_site_by_sitename(sitename):
@@ -48,5 +59,46 @@ class TeraSite(db.Model, BaseModel):
     def delete(cls, id_todel):
         super().delete(id_todel)
 
-        from libtera.db.models.TeraSession import TeraSession
-        TeraSession.delete_orphaned_sessions()
+        # from libtera.db.models.TeraSession import TeraSession
+        # TeraSession.delete_orphaned_sessions()
+
+    @classmethod
+    def insert(cls, site):
+        # Creates admin and user roles for that site
+        super().insert(site)
+
+        from libtera.db.models.TeraServiceRole import TeraServiceRole
+        from libtera.db.models.TeraService import TeraService
+        opentera_service_id = TeraService.get_openteraserver_service().id_service
+        access_role = TeraServiceRole()
+        access_role.id_service = opentera_service_id
+        access_role.id_site = site.id_site
+        access_role.service_role_name = 'admin'
+        db.session.add(access_role)
+
+        access_role = TeraServiceRole()
+        access_role.id_service = opentera_service_id
+        access_role.id_site = site.id_site
+        access_role.service_role_name = 'user'
+        db.session.add(access_role)
+
+        db.session.commit()
+
+#
+# @event.listens_for(TeraSite, 'after_insert')
+# def site_inserted(mapper, connection, target):
+#     # By default, creates user and admin roles after a site has been added
+#     from libtera.db.models.TeraServiceRole import TeraServiceRole
+#     from libtera.db.models.TeraService import TeraService
+#
+#     access_role = TeraServiceRole()
+#     access_role.id_service = Globals.opentera_service_id
+#     access_role.id_site = target.id_site
+#     access_role.service_role_name = 'admin'
+#     db.session.add(access_role)
+#
+#     access_role = TeraServiceRole()
+#     access_role.id_service = Globals.opentera_service_id
+#     access_role.id_site = target.id_site
+#     access_role.service_role_name = 'user'
+#     db.session.add(access_role)

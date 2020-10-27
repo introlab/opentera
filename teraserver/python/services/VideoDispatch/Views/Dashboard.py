@@ -14,8 +14,8 @@ class Dashboard(MethodView):
     def get(self):
         # print('get')
 
-        hostname = self.flaskModule.config.server_config['hostname']
-        port = self.flaskModule.config.server_config['port']
+        hostname = self.flaskModule.config.service_config['hostname']
+        port = self.flaskModule.config.service_config['port']
         backend_hostname = self.flaskModule.config.backend_config['hostname']
         backend_port = self.flaskModule.config.backend_config['port']
         if 'X_EXTERNALHOST' in request.headers:
@@ -37,14 +37,16 @@ class Dashboard(MethodView):
             is_participant = False
         else:
             if current_participant_client:
-                participant_reply = current_participant_client.do_get_request_to_backend(
-                    '/api/participant/participants')
+                # Get information from service API
+                from services.VideoDispatch.Globals import service
+                params = {'participant_uuid': current_participant_client.participant_uuid}
+                participant_reply = service.get_from_opentera('/api/service/participants', params)
 
                 if participant_reply.status_code == 200:
-                    participant_json = json.loads(participant_reply.content)
+                    participant_json = participant_reply.json()
                     user_fullname = participant_json['participant_name']
 
-        return render_template('dashboard.html', hostname=hostname, port=port,
+        return render_template('dashboard_en.html', hostname=hostname, port=port,
                                backend_hostname=backend_hostname, backend_port=backend_port,
                                user_fullname=user_fullname, is_participant=is_participant
                                )

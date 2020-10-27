@@ -21,14 +21,14 @@ class TeraDeviceSubType(db.Model, BaseModel):
         device_subtype_json = super().to_json(ignore_fields=ignore_fields)
 
         # Add device type name as parent
-        device_subtype_json['device_subtype_parent'] = self.device_subtype_type.get_name()
+        device_subtype_json['device_subtype_parent'] = self.device_subtype_type.device_type_name
 
         return device_subtype_json
 
     @staticmethod
-    def create_defaults():
+    def create_defaults(test=False):
         from libtera.db.models.TeraDeviceType import TeraDeviceType
-        bureau = TeraDeviceType.get_device_type(TeraDeviceType.DeviceTypeEnum.BUREAU_ACTIF.value)
+        bureau = TeraDeviceType.get_device_type_by_key('bureau_actif')
         subtype = TeraDeviceSubType()
         subtype.device_subtype_type = bureau
         subtype.device_subtype_name = 'Bureau modèle #1'
