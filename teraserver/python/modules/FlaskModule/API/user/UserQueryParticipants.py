@@ -160,11 +160,15 @@ class UserQueryParticipants(Resource):
                                 participant_json['participant_devices'] = devices
                                 participant_json['participant_project'] = participant.participant_project.to_json()
 
-                        if args['with_status'] and participant.participant_uuid in status_participants:
-                            participant_json['participant_busy'] = \
-                                status_participants[participant.participant_uuid]['busy']
-                            participant_json['participant_online'] = \
-                                status_participants[participant.participant_uuid]['online']
+                        if args['with_status']:
+                            if participant.participant_uuid in status_participants:
+                                participant_json['participant_busy'] = \
+                                    status_participants[participant.participant_uuid]['busy']
+                                participant_json['participant_online'] = \
+                                    status_participants[participant.participant_uuid]['online']
+                            else:
+                                participant_json['participant_busy'] = False
+                                participant_json['participant_online'] = False
 
                         participant_list.append(participant_json)
 
