@@ -32,8 +32,8 @@ get_parser.add_argument('full', type=inputs.boolean, help='Flag that expands the
                                                           'information')
 get_parser.add_argument('no_group', type=inputs.boolean,
                         help='Flag that limits the returned data with only participants without a group')
-get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
-                                                                 'for each participant')
+# get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
+#                                                                  'for each participant')
 
 # post_parser = reqparse.RequestParser()
 post_schema = api.schema_model('user_participant', {'properties': TeraParticipant.get_json_schema(),
@@ -116,10 +116,10 @@ class UserQueryParticipants(Resource):
             if participants:
                 participant_list = []
                 status_participants = {}
-                if args['with_status']:
-                    # Query status
-                    rpc = RedisRPCClient(self.module.config.redis_config)
-                    status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+
+                # Query status
+                rpc = RedisRPCClient(self.module.config.redis_config)
+                status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
 
                 for participant in participants:
                     if args['enabled'] is not None:
@@ -160,15 +160,15 @@ class UserQueryParticipants(Resource):
                                 participant_json['participant_devices'] = devices
                                 participant_json['participant_project'] = participant.participant_project.to_json()
 
-                        if args['with_status']:
-                            if participant.participant_uuid in status_participants:
-                                participant_json['participant_busy'] = \
-                                    status_participants[participant.participant_uuid]['busy']
-                                participant_json['participant_online'] = \
-                                    status_participants[participant.participant_uuid]['online']
-                            else:
-                                participant_json['participant_busy'] = False
-                                participant_json['participant_online'] = False
+                        # Update participants status
+                        if participant.participant_uuid in status_participants:
+                            participant_json['participant_busy'] = \
+                                status_participants[participant.participant_uuid]['busy']
+                            participant_json['participant_online'] = \
+                                status_participants[participant.participant_uuid]['online']
+                        else:
+                            participant_json['participant_busy'] = False
+                            participant_json['participant_online'] = False
 
                         participant_list.append(participant_json)
 
@@ -277,7 +277,18 @@ class UserQueryParticipants(Resource):
 
         update_participant = TeraParticipant.get_participant_by_id(json_participant['id_participant'])
         update_participant_json = update_participant.to_json()
-        # update_participant_json['id_site'] = update_participant.participant_project.id_site
+
+        # Query status
+        rpc = RedisRPCClient(self.module.config.redis_config)
+        status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+        if update_participant.participant_uuid in status_participants:
+            update_participant_json['participant_busy'] = \
+                status_participants[update_participant.participant_uuid]['busy']
+            update_participant_json['participant_online'] = \
+                status_participants[update_participant.participant_uuid]['online']
+        else:
+            update_participant_json['participant_busy'] = False
+            update_participant_json['participant_online'] = False
 
         return jsonify([update_participant_json])
 

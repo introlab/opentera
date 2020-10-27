@@ -319,6 +319,7 @@ class TeraParticipant(db.Model, BaseModel):
 
         participant.participant_lastonline = None
         participant.participant_uuid = str(uuid.uuid4())
+        participant.participant_token = None
         # participant.create_token()
         # Check if username is available
         if not TeraParticipant.is_participant_username_available(participant.participant_username):
