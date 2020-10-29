@@ -171,8 +171,7 @@ class LoginModule(BaseModule):
         participant_token_auth.get_user_roles(self.participant_get_user_roles_token)
 
     def load_user(self, user_id):
-        print('LoginModule - load_user', self, user_id)
-
+        # print('LoginModule - load_user', self, user_id)
         # Depending if we have a user or a participant online, return the right object.
         # Here current_user or current_participant are already invalid
         # Need to fetch them from database
@@ -194,13 +193,13 @@ class LoginModule(BaseModule):
         return None
 
     def user_verify_password(self, username, password):
-        print('LoginModule - user_verify_password ', username)
+        # print('LoginModule - user_verify_password ', username)
 
         if TeraUser.verify_password(username=username, password=password):
 
             _request_ctx_stack.top.current_user = TeraUser.get_user_by_username(username)
 
-            print('user_verify_password, found user: ', current_user)
+            # print('user_verify_password, found user: ', current_user)
             # current_user.update_last_online()
 
             login_user(current_user, remember=True)
@@ -255,13 +254,13 @@ class LoginModule(BaseModule):
         return False
 
     def participant_verify_password(self, username, password):
-        print('LoginModule - participant_verify_password for ', username)
+        # print('LoginModule - participant_verify_password for ', username)
 
         if TeraParticipant.verify_password(username=username, password=password):
 
             _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_username(username)
 
-            print('participant_verify_password, found participant: ', current_participant)
+            # print('participant_verify_password, found participant: ', current_participant)
             # current_participant.update_last_online()
 
             login_user(current_participant, remember=True)
@@ -288,7 +287,7 @@ class LoginModule(BaseModule):
         """
         Tokens for participants are stored in the DB.
         """
-        print('LoginModule - participant_verify_token for ', token_value, self)
+        # print('LoginModule - participant_verify_token for ', token_value, self)
 
         # TeraParticipant verifies if the participant is active and login is enabled
         _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_value)

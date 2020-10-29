@@ -219,7 +219,7 @@ if __name__ == '__main__':
             Globals.db_man.open(config_man.server_config['debug_mode'])
 
             # Create minimal values, if required
-            Globals.db_man.create_defaults(config=config_man, test=True)
+            Globals.db_man.create_defaults(config=config_man, test=False)
 
     except OperationalError as e:
         print("Unable to connect to database - please check settings in config file!", e)

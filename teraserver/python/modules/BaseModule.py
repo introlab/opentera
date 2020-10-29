@@ -106,7 +106,7 @@ class BaseModule(RedisClient):
 
     def notify_module_rpc(self, pattern, channel, message):
         import threading
-        print('BaseModule - Received rpc', self, pattern, channel, message, ' thread:', threading.current_thread())
+        # print('BaseModule - Received rpc', self, pattern, channel, message, ' thread:', threading.current_thread())
 
         try:
             # Look for a RPCMessage
