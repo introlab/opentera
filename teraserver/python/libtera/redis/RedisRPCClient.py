@@ -9,23 +9,21 @@ from modules.RedisVars import RedisVars
 
 
 class RedisRPCClient:
-    def __init__(self, config: dict, timeout=5):
+    def __init__(self, config: dict, timeout=10):
         self.config = config
         self.timeout = timeout
         # Create a unique random pattern
         self.pattern = 'RedisRPCClient.' + str(uuid.uuid4())
         self.msg_id = 0
+        self.client = redis.Redis(host=self.config['hostname'],
+                                  port=self.config['port'],
+                                  db=self.config['db'],
+                                  username=self.config['username'],
+                                  password=self.config['password'])
 
     def _internal_rpc_call(self, topic: str, function_name: str, *args):
-        print('RedisRPCClient - current thread', threading.current_thread())
-        print(self.pattern, ' calling:', topic, function_name, args)
-        # Get redis instance
-        r = redis.StrictRedis(host=self.config['hostname'],
-                              port=self.config['port'],
-                              db=self.config['db'],
-                              username=self.config['username'],
-                              password=self.config['password'])
-        p = r.pubsub()
+        # Pub/Sub client
+        p = self.client.pubsub()
 
         message = RPCMessage()
         message.method = function_name
@@ -69,10 +67,13 @@ class RedisRPCClient:
         message1 = p.get_message(timeout=self.timeout)
 
         # Publish request
-        r.publish(topic, message.SerializeToString())
+        self.client.publish(topic, message.SerializeToString())
 
         # Second message is data received
         message2 = p.get_message(timeout=self.timeout)
+
+        # Unsubscribe to message
+        p.unsubscribe(message.reply_to)
 
         if message2:
             result = json.loads(message2['data'])
