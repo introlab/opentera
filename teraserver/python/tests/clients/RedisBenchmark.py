@@ -11,7 +11,7 @@ if __name__ == '__main__':
     start_time = datetime.now()
 
     rpc = RedisRPCClient(config.redis_config)
-    count = 1000
+    count = 10000
     for i in range(count):
         status_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_users')
 

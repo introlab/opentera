@@ -73,7 +73,9 @@ class RedisRPCClient:
         message2 = p.get_message(timeout=self.timeout)
 
         # Unsubscribe to message
-        p.unsubscribe(message.reply_to)
+        # p.unsubscribe(message.reply_to)
+        # Closing (will automatically unsubscribe)
+        p.close()
 
         if message2:
             result = json.loads(message2['data'])
