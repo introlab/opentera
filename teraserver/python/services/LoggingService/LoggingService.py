@@ -80,7 +80,7 @@ class LoggingService(ServiceOpenTera):
             d.addErrback(self.ebLoopFailed)
 
     def log_event_received(self, pattern, channel, message):
-        print('LoggingService - user_manager_event_received', pattern, channel, message)
+        # print('LoggingService - user_manager_event_received', pattern, channel, message)
         try:
             tera_event = messages.TeraEvent()
             if isinstance(message, str):

@@ -48,27 +48,27 @@ class UserManagerModule(BaseModule):
         self.rpc_api['status_devices'] = {'args': [], 'returns': 'dict', 'callback': self.status_devices_rpc_callback}
 
     def online_users_rpc_callback(self, *args, **kwargs):
-        print('online_users_rpc_callback', args, kwargs)
+        # print('online_users_rpc_callback', args, kwargs)
         return self.user_registry.online_users()
 
     def online_participants_rpc_callback(self, *args, **kwargs):
-        print('online_participants_rpc_callback', args, kwargs)
+        # print('online_participants_rpc_callback', args, kwargs)
         return self.participant_registry.online_participants()
 
     def online_devices_rpc_callback(self, *args, **kwargs):
-        print('online_devices_rpc_callback', args, kwargs)
+        # print('online_devices_rpc_callback', args, kwargs)
         return self.device_registry.online_devices()
 
     def busy_users_rpc_callback(self, *args, **kwargs):
-        print('busy_users_rpc_callback', args, kwargs)
+        # print('busy_users_rpc_callback', args, kwargs)
         return self.user_registry.busy_users()
 
     def busy_participants_rpc_callback(self, *args, **kwargs):
-        print('busy_participants_rpc_callback', args, kwargs)
+        # print('busy_participants_rpc_callback', args, kwargs)
         return self.participant_registry.busy_participants()
 
     def busy_devices_rpc_callback(self, *args, **kwargs):
-        print('busy_devices_rpc_callback', args, kwargs)
+        # print('busy_devices_rpc_callback', args, kwargs)
         return self.device_registry.busy_devices()
 
     def status_users_rpc_callback(self, *args, **kwargs):
@@ -138,7 +138,7 @@ class UserManagerModule(BaseModule):
         """
         We have received a published message from redis
         """
-        print('UserManagerModule - Received message ', pattern, channel, message)
+        # print('UserManagerModule - Received message ', pattern, channel, message)
 
         tera_message = TeraModuleMessage()
         tera_message.ParseFromString(message)

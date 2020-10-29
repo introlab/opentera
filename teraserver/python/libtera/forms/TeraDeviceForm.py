@@ -41,7 +41,7 @@ class TeraDeviceForm:
         section.add_item(TeraFormItem("device_onlineable", gettext("Device Onlineable?"), "boolean",
                                       item_required=True))
 
-        section.add_item(TeraFormItem("device_lastonline", gettext("Last Connection"), "label",
+        section.add_item(TeraFormItem("device_lastonline", gettext("Last Connection"), "datetime",
                                       item_options={"readonly": True}))
 
         section3 = TeraFormSection("infos", gettext("Information"))

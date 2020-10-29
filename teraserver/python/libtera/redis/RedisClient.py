@@ -45,7 +45,7 @@ class RedisClient:
         pass
 
     def redisMessageReceived(self, pattern, channel, message):
-        print(self, 'redisMessageReceived', pattern, channel, message)
+        # print(self, 'redisMessageReceived', pattern, channel, message)
         if pattern in self.callbacks_dict:
             # Call function.
             self.callbacks_dict[pattern](pattern, channel, message)
@@ -60,7 +60,7 @@ class RedisClient:
 
     def subscribe(self, topic):
         if self.protocol:
-            print('RedisClient (', self, ') subscribing to: ',  topic)
+            # print('RedisClient (', self, ') subscribing to: ',  topic)
             return self.protocol.psubscribe(topic)
         else:
             print('Error, no protocol')
@@ -86,12 +86,12 @@ class RedisClient:
         return self.redis.delete(key)
 
     def subscribe_pattern_with_callback(self, pattern, function):
-        print(self, 'subscribe_pattern_with_callback', pattern, function)
+        # print(self, 'subscribe_pattern_with_callback', pattern, function)
         self.callbacks_dict[pattern] = function
         return self.subscribe(pattern)
 
     def unsubscribe_pattern_with_callback(self, pattern, function):
-        print(self, 'unsubscribe_pattern_with_callback', pattern, function)
+        # print(self, 'unsubscribe_pattern_with_callback', pattern, function)
         ret = self.unsubscribe(pattern)
         del self.callbacks_dict[pattern]
         return ret
