@@ -117,7 +117,7 @@ class UserQueryDevices(Resource):
                     if device.id_device not in user_access.get_accessible_devices_ids():
                         devices = []
         else:
-            return gettext('To many ID'), 400
+            return gettext('Too many IDs'), 400
 
         # if not devices:
         #     return gettext('Forbidden access'), 403
