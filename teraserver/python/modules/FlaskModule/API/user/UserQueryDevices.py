@@ -89,7 +89,10 @@ class UserQueryDevices(Resource):
         devices = []
         # If we have no arguments, return all accessible devices
         if self._value_counter(args=args) == 0:
-            devices = user_access.get_accessible_devices()
+            if id_device_type:
+                devices = user_access.query_devices_by_type(id_device_type)
+            else:
+                devices = user_access.get_accessible_devices()
         elif self._value_counter(args=args) == 1:
             if args['id_device']:
                 if args['id_device'] in user_access.get_accessible_devices_ids():
@@ -104,8 +107,6 @@ class UserQueryDevices(Resource):
                 devices = user_access.query_devices_for_site(args['id_site'], id_device_type, has_enabled)
             if args['id_project']:
                 devices = user_access.query_devices_for_project(args['id_project'], id_device_type, has_enabled)
-            if id_device_type:
-                devices = user_access.query_devices_by_type(id_device_type)
             if args['id_device_subtype']:
                 devices = user_access.query_devices_by_subtype(args['id_device_subtype'])
             if args['name']:
