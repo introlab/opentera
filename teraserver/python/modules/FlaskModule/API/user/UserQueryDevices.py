@@ -84,6 +84,7 @@ class UserQueryDevices(Resource):
         has_with_participants = args.pop('with_participants')
         has_with_sites = args.pop('with_sites')
         has_with_status = args.pop('with_status')
+        id_device_type = args.pop('id_device_type')
 
         devices = []
         # If we have no arguments, return all accessible devices
@@ -100,11 +101,11 @@ class UserQueryDevices(Resource):
                 if args['uuid'] in user_access.get_accessible_devices_uuids():
                     devices = [TeraDevice.get_device_by_uuid(args['uuid'])]
             if args['id_site']:
-                devices = user_access.query_devices_for_site(args['id_site'], args['id_device_type'], has_enabled)
+                devices = user_access.query_devices_for_site(args['id_site'], id_device_type, has_enabled)
             if args['id_project']:
-                devices = user_access.query_devices_for_project(args['id_project'], args['id_device_type'], has_enabled)
-            if args['id_device_type']:
-                devices = user_access.query_devices_by_type(args['id_device_type'])
+                devices = user_access.query_devices_for_project(args['id_project'], id_device_type, has_enabled)
+            if id_device_type:
+                devices = user_access.query_devices_by_type(id_device_type)
             if args['id_device_subtype']:
                 devices = user_access.query_devices_by_subtype(args['id_device_subtype'])
             if args['name']:
