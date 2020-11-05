@@ -292,7 +292,8 @@ class TeraParticipant(db.Model, BaseModel):
             if values['participant_password'] == '':
                 del values['participant_password']
             else:
-                values['participant_password'] = TeraParticipant.encrypt_password(values['participant_password'])
+                # Forcing password to string
+                values['participant_password'] = TeraParticipant.encrypt_password(str(values['participant_password']))
 
         # Check if we need to generate or delete tokens
         if 'participant_token_enabled' in values:
@@ -315,7 +316,8 @@ class TeraParticipant(db.Model, BaseModel):
     def insert(cls, participant):
         # Encrypts password
         if participant.participant_password:
-            participant.participant_password = TeraParticipant.encrypt_password(participant.participant_password)
+            # Forcing password to string
+            participant.participant_password = TeraParticipant.encrypt_password(str(participant.participant_password))
 
         participant.participant_lastonline = None
         participant.participant_uuid = str(uuid.uuid4())
