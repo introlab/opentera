@@ -80,10 +80,10 @@ class DBManagerBureauActifDataProcess:
         self.timers = raw_data['timers']
 
         # Sort data by time -> to remove once the time on pi is fixed
-        self.data = sorted(self.data, key=lambda x: datetime.datetime.strptime(x[0].lstrip(' '), '%Y-%m-%d %H:%M:%S'))
+        self.data = sorted(self.data, key=lambda x: datetime.datetime.fromisoformat(x[0].lstrip(' ')))
         uuid_participant = file_db_entry.data_participant_uuid
         date_str = raw_data['data'][0][0].lstrip(' ')
-        date = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+        date = datetime.datetime.fromisoformat(date_str)
 
         self.create_calendar_objects(uuid_participant, date)
         self.create_timeline(uuid_participant, date)
@@ -206,7 +206,7 @@ class DBManagerBureauActifDataProcess:
 
     def get_time(self, index):
         date_str = self.data[index][0].lstrip(' ')
-        return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+        return datetime.datetime.fromisoformat(date_str)
 
     def update_remaining_data(self, current_index):
         up = self.timers['up_secs']
