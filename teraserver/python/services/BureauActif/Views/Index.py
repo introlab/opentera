@@ -1,6 +1,8 @@
 from flask.views import MethodView
+from flask import send_from_directory
+from services.BureauActif.FlaskModule import flask_app
 from flask import render_template, request
-from services.BureauActif.AccessManager import AccessManager, current_user_client
+from werkzeug.exceptions import NotFound
 
 
 class Index(MethodView):
@@ -13,9 +15,8 @@ class Index(MethodView):
         print(self.flaskModule)
 
     def get(self):
-
-        return self.flaskModule.session.app.send_static_file('index.html')
-
-    def post(self):
-        print('post')
-        pass
+        try:
+            return flask_app.send_static_file('default_index.html')
+        except NotFound:
+            # If the file was not found, send the default index file
+            return flask_app.send_static_file('default_index.html')

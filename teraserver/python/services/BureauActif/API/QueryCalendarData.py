@@ -7,7 +7,7 @@ from sqlalchemy.exc import InvalidRequestError
 from services.BureauActif.FlaskModule import default_api_ns as api
 
 from services.BureauActif.libbureauactif.db.DBManager import DBManager
-from services.BureauActif.AccessManager import AccessManager, current_participant_client
+from services.shared.ServiceAccessManager import ServiceAccessManager, current_participant_client
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -29,7 +29,7 @@ class QueryCalendarData(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
-    @AccessManager.token_required
+    @ServiceAccessManager.token_required
     def get(self):
         calendar_access = DBManager.calendarAccess()
         parser = get_parser
