@@ -16,7 +16,7 @@ class Index(MethodView):
 
     def get(self):
         try:
-            return flask_app.send_static_file('default_index.html')
+            return flask_app.send_static_file('index.html')
         except NotFound:
             # If the file was not found, send the default index file
             return flask_app.send_static_file('default_index.html')

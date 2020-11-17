@@ -266,7 +266,7 @@ class FlaskModule(BaseModule):
 @flask_app.errorhandler(404)
 def page_not_found(e):
     # This might occur in Angular if the user is refreshing the page with the web browser
-    return flask_app.send_static_file('default_index.html')
+    return flask_app.send_static_file('index.html')
 
 
 @flask_app.after_request
