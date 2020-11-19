@@ -81,13 +81,12 @@ class DBManagerBureauActifDataProcess:
 
         # Sort data by time -> to remove once the time on pi is fixed
         self.data = sorted(self.data, key=lambda x: datetime.datetime.fromisoformat(x[0].lstrip(' ')))
+
         uuid_participant = file_db_entry.data_participant_uuid
         date_str = raw_data['data'][0][0].lstrip(' ')
         date = datetime.datetime.fromisoformat(date_str)
-
         self.create_calendar_objects(uuid_participant, date)
         self.create_timeline(uuid_participant, date)
-
         self.get_starting_position()
 
         self.half_timer_starting_position = self.first_position_timer / 2  # Half of the timer of the first position
@@ -117,7 +116,8 @@ class DBManagerBureauActifDataProcess:
             # Check if last entry or position changed or gap in the timeline (absence)
             if self.is_last_data(index) or was_standing != is_standing or \
                     absent_time != 0 or previous_button_state != self.button_pressed:
-                self.position_changes.done += 1
+                if was_standing != is_standing:
+                    self.position_changes.done += 1  # Count as a position change
                 self.update_position(was_standing, index, entries_before_position_change)
                 self.update_last_timeline_entry(absent_time, 4)
                 entries_before_position_change = 0
@@ -133,6 +133,7 @@ class DBManagerBureauActifDataProcess:
             delta = current_data - past_data
             if delta.seconds > 60:
                 delta_in_hour = delta.seconds / 3600
+                self.position_changes.done += 1  # Count as a position change
                 return delta_in_hour
         return 0
 
@@ -150,6 +151,7 @@ class DBManagerBureauActifDataProcess:
             self.standing = BureauActifCalendarData.get_calendar_data(self.calendar_day.id_calendar_day, 2)
             self.position_changes = BureauActifCalendarData.get_calendar_data(self.calendar_day.id_calendar_day, 3)
 
+    # Get previous timeline entries for the day or start a new timeline day
     def create_timeline(self, uuid_participant, date):
         entry = get_timeline_day(uuid_participant, date)
 
@@ -161,14 +163,17 @@ class DBManagerBureauActifDataProcess:
             self.timeline_day_entries = BureauActifTimelineDayEntry.get_timeline_day_entries(
                 self.timeline_day.id_timeline_day)
 
+    # Check if desk is at max height +- 5 cm meaning it's up
     def is_desk_up(self, desk_height):
         max_height = float(self.desk_config['max_height'])
         delta = abs(desk_height - max_height)
         return delta <= 5 or desk_height > max_height
 
+    # Check if it's the last entry in the data file received from pi
     def is_last_data(self, index):
         return index == len(self.data) - 1
 
+    # Check if the participant's position changed by comparing desk height to the previous entry in the file
     def position_has_changed(self, index, desk_height):
         if index != 0:
             previous_height = float(self.data[index - 1][1])
@@ -256,6 +261,7 @@ class DBManagerBureauActifDataProcess:
                 new_entry = BureauActifTimelineDayEntry.insert(self.create_new_timeline_entry(color_type, delta))
                 self.timeline_day_entries.append(new_entry)
 
+    # Set the right type of entry for the timeline color
     def get_right_timeline_color(self, id_type):
         if id_type == 2:  # Standing
             if not self.config_is_respected and self.button_pressed:  # Supposed to be seating
@@ -272,6 +278,7 @@ class DBManagerBureauActifDataProcess:
         entry.id_timeline_day = self.timeline_day.id_timeline_day
         return entry
 
+    # Add the timeline bloc from midnight to first entry time to make the relative timeline
     def set_starting_hour(self, date):
         starting_time = date.time()
         time = starting_time.hour + (starting_time.minute / 60)
@@ -297,6 +304,7 @@ class DBManagerBureauActifDataProcess:
         else:  # Position is supposed to be the opposite of the starting one
             self.actual_config_is_up = False
 
+    # Check if expected position of the participant is the actual position of the participant
     def check_if_config_is_respected(self, is_standing):
         self.config_is_respected = self.actual_config_is_up == is_standing
 
