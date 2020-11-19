@@ -6,12 +6,12 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, fields
 from werkzeug.utils import secure_filename
 
+from services.BureauActif import Globals
 from services.shared.ServiceAccessManager import ServiceAccessManager, current_login_type, current_device_client, \
     LoginType
 
 from services.BureauActif.FlaskModule import default_api_ns as api, flask_app
 from services.BureauActif.libbureauactif.db.Base import db
-from services.BureauActif.Globals import service
 from services.BureauActif.libbureauactif.db.models.BureauActifData import BureauActifData
 from services.BureauActif.libbureauactif.db.DBManager import DBManager
 
@@ -104,7 +104,8 @@ class QueryRawData(Resource):
                                     'asset_name': filename,
                                     'asset_type': 2  # Hard coded for now as RAW_DATA
                                     }}
-            post_result = service.post_to_opentera(api_url='/api/service/assets', json_data=json_asset)
+
+            post_result = Globals.service.post_to_opentera(api_url='/api/service/assets', json_data=json_asset)
             if post_result.status_code != 200:
                 print('Error sending asset to OpenTera: : Code=' + str(post_result.status_code) + ', Message=' +
                       post_result.content.decode())
