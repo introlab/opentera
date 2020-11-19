@@ -8,7 +8,7 @@ from modules.LoginModule.LoginModule import LoginModule
 from sqlalchemy import exc
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from libtera.db.models.TeraDevice import TeraDevice
-import uuid
+import datetime
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -110,6 +110,7 @@ class DeviceQuerySessions(Resource):
                         403: 'Logged device doesn\'t have permission to access the requested data'})
     def post(self):
         current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
+        # current_device = TeraDevice.get_device_by_id(4) #  For tests only
 
         args = post_parser.parse_args()
 
@@ -123,16 +124,16 @@ class DeviceQuerySessions(Resource):
 
         # Validate if we have an id
         if 'id_session' not in json_session:
-            return  gettext('Missing arguments'), 400
+            return gettext('Missing arguments'), 400
 
         # Validate if we have an id
         if 'id_session_type' not in json_session:
-            return  gettext('Missing arguments'), 400
+            return gettext('Missing arguments'), 400
 
         # Validate that we have session participants or users for new sessions
         if ('session_participants' not in json_session and 'session_users' not in json_session) \
                 and json_session['id_session'] == 0:
-            return  gettext('Missing arguments'), 400
+            return gettext('Missing arguments'), 400
 
         # We know we have a device
         # Avoid identity thief
@@ -144,8 +145,32 @@ class DeviceQuerySessions(Resource):
         if not json_session['id_session_type'] in session_types:
             return gettext('Unauthorized'), 403
 
+        # Check if a session of that type and name already exists. If so, don't create it, just returns it.
+        if json_session['id_session'] == 0:
+            if 'session_name' not in json_session:
+                return gettext('Missing argument \'session name\''), 400
+            if 'session_start_datetime' not in json_session:
+                return gettext('Missing argument \'session_start_datetime\''), 400
+
+            existing_session = device_access.query_existing_session(session_name=json_session['session_name'],
+                                                                    session_type_id=json_session['id_session_type'],
+                                                                    session_date=datetime.datetime.fromisoformat(
+                                                                        json_session['session_start_datetime']),
+                                                                    participant_uuids=
+                                                                    json_session['session_participants']
+                                                                    )
+            if existing_session:
+                json_session['id_session'] = existing_session.id_session
+                # Don't change session start datetime
+                json_session['session_start_datetime'] = existing_session.session_start_datetime.isoformat()
+        else:
+            # Existing session - check if we can access it
+            if json_session['id_session'] not in device_access.get_accessible_sessions_ids():
+                return gettext('Unauthorized', 403)
+
         # Do the update!
         if json_session['id_session'] > 0:
+
             # Already existing
             # TODO handle participant list (remove, add) in session
             try:
