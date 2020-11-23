@@ -31,11 +31,11 @@ class QueryParticipantInfos(Resource):
                         400: 'Missing parameter',
                         403: 'Forbidden - only logged user can get that information'})
     @api.expect(get_parser)
-    # @ServiceAccessManager.token_required
+    @ServiceAccessManager.token_required
     def get(self):
 
-        # if current_login_type != LoginType.USER_LOGIN:
-        #     return '', 403
+        if current_login_type != LoginType.USER_LOGIN:
+            return '', 403
 
         parser = get_parser
 
@@ -63,12 +63,12 @@ class QueryParticipantInfos(Resource):
                         400: 'Missing parameters',
                         403: 'Logged client doesn\'t have permission to access the requested data'
                         })
-    # @ServiceAccessManager.token_required
+    @ServiceAccessManager.token_required
     def post(self):
 
         # Only device can update for now
-        # if current_login_type != LoginType.DEVICE_LOGIN:
-        #     return '', 403
+        if current_login_type != LoginType.DEVICE_LOGIN:
+            return '', 403
 
         if 'participant_info' not in request.json:
             return 'Missing participant infos', 400
