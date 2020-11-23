@@ -6,10 +6,12 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, fields
 from werkzeug.utils import secure_filename
 
-from services.BureauActif.AccessManager import AccessManager, current_login_type, current_device_client, LoginType
+from services.BureauActif import Globals
+from services.shared.ServiceAccessManager import ServiceAccessManager, current_login_type, current_device_client, \
+    LoginType
+
 from services.BureauActif.FlaskModule import default_api_ns as api, flask_app
 from services.BureauActif.libbureauactif.db.Base import db
-from services.BureauActif.Globals import service_opentera
 from services.BureauActif.libbureauactif.db.models.BureauActifData import BureauActifData
 from services.BureauActif.libbureauactif.db.DBManager import DBManager
 
@@ -32,7 +34,7 @@ class QueryRawData(Resource):
                         403: 'Logged client doesn\'t have permission to access the requested data',
                         404: 'Session to attach data doesn\'t exists or is not available for the logged client',
                         500: 'No participant associated to that device'})
-    @AccessManager.token_required
+    @ServiceAccessManager.token_required
     def post(self):
         data_process = DBManager.dataProcess()
 
@@ -102,12 +104,12 @@ class QueryRawData(Resource):
                                     'asset_name': filename,
                                     'asset_type': 2  # Hard coded for now as RAW_DATA
                                     }}
-            post_result = service_opentera.post_to_opentera(api_url='/api/service/assets', json_data=json_asset)
+
+            post_result = Globals.service.post_to_opentera(api_url='/api/service/assets', json_data=json_asset)
             if post_result.status_code != 200:
                 print('Error sending asset to OpenTera: : Code=' + str(post_result.status_code) + ', Message=' +
                       post_result.content.decode())
 
-            # TODO: Process data
             # Data is in raw_data and stored in the "t_data" table.
             # Format is a dict with:
             # data -> A list of list which each item is a row in the raw data file:

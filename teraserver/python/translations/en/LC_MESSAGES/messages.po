@@ -984,7 +984,7 @@ msgid "Device type successfully deleted"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:119
-msgid "To many ID"
+msgid "Too many IDs"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:236

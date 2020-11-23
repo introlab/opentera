@@ -1,5 +1,4 @@
-from services.BureauActif.libbureauactif.db.Base import db
-from libtera.db.Base import BaseModel
+from services.BureauActif.libbureauactif.db.Base import db, BaseModel
 import datetime
 import os
 
