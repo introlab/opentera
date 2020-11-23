@@ -8,14 +8,13 @@ db = SQLAlchemy()
 
 
 class BaseModel:
-
-    version_id = db.Column(db.BigInteger, nullable=False, default=time.time()*1000)
+    version_id = db.Column(db.BigInteger, nullable=False, default=time.time() * 1000)
 
     # Using timestamp as version tracker - multiplying by 1000 to keep ms part without using floats (which seems to
     # cause problems with the mapper)
     __mapper_args__ = {
         'version_id_col': version_id,
-        'version_id_generator': lambda version: int(time.time()*1000)  # uuid.uuid4().hex
+        'version_id_generator': lambda version: int(time.time() * 1000)  # uuid.uuid4().hex
     }
 
     def to_json(self, ignore_fields=None):
