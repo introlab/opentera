@@ -244,7 +244,7 @@ class FlaskModule(BaseModule):
         from .API.QueryTimelineData import QueryTimelineData
         from .API.QueryLoginType import QueryLoginType
         from .API.QueryServiceInfos import QueryServiceInfos
-        from .API.QueryParticipantInfos import QueryParticipantInfos
+        from .API.QueryDeviceInfos import QueryDeviceInfos
 
         # Resources
         default_api_ns.add_resource(QueryRawData,       '/rawdata', resource_class_kwargs=kwargs)
@@ -252,7 +252,7 @@ class FlaskModule(BaseModule):
         default_api_ns.add_resource(QueryTimelineData,  '/timelinedata', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryLoginType,     '/me', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryServiceInfos,  '/serviceinfos', resource_class_kwargs=kwargs)
-        default_api_ns.add_resource(QueryParticipantInfos, '/participantinfos', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryDeviceInfos, '/deviceinfos', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from .Views.Index import Index
