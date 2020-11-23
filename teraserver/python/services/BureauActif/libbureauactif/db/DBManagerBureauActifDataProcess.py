@@ -137,12 +137,12 @@ class DBManagerBureauActifDataProcess:
     def create_calendar_objects(self, uuid_participant, date):
         entry = get_calendar_day(uuid_participant, date)
 
-        if entry is None:
+        if entry is None:  # No data for the current day, starting a new one
             self.calendar_day = BureauActifCalendarDay.insert(create_new_calendar_day(date, uuid_participant))
             self.seating = create_new_calendar_data(self.calendar_day.id_calendar_day, 1)
             self.standing = create_new_calendar_data(self.calendar_day.id_calendar_day, 2)
             self.position_changes = create_new_calendar_data(self.calendar_day.id_calendar_day, 3)
-        else:
+        else:  # Data already present for the current day
             self.calendar_day = entry
             self.seating = BureauActifCalendarData.get_calendar_data(self.calendar_day.id_calendar_day, 1)
             self.standing = BureauActifCalendarData.get_calendar_data(self.calendar_day.id_calendar_day, 2)
@@ -152,10 +152,10 @@ class DBManagerBureauActifDataProcess:
     def create_timeline(self, uuid_participant, date):
         entry = get_timeline_day(uuid_participant, date)
 
-        if entry is None:
+        if entry is None:  # No data for the current day, starting a new one
             self.timeline_day = BureauActifTimelineDay.insert(create_new_timeline_day(date, uuid_participant))
             self.set_starting_hour(date)  # Add starting bloc in timeline
-        else:
+        else:  # Data already present for the current day
             self.timeline_day = entry
             self.timeline_day_entries = BureauActifTimelineDayEntry.get_timeline_day_entries(
                 self.timeline_day.id_timeline_day)
