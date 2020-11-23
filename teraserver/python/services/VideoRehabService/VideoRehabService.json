@@ -1,23 +1,23 @@
 {
 	"Service": {
 		"name": "VideoRehabService",
-		"hostname": "localhost",
+		"hostname": "127.0.0.1",
 		"port": 4070,
 		"debug_mode": false
 	},
 	"Backend": {
-		"hostname": "localhost",
+		"hostname": "127.0.0.1",
 		"port": 40075
 	},
 	"Redis": {
-	    "hostname": "localhost",
+	    "hostname": "127.0.0.1",
 	    "port": 6379,
 	    "db": 0,
 	    "username": "",
 	    "password": ""
 	},
 	"WebRTC": {
-	    "hostname": "localhost",
+	    "hostname": "127.0.0.1",
 	    "external_port": 40075,
 	    "local_base_port": 8080,
 	    "max_sessions": 10,

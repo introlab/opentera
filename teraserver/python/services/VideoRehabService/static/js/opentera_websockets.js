@@ -79,8 +79,8 @@ function ws_MessageReceived(evt){
 
     // Stop or leave session
     if (msg_type === "type.googleapis.com/opentera.protobuf.StopSessionEvent" ||
-    (msg_type === "type.googleapis.com/opentera.protobuf.ParticipantEvent") &&
-    json_msg.message.events[0]["TYPE"] === "PARTICIPANT_LEFT_SESSION")
+    (msg_type === "type.googleapis.com/opentera.protobuf.LeaveSessionEvent") &&
+    json_msg.message.events[0]["leavingParticipants"].includes(participant_uuid))
     {
         showElement('btnLogout');
         showElement('logos');

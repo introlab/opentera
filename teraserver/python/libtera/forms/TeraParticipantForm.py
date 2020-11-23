@@ -42,9 +42,9 @@ class TeraParticipantForm:
             TeraFormItem("participant_password", gettext("Participant Password"), "password",
                          item_options={"confirm": True},
                          item_condition=TeraFormItemCondition("participant_login_enabled", "=", True)))
-        section.add_item(TeraFormItem("participant_lastonline", gettext("Last Connection"), "label",
+        section.add_item(TeraFormItem("participant_lastonline", gettext("Last Connection"), "datetime",
                                       item_options={"readonly": True}))
-        section.add_item(TeraFormItem("participant_lastsession", gettext("Last Session"), "label",
+        section.add_item(TeraFormItem("participant_lastsession", gettext("Last Session"), "datetime",
                                       item_options={"readonly": True}))
 
         return form.to_dict()

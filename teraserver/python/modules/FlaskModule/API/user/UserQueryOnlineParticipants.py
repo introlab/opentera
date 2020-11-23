@@ -11,7 +11,6 @@ from modules.BaseModule import ModuleNames
 from modules.DatabaseModule.DBManager import DBManager
 
 get_parser = api.parser()
-get_parser.add_argument('with_busy', type=inputs.boolean, help='Also return participants that are busy.')
 
 
 class UserQueryOnlineParticipants(Resource):
@@ -30,43 +29,24 @@ class UserQueryOnlineParticipants(Resource):
         user_access = DBManager.userAccess(current_user)
 
         try:
-            # rpc = RedisRPCClient(self.flaskModule.config.redis_config)
-            # online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
-            #
-            # # Filter participants that are available to the query
-            # participant_uuids = list(set(online_participants).intersection(user_access.
-            #                                                                get_accessible_participants_uuids()))
-            #
-            # return participant_uuids
-
             accessible_participants = user_access.get_accessible_participants_uuids()
             rpc = RedisRPCClient(self.flaskModule.config.redis_config)
-            online_parts = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
+            status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
 
+            participants_uuids = [participant_uuid for participant_uuid in status_participants]
             # Filter participants that are available to the query
-            online_part_uuids = list(set(online_parts).intersection(accessible_participants))
+            filtered_participants_uuids = list(set(participants_uuids).intersection(accessible_participants))
 
-            # Query user information
-            participants = TeraParticipant.query.filter(TeraParticipant.participant_uuid.in_(online_part_uuids)).all()
-            parts_json = [part.to_json(minimal=True) for part in participants]
-            for part in parts_json:
-                part['participant_online'] = True
+            # Query participants information
+            participants = TeraParticipant.query.filter(TeraParticipant.participant_uuid.in_(
+                filtered_participants_uuids)).all()
 
-            # Also query busy participants?
-            if args['with_busy']:
-                busy_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_participants')
+            participants_json = [participant.to_json(minimal=True) for participant in participants]
+            for participant in participants_json:
+                participant['participant_online'] = status_participants[participant['participant_uuid']]['online']
+                participant['participant_busy'] = status_participants[participant['participant_uuid']]['busy']
 
-                # Filter participants that are available to the query
-                busy_part_uuids = list(set(busy_participants).intersection(accessible_participants))
-
-                # Query user information
-                busy_parts = TeraParticipant.query.filter(TeraParticipant.participant_uuid.in_(busy_part_uuids)).all()
-                busy_parts_json = [part.to_json(minimal=True) for part in busy_parts]
-                for part in busy_parts_json:
-                    part['participant_busy'] = True
-                parts_json.extend(busy_parts_json)
-
-            return parts_json
+            return participants_json
 
         except InvalidRequestError as e:
             self.module.logger.log_error(self.module.module_name,

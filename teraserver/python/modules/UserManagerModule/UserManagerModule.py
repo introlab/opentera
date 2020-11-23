@@ -48,36 +48,36 @@ class UserManagerModule(BaseModule):
         self.rpc_api['status_devices'] = {'args': [], 'returns': 'dict', 'callback': self.status_devices_rpc_callback}
 
     def online_users_rpc_callback(self, *args, **kwargs):
-        print('online_users_rpc_callback', args, kwargs)
+        # print('online_users_rpc_callback', args, kwargs)
         return self.user_registry.online_users()
 
     def online_participants_rpc_callback(self, *args, **kwargs):
-        print('online_participants_rpc_callback', args, kwargs)
+        # print('online_participants_rpc_callback', args, kwargs)
         return self.participant_registry.online_participants()
 
     def online_devices_rpc_callback(self, *args, **kwargs):
-        print('online_devices_rpc_callback', args, kwargs)
+        # print('online_devices_rpc_callback', args, kwargs)
         return self.device_registry.online_devices()
 
     def busy_users_rpc_callback(self, *args, **kwargs):
-        print('busy_users_rpc_callback', args, kwargs)
+        # print('busy_users_rpc_callback', args, kwargs)
         return self.user_registry.busy_users()
 
     def busy_participants_rpc_callback(self, *args, **kwargs):
-        print('busy_participants_rpc_callback', args, kwargs)
+        # print('busy_participants_rpc_callback', args, kwargs)
         return self.participant_registry.busy_participants()
 
     def busy_devices_rpc_callback(self, *args, **kwargs):
-        print('busy_devices_rpc_callback', args, kwargs)
+        # print('busy_devices_rpc_callback', args, kwargs)
         return self.device_registry.busy_devices()
 
     def status_users_rpc_callback(self, *args, **kwargs):
         # Get online users
-        online_users = self.user_registry.online_users()
+        online_users = [uuid for uuid in self.user_registry.online_users()]
         # Get busy users
-        busy_users = self.user_registry.busy_users()
+        busy_users = [uuid for uuid in self.user_registry.busy_users()]
         # Get unique uuids (merge lists)
-        all_uuids = set(online_users.extend(busy_users))
+        all_uuids = set(online_users + busy_users)
 
         result = {}
         for user_uuid in all_uuids:
@@ -93,11 +93,11 @@ class UserManagerModule(BaseModule):
 
     def status_participants_rpc_callback(self, *args, **kwargs):
         # Get online participants
-        online_participants = self.participant_registry.online_participants()
+        online_participants = [uuid for uuid in self.participant_registry.online_participants()]
         # Get busy participants
-        busy_participants = self.participant_registry.busy_participants()
+        busy_participants = [uuid for uuid in self.participant_registry.busy_participants()]
         # Get unique uuids (merge lists)
-        all_uuids = set(online_participants.extend(busy_participants))
+        all_uuids = set(online_participants + busy_participants)
 
         result = {}
         for participant_uuid in all_uuids:
@@ -113,11 +113,11 @@ class UserManagerModule(BaseModule):
 
     def status_devices_rpc_callback(self, *args, **kwargs):
         # Get online devices
-        online_devices = self.device_registry.online_devices()
+        online_devices = [uuid for uuid in self.device_registry.online_devices()]
         # Get busy devices
-        busy_devices = self.device_registry.busy_devices()
+        busy_devices = [uuid for uuid in self.device_registry.busy_devices()]
         # Get unique uuids (merge lists)
-        all_uuids = set(online_devices.extend(busy_devices))
+        all_uuids = set(online_devices + busy_devices)
 
         result = {}
         for device_uuid in all_uuids:
@@ -138,7 +138,7 @@ class UserManagerModule(BaseModule):
         """
         We have received a published message from redis
         """
-        print('UserManagerModule - Received message ', pattern, channel, message)
+        # print('UserManagerModule - Received message ', pattern, channel, message)
 
         tera_message = TeraModuleMessage()
         tera_message.ParseFromString(message)

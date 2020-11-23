@@ -277,11 +277,17 @@ class UserQueryUserStats(Resource):
         if last_session:
             last_session_date = last_session.session_start_datetime.isoformat()
 
+        last_online = participant.participant_lastonline
+        last_online_date = None
+        if last_online:
+            last_online_date = last_online.isoformat()
+
         stats = {'id_participant': participant.id_participant,
                  'participant_name': participant.participant_name,
                  'participant_enabled': participant.participant_enabled,
                  'participant_sessions_count': len(participant.participant_sessions),
                  'participant_first_session': first_session_date,
-                 'participant_last_session': last_session_date
+                 'participant_last_session': last_session_date,
+                 'participant_last_online': last_online_date
                  }
         return stats

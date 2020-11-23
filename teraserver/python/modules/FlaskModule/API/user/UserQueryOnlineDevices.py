@@ -11,7 +11,6 @@ from modules.BaseModule import ModuleNames
 from modules.DatabaseModule.DBManager import DBManager
 
 get_parser = api.parser()
-get_parser.add_argument('with_busy', type=inputs.boolean, help='Also return devices that are busy.')
 
 
 class UserQueryOnlineDevices(Resource):
@@ -30,39 +29,20 @@ class UserQueryOnlineDevices(Resource):
         user_access = DBManager.userAccess(current_user)
 
         try:
-            # rpc = RedisRPCClient(self.flaskModule.config.redis_config)
-            # online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
-            #
-            # # Filter devices that are available to the query
-            # devices_uuids = list(set(online_devices).intersection(user_access.get_accessible_devices_uuids()))
-            #
-            # return devices_uuids
             accessible_devices = user_access.get_accessible_devices_uuids()
             rpc = RedisRPCClient(self.flaskModule.config.redis_config)
-            online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
+            status_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_devices')
 
+            devices_uuids = [device_uuid for device_uuid in status_devices]
             # Filter devices that are available to the query
-            online_device_uuids = list(set(online_devices).intersection(accessible_devices))
+            filtered_devices_uuids = list(set(devices_uuids).intersection(accessible_devices))
 
             # Query device information
-            devices = TeraDevice.query.filter(TeraDevice.device_uuid.in_(online_device_uuids)).all()
+            devices = TeraDevice.query.filter(TeraDevice.device_uuid.in_(filtered_devices_uuids)).all()
             devices_json = [device.to_json(minimal=True) for device in devices]
             for device in devices_json:
-                device['device_online'] = True
-
-            # Also query busy devices?
-            if args['with_busy']:
-                busy_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_devices')
-
-                # Filter devices that are available to the query
-                busy_device_uuids = list(set(busy_devices).intersection(accessible_devices))
-
-                # Query device information
-                busy_devices = TeraDevice.query.filter(TeraDevice.device_uuid.in_(busy_device_uuids)).all()
-                busy_devices_json = [device.to_json(minimal=True) for device in busy_devices]
-                for device in busy_devices_json:
-                    device['device_busy'] = True
-                devices_json.extend(busy_devices_json)
+                device['device_online'] = status_devices[device['device_uuid']]['online']
+                device['device_busy'] = status_devices[device['device_uuid']]['busy']
 
             return devices_json
 
