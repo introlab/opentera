@@ -1,4 +1,4 @@
-from math import floor
+from math import floor, ceil
 import datetime
 from services.BureauActif.libbureauactif.db.Base import db
 from services.BureauActif.libbureauactif.db.models.BureauActifCalendarDay import BureauActifCalendarDay
@@ -79,8 +79,8 @@ class DBManagerBureauActifDataProcess:
         self.desk_config = raw_data['config']
         self.timers = raw_data['timers']
 
-        # Sort data by time -> to remove once the time on pi is fixed
-        self.data = sorted(self.data, key=lambda x: datetime.datetime.fromisoformat(x[0].lstrip(' ')))
+        # Sort data by time -> use when time on pi de-sync - to remove once the time on pi is fixed
+        # self.data = sorted(self.data, key=lambda x: datetime.datetime.fromisoformat(x[0].lstrip(' ')))
 
         uuid_participant = file_db_entry.data_participant_uuid
         date_str = raw_data['data'][0][0].lstrip(' ')
@@ -116,8 +116,6 @@ class DBManagerBureauActifDataProcess:
             # Check if last entry or position changed or gap in the timeline (absence)
             if self.is_last_data(index) or was_standing != is_standing or \
                     absent_time != 0 or previous_button_state != self.button_pressed:
-                if was_standing != is_standing:
-                    self.position_changes.done += 1  # Count as a position change
                 self.update_position(was_standing, index, entries_before_position_change)
                 self.update_last_timeline_entry(absent_time, 4)
                 entries_before_position_change = 0
@@ -133,7 +131,6 @@ class DBManagerBureauActifDataProcess:
             delta = current_data - past_data
             if delta.seconds > 60:
                 delta_in_hour = delta.seconds / 3600
-                self.position_changes.done += 1  # Count as a position change
                 return delta_in_hour
         return 0
 
@@ -229,9 +226,9 @@ class DBManagerBureauActifDataProcess:
         down_to_do = work_time * down_ratio
 
         if up > 0:
-            position_changes_to_do = floor(work_time / up)
+            position_changes_to_do = ceil(work_time / up)
         elif down > 0:
-            position_changes_to_do = floor(work_time / down)
+            position_changes_to_do = ceil(work_time / down)
         else:
             position_changes_to_do = 0
 
@@ -269,6 +266,7 @@ class DBManagerBureauActifDataProcess:
         elif id_type == 3:  # Seating
             if not self.config_is_respected and self.button_pressed:  # Supposed to be standing
                 return 5
+        self.position_changes.done += 1  # Count as a position change
         return id_type
 
     def create_new_timeline_entry(self, id_type, delta):
