@@ -129,7 +129,7 @@ class DBManagerBureauActifDataProcess:
             past_data = self.get_time(current_index - 1)
             current_data = self.get_time(current_index)
             delta = current_data - past_data
-            if delta.seconds > 60:
+            if delta.seconds > 300:  # Absence is worth showing in timeline only if at least 5 minutes
                 delta_in_hour = delta.seconds / 3600
                 return delta_in_hour
         return 0
