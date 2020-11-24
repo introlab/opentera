@@ -6,27 +6,27 @@ from services.shared.ServiceAccessManager import ServiceAccessManager, current_l
 from services.BureauActif.Globals import config_man
 from services.BureauActif.FlaskModule import default_api_ns as api
 
-from services.BureauActif.libbureauactif.db.models.BureauActifParticipantInfos import BureauActifParticipantInfo
+from services.BureauActif.libbureauactif.db.models.BureauActifDeviceInfos import BureauActifDeviceInfo
 
 from sqlalchemy import exc
 
 get_parser = api.parser()
-get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the participant to query')
-get_parser.add_argument('uuid', type=str, help='Alias for "participant_uuid"')
+get_parser.add_argument('device_uuid', type=str, help='Device uuid of the device to query')
+get_parser.add_argument('uuid', type=str, help='Alias for "device_uuid"')
 
 # post_parser = reqparse.RequestParser()
-post_schema = api.schema_model('participant_info', {'properties': BureauActifParticipantInfo.get_json_schema(),
-                                                    'type': 'object',
-                                                    'location': 'json'})
+post_schema = api.schema_model('device_info', {'properties': BureauActifDeviceInfo.get_json_schema(),
+                                               'type': 'object',
+                                               'location': 'json'})
 
 
-class QueryParticipantInfos(Resource):
+class QueryDeviceInfos(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @api.doc(description='Gets current participant informations',
+    @api.doc(description='Gets current device informations',
              responses={200: 'Success',
                         400: 'Missing parameter',
                         403: 'Forbidden - only logged user can get that information'})
@@ -42,15 +42,15 @@ class QueryParticipantInfos(Resource):
         args = parser.parse_args()
 
         if args['uuid']:
-            args['participant_uuid'] = args['uuid']
+            args['device_uuid'] = args['uuid']
 
-        if not args['participant_uuid']:
-            return 'Missing participant UUID', 400
+        if not args['device_uuid']:
+            return 'Missing device UUID', 400
 
-        # TODO: Check if requester can access that participant or not.
+        # TODO: Check if requester can access that device or not.
 
         # Query informations from database
-        infos = BureauActifParticipantInfo.get_infos_for_participant(part_uuid=args['participant_uuid'])
+        infos = BureauActifDeviceInfo.get_infos_for_device(device_uuid=args['device_uuid'])
 
         if infos:
             return infos.to_json()
@@ -58,7 +58,7 @@ class QueryParticipantInfos(Resource):
         return None
 
     @api.expect(post_schema)
-    @api.doc(description='Update participants information',
+    @api.doc(description='Update devices information',
              responses={200: 'Success',
                         400: 'Missing parameters',
                         403: 'Logged client doesn\'t have permission to access the requested data'
@@ -70,24 +70,24 @@ class QueryParticipantInfos(Resource):
         if current_login_type != LoginType.DEVICE_LOGIN:
             return '', 403
 
-        if 'participant_info' not in request.json:
-            return 'Missing participant infos', 400
+        if 'device_info' not in request.json:
+            return 'Missing device infos', 400
 
-        json_infos = request.json['participant_info']
+        json_infos = request.json['device_info']
 
-        # TODO: Check if that device can update that participant
+        # TODO: Check if that device can update that device
 
         # Check if we already have infos for that participant
-        if 'participant_info_participant_uuid' not in json_infos:
-            return 'Missing participant uuid', 400
+        if 'device_info_device_uuid' not in json_infos:
+            return 'Missing device uuid', 400
 
-        infos = BureauActifParticipantInfo.get_infos_for_participant(
-            part_uuid=json_infos['participant_info_participant_uuid'])
+        infos = BureauActifDeviceInfo.get_infos_for_device(
+            device_uuid=json_infos['device_info_device_uuid'])
 
         if infos:
             # Update query
             try:
-                BureauActifParticipantInfo.update(infos.id_participant_info, json_infos)
+                BureauActifDeviceInfo.update(infos.id_device_info, json_infos)
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
@@ -96,9 +96,9 @@ class QueryParticipantInfos(Resource):
         else:
             # New query
             try:
-                infos = BureauActifParticipantInfo()
+                infos = BureauActifDeviceInfo()
                 infos.from_json(json_infos)
-                BureauActifParticipantInfo.insert(infos)
+                BureauActifDeviceInfo.insert(infos)
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
