@@ -873,7 +873,7 @@ class DBManagerTeraUserAccess:
         accessible_users = self.get_accessible_users()
         users = set()
         for user in accessible_users:
-            if enabled_only and not user.user_enabled:
+            if enabled_only and not user.user_enabled or user.user_superadmin:  # Don't include super admins!
                 continue
             project_roles = user.get_projects_roles()
             if project_id in [proj.id_project for proj, proj_role in project_roles.items()
