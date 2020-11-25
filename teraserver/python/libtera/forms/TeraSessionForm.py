@@ -44,7 +44,20 @@ class TeraSessionForm:
         # Session status
         status_list = []
         for status in TeraSessionStatus:
-            status_list.append(TeraFormValue(value_id=status.value, value=status.name))
+            # Translation is done here, since we have to proper language context
+            status_name = gettext('Unknown')
+            if status.value == TeraSessionStatus.STATUS_CANCELLED.value:
+                status_name = gettext('Cancelled')
+            if status.value == TeraSessionStatus.STATUS_COMPLETED.value:
+                status_name = gettext('Completed')
+            if status.value == TeraSessionStatus.STATUS_INPROGRESS.value:
+                status_name = gettext('In progess')
+            if status.value == TeraSessionStatus.STATUS_NOTSTARTED.value:
+                status_name = gettext('Planned')
+            if status.value == TeraSessionStatus.STATUS_TERMINATED.value:
+                status_name = gettext('Interrupted')
+
+            status_list.append(TeraFormValue(value_id=status.value, value=status_name))
 
         # Sections
         section = TeraFormSection("informations", gettext("Information"))

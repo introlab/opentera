@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-10-27 09:46-0400\n"
+"POT-Creation-Date: 2020-11-25 11:30-0500\n"
 "PO-Revision-Date: 2019-10-08 10:59-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: libtera/db/models/TeraSessionType.py:130
+#: libtera/db/models/TeraSessionType.py:130 libtera/forms/TeraSessionForm.py:48
 msgid "Unknown"
 msgstr ""
 
@@ -91,7 +91,7 @@ msgstr ""
 #: libtera/forms/TeraParticipantGroupForm.py:19
 #: libtera/forms/TeraProjectForm.py:19
 #: libtera/forms/TeraServiceConfigForm.py:18
-#: libtera/forms/TeraServiceForm.py:18 libtera/forms/TeraSessionForm.py:50
+#: libtera/forms/TeraServiceForm.py:18 libtera/forms/TeraSessionForm.py:63
 #: libtera/forms/TeraSessionTypeForm.py:33 libtera/forms/TeraSiteForm.py:12
 #: libtera/forms/TeraUserForm.py:13 libtera/forms/TeraUserGroupForm.py:18
 #: libtera/forms/TeraVersionsForm.py:18
@@ -366,59 +366,79 @@ msgstr ""
 msgid "Service Default Configuration"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:54
-msgid "Session ID"
+#: libtera/forms/TeraSessionForm.py:50
+msgid "Cancelled"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:55
-msgid "Session UUID"
+#: libtera/forms/TeraSessionForm.py:52
+msgid "Completed"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:54
+msgid "In progess"
 msgstr ""
 
 #: libtera/forms/TeraSessionForm.py:56
+msgid "Planned"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:58
+msgid "Interrupted"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:67
+msgid "Session ID"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:68
+msgid "Session UUID"
+msgstr ""
+
+#: libtera/forms/TeraSessionForm.py:69
 msgid "Session Name"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:57
+#: libtera/forms/TeraSessionForm.py:70
 msgid "Session Type"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:58 libtera/forms/TeraSessionForm.py:59
+#: libtera/forms/TeraSessionForm.py:71 libtera/forms/TeraSessionForm.py:72
 msgid "Session User Creator"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:64
+#: libtera/forms/TeraSessionForm.py:77
 msgid "Session Creator Device"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:65
+#: libtera/forms/TeraSessionForm.py:78
 msgid "Session Creator Device ID"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:71 libtera/forms/TeraSessionForm.py:73
+#: libtera/forms/TeraSessionForm.py:84 libtera/forms/TeraSessionForm.py:86
 msgid "Session Creator Participant"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:78 libtera/forms/TeraSessionForm.py:80
+#: libtera/forms/TeraSessionForm.py:91 libtera/forms/TeraSessionForm.py:93
 msgid "Session Creator Service"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:85
+#: libtera/forms/TeraSessionForm.py:98
 msgid "Start Date"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:86
+#: libtera/forms/TeraSessionForm.py:99
 msgid "Duration"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:89
+#: libtera/forms/TeraSessionForm.py:102
 msgid "State"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:90
+#: libtera/forms/TeraSessionForm.py:103
 msgid "Comments"
 msgstr ""
 
-#: libtera/forms/TeraSessionForm.py:96
+#: libtera/forms/TeraSessionForm.py:109
 msgid "Session Has Device Data"
 msgstr ""
 
@@ -558,9 +578,9 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryDeviceSubTypes.py:171
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:106
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:181
-#: modules/FlaskModule/API/user/UserQueryDevices.py:258
-#: modules/FlaskModule/API/user/UserQueryDevices.py:262
-#: modules/FlaskModule/API/user/UserQueryDevices.py:363
+#: modules/FlaskModule/API/user/UserQueryDevices.py:260
+#: modules/FlaskModule/API/user/UserQueryDevices.py:264
+#: modules/FlaskModule/API/user/UserQueryDevices.py:365
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:109
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:163
 #: modules/FlaskModule/API/user/UserQueryParticipants.py:315
@@ -619,7 +639,7 @@ msgstr ""
 #: modules/FlaskModule/API/device/DeviceQueryDevices.py:92
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:93
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:108
-#: modules/FlaskModule/API/device/DeviceQuerySessions.py:163
+#: modules/FlaskModule/API/device/DeviceQuerySessions.py:188
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:132
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:146
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:183
@@ -642,9 +662,9 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:119
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:134
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:179
-#: modules/FlaskModule/API/user/UserQueryDevices.py:293
-#: modules/FlaskModule/API/user/UserQueryDevices.py:308
-#: modules/FlaskModule/API/user/UserQueryDevices.py:399
+#: modules/FlaskModule/API/user/UserQueryDevices.py:295
+#: modules/FlaskModule/API/user/UserQueryDevices.py:310
+#: modules/FlaskModule/API/user/UserQueryDevices.py:401
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:122
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:137
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:183
@@ -715,16 +735,16 @@ msgstr ""
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:53
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:117
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:101
-#: modules/FlaskModule/API/device/DeviceQuerySessions.py:197
+#: modules/FlaskModule/API/device/DeviceQuerySessions.py:222
 msgid "Forbidden for security reasons"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:66
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:72
-#: modules/FlaskModule/API/device/DeviceQuerySessions.py:118
-#: modules/FlaskModule/API/device/DeviceQuerySessions.py:126
-#: modules/FlaskModule/API/device/DeviceQuerySessions.py:130
-#: modules/FlaskModule/API/device/DeviceQuerySessions.py:135
+#: modules/FlaskModule/API/device/DeviceQuerySessions.py:119
+#: modules/FlaskModule/API/device/DeviceQuerySessions.py:127
+#: modules/FlaskModule/API/device/DeviceQuerySessions.py:131
+#: modules/FlaskModule/API/device/DeviceQuerySessions.py:136
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:45
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:169
 #: modules/FlaskModule/API/service/ServiceQueryParticipants.py:69
@@ -747,13 +767,22 @@ msgid "Missing arguments"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:80
-#: modules/FlaskModule/API/device/DeviceQuerySessions.py:145
-#: modules/LoginModule/LoginModule.py:425
-#: modules/LoginModule/LoginModule.py:467
-#: modules/LoginModule/LoginModule.py:485
-#: modules/LoginModule/LoginModule.py:495
+#: modules/FlaskModule/API/device/DeviceQuerySessions.py:146
+#: modules/FlaskModule/API/device/DeviceQuerySessions.py:169
+#: modules/LoginModule/LoginModule.py:424
+#: modules/LoginModule/LoginModule.py:466
+#: modules/LoginModule/LoginModule.py:484
+#: modules/LoginModule/LoginModule.py:494
 msgid "Unauthorized"
 msgstr "Non autorisé"
+
+#: modules/FlaskModule/API/device/DeviceQuerySessions.py:151
+msgid "Missing argument 'session name'"
+msgstr ""
+
+#: modules/FlaskModule/API/device/DeviceQuerySessions.py:153
+msgid "Missing argument 'session_start_datetime'"
+msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceRegister.py:110
 msgid "Invalid CSR signature"
@@ -983,49 +1012,49 @@ msgstr ""
 msgid "Device type successfully deleted"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:119
+#: modules/FlaskModule/API/user/UserQueryDevices.py:121
 msgid "Too many IDs"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:236
+#: modules/FlaskModule/API/user/UserQueryDevices.py:238
 msgid "Missing id_device"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:252
+#: modules/FlaskModule/API/user/UserQueryDevices.py:254
 #: modules/FlaskModule/API/user/UserQueryUserGroups.py:172
 msgid "No site admin access for at a least one project in the list"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:358
+#: modules/FlaskModule/API/user/UserQueryDevices.py:360
 #: modules/FlaskModule/API/user/UserQueryUsers.py:335
 msgid "Invalid id"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:383
+#: modules/FlaskModule/API/user/UserQueryDevices.py:385
 msgid ""
 "Can't delete device: please delete all participants association before "
 "deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:386
+#: modules/FlaskModule/API/user/UserQueryDevices.py:388
 msgid ""
 "Can't delete device: please remove all sessions referring to that device "
 "before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:389
+#: modules/FlaskModule/API/user/UserQueryDevices.py:391
 msgid ""
 "Can't delete device: please remove all sessions created by that device "
 "before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:391
+#: modules/FlaskModule/API/user/UserQueryDevices.py:393
 msgid ""
 "Can't delete device: please delete all assets created by that device "
 "before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDevices.py:408
+#: modules/FlaskModule/API/user/UserQueryDevices.py:410
 msgid "Device successfully deleted"
 msgstr ""
 
@@ -1421,11 +1450,11 @@ msgstr ""
 msgid "No answer from service."
 msgstr "Pas de réponse du service."
 
-#: modules/LoginModule/LoginModule.py:395
+#: modules/LoginModule/LoginModule.py:394
 msgid "Invalid token"
 msgstr "Jeton invalide"
 
-#: modules/LoginModule/LoginModule.py:454
+#: modules/LoginModule/LoginModule.py:453
 msgid "Invalid Token"
 msgstr "Jeton invalide"
 
