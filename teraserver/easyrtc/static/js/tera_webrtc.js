@@ -574,12 +574,11 @@ function streamDisconnected(callerid, mediaStream, streamName){
         }
     }
 
-    // Remove contact info
-    // Keep them all for now...
-    /*let contact_index = getContactIndexForPeerId(callerid);
-    if (contact_index !== undefined){
+    // Remove contact info if the "default" stream was disconnected
+    let contact_index = getContactIndexForPeerId(callerid);
+    if (contact_index !== undefined && streamName === 'default'){
         remoteContacts.splice(contact_index, 1);
-    }*/
+    }
 
     // Update views
     for (let i=0; i<remoteStreams.length; i++){
@@ -635,6 +634,14 @@ function getContactIndexForUuid(uuid){
 function getContactIndexForPeerId(peerid){
     for (let i=0; i<remoteContacts.length; i++){
         if (remoteContacts[i].peerid === peerid)
+            return i;
+    }
+    return undefined;
+}
+
+function getContactIndexForName(name){
+    for (let i=0; i<remoteContacts.length; i++){
+        if (remoteContacts[i].name === name)
             return i;
     }
     return undefined;
