@@ -71,7 +71,8 @@ class UserQueryUsers(Resource):
                 users.append(current_user.get_user_by_id(args['id_user']))
         elif args['id_project']:
             if args['id_project'] in user_access.get_accessible_projects_ids():
-                users = user_access.query_users_for_project(project_id=args['id_project'], enabled_only=True)
+                users = user_access.query_users_for_project(project_id=args['id_project'], enabled_only=True,
+                                                            include_super_admins=True)
         elif args['self'] is not None:
             users.append(current_user)
         elif args['username'] is not None:
