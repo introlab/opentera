@@ -86,10 +86,7 @@ class DeviceRegister(Resource):
                 device.device_certificate = cert.public_bytes(serialization.Encoding.PEM).decode('utf-8')
 
                 # Store
-                db.session.add(device)
-
-                # Commit to database
-                db.session.commit()
+                TeraDevice.insert(device)
 
                 result = dict()
                 result['certificate'] = device.device_certificate
@@ -126,10 +123,7 @@ class DeviceRegister(Resource):
             device = self.create_device(device_name, device_info)
 
             # Store
-            db.session.add(device)
-
-            # Commit to database
-            db.session.commit()
+            TeraDevice.insert(device)
 
             result = dict()
             result['token'] = device.device_token
