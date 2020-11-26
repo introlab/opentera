@@ -28,11 +28,18 @@
         function getTeraPlusPort() {
             return "<%= teraplus_port %>"
         }
+		
+		window.onload = function() {
+            console.log('Page loaded. Ready to start!');
+            initialUserLayout();
+            initUI();
+            initSystem();
+        }
     </script>
 
 
 </head>
-<body onload = "initialUserLayout();initUI();initSystem();" style="background-color: black;">
+<body style="background-color: black;">
 
 <!-- Audio for browsers -->
 <audio id="audioConnected" src="sounds/OpenTera_CallConnected.mp3" type="audio/mpeg"></audio>

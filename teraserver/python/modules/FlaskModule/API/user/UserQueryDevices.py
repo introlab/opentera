@@ -84,11 +84,15 @@ class UserQueryDevices(Resource):
         has_with_participants = args.pop('with_participants')
         has_with_sites = args.pop('with_sites')
         has_with_status = args.pop('with_status')
+        id_device_type = args.pop('id_device_type')
 
         devices = []
         # If we have no arguments, return all accessible devices
         if self._value_counter(args=args) == 0:
-            devices = user_access.get_accessible_devices()
+            if id_device_type is not None:
+                devices = user_access.query_devices_by_type(id_device_type)
+            else:
+                devices = user_access.get_accessible_devices()
         elif self._value_counter(args=args) == 1:
             if args['id_device']:
                 if args['id_device'] in user_access.get_accessible_devices_ids():
@@ -100,11 +104,9 @@ class UserQueryDevices(Resource):
                 if args['uuid'] in user_access.get_accessible_devices_uuids():
                     devices = [TeraDevice.get_device_by_uuid(args['uuid'])]
             if args['id_site']:
-                devices = user_access.query_devices_for_site(args['id_site'], args['id_device_type'], has_enabled)
+                devices = user_access.query_devices_for_site(args['id_site'], id_device_type, has_enabled)
             if args['id_project']:
-                devices = user_access.query_devices_for_project(args['id_project'], args['id_device_type'], has_enabled)
-            if args['id_device_type']:
-                devices = user_access.query_devices_by_type(args['id_device_type'])
+                devices = user_access.query_devices_for_project(args['id_project'], id_device_type, has_enabled)
             if args['id_device_subtype']:
                 devices = user_access.query_devices_by_subtype(args['id_device_subtype'])
             if args['name']:
@@ -116,7 +118,7 @@ class UserQueryDevices(Resource):
                     if device.id_device not in user_access.get_accessible_devices_ids():
                         devices = []
         else:
-            return gettext('To many ID'), 400
+            return gettext('Too many IDs'), 400
 
         # if not devices:
         #     return gettext('Forbidden access'), 403

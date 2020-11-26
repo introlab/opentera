@@ -1,7 +1,8 @@
 from flask import jsonify, session, request
 from flask_restx import Resource
 
-from services.BureauActif.AccessManager import AccessManager, current_login_type, LoginType
+from services.shared.ServiceAccessManager import ServiceAccessManager, current_login_type, LoginType
+
 from services.BureauActif.Globals import config_man
 from services.BureauActif.FlaskModule import default_api_ns as api, flask_app
 
@@ -14,7 +15,7 @@ class QueryServiceInfos(Resource):
 
     @api.doc(description='Gets service informations',
              responses={200: 'Success', 403: 'Forbidden - only logged user can get that information'})
-    @AccessManager.token_required
+    @ServiceAccessManager.token_required
     def get(self):
 
         if current_login_type != LoginType.USER_LOGIN:

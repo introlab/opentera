@@ -1,13 +1,12 @@
 
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSite import TeraSite
 from libtera.db.models.TeraProject import TeraProject
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
-from libtera.db.models.TeraDeviceType import TeraDeviceType
 from libtera.db.models.TeraSessionType import TeraSessionType
 from libtera.db.models.TeraDevice import TeraDevice
 from libtera.db.models.TeraSession import TeraSession
+
+from sqlalchemy import func
+
+import datetime
 
 
 class DBManagerTeraDeviceAccess:
@@ -23,9 +22,27 @@ class DBManagerTeraDeviceAccess:
                     return sessions
         return sessions
 
+    def query_existing_session(self, session_name: str, session_type_id: int, session_date: datetime,
+                               participant_uuids: list):
+        sessions = TeraSession.query.filter(TeraSession.id_creator_device == self.device.id_device).\
+            filter(TeraSession.session_name == session_name).filter(TeraSession.id_session_type == session_type_id).\
+            filter(func.date(TeraSession.session_start_datetime) == session_date.date()).\
+            order_by(TeraSession.id_session.asc()).all()
+
+        for session in sessions:
+            sessions_participants_uuids = set([part.participant_uuid for part in session.session_participants])
+            if set(participant_uuids) == sessions_participants_uuids:
+                # We have a match on that session participants too
+                return session
+        return None
+
     def get_accessible_sessions(self):
         query = TeraSession.query.filter(TeraSession.id_creator_device == self.device.id_device)
         return query.all()
+
+    def get_accessible_sessions_ids(self):
+        sessions = self.get_accessible_sessions()
+        return [session.id_session for session in sessions]
 
     def get_accessible_participants(self, admin_only=False):
         return self.device.device_participants

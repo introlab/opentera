@@ -1,16 +1,16 @@
 {
   "Service": {
     "name": "FileTransferService",
-    "hostname": "localhost",
+    "hostname": "127.0.0.1",
     "port": 4042,
     "debug_mode": false
   },
   "Backend": {
-    "hostname": "localhost",
+    "hostname": "127.0.0.1",
     "port": 40075
   },
   "Redis": {
-    "hostname": "localhost",
+    "hostname": "127.0.0.1",
     "port": 6379,
     "db": 0,
     "username": "",
@@ -22,7 +22,7 @@
   "Database": {
     "db_type": "QPSQL",
     "name": "openterafiles",
-    "url": "localhost",
+    "url": "127.0.0.1",
     "port": 5432,
     "username": "teraagent",
     "password": "tera"

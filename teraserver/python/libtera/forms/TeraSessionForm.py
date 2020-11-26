@@ -1,42 +1,77 @@
 from libtera.forms.TeraForm import *
 from flask_babel import gettext
 from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
-from libtera.db.models.TeraSession import TeraSessionStatus
+from libtera.db.models.TeraSession import TeraSessionStatus, TeraSession
+from libtera.db.models.TeraProject import TeraProject
+from libtera.db.models.TeraDeviceProject import TeraDeviceProject
 
 
 class TeraSessionForm:
 
     @staticmethod
-    def get_session_form(user_access: DBManagerTeraUserAccess):
+    def get_session_form(user_access: DBManagerTeraUserAccess, specific_session_id: int = None):
         form = TeraForm("session")
+
+        # If not allowed to access that session or new session, will return all accessibles lists
+        if specific_session_id and specific_session_id not in user_access.get_accessible_sessions_ids():
+            specific_session_id = None
+
+        session_info = None
+        project_info = None
+        if specific_session_id:
+            session_info = TeraSession.get_session_by_id(specific_session_id)
+            if session_info:
+                project_info = TeraProject.get_project_by_id(session_info.get_associated_project_id())
 
         # Building lists
         # Session types
-        ses_types = user_access.get_accessible_session_types()
+        ses_types = []
+
+        if not project_info:
+            ses_types = user_access.get_accessible_session_types()
+        else:
+            ses_types_projects = user_access.query_session_types_for_project(project_info.id_project)
+            ses_types = [ses_type.session_type_project_session_type for ses_type in ses_types_projects]
+
         st_list = []
         for st in ses_types:
             st_list.append(TeraFormValue(value_id=st.id_session_type, value=st.session_type_name))
 
         # Users
-        users = user_access.get_accessible_users()
+        if not project_info:
+            users = user_access.get_accessible_users()
+        else:
+            users = project_info.get_users_in_project()
+
         users_list = []
         for user in users:
             users_list.append(TeraFormValue(value_id=user.id_user, value=user.get_fullname()))
 
         # Devices
-        devices = user_access.get_accessible_devices()
+        if not project_info:
+            devices = user_access.get_accessible_devices()
+        else:
+            devices = [dev.device_project_device for dev in
+                       TeraDeviceProject.query_devices_for_project(project_info.id_project)]
+
         devices_list = list()
         for device in devices:
             devices_list.append(TeraFormValue(value_id=device.id_device, value=device.device_name))
 
         # Participants
-        participants = user_access.get_accessible_participants()
+        if not project_info:
+            participants = user_access.get_accessible_participants()
+        else:
+            participants = user_access.query_all_participants_for_project(project_info.id_project)
         parts_list = list()
         for part in participants:
             parts_list.append(TeraFormValue(value_id=part.id_participant, value=part.participant_name))
 
         # Services
-        services = user_access.get_accessible_services()
+        if not project_info:
+            services = user_access.get_accessible_services()
+        else:
+            services = user_access.query_services_for_project(project_info.id_project)
         services_list = list()
         for service in services:
             services_list.append(TeraFormValue(value_id=service.id_service, value=service.service_name))
@@ -44,7 +79,20 @@ class TeraSessionForm:
         # Session status
         status_list = []
         for status in TeraSessionStatus:
-            status_list.append(TeraFormValue(value_id=status.value, value=status.name))
+            # Translation is done here, since we have to proper language context
+            status_name = gettext('Unknown')
+            if status.value == TeraSessionStatus.STATUS_CANCELLED.value:
+                status_name = gettext('Cancelled')
+            if status.value == TeraSessionStatus.STATUS_COMPLETED.value:
+                status_name = gettext('Completed')
+            if status.value == TeraSessionStatus.STATUS_INPROGRESS.value:
+                status_name = gettext('In progess')
+            if status.value == TeraSessionStatus.STATUS_NOTSTARTED.value:
+                status_name = gettext('Planned')
+            if status.value == TeraSessionStatus.STATUS_TERMINATED.value:
+                status_name = gettext('Interrupted')
+
+            status_list.append(TeraFormValue(value_id=status.value, value=status_name))
 
         # Sections
         section = TeraFormSection("informations", gettext("Information"))

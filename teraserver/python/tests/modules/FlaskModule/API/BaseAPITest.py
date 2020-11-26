@@ -3,7 +3,7 @@ from requests import get, post, delete
 
 
 class BaseAPITest(unittest.TestCase):
-    host = 'localhost'
+    host = '127.0.0.1'
     port = 40075
     login_endpoint = ''
     test_endpoint = ''

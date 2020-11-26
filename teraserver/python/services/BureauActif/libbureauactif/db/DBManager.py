@@ -13,6 +13,7 @@ from .models.BureauActifTimelineEntryType import BureauActifTimelineEntryType
 from .models.BureauActifCalendarDay import BureauActifCalendarDay
 from .models.BureauActifCalendarData import BureauActifCalendarData
 from .models.BureauActifCalendarDataType import BureauActifCalendarDataType
+from .models.BureauActifDeviceInfos import BureauActifDeviceInfo
 
 from services.BureauActif.ConfigManager import ConfigManager
 
@@ -83,6 +84,9 @@ class DBManager:
         if BureauActifTimelineDayEntry.get_count() == 0:
             print('No timeline day entry - creating defaults')
             BureauActifTimelineDayEntry.create_defaults()
+
+        if BureauActifDeviceInfo.get_count() == 0:
+            BureauActifDeviceInfo.create_defaults()
 
     def open(self, db_infos, echo=False):
         self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos

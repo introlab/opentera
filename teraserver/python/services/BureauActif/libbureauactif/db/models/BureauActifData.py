@@ -1,5 +1,4 @@
-from services.BureauActif.libbureauactif.db.Base import db
-from libtera.db.Base import BaseModel
+from services.BureauActif.libbureauactif.db.Base import db, BaseModel
 import uuid
 import datetime
 import os
@@ -8,7 +7,7 @@ from services.BureauActif.FlaskModule import flask_app
 
 
 class BureauActifData(db.Model, BaseModel):
-    __tablename__ = "t_data"
+    __tablename__ = "ba_raw_data"
     id_data = db.Column(db.Integer, db.Sequence('id_data_sequence'), primary_key=True, autoincrement=True)
     id_session = db.Column(db.Integer, nullable=False)
     id_device = db.Column(db.Integer, nullable=False)

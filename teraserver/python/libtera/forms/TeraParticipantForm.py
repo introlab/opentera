@@ -1,16 +1,28 @@
 from libtera.forms.TeraForm import *
 from flask_babel import gettext
 from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
+from libtera.db.models.TeraParticipant import TeraParticipant
+from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 
 
 class TeraParticipantForm:
 
     @staticmethod
-    def get_participant_form(user_access: DBManagerTeraUserAccess):
+    def get_participant_form(user_access: DBManagerTeraUserAccess, specific_participant_id: int = None):
         form = TeraForm("participant")
 
         # Building lists
-        groups = user_access.get_accessible_groups()
+
+        # Generic list or not accessible participant (such as when creating a new one) - return all groups
+        groups = []
+        if not specific_participant_id or specific_participant_id not in user_access.get_accessible_participants_ids():
+            groups = user_access.get_accessible_groups()
+        else:
+            participant = TeraParticipant.get_participant_by_id(specific_participant_id)
+            if participant:
+                groups = TeraParticipantGroup.get_participant_group_for_project(
+                    participant.participant_project.id_project)
+
         groups_list = []
         for group in groups:
             groups_list.append(TeraFormValue(value_id=group.id_participant_group, value=group.participant_group_name))

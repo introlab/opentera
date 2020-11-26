@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restx import Resource
 
-from services.BureauActif.AccessManager import AccessManager, current_login_type, current_device_client, \
+from services.shared.ServiceAccessManager import ServiceAccessManager, current_login_type, current_device_client, \
     current_participant_client, current_user_client, LoginType
 from services.BureauActif.FlaskModule import default_api_ns as api, flask_app
 
@@ -14,7 +14,7 @@ class QueryLoginType(Resource):
 
     @api.doc(description='Gets current login type: device, participant or user and associated informations',
              responses={200: 'Success'})
-    @AccessManager.token_required
+    @ServiceAccessManager.token_required
     def get(self):
         login_infos = {
             'login_type': 'unknown',

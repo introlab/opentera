@@ -252,6 +252,7 @@ class FlaskModule(BaseModule):
         flask_app.add_url_rule('/participant_endpoint',
                                view_func=ParticipantEndpoint.as_view('participant_endpoint', *args, **kwargs))
 
+
 @flask_app.after_request
 def apply_caching(response):
     # This is required to expose the backend API to rendered webpages from other sources, such as services

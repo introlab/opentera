@@ -127,7 +127,7 @@ function setLargeView(view_id){
     if (view_id !== ""){
         let view = $("#" + view_id);
         removeClassByPrefix(view[0], 'col');
-        largeView.append(view);
+        largeView.prepend(view);
     }
 
     updateUserRemoteViewsLayout(remoteStreams.length);

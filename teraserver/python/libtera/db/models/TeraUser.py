@@ -209,7 +209,8 @@ class TeraUser(db.Model, BaseModel):
             if values['user_password'] == '':
                 del values['user_password']
             else:
-                values['user_password'] = TeraUser.encrypt_password(values['user_password'])
+                # Forcing password to string
+                values['user_password'] = TeraUser.encrypt_password(str(values['user_password']))
 
         # Dumps the user profile if present
         if 'user_profile' in values:
@@ -225,7 +226,8 @@ class TeraUser(db.Model, BaseModel):
     @classmethod
     def insert(cls, user):
         # Encrypts password
-        user.user_password = TeraUser.encrypt_password(user.user_password)
+        # Forcing password to string
+        user.user_password = TeraUser.encrypt_password(str(user.user_password))
 
         # Generate UUID
         user.user_uuid = str(uuid.uuid4())

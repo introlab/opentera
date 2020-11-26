@@ -1,6 +1,6 @@
-from math import floor
+from math import floor, ceil
 import datetime
-
+from services.BureauActif.libbureauactif.db.Base import db
 from services.BureauActif.libbureauactif.db.models.BureauActifCalendarDay import BureauActifCalendarDay
 from services.BureauActif.libbureauactif.db.models.BureauActifCalendarData import BureauActifCalendarData
 from services.BureauActif.libbureauactif.db.models.BureauActifTimelineDay import BureauActifTimelineDay
@@ -79,16 +79,14 @@ class DBManagerBureauActifDataProcess:
         self.desk_config = raw_data['config']
         self.timers = raw_data['timers']
 
-        # Sort data by time
-        self.data = sorted(self.data, key=lambda x: datetime.datetime.strptime(x[0].lstrip(' '), '%Y-%m-%d %H:%M:%S'))
+        # Sort data by time -> use when time on pi de-sync - to remove once the time on pi is fixed
+        # self.data = sorted(self.data, key=lambda x: datetime.datetime.fromisoformat(x[0].lstrip(' ')))
+
         uuid_participant = file_db_entry.data_participant_uuid
         date_str = raw_data['data'][0][0].lstrip(' ')
-        date = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-
+        date = datetime.datetime.fromisoformat(date_str)
         self.create_calendar_objects(uuid_participant, date)
         self.create_timeline(uuid_participant, date)
-
-        self.set_starting_hour(date)  # Add starting bloc in timeline
         self.get_starting_position()
 
         self.half_timer_starting_position = self.first_position_timer / 2  # Half of the timer of the first position
@@ -115,10 +113,9 @@ class DBManagerBureauActifDataProcess:
             absent_time = self.get_absent_time(index)
 
             self.check_if_config_is_respected(was_standing)
-            if self.is_last_data(index):  # Check if it's the last entry
-                self.update_position(was_standing, index, entries_before_position_change + 1)
-            elif was_standing != is_standing or absent_time != 0 or previous_button_state != self.button_pressed:  # If position changed or gap in the timestamp
-                self.position_changes.done += 1
+            # Check if last entry or position changed or gap in the timeline (absence)
+            if self.is_last_data(index) or was_standing != is_standing or \
+                    absent_time != 0 or previous_button_state != self.button_pressed:
                 self.update_position(was_standing, index, entries_before_position_change)
                 self.update_last_timeline_entry(absent_time, 4)
                 entries_before_position_change = 0
@@ -132,7 +129,7 @@ class DBManagerBureauActifDataProcess:
             past_data = self.get_time(current_index - 1)
             current_data = self.get_time(current_index)
             delta = current_data - past_data
-            if delta.seconds > 300:
+            if delta.seconds > 300:  # Absence is worth showing in timeline only if at least 5 minutes
                 delta_in_hour = delta.seconds / 3600
                 return delta_in_hour
         return 0
@@ -140,35 +137,40 @@ class DBManagerBureauActifDataProcess:
     def create_calendar_objects(self, uuid_participant, date):
         entry = get_calendar_day(uuid_participant, date)
 
-        if entry is None:
+        if entry is None:  # No data for the current day, starting a new one
             self.calendar_day = BureauActifCalendarDay.insert(create_new_calendar_day(date, uuid_participant))
             self.seating = create_new_calendar_data(self.calendar_day.id_calendar_day, 1)
             self.standing = create_new_calendar_data(self.calendar_day.id_calendar_day, 2)
             self.position_changes = create_new_calendar_data(self.calendar_day.id_calendar_day, 3)
-        else:
+        else:  # Data already present for the current day
             self.calendar_day = entry
             self.seating = BureauActifCalendarData.get_calendar_data(self.calendar_day.id_calendar_day, 1)
-            self.standing = BureauActifCalendarData.create_calendar_data(self.calendar_day.id_calendar_day, 2)
-            self.position_changes = BureauActifCalendarData.create_calendar_data(self.calendar_day.id_calendar_day, 3)
+            self.standing = BureauActifCalendarData.get_calendar_data(self.calendar_day.id_calendar_day, 2)
+            self.position_changes = BureauActifCalendarData.get_calendar_data(self.calendar_day.id_calendar_day, 3)
 
+    # Get previous timeline entries for the day or start a new timeline day
     def create_timeline(self, uuid_participant, date):
         entry = get_timeline_day(uuid_participant, date)
 
-        if entry is None:
+        if entry is None:  # No data for the current day, starting a new one
             self.timeline_day = BureauActifTimelineDay.insert(create_new_timeline_day(date, uuid_participant))
-        else:
+            self.set_starting_hour(date)  # Add starting bloc in timeline
+        else:  # Data already present for the current day
             self.timeline_day = entry
             self.timeline_day_entries = BureauActifTimelineDayEntry.get_timeline_day_entries(
                 self.timeline_day.id_timeline_day)
 
+    # Check if desk is at max height +- 5 cm meaning it's up
     def is_desk_up(self, desk_height):
         max_height = float(self.desk_config['max_height'])
         delta = abs(desk_height - max_height)
         return delta <= 5 or desk_height > max_height
 
+    # Check if it's the last entry in the data file received from pi
     def is_last_data(self, index):
         return index == len(self.data) - 1
 
+    # Check if the participant's position changed by comparing desk height to the previous entry in the file
     def position_has_changed(self, index, desk_height):
         if index != 0:
             previous_height = float(self.data[index - 1][1])
@@ -206,7 +208,7 @@ class DBManagerBureauActifDataProcess:
 
     def get_time(self, index):
         date_str = self.data[index][0].lstrip(' ')
-        return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+        return datetime.datetime.fromisoformat(date_str)
 
     def update_remaining_data(self, current_index):
         up = self.timers['up_secs']
@@ -224,9 +226,9 @@ class DBManagerBureauActifDataProcess:
         down_to_do = work_time * down_ratio
 
         if up > 0:
-            position_changes_to_do = floor(work_time / up)
+            position_changes_to_do = ceil(work_time / up)
         elif down > 0:
-            position_changes_to_do = floor(work_time / down)
+            position_changes_to_do = ceil(work_time / down)
         else:
             position_changes_to_do = 0
 
@@ -236,19 +238,13 @@ class DBManagerBureauActifDataProcess:
             if position_changes_to_do - self.position_changes.done >= 0 else 0
 
     def save_calendar_data(self):
-        if self.position_changes.id_calendar_data > 0:
-            BureauActifCalendarData.update(self.position_changes.id_calendar_data, self.position_changes)
+        if self.position_changes.id_calendar_data > 0 \
+                and self.seating.id_calendar_data > 0 \
+                and self.standing.id_calendar_data > 0:
+            db.session.commit()
         else:
             BureauActifCalendarData.insert(self.position_changes)
-
-        if self.seating.id_calendar_data > 0:
-            BureauActifCalendarData.update(self.seating.id_calendar_data, self.seating)
-        else:
             BureauActifCalendarData.insert(self.seating)
-
-        if self.standing.id_calendar_data > 0:
-            BureauActifCalendarData.update(self.standing.id_calendar_data, self.standing)
-        else:
             BureauActifCalendarData.insert(self.standing)
 
     def update_last_timeline_entry(self, delta, id_type):
@@ -256,12 +252,13 @@ class DBManagerBureauActifDataProcess:
             last_entry = self.timeline_day_entries[len(self.timeline_day_entries) - 1]
             if last_entry.id_timeline_entry_type == id_type:
                 last_entry.value += delta
-                BureauActifTimelineDayEntry.update_entry(last_entry.id_timeline_day_entry, last_entry.value)
+                db.session.commit()
             else:
                 color_type = self.get_right_timeline_color(id_type)
                 new_entry = BureauActifTimelineDayEntry.insert(self.create_new_timeline_entry(color_type, delta))
                 self.timeline_day_entries.append(new_entry)
 
+    # Set the right type of entry for the timeline color
     def get_right_timeline_color(self, id_type):
         if id_type == 2:  # Standing
             if not self.config_is_respected and self.button_pressed:  # Supposed to be seating
@@ -269,6 +266,7 @@ class DBManagerBureauActifDataProcess:
         elif id_type == 3:  # Seating
             if not self.config_is_respected and self.button_pressed:  # Supposed to be standing
                 return 5
+        self.position_changes.done += 1  # Count as a position change
         return id_type
 
     def create_new_timeline_entry(self, id_type, delta):
@@ -278,6 +276,7 @@ class DBManagerBureauActifDataProcess:
         entry.id_timeline_day = self.timeline_day.id_timeline_day
         return entry
 
+    # Add the timeline bloc from midnight to first entry time to make the relative timeline
     def set_starting_hour(self, date):
         starting_time = date.time()
         time = starting_time.hour + (starting_time.minute / 60)
@@ -303,6 +302,7 @@ class DBManagerBureauActifDataProcess:
         else:  # Position is supposed to be the opposite of the starting one
             self.actual_config_is_up = False
 
+    # Check if expected position of the participant is the actual position of the participant
     def check_if_config_is_respected(self, is_standing):
         self.config_is_respected = self.actual_config_is_up == is_standing
 

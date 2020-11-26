@@ -40,7 +40,8 @@ get_parser.add_argument(name='type', type=str, help='Data type of the required f
                                                     'user_group\n'
                                                     'versions\n'
                         )
-get_parser.add_argument(name='id', type=int, help='Specific id of subitem to query. Used with service_config.')
+get_parser.add_argument(name='id', type=int, help='Specific id of subitem to query. Used to provide context to the '
+                                                  'returned form.')
 get_parser.add_argument(name='key', type=str, help='Specific key of subitem to query. Used with service_config.')
 
 
@@ -81,16 +82,19 @@ class UserQueryForms(Resource):
             return jsonify(TeraProjectForm.get_project_form(user_access=user_access))
 
         if args['type'] == 'group':
-            return jsonify(TeraParticipantGroupForm.get_participant_group_form(user_access=user_access))
+            return jsonify(TeraParticipantGroupForm.get_participant_group_form(user_access=user_access,
+                                                                               specific_group_id=args['id']))
 
         if args['type'] == 'participant':
-            return jsonify(TeraParticipantForm.get_participant_form(user_access=user_access))
+            return jsonify(TeraParticipantForm.get_participant_form(user_access=user_access,
+                                                                    specific_participant_id=args['id']))
 
         if args['type'] == 'session_type':
             return jsonify(TeraSessionTypeForm.get_session_type_form(user_access=user_access))
 
         if args['type'] == 'session':
-            return jsonify(TeraSessionForm.get_session_form(user_access=user_access))
+            return jsonify(TeraSessionForm.get_session_form(user_access=user_access,
+                                                            specific_session_id=args['id']))
 
         if args['type'] == 'device_type':
             return jsonify(TeraDeviceTypeForm.get_device_type_form(user_access=user_access))
