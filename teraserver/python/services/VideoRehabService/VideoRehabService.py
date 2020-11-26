@@ -330,7 +330,7 @@ class VideoRehabService(ServiceOpenTera):
                                    'id_session_type': id_session_type,
                                    'session_participants_uuids': participants,
                                    'session_users_uuids': users,
-                                   'sessiom_devices_uuids': devices,
+                                   'session_devices_uuids': devices,
                                    'session_parameters': parameters}
                        }
 

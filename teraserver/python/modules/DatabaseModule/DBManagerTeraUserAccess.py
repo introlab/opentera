@@ -857,11 +857,12 @@ class DBManagerTeraUserAccess:
         user_usergroups = self.query_users_usergroups_for_user(user_id=user_id)
         return [ug.user_user_group_user_group for ug in user_usergroups]
 
-    def query_users_for_site(self, site_id: int, enabled_only: bool = False, admin_only: bool = False):
+    def query_users_for_site(self, site_id: int, enabled_only: bool = False, admin_only: bool = False,
+                             include_super_admins: bool = False):
         accessible_users = self.get_accessible_users()
         users = set()
         for user in accessible_users:
-            if (enabled_only and not user.user_enabled) or user.user_superadmin:  # Don't include super admins!
+            if (enabled_only and not user.user_enabled) or (not include_super_admins and user.user_superadmin):
                 continue
             sites_roles = user.get_sites_roles()
             if site_id in [site.id_site for site, site_role in sites_roles.items()
@@ -870,11 +871,12 @@ class DBManagerTeraUserAccess:
 
         return users
 
-    def query_users_for_project(self, project_id: int, enabled_only: bool = False, admin_only: bool = False):
+    def query_users_for_project(self, project_id: int, enabled_only: bool = False, admin_only: bool = False,
+                                include_super_admins: bool = False):
         accessible_users = self.get_accessible_users()
         users = set()
         for user in accessible_users:
-            if enabled_only and not user.user_enabled or user.user_superadmin:  # Don't include super admins!
+            if enabled_only and not user.user_enabled or (not include_super_admins and user.user_superadmin):
                 continue
             project_roles = user.get_projects_roles()
             if project_id in [proj.id_project for proj, proj_role in project_roles.items()
