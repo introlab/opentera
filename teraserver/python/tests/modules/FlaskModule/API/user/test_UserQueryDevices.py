@@ -94,7 +94,8 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         params = {'id_device': 0, 'projects': 0, 'enabled': 1, 'list': 1,
                   'with_participants': 1, 'with_sites': 1, 'with_status': 1}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
         #
         params = {'id_device': 1, 'projects': 1, 'enabled': 0, 'list': 1,
                   'with_participants': 1, 'with_sites': 1, 'with_status': 1}
@@ -105,7 +106,9 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         params = {'id_device': 100, 'projects': 1, 'enabled': 1, 'list': 0,
                   'with_participants': 1, 'with_sites': 1, 'with_status': 1}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
+
         #
         params = {'id_device': 1, "device_uuid": "b707e0b2-e649-47e7-a938-2b949c423f73", 'projects': 1,
                   'enabled': 1, 'list': 1, 'with_participants': 0, 'with_sites': 1,
@@ -129,10 +132,11 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
 
         # There is an error in the uuid
         params = {"uuid": "b707e0b2-e649-47e7-a938-2b949e423f73", 'projects': 0,
-                  'enabled': 1, 'list':0, 'with_participants': 1, 'with_sites': 0,
+                  'enabled': 1, 'list': 0, 'with_participants': 1, 'with_sites': 0,
                   'with_status': 1}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
 
         params = {"device_uuid": "b707e0b2-e649-47e7-a938-2b949c423f73", "uuid": "b707e0b2-e649-47e7-a938-2b949e423f73",
                   'projects': 1, 'enabled': 1, 'list': 1, 'with_participants': 0,
@@ -143,7 +147,8 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         params = {'id_site': 0, 'projects': 0, 'enabled': 0, 'list': 0,
                   'with_participants': 1, 'with_sites': 1, 'with_status': 1}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
 
         params = {'id_site': 1, 'projects': 1, 'enabled': 1, 'list': 0,
                   'with_participants': 0, 'with_sites': 1, 'with_status': 1}
@@ -154,12 +159,14 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         params = {'id_site': 100, 'projects': 0, 'enabled': 0, 'list': 1,
                   'with_participants': 1, 'with_sites': 0, 'with_status': 0}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
 
         params = {'id_project': 0, 'projects': 1, 'enabled': 0, 'list': 1,
                   'with_participants': 1, 'with_sites': 1, 'with_status': 0}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
 
         params = {'id_project': 1, 'projects': 1, 'enabled': 1, 'list': 1,
                   'with_participants': 1, 'with_sites': 0, 'with_status': 0}
@@ -170,12 +177,14 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         params = {'id_project': 100, 'projects': 1, 'enabled': 0, 'list': 0,
                   'with_participants': 1, 'with_sites': 1, 'with_status': 1}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
 
         params = {'id_device_type': 0, 'projects': 1, 'enabled': 0, 'list': 0,
                   'with_participants': 1, 'with_sites': 1, 'with_status': 1}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
 
         params = {'id_device_type': 1, 'projects': 1, 'enabled': 0, 'list': 0,
                   'with_participants': 1, 'with_sites': 0, 'with_status': 1}
@@ -186,12 +195,14 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         params = {'id_device_type': 100, 'projects': 0, 'enabled': 0, 'list': 1,
                   'with_participants': 1, 'with_sites': 1, 'with_status': 0}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
 
         params = {'id_device_subtype': 0, 'projects': 1, 'enabled': 0, 'list': 0,
                   'with_participants': 1, 'with_sites': 1, 'with_status': 0}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
 
         # Can't test because no id_device_subtypes available in DB
         # params = {'id_device_subtype': 'Null', 'projects': flags[0], 'enabled': flags[1], 'list': flags[2],
@@ -203,12 +214,14 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         params = {'id_device_subtype': 100, 'projects': 0, 'enabled': 1, 'list': 0,
                   'with_participants': 0, 'with_sites': 0, 'with_status': 0}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
 
         params = {'name': " ", 'projects': 1, 'enabled': None, 'list': None,
                   'with_participants': None, 'with_sites': 1, 'with_status': 0}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
 
         params = {'name': "Apple Watch #W05P1", 'projects': None, 'enabled': 0, 'list': 1,
                   'with_participants': 0, 'with_sites': None, 'with_status': None}
@@ -219,7 +232,8 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         params = {'name': "Apple Watch", 'projects': 0, 'enabled': 0, 'list': 0,
                   'with_participants': 1, 'with_sites': 0, 'with_status': 1}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 0)
 
     def test_query_post_as_admin(self):
         new_id = []

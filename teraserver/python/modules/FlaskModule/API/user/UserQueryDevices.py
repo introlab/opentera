@@ -89,7 +89,7 @@ class UserQueryDevices(Resource):
         devices = []
         # If we have no arguments, return all accessible devices
         if self._value_counter(args=args) == 0:
-            if id_device_type:
+            if id_device_type is not None:
                 devices = user_access.query_devices_by_type(id_device_type)
             else:
                 devices = user_access.get_accessible_devices()
