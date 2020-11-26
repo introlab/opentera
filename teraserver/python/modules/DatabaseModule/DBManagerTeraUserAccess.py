@@ -652,18 +652,19 @@ class DBManagerTeraUserAccess:
 
         session = TeraSession.get_session_by_id(session_id)
 
-        # Check if we are the creator of that session
-        if session.id_creator_user == self.user.id_user:
-            return session
+        if session:
+            # Check if we are the creator of that session
+            if session.id_creator_user == self.user.id_user:
+                return session
 
-        # Check if we are parts of the users of that session
-        if session.has_user(self.user.id_user):
-            return session
+            # Check if we are parts of the users of that session
+            if session.has_user(self.user.id_user):
+                return session
 
-        # Check if we have access to the project of that session
-        accessible_projects = self.get_accessible_projects_ids()
-        if session.get_associated_project_id() in accessible_projects:
-            return session
+            # Check if we have access to the project of that session
+            accessible_projects = self.get_accessible_projects_ids()
+            if session.get_associated_project_id() in accessible_projects:
+                return session
 
         return None
 
