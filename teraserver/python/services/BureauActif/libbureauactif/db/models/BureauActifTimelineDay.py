@@ -21,8 +21,9 @@ class BureauActifTimelineDay(db.Model, BaseModel):
 
     @staticmethod
     def get_timeline_data(start_date, end_date, participant_uuid):
-        days = BureauActifTimelineDay.query.filter(BureauActifTimelineDay.name.between(start_date, end_date),
-                                                   BureauActifTimelineDay.participant_uuid == participant_uuid).all()
+        days = BureauActifTimelineDay.query.filter(
+            BureauActifTimelineDay.name.between(func.date(start_date), func.date(end_date)),
+            BureauActifTimelineDay.participant_uuid == participant_uuid).order_by(BureauActifTimelineDay.name).all()
         if days:
             return days
         return None
