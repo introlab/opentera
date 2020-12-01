@@ -12,7 +12,7 @@ class DBManagerBureauActifCalendarAccess:
 
         num_days = calendar.monthrange(year, month)[1]
         start_date = datetime.date(year, month, 1)
-        end_date = datetime.date(year, month, num_days)
+        end_date = datetime.datetime(year, month, num_days, 23, 59)
 
         calendar_days = BureauActifCalendarDay.get_calendar_day_by_month(start_date, end_date, participant_uuid)
 
