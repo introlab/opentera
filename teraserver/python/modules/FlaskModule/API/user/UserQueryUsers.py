@@ -193,16 +193,17 @@ class UserQueryUsers(Resource):
 
         # Check if current user can modify the posted user
         if json_user['id_user'] > 0:
-            # Existing user
-            update_user = TeraUser.get_user_by_id(json_user['id_user'])
-            if not update_user:
-                return '', 400
-            if not current_user.user_superadmin:
-                site_roles = update_user.get_sites_roles()
-                user_sites_ids = [site.id_site for site in site_roles]
-                # if json_user['id_user'] not in user_access.get_accessible_users_ids(admin_only=True):
-                if len(set(user_sites_ids).intersection(user_access.get_accessible_sites_ids(admin_only=True))) == 0:
-                    return gettext('Forbidden'), 403
+            if json_user['id_user'] != current_user.id_user:
+                # Existing user and not ourselves
+                update_user = TeraUser.get_user_by_id(json_user['id_user'])
+                if not update_user:
+                    return '', 400
+                if not current_user.user_superadmin:
+                    site_roles = update_user.get_sites_roles()
+                    user_sites_ids = [site.id_site for site in site_roles]
+                    # if json_user['id_user'] not in user_access.get_accessible_users_ids(admin_only=True):
+                    if len(set(user_sites_ids).intersection(user_access.get_accessible_sites_ids(admin_only=True))) == 0:
+                        return gettext('Forbidden'), 403
         else:
             # New user can be created by superadmins and by site admins, when user groups are specified
             # If update_user_group is set, we have new user groups with that user, and we are admin in all of them!
