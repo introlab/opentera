@@ -46,22 +46,22 @@ class DeviceRegister(Resource):
 
         print(self.ca_info)
 
-    def create_device(self, name):
+    def create_device(self, name, device_json = None):
         # Create TeraDevice
         device = TeraDevice()
 
-        # Required field(s)
-        # Name should be taken from CSR or JSON request
-        device.device_name = name
-        # TODO set flags properly
-        device.device_onlineable = False
-        # TODO WARNING - Should be disabled when created...
+        if device_json:
+            device.from_json(device_json)
+        else:
+            # Name should be taken from CSR or JSON request
+            device.device_name = name
+            # TODO set flags properly
+            device.device_onlineable = False
+            # TODO FORCING 'capteur' as default?
+            device.id_device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
+
+        # Force disabled by default
         device.device_enabled = False
-        # TODO FORCING 'capteur' as default?
-        device.id_device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
-        device.device_uuid = str(uuid.uuid4())
-        device.create_token()
-        device.update_last_online()
 
         return device
 
@@ -86,10 +86,7 @@ class DeviceRegister(Resource):
                 device.device_certificate = cert.public_bytes(serialization.Encoding.PEM).decode('utf-8')
 
                 # Store
-                db.session.add(device)
-
-                # Commit to database
-                db.session.commit()
+                TeraDevice.insert(device)
 
                 result = dict()
                 result['certificate'] = device.device_certificate
@@ -123,13 +120,10 @@ class DeviceRegister(Resource):
                 return gettext('Invalid content type'), 400
 
             device_name = device_info['device_name']
-            device = self.create_device(device_name)
+            device = self.create_device(device_name, device_info)
 
             # Store
-            db.session.add(device)
-
-            # Commit to database
-            db.session.commit()
+            TeraDevice.insert(device)
 
             result = dict()
             result['token'] = device.device_token
