@@ -1,4 +1,4 @@
-from sqlalchemy import and_, func
+from sqlalchemy import and_, func, desc
 from services.BureauActif.libbureauactif.db.Base import db, BaseModel
 import datetime
 
@@ -37,6 +37,14 @@ class BureauActifCalendarDay(db.Model, BaseModel):
             .order_by(BureauActifCalendarDay.date).all()
         if days:
             return days
+        return None
+
+    @staticmethod
+    def get_last_entry(participant_uuid):
+        day = BureauActifCalendarDay.query.filter(
+            BureauActifCalendarDay.participant_uuid == participant_uuid).order_by(desc('date')).first()
+        if day:
+            return day
         return None
 
     @staticmethod
