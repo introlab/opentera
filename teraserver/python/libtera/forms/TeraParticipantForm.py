@@ -8,14 +8,17 @@ from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
 class TeraParticipantForm:
 
     @staticmethod
-    def get_participant_form(user_access: DBManagerTeraUserAccess, specific_participant_id: int = None):
+    def get_participant_form(user_access: DBManagerTeraUserAccess, specific_participant_id: int = None,
+                             project_id: int = None):
         form = TeraForm("participant")
 
         # Building lists
 
         # Generic list or not accessible participant (such as when creating a new one) - return all groups
         groups = []
-        if not specific_participant_id or specific_participant_id not in user_access.get_accessible_participants_ids():
+        if project_id and project_id in user_access.get_accessible_projects_ids():
+            groups = TeraParticipantGroup.get_participant_group_for_project(project_id=project_id)
+        elif not specific_participant_id or specific_participant_id not in user_access.get_accessible_participants_ids():
             groups = user_access.get_accessible_groups()
         else:
             participant = TeraParticipant.get_participant_by_id(specific_participant_id)
