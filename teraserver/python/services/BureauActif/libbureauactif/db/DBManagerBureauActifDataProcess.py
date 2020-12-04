@@ -51,7 +51,7 @@ class DBManagerBureauActifDataProcess:
         self.desk_config = {}
         self.timers = {}
 
-        self.expected_height = None
+        self.expected_desk_height = None
         self.is_config_respected = True
         self.expected_standing = False
         self.expected_seating = False
@@ -75,7 +75,7 @@ class DBManagerBureauActifDataProcess:
         # 0: datetime, 1: height, 2: button state, 3: presence, 4: expected height
         for index, val in enumerate(self.data):
             desk_height = float(val[1])
-            self.expected_height = float(val[4])
+            self.expected_desk_height = float(val[4])
             was_standing = is_standing  # Save previous position to check if it changed
             previous_is_config_respected = self.is_config_respected  # Save previous button state
             self.is_config_respected = self.check_if_config_respected(is_standing)
@@ -146,11 +146,11 @@ class DBManagerBureauActifDataProcess:
 
     def check_if_should_be_standing(self):
         max_height = float(self.desk_config['max_height'])
-        return self.expected_height - 5 <= max_height <= self.expected_height + 5
+        return max_height == self.expected_desk_height
 
     def check_if_should_be_seating(self):
         min_height = float(self.desk_config['min_height'])
-        return self.expected_height - 5 <= min_height <= self.expected_height + 5
+        return min_height == self.expected_desk_height
 
     # Check if it's the last entry in the data file received from pi
     def is_last_data(self, index):
