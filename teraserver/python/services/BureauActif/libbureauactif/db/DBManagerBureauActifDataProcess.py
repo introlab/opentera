@@ -104,7 +104,6 @@ class DBManagerBureauActifDataProcess:
             delta = current_data - past_data
             if delta.seconds > 300:  # Absence is worth showing in timeline only if at least 5 minutes
                 delta_in_hour = delta.seconds / 3600
-                self.position_changes.done += 1  # Count as a position change
                 return delta_in_hour
         return 0
 
@@ -128,7 +127,7 @@ class DBManagerBureauActifDataProcess:
 
         if entry is None:  # No data for the current day, starting a new one
             self.timeline_day = BureauActifTimelineDay.insert(create_new_timeline_day(date, uuid_participant))
-            self.set_starting_hour(date)  # Add starting bloc in timeline
+            self.set_starting_hour(date)  # Add starting block in timeline
         else:  # Data already present for the current day
             self.timeline_day = entry
             self.timeline_day_entries = BureauActifTimelineDayEntry.get_timeline_day_entries(
@@ -143,7 +142,7 @@ class DBManagerBureauActifDataProcess:
     def check_if_config_respected(self, is_standing):
         self.expected_standing = self.check_if_should_be_standing()
         self.expected_seating = self.check_if_should_be_seating()
-        return self.expected_standing is is_standing or self.expected_seating is not is_standing
+        return self.expected_standing == is_standing or self.expected_seating != is_standing
 
     def check_if_should_be_standing(self):
         max_height = float(self.desk_config['max_height'])
@@ -241,8 +240,23 @@ class DBManagerBureauActifDataProcess:
                 db.session.commit()
             else:
                 color_type = self.get_right_timeline_color(id_type)
+                if color_type not in [5, 6] and not self.is_first_timeline_entry() \
+                        and not self.is_back_from_absence() and not self.config_was_not_respected():
+                    self.position_changes.done += 1  # Count as a position change
                 new_entry = BureauActifTimelineDayEntry.insert(self.create_new_timeline_entry(color_type, delta))
                 self.timeline_day_entries.append(new_entry)
+
+    # Returns true if the only entry in the timeline is the starting block
+    def is_first_timeline_entry(self):
+        return len(self.timeline_day_entries) == 1
+
+    # Returns true if the last entry in timeline is an absence block
+    def is_back_from_absence(self):
+        return self.timeline_day_entries[len(self.timeline_day_entries) - 1].id_timeline_entry_type == 4
+
+    # Returns true if the button was previously pressed and the schedule was not respected
+    def config_was_not_respected(self):
+        return self.timeline_day_entries[len(self.timeline_day_entries) - 1].id_timeline_entry_type in [5, 6]
 
     # Set the right type of entry for the timeline color
     def get_right_timeline_color(self, id_type):
@@ -252,7 +266,6 @@ class DBManagerBureauActifDataProcess:
         elif id_type == 3:  # Seating
             if not self.is_config_respected:  # Supposed to be standing
                 return 5
-        self.position_changes.done += 1  # Count as a position change
         return id_type
 
     def create_new_timeline_entry(self, id_type, delta):
@@ -262,7 +275,7 @@ class DBManagerBureauActifDataProcess:
         entry.id_timeline_day = self.timeline_day.id_timeline_day
         return entry
 
-    # Add the timeline bloc from midnight to first entry time to make the relative timeline
+    # Add the timeline block from midnight to first entry time to make the relative timeline
     def set_starting_hour(self, date):
         starting_time = date.time()
         time = starting_time.hour + (starting_time.minute / 60)
