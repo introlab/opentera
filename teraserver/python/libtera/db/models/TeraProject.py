@@ -60,8 +60,8 @@ class TeraProject(db.Model, BaseModel):
         for access in project_access:
             # Get all users in the related group
             if access.service_access_user_group:
-                users = access.service_access_user_group.user_group_users
-                for user in users:
+                access_users = access.service_access_user_group.user_group_users
+                for user in access_users:
                     if user not in users:
                         users.append(user)
 

@@ -4,12 +4,13 @@ from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAcce
 from libtera.db.models.TeraSession import TeraSessionStatus, TeraSession
 from libtera.db.models.TeraProject import TeraProject
 from libtera.db.models.TeraDeviceProject import TeraDeviceProject
+from libtera.db.models.TeraUser import TeraUser
 
 
 class TeraSessionForm:
 
     @staticmethod
-    def get_session_form(user_access: DBManagerTeraUserAccess, specific_session_id: int = None):
+    def get_session_form(user_access: DBManagerTeraUserAccess, specific_session_id: int = None, project_id: int = None):
         form = TeraForm("session")
 
         # If not allowed to access that session or new session, will return all accessibles lists
@@ -22,6 +23,9 @@ class TeraSessionForm:
             session_info = TeraSession.get_session_by_id(specific_session_id)
             if session_info:
                 project_info = TeraProject.get_project_by_id(session_info.get_associated_project_id())
+        elif project_id:
+            if project_id in user_access.get_accessible_projects_ids():
+                project_info = TeraProject.get_project_by_id(project_id=project_id)
 
         # Building lists
         # Session types
@@ -44,8 +48,22 @@ class TeraSessionForm:
             users = project_info.get_users_in_project()
 
         users_list = []
+        users_ids = []
         for user in users:
             users_list.append(TeraFormValue(value_id=user.id_user, value=user.get_fullname()))
+            users_ids.append(user.id_user)
+
+        # Also appends super-admins if user is super-admin
+        if user_access.user.user_superadmin:
+            for user in TeraUser.get_superadmins():
+                if user.id_user not in users_ids:
+                    users_list.append(TeraFormValue(value_id=user.id_user, value=user.get_fullname()))
+                    users_ids.append(user.id_user)
+
+        # Always append querying user if not there
+        if user_access.user.id_user not in users_ids:
+            users_list.append(TeraFormValue(value_id=user_access.user.id_user, value=user_access.user.get_fullname()))
+            users_ids.append(user_access.user.id_user)
 
         # Devices
         if not project_info:

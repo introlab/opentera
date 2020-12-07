@@ -59,6 +59,22 @@ class UserQueryUserGroupsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
             self.assertEqual(data_item['id_user_group'], 1)
 
+    def test_query_usergroup_for_specific_site(self):
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_site=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 4)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_site=2")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 0)
+
     def test_query_specific_usergroup_as_user(self):
         response = self._request_with_http_auth(username='user', password='user', payload="id_user_group=4")
         self.assertEqual(response.status_code, 200)

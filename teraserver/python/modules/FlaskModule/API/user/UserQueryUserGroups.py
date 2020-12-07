@@ -15,13 +15,14 @@ import modules.Globals as Globals
 get_parser = api.parser()
 get_parser.add_argument('id_user_group', type=int, help='ID of the user group to query')
 get_parser.add_argument('id_user', type=int, help='ID of the user to get all user groups')
+get_parser.add_argument('id_site', type=int, help='ID of the site to get all user groups with access in that site')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('user_group', type=str, location='json', help='User group to create / update', required=True)
 post_schema = api.schema_model('user_group', {'properties': TeraUserGroup.get_json_schema(),
-                                                   'type': 'object',
-                                                   'location': 'json'})
+                                              'type': 'object',
+                                              'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='User group ID to delete', required=True)
@@ -90,6 +91,8 @@ class UserQueryUserGroups(Resource):
         elif args['id_user']:
             if args['id_user'] in user_access.get_accessible_users_ids():
                 user_groups = user_access.query_usergroups_for_user(args['id_user'])
+        elif args['id_site']:
+            user_groups = user_access.query_access_for_site(site_id=args['id_site'])
         else:
             # If we have no arguments, return all accessible user groups
             user_groups = user_access.get_accessible_users_groups()

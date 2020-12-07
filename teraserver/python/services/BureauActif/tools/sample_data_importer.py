@@ -20,7 +20,7 @@ class Config:
     user_device_project_endpoint = '/api/user/deviceprojects'
     user_device_participant_endpoint = '/api/user/deviceparticipants'
     user_session_type_project = '/api/user/sessiontypeprojects'
-    user_service_project = '/api/user/serviceprojects'
+    user_service_project = '/api/user/services/projects'
 
     # Device endpoints
     device_login_endpoint = '/api/device/login'
@@ -197,7 +197,7 @@ def delete_participant(config: Config, id: int):
 def create_device(config: Config, name: str):
     url = _make_url(config.hostname, config.port, config.user_device_endpoint)
     try:
-        device_dict = {'device': {'id_device': 0, 'device_name': name, 'device_type': 4, 'device_enabled': True}}
+        device_dict = {'device': {'id_device': 0, 'device_name': name, 'id_device_type': 4, 'device_enabled': True}}
         response = post(url=url, json=device_dict, verify=False, auth=(config.username, config.password))
 
     except Exception as e:
@@ -241,7 +241,7 @@ def add_device_project(config: Config, id_project: int, id_device: int):
         print(e)
         return {}
     if response.status_code == 200:
-        return response.json().pop()
+        return response.json()
     import inspect
     print('Error in ' + inspect.currentframe().f_code.co_name + ': Code=' + str(response.status_code) + ', Message=' +
           response.content.decode())
@@ -375,7 +375,7 @@ def get_bureau_actif_service_uuid(config: Config, token: str) -> str:
 if __name__ == '__main__':
 
     base_config = Config()
-    data_path = '/DATA/Data/CloudStation_Sync/Workspace/Travail/Data/Rasp8'
+    data_path = r''
 
     # Ignore insecure requests warning
     import urllib3
