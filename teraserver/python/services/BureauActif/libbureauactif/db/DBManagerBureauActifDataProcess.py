@@ -104,6 +104,7 @@ class DBManagerBureauActifDataProcess:
             delta = current_data - past_data
             if delta.seconds > 300:  # Absence is worth showing in timeline only if at least 5 minutes
                 delta_in_hour = delta.seconds / 3600
+                self.position_changes.done += 1  # Count as a position change
                 return delta_in_hour
         return 0
 
@@ -197,29 +198,28 @@ class DBManagerBureauActifDataProcess:
         return datetime.datetime.fromisoformat(date_str)
 
     def update_remaining_data(self, current_index):
-        up = self.timers['up_secs']
-        down = self.timers['down_secs']
-        total = up + down
-        up_ratio = up / total if total > 0 else 0
-        down_ratio = down / total if total > 0 else 0
+        up_time = self.timers['up_secs']
+        down_time = self.timers['down_secs']
+        total_timers = up_time + down_time
+        up_ratio = up_time / total_timers if total_timers > 0 else 0
+        down_ratio = down_time / total_timers if total_timers > 0 else 0
 
         start_of_day = self.calendar_day.date
-        current = self.get_time(current_index)
-        delta = current - start_of_day
-        work_time = delta.seconds / 3600
+        current_time = self.get_time(current_index)
+        time_worked = current_time - start_of_day
+        standing_position_to_do = time_worked.seconds / 3600 * up_ratio
+        seated_position_to_do = time_worked.seconds / 3600 * down_ratio
 
-        up_to_do = work_time * up_ratio
-        down_to_do = work_time * down_ratio
+        position_changes_to_do = 0
+        if down_time <= up_time:
+            position_changes_to_do = ceil(time_worked.seconds / up_time)
+        elif down_time >= up_time:
+            position_changes_to_do = ceil(time_worked.seconds / down_time)
 
-        if up > 0:
-            position_changes_to_do = ceil(work_time / up)
-        elif down > 0:
-            position_changes_to_do = ceil(work_time / down)
-        else:
-            position_changes_to_do = 0
-
-        self.seating.remaining = down_to_do - self.seating.done if down_to_do - self.seating.done >= 0 else 0
-        self.standing.remaining = up_to_do - self.standing.done if up_to_do - self.standing.done >= 0 else 0
+        self.seating.remaining = seated_position_to_do - self.seating.done \
+            if seated_position_to_do - self.seating.done >= 0 else 0
+        self.standing.remaining = standing_position_to_do - self.standing.done \
+            if standing_position_to_do - self.standing.done >= 0 else 0
         self.position_changes.remaining = position_changes_to_do - self.position_changes.done \
             if position_changes_to_do - self.position_changes.done >= 0 else 0
 
