@@ -375,7 +375,7 @@ def get_bureau_actif_service_uuid(config: Config, token: str) -> str:
 if __name__ == '__main__':
 
     base_config = Config()
-    data_path = r'C:\Users\tubbs\Desktop\New'
+    data_path = r''
 
     # Ignore insecure requests warning
     import urllib3
