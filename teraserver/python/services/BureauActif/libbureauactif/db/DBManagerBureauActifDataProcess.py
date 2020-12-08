@@ -210,9 +210,9 @@ class DBManagerBureauActifDataProcess:
         seated_position_to_do = time_worked.seconds / 3600 * down_ratio
 
         position_changes_to_do = 0
-        if down_time <= up_time:
+        if up_time != 0 and down_time <= up_time:
             position_changes_to_do = ceil(time_worked.seconds / up_time)
-        elif down_time >= up_time:
+        elif down_time != 0 and down_time >= up_time:
             position_changes_to_do = ceil(time_worked.seconds / down_time)
 
         self.seating.remaining = seated_position_to_do - self.seating.done \
