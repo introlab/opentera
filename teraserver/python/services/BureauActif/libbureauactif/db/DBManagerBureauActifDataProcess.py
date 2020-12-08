@@ -146,11 +146,11 @@ class DBManagerBureauActifDataProcess:
 
     def check_if_should_be_standing(self):
         max_height = float(self.desk_config['max_height'])
-        return max_height == self.expected_desk_height
+        return self.expected_desk_height - 5 <= max_height <= self.expected_desk_height - 5
 
     def check_if_should_be_seating(self):
         min_height = float(self.desk_config['min_height'])
-        return min_height == self.expected_desk_height
+        return self.expected_desk_height - 5 <= min_height <= self.expected_desk_height - 5
 
     # Check if it's the last entry in the data file received from pi
     def is_last_data(self, index):
