@@ -99,11 +99,12 @@ function chronoTimerTimeout(){
     }
 }
 
-function stopChrono(local, index){
+function stopChrono(local, index, no_msg=false){
     if (local === false){
         chronoValues[index-1] = 0;
         let target_peer = remoteStreams[index-1].peerid;
-        sendChronoMessage([target_peer], false);
+        if (!no_msg)
+            sendChronoMessage([target_peer], false);
     }else{
         localChronoValue = 0;
     }

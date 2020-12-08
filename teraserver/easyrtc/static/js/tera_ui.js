@@ -145,20 +145,6 @@ function inactiveTimeout(local, index){
     showButtons(local, false, index);
 }
 
-function showAllButtons(show){
-    showButtons(true, show, 1);
-    showButtons(true, show, 2);
-    showButtons(false, show, 1);
-    showButtons(false, show, 2);
-    showButtons(false, show,3);
-    showButtons(false, show,4);
-}
-
-/*function showSecondaryLocalSourcesIcons(show_add_button, show_remove_button){
-    (show_add_button) ? showElement('imgAddLocalVideo2') : hideElement('imgAddLocalVideo2');
-    (show_remove_button) ? showElement('imgRemoveLocalVideo2') : hideElement('imgRemoveLocalVideo2');
-}*/
-
 function showVideoMirror(local, index, mirror){
     let video_widget = getVideoWidget(local, index);
     if (video_widget !== undefined){
@@ -329,8 +315,9 @@ function btnShareScreenClicked(){
 
         // Force views on new screen share
         if (!isParticipant){
-            setPrimaryView(local_peerid, "ScreenShare");
-            setPrimaryViewIcon(local_peerid, "ScreenShare");
+            //setPrimaryView(local_peerid, "ScreenShare");
+            //sendPrimaryView(local_peerid, "ScreenShare");
+            //setPrimaryViewIcon(local_peerid, "ScreenShare");
         }
 
     }).catch(function (){
@@ -531,27 +518,6 @@ function refreshRemoteStatusIcons(peerid){
     if (status.video !== undefined) {
         updateStatusIconState(status.video, false, index + 1, "Video");
     }
-
-    if (status.primaryView !== undefined){
-        if (isParticipant){
-            if (status.primaryView.peerid !== 0){
-                index = getStreamIndexForPeerId(peerid, status.primaryView.streamName);
-            }
-
-            if (index !== undefined){
-                let local = (status.primaryView.peerid === local_peerid);
-                let view_id = getVideoViewId(local, index+1);
-                setLargeView(view_id);
-
-            }else{
-                // Defaults to first remote view
-                setLargeView('remoteView1');
-
-            }
-       }
-        primaryView = status.primaryView;
-        setPrimaryViewIcon(status.primaryView.peerid, status.primaryView.streamName);
-    }
 }
 
 function getVideoViewId(local, index){
@@ -631,7 +597,7 @@ function selectPrimaryView(local, index){
             peer_id = remoteStreams[index-1].peerid;
         }
     }
-    setPrimaryView(peer_id, streamName);
+    sendPrimaryView(peer_id, streamName);
     setPrimaryViewIcon(peer_id, streamName);
 }
 
@@ -639,18 +605,24 @@ function setPrimaryViewIcon(peer_id, streamName){
     let local = (peer_id === local_peerid);
     // Browse all streams, and set icon accordingly
     for (let i=0; i<localStreams.length; i++){
+        let starButton = getButtonIcon(true, i+1, "Star");
         if (local === true && localStreams[i].streamname === streamName){
             updateButtonIconState(true, true, i+1, 'Star');
+            starButton.show();
         }else{
             updateButtonIconState(false, true, i+1, 'Star');
+            starButton.hide();
         }
     }
 
     for (let i=0; i<remoteStreams.length; i++){
+        let starButton = getButtonIcon(false, i+1, "Star");
         if (local === false && remoteStreams[i].peerid === peer_id && remoteStreams[i].streamname === streamName){
             updateButtonIconState(true, false, i+1, 'Star');
+            starButton.show();
         }else{
             updateButtonIconState(false, false, i+1, 'Star');
+            starButton.hide();
         }
     }
 }

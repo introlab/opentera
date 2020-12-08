@@ -202,19 +202,41 @@ function setMirror(mirror, local, index){
     }
 }
 
-function setPrimaryView(peer_id, streamname){
+function sendPrimaryView(peer_id, streamname){
     primaryView = {peerid: peer_id, streamName: streamname};
 
-    // Send request to everyone for the update
-    let request = {"primaryView": primaryView};
+    let request = primaryView;
     if (easyrtc.webSocketConnected){
-        easyrtc.sendDataWS({targetRoom: "default"}, 'updateStatus', request,
+        easyrtc.sendDataWS({targetRoom: "default"}, 'setPrimaryView', request,
             function (ackMesg) {
                 if (ackMesg.msgType === 'error') {
                     console.error(ackMesg.msgData.errorText);
                 }
             });
     }
+}
+
+function setPrimaryView(peer_id, streamname){
+    primaryView = {peerid: peer_id, streamName: streamname};
+    if (isParticipant){
+        let index = undefined;
+        if (primaryView.peerid !== 0){
+            if (peer_id !== local_peerid)
+                index = getStreamIndexForPeerId(primaryView.peerid, primaryView.streamName);
+            else
+                index = getLocalStreamIndex(primaryView.streamName);
+        }
+
+        if (index !== undefined){
+            let local = (primaryView.peerid === local_peerid);
+            let view_id = getVideoViewId(local, index+1);
+            setLargeView(view_id);
+        }else{
+            // Defaults to first remote view
+            setLargeView('remoteView1');
+        }
+    }
+    setPrimaryViewIcon(primaryView.peerid, primaryView.streamName);
 }
 
 function updateLocalAudioVideoSource(streamindex){
@@ -530,6 +552,17 @@ function newStreamStarted(callerid, stream, streamname) {
         broadcastlocalCapabilities();
 
         sendStatus(callerid);
+
+        if (!isParticipant){
+            if (primaryView.peerid !== 0){
+                sendPrimaryView(primaryView.peerid, primaryView.streamName);
+            }
+        }
+    }
+
+    if (primaryView.peerid === callerid){
+        // Select current primary view
+        setPrimaryView(primaryView.peerid, primaryView.streamName);
     }
 
     // Add second video, if present
@@ -562,8 +595,17 @@ function streamDisconnected(callerid, mediaStream, streamName){
 
     // Stop chronos if it's the default stream that was stopped
     if (streamName === 'default'){
-        stopChrono(isParticipant, slot+1);
+        stopChrono(isParticipant, slot+1, true);
         playSound("audioDisconnected");
+    }
+
+    // Remove primaryView if it's the stream that was displayed in primary view
+    if (!isParticipant){
+        if (primaryView.streamName === streamName && callerid === primaryView.peerid){
+            primaryView = undefined
+            sendPrimaryView(0,"");
+            setPrimaryViewIcon(0,"");
+        }
     }
 
     // Remove stream
@@ -655,6 +697,13 @@ function getStreamIndexForPeerId(peerid, streamname = 'default'){
     return undefined;
 }
 
+function getLocalStreamIndex(streamname = 'default'){
+    for (let i=0; i<localStreams.length; i++){
+        if (localStreams[i].streamname === streamname)
+            return i;
+    }
+    return undefined;
+}
 
 function sendStatus(target_peerid){
     let request = {"peerid": local_peerid,
@@ -662,7 +711,8 @@ function sendStatus(target_peerid){
         "micro2":isStatusIconActive(true, 2, "Mic"),
         "speaker": isStatusIconActive(true, 1, "Speaker"),
         "video": isStatusIconActive(true, 1, "Video"),
-        "primaryView": primaryView};
+        "isUser": !isParticipant
+    };
 
     if (easyrtc.webSocketConnected){
         easyrtc.sendDataWS(target_peerid, 'updateStatus', request, function(ackMesg) {
@@ -766,7 +816,7 @@ function dataReception(sendercid, msgType, msgData, targeting) {
     }
 
     if (msgType === "setMirror"){
-        showVideoMirror(true, msgData.index, msgData.mirror); // TODO: handle index
+        showVideoMirror(true, msgData.index, msgData.mirror);
     }
 
     if (msgType === "addVideo"){
@@ -785,6 +835,10 @@ function dataReception(sendercid, msgType, msgData, targeting) {
 
     if (msgType === "updateCapabilities"){
         setCapabilities(sendercid, msgData.video2);
+    }
+
+    if (msgType === "setPrimaryView"){
+        setPrimaryView(msgData.peerid, msgData.streamName);
     }
 
     if (msgType === "updateStatus"){
@@ -866,7 +920,7 @@ async function shareScreen(local, start){
             // Then to add to existing connections
             for (let i=0; i<remoteStreams.length; i++){
                 easyrtc.addStreamToCall(remoteStreams[i].peerid, 'ScreenShare', function (caller, streamName) {
-                    //console.log("Started screen sharing with " + caller + " - " + streamName);
+                    console.log("Started screen sharing with " + caller + " - " + streamName);
                 });
             }
             easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], screenStream);
