@@ -873,18 +873,20 @@ function dataReception(sendercid, msgType, msgData, targeting) {
         if (index === undefined){
             // Got status before stream... must "buf" that status
             console.log("Got updateStatus, but no stream yet - buffering.");
+
         }else {
             refreshRemoteStatusIcons(sendercid);
 
             if (msgData.mirror !== undefined){
                 showVideoMirror(false, index, msgData.mirror);
             }
+
+            // Update large view if required
+            if (isParticipant && primaryView.peerid === 0 && msgData.isUser){
+                setLargeView(getVideoViewId(false, index+1));
+            }
         }
 
-        // Update large view if required
-        if (isParticipant && primaryView.peerid === 0 && msgData.isUser){
-            setLargeView(getVideoViewId(false, index+1));
-        }
     }
 
     if (msgType === "Chrono"){

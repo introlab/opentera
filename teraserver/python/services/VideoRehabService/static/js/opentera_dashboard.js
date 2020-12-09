@@ -45,25 +45,25 @@ function connectError(event, status){
 }*/
 
 
-var sessionUrlTries = 0;
+let sessionUrlTries = 0;
 function testCurrentSessionUrlValid(){
     //console.log("testCurrentSessionUrlValid");
-    var request = new XMLHttpRequest();
+    let request = new XMLHttpRequest();
     request.open('GET', current_session_url, true);
     request.onreadystatechange = function(){
         if (request.readyState === 4){
-            if (request.status != 200) {
+            if (request.status !== 200) {
                 // Not started yet... try again...
                 sessionUrlTries++;
                 if (sessionUrlTries >= 12){
                     window.parent.document.getElementById('mainview').contentWindow.document.getElementById("dialogWait").style.display="none";
-                    alert("Error - Can't start session!");
+                    alert("Impossible de démarrer la séance!");
                 }else{
                     setTimeout(testCurrentSessionUrlValid, 250);
                 }
             }else{
                 sessionUrlTries = 0;
-                if (sessionStorage.getItem("is_participant") == "false")
+                if (sessionStorage.getItem("is_participant") === "false")
                     window.location.replace(current_session_url);
                 else
                     document.getElementById('mainview').src = current_session_url;
@@ -72,31 +72,6 @@ function testCurrentSessionUrlValid(){
     };
     request.send();
 }
-
-/*function updateStatus(){
-    //console.log("Updating status...");
-    doGetRequest(service_hostname, service_port, '/videodispatch/api/videodispatch/status', statusSuccess);
-}
-
-function statusSuccess(response, status, request){
-    //console.log(response);
-    if (response['online_count'] !== undefined){
-        document.getElementById('lblOnlineCount').innerHTML = response['online_count'];
-        document.getElementById('lblInSessionCount').innerHTML = response['in_session_count'];
-        document.getElementById('lblDoneCount').innerHTML = response['done_count'];
-
-         document.getElementById('btnConnect').disabled = (response['online_count'] === 0);
-    }else{
-        if (response['rank'] !== undefined){
-            if (response['rank'] < 1){
-                hideElement('cardRank');
-            }else{
-                document.getElementById('cardRank').style.display="block";
-            }
-            document.getElementById('lblRank').innerHTML = response['rank'];
-        }
-    }
-}*/
 
 function doStopCurrentSession(session_key){
     if (session_key === undefined)
@@ -113,7 +88,7 @@ function doStopCurrentSession(session_key){
 }
 
 function sessionStopSuccess(response, status, request){
-    if (response == 200){
+    if (response === 200){
         window.parent.document.getElementById('btnLogout').style.display="inline";
         window.parent.document.getElementById('btnStopSession').style.display="none";
         current_session_key = undefined;

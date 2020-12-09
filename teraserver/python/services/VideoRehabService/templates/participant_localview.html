@@ -11,18 +11,42 @@
 	<script src="./static/js/opentera_dashboard.js"></script>
 
     <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
-    <link href="./static/css/solid.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="./static/css/teraplus.css" />
 
 </head>
 <body onload="init_dashboard('{{ backend_hostname }}', {{ backend_port }});
-initLocalVideo('#selfVideo');" style="background-color:black;overflow: hidden;">
+initLocalVideo();" style="background-color:black;overflow: hidden;">
+
+<!-- ErrorDialog -->
+<div class="modal fade" id="errorDialog" tabindex="-1" role="dialog" aria-labelledby="errorDialogCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-error">
+                <h5 class="modal-title" id="errorDialogLongTitle">Erreur</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body modal-body-error">
+                <label id="errorDialogText">Description de l'erreur.</label><br></p>
+            </div>
+            <div class="modal-footer modal-footer-error">
+                <button type="button" id="errorRefresh" class="btn btn-success" data-dismiss="modal" onclick="location.reload();">Réessayer</button>
+                <button type="button" id="errorIgnore" class="btn btn-danger" data-dismiss="modal">Ignorer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="messages" class="bg-{{message_type}} text-black text-center font-weight-bold p-2">
+    <label>{{message}}</label>
+</div>
 <div class="container-fluid" id="mainContainer">
 		<div id="selfView" title="Vidéo locale" onmousemove="resetInactiveTimer();openButtons('navButtons');return false;" width="100%" onmouseleave="closeButtons('navButtons');return false;"  style="overflow: hidden;">
 
 			<div id="navButtons" class="overlay">
-				<div class="overlay-top-center" style="padding-left:20px; padding-top:20px;">
+				<div class="overlay-top-center pt-5">
 					<div>
 						<select id="videoSelect" onchange="updateVideoSource();event.stopPropagation();"
                                 onclick="event.stopPropagation();">
@@ -31,20 +55,20 @@ initLocalVideo('#selfVideo');" style="background-color:black;overflow: hidden;">
 				  </div>
 			</div>
 			<video playsinline="true" autoplay="true" id="selfVideo" muted="muted" volume="1" micEnabled="false"
-                   class="easyrtcMirror" style="top:30px;"/>
+                   class="videoMirror mt-3" style="top:30px;"/>
 		  </div>
 		</div>
 
 		<div class="modal" tabindex="-1" role="dialog" id="dialogWait" >
-          <div class="modal-dialog" role="document">
+          <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Connexion en cours...</h5>
+              <div class="modal-header bg-primary">
+                <h5 class="modal-title ml-auto mr-auto">Démarrage en cours...</h5>
               </div>
-              <div class="modal-body">
-                <p>Vous serez bientôt en communication avec un intervenant.</p>
+              <div class="modal-body bg-white text-dark ml-auto mr-auto">
+                <p>La séance est en cours de démarrage... Bonne séance!</p>
               </div>
-              <div class="modal-footer">
+              <div class="modal-footer bg-primary">
 
               </div>
             </div>

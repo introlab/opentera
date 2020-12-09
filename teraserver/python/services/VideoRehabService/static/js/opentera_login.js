@@ -125,17 +125,28 @@ function loginReply(response, status, request){
 function loginError(event, status){
 	clearInterval(timerId);
 	timerId=-1;
-	console.log("loginError: " + status.status + " : " + status.responseText + " / " + status.statusText);
+	showError("loginError", "Impossible de se connecter. Votre accès est peut-être désactivé ou vous " +
+		"êtes déjà connecté sur un autre appareil.", true);
+
+	// Hide everything else
+	$('#mainContainer').hide();
+
+	/*console.log("loginError: " + status.status + " : " + status.responseText + " / " + status.statusText);
 	$('#txtmessage').css('color','red');
 	$('#txtmessage').text(status.responseText);
-	$('#messages').css('display','block');
+	$('#messages').css('display','block');*/
 	//$("#loginform :input").prop("disabled", false);
 }
 
 function loginParticipantError(event, status){
 	clearInterval(timerId);
 	timerId=-1;
-	console.log("loginError: " + status.status + " : " + status.responseText + " / " + status.statusText);
+	//console.log("loginError: " + status.status + " : " + status.responseText + " / " + status.statusText);
+
+	// Redirect to error page
+	document.getElementById('mainview').src = "participant_error?token=" +
+		sessionStorage.getItem("participant_token") + "&error=Impossible de se connecter. " +
+		"Votre accès est peut-être désactivé ou vous êtes déjà connecté sur un autre appareil.";
 }
 
 function doLogout(backend_url, backend_port){
