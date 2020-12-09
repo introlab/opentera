@@ -45,7 +45,6 @@ class TeraServerSettingsTest(unittest.TestCase):
         db.session.add(new_settings)
         self.assertRaises(exc.IntegrityError, db.session.commit)
         db.session.rollback()
-        # breakpoint()
         new_settings.server_settings_name = 'Name'
         db.session.add(new_settings)
         self.assertRaises(exc.IntegrityError, db.session.commit)
@@ -80,23 +79,12 @@ class TeraServerSettingsTest(unittest.TestCase):
         new_settings = TeraServerSettings.get_server_setting(setting_name='Nom Unique')
         self.assertEqual(new_settings.server_settings_name, 'Nom Unique')
         self.assertEqual(new_settings.server_settings_value, 'Key')
-        TeraServerSettings.set_server_setting(setting_name='Nom Unique', setting_value='Updated Key')
-        new_settings2 = TeraServerSettings.get_server_setting(setting_name='Nom Unique')
-        self.assertEqual(new_settings.server_settings_name, 'Nom Unique')
-        self.assertEqual(new_settings.server_settings_value, 'Updated Key')
-        self.assertEqual(new_settings2.server_settings_name, 'Nom Unique')
-        self.assertEqual(new_settings2.server_settings_value, 'Updated Key')
-
-        # If you want to create another server setting with the same name, it changes the original settings
 
     def test_generate_token_key(self):
         key_len_16 = TeraServerSettings.generate_token_key(length=16)
         key_len_32 = TeraServerSettings.generate_token_key(length=32)
         self.assertEqual(16, len(key_len_16))
         self.assertEqual(32, len(key_len_32))
-        # try:
-        #     key_len_16 = TeraServerSettings.generate_token_key(length='An error')
-        # except:
 
     def test_get_server_setting_value(self):
         TeraServerSettings.set_server_setting(setting_name='Nom Unique', setting_value='Key')
