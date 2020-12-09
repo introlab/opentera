@@ -1,9 +1,12 @@
 import unittest
 import os
 
+import sqlite3
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy import exc
 from modules.DatabaseModule.DBManager import DBManager
 from libtera.db.models.TeraServerSettings import TeraServerSettings
-
+from libtera.db.Base import db
 from libtera.db.models.TeraUser import TeraUser
 from libtera.ConfigManager import ConfigManager
 
@@ -32,10 +35,34 @@ class TeraServerSettingsTest(unittest.TestCase):
         self.db_man.open_local(self.SQLITE)
 
         # Creating default users / tests.
-        self.db_man.create_defaults(self.config)
+        self.db_man.create_defaults(self.config, test= True)
 
     def tearDown(self):
         pass
+
+    def test_nullable_args(self):
+        new_settings = TeraServerSettings()
+        db.session.add(new_settings)
+        self.assertRaises(exc.IntegrityError, db.session.commit)
+        db.session.rollback()
+        # breakpoint()
+        new_settings.server_settings_name = 'Name'
+        db.session.add(new_settings)
+        self.assertRaises(exc.IntegrityError, db.session.commit)
+        db.session.rollback()
+        new_settings.server_settings_name = None
+        new_settings.server_settings_value = 'Key'
+        db.session.add(new_settings)
+        self.assertRaises(exc.IntegrityError, db.session.commit)
+
+    def test_unique_args(self):
+        new_settings = TeraServerSettings()
+        same_settings = TeraServerSettings()
+        new_settings.server_settings_name = 'Name'
+        same_settings.server_settings_name = 'Name'
+        db.session.add(new_settings)
+        db.session.add(same_settings)
+        self.assertRaises(exc.IntegrityError, db.session.commit)
 
     def test_constants_check(self):
         for settings in TeraServerSettings.query.all():
@@ -67,6 +94,9 @@ class TeraServerSettingsTest(unittest.TestCase):
         key_len_32 = TeraServerSettings.generate_token_key(length=32)
         self.assertEqual(16, len(key_len_16))
         self.assertEqual(32, len(key_len_32))
+        # try:
+        #     key_len_16 = TeraServerSettings.generate_token_key(length='An error')
+        # except:
 
     def test_get_server_setting_value(self):
         TeraServerSettings.set_server_setting(setting_name='Nom Unique', setting_value='Key')
