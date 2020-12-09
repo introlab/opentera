@@ -526,9 +526,9 @@ function getVideoViewId(local, index){
 }
 
 function getFirstRemoteUserVideoViewId(){
-    for (let i=0; i<=remoteContacts.length; i++){
+    for (let i=0; i<remoteContacts.length; i++){
         if (remoteContacts[i].status.isUser){
-            let video_index = getStreamIndexForPeerId(remoteContacts.peerid);
+            let video_index = getStreamIndexForPeerId(remoteContacts[i].peerid);
             if (video_index !== undefined){
                 return getVideoViewId(false, video_index+1);
             }

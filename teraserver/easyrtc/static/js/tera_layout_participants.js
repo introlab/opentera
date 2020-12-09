@@ -101,7 +101,7 @@ function updateUserLocalViewLayout(local_num, remote_num){
     }
 }
 
-function setLargeView(view_id){
+function setLargeView(view_id, updateui=true){
     // Remove current view
     let largeView = $("#largeView");
     if (currentLargeViewId !== ""){
@@ -130,8 +130,10 @@ function setLargeView(view_id){
         largeView.prepend(view);
     }
 
-    updateUserRemoteViewsLayout(remoteStreams.length);
-    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    if (updateui){
+        updateUserRemoteViewsLayout(remoteStreams.length);
+        updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    }
 }
 
 function setColWidth(col, width){

@@ -588,10 +588,12 @@ function streamDisconnected(callerid, mediaStream, streamName){
     console.log ("Stream disconnected: " + callerid + " - Slot " + (slot+1));
 
     // Is that stream displayed in large view? If so, we must also switch the layout
-    if (typeof(currentLayoutId) !== 'undefined'){
-        if (currentLayoutId === layouts.LARGEVIEW){
-            if (getVideoViewId(false, slot) === currentLargeViewId){
-                setCurrentUserLayout(layouts.GRID, false);
+    if (!isParticipant){
+        if (typeof(currentLayoutId) !== 'undefined'){
+            if (currentLayoutId === layouts.LARGEVIEW){
+                if (getVideoViewId(false, slot) === currentLargeViewId){
+                    setCurrentUserLayout(layouts.GRID, false);
+                }
             }
         }
     }
@@ -613,7 +615,9 @@ function streamDisconnected(callerid, mediaStream, streamName){
 
     // Remove stream
     for (let i=0; i<remoteStreams.length; i++){
+        //console.log(remoteStreams[i].peerid + " = " + callerid + " && " + remoteStreams[i].streamname + " = " + streamName + "?");
         if (remoteStreams[i].peerid === callerid && remoteStreams[i].streamname === streamName){
+            console.log("Removed stream from remote stream list");
             remoteStreams.splice(i,1);
             break;
         }
@@ -630,6 +634,16 @@ function streamDisconnected(callerid, mediaStream, streamName){
         easyrtc.setVideoObjectSrc(getVideoWidget(false,i+1)[0], remoteStreams[i].stream);
         refreshRemoteStatusIcons(remoteStreams[i].peerid);
         setTitle(false, i+1, remoteContacts[i].name)
+    }
+
+    if (isParticipant){
+        if (currentLargeViewId === getVideoViewId(callerid === local_peerid, slot+1)){
+            // Currently displayed in large view - set next large view
+            let new_large_view = getFirstRemoteUserVideoViewId();
+            if (new_large_view === undefined)
+                new_large_view = "remoteView1";
+            setLargeView(new_large_view, false);
+        }
     }
 
     updateUserRemoteViewsLayout(remoteStreams.length);
@@ -744,11 +758,6 @@ function dataReception(sendercid, msgType, msgData, targeting) {
         let stream_index = getStreamIndexForPeerId(sendercid, 'default');
         if (stream_index !== undefined) {
             setTitle(false, stream_index+1, msgData.name);
-        }
-
-        // Update large view if required
-        if (isParticipant && primaryView.peerid === 0){
-            setLargeView(getVideoViewId(false, stream_index+1));
         }
     }
 
@@ -870,6 +879,11 @@ function dataReception(sendercid, msgType, msgData, targeting) {
             if (msgData.mirror !== undefined){
                 showVideoMirror(false, index, msgData.mirror);
             }
+        }
+
+        // Update large view if required
+        if (isParticipant && primaryView.peerid === 0 && msgData.isUser){
+            setLargeView(getVideoViewId(false, index+1));
         }
     }
 
