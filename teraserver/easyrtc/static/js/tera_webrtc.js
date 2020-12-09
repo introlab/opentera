@@ -232,8 +232,11 @@ function setPrimaryView(peer_id, streamname){
             let view_id = getVideoViewId(local, index+1);
             setLargeView(view_id);
         }else{
-            // Defaults to first remote view
-            setLargeView('remoteView1');
+            // Defaults to first remote user view
+            let view_id = getFirstRemoteUserVideoViewId();
+            if (view_id === undefined)
+                view_id = "remoteView1";
+            setLargeView(view_id);
         }
     }
     setPrimaryViewIcon(primaryView.peerid, primaryView.streamName);
@@ -741,6 +744,11 @@ function dataReception(sendercid, msgType, msgData, targeting) {
         let stream_index = getStreamIndexForPeerId(sendercid, 'default');
         if (stream_index !== undefined) {
             setTitle(false, stream_index+1, msgData.name);
+        }
+
+        // Update large view if required
+        if (isParticipant && primaryView.peerid === 0){
+            setLargeView(getVideoViewId(false, stream_index+1));
         }
     }
 

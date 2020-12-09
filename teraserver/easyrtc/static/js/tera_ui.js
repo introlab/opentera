@@ -525,6 +525,18 @@ function getVideoViewId(local, index){
     return view_prefix + "View" + index;
 }
 
+function getFirstRemoteUserVideoViewId(){
+    for (let i=0; i<=remoteContacts.length; i++){
+        if (remoteContacts[i].status.isUser){
+            let video_index = getStreamIndexForPeerId(remoteContacts.peerid);
+            if (video_index !== undefined){
+                return getVideoViewId(false, video_index+1);
+            }
+        }
+    }
+    return undefined;
+}
+
 function muteMicroAll(){
     let mute = !isIconActive("btnMicAll");
     for (let i=1; i<=remoteStreams.length; i++){
