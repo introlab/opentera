@@ -77,12 +77,14 @@ class DBManagerBureauActifDataProcess:
         for index, val in enumerate(self.data):
             desk_height = float(val[1])
             self.expected_desk_height = float(val[4])
-            was_standing = is_standing  # Save previous position to check if it changed
-            self.previous_is_config_respected = self.is_config_respected  # Save previous button state
-            self.is_config_respected = self.check_if_config_respected(is_standing)
 
+            was_standing = is_standing  # Save previous position to check if it changed
             # Check if desk is in standing position (true) or in seating position (false)
             is_standing = self.is_desk_up(desk_height)
+
+            self.previous_is_config_respected = self.is_config_respected  # Save if last entry was respecting config
+            # Check if the desk's height matches the expected height
+            self.is_config_respected = self.check_if_config_respected(is_standing)
 
             # Check if gap between timestamp of data, meaning no one was present in front of the sensor
             absent_time = self.get_absent_time(index)
@@ -234,13 +236,13 @@ class DBManagerBureauActifDataProcess:
             BureauActifCalendarData.insert(self.standing)
 
     def update_last_timeline_entry(self, delta, id_type):
+        color_type = self.get_right_timeline_color(id_type)
         if delta > 0:
             last_entry = self.timeline_day_entries[len(self.timeline_day_entries) - 1]
-            if last_entry.id_timeline_entry_type == id_type:
+            if last_entry.id_timeline_entry_type == color_type:
                 last_entry.value += delta
                 db.session.commit()
             else:
-                color_type = self.get_right_timeline_color(id_type)
                 if color_type not in [5, 6] and not self.is_first_timeline_entry() \
                         and not self.is_back_from_absence() and not self.config_was_not_respected():
                     self.position_changes.done += 1  # Count as a position change
