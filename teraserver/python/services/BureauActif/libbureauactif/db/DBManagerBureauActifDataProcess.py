@@ -98,6 +98,7 @@ class DBManagerBureauActifDataProcess:
             else:
                 entries_before_position_change += 1
 
+        self.update_remaining_data()
         self.save_calendar_data()
 
     def get_absent_time(self, current_index):
@@ -178,13 +179,11 @@ class DBManagerBureauActifDataProcess:
         delta = self.get_time_difference(index, entries_before_position_change)
         self.update_last_timeline_entry(delta, 3)
         self.seating.done += delta
-        self.update_remaining_data(index)
 
     def update_standing(self, index, entries_before_position_change):
         delta = self.get_time_difference(index, entries_before_position_change)
         self.update_last_timeline_entry(delta, 2)
         self.standing.done += delta
-        self.update_remaining_data(index)
 
     def get_time_difference(self, index, entries_count):
         if index != 0 and entries_count != 0 and entries_count <= index:
@@ -199,7 +198,7 @@ class DBManagerBureauActifDataProcess:
         date_str = self.data[index][0].lstrip(' ')
         return datetime.datetime.fromisoformat(date_str)
 
-    def update_remaining_data(self, current_index):
+    def update_remaining_data(self):
         up_time = self.timers['up_secs']
         down_time = self.timers['down_secs']
         total_timers = up_time + down_time
@@ -207,7 +206,7 @@ class DBManagerBureauActifDataProcess:
         down_ratio = down_time / total_timers if total_timers > 0 else 0
 
         start_of_day = self.calendar_day.date
-        current_time = self.get_time(current_index)
+        current_time = self.get_time(len(self.data) - 1)
         time_worked = current_time - start_of_day
         standing_position_to_do = time_worked.seconds / 3600 * up_ratio
         seated_position_to_do = time_worked.seconds / 3600 * down_ratio
