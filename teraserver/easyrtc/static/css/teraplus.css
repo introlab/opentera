@@ -41,8 +41,8 @@ video {
 	object-fit: contain;
 /*  -o-object-fit: fill;
     object-fit: fill;*/
-	-o-object-position: top center;
-	object-position: top center;
+	/*-o-object-position: top center;
+	object-position: top center;*/
 	background-color: black;
 }
 
