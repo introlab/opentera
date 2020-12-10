@@ -1,43 +1,50 @@
-var videoSources = [];
-var currentVideoSourceIndex = 0;
-var timerHandle = 0;
+let videoSources = [];
+let currentVideoSourceIndex = 0;
+let timerHandle = 0;
 
-function initLocalVideo(tag){
-	video = document.querySelector(tag);
-
-	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+function initLocalVideo(){
+	navigator.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.getUserMedia ||
+		navigator.webkitGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 
 	if (navigator.getUserMedia) {
 		//navigator.getUserMedia({video: true, audio: false}, handleVideo, videoError);
-		navigator.mediaDevices.getUserMedia({video: true, audio: false}).then(handleVideo).catch(videoError);
+		navigator.mediaDevices.getUserMedia({video: {facingMode: "user" },
+			audio: false}).then(initialHandleVideo).catch(videoError);
 	}
 }
+
+function initialHandleVideo(stream){
+	handleVideo(stream);
+
+	fillVideoSourceList(stream.getVideoTracks()[0].label);
+
+}
+
 function handleVideo(stream) {
-	var video = document.getElementById("selfVideo");
+	let video = document.getElementById("selfVideo");
 
 	//console.log("Success! Device Name: " + stream.getVideoTracks()[0].label);
 	video.srcObject = stream;
-	//video.src = URL.createObjectURL(stream);
 
-	fillVideoSourceList();
 }
 
-function videoError(e) {
+function videoError(err) {
 	// do something
-	console.error(e);
+	showError("videoError()",
+		"Impossible d'accéder à la caméra ou au micro.<br><br>Le message d'erreur est:<br>" + err.name + " - " + err.message, true);
 }
 
 
-function fillVideoSourceList(){
+function fillVideoSourceList(selected_source=undefined){
 	videoSources.length=0;
-	var select = document.getElementById('videoSelect');
+	let select = document.getElementById('videoSelect');
 	select.options.length = 0;
-	var count = 0;
+	let count = 0;
 
 	navigator.mediaDevices.enumerateDevices()
 	.then(function(devices) {
 		devices.forEach(function(device) {
-			if (device.kind=="videoinput"){
+			if (device.kind === "videoinput"){
 				videoSources[videoSources.length] = device;
 				//select.options[select.options.length] = new Option(device.label.substring(0,device.label.length-12), device.id);
 				select.options[select.options.length] = new Option(device.label, device.id);
@@ -48,9 +55,13 @@ function fillVideoSourceList(){
 					showElement("videoSelect");
 				}
 			}
-			select.selectedIndex = currentVideoSourceIndex;
 			//console.log(device.kind + ": " + device.label + " id = " + device.deviceId);
 		});
+		if (selected_source !== undefined){
+			selectVideoSource(selected_source);
+		}else{
+			select.selectedIndex = currentVideoSourceIndex;
+		}
 	})
 	.catch(function(err) {
 		console.log(err.name + ": " + err.message);
@@ -58,22 +69,24 @@ function fillVideoSourceList(){
 }
 
 function updateVideoSource(){
-	var select = document.getElementById('videoSelect');
+	let select = document.getElementById('videoSelect');
 	if (select.selectedIndex>=0){
 		currentVideoSourceIndex = select.selectedIndex;
-		var constraints = { deviceId: { exact: videoSources[currentVideoSourceIndex].deviceId } };
+		let constraints = { deviceId: { exact: videoSources[currentVideoSourceIndex].deviceId } };
 		//console.log(constraints);
 		navigator.mediaDevices.getUserMedia({video: constraints}).then(handleVideo).catch(videoError);
 	}
 }
 
 function selectVideoSource(source){
-	video = JSON.parse(source);
-	for (var i=0; i<videoSources.length; i++){
-		if (videoSources[i].label.includes(video.name)){
-			var select = document.getElementById('videoSelect');
+	console.log("Selecting " + source);
+	for (let i=0; i<videoSources.length; i++){
+		console.log(source + " = " + videoSources[i].label + " ?");
+		if (videoSources[i].label.includes(source)){
+			let select = document.getElementById('videoSelect');
 			select.selectedIndex = i;
-			updateVideoSource();
+			currentVideoSourceIndex = i;
+			//updateVideoSource();
 			break;
 		}
 	}

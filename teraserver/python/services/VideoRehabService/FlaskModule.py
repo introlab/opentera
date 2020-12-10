@@ -242,6 +242,7 @@ class FlaskModule(BaseModule):
         from services.VideoRehabService.Views.ParticipantLocalView import ParticipantLocalView
         from services.VideoRehabService.Views.ParticipantDashboard import ParticipantDashboard
         from services.VideoRehabService.Views.ParticipantEndpoint import ParticipantEndpoint
+        from services.VideoRehabService.Views.ParticipantError import ParticipantError
 
         # Will create a function that calls the __index__ method with args, kwargs
         flask_app.add_url_rule('/', view_func=Index.as_view('index', *args, **kwargs))
@@ -251,6 +252,8 @@ class FlaskModule(BaseModule):
                                                                                       **kwargs))
         flask_app.add_url_rule('/participant_endpoint',
                                view_func=ParticipantEndpoint.as_view('participant_endpoint', *args, **kwargs))
+        flask_app.add_url_rule('/participant_error',
+                               view_func=ParticipantError.as_view('participant_error', *args, **kwargs))
 
 
 @flask_app.after_request

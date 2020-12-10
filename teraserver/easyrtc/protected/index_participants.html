@@ -111,7 +111,7 @@
                     <span class="badge badge-info" id="localViewTitle1">Vue locale #1</span>
                     <!-- Video controls -->
                     <div id="localVideoControls1" class="overlay-top-right" style="">
-                        <input id="localBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(true,1);event.stopPropagation();" />
+                        <input id="localBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(true,1);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
@@ -162,7 +162,7 @@
 
                     <!-- Video controls -->
                     <div id="localVideoControls2" class="overlay-top-right" style="">
-                        <input id="localBtnSwapVideo2" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(true,2);event.stopPropagation();" />
+                        <input id="localBtnSwapVideo2" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(true,2);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
@@ -197,7 +197,7 @@
 
                     <!-- Video controls -->
                     <div id="remoteVideoControls1" class="overlay-top-right" style="">
-                        <input id="remoteBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,1);event.stopPropagation();" />
+                        <input id="remoteBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,1);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
@@ -213,12 +213,15 @@
                            onclick=""
                            onwheel="" class=""></video>
                 </div>
-                <div class="col videoView" id="remoteView2">
+                <div class="col videoView" id="remoteView2"
+                     onmousemove="resetInactiveTimer(false, 2);showButtons(false, true, 2);"
+                     onmouseleave="stopInactiveTimer(false, 2);showButtons(false, false, 2); return false;"
+                     oncontextmenu="resetInactiveTimer(false, 2);showButtons(false, true, 2);">
                     <span class="badge badge-primary" id="remoteViewTitle2">Participant #2</span>
 
                     <!-- Video controls -->
                     <div id="remoteVideoControls2" class="overlay-top-right" style="">
-                        <input id="remoteBtnSwapVideo2" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,2);event.stopPropagation();" />
+                        <input id="remoteBtnSwapVideo2" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,2);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Text display -->
@@ -239,11 +242,14 @@
                            onclick=""
                            onwheel="" class=""></video>
                 </div>
-                <div class="col videoView" id="remoteView3">
+                <div class="col videoView" id="remoteView3"
+                     onmousemove="resetInactiveTimer(false, 3);showButtons(false, true, 3);"
+                     onmouseleave="stopInactiveTimer(false, 3);showButtons(false, false, 3); return false;"
+                     oncontextmenu="resetInactiveTimer(false, 3);showButtons(false, true, 3);">
                     <span class="badge badge-primary" id="remoteViewTitle3">Participant #3</span>
                     <!-- Video controls -->
                     <div id="remoteVideoControls3" class="overlay-top-right" style="">
-                        <input id="remoteBtnSwapVideo3" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,3);event.stopPropagation();" />
+                        <input id="remoteBtnSwapVideo3" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,3);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Text display -->
@@ -264,12 +270,15 @@
                            onclick=""
                            onwheel="" class=""></video>
                 </div>
-                <div class="col videoView" id="remoteView4">
+                <div class="col videoView" id="remoteView4"
+                     onmousemove="resetInactiveTimer(false, 4);showButtons(false, true, 4);"
+                     onmouseleave="stopInactiveTimer(false, 4);showButtons(false, false, 4); return false;"
+                     oncontextmenu="resetInactiveTimer(false, 4);showButtons(false, true, 4);">
                     <span class="badge badge-primary" id="remoteViewTitle4">Participant #4</span>
 
                     <!-- Video controls -->
                     <div id="remoteVideoControls4" class="overlay-top-right" style="">
-                        <input id="remoteBtnSwapVideo4" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,4);event.stopPropagation();" />
+                        <input id="remoteBtnSwapVideo4" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,4);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->

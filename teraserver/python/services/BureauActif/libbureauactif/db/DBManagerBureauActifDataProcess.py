@@ -53,6 +53,7 @@ class DBManagerBureauActifDataProcess:
 
         self.expected_desk_height = None
         self.is_config_respected = True
+        self.previous_is_config_respected = True
         self.expected_standing = False
         self.expected_seating = False
 
@@ -77,7 +78,7 @@ class DBManagerBureauActifDataProcess:
             desk_height = float(val[1])
             self.expected_desk_height = float(val[4])
             was_standing = is_standing  # Save previous position to check if it changed
-            previous_is_config_respected = self.is_config_respected  # Save previous button state
+            self.previous_is_config_respected = self.is_config_respected  # Save previous button state
             self.is_config_respected = self.check_if_config_respected(is_standing)
 
             # Check if desk is in standing position (true) or in seating position (false)
@@ -88,7 +89,7 @@ class DBManagerBureauActifDataProcess:
 
             # Check if last entry or position changed or gap in the timeline (absence)
             if self.is_last_data(index) or was_standing != is_standing or \
-                    absent_time != 0 or previous_is_config_respected != self.is_config_respected:
+                    absent_time != 0 or self.previous_is_config_respected != self.is_config_respected:
                 self.update_position(was_standing, index, entries_before_position_change)
                 self.update_last_timeline_entry(absent_time, 4)
                 entries_before_position_change = 0
@@ -146,11 +147,11 @@ class DBManagerBureauActifDataProcess:
 
     def check_if_should_be_standing(self):
         max_height = float(self.desk_config['max_height'])
-        return max_height == self.expected_desk_height
+        return max_height - 5 <= self.expected_desk_height <= max_height + 5
 
     def check_if_should_be_seating(self):
         min_height = float(self.desk_config['min_height'])
-        return min_height == self.expected_desk_height
+        return min_height - 5 <= self.expected_desk_height <= min_height + 5
 
     # Check if it's the last entry in the data file received from pi
     def is_last_data(self, index):
@@ -210,9 +211,9 @@ class DBManagerBureauActifDataProcess:
         seated_position_to_do = time_worked.seconds / 3600 * down_ratio
 
         position_changes_to_do = 0
-        if down_time <= up_time:
+        if up_time != 0 and down_time <= up_time:
             position_changes_to_do = ceil(time_worked.seconds / up_time)
-        elif down_time >= up_time:
+        elif down_time != 0 and down_time >= up_time:
             position_changes_to_do = ceil(time_worked.seconds / down_time)
 
         self.seating.remaining = seated_position_to_do - self.seating.done \
@@ -260,12 +261,10 @@ class DBManagerBureauActifDataProcess:
 
     # Set the right type of entry for the timeline color
     def get_right_timeline_color(self, id_type):
-        if id_type == 2:  # Standing
-            if not self.is_config_respected:  # Supposed to be seating
-                return 6
-        elif id_type == 3:  # Seating
-            if not self.is_config_respected:  # Supposed to be standing
-                return 5
+        if id_type == 2 and not self.previous_is_config_respected:  # Standing
+            return 6  # Supposed to be seating
+        elif id_type == 3 and not self.previous_is_config_respected:  # Seating
+            return 5  # Supposed to be standing
         return id_type
 
     def create_new_timeline_entry(self, id_type, delta):

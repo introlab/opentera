@@ -1,6 +1,7 @@
 from flask.views import MethodView
 from flask import render_template, request
 from services.shared.ServiceAccessManager import ServiceAccessManager, current_participant_client
+from flask_babel import gettext
 import json
 
 
@@ -23,11 +24,19 @@ class ParticipantLocalView(MethodView):
         if 'X_EXTERNALPORT' in request.headers:
             backend_port = request.headers['X_EXTERNALPORT']
 
+        message = gettext('Votre séance débutera bientôt. Merci de patienter!')
+        if 'message' in request.args:
+            message = request.args['message']
+        message_type = 'info'
+        if 'message_type' in request.args:
+            message_type = request.args['message_type']
+
         # Query full participant infos
         # participant_info = current_participant_client.get_participant_infos()
 
         return render_template('participant_localview.html', hostname=hostname, port=port,
-                               backend_hostname=backend_hostname, backend_port=backend_port)
+                               backend_hostname=backend_hostname, backend_port=backend_port, message=message,
+                               message_type=message_type)
 
         # Get participant information
         # response = current_participant_client.do_get_request_to_backend('/api/participant/participants')

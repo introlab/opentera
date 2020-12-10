@@ -118,7 +118,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_uuid = '00000000-0000-0000-0000-000000000001'
         new_service.service_key = 'OpenTeraServer'
         new_service.service_name = 'OpenTera Server'
-        new_service.service_hostname = 'localhost'
+        new_service.service_hostname = '127.0.0.1'
         new_service.service_port = 4040
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/'
@@ -134,7 +134,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_uuid = str(uuid.uuid4())
         new_service.service_key = 'LoggingService'
         new_service.service_name = 'Logging Service'
-        new_service.service_hostname = 'localhost'
+        new_service.service_hostname = '127.0.0.1'
         new_service.service_port = 4041
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/log'
@@ -146,7 +146,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_uuid = str(uuid.uuid4())
         new_service.service_key = 'FileTransferService'
         new_service.service_name = 'File Transfer Service'
-        new_service.service_hostname = 'localhost'
+        new_service.service_hostname = '127.0.0.1'
         new_service.service_port = 4042
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/file'
@@ -158,7 +158,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_uuid = str(uuid.uuid4())
         new_service.service_key = 'BureauActif'
         new_service.service_name = 'Bureau Actif'
-        new_service.service_hostname = 'localhost'
+        new_service.service_hostname = '127.0.0.1'
         new_service.service_port = 4050
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/bureau'
@@ -169,7 +169,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_uuid = str(uuid.uuid4())
         new_service.service_key = 'VideoDispatch'
         new_service.service_name = 'Salle d\'attente vidéo'
-        new_service.service_hostname = 'localhost'
+        new_service.service_hostname = '127.0.0.1'
         new_service.service_port = 4060
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/videodispatch'
@@ -180,7 +180,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_uuid = str(uuid.uuid4())
         new_service.service_key = 'VideoRehabService'
         new_service.service_name = 'Télé-réadaptation vidéo'
-        new_service.service_hostname = 'localhost'
+        new_service.service_hostname = '127.0.0.1'
         new_service.service_port = 4070
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/rehab'
@@ -196,7 +196,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_uuid = str(uuid.uuid4())
         new_service.service_key = 'RobotTeleOperationService'
         new_service.service_name = 'Robot Teleoperation Service'
-        new_service.service_hostname = 'localhost'
+        new_service.service_hostname = '127.0.0.1'
         new_service.service_port = 4080
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/robot'
