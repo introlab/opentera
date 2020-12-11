@@ -1,13 +1,10 @@
 import unittest
 import os
 
-import sqlite3
-from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from modules.DatabaseModule.DBManager import DBManager
 from libtera.db.models.TeraServerSettings import TeraServerSettings
 from libtera.db.Base import db
-from libtera.db.models.TeraUser import TeraUser
 from libtera.ConfigManager import ConfigManager
 
 
