@@ -1,15 +1,12 @@
 import os
-import unittest
-
+from tests.libtera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
-
-from libtera.ConfigManager import ConfigManager
 from libtera.db.Base import db
+
 from libtera.db.models.TeraService import TeraService
-from modules.DatabaseModule.DBManager import DBManager
 
 
-class TeraServiceTest(unittest.TestCase):
+class TeraServiceTest(BaseModelsTest):
 
     filename = os.path.join(os.path.dirname(__file__), 'TeraServiceTest.db')
 
@@ -17,33 +14,8 @@ class TeraServiceTest(unittest.TestCase):
         'filename': filename
     }
 
-    def setUp(self):
-        if os.path.isfile(self.filename):
-            print('removing database')
-            os.remove(self.filename)
-
-        self.admin_user = None
-        self.test_user = None
-
-        self.config = ConfigManager()
-        self.config.create_defaults()
-
-        self.db_man = DBManager(self.config)
-
-        self.db_man.open_local(self.SQLITE)
-
-        # Creating default users / tests.
-        self.db_man.create_defaults(self.config, test= True)
-
-    def tearDown(self):
-        pass
-
-    def test_defaults(self):
-        pass
-
     def test_nullable_args(self):
         new_service = TeraService()
-
         new_service.service_name = 'Name'
         new_service.service_key = 'Key'
         new_service.service_hostname = 'Hostname'
@@ -85,6 +57,7 @@ class TeraServiceTest(unittest.TestCase):
         new_service.service_clientendpoint = None
         db.session.add(new_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
+        db.session.rollback()
 
     def test_nullable_bool1(self):
         #testing bool service_enabled
@@ -101,6 +74,8 @@ class TeraServiceTest(unittest.TestCase):
         new_service.service_enabled = None
         db.session.add(new_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
+        db.session.rollback()
+
 
     def test_nullable_bool2(self):
         # testing bool service_system
@@ -117,6 +92,7 @@ class TeraServiceTest(unittest.TestCase):
         new_service.service_system = None
         db.session.add(new_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
+        db.session.rollback()
 
     def test_nullable_bool3(self):
         # testing bool service_editable_config
@@ -133,17 +109,7 @@ class TeraServiceTest(unittest.TestCase):
         new_service.service_editable_config = None
         db.session.add(new_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
-
-        # new_service.service_uuid = db.Column(db.String(36), nullable=False, unique=True)
-        # new_service.service_name = db.Column(db.String, nullable=False)
-        # new_service.service_key = db.Column(db.String, nullable=False, unique=True)
-        # new_service.service_hostname = db.Column(db.String, nullable=False)
-        # new_service.service_port = db.Column(db.Integer, nullable=False)
-        # new_service.service_endpoint = db.Column(db.String, nullable=False)
-        # new_service.service_clientendpoint = db.Column(db.String, nullable=False)
-        # new_service.service_enabled = db.Column(db.Boolean, nullable=False, default=False)
-        # new_service.service_system = db.Column(db.Boolean, nullable=False, default=False)
-        # new_service.service_editable_config = db.Column(db.Boolean, nullable=False, default=False)
+        db.session.rollback()
 
     def test_unique_args_uuid(self):
         new_service = TeraService()
@@ -174,6 +140,7 @@ class TeraServiceTest(unittest.TestCase):
         db.session.add(new_service)
         db.session.add(same_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
+        db.session.rollback()
 
     def test_unique_args_service_key(self):
         new_service = TeraService()
@@ -204,6 +171,7 @@ class TeraServiceTest(unittest.TestCase):
         db.session.add(new_service)
         db.session.add(same_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
+        db.session.rollback()
 
     def test_service_port_integer(self):
         new_service = TeraService()
@@ -219,6 +187,7 @@ class TeraServiceTest(unittest.TestCase):
         new_service.service_editable_config = True
         db.session.add(new_service)
         self.assertRaises(exc.StatementError, db.session.commit)
+        db.session.rollback()
 
     def test_service_system_integer(self):
         new_service = TeraService()
@@ -234,7 +203,8 @@ class TeraServiceTest(unittest.TestCase):
         new_service.service_editable_config = True
         db.session.add(new_service)
         self.assertRaises(exc.StatementError, db.session.commit)
-
+        db.session.rollback()
+    #
     def test_service_editable_config_integer(self):
         new_service = TeraService()
         new_service.service_uuid = 'uuid'
@@ -249,6 +219,7 @@ class TeraServiceTest(unittest.TestCase):
         new_service.service_editable_config = 15
         db.session.add(new_service)
         self.assertRaises(exc.StatementError, db.session.commit)
+        db.session.rollback()
 
     def test_service_to_json(self):
         new_service = TeraService()
@@ -267,11 +238,11 @@ class TeraServiceTest(unittest.TestCase):
         new_service.service_default_config = 'DEFAULT CONFIG'
         json_values = new_service.to_json()
         json_minimal = new_service.to_json(minimal=True)
-        breakpoint()
         TeraServiceTest._check_json(self, service=new_service, json_data=json_values)
         TeraServiceTest._check_json(self, service=new_service, json_data=json_minimal, minimal=True)
+        db.session.rollback()
 
-    def _check_json(self, service, json_data, minimal = False):
+    def _check_json(self, service, json_data, minimal=False):
         self.assertEqual(json_data['service_uuid'], service.service_uuid)
         self.assertEqual(json_data['service_name'], service.service_name)
         self.assertEqual(json_data['service_key'], service.service_key)

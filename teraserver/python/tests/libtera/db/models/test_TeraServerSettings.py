@@ -1,41 +1,19 @@
-import unittest
 import os
-
+from tests.libtera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
-from modules.DatabaseModule.DBManager import DBManager
-from libtera.db.models.TeraServerSettings import TeraServerSettings
 from libtera.db.Base import db
-from libtera.ConfigManager import ConfigManager
+
+from libtera.db.models.TeraServerSettings import TeraServerSettings
 
 
-class TeraServerSettingsTest(unittest.TestCase):
+
+class TeraServerSettingsTest(BaseModelsTest):
 
     filename = os.path.join(os.path.dirname(__file__), 'TeraServerSettingsTest.db')
 
     SQLITE = {
         'filename': filename
     }
-
-    def setUp(self):
-        if os.path.isfile(self.filename):
-            print('removing database')
-            os.remove(self.filename)
-
-        self.admin_user = None
-        self.test_user = None
-
-        self.config = ConfigManager()
-        self.config.create_defaults()
-
-        self.db_man = DBManager(self.config)
-
-        self.db_man.open_local(self.SQLITE)
-
-        # Creating default users / tests.
-        self.db_man.create_defaults(self.config, test= True)
-
-    def tearDown(self):
-        pass
 
     def test_nullable_args(self):
         new_settings = TeraServerSettings()
@@ -50,6 +28,7 @@ class TeraServerSettingsTest(unittest.TestCase):
         new_settings.server_settings_value = 'Key'
         db.session.add(new_settings)
         self.assertRaises(exc.IntegrityError, db.session.commit)
+        db.session.rollback()
 
     def test_unique_args(self):
         new_settings = TeraServerSettings()
@@ -59,6 +38,7 @@ class TeraServerSettingsTest(unittest.TestCase):
         db.session.add(new_settings)
         db.session.add(same_settings)
         self.assertRaises(exc.IntegrityError, db.session.commit)
+        db.session.rollback()
 
     def test_constants_check(self):
         for settings in TeraServerSettings.query.all():
