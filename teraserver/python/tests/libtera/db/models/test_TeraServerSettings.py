@@ -5,8 +5,6 @@ from libtera.db.Base import db
 
 from libtera.db.models.TeraServerSettings import TeraServerSettings
 
-
-
 class TeraServerSettingsTest(BaseModelsTest):
 
     filename = os.path.join(os.path.dirname(__file__), 'TeraServerSettingsTest.db')

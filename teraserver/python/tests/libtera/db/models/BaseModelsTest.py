@@ -10,6 +10,11 @@ from sqlite3 import Connection as SQLite3Connection
 
 class BaseModelsTest(unittest.TestCase):
 
+    # filename = os.path.join(os.path.dirname(__file__), 'BaseModelsTest.db')
+    #
+    # SQLITE = {
+    #     'filename': filename
+    # }
     def setUp(self):
         if os.path.isfile(self.filename):
             print('removing database')
