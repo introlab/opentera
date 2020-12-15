@@ -1,4 +1,4 @@
-from math import ceil
+from math import ceil, floor
 import datetime
 from services.BureauActif.libbureauactif.db.Base import db
 from services.BureauActif.libbureauactif.db.models.BureauActifCalendarDay import BureauActifCalendarDay
@@ -14,7 +14,7 @@ def get_calendar_day(uuid_participant, date):
 def create_new_calendar_data(id_calendar_day, id_calendar_data_type):
     calendar_data = BureauActifCalendarData()
     calendar_data.id_calendar_data = 0
-    calendar_data.remaining = 0
+    calendar_data.expected = 0
     calendar_data.done = 0
     calendar_data.id_calendar_data_type = id_calendar_data_type
     calendar_data.id_calendar_day = id_calendar_day
@@ -98,7 +98,8 @@ class DBManagerBureauActifDataProcess:
             else:
                 entries_before_position_change += 1
 
-        self.update_remaining_data()
+        first_position_is_seating = self.find_first_position()  # Find first position of the day
+        self.update_expected_data(first_position_is_seating)
         self.save_calendar_data()
 
     def get_absent_time(self, current_index):
@@ -198,31 +199,43 @@ class DBManagerBureauActifDataProcess:
         date_str = self.data[index][0].lstrip(' ')
         return datetime.datetime.fromisoformat(date_str)
 
-    def update_remaining_data(self):
+    def update_expected_data(self, first_position_is_seating):
         up_time = self.timers['up_secs']
         down_time = self.timers['down_secs']
         total_timers = up_time + down_time
-        up_ratio = up_time / total_timers if total_timers > 0 else 0
-        down_ratio = down_time / total_timers if total_timers > 0 else 0
 
         start_of_day = self.calendar_day.date
         current_time = self.get_time(len(self.data) - 1)
         time_worked = current_time - start_of_day
-        standing_position_to_do = time_worked.seconds / 3600 * up_ratio
-        seated_position_to_do = time_worked.seconds / 3600 * down_ratio
 
-        position_changes_to_do = 0
-        if up_time != 0 and down_time <= up_time:
-            position_changes_to_do = ceil(time_worked.seconds / up_time)
-        elif down_time != 0 and down_time >= up_time:
-            position_changes_to_do = ceil(time_worked.seconds / down_time)
+        seconds_worked = time_worked.seconds
+        cycles = seconds_worked / total_timers
+        full_cycles = floor(cycles)
+        started_cycle = cycles % 1
+        started_cycle_seconds = started_cycle * total_timers
+        self.position_changes.expected = (full_cycles * 2) - 1  # First position of the day doesn't count
+        expected_second_standing = full_cycles * up_time
+        expected_second_seating = full_cycles * down_time
 
-        self.seating.remaining = seated_position_to_do - self.seating.done \
-            if seated_position_to_do - self.seating.done >= 0 else 0
-        self.standing.remaining = standing_position_to_do - self.standing.done \
-            if standing_position_to_do - self.standing.done >= 0 else 0
-        self.position_changes.remaining = position_changes_to_do - self.position_changes.done \
-            if position_changes_to_do - self.position_changes.done >= 0 else 0
+        if started_cycle_seconds > 0 and first_position_is_seating:
+            self.position_changes.expected += 1  # Participant started to work in a new position
+            if started_cycle_seconds <= down_time:
+                expected_second_seating += started_cycle_seconds
+            else:
+                self.position_changes.expected += 1  # Participant had done the previous and started the next
+                expected_second_seating += down_time
+                expected_second_standing += started_cycle_seconds - down_time
+        elif started_cycle_seconds > 0 and not first_position_is_seating:
+            self.position_changes.expected += 1  # Participant started to work in a new position
+            if started_cycle_seconds <= up_time:
+                expected_second_standing += started_cycle_seconds
+            else:
+                self.position_changes.expected += 1  # Participant had done the previous and started the next
+                expected_second_standing += up_time
+                expected_second_seating += started_cycle_seconds - up_time
+
+        self.standing.expected = expected_second_standing / 3600
+        self.seating.expected = expected_second_seating / 3600
 
     def save_calendar_data(self):
         if self.position_changes.id_calendar_data > 0 \
@@ -243,7 +256,7 @@ class DBManagerBureauActifDataProcess:
                 db.session.commit()
             else:
                 if color_type not in [5, 6] and not self.is_first_timeline_entry() \
-                        and not self.is_back_from_absence() and not self.config_was_not_respected():
+                        and not self.is_back_from_absence() and not self.is_position_same(color_type):
                     self.position_changes.done += 1  # Count as a position change
                 new_entry = BureauActifTimelineDayEntry.insert(self.create_new_timeline_entry(color_type, delta))
                 self.timeline_day_entries.append(new_entry)
@@ -256,9 +269,13 @@ class DBManagerBureauActifDataProcess:
     def is_back_from_absence(self):
         return self.timeline_day_entries[len(self.timeline_day_entries) - 1].id_timeline_entry_type == 4
 
-    # Returns true if the button was previously pressed and the schedule was not respected
-    def config_was_not_respected(self):
-        return self.timeline_day_entries[len(self.timeline_day_entries) - 1].id_timeline_entry_type in [5, 6]
+    # Check if the actual position of the participant was the same in the last entry
+    def is_position_same(self, id_type):
+        if id_type in [2, 5]:
+            return self.timeline_day_entries[len(self.timeline_day_entries) - 1].id_timeline_entry_type in [2, 5]
+        elif id_type in [3, 6]:
+            return self.timeline_day_entries[len(self.timeline_day_entries) - 1].id_timeline_entry_type in [3, 6]
+        return False
 
     # Set the right type of entry for the timeline color
     def get_right_timeline_color(self, id_type):
@@ -281,3 +298,7 @@ class DBManagerBureauActifDataProcess:
         time = starting_time.hour + (starting_time.minute / 60)
         first_entry = BureauActifTimelineDayEntry.insert(self.create_new_timeline_entry(1, time))
         self.timeline_day_entries.append(first_entry)
+
+    # Return True if first position of the day was seating
+    def find_first_position(self):
+        return True if self.timeline_day_entries[1].id_timeline_entry_type in [3, 5] else False
