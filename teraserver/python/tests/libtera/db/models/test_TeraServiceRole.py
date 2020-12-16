@@ -105,6 +105,8 @@ class TeraServiceRoleTest(BaseModelsTest):
         same_service_role = TeraServiceRole.get_specific_service_role_for_site(service_id=new_service_role.id_service,
                                        site_id=new_service_role.id_site, rolename=new_service_role.service_role_name)
         self.assertEqual(same_service_role.service_role_name, new_service_role.service_role_name)
+        # the BaseModelstest is changing the same_service_role.id_service_role
+        # when the class is the but not the test alone
         db.session.rollback()
 
     def test_get_service_roles_for_project(self):
