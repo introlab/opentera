@@ -1,6 +1,7 @@
 import unittest
 import os
 
+from libtera.db.Base import db
 from modules.DatabaseModule.DBManager import DBManager
 from libtera.ConfigManager import ConfigManager
 from sqlalchemy import event
@@ -10,11 +11,11 @@ from sqlite3 import Connection as SQLite3Connection
 
 class BaseModelsTest(unittest.TestCase):
 
-    # filename = os.path.join(os.path.dirname(__file__), 'BaseModelsTest.db')
-    #
-    # SQLITE = {
-    #     'filename': filename
-    # }
+    filename = os.path.join(os.path.dirname(__file__), 'BaseModelsTest.db')
+
+    SQLITE = {
+        'filename': filename
+    }
     def setUp(self):
         if os.path.isfile(self.filename):
             print('removing database')
@@ -34,6 +35,7 @@ class BaseModelsTest(unittest.TestCase):
         self.db_man.create_defaults(self.config, test=True)
 
     def tearDown(self):
+        db.session.remove()
         pass
 
     def test_defaults(self):

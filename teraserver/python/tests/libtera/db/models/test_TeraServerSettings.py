@@ -26,7 +26,6 @@ class TeraServerSettingsTest(BaseModelsTest):
         new_settings.server_settings_value = 'Key'
         db.session.add(new_settings)
         self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
 
     def test_unique_args(self):
         new_settings = TeraServerSettings()
@@ -36,7 +35,6 @@ class TeraServerSettingsTest(BaseModelsTest):
         db.session.add(new_settings)
         db.session.add(same_settings)
         self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
 
     def test_constants_check(self):
         for settings in TeraServerSettings.query.all():

@@ -57,7 +57,6 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_clientendpoint = None
         db.session.add(new_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
 
     def test_nullable_bool1(self):
         #testing bool service_enabled
@@ -74,8 +73,6 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_enabled = None
         db.session.add(new_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
-
 
     def test_nullable_bool2(self):
         # testing bool service_system
@@ -92,7 +89,6 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_system = None
         db.session.add(new_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
 
     def test_nullable_bool3(self):
         # testing bool service_editable_config
@@ -109,7 +105,6 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_editable_config = None
         db.session.add(new_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
 
     def test_unique_args_uuid(self):
         new_service = TeraService()
@@ -140,7 +135,6 @@ class TeraServiceTest(BaseModelsTest):
         db.session.add(new_service)
         db.session.add(same_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
 
     def test_unique_args_service_key(self):
         new_service = TeraService()
@@ -171,7 +165,6 @@ class TeraServiceTest(BaseModelsTest):
         db.session.add(new_service)
         db.session.add(same_service)
         self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
 
     def test_service_port_integer(self):
         new_service = TeraService()
@@ -187,7 +180,6 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_editable_config = True
         db.session.add(new_service)
         self.assertRaises(exc.StatementError, db.session.commit)
-        db.session.rollback()
 
     def test_service_system_integer(self):
         new_service = TeraService()
@@ -203,8 +195,7 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_editable_config = True
         db.session.add(new_service)
         self.assertRaises(exc.StatementError, db.session.commit)
-        db.session.rollback()
-    #
+
     def test_service_editable_config_integer(self):
         new_service = TeraService()
         new_service.service_uuid = 'uuid'
@@ -219,7 +210,6 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_editable_config = 15
         db.session.add(new_service)
         self.assertRaises(exc.StatementError, db.session.commit)
-        db.session.rollback()
 
     def test_service_to_json(self):
         new_service = TeraService()
@@ -240,7 +230,6 @@ class TeraServiceTest(BaseModelsTest):
         json_minimal = new_service.to_json(minimal=True)
         TeraServiceTest._check_json(self, service=new_service, json_data=json_values)
         TeraServiceTest._check_json(self, service=new_service, json_data=json_minimal, minimal=True)
-        db.session.rollback()
 
     def _check_json(self, service, json_data, minimal=False):
         self.assertEqual(json_data['service_uuid'], service.service_uuid)
