@@ -13,19 +13,6 @@ class TeraProjectTest(BaseModelsTest):
         'filename': filename
     }
 
-    # __tablename__ = 't_projects'
-    # id_project = db.Column(db.Integer, db.Sequence('id_project_sequence'), primary_key=True, autoincrement=True)
-    # id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
-    # project_name = db.Column(db.String, nullable=False, unique=False)
-
-    #
-    # project_site = db.relationship("TeraSite")
-    # project_participants = db.relationship("TeraParticipant", passive_deletes=True)
-    # project_participants_groups = db.relationship("TeraParticipantGroup", passive_deletes=True)
-    # project_devices = db.relationship("TeraDevice", secondary="t_devices_projects", back_populates="device_projects")
-    # project_session_types = db.relationship("TeraSessionType", secondary="t_sessions_types_projects",
-    #                                         back_populates="session_type_projects")
-
     def test_nullable_args(self):
         new_project = TeraProject()
         new_project.id_site = 1
