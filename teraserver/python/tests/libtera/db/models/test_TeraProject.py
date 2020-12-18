@@ -31,14 +31,12 @@ class TeraProjectTest(BaseModelsTest):
         new_project.id_site = 1
         new_project.project_name = None
         db.session.add(new_project)
-        db.session.commit()
         self.assertRaises(exc.IntegrityError, db.session.commit)
         db.session.rollback()
         new_project = TeraProject()
         new_project.id_site = None
         new_project.project_name = 'Project Name'
         db.session.add(new_project)
-        db.session.commit()
         self.assertRaises(exc.IntegrityError, db.session.commit)
 
     def test_unique_args(self):
