@@ -138,8 +138,7 @@ class ServiceOpenTera(RedisClient):
             'service_uuid': self.service_uuid
         }
 
-        return jwt.encode(payload, self.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey),
-                          algorithm='HS256').decode('utf-8')
+        return jwt.encode(payload, self.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey), algorithm='HS256')
 
     def post_to_opentera(self, api_url: str, json_data: dict) -> Response:
         # Synchronous call to OpenTera backend

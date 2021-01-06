@@ -77,7 +77,7 @@ class TeraParticipant(db.Model, BaseModel):
             'user_fullname': self.participant_name
         }
 
-        return jwt.encode(payload, token_key, algorithm='HS256').decode('utf-8')
+        return jwt.encode(payload, token_key, algorithm='HS256')
 
     def create_token(self):
         import random
@@ -90,7 +90,7 @@ class TeraParticipant(db.Model, BaseModel):
         }
 
         self.participant_token = jwt.encode(payload, TeraServerSettings.get_server_setting_value(
-            TeraServerSettings.ServerParticipantTokenKey), algorithm='HS256').decode('utf-8')
+            TeraServerSettings.ServerParticipantTokenKey), algorithm='HS256')
 
         return self.participant_token
 
