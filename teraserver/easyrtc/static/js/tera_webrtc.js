@@ -203,6 +203,7 @@ function setMirror(mirror, local, index){
 }
 
 function sendPrimaryView(peer_id, streamname){
+    console.log('sendPrimaryView - peer: ' + peer_id + ', stream: ' + streamname);
     primaryView = {peerid: peer_id, streamName: streamname};
 
     let request = primaryView;
@@ -217,6 +218,7 @@ function sendPrimaryView(peer_id, streamname){
 }
 
 function setPrimaryView(peer_id, streamname){
+    console.log('setPrimaryView - peer: ' + peer_id + ', stream: ' + streamname);
     primaryView = {peerid: peer_id, streamName: streamname};
     if (isParticipant){
         let index = undefined;
@@ -439,7 +441,7 @@ function sendContactInfo(peerid_target){
 }
 
 function updateRoomUsers(roomName, occupants, isPrimary) {
-    console.log("updateRoomUsers: " + JSON.stringify(occupants));
+    //console.log("updateRoomUsers: " + JSON.stringify(occupants));
     for(let peerid in occupants) {
         if (peerid !== local_peerid){
             if (needToCallOtherUsers) {
@@ -453,7 +455,7 @@ function updateRoomUsers(roomName, occupants, isPrimary) {
                     //null
                     null,
                     //easyrtc.getLocalMediaIds()
-                    null
+                    localStreams.map(stream => stream.streamname)
                 )
             }
         }
@@ -570,8 +572,12 @@ function newStreamStarted(callerid, stream, streamname) {
 
     // Add second video, if present
     if (localStreams.length>1){
-        console.log("Adding secondary video...");
-        easyrtc.addStreamToCall(callerid, localStreams[1].streamname);
+        setTimeout(function(){
+            console.log("Adding secondary video to " + callerid + ", name: " + localStreams[1].streamname);
+            easyrtc.addStreamToCall(callerid, localStreams[1].streamname, function (caller, streamName) {
+                console.log("Added secondary stream to " + caller + " - " + streamName);
+            });
+        }, 1000);
     }
 
 }
@@ -591,11 +597,19 @@ function streamDisconnected(callerid, mediaStream, streamName){
     if (!isParticipant){
         if (typeof(currentLayoutId) !== 'undefined'){
             if (currentLayoutId === layouts.LARGEVIEW){
-                if (getVideoViewId(false, slot) === currentLargeViewId){
+                if (getVideoViewId(false, slot+1) === currentLargeViewId){
                     setCurrentUserLayout(layouts.GRID, false);
                 }
             }
         }
+    }else{
+        /*if (currentLargeViewId === getVideoViewId(callerid === local_peerid, slot+1)){
+            // Currently displayed in large view - set next large view
+            let new_large_view = getFirstRemoteUserVideoViewId();
+            if (new_large_view === undefined)
+                new_large_view = "remoteView1";
+            setLargeView(new_large_view, false);
+        }*/
     }
 
     // Stop chronos if it's the default stream that was stopped
@@ -610,6 +624,15 @@ function streamDisconnected(callerid, mediaStream, streamName){
             primaryView = undefined
             sendPrimaryView(0,"");
             setPrimaryViewIcon(0,"");
+        }
+    }else{
+        if (primaryView.streamName === streamName && callerid === primaryView.peerid){
+            // set next large view
+            /*let new_large_view = getFirstRemoteUserVideoViewId();
+            if (new_large_view === undefined)
+                new_large_view = "remoteView1";*/
+            setPrimaryView(0, "");
+            //setLargeView(new_large_view, false);
         }
     }
 
@@ -633,16 +656,12 @@ function streamDisconnected(callerid, mediaStream, streamName){
     for (let i=0; i<remoteStreams.length; i++){
         easyrtc.setVideoObjectSrc(getVideoWidget(false,i+1)[0], remoteStreams[i].stream);
         refreshRemoteStatusIcons(remoteStreams[i].peerid);
-        setTitle(false, i+1, remoteContacts[i].name)
-    }
-
-    if (isParticipant){
-        if (currentLargeViewId === getVideoViewId(callerid === local_peerid, slot+1)){
-            // Currently displayed in large view - set next large view
-            let new_large_view = getFirstRemoteUserVideoViewId();
-            if (new_large_view === undefined)
-                new_large_view = "remoteView1";
-            setLargeView(new_large_view, false);
+        let contact_index = getContactIndexForPeerId(remoteStreams[i].peerid);
+        if (contact_index !== undefined) {
+            let title = remoteContacts[contact_index].name;
+            if (remoteStreams[i].streamname === 'ScreenShare')
+                title = "Écran de " + title;
+            setTitle(false, i + 1, title);
         }
     }
 
@@ -943,12 +962,15 @@ async function shareScreen(local, start){
 
             // Then to add to existing connections
             for (let i=0; i<remoteStreams.length; i++){
+                console.log("Starting screen sharing with " + remoteStreams[i].peerid);
                 easyrtc.addStreamToCall(remoteStreams[i].peerid, 'ScreenShare', function (caller, streamName) {
                     console.log("Started screen sharing with " + caller + " - " + streamName);
                 });
             }
             easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], screenStream);
             localStreams.push({"peerid": local_peerid, "streamname": "ScreenShare", "stream":screenStream});
+            sendPrimaryView(local_peerid, "ScreenShare");
+            setPrimaryViewIcon(local_peerid, "ScreenShare");
 
         } catch(err) {
             showError("shareScreen", "Impossible de partager l'écran.<br/><br/>Le message d'erreur est le suivant: <br/>" + err, true, false);
