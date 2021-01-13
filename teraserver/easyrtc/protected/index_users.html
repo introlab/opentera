@@ -166,6 +166,12 @@
                         <input id="localVideoStatus1" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(true,1);event.stopPropagation();" style="display: none;"/>
                         <input id="localSpeakerStatus1" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(true,1);event.stopPropagation();" style="display: none;"/>
                     </div>
+
+                    <!-- Video sources controls -->
+                    <div id="localViewCameras1" class="overlay-bottom-left">
+                        <input id="localVideoSwap1" type="image" alt="image" src="images/videoswap.png" height=32 onclick="swapVideoSource(true, 1); event.stopPropagation();" style="display:none;"/>
+                    </div>
+
                     <!-- PTZ controls -->
                     <div id="localPtzControls1" class="overlay-left" oncontextmenu="" onclick="" onwheel="" style="display: none;">
                         <div id="localZoomButtons1" style="display: none;">
@@ -286,8 +292,9 @@
                         <input id="remoteSpeakerStatus1" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,1);event.stopPropagation();" style="display: none;"/>
                     </div>
 
+                    <!-- Video source controls -->
                     <div id="remoteViewCameras1" class="overlay-bottom-left">
-                        <!--<input id="remoteConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="" style="display: none;"/>-->
+                        <input id="remoteVideoSwap1" type="image" alt="image" src="images/videoswap.png" height=32 onclick="swapVideoSource(false, 1); event.stopPropagation();" style="display:none;"/>
                     </div>
 
                     <!-- PTZ controls -->
@@ -345,6 +352,12 @@
                         <input id="remoteVideoStatus2" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(false,2);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteSpeakerStatus2" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,2);event.stopPropagation();" style="display: none;"/>
                     </div>
+
+                    <!-- Video source controls -->
+                    <div id="remoteViewCameras2" class="overlay-bottom-left">
+                        <input id="remoteVideoSwap2" type="image" alt="image" src="images/videoswap.png" height=32 onclick="swapVideoSource(false, 2); event.stopPropagation();" style="display:none;"/>
+                    </div>
+
                     <!-- PTZ controls -->
                     <div id="remotePtzControls2" class="overlay-left" oncontextmenu="" onclick="" onwheel="" style="display: none;">
                         <div id="remoteZoomButtons2" style="display: none;">
@@ -392,6 +405,11 @@
                         <input id="remoteSpeakerStatus3" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,3);event.stopPropagation();" style="display: none;"/>
                     </div>
 
+                    <!-- Video source controls -->
+                    <div id="remoteViewCameras3" class="overlay-bottom-left">
+                        <input id="remoteVideoSwap3" type="image" alt="image" src="images/videoswap.png" height=32 onclick="swapVideoSource(false, 3); event.stopPropagation();" style="display:none;"/>
+                    </div>
+
                     <!-- PTZ controls -->
                     <div id="remotePtzControls3" class="overlay-left" oncontextmenu="" onclick="" onwheel="" style="display: none;">
                         <div id="remoteZoomButtons3" style="display: none;">
@@ -435,10 +453,15 @@
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteViewControls4" class="overlay-bottom-center" >
-                        <input id="remoteConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(false, 4);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteConfig4" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(false, 4);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteMicStatus4" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(false,4);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteVideoStatus4" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(false,4);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteSpeakerStatus4" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,4);event.stopPropagation();" style="display: none;"/>
+                    </div>
+
+                    <!-- Video sources controls -->
+                    <div id="remoteViewCameras4" class="overlay-bottom-left">
+                        <input id="remoteVideoSwap4" type="image" alt="image" src="images/videoswap.png" height=32 onclick="swapVideoSource(false, 4); event.stopPropagation();" style="display:none;"/>
                     </div>
 
                     <!-- PTZ controls -->

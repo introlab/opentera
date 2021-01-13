@@ -747,7 +747,8 @@ function sendStatus(target_peerid){
         "micro2":isStatusIconActive(true, 2, "Mic"),
         "speaker": isStatusIconActive(true, 1, "Speaker"),
         "video": isStatusIconActive(true, 1, "Video"),
-        "isUser": !isParticipant
+        "isUser": !isParticipant,
+        "videoSrcLength": videoSources.length
     };
 
     if (easyrtc.webSocketConnected){
@@ -957,6 +958,10 @@ function dataReception(sendercid, msgType, msgData, targeting) {
 
         updateLocalConfig(msgData);
     }
+
+    if (msgType === "nextVideoSource"){
+        swapVideoSource(true, 1);
+    }
 }
 
 function signalingLoginSuccess(peerid,  roomOwner) {
@@ -1153,6 +1158,17 @@ function sendUpdateConfig(peerid_target, config){
     console.log("Sending config to :", peerid_target);
     if (easyrtc.webSocketConnected){
         easyrtc.sendDataWS(peerid_target, 'updateConfig', config,function(ackMesg) {
+            if( ackMesg.msgType === 'error' ) {
+                console.error(ackMesg.msgData.errorText);
+            }
+        });
+    }
+}
+
+function sendNextVideoSource(peerid_target){
+    console.log("Sending next video source request to :", peerid_target);
+    if (easyrtc.webSocketConnected){
+        easyrtc.sendDataWS(peerid_target, 'nextVideoSource', null,function(ackMesg) {
             if( ackMesg.msgType === 'error' ) {
                 console.error(ackMesg.msgData.errorText);
             }

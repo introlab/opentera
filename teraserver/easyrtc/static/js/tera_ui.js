@@ -35,6 +35,7 @@ function showButtons(local, show, index){
     let srcControls = $("#" + view_prefix + "SourcesControls" + index);
     let statusControls = $("#" + view_prefix + "ViewControls" + index)
     let videoControls = $("#" + view_prefix + "VideoControls" + index);
+    let viewCameras = $("#" + view_prefix + "ViewCameras" + index);
 
     if (videoControls.length){
         // Must hide individual icons according to state
@@ -129,6 +130,30 @@ function showButtons(local, show, index){
         }
         if (configIcon.length){
             (show === true) ? configIcon.show() : configIcon.hide();
+        }
+    }
+
+    if (viewCameras.length){
+        let videoSwapIcon = $("#" + view_prefix + "VideoSwap" + index);
+        if (videoSwapIcon.length){
+            if (local === true){
+                if (videoSources.length>1)
+                    (show === true) ? videoSwapIcon.show() : videoSwapIcon.hide();
+                else
+                    videoSwapIcon.hide();
+            }else{
+                let contact_index = getContactIndexForPeerId(remoteStreams[index-1].peerid);
+                if (contact_index !== undefined){
+                    if (remoteContacts[contact_index].status &&
+                        remoteContacts[contact_index].status.videoSrcLength > 1){
+                        (show === true) ? videoSwapIcon.show() : videoSwapIcon.hide();
+                    }else{
+                        videoSwapIcon.hide();
+                    }
+                }else{
+                    videoSwapIcon.hide();
+                }
+            }
         }
     }
 
@@ -691,4 +716,16 @@ function showConfigDialog(peer_id, audios, videos, config){
     }
     $('#configDialogLongTitle')[0].innerHTML = "Paramètres - " + peer_name;
     $('#configDialog').modal('show');
+}
+
+function swapVideoSource(local, index){
+    if (local === true){
+        currentConfig['currentVideoSourceIndex'] += 1;
+        if (currentConfig['currentVideoSourceIndex'] >= videoSources.length)
+            currentConfig['currentVideoSourceIndex'] = 0;
+        updateLocalAudioVideoSource(1);
+    }else{
+        let target_peerid = remoteStreams[index-1].peerid;
+        sendNextVideoSource(target_peerid);
+    }
 }
