@@ -916,6 +916,47 @@ function dataReception(sendercid, msgType, msgData, targeting) {
             stopChrono(true, 1);
         }
     }
+
+    if (msgType === "queryConfig"){
+        // Send audio & video sources, and current config
+        // Check if querying peer is a user, otherwise ignore.
+        let src_index = getContactIndexForPeerId(sendercid);
+        if (src_index === undefined){
+            console.warn("Ignoring query - peer querying not in contact list!");
+            return;
+        }
+        if (!remoteContacts[src_index].status.isUser){
+            console.warn("Ignoring query - peer is not of 'user' type.");
+            return;
+        }
+        // Send reply
+        easyrtc.sendDataWS(sendercid, "currentConfig", {"audios": audioSources,
+                                                                        "videos": videoSources,
+                                                                        "config": currentConfig}, function(ackMesg) {
+            if( ackMesg.msgType === 'error' ) {
+                console.error(ackMesg.msgData.errorText);
+            }
+        });
+    }
+
+    if (msgType === "currentConfig"){
+        // Display config dialog with values
+        showConfigDialog(sendercid, msgData.audios, msgData.videos, msgData.config);
+    }
+
+    if (msgType === "updateConfig"){
+        let src_index = getContactIndexForPeerId(sendercid);
+        if (src_index === undefined){
+            console.warn("Ignoring query - peer querying not in contact list!");
+            return;
+        }
+        if (!remoteContacts[src_index].status.isUser){
+            console.warn("Ignoring query - peer is not of 'user' type.");
+            return;
+        }
+
+        updateLocalConfig(msgData);
+    }
 }
 
 function signalingLoginSuccess(peerid,  roomOwner) {
@@ -1093,5 +1134,28 @@ function sendChronoMessage(target_peerids, state, msg = undefined, duration=unde
                     }
                 });
         }
+    }
+}
+
+function sendQueryConfig(peerid_target){
+    console.log("Sending config query to :", peerid_target);
+    // Query for the remote configuration
+    if (easyrtc.webSocketConnected){
+        easyrtc.sendDataWS(peerid_target, 'queryConfig', null,function(ackMesg) {
+            if( ackMesg.msgType === 'error' ) {
+                console.error(ackMesg.msgData.errorText);
+            }
+        });
+    }
+}
+
+function sendUpdateConfig(peerid_target, config){
+    console.log("Sending config to :", peerid_target);
+    if (easyrtc.webSocketConnected){
+        easyrtc.sendDataWS(peerid_target, 'updateConfig', config,function(ackMesg) {
+            if( ackMesg.msgType === 'error' ) {
+                console.error(ackMesg.msgData.errorText);
+            }
+        });
     }
 }

@@ -368,7 +368,11 @@ function clearStatusMsg(){
     $('#statusAlert').hide();
 }
 
-function setConfigDialogValues(audios, videos, config){
+function setConfigDialogValues(peer_id, audios, videos, config){
+    // Peer id infos
+    let peerInfos = $('#configPeerId')[0];
+    peerInfos.value = peer_id;
+
     // Main video source selector
     let videoSelect = $('#videoSelect')[0];
     videoSelect.options.length = 0;
@@ -413,33 +417,52 @@ function setConfigDialogValues(audios, videos, config){
 }
 
 function configDialogClosed(){
-    // Compare values with current config and apply changes if needed
+    let peer_id = $('#configPeerId')[0].value;
     let videoSelect = $('#videoSelect')[0];
     let audioSelect = $('#audioSelect')[0];
     let videoSelect2 = $('#videoSelect2')[0];
     let audioSelect2 = $('#audioSelect2')[0];
     let mirrorCheck = $('#mirrorCheck')[0];
 
-    if (videoSelect.selectedIndex !== currentConfig['currentVideoSourceIndex'] ||
-        audioSelect.selectedIndex !== currentConfig['currentAudioSourceIndex']){
+    let new_config = {
+        'currentVideoSourceIndex': videoSelect.selectedIndex,
+        'currentAudioSourceIndex': audioSelect.selectedIndex,
+        'video1Mirror': mirrorCheck.checked,
+        'currentVideoSource2Index': videoSelect2.selectedIndex-1,
+        'currentAudioSource2Index': audioSelect2.selectedIndex-1
+    };
+
+    if (peer_id === local_peerid){
+        // Compare values with current config and apply changes if needed
+        updateLocalConfig(new_config);
+    }else{
+        // Send update config message to remote
+        sendUpdateConfig(peer_id, new_config);
+    }
+}
+
+function updateLocalConfig(new_config){
+
+    if (new_config['currentVideoSourceIndex'] !== currentConfig['currentVideoSourceIndex'] ||
+        new_config['currentAudioSourceIndex'] !== currentConfig['currentAudioSourceIndex']){
         // Video and/or audio source changed
-        currentConfig['currentVideoSourceIndex'] = videoSelect.selectedIndex;
-        currentConfig['currentAudioSourceIndex'] = audioSelect.selectedIndex;
+        currentConfig['currentVideoSourceIndex'] = new_config['currentVideoSourceIndex'];
+        currentConfig['currentAudioSourceIndex'] = new_config['currentAudioSourceIndex'];
         updateLocalAudioVideoSource(1);
     }
 
-    if (mirrorCheck.checked !== currentConfig['video1Mirror']){
+    if (new_config['video1Mirror'] !== currentConfig['video1Mirror']){
         // Mirror changed
-        currentConfig['video1Mirror'] = mirrorCheck.checked;
+        currentConfig['video1Mirror'] = new_config['video1Mirror'];
         setMirror(currentConfig['video1Mirror'], true, 1);
     }
 
-    if (videoSelect2.selectedIndex !== currentConfig['currentVideoSource2Index'] ||
-        audioSelect2.selectedIndex !== currentConfig['currentAudioSource2Index']
+    if (new_config['currentVideoSource2Index'] !== currentConfig['currentVideoSource2Index'] ||
+        new_config['currentAudioSource2Index'] !== currentConfig['currentAudioSource2Index']
     ){
         // Secondary audio/video source changed
-        currentConfig['currentVideoSource2Index'] = videoSelect2.selectedIndex-1;
-        currentConfig['currentAudioSource2Index'] = audioSelect2.selectedIndex-1;
+        currentConfig['currentVideoSource2Index'] = new_config['currentVideoSource2Index'];
+        currentConfig['currentAudioSource2Index'] = new_config['currentAudioSource2Index'];
     }
 }
 
@@ -649,4 +672,23 @@ function stopSounds(){
     document.getElementById("audioConnected").pause();
     document.getElementById("audioDisconnected").pause();
     document.getElementById("audioCalling").pause();
+}
+
+function btnConfigClicked(local, index){
+    if (local === true){
+        showConfigDialog(local_peerid, audioSources, videoSources, currentConfig);
+    }else{
+        let target_peerid = remoteStreams[index-1].peerid;
+        sendQueryConfig(target_peerid);
+    }
+}
+
+function showConfigDialog(peer_id, audios, videos, config){
+    setConfigDialogValues(peer_id, audios, videos, config);
+    let peer_name = localContact.name;
+    if (peer_id !== local_peerid){
+        peer_name = remoteContacts[getContactIndexForPeerId(peer_id)].name;
+    }
+    $('#configDialogLongTitle')[0].innerHTML = "Paramètres - " + peer_name;
+    $('#configDialog').modal('show');
 }

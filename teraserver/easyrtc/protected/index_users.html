@@ -60,6 +60,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                <input type="hidden" id="configPeerId" value="">
                 <p><label for="videoSelect">Source vidéo principale: </label></p><p><select id="videoSelect" ></select></p>
                 <p><label for="audioSelect">Source audio principale: </label></p><p><select id="audioSelect" ></select></p>
                 <p>Source vidéo secondaire:</p><p> <select id="videoSelect2" ></select></p>
@@ -160,7 +161,7 @@
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="localViewControls1" class="overlay-bottom-center">
-                        <input id="localConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="setConfigDialogValues(audioSources, videoSources, currentConfig);" data-toggle="modal" data-target="#configDialog" style="display: none;"/>
+                        <input id="localConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(true, 1);event.stopPropagation();" style="display: none;"/>
                         <input id="localMicStatus1" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(true,1);event.stopPropagation();" style="display: none;"/>
                         <input id="localVideoStatus1" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(true,1);event.stopPropagation();" style="display: none;"/>
                         <input id="localSpeakerStatus1" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(true,1);event.stopPropagation();" style="display: none;"/>
@@ -279,9 +280,14 @@
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteViewControls1" class="overlay-bottom-center" >
+                        <input id="remoteConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(false, 1);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteMicStatus1" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(false,1);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteVideoStatus1" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(false,1);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteSpeakerStatus1" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,1);event.stopPropagation();" style="display: none;"/>
+                    </div>
+
+                    <div id="remoteViewCameras1" class="overlay-bottom-left">
+                        <!--<input id="remoteConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="" style="display: none;"/>-->
                     </div>
 
                     <!-- PTZ controls -->
@@ -299,6 +305,13 @@
                         </div>
                         <div id="remoteSettingsButton1" style="display: none;">
                             <input type="image" alt="image" src="images/settings.png" height=22 onclick="camSettings(true, 1);event.stopPropagation();"/>
+                        </div>
+                    </div>
+
+                    <!-- Sources controls -->
+                    <div id="remoteSourcesControls1" class="overlay-bottom-right">
+                        <div style="padding-left:20px;padding-top:20px;background-color:rgba(0,0,0,0);">
+                            <!--<input id="remoteBtnShareScreen1" type="image" alt="image" src="images/sharescreen.png" height=32 onclick="event.stopPropagation();" style="display: none;"/>-->
                         </div>
                     </div>
 
@@ -327,6 +340,7 @@
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteViewControls2" class="overlay-bottom-center" >
+                        <input id="remoteConfig2" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(false, 2);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteMicStatus2" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(false,2);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteVideoStatus2" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(false,2);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteSpeakerStatus2" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,2);event.stopPropagation();" style="display: none;"/>
@@ -372,6 +386,7 @@
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteViewControls3" class="overlay-bottom-center" >
+                        <input id="remoteConfig3" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(false, 3);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteMicStatus3" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(false,3);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteVideoStatus3" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(false,3);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteSpeakerStatus3" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,3);event.stopPropagation();" style="display: none;"/>
@@ -420,6 +435,7 @@
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteViewControls4" class="overlay-bottom-center" >
+                        <input id="remoteConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(false, 4);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteMicStatus4" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(false,4);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteVideoStatus4" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(false,4);event.stopPropagation();" style="display: none;"/>
                         <input id="remoteSpeakerStatus4" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,4);event.stopPropagation();" style="display: none;"/>
