@@ -152,8 +152,10 @@ video {
 }
 
 .tool-icon{
-	padding: 10px;
-	text-align: center;
+	/*padding: 10px;
+	text-align: center;*/
+	vertical-align: middle;
+	height: 24px;
 }
 
 .chrono{
@@ -260,3 +262,10 @@ video {
 	-o-transform: scaleX(-1);
 	transform: scaleX(-1);
 }
+/* Show the dropdown menu on hover */
+.dropup {
+	position: relative;
+	display: inline-block;
+}
+
+.dropup:hover .dropdown-menu {display: block;}

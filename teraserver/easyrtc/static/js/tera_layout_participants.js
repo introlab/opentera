@@ -87,12 +87,9 @@ function updateUserLocalViewLayout(local_num, remote_num){
 
     switch(local_num){
         case 1:
-            setRowHeight(selfViewRow1, 100);
             selfViewRow2.hide();
             break;
         case 2:
-            setRowHeight(selfViewRow1, 50);
-            setRowHeight(selfViewRow2, 50);
             selfViewRow2.show();
             break;
         default:

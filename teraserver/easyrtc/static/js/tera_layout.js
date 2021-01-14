@@ -90,30 +90,18 @@ function updateUserLocalViewLayout(local_num, remote_num){
     let selfViewRow2 = $("#localView2Row");
     let toolsView = $("#toolsViewRow");
 
+    // Tool bar display
+    if (remote_num>0){
+        toolsView.show();
+    }else{
+        toolsView.hide();
+    }
+
     switch(local_num){
         case 1:
-            if (remote_num>0){
-                setRowHeight(selfViewRow1, 80);
-                setRowHeight(toolsView, 20);
-                toolsView.show();
-            }else{
-                setRowHeight(selfViewRow1, 100);
-                toolsView.hide();
-            }
             selfViewRow2.hide();
             break;
         case 2:
-            if (remote_num>0){
-                setRowHeight(selfViewRow1, 40);
-                setRowHeight(selfViewRow2, 40);
-                setRowHeight(toolsView,20);
-                toolsView.show();
-            }else{
-                setRowHeight(selfViewRow1,50);
-                setRowHeight(selfViewRow2,50);
-                toolsView.hide();
-            }
-
             selfViewRow2.show();
             break;
         default:

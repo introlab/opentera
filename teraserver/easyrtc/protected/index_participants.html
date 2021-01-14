@@ -100,8 +100,8 @@
 
 <div class="container-fluid h-100" id="mainContainer" style="display: none">
     <div class="row h-100" id="row1">
-        <div class="col-2 h-100" id="localViews">
-            <div class="row h-50" id="localView1Row">
+        <div class="d-flex flex-column col-2" id="localViews">
+            <div class="row flex-grow-1" id="localView1Row">
                 <!------------------------------ LOCAL VIEW #1 -------------------------------------------------------->
                 <div class="col-12 videoView" id="localView1"
                      onmousemove="resetInactiveTimer(true, 1);showButtons(true, true, 1);"
@@ -153,7 +153,7 @@
                            class="videoMirror"></video>
                 </div>
             </div>
-            <div class="row h-50" id="localView2Row">
+            <div class="row flex-grow-1" id="localView2Row">
                 <div class="col-12 videoView" id="localView2"
                      onmousemove="resetInactiveTimer(true, 2);showButtons(true, true, 2);"
                      onmouseleave="stopInactiveTimer(true, 2);showButtons(true, false, 2); return false;"
