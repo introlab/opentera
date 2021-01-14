@@ -409,12 +409,12 @@ function setConfigDialogValues(peer_id, audios, videos, config){
     // Secondary video source selector
     let videoSelect2 = $('#videoSelect2')[0];
     videoSelect2.options.length = 0;
-    videoSelect2.options[videoSelect2.options.length] = new Option("Aucune", "0");
+    videoSelect2.options[videoSelect2.options.length] = new Option(translator.translateForKey("configDialog.none", currentLang), "0");
 
     // Secondary audio source selector
     let audioSelect2 = $('#audioSelect2')[0];
     audioSelect2.options.length = 0;
-    audioSelect2.options[audioSelect2.options.length] = new Option("Aucune", "0");
+    audioSelect2.options[audioSelect2.options.length] = new Option(translator.translateForKey("configDialog.none", currentLang), "0");
 
     // Mirror toggle
     let mirrorCheck = $('#mirrorCheck')[0];
@@ -714,7 +714,7 @@ function showConfigDialog(peer_id, audios, videos, config){
     if (peer_id !== local_peerid){
         peer_name = remoteContacts[getContactIndexForPeerId(peer_id)].name;
     }
-    $('#configDialogLongTitle')[0].innerHTML = "Paramètres - " + peer_name;
+    $('#configDialogLongTitle')[0].innerHTML = translator.translateForKey("configDialog.title", currentLang) + " - " + peer_name;
     $('#configDialog').modal('show');
 }
 

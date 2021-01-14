@@ -1,0 +1,16 @@
+{
+	"header":{
+		"title-user": "OpenTeraPlus - User View",
+		"title-participant": "OpenTeraPlus - Participant View"
+	},
+	"configDialog":{
+		"title": "Parameters",
+		"close": "Apply",
+		"video1": "Main Video Source",
+		"audio1": "Main Audio Source",
+		"video2": "Extra Video Source",
+		"audio2": "Extra Audio Source",
+		"mirror": "Mirror Image",
+		"none": "None"
+	}
+}

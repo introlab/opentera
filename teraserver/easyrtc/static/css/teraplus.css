@@ -269,3 +269,7 @@ video {
 }
 
 .dropup:hover .dropdown-menu {display: block;}
+
+input[type=checkbox] {
+	transform: scale(1.5);
+}

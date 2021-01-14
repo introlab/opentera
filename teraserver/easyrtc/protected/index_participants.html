@@ -2,7 +2,7 @@
 <html lang="fr">
 <meta charset="UTF-8">
 <head>
-    <title>OpenTeraPlus - Vue participant</title>
+    <title data-i18n="header.title-participant">OpenTeraPlus - Vue participant</title>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" type="text/css" href="css/teraplus.css" />
@@ -10,7 +10,7 @@
 
     <!-- Javascripts -->
     <script src="js/jquery/jquery-3.5.1.min.js"></script>
-    <script src="js/bootstrap/bootstrap.min.js"></script>
+    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="js/socket.io.js"></script>
     <script src="easyrtc/easyrtc.js"></script>
 
@@ -24,6 +24,8 @@
     <script src="js/tera_medias.js"></script>
     <script src="js/tera_tools.js"></script>
 
+    <script src="js/simpletranslator/translator.min.js"></script>
+
     <script>
         function getTeraPlusPort() {
             return "<%= teraplus_port %>"
@@ -31,6 +33,7 @@
 		
 		window.onload = function() {
             console.log('Page loaded. Ready to start!');
+            initTranslator();
             initialUserLayout();
             initUI();
             initSystem();
@@ -52,25 +55,41 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="configDialogLongTitle">Paramètres</h5>
+                <h5 class="modal-title" id="configDialogLongTitle" data-i18n="configDialog.title">Paramètres</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
                     <span aria-hidden="true" style="color: white;">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p><label for="videoSelect">Source vidéo principale: </label></p><p><select id="videoSelect" ></select></p>
-                <p><label for="audioSelect">Source audio principale: </label></p><p><select id="audioSelect" ></select></p>
-                <p>Source vidéo secondaire:</p><p> <select id="videoSelect2" ></select></p>
-                <p>Source audio secondaire:</p><p> <select id="audioSelect2" ></select></p>
-                <p><input type="checkbox" id="mirrorCheck" name="mirrorCheck" value="Mirror">
-                <label for="mirrorCheck"> Image Miroir</label><br></p>
+                <input type="hidden" id="configPeerId" value="">
+                <div class="form-group">
+                    <label for="videoSelect" class="form-label" data-i18n="configDialog.video1">Source vidéo principale: </label>
+                    <select id="videoSelect" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <label for="audioSelect" class="form-label" data-i18n="configDialog.audio1">Source audio principale: </label>
+                    <select id="audioSelect" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <label for="videoSelect2" class="form-label" data-i18n="configDialog.video2">Source vidéo secondaire:</label>
+                    <select id="videoSelect2" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <label for="audioSelect2" class="form-label" data-i18n="configDialog.audio2">Source audio secondaire:</label>
+                    <select id="audioSelect2" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="mirrorCheck" name="mirrorCheck" value="Mirror" class="">
+                    <label for="mirrorCheck" class="form-label ml-2" data-i18n="configDialog.mirror">Image Miroir</label>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Appliquer</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" data-i18n="configDialog.close">Appliquer</button>
             </div>
         </div>
     </div>
 </div>
+
 <!-- ErrorDialog -->
 <div class="modal fade" id="errorDialog" tabindex="-1" role="dialog" aria-labelledby="errorDialogCenterTitle"
      aria-hidden="true">
@@ -116,7 +135,7 @@
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="localViewControls1" class="overlay-bottom-center">
-                        <input id="localConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="setConfigDialogValues(audioSources, videoSources, currentConfig);" data-toggle="modal" data-target="#configDialog" style="display: none;"/>
+                        <input id="localConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(true, 1);event.stopPropagation();" data-toggle="modal" data-target="#configDialog" style="display: none;"/>
                         <input id="localMicStatus1" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(true,1);event.stopPropagation();" style="display: none;"/>
                         <input id="localVideoStatus1" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(true,1);event.stopPropagation();" style="display: none;"/>
                         <input id="localSpeakerStatus1" type="image" alt="image" src="images/speaker.png" height=32 style="display: none;"/>
