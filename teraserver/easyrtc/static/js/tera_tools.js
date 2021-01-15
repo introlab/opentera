@@ -6,7 +6,7 @@ function startChronosFromDialog(){
     // Build list of participants to send
     let target_ids = [];
     let partSelect = Number($('#chronosPartSelect').children("option:selected").val());
-    let msgSelect = $('#chronosTitleSelect').children("option:selected").val();
+    let msgSelect = $('#chronosTitleSelect').children("option:selected")[0].text;
     let durationSelect = Number($('#chronosDurationSelect').children("option:selected").val());
 
     if (partSelect === 0){
@@ -54,7 +54,8 @@ function updateChronoDisplay(local, index, duration, title=undefined){
     let count_str = new Date(duration * 1000).toISOString().substr(14, 5)
 
     if (duration === 0){
-        count_str = "<font color='yellow'>Terminé!</font>";
+        count_str = "<font color='yellow'>" + translator.translateForKey("chronosDialog.completed", currentLang) +
+            "</font>";
     }
 
     if (title !== undefined){

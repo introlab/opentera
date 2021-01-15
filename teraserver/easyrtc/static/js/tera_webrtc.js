@@ -480,7 +480,7 @@ function newStreamStarted(callerid, stream, streamname) {
     // Find first empty slot
     if (slot === undefined){
         if (remoteStreams.length+1 > 4) {
-            showError("newStreamStarted", "New stream received, but not slot available!", true);
+            showError("newStreamStarted", translator.translateForKey("errors.stream-no-slot", currentLang), true);
             return;
         }
         remoteStreams.push({'peerid': callerid, 'streamname': streamname, 'stream': stream})
@@ -671,7 +671,7 @@ function streamDisconnected(callerid, mediaStream, streamName){
 
 function disconnectedFromSignalingServer(){
     showError("disconnectedFromSignalingServer", "Disconnected from signaling server... Trying to reconnect.", false);
-    showStatusMsg("Connexion perdue... Reconnexion en cours...");
+    showStatusMsg(translator.translateForKey("status.lost-connection", currentLang));
     localStreams = [];
     remoteStreams = [];
     remoteContacts = [];
@@ -990,7 +990,7 @@ function signalingLoginSuccess(peerid,  roomOwner) {
 
 function signalingLoginFailure(errorCode, message) {
 
-    showError("signalingLoginFailure", "Can't connect to signaling server! Code: " + errorCode +" - " + message);
+    showError("signalingLoginFailure", "Can't connect to signaling server! Code: " + errorCode +" - " + message, false);
     //easyrtc.showError(errorCode, message);
 
     clearStatusMsg();
@@ -1019,7 +1019,9 @@ async function shareScreen(local, start){
             setPrimaryViewIcon(local_peerid, "ScreenShare");
 
         } catch(err) {
-            showError("shareScreen", "Impossible de partager l'écran.<br/><br/>Le message d'erreur est le suivant: <br/>" + err, true, false);
+            showError("shareScreen", translator.translateForKey("errors.no-sharescreen-access", currentLang)
+                + "<br/><br/>" + translator.translateForKey("errors.error-msg", currentLang) +
+                ": <br/>" + err, true, false);
             return Promise.Reject(err)
         }
 
@@ -1046,7 +1048,7 @@ async function shareScreen(local, start){
 function share2ndStream(local, start){
 
     if (connected !== true) {
-        showError("share2ndStream", "Impossible de démarrer une deuxième source: non-connecté", true, false);
+        showError("share2ndStream", translator.translateForKey("errors.extrasource-not-connected", currentLang), true, false);
         return;
     }
     let streamname = "2ndStream";

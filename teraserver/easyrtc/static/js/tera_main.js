@@ -59,7 +59,7 @@ function initSystem(){
 
     // Initialize video and audio sources
     fillDefaultSourceList().then(initSystemDone).catch(err => {
-        showStatusMsg("Impossible de continuer. Veuillez réessayer.")
+        showStatusMsg(translator.translateForKey("status.cant-continue", currentLang))
     })
 }
 

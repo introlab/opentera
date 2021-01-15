@@ -96,7 +96,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header modal-header-error">
-                <h5 class="modal-title" id="errorDialogLongTitle">Erreur</h5>
+                <h5 class="modal-title" id="errorDialogLongTitle" data-i18n="errorDialog.title">Erreur</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
                     <span aria-hidden="true" style="color: white;">&times;</span>
                 </button>
@@ -105,18 +105,19 @@
                 <label id="errorDialogText">Description de l'erreur.</label><br></p>
             </div>
             <div class="modal-footer modal-footer-error">
-                <button type="button" id="errorRefresh" class="btn btn-success" data-dismiss="modal" onclick="location.reload();">Réessayer</button>
-                <button type="button" id="errorIgnore" class="btn btn-danger" data-dismiss="modal">Ignorer</button>
+                <button type="button" id="errorRefresh" class="btn btn-success" data-dismiss="modal" onclick="location.reload();" data-i18n="errorDialog.retry">Réessayer</button>
+                <button type="button" id="errorIgnore" class="btn btn-danger" data-dismiss="modal" data-i18n="errorDialog.title">Ignorer</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Status alert -->
-<div id="statusAlert" class="alert alert-primary text-center" role="alert">
-    <label id="statusLabel" class="font-weight-bold">Initialisation en cours...</label>
+<div id="statusAlert" class="fixed-top alert alert-primary text-center" role="alert">
+    <label id="statusLabel" class="font-weight-bold" data-i18n="status.initializing">Initialisation en cours...</label>
 </div>
 
+<!-- Main container -->
 <div class="container-fluid h-100" id="mainContainer" style="display: none">
     <div class="row h-100" id="row1">
         <div class="d-flex flex-column col-2" id="localViews">

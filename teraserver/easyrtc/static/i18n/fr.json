@@ -1,9 +1,9 @@
 {
-	"header":{
+	"header": {
 		"title-user": "OpenTeraPlus - Vue utilisateur",
 		"title-participant": "OpenTeraPlus - Vue participant"
 	},
-	"configDialog":{
+	"configDialog": {
 		"title": "Paramètres",
 		"close": "Appliquer",
 		"video1": "Source Vidéo Principale",
@@ -12,5 +12,47 @@
 		"audio2": "Source Audio Secondaire",
 		"mirror": "Image Miroir",
 		"none": "Aucune"
+	},
+	"chronosDialog": {
+		"title": "Chronomètres",
+		"participants": "Participant(s)",
+		"chrono-label": "Libellé",
+		"label-exercices": "Exercices",
+		"label-rest": "Repos",
+		"duration": "Durée",
+		"start": "Démarrer",
+		"cancel": "Annuler",
+		"completed": "Terminé!"
+	},
+	"measureDialog": {
+		"title": "Mesures",
+		"close": "Fermer"
+	},
+	"errorDialog": {
+		"title": "Erreur",
+		"retry": "Réessayer",
+		"ignore": "Ignorer"
+	},
+	"errors": {
+		"no-media-access": "Impossible d'accéder à la caméra ou au micro",
+		"no-sharescreen-access": "Impossible de partager l'écran",
+		"error-msg": "Le message d'erreur est",
+		"screenshare-no-slot": "Impossible de partager l'écran: trop de sources dans la séance",
+		"extrasource-no-slot": "Impossible d'ajouter une deuxième source vidéo: trop de sources dans la séance",
+		"extrasource-not-connected": "Impossible d'ajouter une deuxième source: non-connecté",
+		"stream-no-slot": "La séance est pleine - impossible d'ajouter une autre source"
+	},
+	"status": {
+		"initializing": "Initialisation en cours...",
+		"cant-continue": "Impossible de continuer. Veuillez réessayer.",
+		"lost-connection": "Connexion perdue... Reconnexion en cours..."
+	},
+	"ui": {
+		"controls": "Contrôles",
+		"mute-all": "Micro - Tous",
+		"speaker-all": "Son - Tous",
+		"tools": "Outils",
+		"chronos": "Chronos",
+		"measures": "Mesures"
 	}
 }

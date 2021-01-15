@@ -315,7 +315,7 @@ function btnShareScreenClicked(){
     }
 
     if (remoteStreams.length >= 4){
-        showError("btnShareScreenClicked", "Impossible de partager l'écran: trop de sources dans la séance", true, false);
+        showError("btnShareScreenClicked", translator.translateForKey("errors.screenshare-no-slot", currentLang), true, false);
         return;
     }
 
@@ -359,7 +359,7 @@ function btnShow2ndLocalVideoClicked(){
     }
 
     if (remoteStreams.length >= 4){
-        showError("btnShow2ndLocalVideoClicked", "Impossible d'ajouter une deuxième source vidéo: trop de sources dans la séance.'", true, false);
+        showError("btnShow2ndLocalVideoClicked", translator.translateForKey("errors.extrasource-no-slot", currentLang), true, false);
         return;
     }
 

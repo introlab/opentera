@@ -92,29 +92,29 @@
     </div>
 </div>
 
-<!-- ChronoDialog -->
+<!-- ChronosDialog -->
 <div class="modal fade" id="chronosDialog" tabindex="-1" role="dialog" aria-labelledby="chronosDialogCenterTitle"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="chronosDialogLongTitle">Chronomètres</h5>
+                <h5 class="modal-title" id="chronosDialogLongTitle" data-i18n="chronosDialog.title">Chronomètres</h5>
 
             </div>
             <div class="modal-body">
                 <div class="form-group row pr-2">
-                    <label for="chronosPartSelect" class="col-form-label col-4">Participant(s): </label>
+                    <label for="chronosPartSelect" class="col-form-label col-4" data-i18n="chronosDialog.participants">Participant(s): </label>
                     <select id="chronosPartSelect" class="col"></select>
                 </div>
                 <div class="form-group row pr-2">
-                    <label for="chronosTitleSelect" class="col-form-label col-4">Type: </label>
+                    <label for="chronosTitleSelect" class="col-form-label col-4" data-i18n="chronosDialog.chrono-label">Type: </label>
                     <select id="chronosTitleSelect" class="col">
-                        <option value="Exercices">Exercices</option>
-                        <option value="Repos">Repos</option>
+                        <option value="Exercices" data-i18n="chronosDialog.label-exercices">Exercices</option>
+                        <option value="Repos" data-i18n="chronosDialog.label-rest">Repos</option>
                     </select>
                 </div>
                 <div class="form-group row pr-2">
-                    <label for="chronosDurationSelect" class="col-form-label col-4">Durée: </label>
+                    <label for="chronosDurationSelect" class="col-form-label col-4" data-i18n="chronosDialog.duration">Durée: </label>
                     <select id="chronosDurationSelect" class="col">
                         <option value="15">00:15</option>
                         <option value="30">00:30</option>
@@ -128,9 +128,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="chronosStart" class="btn btn-success" data-dismiss="modal"
-                        onclick="startChronosFromDialog();">
+                        onclick="startChronosFromDialog();" data-i18n="chronosDialog.start">
                     Activer</button>
-                <button type="button" id="chronosCancel" class="btn btn-primary" data-dismiss="modal">Annuler</button>
+                <button type="button" id="chronosCancel" class="btn btn-primary" data-dismiss="modal" data-i18n="chronosDialog.cancel">Annuler</button>
             </div>
         </div>
     </div>
@@ -142,13 +142,13 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="measureDialogLongTitle">Mesures</h5>
+                <h5 class="modal-title" id="measureDialogLongTitle" data-i18n="measureDialog.title">Mesures</h5>
 
             </div>
             <div class="modal-body">
             </div>
             <div class="modal-footer">
-                <button type="button" id="measureClose" class="btn btn-primary" data-dismiss="modal">Fermer</button>
+                <button type="button" id="measureClose" class="btn btn-primary" data-dismiss="modal" data-i18n="measureDialog.close">Fermer</button>
             </div>
         </div>
     </div>
@@ -160,7 +160,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header modal-header-error">
-                <h5 class="modal-title" id="errorDialogLongTitle">Erreur</h5>
+                <h5 class="modal-title" id="errorDialogLongTitle" data-i18n="errorDialog.title">Erreur</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
                     <span aria-hidden="true" style="color: white;">&times;</span>
                 </button>
@@ -169,8 +169,8 @@
                 <label id="errorDialogText">Description de l'erreur.</label><br></p>
             </div>
             <div class="modal-footer modal-footer-error">
-                <button type="button" id="errorRefresh" class="btn btn-success" data-dismiss="modal" onclick="location.reload();">Réessayer</button>
-                <button type="button" id="errorIgnore" class="btn btn-danger" data-dismiss="modal">Ignorer</button>
+                <button type="button" id="errorRefresh" class="btn btn-success" data-dismiss="modal" onclick="location.reload();" data-i18n="errorDialog.retry">Réessayer</button>
+                <button type="button" id="errorIgnore" class="btn btn-danger" data-dismiss="modal" data-i18n="errorDialog.title">Ignorer</button>
             </div>
         </div>
     </div>
@@ -178,8 +178,10 @@
 
 <!-- Status alert -->
 <div id="statusAlert" class="fixed-top alert alert-primary text-center" role="alert">
-    <label id="statusLabel" class="font-weight-bold">Initialisation en cours...</label>
+    <label id="statusLabel" class="font-weight-bold" data-i18n="status.initializing">Initialisation en cours...</label>
 </div>
+
+<!-- Main container -->
 <div class="container-fluid h-100" id="mainContainer" style="display: none">
     <div class="row h-100" id="row1">
         <div class="d-flex flex-column col-3" id="localViews">
@@ -275,35 +277,36 @@
 
                 </div>
             </div>
+            <!-- Tools and controls -->
             <div class="row mt-1" id="toolsViewRow" style="min-height:45px; background: #2f2f40;">
                 <div class="btn-toolbar ml-auto mr-auto">
                     <div class="dropup mr-2">
-                        <button class="btn btn-warning dropdown-toggle" type="button" id="controlsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-warning dropdown-toggle" type="button" id="controlsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.controls">
                             Contrôles
                         </button>
                         <div class="dropdown-menu bg-warning" aria-labelledby="controlsDropdown">
                             <div class="dropdown-item" onclick="muteMicroAll();">
                                 <input class="tool-icon" id="btnMicAll" type="image" alt="image" src="images/mic.png" />
-                                <label>Tous</label>
+                                <label data-i18n="ui.mute-all">Micro - Tous</label>
                             </div>
                             <div class="dropdown-item" onclick="muteSpeakerAll();">
                                 <input class="tool-icon" id="btnSpeakerAll" type="image" alt="image" src="images/speaker.png"/>
-                                <label>Tous</label>
+                                <label data-i18n="ui.speaker-all">Son - Tous</label>
                             </div>
                         </div>
                     </div>
                     <div class="dropup">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="toolsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="toolsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.tools">
                             Outils
                         </button>
                         <div class="dropdown-menu bg-primary" aria-labelledby="toolsDropdown">
                             <div class="dropdown-item" onclick="showChronosDialog();">
                                 <input class="tool-icon" id="btnChronos" type="image" alt="image" src="images/timer.png"/>
-                                <label>Chronos</label>
+                                <label data-i18n="ui.chronos">Chronos</label>
                             </div>
                             <div class="dropdown-item" onclick="">
                                 <input class="tool-icon" id="btnAngles" type="image" alt="image" src="images/angles.png"/>
-                                <label>Mesures</label>
+                                <label data-i18n="ui.measures">Mesures</label>
                             </div>
                         </div>
                     </div>
