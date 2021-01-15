@@ -26,7 +26,9 @@
 	},
 	"measureDialog": {
 		"title": "Mesures",
-		"close": "Fermer"
+		"close": "Fermer",
+		"participant": "Participant",
+		"angle": "Mesurer Angle"
 	},
 	"errorDialog": {
 		"title": "Erreur",

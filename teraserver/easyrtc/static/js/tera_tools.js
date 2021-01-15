@@ -1,3 +1,6 @@
+///////////////////////////////////////////
+// CHRONOS TOOLS
+///////////////////////////////////////////
 let localChronoTimerHandle = 0;
 let chronoValues = [0, 0, 0, 0];
 let localChronoValue = 0;
@@ -112,3 +115,40 @@ function stopChrono(local, index, no_msg=false){
 
     showTextDisplay(local,index,false);
 }
+
+///////////////////////////////////////////
+// MEASUREMENTS TOOLS
+///////////////////////////////////////////
+let measuring = false;
+function onMeasureParticipantChanged(){
+    let partSelect = Number($('#measurePartSelect').children("option:selected").val());
+
+    // Show selected video
+    easyrtc.setVideoObjectSrc($('#measureVideo')[0], remoteStreams[partSelect-1].stream);
+}
+
+function onAngleMeasurementToggle(){
+    if (measuring)
+        stopAngleMeasurement();
+    else
+        startAngleMeasurement();
+}
+
+function startAngleMeasurement(){
+    $('#measureVideo')[0].pause();
+    measuring = true;
+    $("#measurePartSelect").attr('disabled',true);
+
+}
+
+function stopAngleMeasurement(){
+    $('#measureVideo')[0].play();
+    measuring = false;
+    $("#measurePartSelect").attr('disabled',false);
+}
+
+// On close event
+$(document).on('hide.bs.modal', '#measureDialog',function (e) {
+    easyrtc.setVideoObjectSrc($('#measureVideo')[0], null);
+    measuring = false;
+})

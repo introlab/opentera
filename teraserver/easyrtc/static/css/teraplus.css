@@ -273,3 +273,12 @@ video {
 input[type=checkbox] {
 	transform: scale(1.5);
 }
+
+.large-modal-dialog{
+	min-width: 50%;
+}
+
+.preview-video{
+	position: relative;
+	width: 60%;
+}

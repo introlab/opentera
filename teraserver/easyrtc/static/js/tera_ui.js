@@ -142,16 +142,18 @@ function showButtons(local, show, index){
                 else
                     videoSwapIcon.hide();
             }else{
-                let contact_index = getContactIndexForPeerId(remoteStreams[index-1].peerid);
-                if (contact_index !== undefined){
-                    if (remoteContacts[contact_index].status &&
-                        remoteContacts[contact_index].status.videoSrcLength > 1){
-                        (show === true) ? videoSwapIcon.show() : videoSwapIcon.hide();
+                if (index <= remoteStreams.length){
+                    let contact_index = getContactIndexForPeerId(remoteStreams[index-1].peerid);
+                    if (contact_index !== undefined){
+                        if (remoteContacts[contact_index].status &&
+                            remoteContacts[contact_index].status.videoSrcLength > 1){
+                            (show === true) ? videoSwapIcon.show() : videoSwapIcon.hide();
+                        }else{
+                            videoSwapIcon.hide();
+                        }
                     }else{
                         videoSwapIcon.hide();
                     }
-                }else{
-                    videoSwapIcon.hide();
                 }
             }
         }
@@ -615,6 +617,23 @@ function showChronosDialog(){
 
     $('#chronosDialog').modal('show');
 
+}
+
+function showMeasuresDialog(){
+    // Fill participants list
+    let partSelect = $('#measurePartSelect')[0];
+    partSelect.options.length = 0;
+
+    for (let i=0; i<remoteContacts.length; i++){
+        let index = getStreamIndexForPeerId(remoteContacts[i].peerid, 'default');
+        if (index !== undefined){
+            partSelect.options[partSelect.options.length] = new Option(getTitle(false, index+1), index+1);
+        }
+    }
+
+    onMeasureParticipantChanged(); // Display currently selected video
+
+    $('#measureDialog').modal('show');
 }
 
 function showTextDisplay(local, index, show){

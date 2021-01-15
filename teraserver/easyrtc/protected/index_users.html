@@ -139,13 +139,24 @@
 <!-- Measurement dialog -->
 <div class="modal fade" id="measureDialog" tabindex="-1" role="dialog" aria-labelledby="measureDialogCenterTitle"
      aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog large-modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="measureDialogLongTitle" data-i18n="measureDialog.title">Mesures</h5>
 
             </div>
             <div class="modal-body">
+                <div class="form-group row pr-2">
+                    <label for="measurePartSelect" class="col-form-label col-2" data-i18n="measureDialog.participant">Participant: </label>
+                    <select id="measurePartSelect" class="col" onchange="onMeasureParticipantChanged();"></select>
+                </div>
+                <div style="text-align: center;">
+                    <video id="measureVideo" muted="muted" class="preview-video"></video>
+                </div>
+                <div style="text-align: center;">
+                    <button type="button" id="btnMeasureAngles" class="btn btn-success" data-toggle="button" aria-pressed="false"
+                            data-i18n="measureDialog.angle" onclick="onAngleMeasurementToggle();">Angle</button>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" id="measureClose" class="btn btn-primary" data-dismiss="modal" data-i18n="measureDialog.close">Fermer</button>
@@ -304,7 +315,7 @@
                                 <input class="tool-icon" id="btnChronos" type="image" alt="image" src="images/timer.png"/>
                                 <label data-i18n="ui.chronos">Chronos</label>
                             </div>
-                            <div class="dropdown-item" onclick="">
+                            <div class="dropdown-item" onclick="showMeasuresDialog();">
                                 <input class="tool-icon" id="btnAngles" type="image" alt="image" src="images/angles.png"/>
                                 <label data-i18n="ui.measures">Mesures</label>
                             </div>
