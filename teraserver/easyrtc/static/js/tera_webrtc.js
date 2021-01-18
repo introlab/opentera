@@ -225,8 +225,12 @@ function setPrimaryView(peer_id, streamname){
         if (primaryView.peerid !== 0){
             if (peer_id !== local_peerid)
                 index = getStreamIndexForPeerId(primaryView.peerid, primaryView.streamName);
-            else
-                index = getLocalStreamIndex(primaryView.streamName);
+            else{
+                // Local view is primary view - don't do anything!
+                //index = getLocalStreamIndex(primaryView.streamName);
+                setPrimaryViewIcon(primaryView.peerid, primaryView.streamName);
+                return;
+            }
         }
 
         if (index !== undefined){
@@ -603,13 +607,13 @@ function streamDisconnected(callerid, mediaStream, streamName){
             }
         }
     }else{
-        /*if (currentLargeViewId === getVideoViewId(callerid === local_peerid, slot+1)){
+        if (currentLargeViewId === getVideoViewId(callerid === local_peerid, slot+1)){
             // Currently displayed in large view - set next large view
             let new_large_view = getFirstRemoteUserVideoViewId();
             if (new_large_view === undefined)
                 new_large_view = "remoteView1";
-            setLargeView(new_large_view, false);
-        }*/
+            setLargeView(new_large_view,false);
+        }
     }
 
     // Stop chronos if it's the default stream that was stopped
@@ -903,6 +907,7 @@ function dataReception(sendercid, msgType, msgData, targeting) {
 
             // Update large view if required
             if (isParticipant && primaryView.peerid === 0 && msgData.isUser){
+                //setPrimaryView(msgData.peerid, "default");
                 setLargeView(getVideoViewId(false, index+1));
             }
         }
