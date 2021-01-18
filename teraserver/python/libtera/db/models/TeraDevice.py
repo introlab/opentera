@@ -105,7 +105,7 @@ class TeraDevice(db.Model, BaseModel):
         }
 
         self.device_token = jwt.encode(payload, TeraServerSettings.get_server_setting_value(
-            TeraServerSettings.ServerDeviceTokenKey), algorithm='HS256').decode('utf-8')
+            TeraServerSettings.ServerDeviceTokenKey), algorithm='HS256')
 
         return self.device_token
 
