@@ -150,12 +150,18 @@
                     <label for="measurePartSelect" class="col-form-label col-2" data-i18n="measureDialog.participant">Participant: </label>
                     <select id="measurePartSelect" class="col" onchange="onMeasureParticipantChanged();"></select>
                 </div>
+                <div class="form-group text-center" id="measureAnglesTools" style="display:none;">
+                    <button type="button" id="btnResetAngles" class="btn btn-info" data-i18n="measureDialog.reset" onclick="clearAngleMeasurement();">Reset</button>
+                    <label id="lblMeasureAngles" class="measure-text ml-5" data-i18n="measureDialog.angle">Angle:</label>
+                    <span class="badge badge-primary measure-text" id="lblMeasureAnglesValue" data-i18n="measureDialog.n-a">N/D</span>
+                </div>
                 <div style="text-align: center;">
-                    <video id="measureVideo" muted="muted" class="preview-video"></video>
+                    <canvas class="video-canvas" id="measureVideoCanvas" style="display:none;"></canvas>
+                    <video id="measureVideo" muted="muted" class="preview-video" onpause="resizeCanvasOverElement('measureVideoCanvas', this);"></video>
                 </div>
                 <div style="text-align: center;">
                     <button type="button" id="btnMeasureAngles" class="btn btn-success" data-toggle="button" aria-pressed="false"
-                            data-i18n="measureDialog.angle" onclick="onAngleMeasurementToggle();">Angle</button>
+                            data-i18n="measureDialog.measure-angle" onclick="onAngleMeasurementToggle();">Angle</button>
                 </div>
             </div>
             <div class="modal-footer">
@@ -289,13 +295,14 @@
                 </div>
             </div>
             <!-- Tools and controls -->
+
             <div class="row mt-1" id="toolsViewRow" style="min-height:45px; background: #2f2f40;">
                 <div class="btn-toolbar ml-auto mr-auto">
                     <div class="dropup mr-2">
                         <button class="btn btn-warning dropdown-toggle" type="button" id="controlsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.controls">
                             Contrôles
                         </button>
-                        <div class="dropdown-menu bg-warning" aria-labelledby="controlsDropdown">
+                        <div class="dropdown-menu bg-warning" aria-labelledby="controlsDropdown" style="transform: translate3d(0px, 2px, 0px);">
                             <div class="dropdown-item" onclick="muteMicroAll();">
                                 <input class="tool-icon" id="btnMicAll" type="image" alt="image" src="images/mic.png" />
                                 <label data-i18n="ui.mute-all">Micro - Tous</label>
@@ -310,7 +317,7 @@
                         <button class="btn btn-primary dropdown-toggle" type="button" id="toolsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.tools">
                             Outils
                         </button>
-                        <div class="dropdown-menu bg-primary" aria-labelledby="toolsDropdown">
+                        <div class="dropdown-menu bg-primary" aria-labelledby="toolsDropdown" style="transform: translate3d(0px, 2px, 0px);">
                             <div class="dropdown-item" onclick="showChronosDialog();">
                                 <input class="tool-icon" id="btnChronos" type="image" alt="image" src="images/timer.png"/>
                                 <label data-i18n="ui.chronos">Chronos</label>

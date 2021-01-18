@@ -748,3 +748,31 @@ function swapVideoSource(local, index){
         sendNextVideoSource(target_peerid);
     }
 }
+
+function resizeCanvasOverElement(canvas, element)
+{
+    let w = element.offsetWidth;
+    let h = element.offsetHeight;
+    let cv = document.getElementById(canvas);
+    cv.width = w;
+    cv.height =h;
+}
+
+/*
+$(document).on('mouseenter', '.dropup', function() {
+    console.log("MouseEnter");
+    let dropdownMenu = $(this).children(".dropdown-menu");
+    if(!dropdownMenu.is(":visible")){
+        dropdownMenu.parent().toggleClass("show");
+        dropdownMenu.toggleClass("show");
+    }
+});
+
+$(document).on('mouseleave', '.dropup', function() {
+    console.log("MouseLeave");
+    let dropdownMenu = $(this).children(".dropdown-menu");
+    if(dropdownMenu.is(":visible")){
+        dropdownMenu.parent().toggleClass("show");
+        dropdownMenu.toggleClass("show");
+    }
+});*/

@@ -266,9 +266,10 @@ video {
 .dropup {
 	position: relative;
 	display: inline-block;
+	margin-bottom: 0px;
 }
 
-.dropup:hover .dropdown-menu {display: block;}
+.dropup:hover .dropdown-menu {display: inline-block;}
 
 input[type=checkbox] {
 	transform: scale(1.5);
@@ -281,4 +282,15 @@ input[type=checkbox] {
 .preview-video{
 	position: relative;
 	width: 60%;
+}
+
+.video-canvas{
+	position: absolute;
+	z-index: 10;
+	/*background-color:rgba(255,0,0,0.5);*/
+	background-color:rgba(100,100,100,0.25);
+}
+
+.badge.measure-text, .measure-text{
+	font-size: 1.3rem;
 }

@@ -28,7 +28,10 @@
 		"title": "Measurements",
 		"close": "Close",
 		"participant": "Participant",
-		"angle": "Measure Angle"
+		"measure-angle": "Measure Angle",
+		"reset": "Reset",
+		"angle": "Angle",
+		"n-a": "N/A"
 	},
 	"errorDialog": {
 		"title": "Error",
