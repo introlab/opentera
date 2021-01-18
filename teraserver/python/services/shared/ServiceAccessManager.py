@@ -82,7 +82,7 @@ class ServiceAccessManager:
 
             # Do we have a user token?
             try:
-                token_dict = jwt.decode(token, ServiceAccessManager.api_user_token_key)
+                token_dict = jwt.decode(token, ServiceAccessManager.api_user_token_key, algorithms='HS256')
             except jwt.PyJWTError as e:
                 # Not a user, or invalid token, will continue...
                 pass
@@ -95,7 +95,7 @@ class ServiceAccessManager:
 
             # Do we have a device token?
             try:
-                token_dict = jwt.decode(token, ServiceAccessManager.api_device_token_key)
+                token_dict = jwt.decode(token, ServiceAccessManager.api_device_token_key, algorithms='HS256')
             except jwt.PyJWTError as e:
                 # Not a device, or invalid token, will continue...
                 pass
@@ -108,7 +108,7 @@ class ServiceAccessManager:
 
             # Do we have a participant token?
             try:
-                token_dict = jwt.decode(token, ServiceAccessManager.api_participant_token_key)
+                token_dict = jwt.decode(token, ServiceAccessManager.api_participant_token_key, algorithms='HS256')
             except jwt.PyJWTError as e:
                 # Not a participant, or invalid token, will continue...
                 pass
@@ -161,7 +161,7 @@ class ServiceAccessManager:
 
             # Do we have a device token?
             try:
-                token_dict = jwt.decode(token, ServiceAccessManager.api_device_static_token_key)
+                token_dict = jwt.decode(token, ServiceAccessManager.api_device_static_token_key, algorithms='HS256')
             except jwt.PyJWTError as e:
                 # Not a device, or invalid token, will continue...
                 pass
@@ -174,7 +174,8 @@ class ServiceAccessManager:
 
             # Do we have a participant token?
             try:
-                token_dict = jwt.decode(token, ServiceAccessManager.api_participant_static_token_key)
+                token_dict = jwt.decode(token, ServiceAccessManager.api_participant_static_token_key,
+                                        algorithms='HS256')
             except jwt.PyJWTError as e:
                 # Not a participant, or invalid token, will continue...
                 pass
@@ -213,7 +214,7 @@ class ServiceAccessManager:
             import jwt
 
             try:
-                token_dict = jwt.decode(token, ServiceAccessManager.api_service_token_key)
+                token_dict = jwt.decode(token, ServiceAccessManager.api_service_token_key, algorithms='HS256')
             except jwt.PyJWTError as e:
                 # Not a device, or invalid token, will continue...
                 pass
