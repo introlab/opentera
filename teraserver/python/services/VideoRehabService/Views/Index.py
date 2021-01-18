@@ -18,7 +18,7 @@ class Index(MethodView):
         if 'X_EXTERNALPORT' in request.headers:
             backend_port = request.headers['X_EXTERNALPORT'];
 
-        return render_template('default_index.html')
+        return render_template('index.html')
 
     def post(self):
         return '', 500

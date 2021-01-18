@@ -28,6 +28,7 @@ function initTranslator(){
     console.log("Loading translation module...");
     translator = new Translator({
         defaultLanguage: 'fr',
+        filesLocation: 'i18n',
         debug: true
     });
     translator.fetch(['en', 'fr']).then(() => {

@@ -67,15 +67,13 @@ function ws_MessageReceived(evt){
         $('#mainview').removeClass('iframe-with-footer');
         $('#mainview').addClass('iframe-without-footer');
         // Join video session event - redirect to session url
-        //document.getElementById('mainview').src = json_msg.data[0]["sessionUrl"];
-        window.parent.document.getElementById('mainview').contentWindow.document.getElementById("dialogWait").style.display="inline";
-        window.parent.document.getElementById('mainview').contentWindow.document.getElementById("messages").style.display="none";
+        showMainViewElement("dialogWait");
+        hideMainViewElement("messages");
         current_session_url = json_msg.message.events[0]["sessionUrl"];
         // Append name and uuid
         current_session_url += "&name=" + participant_name.replace("#", "") + "&uuid=" + participant_uuid;
-        console.log ("Joining session at " + current_session_url)
-        testCurrentSessionUrlValid();
-
+        console.log ("About to join session: " + current_session_url)
+        setTimeout(waitDialogTimeout, 3000);
     }
 
     // Stop or leave session
@@ -91,4 +89,9 @@ function ws_MessageReceived(evt){
         document.getElementById('mainview').src = "participant_localview?token=" + sessionStorage.getItem("participant_token") +
         '&message=Votre séance est maintenant terminée. Vous pouvez maintenant vous déconnecter ou fermer cette page.&message_type=light';
     }
+}
+
+function waitDialogTimeout(){
+    console.log("Joining session now!");
+    joinSession();
 }
