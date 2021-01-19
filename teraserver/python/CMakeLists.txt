@@ -70,3 +70,6 @@ add_custom_target(python-all-with-translations DEPENDS python-all python-transla
 
 # Docker
 add_subdirectory(docker)
+
+# Services
+add_subdirectory(services)

@@ -1,0 +1,116 @@
+# French translations for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-01-19 16:16-0500\n"
+"PO-Revision-Date: 2021-01-19 16:16-0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.0\n"
+
+#: VideoRehabService.py:65
+msgid "Join me!"
+msgstr ""
+
+#: VideoRehabService.py:356
+msgid "Cannot create session event"
+msgstr ""
+
+#: VideoRehabService.py:385
+msgid "Cannot create process"
+msgstr ""
+
+#: VideoRehabService.py:399
+msgid "Cannot create session"
+msgstr ""
+
+#: VideoRehabService.py:421
+msgid "Cannot create STOP session event"
+msgstr ""
+
+#: VideoRehabService.py:477
+msgid "Error stopping session - check server logs. "
+msgstr ""
+
+#: VideoRehabService.py:479
+msgid "No matching session to stop"
+msgstr ""
+
+#: VideoRehabService.py:502 VideoRehabService.py:573
+msgid "User: "
+msgstr ""
+
+#: VideoRehabService.py:504
+msgid "Error creating user invited session event "
+msgstr ""
+
+#: VideoRehabService.py:514 VideoRehabService.py:586
+msgid "Participant: "
+msgstr ""
+
+#: VideoRehabService.py:516
+msgid "Error creating participant invited session event "
+msgstr ""
+
+#: VideoRehabService.py:527 VideoRehabService.py:600
+msgid "Device: "
+msgstr ""
+
+#: VideoRehabService.py:529
+msgid "Error creating device invited session event "
+msgstr ""
+
+#: VideoRehabService.py:545
+msgid "Error updating session"
+msgstr ""
+
+#: VideoRehabService.py:575
+msgid "Error creating user left session event "
+msgstr ""
+
+#: VideoRehabService.py:588
+msgid "Error creating participant left session event "
+msgstr ""
+
+#: VideoRehabService.py:602
+msgid "Error creating device left session event "
+msgstr ""
+
+#: VideoRehabService.py:654
+msgid "User "
+msgstr ""
+
+#: VideoRehabService.py:657 VideoRehabService.py:671 VideoRehabService.py:684
+msgid "Cannot create refused session event"
+msgstr ""
+
+#: VideoRehabService.py:667
+msgid "Participant "
+msgstr ""
+
+#: VideoRehabService.py:681
+msgid "Device "
+msgstr ""
+
+#: Views/ParticipantError.py:26
+msgid "Unknown error"
+msgstr ""
+
+#: Views/ParticipantLocalView.py:27
+msgid "Votre séance débutera bientôt. Merci de patienter!"
+msgstr ""
+
+#: templates/index.html:16
+msgid "En construction...!"
+msgstr ""
+
