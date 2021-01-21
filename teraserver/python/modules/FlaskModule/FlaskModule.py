@@ -3,7 +3,7 @@ from flask_session import Session
 from flask_restx import Api
 from opentera.ConfigManager import ConfigManager
 from flask_babel import Babel
-from modules.BaseModule import BaseModule, ModuleNames
+from opentera.modules.BaseModule import BaseModule, ModuleNames
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 import redis
 

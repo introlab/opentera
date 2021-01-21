@@ -10,7 +10,7 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from flask_babel import gettext
 from opentera.redis.RedisRPCClient import RedisRPCClient
-from modules.BaseModule import ModuleNames
+from opentera.modules.BaseModule import ModuleNames
 
 # Parser definition(s)
 get_parser = api.parser()

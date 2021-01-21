@@ -1,5 +1,5 @@
 from opentera.services.ServiceConfigManager import ServiceConfigManager
-from modules.BaseModule import BaseModule
+from opentera.modules.BaseModule import BaseModule
 
 import os
 import subprocess

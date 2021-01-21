@@ -3,7 +3,7 @@ import services.LoggingService.Globals as Globals
 from opentera.redis.RedisClient import RedisClient
 from services.LoggingService.ConfigManager import ConfigManager
 from opentera.services.ServiceAccessManager import ServiceAccessManager
-from modules.RedisVars import RedisVars
+from opentera.redis.RedisVars import RedisVars
 from google.protobuf.json_format import ParseError
 from google.protobuf.message import DecodeError
 

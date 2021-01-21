@@ -3,9 +3,7 @@ from opentera.messages.python.RPCMessage_pb2 import RPCMessage, Value
 from datetime import datetime
 import json
 import uuid
-import threading
-from twisted.internet import defer, reactor, threads
-from modules.RedisVars import RedisVars
+from opentera.redis.RedisVars import RedisVars
 
 
 class RedisRPCClient:

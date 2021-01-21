@@ -1,29 +1,20 @@
 # WebSockets
-from autobahn.twisted.websocket import WebSocketServerProtocol
 from autobahn.websocket.types import ConnectionDeny
 
 # OpenTera
 from opentera.db.models.TeraUser import TeraUser
-from opentera.db.models.TeraParticipant import TeraParticipant
-from opentera.db.models.TeraDevice import TeraDevice
-from opentera.db.models.TeraAsset import TeraAsset
 
-from opentera.redis.RedisClient import RedisClient
-from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
+from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 
 
 # Messages
 import opentera.messages.python as messages
-import datetime
-from google.protobuf.json_format import MessageToJson
-from google.protobuf.json_format import Parse, ParseError
-from google.protobuf.message import DecodeError
 
 # Twisted
 from twisted.internet import defer
 
 # Event manager
-from modules.UserEventManager import UserEventManager
+from opentera.events.UserEventManager import UserEventManager
 
 from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
 

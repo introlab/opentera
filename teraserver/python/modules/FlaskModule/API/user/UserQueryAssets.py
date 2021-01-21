@@ -10,9 +10,7 @@ from werkzeug.utils import secure_filename
 
 from sqlalchemy import exc
 from modules.DatabaseModule.DBManager import DBManager
-from modules.RedisVars import RedisVars
-
-import uuid
+from opentera.redis.RedisVars import RedisVars
 
 # Parser definition(s)
 # GET

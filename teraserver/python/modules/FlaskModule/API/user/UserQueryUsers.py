@@ -8,7 +8,7 @@ from opentera.db.models.TeraUserGroup import TeraUserGroup
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.redis.RedisRPCClient import RedisRPCClient
-from modules.BaseModule import ModuleNames
+from opentera.modules.BaseModule import ModuleNames
 
 # Parser definition(s)
 get_parser = api.parser()

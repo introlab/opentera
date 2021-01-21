@@ -3,7 +3,7 @@ import services.FileTransferService.Globals as Globals
 from opentera.redis.RedisClient import RedisClient
 from services.FileTransferService.ConfigManager import ConfigManager
 from opentera.services.ServiceAccessManager import ServiceAccessManager
-from modules.RedisVars import RedisVars
+from opentera.redis.RedisVars import RedisVars
 
 # Twisted
 from twisted.internet import reactor

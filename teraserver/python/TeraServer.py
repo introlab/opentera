@@ -31,7 +31,6 @@ from modules.TwistedModule.TwistedModule import TwistedModule
 from modules.ServiceLauncherModule.ServiceLauncherModule import ServiceLauncherModule
 
 from opentera.ConfigManager import ConfigManager
-from opentera.redis.RedisClient import RedisClient
 import modules.Globals as Globals
 
 from modules.UserManagerModule.UserManagerModule import UserManagerModule
@@ -99,7 +98,7 @@ def init_shared_variables(config):
                                password=config.redis_config['password'])
 
     # Set API Token Keys
-    from modules.RedisVars import RedisVars
+    from opentera.redis.RedisVars import RedisVars
     # Set USER
     redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, user_token_key)
 
@@ -130,7 +129,7 @@ def init_services(config: ConfigManager):
     print('Initializing services...')
 
     from opentera.db.models.TeraService import TeraService
-    from modules.RedisVars import RedisVars
+    from opentera.redis.RedisVars import RedisVars
     import json
     # Create redis client
     import redis

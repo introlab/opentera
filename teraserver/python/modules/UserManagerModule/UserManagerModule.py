@@ -7,7 +7,7 @@ from opentera.messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
 from opentera.messages.python.StopSessionEvent_pb2 import StopSessionEvent
 from opentera.messages.python.LeaveSessionEvent_pb2 import LeaveSessionEvent
 from opentera.messages.python.JoinSessionReplyEvent_pb2 import JoinSessionReplyEvent
-from modules.BaseModule import BaseModule, ModuleNames
+from opentera.modules.BaseModule import BaseModule, ModuleNames
 from modules.UserManagerModule.UserRegistry import UserRegistry
 from modules.UserManagerModule.ParticipantRegistry import ParticipantRegistry
 from modules.UserManagerModule.DeviceRegistry import DeviceRegistry

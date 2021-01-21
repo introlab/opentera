@@ -1,10 +1,10 @@
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse, fields
+from flask import session, request
+from flask_restx import Resource, reqparse
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_http_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.redis.RedisRPCClient import RedisRPCClient
-from modules.BaseModule import ModuleNames
+from opentera.modules.BaseModule import ModuleNames
 
 # model = api.model('Login', {
 #     'websocket_url': fields.String,
@@ -43,7 +43,7 @@ class UserLogin(Resource):
             port = request.headers['X_EXTERNALPORT']
 
         # Get user token key from redis
-        from modules.RedisVars import RedisVars
+        from opentera.redis.RedisVars import RedisVars
         token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
 
         # Get token for user

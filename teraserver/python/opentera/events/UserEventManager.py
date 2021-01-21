@@ -1,4 +1,4 @@
-from modules.EventManager import EventManager
+from opentera.events.EventManager import EventManager
 import opentera.db.models as models
 from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 import opentera.messages.python as messages

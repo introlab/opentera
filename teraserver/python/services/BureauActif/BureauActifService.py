@@ -1,7 +1,7 @@
 import services.BureauActif.Globals as Globals
 from services.BureauActif.ConfigManager import ConfigManager
 
-from modules.RedisVars import RedisVars
+from opentera.redis.RedisVars import RedisVars
 
 from opentera.redis.RedisClient import RedisClient
 

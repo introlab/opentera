@@ -4,8 +4,8 @@ from opentera.redis.RedisClient import RedisClient
 from opentera.db.models.TeraSession import TeraSessionStatus
 from services.VideoRehabService.ConfigManager import ConfigManager
 from opentera.services.ServiceAccessManager import ServiceAccessManager
-from modules.RedisVars import RedisVars
-from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
+from opentera.redis.RedisVars import RedisVars
+from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 from google.protobuf.json_format import ParseError
 from google.protobuf.message import DecodeError
 from requests import Response

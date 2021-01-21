@@ -1,7 +1,7 @@
 import jwt
 import json
 import time
-from modules.RedisVars import RedisVars
+from opentera.redis.RedisVars import RedisVars
 from opentera.redis.RedisClient import RedisClient
 from requests import get, post, Response
 from opentera.services.ServiceConfigManager import ServiceConfigManager

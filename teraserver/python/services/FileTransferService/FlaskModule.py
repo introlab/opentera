@@ -1,27 +1,21 @@
 # Flask
 from flask import Flask, request, g, url_for
-from flask_session import Session
 from flask_restx import Api
 from flask_babel import Babel
 
 # OpenTera
-from modules.BaseModule import BaseModule, ModuleNames
+from opentera.modules.BaseModule import BaseModule
 from services.FileTransferService.ConfigManager import ConfigManager
 
 # WebSockets
-from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
+from autobahn.twisted.resource import WSGIRootResource
 
 # Twisted
-from twisted.application import internet, service
-from twisted.internet import reactor, ssl
-from twisted.python.threadpool import ThreadPool
+from twisted.internet import reactor
 from twisted.web.http import HTTPChannel
 from twisted.web.server import Site
 from twisted.web.static import File
 from twisted.web.wsgi import WSGIResource
-from twisted.python import log
-from OpenSSL import SSL
-import sys
 import os
 
 # Flask application

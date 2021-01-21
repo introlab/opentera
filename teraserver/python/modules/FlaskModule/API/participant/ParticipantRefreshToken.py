@@ -1,10 +1,7 @@
 from flask import session, request
-from flask_restx import Resource, inputs
-from flask_babel import gettext
+from flask_restx import Resource
 from modules.LoginModule.LoginModule import participant_token_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
-from opentera.db.models.TeraParticipant import TeraParticipant
-from modules.DatabaseModule.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule
 
 # Parser definition(s)
@@ -25,7 +22,7 @@ class ParticipantRefreshToken(Resource):
     def get(self):
         # If we have made it this far, token passed in headers was valid.
         # Get user token key from redis
-        from modules.RedisVars import RedisVars
+        from opentera.redis.RedisVars import RedisVars
         token_key = self.module.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
 
         # Get token for user
