@@ -32,6 +32,11 @@ jobs:
         echo $HOME
         wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
         bash ./Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
+    - name: Run CMake and build
+      working-directory: teraserver
+      run: |
+        cmake .
+        make python-all
     - name: Install python dependencies
       run: |
         ls -l
