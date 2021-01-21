@@ -10,7 +10,7 @@ from google.protobuf.message import DecodeError
 # Twisted
 from twisted.internet import reactor, defer, task
 from twisted.python import log
-import messages.python as messages
+import opentera.messages.python as messages
 import sys
 
 from opentera.services.ServiceOpenTera import ServiceOpenTera

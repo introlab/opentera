@@ -8,7 +8,7 @@ from opentera.redis.RedisClient import RedisClient
 from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 
 # Messages
-import messages.python as messages
+import opentera.messages.python as messages
 
 from google.protobuf.any_pb2 import Any
 import datetime

@@ -1,5 +1,5 @@
 import redis
-from messages.python.RPCMessage_pb2 import RPCMessage, Value
+from opentera.messages.python.RPCMessage_pb2 import RPCMessage, Value
 from datetime import datetime
 import json
 import uuid

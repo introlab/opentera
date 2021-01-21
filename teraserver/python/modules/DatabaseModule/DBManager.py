@@ -1,6 +1,6 @@
 from flask_sqlalchemy import event
 from opentera.db.Base import db
-import messages.python as messages
+import opentera.messages.python as messages
 
 # Must include all Database objects here to be properly initialized and created if needed
 from modules.BaseModule import BaseModule, ModuleNames, create_module_event_topic_from_name

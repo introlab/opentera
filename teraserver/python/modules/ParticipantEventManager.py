@@ -3,7 +3,7 @@ from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSession import TeraSession
 from modules.DatabaseModule.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
-import messages.python as messages
+import opentera.messages.python as messages
 
 
 class ParticipantEventManager(EventManager):

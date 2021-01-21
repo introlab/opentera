@@ -8,7 +8,7 @@ from opentera.db.models.TeraSession import TeraSession
 from modules.RedisVars import RedisVars
 from opentera.redis.RedisClient import RedisClient
 from modules.BaseModule import ModuleNames, create_module_message_topic_from_name
-import messages.python as messages
+import opentera.messages.python as messages
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.redis.RedisRPCClient import RedisRPCClient
@@ -154,7 +154,7 @@ class UserSessionManager(Resource):
             if 'reply_code' not in parameters:
                 return gettext('Missing reply code in parameters'), 400
             # Validate reply code, based on JoinSessionReplyEvent enum
-            from messages.python.JoinSessionReplyEvent_pb2 import JoinSessionReplyEvent
+            from opentera.messages.python.JoinSessionReplyEvent_pb2 import JoinSessionReplyEvent
             if isinstance(parameters['reply_code'], str):
                 if parameters['reply_code'] == 'accept':
                     parameters['reply_code'] = JoinSessionReplyEvent.REPLY_ACCEPTED

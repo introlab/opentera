@@ -1,7 +1,7 @@
 from modules.EventManager import EventManager
 import opentera.db.models as models
 from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
-import messages.python as messages
+import opentera.messages.python as messages
 
 
 class UserEventManager(EventManager):

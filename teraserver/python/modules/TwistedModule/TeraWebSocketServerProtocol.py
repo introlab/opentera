@@ -8,7 +8,7 @@ from opentera.redis.RedisClient import RedisClient
 from opentera.logging.LoggingClient import LoggingClient
 
 # Messages
-import messages.python as messages
+import opentera.messages.python as messages
 import datetime
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.json_format import Parse, ParseError

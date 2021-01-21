@@ -21,7 +21,7 @@ else(WIN32)
     set(PYBABEL_EXECUTABLE ${PYTHON_ENV_DIRECTORY}/bin/pybabel)
 endif(WIN32)
 
-add_subdirectory(messages/python)
+add_subdirectory(opentera/messages/python)
 
 # Generate protobuf python files
 

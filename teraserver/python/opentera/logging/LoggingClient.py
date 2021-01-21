@@ -1,5 +1,5 @@
 from redis import Redis
-import messages.python as messages
+import opentera.messages.python as messages
 import datetime
 
 

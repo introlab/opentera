@@ -1,7 +1,7 @@
 from opentera.redis.RedisClient import RedisClient
 from opentera.ConfigManager import ConfigManager
 from enum import Enum, unique
-import messages.python as messages
+import opentera.messages.python as messages
 from opentera.logging.LoggingClient import LoggingClient
 
 import json

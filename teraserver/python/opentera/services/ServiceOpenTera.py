@@ -5,7 +5,7 @@ from modules.RedisVars import RedisVars
 from opentera.redis.RedisClient import RedisClient
 from requests import get, post, Response
 from opentera.services.ServiceConfigManager import ServiceConfigManager
-import messages.python as messages
+import opentera.messages.python as messages
 from twisted.internet import defer
 import datetime
 from opentera.logging.LoggingClient import LoggingClient

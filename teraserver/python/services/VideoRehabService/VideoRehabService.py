@@ -13,7 +13,7 @@ from requests import Response
 # Twisted
 from twisted.internet import reactor, defer
 from twisted.python import log
-import messages.python as messages
+import opentera.messages.python as messages
 import sys
 import uuid
 

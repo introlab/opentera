@@ -9,7 +9,7 @@ from modules.BaseModule import ModuleNames, create_module_message_topic_from_nam
 
 
 # Messages
-import messages.python as messages
+import opentera.messages.python as messages
 import datetime
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.json_format import Parse, ParseError
