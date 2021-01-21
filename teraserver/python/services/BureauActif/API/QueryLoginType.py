@@ -1,9 +1,8 @@
-from flask import jsonify, session, request
 from flask_restx import Resource
 
-from services.shared.ServiceAccessManager import ServiceAccessManager, current_login_type, current_device_client, \
+from libtera.services.ServiceAccessManager import ServiceAccessManager, current_login_type, current_device_client, \
     current_participant_client, current_user_client, LoginType
-from services.BureauActif.FlaskModule import default_api_ns as api, flask_app
+from services.BureauActif.FlaskModule import default_api_ns as api
 
 
 class QueryLoginType(Resource):

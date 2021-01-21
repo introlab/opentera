@@ -1,4 +1,4 @@
-from services.shared.ServiceConfigManager import ServiceConfigManager, DBConfig
+from libtera.services.ServiceConfigManager import ServiceConfigManager, DBConfig
 
 
 class LoggingConfig:

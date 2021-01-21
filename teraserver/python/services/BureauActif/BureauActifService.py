@@ -7,7 +7,7 @@ from libtera.redis.RedisClient import RedisClient
 
 from sqlalchemy.exc import OperationalError
 
-from services.shared.ServiceAccessManager import ServiceAccessManager
+from libtera.services.ServiceAccessManager import ServiceAccessManager
 
 # Twisted
 from twisted.internet import reactor
@@ -15,8 +15,7 @@ from twisted.python import log
 
 # Flask Module
 from services.BureauActif.FlaskModule import FlaskModule, flask_app
-from services.shared.ServiceOpenTera import ServiceOpenTera
-from flask_babel import gettext
+from libtera.services.ServiceOpenTera import ServiceOpenTera
 
 import os
 import sys
