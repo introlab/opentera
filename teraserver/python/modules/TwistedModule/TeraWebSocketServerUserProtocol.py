@@ -14,7 +14,7 @@ import opentera.messages.python as messages
 from twisted.internet import defer
 
 # Event manager
-from opentera.events.UserEventManager import UserEventManager
+from modules.UserEventManager import UserEventManager
 
 from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
 

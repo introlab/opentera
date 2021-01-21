@@ -1,4 +1,4 @@
-from opentera.events.EventManager import EventManager
+from modules.EventManager import EventManager
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSession import TeraSession

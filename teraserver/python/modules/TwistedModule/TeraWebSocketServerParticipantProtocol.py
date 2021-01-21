@@ -14,7 +14,7 @@ from google.protobuf.any_pb2 import Any
 from twisted.internet import defer
 
 # Event manager
-from opentera.events.ParticipantEventManager import ParticipantEventManager
+from modules.ParticipantEventManager import ParticipantEventManager
 
 from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
 

@@ -13,7 +13,7 @@ import opentera.messages.python as messages
 from twisted.internet import defer
 
 # Event manager
-from opentera.events.DeviceEventManager import DeviceEventManager
+from modules.DeviceEventManager import DeviceEventManager
 
 # Base class
 from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
