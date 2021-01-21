@@ -3,8 +3,8 @@ from autobahn.twisted.websocket import WebSocketServerProtocol
 from autobahn.websocket.types import ConnectionRequest, ConnectionResponse, ConnectionDeny
 
 # OpenTera
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.redis.RedisClient import RedisClient
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.redis.RedisClient import RedisClient
 from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 
 

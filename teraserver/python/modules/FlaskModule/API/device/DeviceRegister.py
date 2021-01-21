@@ -5,16 +5,16 @@ from flask import request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address, get_ipaddr
 import base64
-from libtera.crypto.crypto_utils import generate_device_certificate, load_private_pem_key, load_pem_certificate
+from opentera.crypto.crypto_utils import generate_device_certificate, load_private_pem_key, load_pem_certificate
 from cryptography import x509
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 
-from libtera.db.Base import db
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraDeviceType import TeraDeviceType
-from libtera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.Base import db
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraDeviceType import TeraDeviceType
+from opentera.db.models.TeraSessionType import TeraSessionType
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 import uuid
 from modules.FlaskModule.FlaskModule import flask_app

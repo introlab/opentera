@@ -3,12 +3,12 @@ from autobahn.twisted.websocket import WebSocketServerProtocol
 from autobahn.websocket.types import ConnectionDeny
 
 # OpenTera
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraAsset import TeraAsset
 
-from libtera.redis.RedisClient import RedisClient
+from opentera.redis.RedisClient import RedisClient
 from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 
 
@@ -53,7 +53,7 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
 
             # Specific events from DatabaseModule
             # We are specific otherwise we receive every database event
-            from libtera.db.models import EventNameClassMap
+            from opentera.db.models import EventNameClassMap
 
             for name in EventNameClassMap:
                 ret = yield self.subscribe_pattern_with_callback(
@@ -147,7 +147,7 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
 
             # Specific events from DatabaseModule
             # We are specific otherwise we receive every database event
-            from libtera.db.models import EventNameClassMap
+            from opentera.db.models import EventNameClassMap
 
             for name in EventNameClassMap:
                 ret = yield self.unsubscribe_pattern_with_callback(

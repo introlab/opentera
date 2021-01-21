@@ -4,7 +4,7 @@ from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule
 from modules.Globals import db_man
 from modules.FlaskModule.FlaskModule import device_api_ns as api
-from libtera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraDevice import TeraDevice
 
 # Parser definition(s)
 get_parser = api.parser()

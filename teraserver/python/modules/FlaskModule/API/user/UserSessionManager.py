@@ -2,16 +2,16 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraService import TeraService
-from libtera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraSession import TeraSession
 from modules.RedisVars import RedisVars
-from libtera.redis.RedisClient import RedisClient
+from opentera.redis.RedisClient import RedisClient
 from modules.BaseModule import ModuleNames, create_module_message_topic_from_name
 import messages.python as messages
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
-from libtera.redis.RedisRPCClient import RedisRPCClient
+from opentera.redis.RedisRPCClient import RedisRPCClient
 import json
 
 # Parser definition(s)

@@ -1,10 +1,10 @@
 from flask import Flask, request, g, url_for
 from flask_session import Session
 from flask_restx import Api
-from libtera.ConfigManager import ConfigManager
+from opentera.ConfigManager import ConfigManager
 from flask_babel import Babel
 from modules.BaseModule import BaseModule, ModuleNames
-from libtera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.db.models.TeraServerSettings import TeraServerSettings
 import redis
 
 # Flask application

@@ -30,8 +30,8 @@ from modules.FlaskModule.FlaskModule import FlaskModule
 from modules.TwistedModule.TwistedModule import TwistedModule
 from modules.ServiceLauncherModule.ServiceLauncherModule import ServiceLauncherModule
 
-from libtera.ConfigManager import ConfigManager
-from libtera.redis.RedisClient import RedisClient
+from opentera.ConfigManager import ConfigManager
+from opentera.redis.RedisClient import RedisClient
 import modules.Globals as Globals
 
 from modules.UserManagerModule.UserManagerModule import UserManagerModule
@@ -41,8 +41,8 @@ from modules.DatabaseModule.DBManager import DBManager
 import os
 
 from sqlalchemy.exc import OperationalError
-import libtera.crypto.crypto_utils as crypto
-from libtera.utils.TeraVersions import TeraVersions
+import opentera.crypto.crypto_utils as crypto
+from opentera.utils.TeraVersions import TeraVersions
 
 
 def generate_certificates(config: ConfigManager):
@@ -81,7 +81,7 @@ def verify_file_upload_directory(config: ConfigManager, create=True):
 
 def init_shared_variables(config):
     # Create user token
-    from libtera.db.models.TeraServerSettings import TeraServerSettings
+    from opentera.db.models.TeraServerSettings import TeraServerSettings
 
     # Dynamic key for users, updated at every restart (for now)
     # Server should rotate key every hour, day?
@@ -129,7 +129,7 @@ def init_shared_variables(config):
 def init_services(config: ConfigManager):
     print('Initializing services...')
 
-    from libtera.db.models.TeraService import TeraService
+    from opentera.db.models.TeraService import TeraService
     from modules.RedisVars import RedisVars
     import json
     # Create redis client

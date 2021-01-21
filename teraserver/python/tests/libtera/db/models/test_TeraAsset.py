@@ -3,9 +3,9 @@ import os
 
 from modules.DatabaseModule.DBManager import DBManager
 
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraAsset import TeraAsset
-from libtera.ConfigManager import ConfigManager
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraAsset import TeraAsset
+from opentera.ConfigManager import ConfigManager
 
 
 class TeraAssetTest(unittest.TestCase):

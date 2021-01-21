@@ -1,8 +1,8 @@
 from services.LoggingService.FlaskModule import flask_app
 import services.LoggingService.Globals as Globals
-from libtera.redis.RedisClient import RedisClient
+from opentera.redis.RedisClient import RedisClient
 from services.LoggingService.ConfigManager import ConfigManager
-from libtera.services.ServiceAccessManager import ServiceAccessManager
+from opentera.services.ServiceAccessManager import ServiceAccessManager
 from modules.RedisVars import RedisVars
 from google.protobuf.json_format import ParseError
 from google.protobuf.message import DecodeError
@@ -13,7 +13,7 @@ from twisted.python import log
 import messages.python as messages
 import sys
 
-from libtera.services.ServiceOpenTera import ServiceOpenTera
+from opentera.services.ServiceOpenTera import ServiceOpenTera
 from sqlalchemy.exc import OperationalError
 from services.LoggingService.FlaskModule import FlaskModule
 

@@ -4,8 +4,8 @@ from autobahn.exception import Disconnected
 from autobahn.websocket.types import ConnectionDeny
 
 # OpenTera
-from libtera.redis.RedisClient import RedisClient
-from libtera.logging.LoggingClient import LoggingClient
+from opentera.redis.RedisClient import RedisClient
+from opentera.logging.LoggingClient import LoggingClient
 
 # Messages
 import messages.python as messages

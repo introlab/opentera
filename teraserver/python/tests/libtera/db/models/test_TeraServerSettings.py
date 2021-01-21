@@ -1,9 +1,9 @@
 import os
 from tests.libtera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
-from libtera.db.Base import db
+from opentera.db.Base import db
 
-from libtera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.db.models.TeraServerSettings import TeraServerSettings
 
 class TeraServerSettingsTest(BaseModelsTest):
 

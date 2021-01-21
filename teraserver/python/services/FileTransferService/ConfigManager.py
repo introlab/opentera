@@ -1,4 +1,4 @@
-from libtera.services.ServiceConfigManager import ServiceConfigManager, DBConfig
+from opentera.services.ServiceConfigManager import ServiceConfigManager, DBConfig
 
 
 class FileTransferConfig:

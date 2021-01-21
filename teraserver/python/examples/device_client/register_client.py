@@ -1,5 +1,5 @@
 from requests import post
-import libtera.crypto.crypto_utils as crypto
+import opentera.crypto.crypto_utils as crypto
 from cryptography.hazmat.primitives import serialization
 import datetime
 from os import path

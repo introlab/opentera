@@ -6,12 +6,12 @@ from modules.FlaskModule.FlaskModule import flask_app
 from modules.BaseModule import BaseModule, ModuleNames
 from modules.RedisVars import RedisVars
 
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraService import TeraService
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraService import TeraService
 
-from libtera.ConfigManager import ConfigManager
+from opentera.ConfigManager import ConfigManager
 import datetime
 import redis
 

@@ -6,7 +6,7 @@ from sqlalchemy.exc import InvalidRequestError
 from services.BureauActif.FlaskModule import default_api_ns as api
 
 from services.BureauActif.libbureauactif.db.DBManager import DBManager
-from libtera.services.ServiceAccessManager import ServiceAccessManager, current_participant_client
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_participant_client
 
 # Parser definition(s)
 get_parser = api.parser()

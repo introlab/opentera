@@ -4,9 +4,9 @@ from flask_babel import gettext
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraServiceAccess import TeraServiceAccess
-from libtera.db.models.TeraServiceRole import TeraServiceRole
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+from opentera.db.models.TeraServiceRole import TeraServiceRole
 from modules.DatabaseModule.DBManager import DBManager
 import modules.Globals as Globals
 
@@ -68,7 +68,7 @@ class UserQuerySiteAccess(Resource):
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading sites roles'})
     def get(self):
-        from libtera.db.models.TeraSite import TeraSite
+        from opentera.db.models.TeraSite import TeraSite
         parser = get_parser
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
@@ -197,7 +197,7 @@ class UserQuerySiteAccess(Resource):
                 # If we are setting a "user" role for a site, check if there's already such an inherited role from
                 # projects
                 if json_site['site_access_role'] == 'user':
-                    from libtera.db.models.TeraUserGroup import TeraUserGroup
+                    from opentera.db.models.TeraUserGroup import TeraUserGroup
                     user_group = TeraUserGroup.get_user_group_by_id(json_site['id_user_group'])
                     projects_roles = [role for project, role in user_group.get_projects_roles(no_inheritance=True)
                                       .items() if project.id_site == json_site['id_site']]

@@ -1,7 +1,7 @@
 from flask import request
 from flask_restx import Resource
 
-from libtera.services.ServiceAccessManager import ServiceAccessManager, current_login_type, LoginType
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_login_type, LoginType
 
 from services.BureauActif.FlaskModule import default_api_ns as api
 

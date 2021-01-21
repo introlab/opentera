@@ -1,8 +1,8 @@
 from services.FileTransferService.FlaskModule import flask_app
 import services.FileTransferService.Globals as Globals
-from libtera.redis.RedisClient import RedisClient
+from opentera.redis.RedisClient import RedisClient
 from services.FileTransferService.ConfigManager import ConfigManager
-from libtera.services.ServiceAccessManager import ServiceAccessManager
+from opentera.services.ServiceAccessManager import ServiceAccessManager
 from modules.RedisVars import RedisVars
 
 # Twisted
@@ -11,7 +11,7 @@ from twisted.python import log
 import sys
 import os
 
-from libtera.services.ServiceOpenTera import ServiceOpenTera
+from opentera.services.ServiceOpenTera import ServiceOpenTera
 from sqlalchemy.exc import OperationalError
 from services.FileTransferService.FlaskModule import FlaskModule
 

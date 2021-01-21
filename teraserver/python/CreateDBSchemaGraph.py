@@ -1,6 +1,6 @@
 from sqlalchemy import MetaData
 from sqlalchemy_schemadisplay import create_schema_graph
-from libtera.ConfigManager import ConfigManager
+from opentera.ConfigManager import ConfigManager
 import os
 import sys
 

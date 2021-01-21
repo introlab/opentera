@@ -14,7 +14,7 @@ from zope.interface import implementer
 import json
 import os
 
-# from libtera.db.models.TeraSession import TeraSession, TeraSessionParticipants, TeraSessionStatus
+# from opentera.db.models.TeraSession import TeraSession, TeraSessionParticipants, TeraSessionStatus
 import datetime
 
 

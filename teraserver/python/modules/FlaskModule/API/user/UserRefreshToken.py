@@ -28,7 +28,7 @@ class UserRefreshToken(Resource):
         token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
 
         # Get token for user
-        from libtera.db.models.TeraUser import TeraUser
+        from opentera.db.models.TeraUser import TeraUser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
 
         # Put old token in disabled tokens

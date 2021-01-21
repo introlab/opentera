@@ -3,7 +3,7 @@ from flask_restx import Resource, reqparse, fields
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_http_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.redis.RedisRPCClient import RedisRPCClient
+from opentera.redis.RedisRPCClient import RedisRPCClient
 from modules.BaseModule import ModuleNames
 
 # model = api.model('Login', {
@@ -47,7 +47,7 @@ class UserLogin(Resource):
         token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
 
         # Get token for user
-        from libtera.db.models.TeraUser import TeraUser
+        from opentera.db.models.TeraUser import TeraUser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
 
         # Verify if user already logged in
@@ -82,7 +82,7 @@ class UserLogin(Resource):
                 client_version_parts = client_version.split('.')
 
                 # Load known version from database.
-                from libtera.utils.TeraVersions import TeraVersions
+                from opentera.utils.TeraVersions import TeraVersions
                 versions = TeraVersions()
                 versions.load_from_db()
 

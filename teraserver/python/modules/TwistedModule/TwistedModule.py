@@ -1,6 +1,6 @@
 from modules.FlaskModule.FlaskModule import flask_app
 from modules.BaseModule import BaseModule, ModuleNames
-from libtera.ConfigManager import ConfigManager
+from opentera.ConfigManager import ConfigManager
 
 
 # Same directory

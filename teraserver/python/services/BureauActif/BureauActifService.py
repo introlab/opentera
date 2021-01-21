@@ -3,11 +3,11 @@ from services.BureauActif.ConfigManager import ConfigManager
 
 from modules.RedisVars import RedisVars
 
-from libtera.redis.RedisClient import RedisClient
+from opentera.redis.RedisClient import RedisClient
 
 from sqlalchemy.exc import OperationalError
 
-from libtera.services.ServiceAccessManager import ServiceAccessManager
+from opentera.services.ServiceAccessManager import ServiceAccessManager
 
 # Twisted
 from twisted.internet import reactor
@@ -15,7 +15,7 @@ from twisted.python import log
 
 # Flask Module
 from services.BureauActif.FlaskModule import FlaskModule, flask_app
-from libtera.services.ServiceOpenTera import ServiceOpenTera
+from opentera.services.ServiceOpenTera import ServiceOpenTera
 
 import os
 import sys

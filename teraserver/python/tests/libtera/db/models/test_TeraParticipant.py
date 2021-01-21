@@ -1,9 +1,9 @@
 import unittest
 from modules.DatabaseModule.DBManager import DBManager
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
-from libtera.db.Base import db
-from libtera.ConfigManager import ConfigManager
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
+from opentera.db.Base import db
+from opentera.ConfigManager import ConfigManager
 import uuid
 import os
 

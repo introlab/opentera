@@ -2,7 +2,7 @@ import unittest
 import os
 from requests import get, post
 import json
-import libtera.crypto.crypto_utils as crypto
+import opentera.crypto.crypto_utils as crypto
 from cryptography.hazmat.primitives import hashes, serialization
 
 

@@ -3,8 +3,8 @@ import os
 
 from modules.DatabaseModule.DBManager import DBManager
 
-from libtera.db.models.TeraUser import TeraUser
-from libtera.ConfigManager import ConfigManager
+from opentera.db.models.TeraUser import TeraUser
+from opentera.ConfigManager import ConfigManager
 
 
 class TeraDeviceSubTypeTest(unittest.TestCase):

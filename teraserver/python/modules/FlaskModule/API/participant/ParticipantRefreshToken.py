@@ -3,7 +3,7 @@ from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_token_auth
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
-from libtera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraParticipant import TeraParticipant
 from modules.DatabaseModule.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule
 
@@ -29,7 +29,7 @@ class ParticipantRefreshToken(Resource):
         token_key = self.module.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
 
         # Get token for user
-        from libtera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraParticipant import TeraParticipant
         current_participant = TeraParticipant.get_participant_by_uuid(session['_user_id'])
 
         # Put old token in disabled tokens

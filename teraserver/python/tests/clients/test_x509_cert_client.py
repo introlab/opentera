@@ -14,12 +14,12 @@ from zope.interface import implementer
 import OpenSSL.crypto
 
 import os
-import libtera.crypto.crypto_utils as crypto
+import opentera.crypto.crypto_utils as crypto
 from cryptography.hazmat.primitives import hashes, serialization
 import base64
 import json
 
-# from libtera.db.models.TeraSession import TeraSession, TeraSessionParticipants, TeraSessionStatus
+# from opentera.db.models.TeraSession import TeraSession, TeraSessionParticipants, TeraSessionStatus
 import datetime
 
 

@@ -4,7 +4,7 @@ from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from modules.RedisVars import RedisVars
-from libtera.redis.RedisRPCClient import RedisRPCClient
+from opentera.redis.RedisRPCClient import RedisRPCClient
 from modules.BaseModule import ModuleNames
 
 

@@ -3,9 +3,9 @@ from flask_restx import Resource, reqparse
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSessionEvent import TeraSessionEvent
-from libtera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraSessionEvent import TeraSessionEvent
+from opentera.db.models.TeraSession import TeraSession
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc

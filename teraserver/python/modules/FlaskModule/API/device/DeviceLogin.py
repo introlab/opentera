@@ -3,8 +3,8 @@ from flask_restx import Resource, reqparse
 from modules.LoginModule.LoginModule import LoginModule
 from modules.Globals import db_man
 from modules.FlaskModule.FlaskModule import device_api_ns as api
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.redis.RedisRPCClient import RedisRPCClient
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.redis.RedisRPCClient import RedisRPCClient
 from modules.BaseModule import ModuleNames
 from flask_babel import gettext
 

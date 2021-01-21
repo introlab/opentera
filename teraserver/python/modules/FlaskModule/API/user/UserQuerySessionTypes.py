@@ -2,9 +2,9 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSessionType import TeraSessionType
-from libtera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraSession import TeraSession
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -180,7 +180,7 @@ class UserQuerySessionTypes(Resource):
 
         # Update session type projects, if needed
         if update_st_projects:
-            from libtera.db.models.TeraProject import TeraProject
+            from opentera.db.models.TeraProject import TeraProject
             if new_st:
                 # New session type - directly update the list
                 update_session_type.session_type_projects = [TeraProject.get_project_by_id(project_id)

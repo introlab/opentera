@@ -1,8 +1,8 @@
 # import unittest
 # from modules.DatabaseModule.DBManager import DBManager
-# from libtera.db.models.TeraDeviceData import TeraDeviceData
+# from opentera.db.models.TeraDeviceData import TeraDeviceData
 # import os
-# from libtera.ConfigManager import ConfigManager
+# from opentera.ConfigManager import ConfigManager
 # from sqlalchemy.exc import InvalidRequestError
 #
 #

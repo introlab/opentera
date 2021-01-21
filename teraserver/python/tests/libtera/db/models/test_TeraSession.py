@@ -1,10 +1,10 @@
 import unittest
 from modules.DatabaseModule.DBManager import DBManager
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraSession import TeraSession, TeraSessionStatus
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraSession import TeraSession, TeraSessionStatus
 import os
-from libtera.ConfigManager import ConfigManager
+from opentera.ConfigManager import ConfigManager
 
 
 class TeraSessionTest(unittest.TestCase):
@@ -30,7 +30,7 @@ class TeraSessionTest(unittest.TestCase):
         self.db_man.create_defaults(self.config)
 
     def tearDown(self):
-        from libtera.db.Base import db
+        from opentera.db.Base import db
         print('tear down')
 
     def test_session_defaults(self):

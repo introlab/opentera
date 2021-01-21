@@ -1,6 +1,6 @@
 from flask.views import MethodView
 from flask import render_template, request
-from libtera.services.ServiceAccessManager import ServiceAccessManager, current_participant_client
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_participant_client
 
 
 class ParticipantEndpoint(MethodView):

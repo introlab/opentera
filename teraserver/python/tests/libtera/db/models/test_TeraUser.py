@@ -1,10 +1,10 @@
 import unittest
 from modules.DatabaseModule.DBManager import DBManager
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSite import TeraSite
-from libtera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraSite import TeraSite
+from opentera.db.models.TeraProject import TeraProject
 import os
-from libtera.ConfigManager import ConfigManager
+from opentera.ConfigManager import ConfigManager
 
 
 class TeraUserTest(unittest.TestCase):

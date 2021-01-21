@@ -1,9 +1,9 @@
 import services.VideoRehabService.Globals as Globals
-from libtera.services.modules.WebRTCModule import WebRTCModule
-from libtera.redis.RedisClient import RedisClient
-from libtera.db.models.TeraSession import TeraSessionStatus
+from opentera.services.modules.WebRTCModule import WebRTCModule
+from opentera.redis.RedisClient import RedisClient
+from opentera.db.models.TeraSession import TeraSessionStatus
 from services.VideoRehabService.ConfigManager import ConfigManager
-from libtera.services.ServiceAccessManager import ServiceAccessManager
+from opentera.services.ServiceAccessManager import ServiceAccessManager
 from modules.RedisVars import RedisVars
 from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 from google.protobuf.json_format import ParseError
@@ -19,7 +19,7 @@ import uuid
 
 # Flask Module
 from services.VideoRehabService.FlaskModule import FlaskModule
-from libtera.services.ServiceOpenTera import ServiceOpenTera
+from opentera.services.ServiceOpenTera import ServiceOpenTera
 from flask_babel import gettext
 
 

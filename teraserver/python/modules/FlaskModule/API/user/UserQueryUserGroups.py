@@ -3,10 +3,10 @@ from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraServiceAccess import TeraServiceAccess
-from libtera.db.models.TeraServiceRole import TeraServiceRole
-from libtera.db.models.TeraUserGroup import TeraUserGroup
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+from opentera.db.models.TeraServiceRole import TeraServiceRole
+from opentera.db.models.TeraUserGroup import TeraUserGroup
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
 import modules.Globals as Globals
@@ -168,7 +168,7 @@ class UserQueryUserGroups(Resource):
             # Check if the current user is site admin in all of those projects
             project_ids = [project['id_project'] for project in json_projects]
 
-            from libtera.db.models.TeraProject import TeraProject
+            from opentera.db.models.TeraProject import TeraProject
             for proj_id in project_ids:
                 proj = TeraProject.get_project_by_id(proj_id)
                 if proj and user_access.get_site_role(proj.id_site) != 'admin':

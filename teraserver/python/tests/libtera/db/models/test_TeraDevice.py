@@ -1,9 +1,9 @@
 import unittest
 from modules.DatabaseModule.DBManager import DBManager
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraDeviceType import TeraDeviceType
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraDeviceType import TeraDeviceType
 import os
-from libtera.ConfigManager import ConfigManager
+from opentera.ConfigManager import ConfigManager
 
 
 class TeraDeviceTest(unittest.TestCase):
