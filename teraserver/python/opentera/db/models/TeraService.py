@@ -167,17 +167,6 @@ class TeraService(db.Model, BaseModel):
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
-        new_service.service_key = 'VideoDispatch'
-        new_service.service_name = 'Salle d\'attente vidéo'
-        new_service.service_hostname = '127.0.0.1'
-        new_service.service_port = 4060
-        new_service.service_endpoint = '/'
-        new_service.service_clientendpoint = '/videodispatch'
-        new_service.service_enabled = True
-        db.session.add(new_service)
-
-        new_service = TeraService()
-        new_service.service_uuid = str(uuid.uuid4())
         new_service.service_key = 'VideoRehabService'
         new_service.service_name = 'Télé-réadaptation vidéo'
         new_service.service_hostname = '127.0.0.1'
