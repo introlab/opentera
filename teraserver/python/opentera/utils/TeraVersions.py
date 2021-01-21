@@ -1,5 +1,5 @@
 from opentera.db.models.TeraServerSettings import TeraServerSettings
-import OpenTeraServerVersion
+from opentera import OpenTeraServerVersion
 import json
 
 
