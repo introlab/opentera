@@ -27,6 +27,8 @@ jobs:
     - name: Install system dependencies
       run: | 
         sudo apt-get install cmake protobuf-compiler wget
+        cat /proc/cpuinfo
+        cat /proc/meminfo
     - name: Install Miniconda3
       run: |
         echo $HOME
