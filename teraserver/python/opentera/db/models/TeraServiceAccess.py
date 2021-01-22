@@ -177,21 +177,35 @@ class TeraServiceAccess(db.Model, BaseModel):
             device = TeraDevice.get_device_by_name('Apple Watch #W05P1')
             group = TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
 
-            servicebureau = TeraService.get_service_by_key('BureauActif')
-            servicebureauadmin = servicebureau.service_roles[0]
-            servicebureauuser = servicebureau.service_roles[1]
+            service_bureau = TeraService.get_service_by_key('BureauActif')
+            service_bureau_admin = service_bureau.service_roles[0]
+            service_bureau_user = service_bureau.service_roles[1]
+
+            service_logging = TeraService.get_service_by_key('LoggingService')
+            service_logging_admin = service_logging.service_roles[0]
+            service_logging_user = service_logging.service_roles[1]
 
             user_group1 = TeraUserGroup.get_user_group_by_group_name('Users - Project 1')
             user_group2 = TeraUserGroup.get_user_group_by_group_name('Admins - Project 1')
 
             service_role = TeraServiceAccess()
             service_role.id_user_group = user_group1.id_user_group
-            service_role.id_service_role = servicebureauadmin.id_service_role
+            service_role.id_service_role = service_bureau_admin.id_service_role
+            db.session.add(service_role)
+
+            service_role = TeraServiceAccess()
+            service_role.id_user_group = user_group2.id_user_group
+            service_role.id_service_role = service_logging_admin.id_service_role
             db.session.add(service_role)
 
             service_role = TeraServiceAccess()
             service_role.id_device = device.id_device
-            service_role.id_service_role = servicebureauuser.id_service_role
+            service_role.id_service_role = service_bureau_user.id_service_role
+            db.session.add(service_role)
+
+            service_role = TeraServiceAccess()
+            service_role.id_participant_group = group.id_participant_group
+            service_role.id_service_role = service_logging_user.id_service_role
             db.session.add(service_role)
 
             db.session.commit()
