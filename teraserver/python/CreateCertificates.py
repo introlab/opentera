@@ -25,7 +25,7 @@ limitations under the License.
 import sys
 
 
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 
 import os
 

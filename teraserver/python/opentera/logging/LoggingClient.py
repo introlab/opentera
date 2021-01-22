@@ -131,7 +131,7 @@ class LoggingClient:
 
 
 if __name__ == '__main__':
-    from opentera.ConfigManager import ConfigManager
+    from opentera.config.ConfigManager import ConfigManager
     config_man = ConfigManager()
     config_man.create_defaults()
 

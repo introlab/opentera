@@ -10,7 +10,7 @@ from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraService import TeraService
 
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 import datetime
 import redis
 

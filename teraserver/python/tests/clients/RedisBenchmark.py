@@ -1,5 +1,5 @@
 from opentera.redis.RedisRPCClient import RedisRPCClient
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 from opentera.modules.BaseModule import ModuleNames
 
 from datetime import datetime

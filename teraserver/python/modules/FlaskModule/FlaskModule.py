@@ -1,7 +1,7 @@
 from flask import Flask, request, g, url_for
 from flask_session import Session
 from flask_restx import Api
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 from flask_babel import Babel
 from opentera.modules.BaseModule import BaseModule, ModuleNames
 from opentera.db.models.TeraServerSettings import TeraServerSettings

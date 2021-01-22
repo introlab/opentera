@@ -4,7 +4,7 @@ from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
 import os
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 
 
 class TeraUserTest(unittest.TestCase):

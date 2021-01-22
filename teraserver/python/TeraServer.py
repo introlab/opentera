@@ -30,7 +30,7 @@ from modules.FlaskModule.FlaskModule import FlaskModule
 from modules.TwistedModule.TwistedModule import TwistedModule
 from modules.ServiceLauncherModule.ServiceLauncherModule import ServiceLauncherModule
 
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 import modules.Globals as Globals
 
 from modules.UserManagerModule.UserManagerModule import UserManagerModule

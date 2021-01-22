@@ -32,7 +32,7 @@ from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 from modules.FlaskModule.FlaskModule import flask_app
 
 # User access with roles

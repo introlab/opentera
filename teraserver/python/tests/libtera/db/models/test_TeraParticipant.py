@@ -3,7 +3,7 @@ from modules.DatabaseModule.DBManager import DBManager
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from opentera.db.Base import db
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 import uuid
 import os
 

@@ -4,7 +4,7 @@ from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSession import TeraSession, TeraSessionStatus
 import os
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 
 
 class TeraSessionTest(unittest.TestCase):
@@ -30,7 +30,6 @@ class TeraSessionTest(unittest.TestCase):
         self.db_man.create_defaults(self.config)
 
     def tearDown(self):
-        from opentera.db.Base import db
         print('tear down')
 
     def test_session_defaults(self):

@@ -1,5 +1,5 @@
 from opentera.modules.BaseModule import BaseModule, ModuleNames
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 from opentera.db.models.TeraService import TeraService
 
 import os

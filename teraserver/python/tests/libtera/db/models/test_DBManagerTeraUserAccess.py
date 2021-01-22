@@ -4,7 +4,7 @@ import os
 from modules.DatabaseModule.DBManager import DBManager
 
 from opentera.db.models.TeraUser import TeraUser
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 
 
 class DBManagerTeraUserAccessTest(unittest.TestCase):

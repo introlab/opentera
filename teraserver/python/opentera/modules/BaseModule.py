@@ -1,5 +1,4 @@
 from opentera.redis.RedisClient import RedisClient
-from opentera.ConfigManager import ConfigManager
 from enum import Enum, unique
 import opentera.messages.python as messages
 from opentera.logging.LoggingClient import LoggingClient
@@ -105,7 +104,6 @@ class BaseModule(RedisClient):
         pass
 
     def notify_module_rpc(self, pattern, channel, message):
-        import threading
         # print('BaseModule - Received rpc', self, pattern, channel, message, ' thread:', threading.current_thread())
 
         try:

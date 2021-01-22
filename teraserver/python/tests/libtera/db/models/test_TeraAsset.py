@@ -3,9 +3,8 @@ import os
 
 from modules.DatabaseModule.DBManager import DBManager
 
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraAsset import TeraAsset
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 
 
 class TeraAssetTest(unittest.TestCase):

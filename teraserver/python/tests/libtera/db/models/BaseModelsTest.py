@@ -3,7 +3,7 @@ import os
 
 from opentera.db.Base import db
 from modules.DatabaseModule.DBManager import DBManager
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection

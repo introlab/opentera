@@ -1,4 +1,4 @@
-from opentera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 from opentera.messages.python.TeraModuleMessage_pb2 import TeraModuleMessage
 from opentera.messages.python.UserEvent_pb2 import UserEvent
 from opentera.messages.python.ParticipantEvent_pb2 import ParticipantEvent
