@@ -1,7 +1,7 @@
 from flask_restx import Resource
 from flask_babel import gettext
 
-from libtera.db.models import TeraUser
+from opentera.db.models import TeraUser
 from modules.LoginModule.LoginModule import LoginModule
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 
