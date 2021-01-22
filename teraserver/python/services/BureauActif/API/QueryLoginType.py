@@ -28,7 +28,8 @@ class QueryLoginType(Resource):
         login_infos = {
             'login_type': 'unknown',
             'login_id': 0,
-            'is_super_admin': False
+            'is_super_admin': False,
+            'username': 'unknown'
         }
 
         if current_login_type == LoginType.DEVICE_LOGIN:
@@ -38,11 +39,25 @@ class QueryLoginType(Resource):
         if current_login_type == LoginType.PARTICIPANT_LOGIN:
             login_infos['login_type'] = 'participant'
             login_infos['login_id'] = current_participant_client.id_participant
+            params = {'participant_id': current_participant_client.id_participant}
+            endpoint = '/api/service/participants'
+            response = Globals.service.get_from_opentera(endpoint, params)
+
+            if response.status_code == 200:
+                participant_infos = response.json()
+                login_infos['username'] = participant_infos['participant_username']
 
         if current_login_type == LoginType.USER_LOGIN:
             login_infos['login_type'] = 'user'
             login_infos['login_id'] = current_user_client.id_user
             login_infos['is_super_admin'] = current_user_client.user_superadmin
+            params = {'user_id': current_user_client.id_user}
+            endpoint = '/api/service/users'
+            response = Globals.service.get_from_opentera(endpoint, params)
+
+            if response.status_code == 200:
+                user_infos = response.json()
+                login_infos['username'] = user_infos['user_username']
 
         # If reservation has a session associated to it, get it from OpenTera
         if args['id_project'] or args['id_site']:
