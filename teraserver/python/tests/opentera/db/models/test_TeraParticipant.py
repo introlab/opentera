@@ -6,9 +6,10 @@ from opentera.db.Base import db
 from opentera.config.ConfigManager import ConfigManager
 import uuid
 import os
+from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
-class TeraParticipantTest(unittest.TestCase):
+class TeraParticipantTest(BaseModelsTest):
 
     filename = os.path.join(os.path.dirname(__file__), 'TeraParticipantTest.db')
 
@@ -16,22 +17,6 @@ class TeraParticipantTest(unittest.TestCase):
         'filename': filename
     }
 
-    def setUp(self):
-        if os.path.isfile(self.filename):
-            print('removing database')
-            os.remove(self.filename)
-
-        self.config = ConfigManager()
-        # Create default config
-        self.config.create_defaults()
-        self.db_man = DBManager(self.config)
-        self.db_man.open_local(self.SQLITE)
-
-        # Creating default users / tests.
-        self.db_man.create_defaults(self.config)
-
-    def tearDown(self):
-        pass
 
     def test_token(self):
         return

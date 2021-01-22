@@ -5,9 +5,10 @@ from modules.DatabaseModule.DBManager import DBManager
 
 from opentera.db.models.TeraUser import TeraUser
 from opentera.config.ConfigManager import ConfigManager
+from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
-class DBManagerTeraUserAccessTest(unittest.TestCase):
+class DBManagerTeraUserAccessTest(BaseModelsTest):
 
     filename = os.path.join(os.path.dirname(__file__), 'DBManagerTeraUserAccessTest.db')
 
@@ -16,31 +17,9 @@ class DBManagerTeraUserAccessTest(unittest.TestCase):
     }
 
     def setUp(self):
-        if os.path.isfile(self.filename):
-            print('removing database')
-            os.remove(self.filename)
-
-        self.admin_user = None
-        self.test_user = None
-
-        self.config = ConfigManager()
-        self.config.create_defaults()
-
-        self.db_man = DBManager(self.config)
-
-        self.db_man.open_local(self.SQLITE)
-
-        # Creating default users / tests.
-        self.db_man.create_defaults(self.config)
-
-        # Load admin user
+        super().setUp()
         self.admin_user = TeraUser.get_user_by_username('admin')
-
-        # Load test user
         self.test_user = TeraUser.get_user_by_username('user')
-
-    def tearDown(self):
-        pass
 
     def test_instance(self):
         self.assertNotEqual(self.admin_user, None)
