@@ -159,7 +159,7 @@ def init_services(config: ConfigManager):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='OpenTera Server')
-    parser.add_argument('--enable_tests', help='Test mode for server.', default=True)
+    parser.add_argument('--enable_tests', help='Test mode for server.', default=False)
     args = parser.parse_args()
 
     config_man = ConfigManager()
