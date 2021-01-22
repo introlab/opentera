@@ -18,6 +18,7 @@ from opentera.db.models.TeraSessionType import TeraSessionType
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 import uuid
 from modules.FlaskModule.FlaskModule import flask_app
+from sqlalchemy.exc import SQLAlchemyError
 
 limiter = Limiter(flask_app, key_func=get_ipaddr)
 
@@ -46,7 +47,7 @@ class DeviceRegister(Resource):
 
         print(self.ca_info)
 
-    def create_device(self, name, device_json = None):
+    def create_device(self, name, device_json=None):
         # Create TeraDevice
         device = TeraDevice()
 
@@ -119,19 +120,31 @@ class DeviceRegister(Resource):
             if 'device_name' not in device_info:
                 return gettext('Invalid content type'), 400
 
-            device_name = device_info['device_name']
-            device = self.create_device(device_name, device_info)
+            if 'id_device_type' not in device_info:
+                return gettext('Invalid content type'), 400
 
-            # Store
-            TeraDevice.insert(device)
+            try:
+                device_name = device_info['device_name']
+                device = self.create_device(device_name, device_info)
 
-            result = dict()
-            result['token'] = device.device_token
+                # Store
+                TeraDevice.insert(device)
 
-            self.module.logger.log_info(self.module.module_name, DeviceRegister.__name__,
-                                        'post', 'Device registered (token)', device.device_uuid, result['token'])
+                result = dict()
+                result['token'] = device.device_token
 
-            # Return token
-            return jsonify(result)
+                self.module.logger.log_info(self.module.module_name, DeviceRegister.__name__,
+                                            'post', 'Device registered (token)', device.device_uuid, result['token'])
+
+                # Return token
+                return jsonify(result)
+            except SQLAlchemyError as e:
+                import sys
+                print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             DeviceRegister.__name__,
+                                             'post', 500, 'Database error', str(e))
+                return e.args, 500
+
         else:
             return gettext('Invalid content type'), 400
