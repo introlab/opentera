@@ -1,4 +1,8 @@
 from flask_sqlalchemy import event
+from sqlalchemy.engine import Engine
+from sqlite3 import Connection as SQLite3Connection
+
+
 from opentera.db.Base import db
 import opentera.messages.python as messages
 
@@ -329,6 +333,14 @@ class DBManager (BaseModule):
         # Stamp database
         command.stamp(config, revision, sql, tag)
 
+
+# Fix foreign_keys on sqlite
+@event.listens_for(Engine, "connect")
+def _set_sqlite_pragma(dbapi_connection, connection_record):
+    if isinstance(dbapi_connection, SQLite3Connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON;")
+        cursor.close()
 
 # @event.listens_for(db.session, 'after_flush')
 # def receive_after_flush(session, flush_context):

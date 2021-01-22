@@ -180,9 +180,6 @@ class TeraServiceAccess(db.Model, BaseModel):
             servicebureau = TeraService.get_service_by_key('BureauActif')
             servicebureauadmin = servicebureau.service_roles[0]
             servicebureauuser = servicebureau.service_roles[1]
-            serviceviddispatch = TeraService.get_service_by_key('VideoDispatch')
-            serviceviddispatchadmin = serviceviddispatch.service_roles[0]
-            serviceviddispatchuser = serviceviddispatch.service_roles[1]
 
             user_group1 = TeraUserGroup.get_user_group_by_group_name('Users - Project 1')
             user_group2 = TeraUserGroup.get_user_group_by_group_name('Admins - Project 1')
@@ -193,18 +190,8 @@ class TeraServiceAccess(db.Model, BaseModel):
             db.session.add(service_role)
 
             service_role = TeraServiceAccess()
-            service_role.id_user_group = user_group2.id_user_group
-            service_role.id_service_role = serviceviddispatchadmin.id_service_role
-            db.session.add(service_role)
-
-            service_role = TeraServiceAccess()
             service_role.id_device = device.id_device
             service_role.id_service_role = servicebureauuser.id_service_role
-            db.session.add(service_role)
-
-            service_role = TeraServiceAccess()
-            service_role.id_participant_group = group.id_participant_group
-            service_role.id_service_role = serviceviddispatchuser.id_service_role
             db.session.add(service_role)
 
             db.session.commit()

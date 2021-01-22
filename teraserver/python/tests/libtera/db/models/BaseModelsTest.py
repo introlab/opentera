@@ -16,6 +16,7 @@ class BaseModelsTest(unittest.TestCase):
     SQLITE = {
         'filename': filename
     }
+
     def setUp(self):
         if os.path.isfile(self.filename):
             print('removing database')
@@ -41,9 +42,3 @@ class BaseModelsTest(unittest.TestCase):
     def test_defaults(self):
         pass
 
-    @event.listens_for(Engine, "connect")
-    def _set_sqlite_pragma(dbapi_connection, connection_record):
-        if isinstance(dbapi_connection, SQLite3Connection):
-            cursor = dbapi_connection.cursor()
-            cursor.execute("PRAGMA foreign_keys=ON;")
-            cursor.close()

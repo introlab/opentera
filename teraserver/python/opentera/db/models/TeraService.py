@@ -80,7 +80,7 @@ class TeraService(db.Model, BaseModel):
             'service_uuid': self.service_uuid
         }
 
-        return jwt.encode(payload, token_key, algorithm='HS256').decode('utf-8')
+        return jwt.encode(payload, token_key, algorithm='HS256')
 
     @staticmethod
     def get_service_by_key(key: str):
