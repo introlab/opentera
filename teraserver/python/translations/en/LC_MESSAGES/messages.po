@@ -7,19 +7,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-01-19 16:16-0500\n"
-"PO-Revision-Date: 2019-10-08 10:59-0400\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2021-01-25 09:46-0500\n"
+"PO-Revision-Date: 2021-01-25 09:47-0500\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.0\n"
+"Last-Translator: \n"
+"X-Generator: Poedit 2.4.2\n"
 
-#: libtera/db/models/TeraSessionType.py:130
-#: libtera/forms/TeraSessionForm.py:101
+#: libtera/db/models/TeraSessionType.py:130 libtera/forms/TeraSessionForm.py:101
 msgid "Unknown"
 msgstr ""
 
@@ -87,11 +87,9 @@ msgid "Last Connection"
 msgstr ""
 
 #: libtera/forms/TeraDeviceForm.py:47 libtera/forms/TeraDeviceSubTypeForm.py:24
-#: libtera/forms/TeraDeviceTypeForm.py:17
-#: libtera/forms/TeraParticipantForm.py:34
+#: libtera/forms/TeraDeviceTypeForm.py:17 libtera/forms/TeraParticipantForm.py:34
 #: libtera/forms/TeraParticipantGroupForm.py:33
-#: libtera/forms/TeraProjectForm.py:19
-#: libtera/forms/TeraServiceConfigForm.py:18
+#: libtera/forms/TeraProjectForm.py:19 libtera/forms/TeraServiceConfigForm.py:18
 #: libtera/forms/TeraServiceForm.py:18 libtera/forms/TeraSessionForm.py:116
 #: libtera/forms/TeraSessionTypeForm.py:33 libtera/forms/TeraSiteForm.py:12
 #: libtera/forms/TeraUserForm.py:13 libtera/forms/TeraUserGroupForm.py:18
@@ -222,8 +220,7 @@ msgstr ""
 msgid "Site Name"
 msgstr ""
 
-#: libtera/forms/TeraServiceConfigForm.py:25
-#: libtera/forms/TeraServiceForm.py:25
+#: libtera/forms/TeraServiceConfigForm.py:25 libtera/forms/TeraServiceForm.py:25
 msgid "Service ID"
 msgstr ""
 
@@ -770,12 +767,10 @@ msgstr ""
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:80
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:146
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:169
-#: modules/LoginModule/LoginModule.py:424
-#: modules/LoginModule/LoginModule.py:466
-#: modules/LoginModule/LoginModule.py:484
-#: modules/LoginModule/LoginModule.py:494
+#: modules/LoginModule/LoginModule.py:424 modules/LoginModule/LoginModule.py:466
+#: modules/LoginModule/LoginModule.py:484 modules/LoginModule/LoginModule.py:494
 msgid "Unauthorized"
-msgstr "Non autorisé"
+msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:151
 msgid "Missing argument 'session name'"
@@ -1033,26 +1028,25 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:385
 msgid ""
-"Can't delete device: please delete all participants association before "
-"deleting."
+"Can't delete device: please delete all participants association before deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:388
 msgid ""
-"Can't delete device: please remove all sessions referring to that device "
-"before deleting."
+"Can't delete device: please remove all sessions referring to that device before "
+"deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:391
 msgid ""
-"Can't delete device: please remove all sessions created by that device "
-"before deleting."
+"Can't delete device: please remove all sessions created by that device before "
+"deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:393
 msgid ""
-"Can't delete device: please delete all assets created by that device "
-"before deleting."
+"Can't delete device: please delete all assets created by that device before "
+"deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:410
@@ -1146,8 +1140,8 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryProjects.py:206
 msgid ""
-"Can't delete project: please delete all participants with sessions before"
-" deleting."
+"Can't delete project: please delete all participants with sessions before "
+"deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:99
@@ -1233,8 +1227,8 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:131
 msgid ""
-"Trying to associate a session type of type \"service\" with a service not"
-" associated to that project"
+"Trying to associate a session type of type \"service\" with a service not "
+"associated to that project"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:93
@@ -1263,8 +1257,8 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:257
 msgid ""
-"Can't delete session type: please delete all sessions with that type "
-"before deleting."
+"Can't delete session type: please delete all sessions with that type before "
+"deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySessions.py:121
@@ -1308,8 +1302,7 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySites.py:190
 msgid ""
-"Can't delete site: please delete all participants with sessions before "
-"deleting."
+"Can't delete site: please delete all participants with sessions before deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryStats.py:89
@@ -1322,8 +1315,8 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUserGroups.py:301
 msgid ""
-"Can't delete user group: please delete all users part of that user group "
-"before deleting."
+"Can't delete user group: please delete all users part of that user group before "
+"deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUserPreferences.py:91
@@ -1389,14 +1382,14 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:360
 msgid ""
-"Can't delete user: please remove all sessions that this user is part of "
-"before deleting."
+"Can't delete user: please remove all sessions that this user is part of before "
+"deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:363
 msgid ""
-"Can't delete user: please remove all sessions created by this user before"
-" deleting."
+"Can't delete user: please remove all sessions created by this user before "
+"deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:365
@@ -1449,15 +1442,15 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserSessionManager.py:245
 msgid "No answer from service."
-msgstr "Pas de réponse du service."
+msgstr ""
 
 #: modules/LoginModule/LoginModule.py:394
 msgid "Invalid token"
-msgstr "Jeton invalide"
+msgstr ""
 
 #: modules/LoginModule/LoginModule.py:453
 msgid "Invalid Token"
-msgstr "Jeton invalide"
+msgstr ""
 
 #: templates/about.html:33
 msgid "Downloads"
@@ -1478,170 +1471,3 @@ msgstr ""
 #: templates/about.html:87
 msgid "Contributors"
 msgstr ""
-
-#~ msgid "Service Configuration Schema"
-#~ msgstr ""
-
-#~ msgid "Preferences"
-#~ msgstr ""
-
-#~ msgid "Language"
-#~ msgstr ""
-
-#~ msgid "Français"
-#~ msgstr ""
-
-#~ msgid "English"
-#~ msgstr ""
-
-#~ msgid "Activate Notification Sounds"
-#~ msgstr ""
-
-#~ msgid "Missing required id."
-#~ msgstr ""
-
-#~ msgid "Service Port"
-#~ msgstr ""
-
-#~ msgid "Service URL"
-#~ msgstr ""
-
-#~ msgid "Service Client Endpoint"
-#~ msgstr ""
-
-#~ msgid "Missing id_creator_user"
-#~ msgstr ""
-
-#~ msgid "Missing json fields"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Device projects may be specified with"
-#~ " that API only on a new device."
-#~ " Use \"device_projects\" instead"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Session type projects may be specified"
-#~ " with that API only on a new"
-#~ " session type. Use \"sessiontypeproject\" "
-#~ "instead"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "User groups may be specified with "
-#~ "that API only on a new user. "
-#~ "Use \"user_usergroups\" instead"
-#~ msgstr ""
-
-#~ msgid "No ID Session specified"
-#~ msgstr ""
-
-#~ msgid "No file specified"
-#~ msgstr ""
-
-#~ msgid "No filename specified"
-#~ msgstr ""
-
-#~ msgid "Inconue"
-#~ msgstr ""
-
-#~ msgid "Envoi de fichiers"
-#~ msgstr ""
-
-#~ msgid "Collecte de données"
-#~ msgstr ""
-
-#~ msgid "Protocole"
-#~ msgstr ""
-
-#~ msgid "Caméra"
-#~ msgstr ""
-
-#~ msgid "Caméra réseau"
-#~ msgstr ""
-
-#~ msgid "Capture d'écran"
-#~ msgstr ""
-
-#~ msgid "Adresse du flux de la caméra"
-#~ msgstr ""
-
-#~ msgid "Trames par seconde"
-#~ msgstr ""
-
-#~ msgid "Résolution"
-#~ msgstr ""
-
-#~ msgid "Caméra contrôlable (PTZ)"
-#~ msgstr ""
-
-#~ msgid "Type de contrôle"
-#~ msgstr ""
-
-#~ msgid "ONVIF (générique)"
-#~ msgstr ""
-
-#~ msgid "Adresse réseau"
-#~ msgstr ""
-
-#~ msgid "Nom utilisateur"
-#~ msgstr ""
-
-#~ msgid "Mot de passe"
-#~ msgstr ""
-
-#~ msgid "Caméra secondaire"
-#~ msgstr ""
-
-#~ msgid "RSTP URL"
-#~ msgstr ""
-
-#~ msgid "Configuration audio-vidéo"
-#~ msgstr ""
-
-#~ msgid "Type de caméra"
-#~ msgstr ""
-
-#~ msgid "Device Type"
-#~ msgstr ""
-
-#~ msgid "Participants"
-#~ msgstr ""
-
-#~ msgid "Users"
-#~ msgstr ""
-
-#~ msgid "Session Type Multiuser"
-#~ msgstr ""
-
-#~ msgid "Missing parameter"
-#~ msgstr ""
-
-#~ msgid "No arguments"
-#~ msgstr ""
-
-#~ msgid "Invalid service id"
-#~ msgstr ""
-
-#~ msgid "ProjectAccess: missing argument."
-#~ msgstr ""
-
-#~ msgid "SiteAccess: missing argument."
-#~ msgstr ""
-
-#~ msgid "Session User Creator ID"
-#~ msgstr ""
-
-#~ msgid "Session Creator Participant ID"
-#~ msgstr ""
-
-#~ msgid "Session Creator Service ID"
-#~ msgstr ""
-
-#~ msgid "Missing id_device_type or id_device_subtype"
-#~ msgstr ""
-
-#~ msgid "Forbidden access"
-#~ msgstr ""
-
