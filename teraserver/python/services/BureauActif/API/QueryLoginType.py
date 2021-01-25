@@ -70,7 +70,12 @@ class QueryLoginType(Resource):
             response = Globals.service.get_from_opentera(endpoint, params)
 
             if response.status_code == 200:
-                permission_info = response.json()
-                login_infos.update(permission_info)
+                role = response.json()
+                if args['id_project']:
+                    project_admin = True if role['project_role'] == 'admin' else False
+                    login_infos.update({'project_admin': project_admin})
+                if args['id_site']:
+                    site_admin = True if role['site_role'] == 'admin' else False
+                    login_infos.update({'site_admin': site_admin})
 
         return login_infos
