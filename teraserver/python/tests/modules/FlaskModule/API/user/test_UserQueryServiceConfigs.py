@@ -224,7 +224,7 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 0)
 
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=6&"
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=5&"
                                                                                             "id_participant=1")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
@@ -233,9 +233,9 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item)
             self.assertEqual(data_item['id_participant'], 1)
-            self.assertEqual(data_item['id_service'], 6)
+            self.assertEqual(data_item['id_service'], 5)
 
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=6&"
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=5&"
                                                                                             "id_device=1")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
@@ -244,7 +244,7 @@ class UserQueryServiceConfigsTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item)
             self.assertEqual(data_item['id_device'], 1)
-            self.assertEqual(data_item['id_service'], 6)
+            self.assertEqual(data_item['id_service'], 5)
 
     def test_post_and_delete(self):
         # New with minimal infos

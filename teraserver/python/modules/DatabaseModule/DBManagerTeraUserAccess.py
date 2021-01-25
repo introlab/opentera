@@ -943,7 +943,7 @@ class DBManagerTeraUserAccess:
                              service_id: int = None):
         from opentera.db.models.TeraServiceAccess import TeraServiceAccess
         from opentera.db.models.TeraServiceRole import TeraServiceRole
-        accessible_services_ids = self.get_accessible_services_ids()
+        accessible_services_ids = self.get_accessible_services_ids(include_system_services=True)
 
         query = TeraServiceAccess.query
         if user_group_id:

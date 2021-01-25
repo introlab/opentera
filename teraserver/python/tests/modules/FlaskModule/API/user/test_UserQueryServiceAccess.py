@@ -56,7 +56,7 @@ class UserQueryServiceAccessTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -127,7 +127,7 @@ class UserQueryServiceAccessTest(BaseAPITest):
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 400, msg="Missing id_service_role")
 
-        json_data['service_access']['id_service_role'] = 7
+        json_data['service_access']['id_service_role'] = 5
         response = self._post_with_http_auth(username='user4', password='user4', payload=json_data)
         self.assertEqual(response.status_code, 403, msg="Post denied for user")  # Forbidden for that user to post that
 

@@ -6,7 +6,7 @@ import json
 
 class DeviceLoginTest(unittest.TestCase):
 
-    host = 'localhost'
+    host = '127.0.0.1'
     port = 40075
     device_login_endpoint = '/api/device/login'
     user_device_endpoint = '/api/user/devices'
