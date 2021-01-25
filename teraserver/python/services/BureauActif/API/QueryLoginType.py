@@ -51,7 +51,7 @@ class QueryLoginType(Resource):
             login_infos['login_type'] = 'user'
             login_infos['login_id'] = current_user_client.id_user
             login_infos['is_super_admin'] = current_user_client.user_superadmin
-            params = {'user_id': current_user_client.id_user}
+            params = {'user_uuid': current_user_client.user_uuid}
             endpoint = '/api/service/users'
             response = Globals.service.get_from_opentera(endpoint, params)
 
