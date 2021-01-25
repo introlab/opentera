@@ -21,7 +21,7 @@ else(WIN32)
     set(PYBABEL_EXECUTABLE ${PYTHON_ENV_DIRECTORY}/bin/pybabel)
 endif(WIN32)
 
-add_subdirectory(messages/python)
+add_subdirectory(opentera/messages/python)
 
 # Generate protobuf python files
 
@@ -57,16 +57,19 @@ add_custom_target(
     SOURCES babel.cfg
 )
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OpenTeraServerVersion.py.in ${CMAKE_CURRENT_SOURCE_DIR}/OpenTeraServerVersion.py)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/opentera/OpenTeraServerVersion.py.in ${CMAKE_CURRENT_SOURCE_DIR}/opentera/OpenTeraServerVersion.py)
 
 # Generate version file
-add_custom_target(python-server-version SOURCES OpenTeraServerVersion.py.in)
+add_custom_target(python-server-version SOURCES opentera/OpenTeraServerVersion.py.in)
 
 # Will always be considered out of date...
-add_custom_target(python-all DEPENDS python-env python-messages python-server-version python-translations-compile-only OpenTeraServerVersion.py)
+add_custom_target(python-all DEPENDS python-env python-messages python-server-version python-translations-compile-only opentera/OpenTeraServerVersion.py)
 
 # Build this target if you want to update translations too...
 add_custom_target(python-all-with-translations DEPENDS python-all python-translations)
 
 # Docker
 add_subdirectory(docker)
+
+# Services
+add_subdirectory(services)

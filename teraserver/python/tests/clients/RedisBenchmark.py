@@ -1,6 +1,6 @@
-from libtera.redis.RedisRPCClient import RedisRPCClient
-from libtera.ConfigManager import ConfigManager
-from modules.BaseModule import ModuleNames, create_module_message_topic_from_name
+from opentera.redis.RedisRPCClient import RedisRPCClient
+from opentera.config.ConfigManager import ConfigManager
+from opentera.modules.BaseModule import ModuleNames
 
 from datetime import datetime
 

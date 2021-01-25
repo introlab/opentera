@@ -5,22 +5,22 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
 from flask_babel import gettext
 
-from libtera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraUser import TeraUser
 
-from libtera.forms.TeraUserForm import TeraUserForm
-from libtera.forms.TeraSiteForm import TeraSiteForm
-from libtera.forms.TeraDeviceForm import TeraDeviceForm
-from libtera.forms.TeraProjectForm import TeraProjectForm
-from libtera.forms.TeraParticipantGroupForm import TeraParticipantGroupForm
-from libtera.forms.TeraParticipantForm import TeraParticipantForm
-from libtera.forms.TeraSessionTypeForm import TeraSessionTypeForm
-from libtera.forms.TeraSessionForm import TeraSessionForm
-from libtera.forms.TeraDeviceTypeForm import TeraDeviceTypeForm
-from libtera.forms.TeraDeviceSubTypeForm import TeraDeviceSubTypeForm
-from libtera.forms.TeraUserGroupForm import TeraUserGroupForm
-from libtera.forms.TeraServiceForm import TeraServiceForm
-from libtera.forms.TeraServiceConfigForm import TeraServiceConfigForm
-from libtera.forms.TeraVersionsForm import TeraVersionsForm
+from opentera.forms.TeraUserForm import TeraUserForm
+from opentera.forms.TeraSiteForm import TeraSiteForm
+from opentera.forms.TeraDeviceForm import TeraDeviceForm
+from opentera.forms.TeraProjectForm import TeraProjectForm
+from opentera.forms.TeraParticipantGroupForm import TeraParticipantGroupForm
+from opentera.forms.TeraParticipantForm import TeraParticipantForm
+from opentera.forms.TeraSessionTypeForm import TeraSessionTypeForm
+from opentera.forms.TeraSessionForm import TeraSessionForm
+from opentera.forms.TeraDeviceTypeForm import TeraDeviceTypeForm
+from opentera.forms.TeraDeviceSubTypeForm import TeraDeviceSubTypeForm
+from opentera.forms.TeraUserGroupForm import TeraUserGroupForm
+from opentera.forms.TeraServiceForm import TeraServiceForm
+from opentera.forms.TeraServiceConfigForm import TeraServiceConfigForm
+from opentera.forms.TeraVersionsForm import TeraVersionsForm
 
 get_parser = api.parser()
 get_parser.add_argument(name='type', type=str, help='Data type of the required form. Currently, the '
@@ -119,11 +119,11 @@ class UserQueryForms(Resource):
 
             service = None
             if args['id']:
-                from libtera.db.models.TeraService import TeraService
+                from opentera.db.models.TeraService import TeraService
                 service = TeraService.get_service_by_id(args['id'])
 
             if args['key']:
-                from libtera.db.models.TeraService import TeraService
+                from opentera.db.models.TeraService import TeraService
                 service = TeraService.get_service_by_key(args['key'])
 
             if not service:

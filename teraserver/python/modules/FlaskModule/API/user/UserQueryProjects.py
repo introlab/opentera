@@ -4,9 +4,9 @@ from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraProject import TeraProject
-from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from modules.DatabaseModule.DBManager import DBManager
 from flask_babel import gettext
 

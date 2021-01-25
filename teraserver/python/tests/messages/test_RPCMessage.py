@@ -1,6 +1,6 @@
 import unittest
 
-from messages.python.RPCMessage_pb2 import RPCMessage, Value
+from opentera.messages.python.RPCMessage_pb2 import RPCMessage, Value
 import datetime
 
 

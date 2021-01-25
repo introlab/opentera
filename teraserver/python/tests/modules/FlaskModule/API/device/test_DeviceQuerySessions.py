@@ -7,7 +7,7 @@ from datetime import datetime
 
 class DeviceQuerySessionsTest(unittest.TestCase):
 
-    host = 'localhost'
+    host = '127.0.0.1'
     port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'

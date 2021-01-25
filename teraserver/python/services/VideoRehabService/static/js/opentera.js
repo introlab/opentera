@@ -1,17 +1,3 @@
-
-function validateInput(inputId){
-	var rval = ($(inputId).val() != "");
-	if (!rval){
-		$(inputId).css('background-color','#e05c5c');
-		$(inputId).css('color','black');
-	}else{
-		$(inputId).css('background-color','');
-		$(inputId).css('color','');
-	}
-
-	return rval;
-}
-
 function setCookie(cname, cvalue, exminutes) {
   var d = new Date();
   d.setTime(d.getTime() + (exminutes*60*1000));
@@ -56,18 +42,9 @@ function doGetRequest(request_url, request_port, request_path, success_response,
           success: success_response,
           error: error_response,
           beforeSend: function (xhr) {
-            if (sessionStorage.getItem("is_participant") === false)
-                xhr.setRequestHeader('Authorization', 'OpenTera ' + getCookie('VideoDispatchToken'));
-            else
-                xhr.setRequestHeader('Authorization', 'OpenTera ' + getCookie('VideoDispatchTokenParticipant'));
-            }
+              xhr.setRequestHeader('Authorization', 'OpenTera ' + sessionStorage.getItem("participant_token"));
+          }
         });
-
-     // Refresh cookies
-     /*if (getCookie('VideoDispatchToken'))
-        setCookie('VideoDispatchToken', getCookie('VideoDispatchToken', 30));
-     if (getCookie('VideoDispatchTokenParticipant'))
-        setCookie('VideoDispatchTokenParticipant', getCookie('VideoDispatchTokenParticipant', 30));*/
 }
 
 function getRequestSuccess(response, status, request){

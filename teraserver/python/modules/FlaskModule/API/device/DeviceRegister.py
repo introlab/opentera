@@ -5,19 +5,20 @@ from flask import request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address, get_ipaddr
 import base64
-from libtera.crypto.crypto_utils import generate_device_certificate, load_private_pem_key, load_pem_certificate
+from opentera.crypto.crypto_utils import generate_device_certificate, load_private_pem_key, load_pem_certificate
 from cryptography import x509
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 
-from libtera.db.Base import db
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraDeviceType import TeraDeviceType
-from libtera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.Base import db
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraDeviceType import TeraDeviceType
+from opentera.db.models.TeraSessionType import TeraSessionType
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 import uuid
 from modules.FlaskModule.FlaskModule import flask_app
+from sqlalchemy.exc import SQLAlchemyError
 
 limiter = Limiter(flask_app, key_func=get_ipaddr)
 
@@ -46,7 +47,7 @@ class DeviceRegister(Resource):
 
         print(self.ca_info)
 
-    def create_device(self, name, device_json = None):
+    def create_device(self, name, device_json=None):
         # Create TeraDevice
         device = TeraDevice()
 
@@ -119,19 +120,31 @@ class DeviceRegister(Resource):
             if 'device_name' not in device_info:
                 return gettext('Invalid content type'), 400
 
-            device_name = device_info['device_name']
-            device = self.create_device(device_name, device_info)
+            if 'id_device_type' not in device_info:
+                return gettext('Invalid content type'), 400
 
-            # Store
-            TeraDevice.insert(device)
+            try:
+                device_name = device_info['device_name']
+                device = self.create_device(device_name, device_info)
 
-            result = dict()
-            result['token'] = device.device_token
+                # Store
+                TeraDevice.insert(device)
 
-            self.module.logger.log_info(self.module.module_name, DeviceRegister.__name__,
-                                        'post', 'Device registered (token)', device.device_uuid, result['token'])
+                result = dict()
+                result['token'] = device.device_token
 
-            # Return token
-            return jsonify(result)
+                self.module.logger.log_info(self.module.module_name, DeviceRegister.__name__,
+                                            'post', 'Device registered (token)', device.device_uuid, result['token'])
+
+                # Return token
+                return jsonify(result)
+            except SQLAlchemyError as e:
+                import sys
+                print(sys.exc_info())
+                self.module.logger.log_error(self.module.module_name,
+                                             DeviceRegister.__name__,
+                                             'post', 500, 'Database error', str(e))
+                return e.args, 500
+
         else:
             return gettext('Invalid content type'), 400

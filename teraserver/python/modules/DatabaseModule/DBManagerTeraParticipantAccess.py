@@ -1,17 +1,17 @@
 
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSite import TeraSite
-from libtera.db.models.TeraProject import TeraProject
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraSessionParticipants import TeraSessionParticipants
-from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
-from libtera.db.models.TeraDeviceType import TeraDeviceType
-from libtera.db.models.TeraSessionType import TeraSessionType
-from libtera.db.models.TeraDevice import TeraDevice
-#from libtera.db.models.TeraDeviceData import TeraDeviceData
-from libtera.db.models.TeraDeviceProject import TeraDeviceProject
-from libtera.db.models.TeraSession import TeraSession
-from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraSite import TeraSite
+from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
+from opentera.db.models.TeraDeviceType import TeraDeviceType
+from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraDevice import TeraDevice
+#from opentera.db.models.TeraDeviceData import TeraDeviceData
+from opentera.db.models.TeraDeviceProject import TeraDeviceProject
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 
 
 class DBManagerTeraParticipantAccess:

@@ -7,7 +7,7 @@ import services.FileTransferService.libfiletransferservice.db.models
 
 from services.FileTransferService.ConfigManager import ConfigManager
 from services.FileTransferService.FlaskModule import flask_app
-from messages.python.LogEvent_pb2 import LogEvent
+from opentera.messages.python.LogEvent_pb2 import LogEvent
 import datetime
 
 # Alembic

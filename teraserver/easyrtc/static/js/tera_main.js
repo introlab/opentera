@@ -1,4 +1,6 @@
 let isWeb = true;
+let translator = null;
+let currentLang = 'fr';
 
 function preInitSystem(){
     console.log("Pre-initializing system...");
@@ -12,6 +14,27 @@ function preInitSystem(){
         include("qrc:///qtwebchannel/qwebchannel.js");
     }
 
+}
+
+function initTranslator(){
+    // Check for url parameters
+    let urlParams = new URLSearchParams(window.location.search);
+
+    let langParam = urlParams.get('lang');
+    if (langParam !== null)
+        currentLang = langParam;
+
+    // Load translation module
+    console.log("Loading translation module...");
+    translator = new Translator({
+        defaultLanguage: 'fr',
+        filesLocation: 'i18n',
+        debug: true
+    });
+    translator.fetch(['en', 'fr']).then(() => {
+        // -> Translations are ready...
+        translator.translatePageTo(currentLang);
+    });
 }
 
 function initSystem(){
@@ -37,7 +60,7 @@ function initSystem(){
 
     // Initialize video and audio sources
     fillDefaultSourceList().then(initSystemDone).catch(err => {
-        showStatusMsg("Impossible de continuer. Veuillez réessayer.")
+        showStatusMsg(translator.translateForKey("status.cant-continue", currentLang))
     })
 }
 

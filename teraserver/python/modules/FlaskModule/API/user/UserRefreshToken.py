@@ -1,6 +1,5 @@
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse, fields
-from flask_babel import gettext
+from flask import session, request
+from flask_restx import Resource, reqparse
 from modules.LoginModule.LoginModule import user_token_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.LoginModule.LoginModule import LoginModule
@@ -24,11 +23,11 @@ class UserRefreshToken(Resource):
     def get(self):
         # If we have made it this far, token passed in headers was valid.
         # Get user token key from redis
-        from modules.RedisVars import RedisVars
+        from opentera.redis.RedisVars import RedisVars
         token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
 
         # Get token for user
-        from libtera.db.models.TeraUser import TeraUser
+        from opentera.db.models.TeraUser import TeraUser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
 
         # Put old token in disabled tokens

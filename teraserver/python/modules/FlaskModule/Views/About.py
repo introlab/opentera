@@ -1,7 +1,7 @@
 from flask.views import MethodView
 from flask import render_template, request
 from modules.LoginModule.LoginModule import user_multi_auth
-from libtera.utils.TeraVersions import TeraVersions
+from opentera.utils.TeraVersions import TeraVersions
 
 
 class About(MethodView):

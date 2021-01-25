@@ -1,38 +1,43 @@
 from flask_sqlalchemy import event
-from libtera.db.Base import db
-import messages.python as messages
+from sqlalchemy.engine import Engine
+from sqlite3 import Connection as SQLite3Connection
+
+
+from opentera.db.Base import db
+import opentera.messages.python as messages
 
 # Must include all Database objects here to be properly initialized and created if needed
-from modules.BaseModule import BaseModule, ModuleNames, create_module_event_topic_from_name
+from opentera.modules.BaseModule import BaseModule, ModuleNames, create_module_event_topic_from_name
 
 # All at once to make sure all files are registered.
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSite import TeraSite
-from libtera.db.models.TeraProject import TeraProject
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
-from libtera.db.models.TeraDeviceType import TeraDeviceType
-from libtera.db.models.TeraDeviceSubType import TeraDeviceSubType
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraSession import TeraSession
-from libtera.db.models.TeraSessionType import TeraSessionType
-# from libtera.db.models.TeraDeviceData import TeraDeviceData
-from libtera.db.models.TeraDeviceProject import TeraDeviceProject
-from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
-from libtera.db.models.TeraServerSettings import TeraServerSettings
-from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
-from libtera.db.models.TeraSessionEvent import TeraSessionEvent
-from libtera.db.models.TeraAsset import TeraAsset
-from libtera.db.models.TeraService import TeraService
-from libtera.db.models.TeraServiceRole import TeraServiceRole
-from libtera.db.models.TeraServiceProject import TeraServiceProject
-from libtera.db.models.TeraUserGroup import TeraUserGroup
-from libtera.db.models.TeraUserPreference import TeraUserPreference
-from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
-from libtera.db.models.TeraServiceAccess import TeraServiceAccess
-from libtera.db.models.TeraServiceConfig import TeraServiceConfig
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraSite import TeraSite
+from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
+from opentera.db.models.TeraDeviceType import TeraDeviceType
+from opentera.db.models.TeraDeviceSubType import TeraDeviceSubType
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraSessionType import TeraSessionType
+# from opentera.db.models.TeraDeviceData import TeraDeviceData
+from opentera.db.models.TeraDeviceProject import TeraDeviceProject
+from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+from opentera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraSessionEvent import TeraSessionEvent
+from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraServiceRole import TeraServiceRole
+from opentera.db.models.TeraServiceProject import TeraServiceProject
+# from opentera.db.models.TeraServiceSite import TeraServiceSite
+from opentera.db.models.TeraUserGroup import TeraUserGroup
+from opentera.db.models.TeraUserPreference import TeraUserPreference
+from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 
-from libtera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 from modules.FlaskModule.FlaskModule import flask_app
 
 # User access with roles
@@ -176,6 +181,10 @@ class DBManager (BaseModule):
             print('No service - project association - creating defaults')
             TeraServiceProject.create_defaults(test)
 
+        # if TeraServiceSite.get_count() == 0:
+        #     print('No service - site association - creating defaults')
+        #     TeraServiceSite.create_defaults(test)
+
         if TeraParticipantGroup.get_count() == 0:
             print("No participant groups - creating defaults")
             TeraParticipantGroup.create_defaults(test)
@@ -224,7 +233,7 @@ class DBManager (BaseModule):
         # TODO Add events that need to be sent through redis
         # TODO Useful to specify event name, always get_model_name() ?
 
-        from libtera.db.models import EventNameClassMap
+        from opentera.db.models import EventNameClassMap
         for name in EventNameClassMap:
             self.setup_events_for_class(EventNameClassMap[name], name)
 
@@ -329,6 +338,14 @@ class DBManager (BaseModule):
         # Stamp database
         command.stamp(config, revision, sql, tag)
 
+
+# Fix foreign_keys on sqlite
+@event.listens_for(Engine, "connect")
+def _set_sqlite_pragma(dbapi_connection, connection_record):
+    if isinstance(dbapi_connection, SQLite3Connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON;")
+        cursor.close()
 
 # @event.listens_for(db.session, 'after_flush')
 # def receive_after_flush(session, flush_context):

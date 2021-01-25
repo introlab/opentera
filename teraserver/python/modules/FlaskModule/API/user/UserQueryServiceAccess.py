@@ -2,7 +2,7 @@ from flask import jsonify, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -39,7 +39,7 @@ class UserQueryServiceAccess(Resource):
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error when getting association'})
     def get(self):
-        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+        from opentera.db.models.TeraServiceAccess import TeraServiceAccess
         user_access = DBManager.userAccess(current_user)
 
         parser = get_parser
@@ -87,7 +87,7 @@ class UserQueryServiceAccess(Resource):
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',
                         500: 'Internal error occured when saving association'})
     def post(self):
-        from libtera.db.models.TeraServiceRole import TeraServiceRole
+        from opentera.db.models.TeraServiceRole import TeraServiceRole
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!

@@ -2,13 +2,13 @@ import unittest
 import os
 from requests import get, post
 import json
-import libtera.crypto.crypto_utils as crypto
+import opentera.crypto.crypto_utils as crypto
 from cryptography.hazmat.primitives import hashes, serialization
 
 
 class DeviceRegisterTest(unittest.TestCase):
 
-    host = 'localhost'
+    host = '127.0.0.1'
     port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
@@ -69,8 +69,22 @@ class DeviceRegisterTest(unittest.TestCase):
         response = self._device_api_post(None, self.device_register_endpoint)
         self.assertEqual(response.status_code, 400)
 
-    def test_device_register_ok_post(self):
+    def test_device_register_incomplete_post(self):
         device_info = {'device_info': {'device_name': 'Device Name'}}
+        response = self._device_api_post(None, self.device_register_endpoint, **device_info)
+        self.assertEqual(400, response.status_code)
+
+        device_info = {'device_info': {'id_device_type': 0}}
+        response = self._device_api_post(None, self.device_register_endpoint, **device_info)
+        self.assertEqual(400, response.status_code)
+
+    def test_device_register_invalid_id_device_type(self):
+        device_info = {'device_info': {'device_name': 'Device Name', 'id_device_type': 0}}
+        response = self._device_api_post(None, self.device_register_endpoint, **device_info)
+        self.assertEqual(500, response.status_code)
+
+    def test_device_register_ok_post(self):
+        device_info = {'device_info': {'device_name': 'Device Name', 'id_device_type': 1}}
         response = self._device_api_post(None, self.device_register_endpoint, **device_info)
         self.assertEqual(200, response.status_code)
 
@@ -83,6 +97,11 @@ class DeviceRegisterTest(unittest.TestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_device_register_with_certificate_csr(self):
+
+        # This is required since the server will throttle device creations
+        import time
+        time.sleep(1)
+
         # This will generate private key and signing request for the CA
         client_info = crypto.create_certificate_signing_request('Test Device with Certificate')
 

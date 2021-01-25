@@ -1,30 +1,28 @@
 
-from flask_login import LoginManager, login_user, logout_user
-from flask import session, jsonify
+from flask_login import LoginManager, login_user
 
 from modules.FlaskModule.FlaskModule import flask_app
-from modules.BaseModule import BaseModule, ModuleNames
-from modules.RedisVars import RedisVars
+from opentera.modules.BaseModule import BaseModule, ModuleNames
+from opentera.redis.RedisVars import RedisVars
 
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraService import TeraService
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraService import TeraService
 
-from libtera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 import datetime
 import redis
 
-from flask import current_app, request, jsonify, _request_ctx_stack
+from flask import request, _request_ctx_stack
 from flask_babel import gettext
 from werkzeug.local import LocalProxy
-from flask_restx import Resource, reqparse
+from flask_restx import reqparse
 from functools import wraps
 
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
 
 from twisted.internet import task
-from twisted.internet import reactor
 
 # Current participant identity, stacked
 current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant', None))

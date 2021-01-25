@@ -16,7 +16,9 @@ async function fillDefaultSourceList(){
         await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
     }catch(err) {
         showError("fillDefaultSourceList() - getUserMedia",
-            "Impossible d'accéder à la caméra ou au micro.<br><br>Le message d'erreur est:<br>" + err.name + " - " + err.message, true);
+            translator.translateForKey("error.no-media-access", currentLang) + "<br><br>" +
+            translator.translateForKey("error.error-msg", currentLang) +
+            ":<br>" + err.name + " - " + err.message, true);
         throw err;
     }
 

@@ -3,15 +3,15 @@ from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
-from libtera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraParticipant import TeraParticipant
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from datetime import datetime
-from libtera.db.models.TeraService import TeraService
-from libtera.db.models.TeraSession import TeraSession, TeraSessionStatus
-from libtera.db.models.TeraSessionType import TeraSessionType
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraSession import TeraSession, TeraSessionStatus
+from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraDevice import TeraDevice
 import datetime
 import json
 
@@ -61,7 +61,7 @@ class ServiceQuerySessions(Resource):
 
                 if args['with_events']:
                     # Get events for session
-                    from libtera.db.models.TeraSessionEvent import TeraSessionEvent
+                    from opentera.db.models.TeraSessionEvent import TeraSessionEvent
                     session_events = TeraSessionEvent.get_events_for_session(ses.id_session)
                     session_events_json = []
                     for event in session_events:

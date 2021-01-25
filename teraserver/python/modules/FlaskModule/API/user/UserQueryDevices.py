@@ -2,14 +2,14 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraDevice import TeraDevice
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from modules.DatabaseModule.DBManager import DBManager, TeraDeviceProject
 from flask_babel import gettext
-from libtera.redis.RedisRPCClient import RedisRPCClient
-from modules.BaseModule import ModuleNames
+from opentera.redis.RedisRPCClient import RedisRPCClient
+from opentera.modules.BaseModule import ModuleNames
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -226,7 +226,7 @@ class UserQueryDevices(Resource):
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
                         500: 'Internal error occured when saving device'})
     def post(self):
-        from libtera.db.models.TeraProject import TeraProject
+        from opentera.db.models.TeraProject import TeraProject
         # parser = post_parser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)

@@ -3,8 +3,8 @@ from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraUserPreference import TeraUserPreference
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraUserPreference import TeraUserPreference
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from modules.DatabaseModule.DBManager import DBManager

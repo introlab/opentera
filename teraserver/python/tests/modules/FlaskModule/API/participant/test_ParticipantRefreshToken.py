@@ -6,7 +6,7 @@ import json
 
 class ParticipantRefreshTokenTest(unittest.TestCase):
 
-    host = 'localhost'
+    host = '127.0.0.1'
     port = 40075
     login_endpoint = '/api/participant/login'
     refresh_token_endpoint = '/api/participant/refresh_token'

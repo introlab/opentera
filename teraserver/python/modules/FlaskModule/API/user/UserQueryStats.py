@@ -3,8 +3,8 @@ from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraParticipant import TeraParticipant
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager, DBManagerTeraUserAccess
 
@@ -103,7 +103,7 @@ class UserQueryUserStats(Resource):
 
     @staticmethod
     def get_user_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:
-        from libtera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraSession import TeraSession
         total_created_sessions = TeraSession.count_with_filters({'id_creator_user': item_id})
         user_sessions = TeraSession.get_sessions_for_user(item_id)
         sessions_participants = set()
@@ -121,7 +121,7 @@ class UserQueryUserStats(Resource):
 
     @staticmethod
     def get_site_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool) -> dict:
-        from libtera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraSession import TeraSession
         site_projects = user_access.query_projects_for_site(item_id)
         site_users = user_access.query_users_for_site(site_id=item_id)
         site_users_enabled = user_access.query_users_for_site(site_id=item_id, enabled_only=True)
@@ -158,8 +158,8 @@ class UserQueryUserStats(Resource):
 
     @staticmethod
     def get_project_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool) -> dict:
-        from libtera.db.models.TeraSession import TeraSession
-        from libtera.db.models.TeraProject import TeraProject
+        from opentera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraProject import TeraProject
         project_users = user_access.query_users_for_project(project_id=item_id)
         project_users_enabled = user_access.query_users_for_project(project_id=item_id, enabled_only=True)
         project = TeraProject.get_project_by_id(item_id)
@@ -188,8 +188,8 @@ class UserQueryUserStats(Resource):
 
     @staticmethod
     def get_participant_group_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool) -> dict:
-        from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
-        from libtera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
+        from opentera.db.models.TeraSession import TeraSession
         group = TeraParticipantGroup.get_participant_group_by_id(item_id)
         participants = user_access.query_participants_for_group(item_id)
         participants_total = len(participants)
@@ -213,7 +213,7 @@ class UserQueryUserStats(Resource):
 
     @staticmethod
     def get_session_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:
-        from libtera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraSession import TeraSession
         ses = TeraSession.get_session_by_id(item_id)
 
         stats = {'users_total_count': len(ses.session_users),
@@ -227,8 +227,8 @@ class UserQueryUserStats(Resource):
 
     @staticmethod
     def get_participant_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:
-        from libtera.db.models.TeraParticipant import TeraParticipant
-        from libtera.db.models.TeraSession import TeraSessionStatus
+        from opentera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraSession import TeraSessionStatus
         participant = TeraParticipant.get_participant_by_id(item_id)
         sessions_total_time = sum([ses.session_duration for ses in participant.participant_sessions])
         sessions_mean_time = sessions_total_time / len(participant.participant_sessions)
@@ -257,7 +257,7 @@ class UserQueryUserStats(Resource):
 
     @staticmethod
     def get_device_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:
-        from libtera.db.models.TeraDevice import TeraDevice
+        from opentera.db.models.TeraDevice import TeraDevice
         device = TeraDevice.get_device_by_id(item_id)
         stats = {'assets_total_count': len(device.device_assets),
                  'projects_total_count': len(device.device_projects),

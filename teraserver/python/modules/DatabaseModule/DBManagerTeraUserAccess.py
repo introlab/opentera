@@ -1,18 +1,18 @@
 from sqlalchemy import true
 
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraUserGroup import TeraUserGroup
-from libtera.db.models.TeraSite import TeraSite
-from libtera.db.models.TeraProject import TeraProject
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
-from libtera.db.models.TeraDeviceType import TeraDeviceType
-from libtera.db.models.TeraDeviceSubType import TeraDeviceSubType
-from libtera.db.models.TeraSessionType import TeraSessionType
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraDeviceProject import TeraDeviceProject
-from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
-from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraUserGroup import TeraUserGroup
+from opentera.db.models.TeraSite import TeraSite
+from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
+from opentera.db.models.TeraDeviceType import TeraDeviceType
+from opentera.db.models.TeraDeviceSubType import TeraDeviceSubType
+from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraDeviceProject import TeraDeviceProject
+from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 
 from sqlalchemy import or_, and_
 
@@ -163,7 +163,7 @@ class DBManagerTeraUserAccess:
         #     return TeraDeviceType.query.all()
         return TeraDeviceType.get_devices_types()
 
-        # from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
+        # from opentera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
         # session_types_id_list = self.get_accessible_session_types_ids(admin_only=admin_only)
         # return TeraDeviceType.query.join(TeraSessionTypeDeviceType).join(TeraSessionType).\
         #     filter(TeraSessionType.id_session_type.in_(session_types_id_list)).all()
@@ -273,7 +273,7 @@ class DBManagerTeraUserAccess:
         return sites_ids
 
     def get_accessible_session_types(self, admin_only=False):
-        from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+        from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
         if self.user.user_superadmin:
             return TeraSessionType.query.all()
 
@@ -291,9 +291,9 @@ class DBManagerTeraUserAccess:
         return st_ids
 
     def get_accessible_sessions(self, admin_only=False):
-        from libtera.db.models.TeraSession import TeraSession
-        from libtera.db.models.TeraSessionUsers import TeraSessionUsers
-        from libtera.db.models.TeraSessionParticipants import TeraSessionParticipants
+        from opentera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraSessionUsers import TeraSessionUsers
+        from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
         part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
         # TODO: CONSIDER SESSIONS CREATED BY USERS AND DEVICES ONLY WITHOUT ANY PARTICIPANT
         # THIS JOIN TAKES A LONG TIME TO PROCESS... IMPROVE!
@@ -315,9 +315,9 @@ class DBManagerTeraUserAccess:
         return ses_ids
 
     def get_accessible_services(self, admin_only=False, include_system_services=False, all_services=False):
-        from libtera.db.models.TeraService import TeraService
-        from libtera.db.models.TeraServiceRole import TeraServiceRole
-        from libtera.db.models.TeraServiceProject import TeraServiceProject
+        from opentera.db.models.TeraService import TeraService
+        from opentera.db.models.TeraServiceRole import TeraServiceRole
+        from opentera.db.models.TeraServiceProject import TeraServiceProject
 
         if self.user.user_superadmin or all_services:
             if include_system_services:
@@ -451,7 +451,7 @@ class DBManagerTeraUserAccess:
         return projects.all()
 
     def query_projects_for_session_type(self, session_type_id: int):
-        from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+        from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
         proj_ids = self.get_accessible_projects_ids()
         projects = TeraProject.query.join(TeraSessionTypeProject.session_type_project_project).filter(
             TeraSessionTypeProject.id_session_type == session_type_id).filter(TeraProject.id_project.in_(proj_ids)) \
@@ -542,7 +542,7 @@ class DBManagerTeraUserAccess:
         return users_groups
 
     def query_site_access_for_user(self, user_id: int, admin_only=False):
-        from libtera.db.models.TeraUser import TeraUser
+        from opentera.db.models.TeraUser import TeraUser
         user = TeraUser.get_user_by_id(user_id)
         site_roles = user.get_sites_roles()
 
@@ -557,7 +557,7 @@ class DBManagerTeraUserAccess:
         return site_roles
 
     def query_project_access_for_user(self, user_id: int, admin_only=False):
-        from libtera.db.models.TeraUser import TeraUser
+        from opentera.db.models.TeraUser import TeraUser
         user = TeraUser.get_user_by_id(user_id)
         project_roles = user.get_projects_roles()
 
@@ -574,7 +574,7 @@ class DBManagerTeraUserAccess:
 
     def query_project_access_for_user_group(self, user_group_id: int, admin_only=False,
                                             include_projects_without_access=False):
-        from libtera.db.models.TeraUserGroup import TeraUserGroup
+        from opentera.db.models.TeraUserGroup import TeraUserGroup
         user_group = TeraUserGroup.get_user_group_by_id(group_id=user_group_id)
         project_roles = user_group.get_projects_roles()
         if admin_only:
@@ -595,7 +595,7 @@ class DBManagerTeraUserAccess:
 
     def query_site_access_for_user_group(self, user_group_id: int, admin_only=False,
                                          include_sites_without_access=False):
-        from libtera.db.models.TeraUserGroup import TeraUserGroup
+        from opentera.db.models.TeraUserGroup import TeraUserGroup
         user_group = TeraUserGroup.get_user_group_by_id(group_id=user_group_id)
         site_roles = user_group.get_sites_roles()
         if admin_only:
@@ -614,7 +614,7 @@ class DBManagerTeraUserAccess:
         return site_roles
 
     def query_participants_for_device(self, device_id: int):
-        from libtera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraParticipant import TeraParticipant
         parts = TeraParticipant.query.join(TeraParticipant.participant_devices).filter_by(id_device=device_id) \
             .filter(TeraDevice.id_device.in_(self.get_accessible_devices_ids()),
                     TeraParticipant.id_participant.in_(self.get_accessible_participants_ids())).all()
@@ -640,9 +640,9 @@ class DBManagerTeraUserAccess:
         return device_parts
 
     def query_session(self, session_id: int):
-        from libtera.db.models.TeraParticipant import TeraParticipant
-        from libtera.db.models.TeraSession import TeraSession
-        from libtera.db.models.TeraSessionUsers import TeraSessionUsers
+        from opentera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraSessionUsers import TeraSessionUsers
 
         # session = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users)\
         #     .filter(and_(TeraSession.id_session == session_id),
@@ -669,7 +669,7 @@ class DBManagerTeraUserAccess:
         return None
 
     def query_session_events(self, session_id: int):
-        from libtera.db.models.TeraSessionEvent import TeraSessionEvent
+        from opentera.db.models.TeraSessionEvent import TeraSessionEvent
 
         if self.query_session(session_id=session_id):
             return TeraSessionEvent.get_events_for_session(id_session=session_id)
@@ -677,7 +677,7 @@ class DBManagerTeraUserAccess:
         return []
 
     # def query_session_types_for_device(self, device_type_id: int):
-    #     from libtera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
+    #     from opentera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
     #     session_types_ids = self.get_accessible_session_types_ids()
     #
     #     session_types = TeraSessionTypeDeviceType.query.filter(TeraSessionTypeDeviceType.id_session_type.
@@ -686,8 +686,8 @@ class DBManagerTeraUserAccess:
     #     return session_types
 
     def query_session_types_for_project(self, project_id: int):
-        from libtera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
-        from libtera.db.models.TeraSessionType import TeraSessionType
+        from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+        from opentera.db.models.TeraSessionType import TeraSessionType
         session_types_ids = self.get_accessible_session_types_ids()
         service_ids = self.get_accessible_services_ids()
 
@@ -700,7 +700,7 @@ class DBManagerTeraUserAccess:
         return session_types
 
     def query_assets_for_service(self, uuid_service: str):
-        from libtera.db.models.TeraAsset import TeraAsset
+        from opentera.db.models.TeraAsset import TeraAsset
         from sqlalchemy import or_
 
         session_ids = self.get_accessible_sessions_ids()
@@ -710,7 +710,7 @@ class DBManagerTeraUserAccess:
             .filter(TeraAsset.asset_service_uuid == uuid_service).all()
 
     def query_projects_for_service(self, service_id: int, site_id: int = None, include_other_projects=False):
-        from libtera.db.models.TeraServiceProject import TeraServiceProject
+        from opentera.db.models.TeraServiceProject import TeraServiceProject
         projects_ids = self.get_accessible_projects_ids()
 
         query = TeraServiceProject.query.filter(TeraServiceProject.id_project.in_(projects_ids)) \
@@ -735,8 +735,8 @@ class DBManagerTeraUserAccess:
         return sorted(service_projects, key=lambda sp: sp.service_project_project.project_name)
 
     def query_services_projects_for_project(self, project_id: int, include_other_services=False):
-        from libtera.db.models.TeraServiceProject import TeraServiceProject
-        from libtera.db.models.TeraService import TeraService
+        from opentera.db.models.TeraServiceProject import TeraServiceProject
+        from opentera.db.models.TeraService import TeraService
         services_ids = self.get_accessible_services_ids()
 
         service_projects = TeraServiceProject.query.filter(TeraServiceProject.id_service.in_(services_ids)) \
@@ -762,7 +762,7 @@ class DBManagerTeraUserAccess:
         return services
 
     # def query_services_roles_for_project(self, project_id: int):
-    #     from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+    #     from opentera.db.models.TeraServiceAccess import TeraServiceAccess
     #     group_ids = self.get_accessible_users_groups_ids()
     #     participant_groups_ids = self.get_accessible_groups_ids()
     #     device_ids = self.get_accessible_devices_ids()
@@ -787,7 +787,7 @@ class DBManagerTeraUserAccess:
     #     return service_projects_roles
     #
     # def query_services_roles_for_service(self, service_id: int):
-    #     from libtera.db.models.TeraServiceAccess import TeraServiceAccess
+    #     from opentera.db.models.TeraServiceAccess import TeraServiceAccess
     #     group_ids = self.get_accessible_users_groups_ids()
     #     participant_groups_ids = self.get_accessible_groups_ids()
     #     device_ids = self.get_accessible_devices_ids()
@@ -896,7 +896,7 @@ class DBManagerTeraUserAccess:
         if participant_id and participant_id not in self.get_accessible_participants_ids():
             return None
 
-        from libtera.db.models.TeraServiceConfig import TeraServiceConfig
+        from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 
         services_configs = None
         if service_id:
@@ -941,9 +941,9 @@ class DBManagerTeraUserAccess:
 
     def query_service_access(self, user_group_id: int = None, device_id: int = None, participant_group_id: int = None,
                              service_id: int = None):
-        from libtera.db.models.TeraServiceAccess import TeraServiceAccess
-        from libtera.db.models.TeraServiceRole import TeraServiceRole
-        accessible_services_ids = self.get_accessible_services_ids()
+        from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+        from opentera.db.models.TeraServiceRole import TeraServiceRole
+        accessible_services_ids = self.get_accessible_services_ids(include_system_services=True)
 
         query = TeraServiceAccess.query
         if user_group_id:

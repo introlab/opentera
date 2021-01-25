@@ -3,16 +3,14 @@ from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraAsset import TeraAsset, AssetType
-from libtera.db.models.TeraService import TeraService
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraAsset import TeraAsset, AssetType
+from opentera.db.models.TeraService import TeraService
 from werkzeug.utils import secure_filename
 
 from sqlalchemy import exc
 from modules.DatabaseModule.DBManager import DBManager
-from modules.RedisVars import RedisVars
-
-import uuid
+from opentera.redis.RedisVars import RedisVars
 
 # Parser definition(s)
 # GET
@@ -86,7 +84,7 @@ class UserQueryAssets(Resource):
 
             # TODO ADD ASSET URL
             # We have previously verified that the service is available to the user
-            from libtera.db.models.TeraService import TeraService
+            from opentera.db.models.TeraService import TeraService
             service = TeraService.get_service_by_uuid(asset.asset_service_uuid)
 
             servername = self.module.config.server_config['hostname']
@@ -116,8 +114,8 @@ class UserQueryAssets(Resource):
                              'the related project)'})
     @api.expect(delete_parser)
     def delete(self):
-        from libtera.db.models.TeraSession import TeraSession
-        from libtera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraParticipant import TeraParticipant
         parser = delete_parser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)

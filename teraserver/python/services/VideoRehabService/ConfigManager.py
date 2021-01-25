@@ -1,4 +1,4 @@
-from services.shared.ServiceConfigManager import ServiceConfigManager, WebRTCConfig
+from opentera.services.ServiceConfigManager import ServiceConfigManager, WebRTCConfig
 
 
 # Build configuration from base classes

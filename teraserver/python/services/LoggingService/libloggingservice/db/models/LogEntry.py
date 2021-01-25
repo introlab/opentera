@@ -1,5 +1,5 @@
 from services.LoggingService.libloggingservice.db.Base import db
-from libtera.db.Base import BaseModel
+from opentera.db.Base import BaseModel
 
 
 class LogEntry(db.Model, BaseModel):

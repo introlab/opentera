@@ -2,9 +2,9 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraSession import TeraSession
-from libtera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraParticipant import TeraParticipant
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -97,7 +97,7 @@ class UserQuerySessions(Resource):
     @api.expect(post_schema)
     def post(self):
         # parser = post_parser
-        from libtera.db.models.TeraDevice import TeraDevice
+        from opentera.db.models.TeraDevice import TeraDevice
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -235,7 +235,7 @@ class UserQuerySessions(Resource):
             # At least one session user is not accessible to the user
             return gettext('User doesn\'t have access to at least one device of that session.'), 403
 
-        from libtera.db.models.TeraSession import TeraSessionStatus
+        from opentera.db.models.TeraSession import TeraSessionStatus
         if todel_session.session_status == TeraSessionStatus.STATUS_INPROGRESS.value:
             return gettext('Session is in progress: can\'t delete that session.'), 403
 

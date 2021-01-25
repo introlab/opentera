@@ -123,7 +123,7 @@ video {
 	position: absolute;
 	height: 100%;
 	max-height: 64px;
-	bottom: 0;
+	bottom: 0px;
 	right: 0;
 	margin-right: 10px;
 	/*background-color: rgba(0,0,0,0.5);
@@ -132,7 +132,16 @@ video {
 	 */
 	float: right;
 	z-index: 3;
+}
 
+.overlay-bottom-left {
+	position: absolute;
+	bottom: 5px;
+	max-height: 48px;
+	width: 15%;
+	float: left;
+	margin-left:10px;
+	z-index: 3;
 }
 
 .overlay-top-center {
@@ -143,8 +152,10 @@ video {
 }
 
 .tool-icon{
-	padding: 10px;
-	text-align: center;
+	/*padding: 10px;
+	text-align: center;*/
+	vertical-align: middle;
+	height: 24px;
 }
 
 .chrono{
@@ -224,19 +235,6 @@ video {
 			z-index: 3;
 		}
 		
-		
-		.overlay-bottom-left {
-			position: absolute;
-			bottom: 0;
-			height: 10%;
-			max-height: 48px;
-			width: 100%;
-			padding: 5px;
-			background-color: rgba(0,0,0,0.5);
-			float: left;
-			margin-left:10px;
-		}
-		
 		.overlay a {
 			padding: 8px;
 			text-decoration: none;
@@ -263,4 +261,36 @@ video {
 	-ms-transform: scaleX(-1);
 	-o-transform: scaleX(-1);
 	transform: scaleX(-1);
+}
+/* Show the dropdown menu on hover */
+.dropup {
+	position: relative;
+	display: inline-block;
+	margin-bottom: 0px;
+}
+
+.dropup:hover .dropdown-menu {display: inline-block;}
+
+input[type=checkbox] {
+	transform: scale(1.5);
+}
+
+.large-modal-dialog{
+	min-width: 50%;
+}
+
+.preview-video{
+	position: relative;
+	width: 60%;
+}
+
+.video-canvas{
+	position: absolute;
+	z-index: 10;
+	/*background-color:rgba(255,0,0,0.5);*/
+	background-color:rgba(100,100,100,0.25);
+}
+
+.badge.measure-text, .measure-text{
+	font-size: 1.3rem;
 }

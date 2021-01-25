@@ -3,8 +3,8 @@
 # from flask_babel import gettext
 # from modules.LoginModule.LoginModule import user_multi_auth
 # from modules.FlaskModule.FlaskModule import user_api_ns as api
-# from libtera.db.models.TeraUser import TeraUser
-# from libtera.db.models.TeraDeviceData import TeraDeviceData
+# from opentera.db.models.TeraUser import TeraUser
+# from opentera.db.models.TeraDeviceData import TeraDeviceData
 # from sqlalchemy import exc
 # from modules.DatabaseModule.DBManager import DBManager
 # import zipfile
@@ -102,7 +102,7 @@
 #                 if args['id_session']:
 #                     file_name = slugify(data.devicedata_session.session_name)
 #                 elif args['id_participant']:
-#                     from libtera.db.models.TeraParticipant import TeraParticipant
+#                     from opentera.db.models.TeraParticipant import TeraParticipant
 #                     file_name = slugify(TeraParticipant.get_participant_by_id(part_id=args['id_participant'])
 #                                         .participant_name)
 #

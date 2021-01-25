@@ -22,6 +22,7 @@ function updateUserRemoteViewsLayout(remote_num){
     if (remote_num === 0){
         remoteViews.hide();
         largeView.hide();
+        setLargeView('remoteView1', false);
         setColWidth(localViews, 12);
         return;
     }else {
@@ -34,6 +35,16 @@ function updateUserRemoteViewsLayout(remote_num){
             remoteViews.hide();
             setColWidth(largeView, 10);
         }
+
+        // Check if large view is still valid
+        let currentLargeViewIndex = parseInt(currentLargeViewId.charAt(currentLargeViewId.length-1));
+        if (currentLargeViewIndex > remote_num){
+            let new_large_view = getFirstRemoteUserVideoViewId();
+            if (new_large_view === undefined)
+                new_large_view = "remoteView1";
+            setLargeView(new_large_view, false);
+        }
+
     }
 
     switch(remote_num){
@@ -87,12 +98,9 @@ function updateUserLocalViewLayout(local_num, remote_num){
 
     switch(local_num){
         case 1:
-            setRowHeight(selfViewRow1, 100);
             selfViewRow2.hide();
             break;
         case 2:
-            setRowHeight(selfViewRow1, 50);
-            setRowHeight(selfViewRow2, 50);
             selfViewRow2.show();
             break;
         default:
@@ -104,6 +112,7 @@ function updateUserLocalViewLayout(local_num, remote_num){
 function setLargeView(view_id, updateui=true){
     // Remove current view
     let largeView = $("#largeView");
+
     if (currentLargeViewId !== ""){
         let view_index = Number(currentLargeViewId.substr(-1));
         if (currentLargeViewId.startsWith("local")){

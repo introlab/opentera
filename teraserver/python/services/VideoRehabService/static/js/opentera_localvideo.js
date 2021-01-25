@@ -130,5 +130,15 @@ function toggleButtons(id) {
 }
 
 function isButtonsClosed(id){
-	return document.getElementById(id).style.height == "0%";
+	return document.getElementById(id).style.height === "0%";
+}
+
+function showError(err_context, err_msg, ui_display, show_retry=true){
+	console.error(err_context + ": " + err_msg);
+
+	if (ui_display === true){
+		$('#errorDialogText')[0].innerHTML = err_msg;
+		$('#errorDialog').modal('show');
+		(show_retry) ? $('#errorRefresh').show() : $('#errorRefresh').hide();
+	}
 }

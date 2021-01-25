@@ -7,7 +7,7 @@ from services.LoggingService.libloggingservice.db.models.LogEntry import LogEntr
 
 from services.LoggingService.ConfigManager import ConfigManager
 from services.LoggingService.FlaskModule import flask_app
-from messages.python.LogEvent_pb2 import LogEvent
+from opentera.messages.python.LogEvent_pb2 import LogEvent
 import datetime
 
 # Alembic

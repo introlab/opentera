@@ -1,13 +1,13 @@
-from libtera.ConfigManager import ConfigManager
-from messages.python.TeraModuleMessage_pb2 import TeraModuleMessage
-from messages.python.UserEvent_pb2 import UserEvent
-from messages.python.ParticipantEvent_pb2 import ParticipantEvent
-from messages.python.DeviceEvent_pb2 import DeviceEvent
-from messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
-from messages.python.StopSessionEvent_pb2 import StopSessionEvent
-from messages.python.LeaveSessionEvent_pb2 import LeaveSessionEvent
-from messages.python.JoinSessionReplyEvent_pb2 import JoinSessionReplyEvent
-from modules.BaseModule import BaseModule, ModuleNames
+from opentera.config.ConfigManager import ConfigManager
+from opentera.messages.python.TeraModuleMessage_pb2 import TeraModuleMessage
+from opentera.messages.python.UserEvent_pb2 import UserEvent
+from opentera.messages.python.ParticipantEvent_pb2 import ParticipantEvent
+from opentera.messages.python.DeviceEvent_pb2 import DeviceEvent
+from opentera.messages.python.JoinSessionEvent_pb2 import JoinSessionEvent
+from opentera.messages.python.StopSessionEvent_pb2 import StopSessionEvent
+from opentera.messages.python.LeaveSessionEvent_pb2 import LeaveSessionEvent
+from opentera.messages.python.JoinSessionReplyEvent_pb2 import JoinSessionReplyEvent
+from opentera.modules.BaseModule import BaseModule, ModuleNames
 from modules.UserManagerModule.UserRegistry import UserRegistry
 from modules.UserManagerModule.ParticipantRegistry import ParticipantRegistry
 from modules.UserManagerModule.DeviceRegistry import DeviceRegistry
@@ -240,7 +240,7 @@ class UserManagerModule(BaseModule):
                 user_event.type = UserEvent.USER_LEFT_SESSION
 
             # Get full name
-            from libtera.db.models.TeraUser import TeraUser
+            from opentera.db.models.TeraUser import TeraUser
             user_data = TeraUser.get_user_by_uuid(user)
             user_event.user_fullname = user_data.get_fullname()
             self.send_event_message(user_event, self.event_topic_name())
@@ -260,7 +260,7 @@ class UserManagerModule(BaseModule):
                 participant_event.type = ParticipantEvent.PARTICIPANT_LEFT_SESSION
 
             # TODO: Get others infos for that participant
-            from libtera.db.models.TeraParticipant import TeraParticipant
+            from opentera.db.models.TeraParticipant import TeraParticipant
             part_data = TeraParticipant.get_participant_by_uuid(participant)
             participant_event.participant_name = part_data.participant_name
             participant_event.participant_project_name = part_data.participant_project.project_name
@@ -281,7 +281,7 @@ class UserManagerModule(BaseModule):
                 self.device_registry.device_leave_session(device, session_uuid)
                 device_event.type = DeviceEvent.DEVICE_LEFT_SESSION
 
-            from libtera.db.models.TeraDevice import TeraDevice
+            from opentera.db.models.TeraDevice import TeraDevice
             device_data = TeraDevice.get_device_by_uuid(device)
             device_event.device_name = device_data.device_name
             self.send_event_message(device_event, self.event_topic_name())

@@ -1,20 +1,14 @@
 # WebSockets
-from autobahn.twisted.websocket import WebSocketServerProtocol
-from autobahn.websocket.types import ConnectionRequest, ConnectionResponse, ConnectionDeny
+from autobahn.websocket.types import ConnectionDeny
 
 # OpenTera
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.redis.RedisClient import RedisClient
-from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
 
 # Messages
-import messages.python as messages
+import opentera.messages.python as messages
 
 from google.protobuf.any_pb2 import Any
-import datetime
-from google.protobuf.json_format import MessageToJson
-from google.protobuf.json_format import Parse, ParseError
-from google.protobuf.message import DecodeError
 
 # Twisted
 from twisted.internet import defer

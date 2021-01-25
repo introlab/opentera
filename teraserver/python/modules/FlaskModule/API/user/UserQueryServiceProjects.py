@@ -2,10 +2,10 @@ from flask import jsonify, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraServiceProject import TeraServiceProject
-from libtera.db.models.TeraServiceRole import TeraServiceRole
-from libtera.db.models.TeraService import TeraService
-from libtera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraServiceProject import TeraServiceProject
+from opentera.db.models.TeraServiceRole import TeraServiceRole
+from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraProject import TeraProject
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc, inspect
@@ -154,7 +154,7 @@ class UserQueryServiceProjects(Resource):
                 return gettext('Missing services'), 400
             id_project = request.json['project']['id_project']
             # Only site admin can modify
-            from libtera.db.models.TeraProject import TeraProject
+            from opentera.db.models.TeraProject import TeraProject
             project = TeraProject.get_project_by_id(id_project)
             if user_access.get_site_role(project.id_site) != 'admin':
                 return gettext('Access denied'), 403
@@ -182,7 +182,7 @@ class UserQueryServiceProjects(Resource):
         for json_sp in json_sps:
             if 'service_uuid' in json_sp:
                 # Get id for that uuid
-                from libtera.db.models.TeraService import TeraService
+                from opentera.db.models.TeraService import TeraService
                 json_sp['id_service'] = TeraService.get_service_by_uuid(json_sp['service_uuid']).id_service
                 del json_sp['service_uuid']
 
@@ -193,7 +193,7 @@ class UserQueryServiceProjects(Resource):
             # if json_sp['id_service'] not in user_access.get_accessible_services_ids(admin_only=True):
             #     return gettext('Access denied'), 403
 
-            from libtera.db.models.TeraProject import TeraProject
+            from opentera.db.models.TeraProject import TeraProject
             project = TeraProject.get_project_by_id(json_sp['id_project'])
             if user_access.get_site_role(project.id_site) != 'admin':
                 return gettext('Access denied'), 403

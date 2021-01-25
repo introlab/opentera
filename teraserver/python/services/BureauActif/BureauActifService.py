@@ -1,13 +1,13 @@
 import services.BureauActif.Globals as Globals
 from services.BureauActif.ConfigManager import ConfigManager
 
-from modules.RedisVars import RedisVars
+from opentera.redis.RedisVars import RedisVars
 
-from libtera.redis.RedisClient import RedisClient
+from opentera.redis.RedisClient import RedisClient
 
 from sqlalchemy.exc import OperationalError
 
-from services.shared.ServiceAccessManager import ServiceAccessManager
+from opentera.services.ServiceAccessManager import ServiceAccessManager
 
 # Twisted
 from twisted.internet import reactor
@@ -15,8 +15,7 @@ from twisted.python import log
 
 # Flask Module
 from services.BureauActif.FlaskModule import FlaskModule, flask_app
-from services.shared.ServiceOpenTera import ServiceOpenTera
-from flask_babel import gettext
+from opentera.services.ServiceOpenTera import ServiceOpenTera
 
 import os
 import sys

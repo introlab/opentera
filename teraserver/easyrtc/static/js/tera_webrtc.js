@@ -203,6 +203,7 @@ function setMirror(mirror, local, index){
 }
 
 function sendPrimaryView(peer_id, streamname){
+    console.log('sendPrimaryView - peer: ' + peer_id + ', stream: ' + streamname);
     primaryView = {peerid: peer_id, streamName: streamname};
 
     let request = primaryView;
@@ -217,14 +218,19 @@ function sendPrimaryView(peer_id, streamname){
 }
 
 function setPrimaryView(peer_id, streamname){
+    console.log('setPrimaryView - peer: ' + peer_id + ', stream: ' + streamname);
     primaryView = {peerid: peer_id, streamName: streamname};
     if (isParticipant){
         let index = undefined;
         if (primaryView.peerid !== 0){
             if (peer_id !== local_peerid)
                 index = getStreamIndexForPeerId(primaryView.peerid, primaryView.streamName);
-            else
-                index = getLocalStreamIndex(primaryView.streamName);
+            else{
+                // Local view is primary view - don't do anything!
+                //index = getLocalStreamIndex(primaryView.streamName);
+                setPrimaryViewIcon(primaryView.peerid, primaryView.streamName);
+                return;
+            }
         }
 
         if (index !== undefined){
@@ -439,7 +445,7 @@ function sendContactInfo(peerid_target){
 }
 
 function updateRoomUsers(roomName, occupants, isPrimary) {
-    console.log("updateRoomUsers: " + JSON.stringify(occupants));
+    //console.log("updateRoomUsers: " + JSON.stringify(occupants));
     for(let peerid in occupants) {
         if (peerid !== local_peerid){
             if (needToCallOtherUsers) {
@@ -453,7 +459,7 @@ function updateRoomUsers(roomName, occupants, isPrimary) {
                     //null
                     null,
                     //easyrtc.getLocalMediaIds()
-                    null
+                    localStreams.map(stream => stream.streamname)
                 )
             }
         }
@@ -478,7 +484,7 @@ function newStreamStarted(callerid, stream, streamname) {
     // Find first empty slot
     if (slot === undefined){
         if (remoteStreams.length+1 > 4) {
-            showError("newStreamStarted", "New stream received, but not slot available!", true);
+            showError("newStreamStarted", translator.translateForKey("errors.stream-no-slot", currentLang), true);
             return;
         }
         remoteStreams.push({'peerid': callerid, 'streamname': streamname, 'stream': stream})
@@ -570,8 +576,12 @@ function newStreamStarted(callerid, stream, streamname) {
 
     // Add second video, if present
     if (localStreams.length>1){
-        console.log("Adding secondary video...");
-        easyrtc.addStreamToCall(callerid, localStreams[1].streamname);
+        setTimeout(function(){
+            console.log("Adding secondary video to " + callerid + ", name: " + localStreams[1].streamname);
+            easyrtc.addStreamToCall(callerid, localStreams[1].streamname, function (caller, streamName) {
+                console.log("Added secondary stream to " + caller + " - " + streamName);
+            });
+        }, 1000);
     }
 
 }
@@ -591,10 +601,18 @@ function streamDisconnected(callerid, mediaStream, streamName){
     if (!isParticipant){
         if (typeof(currentLayoutId) !== 'undefined'){
             if (currentLayoutId === layouts.LARGEVIEW){
-                if (getVideoViewId(false, slot) === currentLargeViewId){
+                if (getVideoViewId(false, slot+1) === currentLargeViewId){
                     setCurrentUserLayout(layouts.GRID, false);
                 }
             }
+        }
+    }else{
+        if (currentLargeViewId === getVideoViewId(callerid === local_peerid, slot+1)){
+            // Currently displayed in large view - set next large view
+            let new_large_view = getFirstRemoteUserVideoViewId();
+            if (new_large_view === undefined)
+                new_large_view = "remoteView1";
+            setLargeView(new_large_view,false);
         }
     }
 
@@ -610,6 +628,15 @@ function streamDisconnected(callerid, mediaStream, streamName){
             primaryView = undefined
             sendPrimaryView(0,"");
             setPrimaryViewIcon(0,"");
+        }
+    }else{
+        if (primaryView.streamName === streamName && callerid === primaryView.peerid){
+            // set next large view
+            /*let new_large_view = getFirstRemoteUserVideoViewId();
+            if (new_large_view === undefined)
+                new_large_view = "remoteView1";*/
+            setPrimaryView(0, "");
+            //setLargeView(new_large_view, false);
         }
     }
 
@@ -633,16 +660,12 @@ function streamDisconnected(callerid, mediaStream, streamName){
     for (let i=0; i<remoteStreams.length; i++){
         easyrtc.setVideoObjectSrc(getVideoWidget(false,i+1)[0], remoteStreams[i].stream);
         refreshRemoteStatusIcons(remoteStreams[i].peerid);
-        setTitle(false, i+1, remoteContacts[i].name)
-    }
-
-    if (isParticipant){
-        if (currentLargeViewId === getVideoViewId(callerid === local_peerid, slot+1)){
-            // Currently displayed in large view - set next large view
-            let new_large_view = getFirstRemoteUserVideoViewId();
-            if (new_large_view === undefined)
-                new_large_view = "remoteView1";
-            setLargeView(new_large_view, false);
+        let contact_index = getContactIndexForPeerId(remoteStreams[i].peerid);
+        if (contact_index !== undefined) {
+            let title = remoteContacts[contact_index].name;
+            if (remoteStreams[i].streamname === 'ScreenShare')
+                title = "Écran de " + title;
+            setTitle(false, i + 1, title);
         }
     }
 
@@ -652,7 +675,7 @@ function streamDisconnected(callerid, mediaStream, streamName){
 
 function disconnectedFromSignalingServer(){
     showError("disconnectedFromSignalingServer", "Disconnected from signaling server... Trying to reconnect.", false);
-    showStatusMsg("Connexion perdue... Reconnexion en cours...");
+    showStatusMsg(translator.translateForKey("status.lost-connection", currentLang));
     localStreams = [];
     remoteStreams = [];
     remoteContacts = [];
@@ -728,7 +751,8 @@ function sendStatus(target_peerid){
         "micro2":isStatusIconActive(true, 2, "Mic"),
         "speaker": isStatusIconActive(true, 1, "Speaker"),
         "video": isStatusIconActive(true, 1, "Video"),
-        "isUser": !isParticipant
+        "isUser": !isParticipant,
+        "videoSrcLength": videoSources.length
     };
 
     if (easyrtc.webSocketConnected){
@@ -883,6 +907,7 @@ function dataReception(sendercid, msgType, msgData, targeting) {
 
             // Update large view if required
             if (isParticipant && primaryView.peerid === 0 && msgData.isUser){
+                //setPrimaryView(msgData.peerid, "default");
                 setLargeView(getVideoViewId(false, index+1));
             }
         }
@@ -896,6 +921,51 @@ function dataReception(sendercid, msgType, msgData, targeting) {
         }else{
             stopChrono(true, 1);
         }
+    }
+
+    if (msgType === "queryConfig"){
+        // Send audio & video sources, and current config
+        // Check if querying peer is a user, otherwise ignore.
+        let src_index = getContactIndexForPeerId(sendercid);
+        if (src_index === undefined){
+            console.warn("Ignoring query - peer querying not in contact list!");
+            return;
+        }
+        if (!remoteContacts[src_index].status.isUser){
+            console.warn("Ignoring query - peer is not of 'user' type.");
+            return;
+        }
+        // Send reply
+        easyrtc.sendDataWS(sendercid, "currentConfig", {"audios": audioSources,
+                                                                        "videos": videoSources,
+                                                                        "config": currentConfig}, function(ackMesg) {
+            if( ackMesg.msgType === 'error' ) {
+                console.error(ackMesg.msgData.errorText);
+            }
+        });
+    }
+
+    if (msgType === "currentConfig"){
+        // Display config dialog with values
+        showConfigDialog(sendercid, msgData.audios, msgData.videos, msgData.config);
+    }
+
+    if (msgType === "updateConfig"){
+        let src_index = getContactIndexForPeerId(sendercid);
+        if (src_index === undefined){
+            console.warn("Ignoring query - peer querying not in contact list!");
+            return;
+        }
+        if (!remoteContacts[src_index].status.isUser){
+            console.warn("Ignoring query - peer is not of 'user' type.");
+            return;
+        }
+
+        updateLocalConfig(msgData);
+    }
+
+    if (msgType === "nextVideoSource"){
+        swapVideoSource(true, 1);
     }
 }
 
@@ -925,7 +995,7 @@ function signalingLoginSuccess(peerid,  roomOwner) {
 
 function signalingLoginFailure(errorCode, message) {
 
-    showError("signalingLoginFailure", "Can't connect to signaling server! Code: " + errorCode +" - " + message);
+    showError("signalingLoginFailure", "Can't connect to signaling server! Code: " + errorCode +" - " + message, false);
     //easyrtc.showError(errorCode, message);
 
     clearStatusMsg();
@@ -943,15 +1013,20 @@ async function shareScreen(local, start){
 
             // Then to add to existing connections
             for (let i=0; i<remoteStreams.length; i++){
+                console.log("Starting screen sharing with " + remoteStreams[i].peerid);
                 easyrtc.addStreamToCall(remoteStreams[i].peerid, 'ScreenShare', function (caller, streamName) {
                     console.log("Started screen sharing with " + caller + " - " + streamName);
                 });
             }
             easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], screenStream);
             localStreams.push({"peerid": local_peerid, "streamname": "ScreenShare", "stream":screenStream});
+            sendPrimaryView(local_peerid, "ScreenShare");
+            setPrimaryViewIcon(local_peerid, "ScreenShare");
 
         } catch(err) {
-            showError("shareScreen", "Impossible de partager l'écran.<br/><br/>Le message d'erreur est le suivant: <br/>" + err, true, false);
+            showError("shareScreen", translator.translateForKey("errors.no-sharescreen-access", currentLang)
+                + "<br/><br/>" + translator.translateForKey("errors.error-msg", currentLang) +
+                ": <br/>" + err, true, false);
             return Promise.Reject(err)
         }
 
@@ -978,7 +1053,7 @@ async function shareScreen(local, start){
 function share2ndStream(local, start){
 
     if (connected !== true) {
-        showError("share2ndStream", "Impossible de démarrer une deuxième source: non-connecté", true, false);
+        showError("share2ndStream", translator.translateForKey("errors.extrasource-not-connected", currentLang), true, false);
         return;
     }
     let streamname = "2ndStream";
@@ -1071,5 +1146,39 @@ function sendChronoMessage(target_peerids, state, msg = undefined, duration=unde
                     }
                 });
         }
+    }
+}
+
+function sendQueryConfig(peerid_target){
+    console.log("Sending config query to :", peerid_target);
+    // Query for the remote configuration
+    if (easyrtc.webSocketConnected){
+        easyrtc.sendDataWS(peerid_target, 'queryConfig', null,function(ackMesg) {
+            if( ackMesg.msgType === 'error' ) {
+                console.error(ackMesg.msgData.errorText);
+            }
+        });
+    }
+}
+
+function sendUpdateConfig(peerid_target, config){
+    console.log("Sending config to :", peerid_target);
+    if (easyrtc.webSocketConnected){
+        easyrtc.sendDataWS(peerid_target, 'updateConfig', config,function(ackMesg) {
+            if( ackMesg.msgType === 'error' ) {
+                console.error(ackMesg.msgData.errorText);
+            }
+        });
+    }
+}
+
+function sendNextVideoSource(peerid_target){
+    console.log("Sending next video source request to :", peerid_target);
+    if (easyrtc.webSocketConnected){
+        easyrtc.sendDataWS(peerid_target, 'nextVideoSource', null,function(ackMesg) {
+            if( ackMesg.msgType === 'error' ) {
+                console.error(ackMesg.msgData.errorText);
+            }
+        });
     }
 }

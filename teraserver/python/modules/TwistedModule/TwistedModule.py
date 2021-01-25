@@ -1,6 +1,6 @@
 from modules.FlaskModule.FlaskModule import flask_app
-from modules.BaseModule import BaseModule, ModuleNames
-from libtera.ConfigManager import ConfigManager
+from opentera.modules.BaseModule import BaseModule, ModuleNames
+from opentera.config.ConfigManager import ConfigManager
 
 
 # Same directory
@@ -13,9 +13,7 @@ from .TeraWebSocketServerDeviceProtocol import TeraWebSocketServerDeviceProtocol
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
 
 # Twisted
-from twisted.application import internet, service
 from twisted.internet import reactor, ssl
-from twisted.python.threadpool import ThreadPool
 from twisted.web.http import HTTPChannel
 from twisted.web.server import Site
 from twisted.web.static import File
@@ -25,8 +23,6 @@ from twisted.python import log
 from OpenSSL import SSL
 import sys
 import os
-
-from flask import session
 
 
 class MyHTTPChannel(HTTPChannel):

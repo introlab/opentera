@@ -1,0 +1,63 @@
+{
+	"header":{
+		"title-user": "OpenTeraPlus - User View",
+		"title-participant": "OpenTeraPlus - Participant View"
+	},
+	"configDialog":{
+		"title": "Parameters",
+		"close": "Apply",
+		"video1": "Main Video Source",
+		"audio1": "Main Audio Source",
+		"video2": "Extra Video Source",
+		"audio2": "Extra Audio Source",
+		"mirror": "Mirror Image",
+		"none": "None"
+	},
+	"chronosDialog": {
+		"title": "Timers",
+		"participants": "Participant(s)",
+		"chrono-label": "Label",
+		"label-exercices": "Exercices",
+		"label-rest": "Rest",
+		"duration": "Duration",
+		"start": "Start",
+		"cancel": "Cancel",
+		"completed": "Completed!"
+	},
+	"measureDialog": {
+		"title": "Measurements",
+		"close": "Close",
+		"participant": "Participant",
+		"measure-angle": "Measure Angle",
+		"reset": "Reset",
+		"angle": "Angle",
+		"n-a": "N/A"
+	},
+	"errorDialog": {
+		"title": "Error",
+		"retry": "Retry",
+		"ignore": "Ignore"
+	},
+	"errors": {
+		"no-media-access": "Unable to access camera or microphone",
+		"no-sharescreen-access": "Unable to share screen",
+		"error-msg": "Error message is",
+		"screenshare-no-slot": "Unable to share screen: too many sources in session",
+		"extrasource-no-slot": "Unable to add extra source: too many sources in session",
+		"extrasource-not-connected": "Unable to add extra source: not in a session",
+		"stream-no-slot": "Session is full - can't add the incoming stream"
+	},
+	"status": {
+		"initializing": "Initializing...",
+		"cant-continue": "Unable to continue. Please try again.",
+		"lost-connection": "Lost connection... Trying to reconnect..."
+	},
+	"ui": {
+		"controls": "Controls",
+		"mute-all": "Micro - All",
+		"speaker-all": "Sound - All",
+		"tools": "Tools",
+		"chronos": "Timers",
+		"measures": "Measurements"
+	}
+}

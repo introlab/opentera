@@ -1,10 +1,10 @@
 from flask import Flask, request, g, url_for
 from flask_session import Session
 from flask_restx import Api
-from libtera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 from flask_babel import Babel
-from modules.BaseModule import BaseModule, ModuleNames
-from libtera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.modules.BaseModule import BaseModule, ModuleNames
+from opentera.db.models.TeraServerSettings import TeraServerSettings
 import redis
 
 # Flask application
@@ -276,11 +276,15 @@ class FlaskModule(BaseModule):
         from .API.service.ServiceQueryAssets import ServiceQueryAssets
         from .API.service.ServiceQuerySessions import ServiceQuerySessions
         from .API.service.ServiceQuerySessionEvents import ServiceQuerySessionEvents
+        from .API.service.ServiceQuerySiteProjectAccessRoles import ServiceQuerySiteProjectAccessRoles
+        from .API.service.ServiceQueryUsers import ServiceQueryUsers
 
         service_api_ns.add_resource(ServiceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryAssets, '/assets', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySessionEvents, '/sessions/events', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQuerySiteProjectAccessRoles, '/users/access', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryUsers, '/users', resource_class_kwargs=kwargs)
 
         # Add namespace
         api.add_namespace(service_api_ns)

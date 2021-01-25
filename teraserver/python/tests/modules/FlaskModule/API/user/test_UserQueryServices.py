@@ -28,7 +28,7 @@ class UserQueryServicesTest(BaseAPITest):
         response = self._request_with_http_auth(username='admin', password='admin')
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        self.assertEqual(len(json_data), 3)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)

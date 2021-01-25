@@ -12,7 +12,7 @@ from twisted.python import log
 from autobahn.twisted.websocket import WebSocketClientProtocol, WebSocketClientFactory, connectWS
 from twisted.internet.ssl import ClientContextFactory
 
-import messages.python as messages
+import opentera.messages.python as messages
 from google.protobuf.json_format import ParseDict, ParseError
 
 

@@ -1,13 +1,11 @@
 import os
 import hashlib
-from datetime import timedelta, datetime
+from datetime import datetime
 from werkzeug.utils import secure_filename
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse, fields
-from sqlalchemy.exc import InvalidRequestError
+from flask import request
+from flask_restx import Resource, reqparse
 from services.FileTransferService.FlaskModule import file_api_ns as api
-from services.FileTransferService.libfiletransferservice.db.DBManager import DBManager
-from services.shared.ServiceAccessManager import ServiceAccessManager, current_service_client
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_service_client
 from services.FileTransferService.FlaskModule import flask_app
 from services.FileTransferService.libfiletransferservice.db.models.AssetFileData import AssetFileData
 from services.FileTransferService.libfiletransferservice.db.Base import db

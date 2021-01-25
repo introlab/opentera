@@ -3,10 +3,10 @@ from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraServerSettings import TeraServerSettings
-from libtera.utils.TeraVersions import TeraVersions, ClientVersions
+from opentera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.utils.TeraVersions import TeraVersions, ClientVersions
 import json
-from libtera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraUser import TeraUser
 
 # Parser definition(s)
 # GET

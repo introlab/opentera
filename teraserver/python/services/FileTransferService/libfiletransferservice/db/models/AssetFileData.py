@@ -1,5 +1,5 @@
 from services.FileTransferService.libfiletransferservice.db.Base import db
-from libtera.db.Base import BaseModel
+from opentera.db.Base import BaseModel
 import os
 
 

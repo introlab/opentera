@@ -1,12 +1,7 @@
-import datetime
-from datetime import timedelta
-
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse, fields
+from flask_restx import Resource, reqparse
 from sqlalchemy.exc import InvalidRequestError
 from services.LoggingService.FlaskModule import logging_api_ns as api
-from services.LoggingService.libloggingservice.db.DBManager import DBManager
-from services.shared.ServiceAccessManager import ServiceAccessManager, current_user_client
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_user_client
 from services.LoggingService.libloggingservice.db.models.LogEntry import LogEntry
 
 # Parser definition(s)
