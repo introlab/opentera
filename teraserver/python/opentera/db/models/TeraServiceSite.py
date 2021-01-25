@@ -4,7 +4,7 @@ from opentera.db.Base import db, BaseModel
 class TeraServiceSite(db.Model, BaseModel):
     __tablename__ = 't_services_sites'
     id_service_site = db.Column(db.Integer, db.Sequence('id_service_site_sequence'), primary_key=True,
-                                   autoincrement=True)
+                                autoincrement=True)
     id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
     id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
 

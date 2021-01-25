@@ -11,7 +11,6 @@ from datetime import datetime
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the participant to query')
-get_parser.add_argument('participant_id', type=str, help='Participant id of the participant to query')
 
 post_parser = api.parser()
 
@@ -64,11 +63,6 @@ class ServiceQueryParticipants(Resource):
         # args['participant_uuid'] Will be None if not specified in args
         if args['participant_uuid']:
             participant = TeraParticipant.get_participant_by_uuid(args['participant_uuid'])
-            if participant:
-                return participant.to_json()
-
-        if args['participant_id']:
-            participant = TeraParticipant.get_participant_by_id(args['participant_id'])
             if participant:
                 return participant.to_json()
 

@@ -37,7 +37,7 @@ class QueryLoginType(Resource):
         if current_login_type == LoginType.PARTICIPANT_LOGIN:
             login_infos['login_type'] = 'participant'
             login_infos['login_id'] = current_participant_client.id_participant
-            params = {'participant_id': current_participant_client.id_participant}
+            params = {'participant_uuid': current_participant_client.participant_uuid}
             endpoint = '/api/service/participants'
             response = Globals.service.get_from_opentera(endpoint, params)
 
@@ -49,7 +49,7 @@ class QueryLoginType(Resource):
             login_infos['login_type'] = 'user'
             login_infos['login_id'] = current_user_client.id_user
             login_infos['is_super_admin'] = current_user_client.user_superadmin
-            params = {'user_id': current_user_client.id_user}
+            params = {'user_uuid': current_user_client.user_uuid}
             endpoint = '/api/service/users'
             response = Globals.service.get_from_opentera(endpoint, params)
 
@@ -64,12 +64,17 @@ class QueryLoginType(Resource):
             if args['id_site']:
                 params = {'id_site': args['id_site'], 'uuid_user': current_user_client.user_uuid}
 
-            endpoint = '/api/service/user_role'
+            endpoint = '/api/service/users/access'
             response = Globals.service.get_from_opentera(endpoint, params)
 
             if response.status_code == 200:
-                permission_info = response.json()
-                login_infos.update(permission_info)
+                role = response.json()
+                if args['id_project']:
+                    project_admin = True if role['project_role'] == 'admin' else False
+                    login_infos.update({'project_admin': project_admin})
+                if args['id_site']:
+                    site_admin = True if role['site_role'] == 'admin' else False
+                    login_infos.update({'site_admin': site_admin})
 
         return login_infos
 

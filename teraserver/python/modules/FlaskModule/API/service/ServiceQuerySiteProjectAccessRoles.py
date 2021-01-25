@@ -1,11 +1,8 @@
-from flask import session
 from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
-from sqlalchemy.exc import InvalidRequestError
 from modules.DatabaseModule.DBManager import DBManager
-import json
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -14,7 +11,7 @@ get_parser.add_argument('id_site', type=int, help='ID of the site to query')
 get_parser.add_argument('uuid_user', type=str, help='UUID of the user')
 
 
-class ServiceQueryPermissions(Resource):
+class ServiceQuerySiteProjectAccessRoles(Resource):
 
     # Handle auth
     def __init__(self, _api, flaskModule=None):
@@ -34,10 +31,10 @@ class ServiceQueryPermissions(Resource):
         service_access = DBManager.serviceAccess(current_service)
 
         project_admin_info = {
-            'project_admin': False,
+            'project_role': 'user',
         }
         site_admin_info = {
-            'site_admin': False,
+            'site_role': 'user',
         }
 
         # Can only query permissions with an id
@@ -45,13 +42,9 @@ class ServiceQueryPermissions(Resource):
             return gettext('Missing arguments', 400)
 
         if args['id_project']:
-            user_project_role = service_access.get_project_role(args['id_project'], args['uuid_user'])
-            if user_project_role == 'admin':
-                project_admin_info['project_admin'] = True
+            project_admin_info['project_role'] = service_access.get_project_role(args['id_project'], args['uuid_user'])
             return project_admin_info
 
         if args['id_site']:
-            user_site_role = service_access.get_site_role(args['id_site'], args['uuid_user'])
-            if user_site_role == 'admin':
-                site_admin_info['site_admin'] = True
+            site_admin_info['site_role'] = service_access.get_site_role(args['id_site'], args['uuid_user'])
             return site_admin_info
