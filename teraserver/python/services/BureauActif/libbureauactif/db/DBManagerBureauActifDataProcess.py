@@ -200,9 +200,9 @@ class DBManagerBureauActifDataProcess:
         return datetime.datetime.fromisoformat(date_str)
 
     def update_expected_data(self, first_position_is_seating):
-        up_time = self.timers['up_secs']
-        down_time = self.timers['down_secs']
-        total_timers = up_time + down_time
+        seconds_up = self.timers['minutes_up'] * 60
+        seconds_down = self.timers['minutes_down'] * 60
+        total_timers = seconds_up + seconds_down
 
         start_of_day = self.calendar_day.date
         current_time = self.get_time(len(self.data) - 1)
@@ -214,25 +214,25 @@ class DBManagerBureauActifDataProcess:
         started_cycle = cycles % 1
         started_cycle_seconds = started_cycle * total_timers
         self.position_changes.expected = (full_cycles * 2) - 1  # First position of the day doesn't count
-        expected_second_standing = full_cycles * up_time
-        expected_second_seating = full_cycles * down_time
+        expected_second_standing = full_cycles * seconds_up
+        expected_second_seating = full_cycles * seconds_down
 
         if started_cycle_seconds > 0 and first_position_is_seating:
             self.position_changes.expected += 1  # Participant started to work in a new position
-            if started_cycle_seconds <= down_time:
+            if started_cycle_seconds <= seconds_down:
                 expected_second_seating += started_cycle_seconds
             else:
                 self.position_changes.expected += 1  # Participant had done the previous and started the next
-                expected_second_seating += down_time
-                expected_second_standing += started_cycle_seconds - down_time
+                expected_second_seating += seconds_down
+                expected_second_standing += started_cycle_seconds - seconds_down
         elif started_cycle_seconds > 0 and not first_position_is_seating:
             self.position_changes.expected += 1  # Participant started to work in a new position
-            if started_cycle_seconds <= up_time:
+            if started_cycle_seconds <= seconds_up:
                 expected_second_standing += started_cycle_seconds
             else:
                 self.position_changes.expected += 1  # Participant had done the previous and started the next
-                expected_second_standing += up_time
-                expected_second_seating += started_cycle_seconds - up_time
+                expected_second_standing += seconds_up
+                expected_second_seating += started_cycle_seconds - seconds_up
 
         self.standing.expected = expected_second_standing / 3600
         self.seating.expected = expected_second_seating / 3600

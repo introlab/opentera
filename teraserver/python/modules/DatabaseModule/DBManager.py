@@ -26,6 +26,7 @@ from libtera.db.models.TeraAsset import TeraAsset
 from libtera.db.models.TeraService import TeraService
 from libtera.db.models.TeraServiceRole import TeraServiceRole
 from libtera.db.models.TeraServiceProject import TeraServiceProject
+from libtera.db.models.TeraServiceSite import TeraServiceSite
 from libtera.db.models.TeraUserGroup import TeraUserGroup
 from libtera.db.models.TeraUserPreference import TeraUserPreference
 from libtera.db.models.TeraUserUserGroup import TeraUserUserGroup
@@ -176,6 +177,10 @@ class DBManager (BaseModule):
             print('No service - project association - creating defaults')
             TeraServiceProject.create_defaults(test)
 
+        if TeraServiceSite.get_count() == 0:
+            print('No service - site association - creating defaults')
+            TeraServiceSite.create_defaults(test)
+
         if TeraParticipantGroup.get_count() == 0:
             print("No participant groups - creating defaults")
             TeraParticipantGroup.create_defaults(test)
@@ -242,7 +247,7 @@ class DBManager (BaseModule):
         db.app = flask_app
 
         # Init tables
-        # db.drop_all()
+        db.drop_all()
         db.create_all()
 
         # Apply any database upgrade, if needed
