@@ -66,7 +66,7 @@ class QueryLoginType(Resource):
             if args['id_site']:
                 params = {'id_site': args['id_site'], 'uuid_user': current_user_client.user_uuid}
 
-            endpoint = '/api/service/user_role'
+            endpoint = '/api/service/users/access'
             response = Globals.service.get_from_opentera(endpoint, params)
 
             if response.status_code == 200:
