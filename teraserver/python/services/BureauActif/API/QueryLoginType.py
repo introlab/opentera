@@ -39,7 +39,7 @@ class QueryLoginType(Resource):
         if current_login_type == LoginType.PARTICIPANT_LOGIN:
             login_infos['login_type'] = 'participant'
             login_infos['login_id'] = current_participant_client.id_participant
-            params = {'participant_id': current_participant_client.id_participant}
+            params = {'participant_uuid': current_participant_client.participant_uuid}
             endpoint = '/api/service/participants'
             response = Globals.service.get_from_opentera(endpoint, params)
 
