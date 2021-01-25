@@ -1,8 +1,8 @@
 from modules.EventManager import EventManager
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraSession import TeraSession
 from modules.DatabaseModule.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
-import messages.python as messages
+import opentera.messages.python as messages
 
 
 class DeviceEventManager(EventManager):

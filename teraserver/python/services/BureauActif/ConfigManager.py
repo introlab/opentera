@@ -1,5 +1,4 @@
-import json
-from services.shared.ServiceConfigManager import ServiceConfigManager, DBConfig
+from opentera.services.ServiceConfigManager import ServiceConfigManager, DBConfig
 
 
 class ConfigManager(ServiceConfigManager, DBConfig):

@@ -1,8 +1,7 @@
 from flask.views import MethodView
 from flask import render_template, request
-from services.shared.ServiceAccessManager import ServiceAccessManager, current_participant_client
+from opentera.services.ServiceAccessManager import ServiceAccessManager
 from flask_babel import gettext
-import json
 
 
 class ParticipantLocalView(MethodView):

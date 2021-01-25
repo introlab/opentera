@@ -3,7 +3,7 @@ from flask_restx import Resource, reqparse
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
-from libtera.db.models.TeraAsset import TeraAsset, AssetType
+from opentera.db.models.TeraAsset import TeraAsset, AssetType
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy import exc
 

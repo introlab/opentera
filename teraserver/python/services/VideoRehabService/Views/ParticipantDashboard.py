@@ -1,9 +1,6 @@
 from flask.views import MethodView
 from flask import render_template, request
-from services.shared.ServiceAccessManager import ServiceAccessManager, current_user_client, \
-    current_participant_client, current_device_client
-
-import json
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_participant_client
 
 
 class ParticipantDashboard(MethodView):

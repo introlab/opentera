@@ -1,5 +1,5 @@
-from libtera.db.models import TeraUser
-from libtera.db.models.TeraService import TeraService
+from opentera.db.models.TeraService import TeraService
+from opentera.db.models import TeraUser
 
 
 class DBManagerTeraServiceAccess:
@@ -7,8 +7,8 @@ class DBManagerTeraServiceAccess:
         self.service = service
 
     def get_accessible_devices(self, admin_only=False):
-        from libtera.db.models.TeraDevice import TeraDevice
-        from libtera.db.models.TeraDeviceProject import TeraDeviceProject
+        from opentera.db.models.TeraDevice import TeraDevice
+        from opentera.db.models.TeraDeviceProject import TeraDeviceProject
 
         # Get projects available to that service
         proj_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
@@ -28,7 +28,7 @@ class DBManagerTeraServiceAccess:
         project_list = []
 
         # Build project list - get projects where that service is associated
-        from libtera.db.models.TeraServiceProject import TeraServiceProject
+        from opentera.db.models.TeraServiceProject import TeraServiceProject
         service_projects = TeraServiceProject.get_projects_for_service(self.service.id_service)
 
         for service_project in service_projects:
@@ -45,8 +45,8 @@ class DBManagerTeraServiceAccess:
         return projects
 
     def get_accessible_sessions(self, admin_only=False):
-        from libtera.db.models.TeraSession import TeraSession
-        from libtera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraParticipant import TeraParticipant
 
         part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
         return TeraSession.query.join(TeraSession.session_participants). \
@@ -64,7 +64,7 @@ class DBManagerTeraServiceAccess:
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
         participant_list = []
 
-        from libtera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraParticipant import TeraParticipant
         participant_list.extend(TeraParticipant.query.filter(TeraParticipant.id_project.in_(project_id_list)))
 
         return participant_list

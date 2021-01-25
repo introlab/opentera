@@ -25,11 +25,11 @@ limitations under the License.
 import sys
 
 
-from libtera.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager
 
 import os
 
-import libtera.crypto.crypto_utils as crypto
+import opentera.crypto.crypto_utils as crypto
 
 
 def generate_certificates(config: ConfigManager):

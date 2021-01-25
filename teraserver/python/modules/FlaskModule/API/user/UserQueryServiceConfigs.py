@@ -2,8 +2,8 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraServiceConfig import TeraServiceConfig
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -60,7 +60,7 @@ class UserQueryServiceConfig(Resource):
         args = parser.parse_args()
 
         if args['service_key'] and not args['id_service']:
-            from libtera.db.models.TeraService import TeraService
+            from opentera.db.models.TeraService import TeraService
             # Get service id for that key
             service = TeraService.get_service_by_key(args['service_key'])
             if not service:
@@ -133,7 +133,7 @@ class UserQueryServiceConfig(Resource):
             return 'Missing id_service_config', 400
 
         if 'service_key' in json_config:
-            from libtera.db.models.TeraService import TeraService
+            from opentera.db.models.TeraService import TeraService
             json_config['id_service'] = TeraService.get_service_by_key(json_config['service_key']).id_service
             del json_config['service_key']
 

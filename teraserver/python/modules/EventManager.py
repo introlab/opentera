@@ -1,5 +1,5 @@
 # Messages
-import messages.python as messages
+import opentera.messages.python as messages
 
 
 class EventManager:

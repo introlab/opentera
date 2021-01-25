@@ -1,10 +1,9 @@
-from modules.BaseModule import BaseModule, ModuleNames
-from libtera.ConfigManager import ConfigManager
-from libtera.db.models.TeraService import TeraService
+from opentera.modules.BaseModule import BaseModule, ModuleNames
+from opentera.config.ConfigManager import ConfigManager
+from opentera.db.models.TeraService import TeraService
 
 import os
 import subprocess
-import threading
 import sys
 
 

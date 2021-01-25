@@ -2,15 +2,15 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.LoginModule.LoginModule import user_multi_auth
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraSession import TeraSession
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from flask_babel import gettext
-from libtera.redis.RedisRPCClient import RedisRPCClient
-from modules.BaseModule import ModuleNames
+from opentera.redis.RedisRPCClient import RedisRPCClient
+from opentera.modules.BaseModule import ModuleNames
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -221,7 +221,7 @@ class UserQueryParticipants(Resource):
         # If we have both an id_group and an id_project, make sure that the id_project in the group matches
         if 'id_project' in json_participant and 'id_participant_group' in json_participant:
             if json_participant['id_participant_group'] is not None and json_participant['id_participant_group'] > 0:
-                from libtera.db.models.TeraParticipantGroup import TeraParticipantGroup
+                from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
                 participant_group = TeraParticipantGroup.get_participant_group_by_id(
                     json_participant['id_participant_group'])
                 if participant_group is None:

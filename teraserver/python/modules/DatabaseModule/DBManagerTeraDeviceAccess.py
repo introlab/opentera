@@ -1,8 +1,8 @@
 
-from libtera.db.models.TeraProject import TeraProject
-from libtera.db.models.TeraSessionType import TeraSessionType
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraSession import TeraSession
 
 from sqlalchemy import func
 
@@ -76,7 +76,7 @@ class DBManagerTeraDeviceAccess:
         return types
 
     def get_accessible_assets(self, id_asset=None):
-        from libtera.db.models.TeraAsset import TeraAsset
+        from opentera.db.models.TeraAsset import TeraAsset
         query = TeraAsset.query.filter(TeraAsset.id_device == self.device.id_device)
         if id_asset:
             query = query.filter(TeraAsset.id_asset == id_asset)

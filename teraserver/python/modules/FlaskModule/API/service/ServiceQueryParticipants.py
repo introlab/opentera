@@ -3,7 +3,7 @@ from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule
 from modules.FlaskModule.FlaskModule import service_api_ns as api
-from libtera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraParticipant import TeraParticipant
 from modules.DatabaseModule.DBManager import db
 import uuid
 from datetime import datetime

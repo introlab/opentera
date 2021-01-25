@@ -3,7 +3,7 @@
 # from flask_babel import gettext
 # from modules.LoginModule.LoginModule import participant_multi_auth
 # from modules.FlaskModule.FlaskModule import participant_api_ns as api
-# from libtera.db.models.TeraParticipant import TeraParticipant
+# from opentera.db.models.TeraParticipant import TeraParticipant
 # from modules.DatabaseModule.DBManager import DBManager
 # import zipfile
 # from io import BytesIO

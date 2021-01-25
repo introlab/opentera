@@ -4,9 +4,9 @@ from flask_babel import gettext
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraServiceAccess import TeraServiceAccess
-from libtera.db.models.TeraServiceRole import TeraServiceRole
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+from opentera.db.models.TeraServiceRole import TeraServiceRole
 from modules.DatabaseModule.DBManager import DBManager
 import modules.Globals as Globals
 
@@ -71,7 +71,7 @@ class UserQueryProjectAccess(Resource):
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading project roles'})
     def get(self):
-        from libtera.db.models.TeraProject import TeraProject
+        from opentera.db.models.TeraProject import TeraProject
         parser = get_parser
 
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])

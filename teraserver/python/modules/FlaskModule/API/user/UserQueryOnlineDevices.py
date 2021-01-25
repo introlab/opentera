@@ -1,13 +1,13 @@
 from flask import session
-from flask_restx import Resource, reqparse, inputs
+from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraDevice import TeraDevice
-from libtera.redis.RedisRPCClient import RedisRPCClient
-from modules.BaseModule import ModuleNames
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.redis.RedisRPCClient import RedisRPCClient
+from opentera.modules.BaseModule import ModuleNames
 from modules.DatabaseModule.DBManager import DBManager
 
 get_parser = api.parser()

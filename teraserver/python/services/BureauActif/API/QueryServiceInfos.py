@@ -1,10 +1,10 @@
-from flask import jsonify, session, request
+from flask import jsonify
 from flask_restx import Resource
 
-from services.shared.ServiceAccessManager import ServiceAccessManager, current_login_type, LoginType
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_login_type, LoginType
 
 from services.BureauActif.Globals import config_man
-from services.BureauActif.FlaskModule import default_api_ns as api, flask_app
+from services.BureauActif.FlaskModule import default_api_ns as api
 
 
 class QueryServiceInfos(Resource):

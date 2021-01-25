@@ -4,8 +4,8 @@ from requests import get
 import json
 import websocket
 import ssl
-from messages.python.UserRegisterToEvent_pb2 import UserRegisterToEvent
-from messages.python.TeraModuleMessage_pb2 import TeraModuleMessage
+from opentera.messages.python.UserRegisterToEvent_pb2 import UserRegisterToEvent
+from opentera.messages.python.TeraModuleMessage_pb2 import TeraModuleMessage
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.json_format import Parse, ParseError
 from google.protobuf.any_pb2 import Any

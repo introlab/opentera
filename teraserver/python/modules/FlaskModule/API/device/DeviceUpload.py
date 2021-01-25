@@ -6,10 +6,10 @@
 # from werkzeug.utils import secure_filename
 # from modules.FlaskModule.FlaskModule import flask_app
 #
-# from libtera.db.models.TeraDeviceData import TeraDeviceData
-# from libtera.db.models.TeraSessionEvent import TeraSessionEvent
+# from opentera.db.models.TeraDeviceData import TeraDeviceData
+# from opentera.db.models.TeraSessionEvent import TeraSessionEvent
 # from modules.DatabaseModule.DBManager import DBManager
-# from libtera.db.Base import db
+# from opentera.db.Base import db
 #
 # import datetime
 # import uuid

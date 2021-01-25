@@ -2,10 +2,10 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, fields, inputs
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from libtera.db.models.TeraUser import TeraUser
-from libtera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
-from libtera.db.models.TeraParticipant import TeraParticipant
-from libtera.db.models.TeraDeviceProject import TeraDeviceProject
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraDeviceProject import TeraDeviceProject
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc

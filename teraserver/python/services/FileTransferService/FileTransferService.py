@@ -1,24 +1,17 @@
 from services.FileTransferService.FlaskModule import flask_app
 import services.FileTransferService.Globals as Globals
-from libtera.redis.RedisClient import RedisClient
+from opentera.redis.RedisClient import RedisClient
 from services.FileTransferService.ConfigManager import ConfigManager
-from services.shared.ServiceAccessManager import ServiceAccessManager
-from modules.RedisVars import RedisVars
-from modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
-from google.protobuf.json_format import Parse, ParseError
-from google.protobuf.message import DecodeError
+from opentera.services.ServiceAccessManager import ServiceAccessManager
+from opentera.redis.RedisVars import RedisVars
 
 # Twisted
-from twisted.application import internet, service
-from twisted.internet import reactor, ssl, defer
+from twisted.internet import reactor
 from twisted.python import log
-import messages.python as messages
 import sys
 import os
-import uuid
 
-from services.shared.ServiceOpenTera import ServiceOpenTera
-from flask_babel import gettext
+from opentera.services.ServiceOpenTera import ServiceOpenTera
 from sqlalchemy.exc import OperationalError
 from services.FileTransferService.FlaskModule import FlaskModule
 

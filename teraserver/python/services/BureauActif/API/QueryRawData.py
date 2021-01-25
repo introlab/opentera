@@ -2,12 +2,12 @@ import datetime
 import uuid
 import os
 
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse, fields
+from flask import request
+from flask_restx import Resource
 from werkzeug.utils import secure_filename
 
 from services.BureauActif import Globals
-from services.shared.ServiceAccessManager import ServiceAccessManager, current_login_type, current_device_client, \
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_login_type, current_device_client, \
     LoginType
 
 from services.BureauActif.FlaskModule import default_api_ns as api, flask_app

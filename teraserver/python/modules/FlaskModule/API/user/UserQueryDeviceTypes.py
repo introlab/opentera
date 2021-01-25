@@ -4,9 +4,9 @@ from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
 from sqlalchemy.exc import InvalidRequestError
 
-from libtera.db.models import TeraDeviceType
-from libtera.db.models.TeraDeviceType import TeraDeviceType
-from libtera.db.models.TeraUser import TeraUser
+from opentera.db.models import TeraDeviceType
+from opentera.db.models.TeraDeviceType import TeraDeviceType
+from opentera.db.models.TeraUser import TeraUser
 from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.LoginModule.LoginModule import user_multi_auth

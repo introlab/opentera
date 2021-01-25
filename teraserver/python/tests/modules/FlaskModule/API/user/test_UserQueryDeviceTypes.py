@@ -1,6 +1,6 @@
 from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
 import random
-from libtera.db.models.TeraDeviceType import TeraDeviceType
+from opentera.db.models.TeraDeviceType import TeraDeviceType
 
 
 class UserQueryDeviceTypesTest(BaseAPITest):

@@ -1,0 +1,56 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python package
+
+on:
+  workflow_dispatch:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install system dependencies
+      run: | 
+        sudo apt-get install cmake protobuf-compiler wget
+        cat /proc/cpuinfo
+        cat /proc/meminfo
+    - name: Install Miniconda3
+      run: |
+        echo $HOME
+        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        bash ./Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
+    - name: Run CMake and build
+      working-directory: teraserver
+      run: |
+        cmake .
+        make python-all
+    - name: Build dist package with setuptools
+      working-directory: teraserver/python
+      run: | 
+        ./env/python-3.8/bin/python3 -m pip install --upgrade setuptools wheel
+        ./env/python-3.8/bin/python3 setup.py sdist bdist_wheel
+        du -h dist
+        
+    - name: Install python dependencies
+      run: |
+        ls -l
+        python -m pip install --upgrade pip
+        python -m pip install flake8 pytest
+        pip install protobuf
+        if [ -f teraserver/python/env/requirements.txt ]; then pip install -r teraserver/python/env/requirements.txt; fi
+

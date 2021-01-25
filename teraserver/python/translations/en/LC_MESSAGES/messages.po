@@ -7,558 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-01-25 09:46-0500\n"
-"PO-Revision-Date: 2021-01-25 09:47-0500\n"
+"POT-Creation-Date: 2021-01-25 13:13-0500\n"
+"PO-Revision-Date: 2021-01-25 13:01-0500\n"
+"Last-Translator: \n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.0\n"
-"Last-Translator: \n"
-"X-Generator: Poedit 2.4.2\n"
-
-#: libtera/db/models/TeraSessionType.py:130 libtera/forms/TeraSessionForm.py:101
-msgid "Unknown"
-msgstr ""
-
-#: libtera/db/models/TeraSessionType.py:132
-#: libtera/forms/TeraSessionTypeForm.py:43
-msgid "Service"
-msgstr ""
-
-#: libtera/db/models/TeraSessionType.py:134
-msgid "File Transfer"
-msgstr ""
-
-#: libtera/db/models/TeraSessionType.py:136
-msgid "Data Collect"
-msgstr ""
-
-#: libtera/db/models/TeraSessionType.py:138
-msgid "Protocol"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:24
-msgid "Parameters"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:28 libtera/forms/TeraServiceConfigForm.py:28
-msgid "Device ID"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:29
-msgid "Device UUID"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:30
-msgid "Device Name"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:31 libtera/forms/TeraDeviceSubTypeForm.py:32
-#: libtera/forms/TeraDeviceTypeForm.py:21
-msgid "Device Type ID"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:33
-msgid "Device Sub-Type"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:36
-msgid "Access Token"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:38
-msgid "Certificate"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:40
-msgid "Device Enabled?"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:41
-msgid "Device Onlineable?"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:44 libtera/forms/TeraParticipantForm.py:60
-#: libtera/forms/TeraUserForm.py:30
-msgid "Last Connection"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:47 libtera/forms/TeraDeviceSubTypeForm.py:24
-#: libtera/forms/TeraDeviceTypeForm.py:17 libtera/forms/TeraParticipantForm.py:34
-#: libtera/forms/TeraParticipantGroupForm.py:33
-#: libtera/forms/TeraProjectForm.py:19 libtera/forms/TeraServiceConfigForm.py:18
-#: libtera/forms/TeraServiceForm.py:18 libtera/forms/TeraSessionForm.py:116
-#: libtera/forms/TeraSessionTypeForm.py:33 libtera/forms/TeraSiteForm.py:12
-#: libtera/forms/TeraUserForm.py:13 libtera/forms/TeraUserGroupForm.py:18
-#: libtera/forms/TeraVersionsForm.py:18
-msgid "Information"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:49
-msgid "Device Information"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:51
-msgid "Configuration"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:53
-msgid "Device Configuration"
-msgstr ""
-
-#: libtera/forms/TeraDeviceForm.py:55 libtera/forms/TeraDeviceForm.py:57
-#: libtera/forms/TeraUserForm.py:28
-msgid "Notes"
-msgstr ""
-
-#: libtera/forms/TeraDeviceSubTypeForm.py:28
-msgid "Device Sub-Type ID"
-msgstr ""
-
-#: libtera/forms/TeraDeviceSubTypeForm.py:30
-msgid "Device Sub-Type Name"
-msgstr ""
-
-#: libtera/forms/TeraDeviceTypeForm.py:23
-msgid "Device Type Name"
-msgstr ""
-
-#: libtera/forms/TeraDeviceTypeForm.py:25
-msgid "Device Type Key"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:38
-#: libtera/forms/TeraServiceConfigForm.py:29
-msgid "Participant ID"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:39
-msgid "Projet ID"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:40 libtera/forms/TeraSiteForm.py:16
-msgid "Site ID"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:41
-msgid "Participant UUID"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:42
-msgid "Participant Name"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:43
-msgid "Participant Email"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:44
-msgid "Participant Group"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:46
-msgid "Participant Enabled"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:48
-msgid "Participant Token Login Enabled"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:50
-msgid "Participant Token"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:52
-msgid "Participant Login Enabled"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:54
-msgid "Participant Username"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:57
-msgid "Participant Password"
-msgstr ""
-
-#: libtera/forms/TeraParticipantForm.py:62
-msgid "Last Session"
-msgstr ""
-
-#: libtera/forms/TeraParticipantGroupForm.py:37
-msgid "Participant Group ID"
-msgstr ""
-
-#: libtera/forms/TeraParticipantGroupForm.py:38
-msgid "Participant Group Name"
-msgstr ""
-
-#: libtera/forms/TeraParticipantGroupForm.py:39
-msgid "Project"
-msgstr ""
-
-#: libtera/forms/TeraParticipantGroupForm.py:40
-#: libtera/forms/TeraProjectForm.py:24
-msgid "Project Name"
-msgstr ""
-
-#: libtera/forms/TeraProjectForm.py:23
-msgid "Project ID"
-msgstr ""
-
-#: libtera/forms/TeraProjectForm.py:25
-msgid "Site"
-msgstr ""
-
-#: libtera/forms/TeraProjectForm.py:26
-msgid "Role"
-msgstr ""
-
-#: libtera/forms/TeraProjectForm.py:27 libtera/forms/TeraSiteForm.py:17
-msgid "Site Name"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:25 libtera/forms/TeraServiceForm.py:25
-msgid "Service ID"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:26
-msgid "Service Config ID"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:27 libtera/forms/TeraUserForm.py:17
-msgid "User ID"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:30
-msgid "Service Config"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:47
-msgid "Multimedia Configuration"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:51
-msgid "Camera"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:52
-msgid "Mirrored image"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:53
-msgid "Camera Type"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:54
-msgid "Network Camera"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:55
-msgid "Screen Capture"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:59
-msgid "RTSP URL"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:63
-msgid "Frames per second (FPS)"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:68
-msgid "Resolution"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:76
-msgid "Pan-Tilt-Zoom Camera"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:77
-msgid "Control Type"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:78
-msgid "Vivotek"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:79
-msgid "ONVIF (Generic)"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:82
-msgid "Network Address"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:85
-msgid "Port"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:88 libtera/forms/TeraUserForm.py:20
-msgid "Username"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:91 libtera/forms/TeraUserForm.py:26
-msgid "Password"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:95
-msgid "Microphone"
-msgstr ""
-
-#: libtera/forms/TeraServiceConfigForm.py:96
-msgid "Secondary Camera"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:26
-msgid "Service UUID"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:28
-msgid "Service Name"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:29
-msgid "Service Key"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:30
-msgid "Service Hostname"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:31
-msgid "Service Internal Port"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:32
-msgid "Service Internal URL"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:33
-msgid "Service External Endpoint"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:35
-msgid "Service User Endpoint"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:37
-msgid "Service Participant Endpoint"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:39
-msgid "Service Device Endpoint"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:41
-msgid "Service Enabled"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:42
-msgid "Service has editable config"
-msgstr ""
-
-#: libtera/forms/TeraServiceForm.py:44
-msgid "Service Default Configuration"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:103
-msgid "Cancelled"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:105
-msgid "Completed"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:107
-msgid "In progess"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:109
-msgid "Planned"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:111
-msgid "Interrupted"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:120
-msgid "Session ID"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:121
-msgid "Session UUID"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:122
-msgid "Session Name"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:123
-msgid "Session Type"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:124 libtera/forms/TeraSessionForm.py:125
-msgid "Session User Creator"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:130
-msgid "Session Creator Device"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:131
-msgid "Session Creator Device ID"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:137 libtera/forms/TeraSessionForm.py:139
-msgid "Session Creator Participant"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:144 libtera/forms/TeraSessionForm.py:146
-msgid "Session Creator Service"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:151
-msgid "Start Date"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:152
-msgid "Duration"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:155
-msgid "State"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:156
-msgid "Comments"
-msgstr ""
-
-#: libtera/forms/TeraSessionForm.py:162
-msgid "Session Has Device Data"
-msgstr ""
-
-#: libtera/forms/TeraSessionTypeForm.py:37
-msgid "Session Type ID"
-msgstr ""
-
-#: libtera/forms/TeraSessionTypeForm.py:38
-msgid "Session Type Name"
-msgstr ""
-
-#: libtera/forms/TeraSessionTypeForm.py:41
-msgid "Category"
-msgstr ""
-
-#: libtera/forms/TeraSessionTypeForm.py:50
-msgid "Session Type Service Key"
-msgstr ""
-
-#: libtera/forms/TeraSessionTypeForm.py:51
-msgid "Session Type Online"
-msgstr ""
-
-#: libtera/forms/TeraSessionTypeForm.py:52
-msgid "Session Type Display Color"
-msgstr ""
-
-#: libtera/forms/TeraSessionTypeForm.py:53
-msgid "Session Type Configuration"
-msgstr ""
-
-#: libtera/forms/TeraSiteForm.py:18
-msgid "Site Role"
-msgstr ""
-
-#: libtera/forms/TeraUserForm.py:18
-msgid "User UUID"
-msgstr ""
-
-#: libtera/forms/TeraUserForm.py:19
-msgid "User Full Name"
-msgstr ""
-
-#: libtera/forms/TeraUserForm.py:21
-msgid "User Enabled"
-msgstr ""
-
-#: libtera/forms/TeraUserForm.py:22
-msgid "First Name"
-msgstr ""
-
-#: libtera/forms/TeraUserForm.py:23
-msgid "Last NAme"
-msgstr ""
-
-#: libtera/forms/TeraUserForm.py:24
-msgid "Email"
-msgstr ""
-
-#: libtera/forms/TeraUserForm.py:27
-msgid "User Is Super Administrator"
-msgstr ""
-
-#: libtera/forms/TeraUserForm.py:29
-msgid "Profile"
-msgstr ""
-
-#: libtera/forms/TeraUserGroupForm.py:22
-msgid "User Group ID"
-msgstr ""
-
-#: libtera/forms/TeraUserGroupForm.py:24
-msgid "User Group Name"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:22
-msgid "OpenTeraServer version string"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:25
-msgid "OpenTeraServer major version number"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:28
-msgid "OpenTeraServer minor version number"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:31
-msgid "OpenTeraServer patch version number"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:44 templates/about.html:26
-msgid "Versions"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:46
-msgid "Client name"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:49
-msgid "Client description"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:52
-msgid "Client version"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:55
-msgid "Client documentation url"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:58
-msgid "Client windows version"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:61
-msgid "Client mac version"
-msgstr ""
-
-#: libtera/forms/TeraVersionsForm.py:64
-msgid "Client linux version"
-msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceLogin.py:50
 msgid "Device already logged in."
@@ -645,7 +103,7 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:113
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:127
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:161
-#: modules/FlaskModule/API/user/UserQueryAssets.py:148
+#: modules/FlaskModule/API/user/UserQueryAssets.py:146
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:158
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:175
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:214
@@ -748,6 +206,8 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQueryParticipants.py:69
 #: modules/FlaskModule/API/service/ServiceQueryParticipants.py:85
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:45
+#: modules/FlaskModule/API/service/ServiceQuerySiteProjectAccessRoles.py:42
+#: modules/FlaskModule/API/service/ServiceQueryUsers.py:39
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:70
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:58
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:56
@@ -767,8 +227,10 @@ msgstr ""
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:80
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:146
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:169
-#: modules/LoginModule/LoginModule.py:424 modules/LoginModule/LoginModule.py:466
-#: modules/LoginModule/LoginModule.py:484 modules/LoginModule/LoginModule.py:494
+#: modules/LoginModule/LoginModule.py:422
+#: modules/LoginModule/LoginModule.py:464
+#: modules/LoginModule/LoginModule.py:482
+#: modules/LoginModule/LoginModule.py:492
 msgid "Unauthorized"
 msgstr ""
 
@@ -780,13 +242,14 @@ msgstr ""
 msgid "Missing argument 'session_start_datetime'"
 msgstr ""
 
-#: modules/FlaskModule/API/device/DeviceRegister.py:107
+#: modules/FlaskModule/API/device/DeviceRegister.py:108
 msgid "Invalid CSR signature"
 msgstr ""
 
-#: modules/FlaskModule/API/device/DeviceRegister.py:114
-#: modules/FlaskModule/API/device/DeviceRegister.py:120
-#: modules/FlaskModule/API/device/DeviceRegister.py:137
+#: modules/FlaskModule/API/device/DeviceRegister.py:115
+#: modules/FlaskModule/API/device/DeviceRegister.py:121
+#: modules/FlaskModule/API/device/DeviceRegister.py:124
+#: modules/FlaskModule/API/device/DeviceRegister.py:150
 msgid "Invalid content type"
 msgstr ""
 
@@ -809,24 +272,24 @@ msgid "Not implemented"
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:48
-#: modules/FlaskModule/API/user/UserQueryAssets.py:59
+#: modules/FlaskModule/API/user/UserQueryAssets.py:57
 msgid "Device access denied"
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:52
-#: modules/FlaskModule/API/user/UserQueryAssets.py:63
+#: modules/FlaskModule/API/user/UserQueryAssets.py:61
 msgid "Session access denied"
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:56
-#: modules/FlaskModule/API/user/UserQueryAssets.py:67
+#: modules/FlaskModule/API/user/UserQueryAssets.py:65
 msgid "Participant access denied"
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:63
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:65
+#: modules/FlaskModule/API/user/UserQueryAssets.py:72
 #: modules/FlaskModule/API/user/UserQueryAssets.py:74
-#: modules/FlaskModule/API/user/UserQueryAssets.py:76
 msgid "Permission denied"
 msgstr ""
 
@@ -923,15 +386,15 @@ msgstr ""
 msgid "User logged out."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryAssets.py:56
+#: modules/FlaskModule/API/user/UserQueryAssets.py:54
 msgid "No arguments specified"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryAssets.py:217
+#: modules/FlaskModule/API/user/UserQueryAssets.py:215
 msgid "Error uploading file"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryAssets.py:218
+#: modules/FlaskModule/API/user/UserQueryAssets.py:216
 #: modules/FlaskModule/API/user/UserQueryVersions.py:75
 msgid "Not authorized"
 msgstr ""
@@ -1028,25 +491,26 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:385
 msgid ""
-"Can't delete device: please delete all participants association before deleting."
+"Can't delete device: please delete all participants association before "
+"deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:388
 msgid ""
-"Can't delete device: please remove all sessions referring to that device before "
-"deleting."
+"Can't delete device: please remove all sessions referring to that device "
+"before deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:391
 msgid ""
-"Can't delete device: please remove all sessions created by that device before "
-"deleting."
+"Can't delete device: please remove all sessions created by that device "
+"before deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:393
 msgid ""
-"Can't delete device: please delete all assets created by that device before "
-"deleting."
+"Can't delete device: please delete all assets created by that device "
+"before deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:410
@@ -1140,8 +604,8 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryProjects.py:206
 msgid ""
-"Can't delete project: please delete all participants with sessions before "
-"deleting."
+"Can't delete project: please delete all participants with sessions before"
+" deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:99
@@ -1227,8 +691,8 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:131
 msgid ""
-"Trying to associate a session type of type \"service\" with a service not "
-"associated to that project"
+"Trying to associate a session type of type \"service\" with a service not"
+" associated to that project"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:93
@@ -1257,8 +721,8 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:257
 msgid ""
-"Can't delete session type: please delete all sessions with that type before "
-"deleting."
+"Can't delete session type: please delete all sessions with that type "
+"before deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySessions.py:121
@@ -1302,7 +766,8 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQuerySites.py:190
 msgid ""
-"Can't delete site: please delete all participants with sessions before deleting."
+"Can't delete site: please delete all participants with sessions before "
+"deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryStats.py:89
@@ -1315,8 +780,8 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUserGroups.py:301
 msgid ""
-"Can't delete user group: please delete all users part of that user group before "
-"deleting."
+"Can't delete user group: please delete all users part of that user group "
+"before deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUserPreferences.py:91
@@ -1382,14 +847,14 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:360
 msgid ""
-"Can't delete user: please remove all sessions that this user is part of before "
-"deleting."
+"Can't delete user: please remove all sessions that this user is part of "
+"before deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:363
 msgid ""
-"Can't delete user: please remove all sessions created by this user before "
-"deleting."
+"Can't delete user: please remove all sessions created by this user before"
+" deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:365
@@ -1402,54 +867,602 @@ msgstr ""
 msgid "Wrong ClientVersions"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:112
+#: modules/FlaskModule/API/user/UserSessionManager.py:108
 msgid "Missing action"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:126
-#: modules/FlaskModule/API/user/UserSessionManager.py:140
+#: modules/FlaskModule/API/user/UserSessionManager.py:122
+#: modules/FlaskModule/API/user/UserSessionManager.py:136
 msgid "Invalid session"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:134
+#: modules/FlaskModule/API/user/UserSessionManager.py:130
 msgid "User doesn't have access to that session"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:147
+#: modules/FlaskModule/API/user/UserSessionManager.py:143
 msgid "User doesn't have access to that service."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:152
+#: modules/FlaskModule/API/user/UserSessionManager.py:148
 msgid "Missing parameters"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:155
+#: modules/FlaskModule/API/user/UserSessionManager.py:151
 msgid "Missing reply code in parameters"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:168
-#: modules/FlaskModule/API/user/UserSessionManager.py:171
+#: modules/FlaskModule/API/user/UserSessionManager.py:164
+#: modules/FlaskModule/API/user/UserSessionManager.py:167
 msgid "Invalid reply code"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:179
+#: modules/FlaskModule/API/user/UserSessionManager.py:175
 msgid "Service not found"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:184
+#: modules/FlaskModule/API/user/UserSessionManager.py:180
 msgid "Not implemented yet"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserSessionManager.py:245
+#: modules/FlaskModule/API/user/UserSessionManager.py:241
 msgid "No answer from service."
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:394
+#: modules/LoginModule/LoginModule.py:392
 msgid "Invalid token"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:453
+#: modules/LoginModule/LoginModule.py:451
 msgid "Invalid Token"
+msgstr ""
+
+#: opentera/db/models/TeraSessionType.py:130
+#: opentera/forms/TeraSessionForm.py:101
+msgid "Unknown"
+msgstr ""
+
+#: opentera/db/models/TeraSessionType.py:132
+#: opentera/forms/TeraSessionTypeForm.py:43
+msgid "Service"
+msgstr ""
+
+#: opentera/db/models/TeraSessionType.py:134
+msgid "File Transfer"
+msgstr ""
+
+#: opentera/db/models/TeraSessionType.py:136
+msgid "Data Collect"
+msgstr ""
+
+#: opentera/db/models/TeraSessionType.py:138
+msgid "Protocol"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:24
+msgid "Parameters"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:28
+#: opentera/forms/TeraServiceConfigForm.py:28
+msgid "Device ID"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:29
+msgid "Device UUID"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:30
+msgid "Device Name"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:31
+#: opentera/forms/TeraDeviceSubTypeForm.py:32
+#: opentera/forms/TeraDeviceTypeForm.py:21
+msgid "Device Type ID"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:33
+msgid "Device Sub-Type"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:36
+msgid "Access Token"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:38
+msgid "Certificate"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:40
+msgid "Device Enabled?"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:41
+msgid "Device Onlineable?"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:44 opentera/forms/TeraParticipantForm.py:60
+#: opentera/forms/TeraUserForm.py:30
+msgid "Last Connection"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:47
+#: opentera/forms/TeraDeviceSubTypeForm.py:24
+#: opentera/forms/TeraDeviceTypeForm.py:17
+#: opentera/forms/TeraParticipantForm.py:34
+#: opentera/forms/TeraParticipantGroupForm.py:33
+#: opentera/forms/TeraProjectForm.py:19
+#: opentera/forms/TeraServiceConfigForm.py:18
+#: opentera/forms/TeraServiceForm.py:18 opentera/forms/TeraSessionForm.py:116
+#: opentera/forms/TeraSessionTypeForm.py:33 opentera/forms/TeraSiteForm.py:12
+#: opentera/forms/TeraUserForm.py:13 opentera/forms/TeraUserGroupForm.py:18
+#: opentera/forms/TeraVersionsForm.py:18
+msgid "Information"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:49
+msgid "Device Information"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:51
+msgid "Configuration"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:53
+msgid "Device Configuration"
+msgstr ""
+
+#: opentera/forms/TeraDeviceForm.py:55 opentera/forms/TeraDeviceForm.py:57
+#: opentera/forms/TeraUserForm.py:28
+msgid "Notes"
+msgstr ""
+
+#: opentera/forms/TeraDeviceSubTypeForm.py:28
+msgid "Device Sub-Type ID"
+msgstr ""
+
+#: opentera/forms/TeraDeviceSubTypeForm.py:30
+msgid "Device Sub-Type Name"
+msgstr ""
+
+#: opentera/forms/TeraDeviceTypeForm.py:23
+msgid "Device Type Name"
+msgstr ""
+
+#: opentera/forms/TeraDeviceTypeForm.py:25
+msgid "Device Type Key"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:38
+#: opentera/forms/TeraServiceConfigForm.py:29
+msgid "Participant ID"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:39
+msgid "Projet ID"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:40 opentera/forms/TeraSiteForm.py:16
+msgid "Site ID"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:41
+msgid "Participant UUID"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:42
+msgid "Participant Name"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:43
+msgid "Participant Email"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:44
+msgid "Participant Group"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:46
+msgid "Participant Enabled"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:48
+msgid "Participant Token Login Enabled"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:50
+msgid "Participant Token"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:52
+msgid "Participant Login Enabled"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:54
+msgid "Participant Username"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:57
+msgid "Participant Password"
+msgstr ""
+
+#: opentera/forms/TeraParticipantForm.py:62
+msgid "Last Session"
+msgstr ""
+
+#: opentera/forms/TeraParticipantGroupForm.py:37
+msgid "Participant Group ID"
+msgstr ""
+
+#: opentera/forms/TeraParticipantGroupForm.py:38
+msgid "Participant Group Name"
+msgstr ""
+
+#: opentera/forms/TeraParticipantGroupForm.py:39
+msgid "Project"
+msgstr ""
+
+#: opentera/forms/TeraParticipantGroupForm.py:40
+#: opentera/forms/TeraProjectForm.py:24
+msgid "Project Name"
+msgstr ""
+
+#: opentera/forms/TeraProjectForm.py:23
+msgid "Project ID"
+msgstr ""
+
+#: opentera/forms/TeraProjectForm.py:25
+msgid "Site"
+msgstr ""
+
+#: opentera/forms/TeraProjectForm.py:26
+msgid "Role"
+msgstr ""
+
+#: opentera/forms/TeraProjectForm.py:27 opentera/forms/TeraSiteForm.py:17
+msgid "Site Name"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:25
+#: opentera/forms/TeraServiceForm.py:25
+msgid "Service ID"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:26
+msgid "Service Config ID"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:27 opentera/forms/TeraUserForm.py:17
+msgid "User ID"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:30
+msgid "Service Config"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:47
+msgid "Multimedia Configuration"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:51
+msgid "Camera"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:52
+msgid "Mirrored image"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:53
+msgid "Camera Type"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:54
+msgid "Network Camera"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:55
+msgid "Screen Capture"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:59
+msgid "RTSP URL"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:63
+msgid "Frames per second (FPS)"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:68
+msgid "Resolution"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:76
+msgid "Pan-Tilt-Zoom Camera"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:77
+msgid "Control Type"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:78
+msgid "Vivotek"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:79
+msgid "ONVIF (Generic)"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:82
+msgid "Network Address"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:85
+msgid "Port"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:88 opentera/forms/TeraUserForm.py:20
+msgid "Username"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:91 opentera/forms/TeraUserForm.py:26
+msgid "Password"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:95
+msgid "Microphone"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:96
+msgid "Secondary Camera"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:26
+msgid "Service UUID"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:28
+msgid "Service Name"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:29
+msgid "Service Key"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:30
+msgid "Service Hostname"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:31
+msgid "Service Internal Port"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:32
+msgid "Service Internal URL"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:33
+msgid "Service External Endpoint"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:35
+msgid "Service User Endpoint"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:37
+msgid "Service Participant Endpoint"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:39
+msgid "Service Device Endpoint"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:41
+msgid "Service Enabled"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:42
+msgid "Service has editable config"
+msgstr ""
+
+#: opentera/forms/TeraServiceForm.py:44
+msgid "Service Default Configuration"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:103
+msgid "Cancelled"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:105
+msgid "Completed"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:107
+msgid "In progess"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:109
+msgid "Planned"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:111
+msgid "Interrupted"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:120
+msgid "Session ID"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:121
+msgid "Session UUID"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:122
+msgid "Session Name"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:123
+msgid "Session Type"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:124 opentera/forms/TeraSessionForm.py:125
+msgid "Session User Creator"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:130
+msgid "Session Creator Device"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:131
+msgid "Session Creator Device ID"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:137 opentera/forms/TeraSessionForm.py:139
+msgid "Session Creator Participant"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:144 opentera/forms/TeraSessionForm.py:146
+msgid "Session Creator Service"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:151
+msgid "Start Date"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:152
+msgid "Duration"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:155
+msgid "State"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:156
+msgid "Comments"
+msgstr ""
+
+#: opentera/forms/TeraSessionForm.py:162
+msgid "Session Has Device Data"
+msgstr ""
+
+#: opentera/forms/TeraSessionTypeForm.py:37
+msgid "Session Type ID"
+msgstr ""
+
+#: opentera/forms/TeraSessionTypeForm.py:38
+msgid "Session Type Name"
+msgstr ""
+
+#: opentera/forms/TeraSessionTypeForm.py:41
+msgid "Category"
+msgstr ""
+
+#: opentera/forms/TeraSessionTypeForm.py:50
+msgid "Session Type Service Key"
+msgstr ""
+
+#: opentera/forms/TeraSessionTypeForm.py:51
+msgid "Session Type Online"
+msgstr ""
+
+#: opentera/forms/TeraSessionTypeForm.py:52
+msgid "Session Type Display Color"
+msgstr ""
+
+#: opentera/forms/TeraSessionTypeForm.py:53
+msgid "Session Type Configuration"
+msgstr ""
+
+#: opentera/forms/TeraSiteForm.py:18
+msgid "Site Role"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:18
+msgid "User UUID"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:19
+msgid "User Full Name"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:21
+msgid "User Enabled"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:22
+msgid "First Name"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:23
+msgid "Last NAme"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:24
+msgid "Email"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:27
+msgid "User Is Super Administrator"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:29
+msgid "Profile"
+msgstr ""
+
+#: opentera/forms/TeraUserGroupForm.py:22
+msgid "User Group ID"
+msgstr ""
+
+#: opentera/forms/TeraUserGroupForm.py:24
+msgid "User Group Name"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:22
+msgid "OpenTeraServer version string"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:25
+msgid "OpenTeraServer major version number"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:28
+msgid "OpenTeraServer minor version number"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:31
+msgid "OpenTeraServer patch version number"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:44 templates/about.html:26
+msgid "Versions"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:46
+msgid "Client name"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:49
+msgid "Client description"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:52
+msgid "Client version"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:55
+msgid "Client documentation url"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:58
+msgid "Client windows version"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:61
+msgid "Client mac version"
+msgstr ""
+
+#: opentera/forms/TeraVersionsForm.py:64
+msgid "Client linux version"
 msgstr ""
 
 #: templates/about.html:33
@@ -1471,3 +1484,4 @@ msgstr ""
 #: templates/about.html:87
 msgid "Contributors"
 msgstr ""
+

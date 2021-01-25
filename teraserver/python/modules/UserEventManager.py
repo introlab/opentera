@@ -1,7 +1,7 @@
 from modules.EventManager import EventManager
-import libtera.db.models as models
+import opentera.db.models as models
 from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
-import messages.python as messages
+import opentera.messages.python as messages
 
 
 class UserEventManager(EventManager):
@@ -62,7 +62,7 @@ class UserEventManager(EventManager):
 
     def filter_database_event(self, event: messages.DatabaseEvent):
         import json
-        from libtera.db.models import EventNameClassMap
+        from opentera.db.models import EventNameClassMap
 
         try:
             if event.object_type in EventNameClassMap:
