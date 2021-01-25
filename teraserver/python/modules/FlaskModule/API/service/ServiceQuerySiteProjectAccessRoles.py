@@ -14,7 +14,7 @@ get_parser.add_argument('id_site', type=int, help='ID of the site to query')
 get_parser.add_argument('uuid_user', type=str, help='UUID of the user')
 
 
-class ServiceQueryPermissions(Resource):
+class ServiceQuerySiteProjectAccessRoles(Resource):
 
     # Handle auth
     def __init__(self, _api, flaskModule=None):
