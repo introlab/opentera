@@ -20,7 +20,7 @@ class TeraUserForm:
         section.add_item(TeraFormItem("user_username", gettext("Username"), "text", True))
         section.add_item(TeraFormItem("user_enabled", gettext("User Enabled"), "boolean", True, item_default=True))
         section.add_item(TeraFormItem("user_firstname", gettext("First Name"), "text", True))
-        section.add_item(TeraFormItem("user_lastname", gettext("Last NAme"), "text", True))
+        section.add_item(TeraFormItem("user_lastname", gettext("Last Name"), "text", True))
         section.add_item(TeraFormItem("user_email", gettext("Email"), "text"))
         section.add_item(
             TeraFormItem("user_password", gettext("Password"), "password", item_options={"confirm": True}))

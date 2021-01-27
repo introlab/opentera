@@ -196,6 +196,7 @@ class FlaskModule(BaseModule):
         base_folder = os.path.dirname(os.path.abspath(__file__))
         static_resource = File(os.path.join(base_folder, 'static'))
         static_resource.contentTypes['.js'] = 'text/javascript'
+        static_resource.contentTypes['.css'] = 'text/css'
         static_resource.forbidden = True
 
         # the path "/assets" served by our File stuff and
@@ -233,12 +234,12 @@ class FlaskModule(BaseModule):
         # Default arguments
         kwargs = {'flaskModule': self}
 
-        from .API.QueryRawData import QueryRawData
-        from .API.QueryCalendarData import QueryCalendarData
-        from .API.QueryTimelineData import QueryTimelineData
-        from .API.QueryLoginType import QueryLoginType
-        from .API.QueryServiceInfos import QueryServiceInfos
-        from .API.QueryDeviceInfos import QueryDeviceInfos
+        from API.QueryRawData import QueryRawData
+        from API.QueryCalendarData import QueryCalendarData
+        from API.QueryTimelineData import QueryTimelineData
+        from API.QueryLoginType import QueryLoginType
+        from API.QueryServiceInfos import QueryServiceInfos
+        from API.QueryDeviceInfos import QueryDeviceInfos
 
         # Resources
         default_api_ns.add_resource(QueryRawData,       '/rawdata', resource_class_kwargs=kwargs)
@@ -246,10 +247,10 @@ class FlaskModule(BaseModule):
         default_api_ns.add_resource(QueryTimelineData,  '/timelinedata', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryLoginType,     '/me', resource_class_kwargs=kwargs)
         default_api_ns.add_resource(QueryServiceInfos,  '/serviceinfos', resource_class_kwargs=kwargs)
-        default_api_ns.add_resource(QueryDeviceInfos, '/deviceinfos', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryDeviceInfos,   '/deviceinfos', resource_class_kwargs=kwargs)
 
     def init_views(self):
-        from .Views.Index import Index
+        from Views.Index import Index
 
         # Default arguments
         args = []
