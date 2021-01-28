@@ -200,7 +200,7 @@ class FlaskModule(BaseModule):
         static_resource.forbidden = True
 
         # the path "/assets" served by our File stuff and
-        root_resource = WSGIRootResource(wsgi_resource, {b'assets': static_resource})
+        root_resource = WSGIRootResource(wsgi_resource, {b'/': static_resource})
 
         # Create a Twisted Web Site
         site = MySite(root_resource)
