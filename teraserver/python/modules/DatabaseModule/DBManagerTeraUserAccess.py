@@ -510,7 +510,7 @@ class DBManagerTeraUserAccess:
     #     return users_access
 
     def query_access_for_site(self, site_id: int, admin_only=False, include_empty_groups=False):
-        all_users_groups = self.get_accessible_users_groups(admin_only=admin_only)
+        all_users_groups = self.get_accessible_users_groups(admin_only=admin_only, by_sites=True)
         users_groups = {}
         for user_group in all_users_groups:
             if not admin_only:
