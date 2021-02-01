@@ -98,8 +98,7 @@ class DBManagerBureauActifDataProcess:
             else:
                 entries_before_position_change += 1
 
-        first_position_is_seating = self.find_first_position()  # Find first position of the day
-        self.update_expected_data(first_position_is_seating)
+        self.update_expected_data(self.first_position_is_seating())  # Find first position of the day
         self.save_calendar_data()
 
     def get_absent_time(self, current_index):
@@ -213,7 +212,8 @@ class DBManagerBureauActifDataProcess:
         full_cycles = floor(cycles)
         started_cycle = cycles % 1
         started_cycle_seconds = started_cycle * total_timers
-        self.position_changes.expected = (full_cycles * 2) - 1  # First position of the day doesn't count
+        # First position of the day doesn't count
+        self.position_changes.expected = (full_cycles * 2) - 1 if ((full_cycles * 2) - 1) > 0 else 0
         expected_second_standing = full_cycles * seconds_up
         expected_second_seating = full_cycles * seconds_down
 
@@ -300,5 +300,7 @@ class DBManagerBureauActifDataProcess:
         self.timeline_day_entries.append(first_entry)
 
     # Return True if first position of the day was seating
-    def find_first_position(self):
-        return True if self.timeline_day_entries[1].id_timeline_entry_type in [3, 5] else False
+    def first_position_is_seating(self):
+        if len(self.timeline_day_entries) > 1:
+            return True if self.timeline_day_entries[1].id_timeline_entry_type in [3, 5] else False
+        return True
