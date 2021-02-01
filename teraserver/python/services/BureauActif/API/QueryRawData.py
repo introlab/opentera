@@ -114,7 +114,7 @@ class QueryRawData(Resource):
             # Format is a dict with:
             # data -> A list of list which each item is a row in the raw data file:
             #          Timestamp, current_height, button_pressed, present, raw_sensor_values
-            # timers -> dict of values for "up_secs" and "down_secs", corresponding to the current Bureau config
+            # timers -> dict of values for "minutes_up" and "minutes_down", corresponding to the current Bureau config
             # config -> dict of values for the "max_height" and the "min_height" of the Bureau
 
             data_process.process_data(raw_data, file_db_entry)
