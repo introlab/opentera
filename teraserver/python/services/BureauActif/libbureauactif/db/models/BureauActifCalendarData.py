@@ -37,6 +37,7 @@ class BureauActifCalendarData(db.Model, BaseModel):
     def insert(cls, new_data):
         super().insert(new_data)
         db.session.commit()
+        return new_data
 
     @classmethod
     def update(cls, update_id, values):
