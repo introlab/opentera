@@ -4,15 +4,15 @@ import csv
 
 def parse_timers_file(fullpath):
     date = 'invalid'
-    values = {'up_secs': 0, 'down_secs': 0}
+    values = {'minutes_up': 0, 'minutes_down': 0}
 
     if 'Timers_' in fullpath and '.txt' in fullpath:
         date = fullpath.split('_')[1].split('.txt')[0]
 
         try:
             with open(fullpath) as file:
-                values['up_secs'] = float(file.readline().strip())
-                values['down_secs'] = float(file.readline().strip())
+                values['minutes_up'] = float(file.readline().strip())
+                values['minutes_down'] = float(file.readline().strip())
         except:
             print('Error reading: ', fullpath)
 
@@ -74,7 +74,7 @@ def load_data_from_path(path):
                 for res in result:
                     if res != 'invalid':
                         file_data[res] = {'data': result[res],
-                                          'timers': {'up_secs': 0, 'down_secs': 0}}
+                                          'timers': {'minutes_up': 0, 'minutes_down': 0}}
 
             # Config file
             if '.txt' in filename:
