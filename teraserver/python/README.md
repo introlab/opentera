@@ -1,13 +1,18 @@
-# OpenTera
+# OpenTera 1.0.2
 
 Python package for OpenTera micro-service architecture. 
 External microservices can use this package as a base.
+
+This is a beta release and is not meant for production at this stage. 
 
 # GitHub
 * https://github.com/introlab/opentera
 
 # License
 OpenTera is licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt) . 
+
+# Documentation
+Please visit our [WiKi documentation on GitHub](https://github.com/introlab/opentera/wiki)
 
 # Dependencies
 OpenTera is based or uses the following Open Source technologies :
