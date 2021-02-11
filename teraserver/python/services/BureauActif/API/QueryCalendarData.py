@@ -55,11 +55,12 @@ class QueryCalendarData(Resource):
                     if day is not None:
                         day_json = day.to_json()
 
-                        day_json['seating'] = day.seating.to_json()
-                        day_json['standing'] = day.standing.to_json()
-                        day_json['positionChanges'] = day.positionChanges.to_json()
+                        if day.seating is not None and day.standing is not None and day.positionChanges is not None:
+                            day_json['seating'] = day.seating.to_json()
+                            day_json['standing'] = day.standing.to_json()
+                            day_json['positionChanges'] = day.positionChanges.to_json()
 
-                        calendar_days_list.append(day_json)
+                            calendar_days_list.append(day_json)
 
             return jsonify(calendar_days_list)
 
