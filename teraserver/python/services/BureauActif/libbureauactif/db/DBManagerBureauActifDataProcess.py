@@ -93,7 +93,7 @@ class DBManagerBureauActifDataProcess:
             if self.is_last_data(index) or was_standing != is_standing or \
                     absent_time != 0 or self.previous_is_config_respected != self.is_config_respected:
                 self.update_position(was_standing, index, entries_before_position_change)
-                self.update_last_timeline_entry(absent_time, 4)
+                self.update_last_timeline_entry(absent_time, 4, index, entries_before_position_change)
                 entries_before_position_change = 0
             else:
                 entries_before_position_change += 1
