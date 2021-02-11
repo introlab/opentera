@@ -52,7 +52,7 @@ class QueryTimelineData(Resource):
             timeline_days_list = []
             if timeline_days is not None:
                 for day in timeline_days:
-                    if day is not None:
+                    if day is not None and len(day.series) > 1:
                         day_json = day.to_json()
 
                         if day.series is not None:
