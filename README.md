@@ -27,7 +27,7 @@ Documentation is in progress... as most of the open-source projects! Feel free t
 First version released, v1.0 This version aims to support tele-rehabilitation video sessions and other related telehealth services. Work is in progress to complete the active desks service and projects (details to come - project not public yet). 
 
 * **(April 2020)**. We made a prototype COVID-19 videoconference dispatch center using OpenTera. The idea is to have a system with a questionnaire that patients fill out online and shedule an appointment for a videoconference. Tt does not send emails at the moment and it gives a direct connection link instead for testing. The dispatch central takes calls in order of arrival with the aim of using remote resource persons (retired nurses from home for instance) who could help people navigate the health system better depending on the severity of the symptoms.
-  * **WARNING - This was a prototype and is probably not working properly in the current version.**
+  * **WARNING - This was a prototype and has been removed from the current releases. **
 
 # License
 OpenTera is licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt) . 
