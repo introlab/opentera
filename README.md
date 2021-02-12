@@ -17,10 +17,10 @@ We are developing an “Open Source” micro-services structure which will allow
 
 If there is a service that you would like to develop in the future and it would be a very interesting addition to the OpenTera platform. You are welcome to participate in this effort.
 
-Documentation is in progress... as most of the open-source projects! Feel free to write any issues if support is needed.
+# Documentation and getting started
+Detailled information is available in the [wiki](https://github.com/introlab/opentera/wiki)
 
-# Visit us on GitHub
-* https://github.com/introlab/opentera
+Documentation is in progress... as most of the open-source projects! Feel free to write any issues if support is needed.
 
 # News
 * **(October 2020)**
@@ -57,16 +57,16 @@ OpenTera is based or uses the following Open Source technologies :
 <table style="width:100%">
   <tr>
     <td align="center">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/IntRoLab.png" width="200">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/Estrad.png" width="200">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/3IT.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/IntRoLab.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/Estrad.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/3IT.png" width="200">
     </td>
   </tr>
   <tr>
     <td align="center">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/logo_CDRV.png" width="200">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/AgeWell.png" width="200">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/INTER.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/logo_CDRV.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/AgeWell.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/INTER.png" width="200">
     </td>
   </tr>
 </table>
