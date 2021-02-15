@@ -1,4 +1,4 @@
-from math import ceil, floor
+from math import floor
 import datetime
 from services.BureauActif.libbureauactif.db.Base import db
 from services.BureauActif.libbureauactif.db.models.BureauActifCalendarDay import BureauActifCalendarDay
@@ -32,10 +32,10 @@ def get_timeline_day(uuid_participant, date):
     return BureauActifTimelineDay.get_timeline_day(uuid_participant, date.date())
 
 
-def create_new_timeline_day(date, uuid_participant):
     timeline_day = BureauActifTimelineDay()
     timeline_day.participant_uuid = uuid_participant
     timeline_day.name = date
+    timeline_day.id_calendar_day = id_calendar_day
     return timeline_day
 
 
@@ -131,7 +131,6 @@ class DBManagerBureauActifDataProcess:
         entry = get_timeline_day(uuid_participant, date)
 
         if entry is None:  # No data for the current day, starting a new one
-            self.timeline_day = BureauActifTimelineDay.insert(create_new_timeline_day(date, uuid_participant))
             self.set_starting_hour(date)  # Add starting block in timeline
         else:  # Data already present for the current day
             self.timeline_day = entry
@@ -254,14 +253,14 @@ class DBManagerBureauActifDataProcess:
             last_entry = self.timeline_day_entries[len(self.timeline_day_entries) - 1]
             if last_entry.id_timeline_entry_type == color_type:
                 last_entry.value += delta
-                last_entry.end_time = self.get_time(index - 1)
+                last_entry.end_time = self.get_time(index)
                 db.session.commit()
             else:
                 if color_type not in [5, 6] and not self.is_first_timeline_entry() \
                         and not self.is_back_from_absence() and not self.is_position_same(color_type):
                     self.position_changes.done += 1  # Count as a position change
                 start_time = self.get_time(index - entries_count)
-                end_time = self.get_time(index - 1)
+                end_time = self.get_time(index)
                 new_entry = BureauActifTimelineDayEntry.insert(
                     self.create_new_timeline_entry(color_type, delta, end_time, start_time))
                 self.timeline_day_entries.append(new_entry)
