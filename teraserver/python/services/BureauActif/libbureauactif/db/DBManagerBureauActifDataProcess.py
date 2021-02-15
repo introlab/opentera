@@ -32,6 +32,7 @@ def get_timeline_day(uuid_participant, date):
     return BureauActifTimelineDay.get_timeline_day(uuid_participant, date.date())
 
 
+def create_new_timeline_day(date, uuid_participant, id_calendar_day):
     timeline_day = BureauActifTimelineDay()
     timeline_day.participant_uuid = uuid_participant
     timeline_day.name = date
@@ -131,6 +132,8 @@ class DBManagerBureauActifDataProcess:
         entry = get_timeline_day(uuid_participant, date)
 
         if entry is None:  # No data for the current day, starting a new one
+            self.timeline_day = BureauActifTimelineDay.insert(
+                create_new_timeline_day(date, uuid_participant, self.calendar_day.id_calendar_day))
             self.set_starting_hour(date)  # Add starting block in timeline
         else:  # Data already present for the current day
             self.timeline_day = entry

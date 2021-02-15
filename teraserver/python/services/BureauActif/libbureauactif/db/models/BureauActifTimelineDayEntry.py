@@ -16,10 +16,12 @@ class BureauActifTimelineDayEntry(db.Model, BaseModel):
     value = db.Column(db.Float, nullable=False)
     start_time = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     end_time = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+    entry_type = db.relationship('BureauActifTimelineEntryType')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
+        ignore_fields.append('entry_type')
 
         return super().to_json(ignore_fields=ignore_fields)
 
