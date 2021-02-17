@@ -1,5 +1,4 @@
 from services.BureauActif.libbureauactif.db.models.BureauActifCalendarDay import BureauActifCalendarDay
-from services.BureauActif.libbureauactif.db.models.BureauActifCalendarData import BureauActifCalendarData
 import datetime
 import calendar
 

@@ -1,4 +1,4 @@
-from math import ceil, floor
+from math import floor
 import datetime
 from services.BureauActif.libbureauactif.db.Base import db
 from services.BureauActif.libbureauactif.db.models.BureauActifCalendarDay import BureauActifCalendarDay
@@ -32,10 +32,11 @@ def get_timeline_day(uuid_participant, date):
     return BureauActifTimelineDay.get_timeline_day(uuid_participant, date.date())
 
 
-def create_new_timeline_day(date, uuid_participant):
+def create_new_timeline_day(date, uuid_participant, id_calendar_day):
     timeline_day = BureauActifTimelineDay()
     timeline_day.participant_uuid = uuid_participant
     timeline_day.name = date
+    timeline_day.id_calendar_day = id_calendar_day
     return timeline_day
 
 
@@ -93,7 +94,7 @@ class DBManagerBureauActifDataProcess:
             if self.is_last_data(index) or was_standing != is_standing or \
                     absent_time != 0 or self.previous_is_config_respected != self.is_config_respected:
                 self.update_position(was_standing, index, entries_before_position_change)
-                self.update_last_timeline_entry(absent_time, 4)
+                self.update_last_timeline_entry(absent_time, 4, index, entries_before_position_change)
                 entries_before_position_change = 0
             else:
                 entries_before_position_change += 1
@@ -106,7 +107,8 @@ class DBManagerBureauActifDataProcess:
             past_data = self.get_time(current_index - 1)
             current_data = self.get_time(current_index)
             delta = current_data - past_data
-            if delta.seconds > 300:  # Absence is worth showing in timeline only if at least 5 minutes
+            # Absence is worth showing in timeline only if at least 30 seconds (match sensitivity of pi censor)
+            if delta.seconds > 30:
                 delta_in_hour = delta.seconds / 3600
                 return delta_in_hour
         return 0
@@ -130,7 +132,8 @@ class DBManagerBureauActifDataProcess:
         entry = get_timeline_day(uuid_participant, date)
 
         if entry is None:  # No data for the current day, starting a new one
-            self.timeline_day = BureauActifTimelineDay.insert(create_new_timeline_day(date, uuid_participant))
+            self.timeline_day = BureauActifTimelineDay.insert(
+                create_new_timeline_day(date, uuid_participant, self.calendar_day.id_calendar_day))
             self.set_starting_hour(date)  # Add starting block in timeline
         else:  # Data already present for the current day
             self.timeline_day = entry
@@ -177,12 +180,12 @@ class DBManagerBureauActifDataProcess:
 
     def update_seating(self, index, entries_before_position_change):
         delta = self.get_time_difference(index, entries_before_position_change)
-        self.update_last_timeline_entry(delta, 3)
+        self.update_last_timeline_entry(delta, 3, index, entries_before_position_change)
         self.seating.done += delta
 
     def update_standing(self, index, entries_before_position_change):
         delta = self.get_time_difference(index, entries_before_position_change)
-        self.update_last_timeline_entry(delta, 2)
+        self.update_last_timeline_entry(delta, 2, index, entries_before_position_change)
         self.standing.done += delta
 
     def get_time_difference(self, index, entries_count):
@@ -247,18 +250,22 @@ class DBManagerBureauActifDataProcess:
             BureauActifCalendarData.insert(self.seating)
             BureauActifCalendarData.insert(self.standing)
 
-    def update_last_timeline_entry(self, delta, id_type):
+    def update_last_timeline_entry(self, delta, id_type, index, entries_count):
         color_type = self.get_right_timeline_color(id_type)
         if delta > 0:
             last_entry = self.timeline_day_entries[len(self.timeline_day_entries) - 1]
             if last_entry.id_timeline_entry_type == color_type:
                 last_entry.value += delta
+                last_entry.end_time = self.get_time(index)
                 db.session.commit()
             else:
                 if color_type not in [5, 6] and not self.is_first_timeline_entry() \
                         and not self.is_back_from_absence() and not self.is_position_same(color_type):
                     self.position_changes.done += 1  # Count as a position change
-                new_entry = BureauActifTimelineDayEntry.insert(self.create_new_timeline_entry(color_type, delta))
+                start_time = self.get_time(index - entries_count)
+                end_time = self.get_time(index)
+                new_entry = BureauActifTimelineDayEntry.insert(
+                    self.create_new_timeline_entry(color_type, delta, end_time, start_time))
                 self.timeline_day_entries.append(new_entry)
 
     # Returns true if the only entry in the timeline is the starting block
@@ -285,18 +292,20 @@ class DBManagerBureauActifDataProcess:
             return 5  # Supposed to be standing
         return id_type
 
-    def create_new_timeline_entry(self, id_type, delta):
+    def create_new_timeline_entry(self, id_type, delta, end_time, start_time=None):
         entry = BureauActifTimelineDayEntry()
         entry.id_timeline_entry_type = id_type
         entry.value = delta
         entry.id_timeline_day = self.timeline_day.id_timeline_day
+        entry.end_time = end_time
+        entry.start_time = start_time
         return entry
 
     # Add the timeline block from midnight to first entry time to make the relative timeline
     def set_starting_hour(self, date):
         starting_time = date.time()
         time = starting_time.hour + (starting_time.minute / 60)
-        first_entry = BureauActifTimelineDayEntry.insert(self.create_new_timeline_entry(1, time))
+        first_entry = BureauActifTimelineDayEntry.insert(self.create_new_timeline_entry(1, time, date))
         self.timeline_day_entries.append(first_entry)
 
     # Return True if first position of the day was seating

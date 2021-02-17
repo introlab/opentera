@@ -52,18 +52,8 @@ class QueryTimelineData(Resource):
             timeline_days_list = []
             if timeline_days is not None:
                 for day in timeline_days:
-                    if day is not None:
+                    if day is not None and len(day.series) > 1:
                         day_json = day.to_json()
-
-                        if day.series is not None:
-                            entries = timeline_access.query_timeline_day_entries(day.id_timeline_day)
-                            entries_json = []
-                            for entry in entries:
-                                entry_json = entry.to_json()
-                                entry_type = timeline_access.query_timeline_type_by_id(entry.id_timeline_entry_type)
-                                entry_json['name'] = entry_type.name
-                                entries_json.append(entry_json)
-                            day_json['series'] = entries_json
 
                         timeline_days_list.append(day_json)
 
