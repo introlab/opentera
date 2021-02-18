@@ -9,7 +9,7 @@ class WebRTCConfig:
 
     def validate_webrtc_config(self, config: dict):
         if 'WebRTC' in config:
-            required_fields = ['hostname', 'working_directory', 'executable', 'script', 'arguments']
+            required_fields = ['hostname', 'working_directory', 'executable', 'script']
             for field in required_fields:
                 if field not in config['WebRTC']:
                     print('ERROR: WebRTC Config - missing field :' + field)
