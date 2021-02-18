@@ -17,17 +17,17 @@ We are developing an “Open Source” micro-services structure which will allow
 
 If there is a service that you would like to develop in the future and it would be a very interesting addition to the OpenTera platform. You are welcome to participate in this effort.
 
-Documentation is in progress... as most of the open-source projects! Feel free to write any issues if support is needed.
+# Documentation and getting started
+Detailled information is available in the [wiki](https://github.com/introlab/opentera/wiki)
 
-# Visit us on GitHub
-* https://github.com/introlab/opentera
+Documentation is in progress... as most of the open-source projects! Feel free to write any issues if support is needed.
 
 # News
 * **(October 2020)**
 First version released, v1.0 This version aims to support tele-rehabilitation video sessions and other related telehealth services. Work is in progress to complete the active desks service and projects (details to come - project not public yet). 
 
 * **(April 2020)**. We made a prototype COVID-19 videoconference dispatch center using OpenTera. The idea is to have a system with a questionnaire that patients fill out online and shedule an appointment for a videoconference. Tt does not send emails at the moment and it gives a direct connection link instead for testing. The dispatch central takes calls in order of arrival with the aim of using remote resource persons (retired nurses from home for instance) who could help people navigate the health system better depending on the severity of the symptoms.
-  * **WARNING - This was a prototype and is probably not working properly in the current version.**
+  * **WARNING - This was a prototype and has been removed from the current releases. **
 
 # License
 OpenTera is licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt) . 
@@ -57,16 +57,16 @@ OpenTera is based or uses the following Open Source technologies :
 <table style="width:100%">
   <tr>
     <td align="center">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/IntRoLab.png" width="200">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/Estrad.png" width="200">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/3IT.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/IntRoLab.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/Estrad.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/3IT.png" width="200">
     </td>
   </tr>
   <tr>
     <td align="center">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/logo_CDRV.png" width="200">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/AgeWell.png" width="200">
-        <img src="teraserver/python/services/VideoDispatch/static/images/logos/INTER.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/logo_CDRV.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/AgeWell.png" width="200">
+        <img src="teraserver/python/services/VideoRehabService/static/images/logos/INTER.png" width="200">
     </td>
   </tr>
 </table>

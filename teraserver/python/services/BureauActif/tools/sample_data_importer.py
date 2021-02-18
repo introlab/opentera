@@ -9,7 +9,8 @@ from services.BureauActif.tools.sample_data_loader import load_data_from_path
 class Config:
     hostname = 'localhost'
     port = 40075
-    servicename = '/bureau'
+    service_name = '/bureau'
+    data_path = r''
 
     # User endpoints
     user_login_endpoint = '/api/user/login'
@@ -328,7 +329,7 @@ def add_service_to_project(config: Config, id_project: int, s_uuid: str):
 
 def create_session_data(config: Config, token: str, filename: str, data, id_session: int,
                         date: datetime = datetime.now()):
-    url = _make_url(config.hostname, config.port, config.servicename + '/' + config.device_session_data_endpoint) + \
+    url = _make_url(config.hostname, config.port, config.service_name + '/' + config.device_session_data_endpoint) + \
           '?token=' + token
 
     # id_session = int(request.headers['X-Id-Session'])
@@ -355,7 +356,7 @@ def create_session_data(config: Config, token: str, filename: str, data, id_sess
 
 
 def get_bureau_actif_service_uuid(config: Config, token: str) -> str:
-    url = _make_url(config.hostname, config.port, config.servicename + config.service_info_endpoint)
+    url = _make_url(config.hostname, config.port, config.service_name + config.service_info_endpoint)
     params = {'token': token}
     try:
         response = get(url=url, params=params, verify=False)
@@ -375,14 +376,13 @@ def get_bureau_actif_service_uuid(config: Config, token: str) -> str:
 if __name__ == '__main__':
 
     base_config = Config()
-    data_path = r''
 
     # Ignore insecure requests warning
     import urllib3
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     # Get data from files
-    result = load_data_from_path(data_path)
+    result = load_data_from_path(base_config.data_path)
 
     # Login admin
     admin_info = login_user(base_config)
@@ -405,7 +405,7 @@ if __name__ == '__main__':
         add_service_to_project(base_config, project_info['id_project'], service_uuid)
 
     import os
-    participant_name = os.path.split(data_path)[-1]
+    participant_name = os.path.split(base_config.data_path)[-1]
     participant_info = get_participant(base_config, participant_name)
 
     if participant_info:

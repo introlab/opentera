@@ -58,6 +58,15 @@
 		"speaker-all": "Son - Tous",
 		"tools": "Outils",
 		"chronos": "Chronos",
-		"measures": "Mesures"
+		"measures": "Mesures",
+		"zoom": "Zoom",
+		"zoom-max": "Max",
+		"zoom-min": "Min",
+		"zoom-in": "Avant",
+		"zoom-out": "Arrière",
+		"presets": "Positions",
+		"preset-1": "Position 1",
+		"preset-2": "Position 2",
+		"preset-3": "Position 3"
 	}
 }

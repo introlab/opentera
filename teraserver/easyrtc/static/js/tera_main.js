@@ -72,5 +72,6 @@ function initSystemDone(){
     }else{
         // Connect Shared Object websocket, which will connect to system when ready
         connectSharedObject();
+
     }
 }

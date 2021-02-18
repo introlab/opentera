@@ -174,6 +174,7 @@ function muteSpeaker(local, index, new_state){
 
 function setMirror(mirror, local, index){
     if (local === true){
+        //console.log("setMirror: " + mirror + ", local=" + local + ", index=" + index);
         // Send display update request
         let request = {"peerid": local_peerid, mirror: mirror};
 
@@ -187,6 +188,8 @@ function setMirror(mirror, local, index){
                     }
                 });
         }
+
+        currentConfig["video" + index + "Mirror"] = mirror;
     }else{
         // Request mirror to someone else
         let request = {"index": 1, "mirror": mirror};

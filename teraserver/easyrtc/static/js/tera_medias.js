@@ -16,8 +16,8 @@ async function fillDefaultSourceList(){
         await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
     }catch(err) {
         showError("fillDefaultSourceList() - getUserMedia",
-            translator.translateForKey("error.no-media-access", currentLang) + "<br><br>" +
-            translator.translateForKey("error.error-msg", currentLang) +
+            translator.translateForKey("errors.no-media-access", currentLang) + "<br><br>" +
+            translator.translateForKey("errors.error-msg", currentLang) +
             ":<br>" + err.name + " - " + err.message, true);
         throw err;
     }
@@ -26,7 +26,8 @@ async function fillDefaultSourceList(){
         let devices = await navigator.mediaDevices.enumerateDevices();
         devices.forEach(device => {
             if (device.kind === "videoinput"){
-                videoSources[videoSources.length] = device;
+                if (!device.label.includes(" IR ")) // Filter "IR" camera, since they won't work.
+                    videoSources[videoSources.length] = device;
             }
             if (device.kind === "audioinput"){
                 audioSources[audioSources.length] = device;
@@ -42,6 +43,17 @@ async function fillDefaultSourceList(){
 
     selectDefaultSources();
 
+}
+
+function removeVideoSource(video_name){
+    for (let i=0; i<videoSources.length; i++){
+        if (videoSources[i].label.includes(video_name)){
+            console.log("Removed " + video_name + " from video source list.");
+            videoSources.splice(i,1);
+            return;
+        }
+    }
+    console.log("No need to remove " + video_name + " - not in source list.");
 }
 
 function selectVideoSource(source){

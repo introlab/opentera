@@ -102,7 +102,7 @@ video {
 	padding-right: 20px;
 	*/
 	margin-top: 10px;
-	height: 100%;
+	/*height: 100%;*/
 	float: right;
 	z-index: 3;
 }
@@ -145,7 +145,11 @@ video {
 }
 
 .overlay-top-center {
-	position: relative;
+	position: absolute;
+	top: 0px;
+	padding-top: 10px;
+	left: 50%;
+	transform: translate(-50%, 0%);
 	margin: auto;
 	text-align: center;
 	z-index: 3;
@@ -222,18 +226,18 @@ video {
 		
 
 		
-		.overlay-bottom-center {
-			position: absolute;
-			left: 50%;
-			bottom: 5px;
-			transform: translate(-50%, 0%);
-			margin: auto;
-			/*background-color: rgba(0,0,0,0.5);
-			height: 48px;*/
-			width: 100%;
-			text-align: center;
-			z-index: 3;
-		}
+.overlay-bottom-center {
+	position: absolute;
+	left: 50%;
+	bottom: 5px;
+	transform: translate(-50%, 0%);
+	margin: auto;
+	/*background-color: rgba(0,0,0,0.5);
+	height: 48px;
+	width: 100%;*/
+	text-align: center;
+	z-index: 3;
+}
 		
 		.overlay a {
 			padding: 8px;
@@ -263,13 +267,32 @@ video {
 	transform: scaleX(-1);
 }
 /* Show the dropdown menu on hover */
-.dropup {
+.dropup, .dropdown {
 	position: relative;
 	display: inline-block;
+}
+
+.dropup{
 	margin-bottom: 0px;
 }
 
-.dropup:hover .dropdown-menu {display: inline-block;}
+.dropdown{
+	margin-top: 0px;
+}
+
+.dropup:hover .dropdown-menu, .dropdown:hover .dropdown-menu {display: inline-block;}
+
+.dropdown .dropdown-menu{
+	margin-top: -1px;
+}
+
+.dropdown-menu label:hover {
+	cursor: pointer;
+}
+
+.dropdown .dropdown-menu .dropdown-item:hover{
+	background-color: #363b41;
+}
 
 input[type=checkbox] {
 	transform: scale(1.5);
@@ -293,4 +316,17 @@ input[type=checkbox] {
 
 .badge.measure-text, .measure-text{
 	font-size: 1.3rem;
+}
+
+.image-icon{
+	width: 3vw;
+	max-width: 32px;
+}
+
+.dropdown .image-icon{
+	max-width: 32px;
+	width: 3vw;
+	height: 3vw;
+	max-height: 32px;
+	padding: 0.2vw;
 }
