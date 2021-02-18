@@ -23,7 +23,6 @@
 	    "max_sessions": 10,
 	    "working_directory": "../../../easyrtc",
 	    "executable": "node",
-	    "script": "server.js",
-	    "arguments": "port;key"
+	    "script": "server.js"
 	}
 }
