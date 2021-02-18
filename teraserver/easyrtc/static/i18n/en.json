@@ -58,6 +58,15 @@
 		"speaker-all": "Sound - All",
 		"tools": "Tools",
 		"chronos": "Timers",
-		"measures": "Measurements"
+		"measures": "Measurements",
+		"zoom": "Zoom",
+		"zoom-max": "Max",
+		"zoom-min": "Min",
+		"zoom-in": "Forward",
+		"zoom-out": "Backward",
+		"presets": "Positions",
+		"preset-1": "Position 1",
+		"preset-2": "Position 2",
+		"preset-3": "Position 3"
 	}
 }

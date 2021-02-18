@@ -19,7 +19,6 @@ function joinSession(){
                 sessionUrlTries++;
                 if (sessionUrlTries >= 12){
                     hideMainViewElement("dialogWait");
-                    error
                 }else{
                     setTimeout(joinSession, 250);
                 }

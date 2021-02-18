@@ -118,7 +118,7 @@ function gotoPreset(event, local, index, preset){
 function camSettings(local, index){
     if (local === true){
         if (teraConnected)
-            SharedObject.camSettingsClicked(uuids[index]);
+            SharedObject.camSettingsClicked(localContact.uuid);
     }else{
         let request = "";
         if (easyrtc.webSocketConnected) {
@@ -152,9 +152,13 @@ function managePTZClickEvent(event, local, index){
     //alert("x=" + (event.clientX - offsets.left) + " y=" + (event.clientY - offsets.top) + " w=" + video.clientWidth + " h=" + video.clientHeight);
     if (local === true){
         if (teraConnected){
-            console.log("Local PTZ request");
+            let x = (event.clientX - bar_width);
+            let y = (event.clientY - bar_height);
+            if (x < 0 || x > real_video_width || y < 0 || y > real_video_height)
+                return; // Click outside the displayed video
+            //console.log("Local PTZ request - x=" + x + ", y=" + y + ", w=" + real_video_width + ", h=" + real_video_height);
             //SharedObject.imageClicked(localContact.uuid, video.clientWidth - (event.clientX - offsets.left), event.clientY - offsets.top, video.clientWidth, video.clientHeight);
-            SharedObject.imageClicked(localContact.uuid, (event.clientX - bar_width), event.clientY - bar_height, real_video_width, real_video_height);
+            SharedObject.imageClicked(localContact.uuid, x, y, real_video_width, real_video_height);
             // Uncomment next line if using mirror image!
             //SharedObject.imageClicked(localContact.uuid, (event.clientX - offsets.left), event.clientY - offsets.top, video.clientWidth, video.clientHeight);
         }

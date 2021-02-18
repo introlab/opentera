@@ -300,13 +300,12 @@ function enlargeView(local, index){
             setCurrentUserLayout(layouts.LARGEVIEW, false, view_id);
         }
     }else{
-        setLargeView(view_id);
+        setLargeView(view_id, false);
     }
 
-
     // Update layouts
-    updateUserRemoteViewsLayout(remoteStreams.length);
     updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    updateUserRemoteViewsLayout(remoteStreams.length);
 
 }
 
@@ -482,6 +481,11 @@ function updateLocalConfig(new_config){
         // Mirror changed
         currentConfig['video1Mirror'] = new_config['video1Mirror'];
         setMirror(currentConfig['video1Mirror'], true, 1);
+        if (teraConnected){
+            // Also set shared object status
+            if (SharedObject.setLocalMirror !== undefined)
+                SharedObject.setLocalMirror(currentConfig['video1Mirror']);
+        }
     }
 
     if (new_config['currentVideoSource2Index'] !== currentConfig['currentVideoSource2Index'] ||

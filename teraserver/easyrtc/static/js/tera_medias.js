@@ -16,8 +16,8 @@ async function fillDefaultSourceList(){
         await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
     }catch(err) {
         showError("fillDefaultSourceList() - getUserMedia",
-            translator.translateForKey("error.no-media-access", currentLang) + "<br><br>" +
-            translator.translateForKey("error.error-msg", currentLang) +
+            translator.translateForKey("errors.no-media-access", currentLang) + "<br><br>" +
+            translator.translateForKey("errors.error-msg", currentLang) +
             ":<br>" + err.name + " - " + err.message, true);
         throw err;
     }
