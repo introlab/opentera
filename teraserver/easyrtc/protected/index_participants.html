@@ -1,6 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="fr">
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <head>
     <title data-i18n="header.title-participant">OpenTeraPlus - Vue participant</title>
 
@@ -159,8 +160,8 @@
                         </div>
                     </div>
                     <!-- Sources controls -->
-                    <div id="localSourcesControls1" class="overlay-bottom-right">
-                        <div style="padding-left:20px;padding-top:20px;background-color:rgba(0,0,0,0);">
+                    <div id="localSourcesControls1" class="mb-5 mb-md-0 overlay-bottom-right">
+                        <div style="background-color:rgba(0,0,0,0);">
                             <input id="localBtnShow2ndVideo1" type="image" alt="image" src="images/show2ndvideo.png" class="image-icon" onclick="btnShow2ndLocalVideoClicked();event.stopPropagation();" style="display: none;"/>
                             <input id="localBtnShareScreen1" type="image" alt="image" src="images/sharescreen.png" class="image-icon" onclick="btnShareScreenClicked();event.stopPropagation();" style="display: none;"/>
                         </div>
@@ -244,11 +245,6 @@
                         <input id="remoteBtnSwapVideo2" type="image" alt="image" src="images/swap.png" class="image-icon" onclick="enlargeView(false,2);event.stopPropagation();" style="display: none;"/>
                     </div>
 
-                    <!-- Text display -->
-                    <div id="remoteDisplay2" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="remoteText2" onclick="stopChrono(false, 1);">Temps restant: xx:xx</label>
-                    </div>
-
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteLockedViewControls2" class="overlay-bottom-center" >
                         <input id="remoteMicStatus2" type="image" alt="image" src="images/mic.png" class="image-icon" style="display: none;"/>
@@ -270,11 +266,6 @@
                     <!-- Video controls -->
                     <div id="remoteVideoControls3" class="overlay-top-right" style="">
                         <input id="remoteBtnSwapVideo3" type="image" alt="image" src="images/swap.png" class="image-icon" onclick="enlargeView(false,3);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Text display -->
-                    <div id="remoteDisplay3" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="remoteText3" onclick="stopChrono(false, 1);">Temps restant: xx:xx</label>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->

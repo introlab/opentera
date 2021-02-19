@@ -4,13 +4,34 @@
 let localChronoTimerHandle = 0;
 let chronoValues = [0, 0, 0, 0];
 let localChronoValue = 0;
+let chronoValuesIncrement = [-1, -1, -1, -1];
+let localChronoIncrement = -1;
 
 function startChronosFromDialog(){
     // Build list of participants to send
     let target_ids = [];
     let partSelect = Number($('#chronosPartSelect').children("option:selected").val());
     let msgSelect = $('#chronosTitleSelect').children("option:selected")[0].text;
-    let durationSelect = Number($('#chronosDurationSelect').children("option:selected").val());
+    if ($('#chronosTitleSelect').children("option:selected").val() === "")
+        msgSelect = "";
+    //let durationSelect = Number($('#chronosDurationSelect').children("option:selected").val());
+    let durationSelect = Number($('#chronosDurationMinutes')[0].value) * 60
+        + Number($('#chronosDurationSeconds')[0].value);
+    let chronoType = Number($('input[name="optChronoType"]:checked').val());
+    let increment = -1;
+
+    if (chronoType === 2){
+        // Chronometer
+        increment = 1;
+        durationSelect = 0; // Always start chronometer at 0
+    }
+
+
+    if (partSelect === -1) {
+        // Self only
+        startChrono(true, 1, increment, durationSelect, msgSelect);
+        return;
+    }
 
     if (partSelect === 0){
         // All participants
@@ -18,31 +39,33 @@ function startChronosFromDialog(){
             target_ids.push(remoteStreams[i].peerid);
         }
     }else{
-        // Only one... for now!
+        // One participant... for now!
         target_ids = [remoteStreams[partSelect-1].peerid];
     }
 
     // Send message
-    sendChronoMessage(target_ids, true, msgSelect, durationSelect);
+    sendChronoMessage(target_ids, true, msgSelect, durationSelect, increment);
 
     // Start chronos
     for (let i=0; i<target_ids.length; i++){
         let stream_index = getStreamIndexForPeerId(target_ids[i]);
         if (stream_index !== undefined){
-            startChrono(false, stream_index+1, durationSelect, msgSelect);
+            startChrono(false, stream_index+1, increment, durationSelect, msgSelect);
         }
     }
 }
 
-function startChrono(local, index, duration = undefined, title=undefined){
+function startChrono(local, index, increment=-1, duration = undefined, title=undefined){
 
     // Start chrono
     if (local === false){
         chronoValues[index-1] = duration;
+        chronoValuesIncrement[index-1] = increment;
     }else{
         localChronoValue = duration;
+        localChronoIncrement = increment;
     }
-    updateChronoDisplay(local, index, duration, title);
+    updateChronoDisplay(local, index, duration, increment, title);
     showTextDisplay(local, index, true);
 
     // Start timer
@@ -52,48 +75,68 @@ function startChrono(local, index, duration = undefined, title=undefined){
 
 }
 
-function updateChronoDisplay(local, index, duration, title=undefined){
+function updateChronoDisplay(local, index, duration, increment, title=undefined){
 
-    let count_str = new Date(duration * 1000).toISOString().substr(14, 5)
-
-    if (duration === 0){
-        count_str = "<font color='yellow'>" + translator.translateForKey("chronosDialog.completed", currentLang) +
-            "</font>";
-    }
+    let count_str = chronoSecondsToText(duration);
 
     if (title !== undefined){
         // Refresh label in full
-        setTextDisplay(local, index, title + ": " + count_str)
+        let full_title = title;
+        if (title !== "")
+            full_title += ": ";
+        full_title += count_str;
+        setTextDisplay(local, index, full_title)
     }else{
         // Only update time
         let displayed = getTextDisplay(local, index);
-        displayed = displayed.substr(0, displayed.length-5) + count_str;
+        let prev_count_str = chronoSecondsToText(duration-1);
+        displayed = displayed.substr(0, displayed.length-prev_count_str.length) + count_str;
         setTextDisplay(local, index, displayed);
     }
+}
+
+function chronoSecondsToText(duration){
+    if (duration < 3600) // No hours
+        return new Date(duration * 1000).toISOString().substr(14, 5);
+    else
+        return new Date(duration * 1000).toISOString().substr(11, 8);
+}
+
+function chronoShowCompleted(local, index, duration){
+    let display_text = "<font color='yellow'>" + translator.translateForKey("chronosDialog.completed", currentLang) +
+            "</font>";
+    if (duration > 0) // Display chrono value if > 0
+        display_text += " - " + chronoSecondsToText(duration);
+    setTextDisplay(local, index, display_text);
+
+    // Start hide chrono timer in 5 seconds
+    setTimeout(showTextDisplay, 5000, local, index, false);
 }
 
 function chronoTimerTimeout(){
     // Update all active chronos
     let active = false;
     for (let i=0; i<chronoValues.length; i++){
-        if (chronoValues[i] > 0){
+        if (chronoValues[i] > 0 || chronoValuesIncrement[i] > 0){
             active = true;
-            chronoValues[i] -= 1;
-            updateChronoDisplay(false, i+1, chronoValues[i]);
-            if (chronoValues[i] === 0){
-                // Start hide chrono timer in 5 seconds
-                setTimeout(showTextDisplay, 5000, false, i+1, false);
+            chronoValues[i] += chronoValuesIncrement[i];
+            if (chronoValues[i] <= 0 && chronoValuesIncrement[i] < 0){
+                // Countdown completed!
+                chronoShowCompleted(false, i+1, chronoValues[i]);
+            }else{
+                updateChronoDisplay(false, i+1, chronoValues[i], chronoValuesIncrement[i]);
             }
         }
     }
 
-    if (localChronoValue > 0){
+    if (localChronoValue > 0 || localChronoIncrement > 0){
         active = true;
-        localChronoValue -= 1;
-        updateChronoDisplay(true, 1, localChronoValue);
-        if (localChronoValue === 0){
+        localChronoValue += localChronoIncrement;
+        if (localChronoValue <= 0 && localChronoIncrement < 0){
             // Start hide chrono timer in 5 seconds
-            setTimeout(showTextDisplay, 5000, true, 1, false);
+            chronoShowCompleted(true, 1, localChronoValue);
+        }else{
+            updateChronoDisplay(true, 1, localChronoValue, localChronoIncrement);
         }
     }
 
@@ -105,15 +148,19 @@ function chronoTimerTimeout(){
 
 function stopChrono(local, index, no_msg=false){
     if (local === false){
+        chronoShowCompleted(local, index, chronoValues[index-1]);
         chronoValues[index-1] = 0;
+        chronoValuesIncrement[index-1] = -1;
         let target_peer = remoteStreams[index-1].peerid;
         if (!no_msg)
             sendChronoMessage([target_peer], false);
     }else{
+        chronoShowCompleted(local, index, localChronoValue);
         localChronoValue = 0;
+        localChronoIncrement = -1;
     }
 
-    showTextDisplay(local,index,false);
+    //showTextDisplay(local,index,false);
 }
 
 ///////////////////////////////////////////

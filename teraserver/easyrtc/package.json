@@ -9,7 +9,7 @@
     "start_nginx_test": "node server.js 8080 ca8cc0c5-216f-4fc8-a13b-a664cdee364d"
   },
   "dependencies": {
-    "ejs": "^3.1.5",
+    "ejs": "^3.1.6",
     "express": "^4.17.1",
     "html": "^1.0.0",
     "minimist": "^1.2.5",

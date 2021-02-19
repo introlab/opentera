@@ -555,22 +555,24 @@ function refreshRemoteStatusIcons(peerid){
 
     let status = remoteContacts[card_index].status;
 
-    if (status.micro !== undefined) {
-        updateStatusIconState(status.micro, false, index + 1, "Mic");
-    }
+    if (status !== undefined){
+        if (status.micro !== undefined) {
+            updateStatusIconState(status.micro, false, index + 1, "Mic");
+        }
 
-    if (status.micro2 !== undefined){
-        let index2 = getStreamIndexForPeerId(peerid, "2ndStream");
-        if (index2)
-            updateStatusIconState(status.micro2, false, index2+1, "Mic");
-    }
+        if (status.micro2 !== undefined){
+            let index2 = getStreamIndexForPeerId(peerid, "2ndStream");
+            if (index2)
+                updateStatusIconState(status.micro2, false, index2+1, "Mic");
+        }
 
-    if (status.speaker !== undefined) {
-        updateStatusIconState(status.speaker, false, index + 1, "Speaker");
-    }
+        if (status.speaker !== undefined) {
+            updateStatusIconState(status.speaker, false, index + 1, "Speaker");
+        }
 
-    if (status.video !== undefined) {
-        updateStatusIconState(status.video, false, index + 1, "Video");
+        if (status.video !== undefined) {
+            updateStatusIconState(status.video, false, index + 1, "Video");
+        }
     }
 }
 
@@ -610,7 +612,7 @@ function muteSpeakerAll(){
 function showChronosDialog(){
     let partSelect = $('#chronosPartSelect')[0];
     partSelect.options.length = 0;
-    partSelect.options[partSelect.options.length] = new Option("Tous", "0");
+    partSelect.options[partSelect.options.length] = new Option(translator.translateForKey("chronosDialog.all", currentLang), "0");
 
     for (let i=0; i<remoteContacts.length; i++){
         let index = getStreamIndexForPeerId(remoteContacts[i].peerid, 'default');
@@ -618,6 +620,7 @@ function showChronosDialog(){
             partSelect.options[partSelect.options.length] = new Option(getTitle(false, index+1), index+1);
         }
     }
+    partSelect.options[partSelect.options.length] = new Option(translator.translateForKey("chronosDialog.self", currentLang), "-1");
 
     $('#chronosDialog').modal('show');
 
@@ -762,6 +765,13 @@ function resizeCanvasOverElement(canvas, element)
     cv.height =h;
 }
 
+$(document).on('change', '#optChronoType1, #optChronoType2', function(){
+    if ($('#optChronoType1')[0].checked === true){
+        $('#chronosDuration').show();
+    }else{
+        $('#chronosDuration').hide();
+    }
+});
 /*
 $(document).on('mouseenter', '.dropup', function() {
     console.log("MouseEnter");

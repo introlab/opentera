@@ -62,6 +62,9 @@ function initSystem(){
     fillDefaultSourceList().then(initSystemDone).catch(err => {
         showStatusMsg(translator.translateForKey("status.cant-continue", currentLang))
     })
+
+    // Reset forms
+    if ($('#chronosForm')[0] !== undefined) $('#chronosForm')[0].reset();
 }
 
 function initSystemDone(){

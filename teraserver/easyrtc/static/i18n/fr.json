@@ -19,10 +19,18 @@
 		"chrono-label": "Libellé",
 		"label-exercices": "Exercices",
 		"label-rest": "Repos",
+		"label-none": "(Aucun)",
+		"chrono-type": "Type",
+		"chrono-countdown": "Décompte",
+		"chrono-countup": "Chronomètre",
 		"duration": "Durée",
+		"minutes": "minutes",
+		"seconds": "secondes",
 		"start": "Démarrer",
 		"cancel": "Annuler",
-		"completed": "Terminé!"
+		"completed": "Terminé!",
+		"all": "Tous",
+		"self": "Seulement moi"
 	},
 	"measureDialog": {
 		"title": "Mesures",

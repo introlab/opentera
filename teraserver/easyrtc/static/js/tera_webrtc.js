@@ -920,7 +920,7 @@ function dataReception(sendercid, msgType, msgData, targeting) {
     if (msgType === "Chrono"){
         // Start - stop local chrono
         if (msgData.state === true){
-            startChrono(true, 1, msgData.duration, msgData.title);
+            startChrono(true, 1, msgData.increment, msgData.duration, msgData.title);
         }else{
             stopChrono(true, 1);
         }
@@ -1130,7 +1130,7 @@ function enableAllTracks(stream, enable){
         audioTracks[i].enabled = enable;
 }
 
-function sendChronoMessage(target_peerids, state, msg = undefined, duration=undefined){
+function sendChronoMessage(target_peerids, state, msg = undefined, duration=undefined, increment=-1){
 
     let request = {"state": state};
     if (msg !== undefined)
@@ -1138,6 +1138,8 @@ function sendChronoMessage(target_peerids, state, msg = undefined, duration=unde
 
     if (duration !== undefined)
         request.duration = duration;
+
+    request.increment = increment;
 
     if (easyrtc.webSocketConnected){
         for (let i=0; i<target_peerids.length; i++){
