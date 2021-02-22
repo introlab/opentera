@@ -13,7 +13,14 @@ async function fillDefaultSourceList(){
 
     // Open a stream to ask for permissions and allow listing of full name of devices.
     try{
-        await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+        await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: {
+                width: {ideal: 1280, max: 1920 },
+                height: {ideal: 720, max: 1080 },
+                frameRate: {min: 15}/*, ideal: 30}*/
+            }
+        });
     }catch(err) {
         showError("fillDefaultSourceList() - getUserMedia",
             translator.translateForKey("errors.no-media-access", currentLang) + "<br><br>" +
@@ -205,5 +212,23 @@ function setCapabilities(peerid, video2){
             remoteContacts[index].capabilities = cap;
         }
     }
+
+}
+
+function getActiveStreams(){
+    let streams = [];
+
+    for (let i=0; i<localStreams.length; i++){
+        if (localStreams[i].stream){
+            streams.push(localStreams[i].stream);
+        }
+    }
+
+    for (let i=0; i<remoteStreams.length; i++){
+        if (remoteStreams[i].stream){
+            streams.push(remoteStreams[i].stream);
+        }
+    }
+    return streams;
 
 }

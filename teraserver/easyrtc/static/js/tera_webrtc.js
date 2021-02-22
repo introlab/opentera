@@ -592,6 +592,11 @@ function newStreamStarted(callerid, stream, streamname) {
         setPrimaryView(primaryView.peerid, primaryView.streamName);
     }
 
+    // Recorder
+    if (streamRecorder){
+        streamRecorder.addVideoToRecorder(stream);
+    }
+
     // Add second video, if present
     if (localStreams.length>1){
         setTimeout(function(){
@@ -666,6 +671,10 @@ function streamDisconnected(callerid, mediaStream, streamName){
             remoteStreams.splice(i,1);
             break;
         }
+    }
+
+    if (streamRecorder){
+        streamRecorder.refreshVideosInRecorder();
     }
 
     // Remove contact info if the "default" stream was disconnected
