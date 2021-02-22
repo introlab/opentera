@@ -516,11 +516,18 @@ function getTitle(local, index){
     return title;
 }
 
-function showPTZControls(local, index, zoom, presets, settings){
+function showPTZControls(local, index, zoom, presets, settings, camera = undefined){
     let view_prefix = ((local === true) ? 'local' : 'remote');
     let zoomControls = $("#" + view_prefix + "ZoomButtons" + index);
     let presetControls = $("#" + view_prefix + "PresetButtons" + index);
     let settingsControl = $("#" + view_prefix + "SettingsButton" + index);
+
+    // If not current selected camera and not PTZ for all camera, then hide buttons
+    if (!isCurrentCameraPTZ()){
+        zoom = false;
+        presets = false;
+        settings = false;
+    }
 
     (zoom === true) ? zoomControls.show() : zoomControls.hide();
     (presets === true) ? presetControls.show() : presetControls.hide();

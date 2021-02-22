@@ -58,7 +58,7 @@ function setupSharedObjectCallbacks(channel){
         setLocalMirror(settings.mirror);
         selectSecondarySources(settings.secondAudioVideo);
         ptz = JSON.parse(settings.ptz);
-        setPTZCapabilities(localContact.uuid, ptz.zoom, ptz.presets, ptz.settings);
+        setPTZCapabilities(localContact.uuid, ptz.zoom, ptz.presets, ptz.settings, ptz.camera);
 
         // Connect to signaling server now that we got all the settings
         connect();

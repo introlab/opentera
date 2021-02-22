@@ -19,7 +19,8 @@ function managePTZMouseWheel(event, local, index){
 function zoomIn(local, index){
     if (local === true){
         if (teraConnected)
-            SharedObject.zoomInClicked(localContact.uuid);
+            if (isCurrentCameraPTZ())
+                SharedObject.zoomInClicked(localContact.uuid);
     }else{
         let request = {"value":"in"};
         if (easyrtc.webSocketConnected) {
@@ -38,7 +39,8 @@ function zoomIn(local, index){
 function zoomOut(local, index){
     if (local === true){
         if (teraConnected)
-            SharedObject.zoomOutClicked(localContact.uuid);
+            if (isCurrentCameraPTZ())
+                SharedObject.zoomOutClicked(localContact.uuid);
     }else{
         let request = {"value":"out"};
         if (easyrtc.webSocketConnected) {
@@ -57,7 +59,8 @@ function zoomOut(local, index){
 function zoomMin(local, index){
     if (local === true){
         if (teraConnected)
-            SharedObject.zoomMinClicked(localContact.uuid);
+            if (isCurrentCameraPTZ())
+                SharedObject.zoomMinClicked(localContact.uuid);
     }else{
         let request = {"value":"min"};
         if (easyrtc.webSocketConnected) {
@@ -74,7 +77,8 @@ function zoomMin(local, index){
 function zoomMax(local, index){
     if (local === true){
         if (teraConnected)
-            SharedObject.zoomMaxClicked(localContact.uuid);
+            if (isCurrentCameraPTZ())
+                SharedObject.zoomMaxClicked(localContact.uuid);
     }else{
         let request = {"value":"max"};
         if (easyrtc.webSocketConnected) {
@@ -93,10 +97,12 @@ function gotoPreset(event, local, index, preset){
         ", shift: " + event.shiftKey + ", ctrl: " + event.ctrlKey);
     if (local === true){
         if (teraConnected){
-            if (event.shiftKey && event.ctrlKey)
-                SharedObject.setPresetClicked(localContact.uuid, preset);
-            else
-                SharedObject.gotoPresetClicked(localContact.uuid, preset);
+            if (isCurrentCameraPTZ()) {
+                if (event.shiftKey && event.ctrlKey)
+                    SharedObject.setPresetClicked(localContact.uuid, preset);
+                else
+                    SharedObject.gotoPresetClicked(localContact.uuid, preset);
+            }
         }
     }else{
         let set = false;
@@ -118,7 +124,8 @@ function gotoPreset(event, local, index, preset){
 function camSettings(local, index){
     if (local === true){
         if (teraConnected)
-            SharedObject.camSettingsClicked(localContact.uuid);
+            if (isCurrentCameraPTZ())
+                SharedObject.camSettingsClicked(localContact.uuid);
     }else{
         let request = "";
         if (easyrtc.webSocketConnected) {
@@ -152,15 +159,14 @@ function managePTZClickEvent(event, local, index){
     //alert("x=" + (event.clientX - offsets.left) + " y=" + (event.clientY - offsets.top) + " w=" + video.clientWidth + " h=" + video.clientHeight);
     if (local === true){
         if (teraConnected){
-            let x = (event.clientX - bar_width);
-            let y = (event.clientY - bar_height);
-            if (x < 0 || x > real_video_width || y < 0 || y > real_video_height)
-                return; // Click outside the displayed video
-            //console.log("Local PTZ request - x=" + x + ", y=" + y + ", w=" + real_video_width + ", h=" + real_video_height);
-            //SharedObject.imageClicked(localContact.uuid, video.clientWidth - (event.clientX - offsets.left), event.clientY - offsets.top, video.clientWidth, video.clientHeight);
-            SharedObject.imageClicked(localContact.uuid, x, y, real_video_width, real_video_height);
-            // Uncomment next line if using mirror image!
-            //SharedObject.imageClicked(localContact.uuid, (event.clientX - offsets.left), event.clientY - offsets.top, video.clientWidth, video.clientHeight);
+            if (isCurrentCameraPTZ()) {
+                let x = (event.clientX - bar_width);
+                let y = (event.clientY - bar_height);
+                if (x < 0 || x > real_video_width || y < 0 || y > real_video_height)
+                    return; // Click outside the displayed video
+                //console.log("Local PTZ request - x=" + x + ", y=" + y + ", w=" + real_video_width + ", h=" + real_video_height);
+                SharedObject.imageClicked(localContact.uuid, x, y, real_video_width, real_video_height);
+            }
         }
     }else{
         // Send message to the other client
@@ -180,10 +186,10 @@ function managePTZClickEvent(event, local, index){
     }
 }
 
-function setPTZCapabilities(uuid, zoom, presets, settings){
-    let ptz = {'uuid':uuid, 'zoom':zoom,'presets':presets,'settings':settings};
+function setPTZCapabilities(uuid, zoom, presets, settings, camera = undefined){
+    let ptz = {'uuid':uuid, 'zoom':zoom,'presets':presets,'settings':settings, 'camera':camera};
 
-    console.log("Setting PTZ Capabilities: " + uuid + " = " + zoom + " " + presets + " " + settings);
+    console.log("Setting PTZ Capabilities on camera: " + camera + ", uuid = " + uuid + " = " + zoom + " " + presets + " " + settings);
 
     if (uuid === 0){
         console.warn("setPTZCapabilities -- UUID = 0, not valid!", false);
@@ -196,10 +202,11 @@ function setPTZCapabilities(uuid, zoom, presets, settings){
         localPTZCapabilities = ptz;
 
         // Show buttons
-        showPTZControls(true, 1, zoom, presets, settings);
+        showPTZControls(true, 1, zoom, presets, settings, camera);
 
         // Send to remotes
         broadcastlocalPTZCapabilities();
+
 
     }else{
         console.log(" -- Remote UUID received: " + uuid + ", I am " + localContact.uuid);
@@ -213,5 +220,15 @@ function setPTZCapabilities(uuid, zoom, presets, settings){
             }
         }
     }
+}
 
+function isCurrentCameraPTZ() {
+    if (currentConfig['currentVideoSourceIndex'] >= 0 && currentConfig['currentVideoSourceIndex'] < videoSources.length) {
+        if (localPTZCapabilities.camera === undefined ||
+            videoSources[currentConfig['currentVideoSourceIndex']].label === localPTZCapabilities.camera){
+            return true;
+        }
+    }
+
+    return false;
 }

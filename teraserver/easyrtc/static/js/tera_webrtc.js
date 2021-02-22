@@ -287,9 +287,15 @@ function updateLocalAudioVideoSource(streamindex){
             localVideoStreamError,
             streamname);
 
+        broadcastlocalPTZCapabilities();
     }else{
         console.log("Updated audio/video source - not connected, selection will take effect when connected.");
     }
+
+    // Update PTZ status if needed
+    showPTZControls(true, 1, localPTZCapabilities.zoom, localPTZCapabilities.presets,
+        localPTZCapabilities.settings, localPTZCapabilities.camera);
+
 }
 
 function localVideoStreamSuccess(stream){
@@ -415,7 +421,16 @@ function broadcastlocalCapabilities(){
 }
 
 function broadcastlocalPTZCapabilities(){
-    let request = localPTZCapabilities;
+    let request = Object.assign({}, localPTZCapabilities);
+
+    if (!isCurrentCameraPTZ()){
+            // Camera isn't selected and PTZ does not apply to all camera - force values to false
+            request.presets = false;
+            request.zoom = false;
+            request.settings = false;
+            request.camera = undefined;
+    }
+
     if (localPTZCapabilities.uuid !== 0 || !teraConnected){
         console.log("Broadcasting PTZ capabilities " + localPTZCapabilities.uuid + " = " + localPTZCapabilities.zoom + " " + localPTZCapabilities.presets + " " + localPTZCapabilities.settings);
         if (easyrtc.webSocketConnected)
