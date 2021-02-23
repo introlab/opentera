@@ -1,5 +1,4 @@
 # Image: introlab3it/openteraserver
-
 # LABEL version="0.1"
 # LABEL description="OpenTera Test Server from IntRoLab."
 
@@ -18,7 +17,7 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 # Clone repository
-# ARG CACHE_DATE=2020-08-19
+# ARG CACHE_DATE=2021-02-23
 RUN git clone --recurse-submodules -b dev https://github.com/introlab/opentera.git
 
 #Create dbs and users
@@ -42,9 +41,11 @@ RUN service postgresql start &&\
 	sudo -u postgres psql -c "ALTER USER bureauactif WITH PASSWORD 'bureauactif';"&&\
 	sudo -u postgres psql -c "\l"
 
-#VOLUME
+#VOLUMES
 RUN mkdir /config
 VOLUME /config
+VOLUME /var/lib/postgresql/data
+VOLUME /opentera/teraserver/python/certificates
 
 # Install miniconda
 WORKDIR /root
@@ -55,7 +56,6 @@ RUN bash ~/Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
 RUN curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh
 RUN bash ~/nodesource_setup.sh
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
-
 
 # Build environment
 WORKDIR /opentera/teraserver
@@ -76,11 +76,15 @@ RUN ["/bin/bash", "-c", "$PYTHON3_EXEC ./CreateCertificates.py"]
 RUN ["/bin/bash", "-c", "ls -l certificates/"]
 
 # Private and public mapping
+# NGINX
 EXPOSE 40075/tcp
+# REDIS
+EXPOSE 6379/tcp
+# POSTGRESQL
+EXPOSE 5432/tcp
 
 # env with a default value
 ENV OPENTERA_CONFIG_PATH /opentera/teraserver/python/config/TeraServerConfig.ini
-ENV VIDEODISPATCH_CONFIG_PATH /opentera/teraserver/python/services/VideoDispatch/VideoDispatchService.ini
 
 # Create nginx logs directory
 RUN mkdir -p config/logs
@@ -89,7 +93,3 @@ ENV PYTHONPATH /opentera/teraserver/python
 
 # Run the required services and python script
 CMD nginx -c /opentera/teraserver/python/config/nginx.conf -p /opentera/teraserver/python/config/ && ./start_docker.sh
-
-
-
-
