@@ -1,8 +1,10 @@
+from flask import jsonify, session, request
 from flask_restx import Resource
+
 from services.BureauActif import Globals
-from opentera.services.ServiceAccessManager import ServiceAccessManager, current_login_type, current_device_client, \
+from services.shared.ServiceAccessManager import ServiceAccessManager, current_login_type, current_device_client, \
     current_participant_client, current_user_client, LoginType
-from services.BureauActif.FlaskModule import default_api_ns as api
+from services.BureauActif.FlaskModule import default_api_ns as api, flask_app
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -77,4 +79,3 @@ class QueryLoginType(Resource):
                         login_infos.update({'site_admin': site_admin})
 
         return login_infos
-   
