@@ -21,6 +21,7 @@ from opentera.forms.TeraUserGroupForm import TeraUserGroupForm
 from opentera.forms.TeraServiceForm import TeraServiceForm
 from opentera.forms.TeraServiceConfigForm import TeraServiceConfigForm
 from opentera.forms.TeraVersionsForm import TeraVersionsForm
+from opentera.forms.TeraSessionTypeConfigForm import TeraSessionTypeConfigForm
 
 get_parser = api.parser()
 get_parser.add_argument(name='type', type=str, help='Data type of the required form. Currently, the '
@@ -35,6 +36,7 @@ get_parser.add_argument(name='type', type=str, help='Data type of the required f
                                                     'service_config\n'
                                                     'session\n'
                                                     'session_type\n'
+                                                    'session_type_config\n'
                                                     'site\n'
                                                     'user\n'
                                                     'user_group\n'
@@ -95,6 +97,9 @@ class UserQueryForms(Resource):
 
         if args['type'] == 'session_type':
             return jsonify(TeraSessionTypeForm.get_session_type_form(user_access=user_access))
+
+        if args['type'] == 'session_type_config':
+            return TeraSessionTypeConfigForm.get_session_type_config_form(user_access=user_access)
 
         if args['type'] == 'session':
             return jsonify(TeraSessionForm.get_session_form(user_access=user_access,

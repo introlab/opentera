@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-01-26 15:29-0500\n"
+"POT-Creation-Date: 2021-02-23 14:58-0500\n"
 "PO-Revision-Date: 2021-01-25 13:01-0500\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -212,7 +212,7 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:58
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:56
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:156
-#: modules/FlaskModule/API/user/UserQueryForms.py:72
+#: modules/FlaskModule/API/user/UserQueryForms.py:74
 #: modules/FlaskModule/API/user/UserQueryParticipants.py:75
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:84
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:52
@@ -517,11 +517,11 @@ msgstr ""
 msgid "Device successfully deleted"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryForms.py:130
+#: modules/FlaskModule/API/user/UserQueryForms.py:135
 msgid "Invalid service specified"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryForms.py:141
+#: modules/FlaskModule/API/user/UserQueryForms.py:146
 msgid "Unknown form type: "
 msgstr ""
 
@@ -1153,67 +1153,43 @@ msgstr ""
 msgid "Mirrored image"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:53
-msgid "Camera Type"
-msgstr ""
-
 #: opentera/forms/TeraServiceConfigForm.py:54
-msgid "Network Camera"
+msgid "URL"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:55
-msgid "Screen Capture"
-msgstr ""
-
-#: opentera/forms/TeraServiceConfigForm.py:59
-msgid "RTSP URL"
-msgstr ""
-
-#: opentera/forms/TeraServiceConfigForm.py:63
-msgid "Frames per second (FPS)"
-msgstr ""
-
-#: opentera/forms/TeraServiceConfigForm.py:68
-msgid "Resolution"
-msgstr ""
-
-#: opentera/forms/TeraServiceConfigForm.py:76
+#: opentera/forms/TeraServiceConfigForm.py:58
 msgid "Pan-Tilt-Zoom Camera"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:77
+#: opentera/forms/TeraServiceConfigForm.py:59
 msgid "Control Type"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:78
+#: opentera/forms/TeraServiceConfigForm.py:60
 msgid "Vivotek"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:79
-msgid "ONVIF (Generic)"
-msgstr ""
-
-#: opentera/forms/TeraServiceConfigForm.py:82
+#: opentera/forms/TeraServiceConfigForm.py:65
 msgid "Network Address"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:85
+#: opentera/forms/TeraServiceConfigForm.py:68
 msgid "Port"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:88 opentera/forms/TeraUserForm.py:20
+#: opentera/forms/TeraServiceConfigForm.py:71 opentera/forms/TeraUserForm.py:20
 msgid "Username"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:91 opentera/forms/TeraUserForm.py:26
+#: opentera/forms/TeraServiceConfigForm.py:74 opentera/forms/TeraUserForm.py:26
 msgid "Password"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:95
+#: opentera/forms/TeraServiceConfigForm.py:78
 msgid "Microphone"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:96
+#: opentera/forms/TeraServiceConfigForm.py:79
 msgid "Secondary Camera"
 msgstr ""
 
@@ -1343,6 +1319,14 @@ msgstr ""
 
 #: opentera/forms/TeraSessionForm.py:162
 msgid "Session Has Device Data"
+msgstr ""
+
+#: opentera/forms/TeraSessionTypeConfigForm.py:14
+msgid "General configuration"
+msgstr ""
+
+#: opentera/forms/TeraSessionTypeConfigForm.py:18
+msgid "Allow session recording"
 msgstr ""
 
 #: opentera/forms/TeraSessionTypeForm.py:37
@@ -1486,5 +1470,26 @@ msgid "Contributors"
 msgstr ""
 
 #~ msgid "Last NAme"
+#~ msgstr ""
+
+#~ msgid "Camera Type"
+#~ msgstr ""
+
+#~ msgid "Network Camera"
+#~ msgstr ""
+
+#~ msgid "Screen Capture"
+#~ msgstr ""
+
+#~ msgid "RTSP URL"
+#~ msgstr ""
+
+#~ msgid "Frames per second (FPS)"
+#~ msgstr ""
+
+#~ msgid "Resolution"
+#~ msgstr ""
+
+#~ msgid "ONVIF (Generic)"
 #~ msgstr ""
 

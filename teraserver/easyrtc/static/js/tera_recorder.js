@@ -35,9 +35,8 @@ let streamRecorder = null;
 
 class TeraVideoRecorder
 {
-    constructor(filename = undefined){
+    constructor(){
         this.recorder = null;
-        this.filename = filename;
     }
 
     startRecording(){
@@ -62,18 +61,8 @@ class TeraVideoRecorder
         let self = this;
         this.recorder.stopRecording(function() {
             getSeekableBlob(self.recorder.getBlob(), function(seekableBlob) {
-
                 //console.log(url);
-                if (self.filename === undefined) {
-                    //let url = URL.createObjectURL(seekableBlob);
-                    //window.open(url);
-                    invokeSaveAsDialog(seekableBlob);
-                }else{
-                    let file = new File([seekableBlob], self.filename);
-
-                    let url = URL.createObjectURL(file);
-                    window.open(url);
-                }
+                invokeSaveAsDialog(seekableBlob);
 
                 self.recorder = null;
             });
