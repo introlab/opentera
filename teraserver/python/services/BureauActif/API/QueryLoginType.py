@@ -1,15 +1,13 @@
-from flask import jsonify, session, request
 from flask_restx import Resource
-
 from services.BureauActif import Globals
-from services.shared.ServiceAccessManager import ServiceAccessManager, current_login_type, current_device_client, \
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_login_type, current_device_client, \
     current_participant_client, current_user_client, LoginType
-from services.BureauActif.FlaskModule import default_api_ns as api, flask_app
+from services.BureauActif.FlaskModule import default_api_ns as api
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('id_project', type=str, help='First day of the month for the data to query')
-get_parser.add_argument('id_site', type=str, help='First day of the month for the data to query')
+get_parser.add_argument('id_project', type=int, help='ID of the project for which to fetch the role')
+get_parser.add_argument('id_site', type=int, help='ID of the site for which to fetch the role')
 
 
 class QueryLoginType(Resource):
@@ -59,23 +57,24 @@ class QueryLoginType(Resource):
                 user_infos = response.json()
                 login_infos['username'] = user_infos['user_username']
 
-        # If reservation has a session associated to it, get it from OpenTera
-        if args['id_project'] or args['id_site']:
-            if args['id_project']:
-                params = {'id_project': args['id_project'], 'uuid_user': current_user_client.user_uuid}
-            if args['id_site']:
-                params = {'id_site': args['id_site'], 'uuid_user': current_user_client.user_uuid}
-
-            endpoint = '/api/service/users/access'
-            response = Globals.service.get_from_opentera(endpoint, params)
-
-            if response.status_code == 200:
-                role = response.json()
+            # If need be, get roles for site or project
+            if args['id_project'] or args['id_site']:
                 if args['id_project']:
-                    project_admin = True if role['project_role'] == 'admin' else False
-                    login_infos.update({'project_admin': project_admin})
+                    params = {'id_project': args['id_project'], 'uuid_user': current_user_client.user_uuid}
                 if args['id_site']:
-                    site_admin = True if role['site_role'] == 'admin' else False
-                    login_infos.update({'site_admin': site_admin})
+                    params = {'id_site': args['id_site'], 'uuid_user': current_user_client.user_uuid}
+
+                endpoint = '/api/service/users/access'
+                response = Globals.service.get_from_opentera(endpoint, params)
+
+                if response.status_code == 200:
+                    role = response.json()
+                    if args['id_project']:
+                        project_admin = True if role['project_role'] == 'admin' else False
+                        login_infos.update({'project_admin': project_admin})
+                    if args['id_site']:
+                        site_admin = True if role['site_role'] == 'admin' else False
+                        login_infos.update({'site_admin': site_admin})
 
         return login_infos
+   
