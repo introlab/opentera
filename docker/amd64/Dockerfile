@@ -44,8 +44,8 @@ RUN service postgresql start &&\
 #VOLUMES
 RUN mkdir /config
 VOLUME /config
-VOLUME /var/lib/postgresql/data
-VOLUME /opentera/teraserver/python/certificates
+# VOLUME /var/lib/postgresql/data
+# VOLUME /opentera/teraserver/python/certificates
 
 # Install miniconda
 WORKDIR /root
