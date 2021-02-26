@@ -44,8 +44,8 @@ RUN service postgresql start &&\
 #VOLUMES
 RUN mkdir /config
 VOLUME /config
-# VOLUME /var/lib/postgresql/data
-# VOLUME /opentera/teraserver/python/certificates
+VOLUME /var/lib/postgresql/data
+
 
 # Install miniconda
 WORKDIR /root
@@ -74,6 +74,7 @@ WORKDIR /opentera/teraserver/python
 # Create certificates from new python env
 RUN ["/bin/bash", "-c", "$PYTHON3_EXEC ./CreateCertificates.py"]
 RUN ["/bin/bash", "-c", "ls -l certificates/"]
+VOLUME /opentera/teraserver/python/certificates
 
 # Private and public mapping
 # NGINX
