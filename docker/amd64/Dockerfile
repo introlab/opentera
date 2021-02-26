@@ -44,7 +44,7 @@ RUN service postgresql start &&\
 #VOLUMES
 RUN mkdir /config
 VOLUME /config
-VOLUME /var/lib/postgresql/data
+VOLUME /var/lib/postgresql
 
 
 # Install miniconda
