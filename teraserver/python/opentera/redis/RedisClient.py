@@ -115,7 +115,6 @@ class RedisClient:
         if self.redis:
             # Close sync client (will terminate conn.)
             self.redis.close()
-            # self.redis.connection_pool.disconnect()
 
 
 # Debug
@@ -143,24 +142,29 @@ if __name__ == '__main__':
         print('redis get', client.redisGet('papa'))
         print('sleeping 10 secs.')
         yield sleep(2)
-        print('done!')
         client.redisClose()
 
-    def called(result):
-        print('Function called')
+    def called(result, msg: str = None):
+        print('Function called', msg)
 
     from twisted.internet import task
-    d = task.deferLater(reactor, 1, function_with_client_should_remove_conn)
-    d.addCallback(called)
+    d1 = task.deferLater(reactor, 1, function_with_client_should_remove_conn)
+    d1.addCallback(called, 'function_with_client_should_remove_conn done!')
 
     # RPCClient
     from opentera.redis.RedisRPCClient import RedisRPCClient
     from opentera.config.ConfigManager import ConfigManager
-    config = ConfigManager()
-    config.create_defaults()
 
-    rpc = RedisRPCClient(config.redis_config)
-    rpc.call('module', 'func', 1, 2, 3)
+    def function_with_rpc_client_should_remove_conn():
+        config = ConfigManager()
+        config.create_defaults()
+
+        rpc = RedisRPCClient(config.redis_config, timeout=1)
+        rpc.call('module', 'func', 1, 2, 3)
+
+
+    d2 = task.deferLater(reactor, 1, function_with_rpc_client_should_remove_conn)
+    d2.addCallback(called, 'function_with_rpc_client_should_remove_conn done!')
 
     print('Starting reactor')
     reactor.run()
