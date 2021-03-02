@@ -40,6 +40,7 @@ class TeraVideoRecorder
     }
 
     startRecording(){
+        console.log("Starting local recording...");
         this.addVideoToRecorder(getActiveStreams());
     }
 
@@ -57,7 +58,10 @@ class TeraVideoRecorder
     }
 
     stopRecording(){
-        if (!this.recorder) return;
+        if (!this.recorder)
+            return;
+
+        console.log("Stopping local recording.");
         let self = this;
         this.recorder.stopRecording(function() {
             getSeekableBlob(self.recorder.getBlob(), function(seekableBlob) {

@@ -45,8 +45,12 @@ function setupSharedObjectCallbacks(channel){
     channel.objects.SharedObject.newDataForward.connect(forwardData);
     channel.objects.SharedObject.newSecondSources.connect(selectSecondarySources);
     channel.objects.SharedObject.setLocalMirrorSignal.connect(setLocalMirror);
-    //if (channel.objects.SharedObject.videoSourceRemoved !== undefined)
-        channel.objects.SharedObject.videoSourceRemoved.connect(removeVideoSource);
+    channel.objects.SharedObject.videoSourceRemoved.connect(removeVideoSource);
+
+    if (channel.objects.SharedObject.startRecordingRequested !== undefined)
+        channel.objects.SharedObject.startRecordingRequested.connect(startRecordingRequest);
+    if (channel.objects.SharedObject.stopRecordingRequested !== undefined)
+        channel.objects.SharedObject.stopRecordingRequested.connect(stopRecordingRequest);
 
     //Request settings from client
     channel.objects.SharedObject.getAllSettings(function(settings) {
@@ -79,4 +83,18 @@ function updateContact(contact)
 
 function setLocalMirror(mirror){
     setMirror(mirror, true, 1);
+}
+
+function startRecordingRequest(){
+    if (!streamRecorder)
+        streamRecorder = new TeraVideoRecorder();
+
+    streamRecorder.startRecording();
+}
+
+function stopRecordingRequest(){
+    if (!streamRecorder)
+        return;
+
+    streamRecorder.stopRecording();
 }
