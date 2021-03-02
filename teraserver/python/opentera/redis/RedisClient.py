@@ -103,7 +103,9 @@ class RedisClient:
     def redisClose(self):
         if self.protocol:
             # Will not reconnect
-            yield self.protocol.quit()
+            var = yield self.protocol.quit()
+            self.protocol.parent = None
+            print(var)
 
         if self.conn:
             # Disconnect socket
@@ -111,8 +113,7 @@ class RedisClient:
 
         if self.redis:
             # Close sync client
-            # self.redis.close()
-            pass
+            self.redis.close()
 
 
 # Debug
@@ -139,7 +140,7 @@ if __name__ == '__main__':
         client.redisSet('papa', 'rien', ex=60)
         print('redis get', client.redisGet('papa'))
         print('sleeping 10 secs.')
-        yield sleep(10)
+        yield sleep(2)
         print('done!')
         client.redisClose()
 
