@@ -23,7 +23,7 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
         RedisClient.__init__(self, config=config)
         WebSocketServerProtocol.__init__(self)
 
-        self.logger = LoggingClient(config)
+        self.logger = LoggingClient(config, 'LoggingClient_' + self.__class__.__name__)
         self.event_manager = None
         self.registered_events = set()  # Collection of unique elements
 
@@ -38,7 +38,7 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
     def onClose(self, wasClean, code, reason):
         print(type(self).__name__, 'TeraWebSocketServerProtocol - onClose')
         self.redisClose()
-        self.redis = None
+        self.logger.close()
 
     def onPong(self, payload):
         # print('onPong', payload)
