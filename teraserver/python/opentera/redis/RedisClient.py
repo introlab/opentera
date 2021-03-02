@@ -38,14 +38,14 @@ class RedisClient:
                                        RedisProtocolFactory(parent=self, protocol=redisProtocol, config=config))
         # print(self.conn)
 
-    def __del__(self):
-        print("****- Deleting RedisClient")
+    # def __del__(self):
+    #     print("****- Deleting RedisClient")
 
     def getConfig(self):
         return self.redisConfig
 
     def redisConnectionMade(self):
-        print('********************* RedisClient connectionMade')
+        print(self, '********************* RedisClient connectionMade')
         pass
 
     def redisMessageReceived(self, pattern, channel, message):
@@ -55,7 +55,7 @@ class RedisClient:
             self.callbacks_dict[pattern](pattern, channel, message)
 
     def redisConnectionLost(self, reason):
-        print("RedisClient lost connection", reason)
+        print(self, "RedisClient lost connection", reason)
         pass
 
     def setProtocol(self, protocol: redisProtocol):
@@ -167,6 +167,15 @@ if __name__ == '__main__':
 
     d2 = task.deferLater(reactor, 1, function_with_rpc_client_should_remove_conn)
     d2.addCallback(called, 'function_with_rpc_client_should_remove_conn done!')
+
+
+    def collect():
+        print('collecting...')
+        import gc
+        gc.collect()
+
+    d3 = task.LoopingCall(collect)
+    d3.start(5)
 
     print('Starting reactor')
     reactor.run()

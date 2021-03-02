@@ -31,7 +31,8 @@ class LoggingClient:
                            port=config['port'],
                            username=config['username'],
                            password=config['password'],
-                           db=config['db'])
+                           db=config['db'],
+                           client_name='LoggingClient')
 
     def log_trace(self, sender: str, *args):
         try:

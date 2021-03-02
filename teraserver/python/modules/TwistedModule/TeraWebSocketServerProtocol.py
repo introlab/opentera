@@ -27,8 +27,8 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
         self.event_manager = None
         self.registered_events = set()  # Collection of unique elements
 
-    def __del__(self):
-        print("****- Deleting TeraWebSocketServerProtocol")
+    # def __del__(self):
+    #     print("****- Deleting TeraWebSocketServerProtocol")
 
     def onOpen(self):
         print(type(self).__name__, 'TeraWebSocketServerProtocol - onOpen')
@@ -37,6 +37,8 @@ class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
 
     def onClose(self, wasClean, code, reason):
         print(type(self).__name__, 'TeraWebSocketServerProtocol - onClose')
+        self.redisClose()
+        self.redis = None
 
     def onPong(self, payload):
         # print('onPong', payload)
