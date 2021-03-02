@@ -18,7 +18,7 @@ from google.protobuf.message import DecodeError
 from twisted.internet import defer
 
 
-class TeraWebSocketServerProtocol(RedisClient, WebSocketServerProtocol):
+class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
     def __init__(self, config):
         RedisClient.__init__(self, config=config)
         WebSocketServerProtocol.__init__(self)
