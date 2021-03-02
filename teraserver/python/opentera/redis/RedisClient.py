@@ -37,6 +37,9 @@ class RedisClient:
                                        RedisProtocolFactory(parent=self, protocol=redisProtocol, config=config))
         print(self.conn)
 
+    def __del__(self):
+        print("****- Deleting RedisClient")
+
     def getConfig(self):
         return self.redisConfig
 

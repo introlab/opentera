@@ -25,6 +25,9 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
         TeraWebSocketServerProtocol.__init__(self, config=config)
         self.user = None
 
+    def __del__(self):
+        print("****- Deleting TeraWebSocketServerUserProtocol")
+
     @defer.inlineCallbacks
     def redisConnectionMade(self):
         print('TeraWebSocketServerUserProtocol - redisConnectionMade (redis)', self)

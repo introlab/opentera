@@ -10,6 +10,9 @@ class redisProtocol(txredis.SubscriberProtocol):
         if self.parent:
             self.parent.setProtocol(self)
 
+    def __del__(self):
+        print("****- Deleting redisProtocol")
+
     def connectionMade(self):
         # print('redisProtocol connectionMade')
         if self.parent:
@@ -48,6 +51,9 @@ class RedisProtocolFactory(txredis.SubscriberFactory):
         self.parent = parent
         self.protocol = protocol
         self.redis_config = config
+
+    def __del__(self):
+        print("****- Deleting RedisProtocolFactory")
 
     def buildProtocol(self, addr):
         """
