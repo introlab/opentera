@@ -106,6 +106,7 @@ class RedisClient:
             # Will not reconnect
             var = yield self.protocol.quit()
             self.protocol.parent = None
+            self.protocol.factory.parent = None
             print(var)
 
         if self.conn:
@@ -143,6 +144,8 @@ if __name__ == '__main__':
         print('sleeping 10 secs.')
         yield sleep(2)
         client.redisClose()
+        import sys
+        print(sys.getrefcount(client))
 
     def called(result, msg: str = None):
         print('Function called', msg)
