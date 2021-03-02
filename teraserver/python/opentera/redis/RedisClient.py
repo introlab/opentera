@@ -30,12 +30,13 @@ class RedisClient:
                                  port=config['port'],
                                  db=config['db'],
                                  username=config['username'],
-                                 password=config['password'])
+                                 password=config['password'],
+                                 client_name=self.__class__.__name__)
 
         # Redis client (async)
         self.conn = reactor.connectTCP(config['hostname'], config['port'],
                                        RedisProtocolFactory(parent=self, protocol=redisProtocol, config=config))
-        print(self.conn)
+        # print(self.conn)
 
     def __del__(self):
         print("****- Deleting RedisClient")
@@ -112,8 +113,9 @@ class RedisClient:
             self.conn.disconnect()
 
         if self.redis:
-            # Close sync client
+            # Close sync client (will terminate conn.)
             self.redis.close()
+            # self.redis.connection_pool.disconnect()
 
 
 # Debug
@@ -150,6 +152,15 @@ if __name__ == '__main__':
     from twisted.internet import task
     d = task.deferLater(reactor, 1, function_with_client_should_remove_conn)
     d.addCallback(called)
+
+    # RPCClient
+    from opentera.redis.RedisRPCClient import RedisRPCClient
+    from opentera.config.ConfigManager import ConfigManager
+    config = ConfigManager()
+    config.create_defaults()
+
+    rpc = RedisRPCClient(config.redis_config)
+    rpc.call('module', 'func', 1, 2, 3)
 
     print('Starting reactor')
     reactor.run()

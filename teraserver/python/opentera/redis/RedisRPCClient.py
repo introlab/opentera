@@ -17,7 +17,8 @@ class RedisRPCClient:
                                   port=self.config['port'],
                                   db=self.config['db'],
                                   username=self.config['username'],
-                                  password=self.config['password'])
+                                  password=self.config['password'],
+                                  client_name=self.pattern)
 
     def _internal_rpc_call(self, topic: str, function_name: str, *args):
         # Pub/Sub client
