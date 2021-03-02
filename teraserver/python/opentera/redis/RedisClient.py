@@ -99,22 +99,56 @@ class RedisClient:
         del self.callbacks_dict[pattern]
         return ret
 
+    @defer.inlineCallbacks
+    def redisClose(self):
+        if self.protocol:
+            # Will not reconnect
+            yield self.protocol.quit()
+
+        if self.conn:
+            # Disconnect socket
+            self.conn.disconnect()
+
+        if self.redis:
+            # Close sync client
+            # self.redis.close()
+            pass
+
 
 # Debug
 if __name__ == '__main__':
     print('Starting')
 
-    class MyClient(RedisClient):
-        def redisConnectionMade(self):
-            self.subscribe('*')
+    from twisted.internet.task import deferLater
+    from twisted.internet.defer import inlineCallbacks
 
-    client = MyClient()
 
-    print('setting variable')
+    def sleep(secs):
+        return deferLater(reactor, secs, lambda: None)
 
-    client.redisSet('papa', 'rien', ex=60)
 
-    print('redis get', client.redisGet('papa'))
+    @inlineCallbacks
+    def function_with_client_should_remove_conn():
+        class MyClient(RedisClient):
+            def redisConnectionMade(self):
+                print('redisConnectionMade')
+                self.subscribe('*')
+
+        client = MyClient()
+        print('setting variable')
+        client.redisSet('papa', 'rien', ex=60)
+        print('redis get', client.redisGet('papa'))
+        print('sleeping 10 secs.')
+        yield sleep(10)
+        print('done!')
+        client.redisClose()
+
+    def called(result):
+        print('Function called')
+
+    from twisted.internet import task
+    d = task.deferLater(reactor, 1, function_with_client_should_remove_conn)
+    d.addCallback(called)
 
     print('Starting reactor')
     reactor.run()
