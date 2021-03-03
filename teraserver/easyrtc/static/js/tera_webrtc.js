@@ -1211,3 +1211,17 @@ function sendNextVideoSource(peerid_target){
         });
     }
 }
+
+function broadcastRecordingStatus(status){
+    console.log("Broadcasting recording: " + status);
+    if (easyrtc.webSocketConnected)
+        easyrtc.sendDataWS({"targetRoom": "default"}, 'recordStatus', status, function(ackMesg) {
+            //console.error("ackMsg:",ackMesg);
+            if( ackMesg.msgType === 'error' ) {
+                console.error(ackMesg.msgData.errorText);
+            }
+        });
+    else{
+        console.log("Didn't broadcast: not connected yet!");
+    }
+}

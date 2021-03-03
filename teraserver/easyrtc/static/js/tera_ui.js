@@ -516,6 +516,15 @@ function getTitle(local, index){
     return title;
 }
 
+function setRecordingStatus(local, index, status){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let elem = view_prefix + 'ViewRec' + index;
+    if (status === true)
+        showElement(elem);
+    else
+        hideElement(elem);
+}
+
 function showPTZControls(local, index, zoom, presets, settings, camera = undefined){
     let view_prefix = ((local === true) ? 'local' : 'remote');
     let zoomControls = $("#" + view_prefix + "ZoomButtons" + index);
