@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python package
+name: Python package and upload to PyPi
 
 on:
   workflow_dispatch:
@@ -42,15 +42,25 @@ jobs:
     - name: Build dist package with setuptools
       working-directory: teraserver/python
       run: | 
-        ./env/python-3.8/bin/python3 -m pip install --upgrade setuptools wheel
+        ./env/python-3.8/bin/python3 -m pip install --upgrade setuptools wheel twine
         ./env/python-3.8/bin/python3 setup.py sdist bdist_wheel
         du -h dist
         
-    - name: Install python dependencies
+    - name: Run Tests
       run: |
         ls -l
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest
-        pip install protobuf
+        python -m pip install flake8 pytest protobuf
         if [ -f teraserver/python/env/requirements.txt ]; then pip install -r teraserver/python/env/requirements.txt; fi
+        
+    - name: Upload package to PyPi
+      working-directory: teraserver/python
+      run: | 
+        ./env/python-3.8/bin/python3 -m twine upload dist/*
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        
+      
+    
 
