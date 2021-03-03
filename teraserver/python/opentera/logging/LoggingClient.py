@@ -25,13 +25,19 @@ class LoggingClient:
     This client will send messages to queues. Logging Service is responsible of reading the queues.
     """
 
-    def __init__(self, config):
+    def __init__(self, config, client_name='LoggingClient'):
         # Setup connection with redis
+        self.client_name = client_name
         self.redis = Redis(host=config['hostname'],
                            port=config['port'],
                            username=config['username'],
                            password=config['password'],
-                           db=config['db'])
+                           db=config['db'],
+                           client_name=self.client_name)
+
+    def close(self):
+        print('Closing :', self.client_name)
+        self.redis.close()
 
     def log_trace(self, sender: str, *args):
         try:
@@ -52,35 +58,35 @@ class LoggingClient:
             self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_INFO, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
-            print('LoggingClient.log_info', e)
+            print(self.client_name + '.log_info', e)
 
     def log_warning(self, sender: str, *args):
         try:
             self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_WARNING, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
-            print('LoggingClient.log_warning', e)
+            print(self.client_name + '.log_warning', e)
 
     def log_critical(self, sender: str, *args):
         try:
             self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_CRITICAL, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
-            print('LoggingClient.log_critical', e)
+            print(self.client_name + '.log_critical', e)
 
     def log_error(self, sender: str, *args):
         try:
             self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_ERROR, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
-            print('LoggingClient.log_error', e)
+            print(self.client_name + '.log_error', e)
 
     def log_fatal(self, sender: str, *args):
         try:
             self._push_tera_event_message(LoggingClient._create_log_event(messages.LogEvent.LOGLEVEL_FATAL, sender, *args))
         # TODO Can we do better than catch base Exception here
         except Exception as e:
-            print('LoggingClient.log_fatal', e)
+            print(self.client_name + '.log_fatal', e)
 
     @staticmethod
     def _create_log_event(level, sender, *args):

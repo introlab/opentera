@@ -12,6 +12,9 @@ class TwistedModuleWebSocketServerFactory(WebSocketServerFactory):
         # Values are in seconds
         self.setProtocolOptions(autoPingInterval=10, autoPingTimeout=30, autoPingSize=20)
 
+    def __del__(self):
+        print("****- Deleting TwistedModuleWebSocketServerFactory")
+
     def buildProtocol(self, addr):
         """
         This overloaded function is called when a new protocol (effective connection to the websocket server) is

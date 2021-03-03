@@ -50,7 +50,7 @@ class ConfigManager:
         for field in redis_required_fields:
             self.redis_config[field] = ''
         # Default redis configuration
-        self.redis_config['hostname'] = 'localhost'
+        self.redis_config['hostname'] = '127.0.0.1'
         self.redis_config['port'] = 6379
         # Already set to empty string previously
         self.redis_config['username'] = ''

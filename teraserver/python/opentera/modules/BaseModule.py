@@ -46,7 +46,7 @@ class BaseModule(RedisClient):
         self.rpc_api = dict()
 
         # Logger
-        self.logger = LoggingClient(config.redis_config)
+        self.logger = LoggingClient(config.redis_config, 'LoggingClient_' + self.__class__.__name__)
 
         # Init redis with configuration
         RedisClient.__init__(self, config=config.redis_config)

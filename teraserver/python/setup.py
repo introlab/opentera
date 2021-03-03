@@ -8,8 +8,8 @@ with open("env/requirements.txt", "r", encoding="utf-8") as f:
     requirements.append('protobuf==3.14.0')
 
 setuptools.setup(
-    name="opentera",  # Replace with your own username
-    version="1.0.2",
+    name="opentera",
+    version="1.0.3",
     author="Dominic Létourneau, Simon Brière",
     author_email="dominic.letourneau@usherbrooke.ca, simon.briere@usherbrooke.ca",
     description="OpenTera base package",
