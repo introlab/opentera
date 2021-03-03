@@ -1,4 +1,4 @@
-# OpenTera 1.0.3
+# OpenTera
 
 Python package for OpenTera micro-service architecture. 
 External microservices can use this package as a base.
