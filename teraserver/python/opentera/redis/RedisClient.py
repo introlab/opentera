@@ -21,7 +21,7 @@ class RedisClient:
         # Fill config
         if config is None:
             print('RedisClient - Warning, using default redis configuration')
-            config = {'hostname': 'localhost', 'port': 6379, 'db': 0, 'username': '', 'password': ''}
+            config = {'hostname': '127.0.0.1', 'port': 6379, 'db': 0, 'username': '', 'password': ''}
 
         self.redisConfig = config
 
@@ -30,18 +30,24 @@ class RedisClient:
                                  port=config['port'],
                                  db=config['db'],
                                  username=config['username'],
-                                 password=config['password'])
+                                 password=config['password'],
+                                 client_name=self.__class__.__name__)
+
+        print('++++++++++++************** Connexion pool: ', self.redis.connection_pool)
 
         # Redis client (async)
         self.conn = reactor.connectTCP(config['hostname'], config['port'],
                                        RedisProtocolFactory(parent=self, protocol=redisProtocol, config=config))
-        print(self.conn)
+        # print(self.conn)
+
+    # def __del__(self):
+    #     print("****- Deleting RedisClient")
 
     def getConfig(self):
         return self.redisConfig
 
     def redisConnectionMade(self):
-        print('********************* RedisClient connectionMade')
+        print(self, '********************* RedisClient connectionMade')
         pass
 
     def redisMessageReceived(self, pattern, channel, message):
@@ -51,7 +57,7 @@ class RedisClient:
             self.callbacks_dict[pattern](pattern, channel, message)
 
     def redisConnectionLost(self, reason):
-        print("RedisClient lost connection", reason)
+        print(self, "RedisClient lost connection", reason)
         pass
 
     def setProtocol(self, protocol: redisProtocol):
@@ -96,22 +102,82 @@ class RedisClient:
         del self.callbacks_dict[pattern]
         return ret
 
+    @defer.inlineCallbacks
+    def redisClose(self):
+        if self.protocol:
+            # Will not reconnect
+            var = yield self.protocol.quit()
+            self.protocol.parent = None
+            self.protocol.factory.parent = None
+            self.protocol = None
+            print(var)
+
+        if self.conn:
+            # Disconnect socket
+            self.conn.disconnect()
+
+        if self.redis:
+            # Close sync client (will terminate conn.)
+            self.redis.close()
+
 
 # Debug
 if __name__ == '__main__':
     print('Starting')
 
-    class MyClient(RedisClient):
-        def redisConnectionMade(self):
-            self.subscribe('*')
+    from twisted.internet.task import deferLater
+    from twisted.internet.defer import inlineCallbacks
 
-    client = MyClient()
 
-    print('setting variable')
+    def sleep(secs):
+        return deferLater(reactor, secs, lambda: None)
 
-    client.redisSet('papa', 'rien', ex=60)
 
-    print('redis get', client.redisGet('papa'))
+    @inlineCallbacks
+    def function_with_client_should_remove_conn():
+        class MyClient(RedisClient):
+            def redisConnectionMade(self):
+                print('redisConnectionMade')
+                self.subscribe('*')
+
+        client = MyClient()
+        print('setting variable')
+        client.redisSet('papa', 'rien', ex=60)
+        print('redis get', client.redisGet('papa'))
+        print('sleeping 2 secs.')
+        yield sleep(2)
+        client.redisClose()
+
+    def called(result, msg: str = None):
+        print('Function called', msg)
+
+    from twisted.internet import task
+    d1 = task.deferLater(reactor, 1, function_with_client_should_remove_conn)
+    d1.addCallback(called, 'function_with_client_should_remove_conn done!')
+
+    # RPCClient
+    from opentera.redis.RedisRPCClient import RedisRPCClient
+    from opentera.config.ConfigManager import ConfigManager
+
+    def function_with_rpc_client_should_remove_conn():
+        config = ConfigManager()
+        config.create_defaults()
+
+        rpc = RedisRPCClient(config.redis_config, timeout=1)
+        rpc.call('module', 'func', 1, 2, 3)
+
+
+    d2 = task.deferLater(reactor, 1, function_with_rpc_client_should_remove_conn)
+    d2.addCallback(called, 'function_with_rpc_client_should_remove_conn done!')
+
+
+    def collect():
+        print('collecting...')
+        import gc
+        gc.collect()
+
+    d3 = task.LoopingCall(collect)
+    d3.start(5)
 
     print('Starting reactor')
     reactor.run()

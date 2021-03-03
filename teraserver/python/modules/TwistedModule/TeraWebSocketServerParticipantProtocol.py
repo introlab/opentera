@@ -107,6 +107,7 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
 
     @defer.inlineCallbacks
     def onClose(self, wasClean, code, reason):
+        print('TeraWebSocketServerParticipantProtocol - onClose', self, wasClean, code, reason)
         if self.participant:
             # Advertise that participant leaved
             tera_message = self.create_tera_message(
@@ -150,7 +151,7 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
         # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
         # print(ret)
 
-        print('TeraWebSocketServerParticipantProtocol - onClose', self, wasClean, code, reason)
+        super().onClose(wasClean, code, reason)
 
     def answer_topic(self):
         if self.participant:

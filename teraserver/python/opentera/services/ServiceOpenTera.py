@@ -18,7 +18,7 @@ class ServiceOpenTera(RedisClient):
         RedisClient.__init__(self, config_man.redis_config)
 
         # Initialize logger
-        self.logger = LoggingClient(config_man.redis_config)
+        self.logger = LoggingClient(config_man.redis_config, 'LoggingClient_' + self.__class__.__name__)
 
         # Store service info
         self.service_info = service_info

@@ -1,6 +1,6 @@
 # Event based, twisted redis
 import txredisapi as txredis
-
+from twisted.internet import defer
 
 class redisProtocol(txredis.SubscriberProtocol):
     def __init__(self, charset=None, errors="strict", parent=None, *args, **kwargs):
@@ -10,9 +10,14 @@ class redisProtocol(txredis.SubscriberProtocol):
         if self.parent:
             self.parent.setProtocol(self)
 
+    # def __del__(self):
+    #     print("****- Deleting redisProtocol")
+
+    @defer.inlineCallbacks
     def connectionMade(self):
         # print('redisProtocol connectionMade')
         if self.parent:
+            ret = yield self.execute_command('client', 'setname', 'txredis_' + self.parent.__class__.__name__)
             self.parent.redisConnectionMade()
         else:
             print('redisProtocol connectionMade')
@@ -48,6 +53,9 @@ class RedisProtocolFactory(txredis.SubscriberFactory):
         self.parent = parent
         self.protocol = protocol
         self.redis_config = config
+
+    # def __del__(self):
+    #     print("****- Deleting RedisProtocolFactory")
 
     def buildProtocol(self, addr):
         """

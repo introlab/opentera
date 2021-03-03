@@ -142,6 +142,7 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
         # Unsubscribe to messages
         # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
         # print(ret)
+        super().onClose(wasClean, code, reason)
 
     def answer_topic(self):
         if self.device:

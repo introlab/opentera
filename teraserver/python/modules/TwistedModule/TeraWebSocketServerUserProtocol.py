@@ -25,6 +25,9 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
         TeraWebSocketServerProtocol.__init__(self, config=config)
         self.user = None
 
+    # def __del__(self):
+    #     print("****- Deleting TeraWebSocketServerUserProtocol")
+
     @defer.inlineCallbacks
     def redisConnectionMade(self):
         print('TeraWebSocketServerUserProtocol - redisConnectionMade (redis)', self)
@@ -153,6 +156,7 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
         # Unsubscribe to messages
         # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
         # print(ret)
+        super().onClose(wasClean, code, reason)
 
     def answer_topic(self):
         if self.user:
