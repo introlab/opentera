@@ -58,7 +58,11 @@
 	"status": {
 		"initializing": "Initialisation en cours...",
 		"cant-continue": "Impossible de continuer. Veuillez réessayer.",
-		"lost-connection": "Connexion perdue... Reconnexion en cours..."
+		"lost-connection": "Connexion perdue... Reconnexion en cours...",
+		"user-start-recording": " a démarré l'enregistrement vidéo de cette séance.",
+		"start-recording": "L'enregistrement vidéo de cette séance a été démarré.",
+		"user-stop-recording": " a arrêté l'enregistrement vidéo de cette séance.",
+		"stop-recording": "L'enregistrement vidéo de cette séance a été arrêté."
 	},
 	"ui": {
 		"controls": "Contrôles",

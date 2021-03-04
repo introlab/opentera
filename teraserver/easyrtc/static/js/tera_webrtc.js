@@ -28,7 +28,7 @@ function connect() {
 
     //Pre-connect Event listeners
     easyrtc.setRoomOccupantListener(updateRoomUsers);
-    easyrtc.setRoomEntryListener(function(entry, roomName) {
+    easyrtc.setRoomEntryListener(function(/*entry, roomName*/) {
         needToCallOtherUsers = true;
     });
     easyrtc.setDisconnectListener(disconnectedFromSignalingServer);
@@ -358,7 +358,7 @@ function localVideoStreamSuccess(stream){
                 console.log("Adding stream to session...");
                 local_index = 1; // Secondary stream in the call
                 for (let i=0; i<remoteStreams.length; i++){
-                    easyrtc.addStreamToCall(remoteStreams[i].peerid, stream.streamName, function (caller, streamName) {
+                    easyrtc.addStreamToCall(remoteStreams[i].peerid, stream.streamName, function (/*caller, streamName*/) {
                         //console.log("Added stream to " + caller + " - " + streamName);
                         updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
                     });
@@ -408,10 +408,8 @@ function forwardData(data)
 }
 
 function broadcastlocalCapabilities(){
-    let request = localCapabilities;
-
     if (easyrtc.webSocketConnected){
-        easyrtc.sendDataWS({"targetRoom":"default"}, 'updateCapabilities', request, function(ackMesg) {
+        easyrtc.sendDataWS({"targetRoom":"default"}, 'updateCapabilities', localCapabilities, function(ackMesg) {
             //console.error("ackMsg:",ackMesg);
             if( ackMesg.msgType === 'error' ) {
                 console.error(ackMesg.msgData.errorText);
@@ -581,6 +579,12 @@ function newStreamStarted(callerid, stream, streamname) {
         sendStatus(callerid);
 
         if (!isParticipant){
+            if (streamRecorder !== undefined && streamRecorder !== null){
+                broadcastRecordingStatus(true, callerid);
+            }
+        }
+
+        if (!isParticipant){
             if (primaryView.peerid !== 0){
                 sendPrimaryView(primaryView.peerid, primaryView.streamName);
             }
@@ -593,8 +597,10 @@ function newStreamStarted(callerid, stream, streamname) {
     }
 
     // Recorder
-    if (streamRecorder){
-        streamRecorder.addVideoToRecorder(stream);
+    if (!isParticipant){
+        if (streamRecorder !== undefined && streamRecorder !== null){
+            streamRecorder.addVideoToRecorder(stream);
+        }
     }
 
     // Add second video, if present
@@ -669,12 +675,16 @@ function streamDisconnected(callerid, mediaStream, streamName){
         if (remoteStreams[i].peerid === callerid && remoteStreams[i].streamname === streamName){
             console.log("Removed stream from remote stream list");
             remoteStreams.splice(i,1);
+            // Remove record status
+            setRecordingStatus(false, i+1, false);
             break;
         }
     }
 
-    if (streamRecorder){
-        streamRecorder.refreshVideosInRecorder();
+    if (!isParticipant){
+        if (streamRecorder !== undefined && streamRecorder !== null){
+            streamRecorder.refreshVideosInRecorder();
+        }
     }
 
     // Remove contact info if the "default" stream was disconnected
@@ -744,6 +754,14 @@ function getContactIndexForPeerId(peerid){
     for (let i=0; i<remoteContacts.length; i++){
         if (remoteContacts[i].peerid === peerid)
             return i;
+    }
+    return undefined;
+}
+
+function getContactNameForPeerId(peerid){
+    for (let i=0; i<remoteContacts.length; i++){
+        if (remoteContacts[i].peerid === peerid)
+            return remoteContacts[i].name;
     }
     return undefined;
 }
@@ -994,6 +1012,29 @@ function dataReception(sendercid, msgType, msgData, targeting) {
     if (msgType === "nextVideoSource"){
         swapVideoSource(true, 1);
     }
+
+    if (msgType === "recordStatus"){
+        // Show record icon
+        let index = getStreamIndexForPeerId(sendercid, 'default');
+        setRecordingStatus(false, index+1, msgData)
+
+        // Display status message
+        let contact_name = getContactNameForPeerId(sendercid);
+        let record_msg = "";
+        if (contact_name !== undefined){
+            if (msgData === true)
+                record_msg = contact_name + translator.translateForKey("status.user-start-recording", currentLang);
+            else
+                record_msg = contact_name + translator.translateForKey("status.user-stop-recording", currentLang);
+        }else{
+            if (msgData === true)
+                record_msg = translator.translateForKey("status.start-recording", currentLang);
+            else
+                record_msg = translator.translateForKey("status.stop-recording", currentLang);
+        }
+
+        showStatusMsg(record_msg, 5000); // Display for 5 seconds
+    }
 }
 
 function signalingLoginSuccess(peerid,  roomOwner) {
@@ -1212,15 +1253,18 @@ function sendNextVideoSource(peerid_target){
     }
 }
 
-function broadcastRecordingStatus(status){
+function broadcastRecordingStatus(status, peerid_target = -1){
     console.log("Broadcasting recording: " + status);
-    if (easyrtc.webSocketConnected)
-        easyrtc.sendDataWS({"targetRoom": "default"}, 'recordStatus', status, function(ackMesg) {
+    if (easyrtc.webSocketConnected){
+        if (peerid_target === -1) // Broadcast to all
+            peerid_target = {"targetRoom": "default"};
+        easyrtc.sendDataWS(peerid_target, 'recordStatus', status, function(ackMesg) {
             //console.error("ackMsg:",ackMesg);
             if( ackMesg.msgType === 'error' ) {
                 console.error(ackMesg.msgData.errorText);
             }
         });
+    }
     else{
         console.log("Didn't broadcast: not connected yet!");
     }
