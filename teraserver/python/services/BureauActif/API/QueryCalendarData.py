@@ -56,8 +56,8 @@ class QueryCalendarData(Resource):
                         day_json = day.to_json(['timeline'])
 
                         if day.seating is not None and day.standing is not None and day.positionChanges is not None \
-                                and (day.seating.expected + day.standing.expected) < 10 \
-                                and day.timeline is not None and len(day.timeline[0].series) > 1:
+                                and (day.seating.expected + day.standing.expected) > 0.17 \
+                                and day.timeline is not None:
                             day_json['seating'] = day.seating.to_json()
                             day_json['standing'] = day.standing.to_json()
                             day_json['positionChanges'] = day.positionChanges.to_json()
