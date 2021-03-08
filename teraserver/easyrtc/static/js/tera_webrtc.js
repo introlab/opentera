@@ -599,6 +599,8 @@ function newStreamStarted(callerid, stream, streamname) {
     // Recorder
     if (!isParticipant){
         if (streamRecorder !== undefined && streamRecorder !== null){
+            //console.log("Adding stream to recorder: " + stream.getVideoTracks().length + " video(s), " +
+            //stream.getAudioTracks().length + " audio(s).");
             streamRecorder.addVideoToRecorder(stream);
         }
     }
