@@ -44,8 +44,8 @@ function ws_Closed(){
 	console.log("Websocket closed.");
 
 	// Must make a new "login" request?
-	// Retry to connect in 5 seconds...
-    setTimeout(function(){ webSocketConnect(); }, 5000);
+	// Retry to connect in 2 seconds...
+    setTimeout(function(){ doParticipantLogin(backend_hostname, backend_port, participant_token); }, 2000);
 
 	// Redirect to login for now...
 	//window.location.replace("login");
