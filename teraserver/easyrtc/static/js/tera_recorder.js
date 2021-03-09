@@ -41,7 +41,10 @@ class TeraVideoRecorder
 
     startRecording(){
         console.log("Starting local recording...");
-        this.addVideoToRecorder(getActiveStreams());
+        let streams = getActiveStreams();
+        let stream;
+        for (stream of streams)
+            this.addVideoToRecorder([stream]);
     }
 
     addVideoToRecorder(stream) {
@@ -54,7 +57,8 @@ class TeraVideoRecorder
     }
 
     refreshVideosInRecorder(){
-        this.recorder.getInternalRecorder().resetVideoStreams(getActiveStreams());
+        let streams = getActiveStreams();
+        this.recorder.getInternalRecorder().resetVideoStreams(streams);
     }
 
     stopRecording(){
@@ -66,9 +70,8 @@ class TeraVideoRecorder
         this.recorder.stopRecording(function() {
             getSeekableBlob(self.recorder.getBlob(), function(seekableBlob) {
                 //console.log(url);
-                invokeSaveAsDialog(seekableBlob);
-
                 self.recorder = null;
+                invokeSaveAsDialog(seekableBlob);
             });
         });
     }

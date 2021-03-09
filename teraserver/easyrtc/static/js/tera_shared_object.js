@@ -90,6 +90,8 @@ function startRecordingRequest(){
         streamRecorder = new TeraVideoRecorder();
 
     streamRecorder.startRecording();
+    setRecordingStatus(true,1,true);
+    broadcastRecordingStatus(true);
 }
 
 function stopRecordingRequest(){
@@ -97,4 +99,7 @@ function stopRecordingRequest(){
         return;
 
     streamRecorder.stopRecording();
+    streamRecorder = null;
+    setRecordingStatus(true,1,false);
+    broadcastRecordingStatus(false);
 }

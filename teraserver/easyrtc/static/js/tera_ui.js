@@ -385,9 +385,12 @@ function showError(err_context, err_msg, ui_display, show_retry=true){
     }
 }
 
-function showStatusMsg(status_msg){
+function showStatusMsg(status_msg, timeout = -1){
     $('#statusLabel')[0].innerHTML = status_msg;
     $('#statusAlert').show();
+    if (timeout > 0 ){
+        setTimeout(clearStatusMsg, timeout);
+    }
 }
 
 function clearStatusMsg(){
@@ -514,6 +517,15 @@ function getTitle(local, index){
         title =  label[0].innerText;
     }
     return title;
+}
+
+function setRecordingStatus(local, index, status){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let elem = view_prefix + 'ViewRec' + index;
+    if (status === true)
+        showElement(elem);
+    else
+        hideElement(elem);
 }
 
 function showPTZControls(local, index, zoom, presets, settings, camera = undefined){

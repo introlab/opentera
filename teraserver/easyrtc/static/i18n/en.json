@@ -58,7 +58,11 @@
 	"status": {
 		"initializing": "Initializing...",
 		"cant-continue": "Unable to continue. Please try again.",
-		"lost-connection": "Lost connection... Trying to reconnect..."
+		"lost-connection": "Lost connection... Trying to reconnect...",
+		"user-start-recording": " started video recording of this session.",
+		"start-recording": "Video recording of this session started.",
+		"user-stop-recording": " stopped video recording of this session.",
+		"stop-recording": "Video recording of this session stopped."
 	},
 	"ui": {
 		"controls": "Controls",
