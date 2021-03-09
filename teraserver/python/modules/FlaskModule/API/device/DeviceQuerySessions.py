@@ -176,7 +176,7 @@ class DeviceQuerySessions(Resource):
             try:
                 if 'session_participants' in json_session:
                     participants = json_session.pop('session_participants')
-                    print('removing participants', participants)
+                    # print('removing participants', participants)
 
                 TeraSession.update(json_session['id_session'], json_session)
             except exc.SQLAlchemyError as e:

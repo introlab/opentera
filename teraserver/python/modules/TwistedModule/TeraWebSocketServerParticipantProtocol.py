@@ -65,6 +65,10 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
             # Publish to login module (bytes)
             self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
+        else:
+            print(type(self).__name__, ' - closing - unauthorized.')
+            super().onClose(False, None, None)
+
 
     def onConnect(self, request):
         """
