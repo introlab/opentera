@@ -22,6 +22,7 @@ class BureauActifTimelineDay(db.Model, BaseModel):
             rval = super().to_json(ignore_fields=ignore_fields)
 
             entries_json = []
+            self.series.sort(key=lambda x: x.id_timeline_day_entry)
             for entry in self.series:
                 entry_type = entry.entry_type
                 entry_json = entry.to_json()
