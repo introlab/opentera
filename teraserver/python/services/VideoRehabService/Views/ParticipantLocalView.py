@@ -23,7 +23,7 @@ class ParticipantLocalView(MethodView):
         if 'X_EXTERNALPORT' in request.headers:
             backend_port = request.headers['X_EXTERNALPORT']
 
-        message = gettext('Votre séance débutera bientôt. Merci de patienter!')
+        message = gettext('Your session will start soon. Thank you for your patience!')
         if 'message' in request.args:
             message = request.args['message']
         message_type = 'info'

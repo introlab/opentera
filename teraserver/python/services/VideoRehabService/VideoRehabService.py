@@ -467,7 +467,7 @@ class VideoRehabService(ServiceOpenTera):
                     session_info = session_info.pop()
                 return {'status': 'stopped', 'session': session_info}
 
-            return {'status': 'error', 'error_text': gettext('Error stopping session - check server logs. ')}
+            return {'status': 'error', 'error_text': gettext('Error stopping session - check server logs')}
 
         return {'status': 'error', 'error_text': gettext('No matching session to stop')}
 
@@ -492,9 +492,9 @@ class VideoRehabService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=12, id_session=id_session,
-                                                           event_text=gettext('User: ') + session_user)
+                                                           event_text=gettext('User') + ': ' + session_user)
                     if api_response.status_code != 200:
-                        return {'status': 'error', 'error_text': gettext('Error creating user invited session event ')}
+                        return {'status': 'error', 'error_text': gettext('Error creating user invited session event')}
 
             if 'session_participants' in session_manage_args:
                 new_session_participants = session_manage_args['session_participants']
@@ -504,10 +504,10 @@ class VideoRehabService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=12, id_session=id_session,
-                                                           event_text=gettext('Participant: ') + session_participant)
+                                                           event_text=gettext('Participant') + ': ' + session_participant)
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Error creating participant invited '
-                                                                         'session event ')}
+                                                                         'session event')}
 
             if 'session_devices' in session_manage_args:
                 new_session_devices = session_manage_args['session_devices']
@@ -517,10 +517,10 @@ class VideoRehabService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=12, id_session=id_session,
-                                                           event_text=gettext('Device: ') + session_device)
+                                                           event_text=gettext('Device') + ': ' + session_device)
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Error creating device invited '
-                                                                         'session event ')}
+                                                                         'session event')}
 
             # Update session with new invitees
             api_req = {'session': {'id_session': id_session,  # New session
@@ -563,9 +563,9 @@ class VideoRehabService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=13, id_session=id_session,
-                                                           event_text=gettext('User: ') + session_user)
+                                                           event_text=gettext('User') + ': ' + session_user)
                     if api_response.status_code != 200:
-                        return {'status': 'error', 'error_text': gettext('Error creating user left session event ')}
+                        return {'status': 'error', 'error_text': gettext('Error creating user left session event')}
 
             if 'session_participants' in session_manage_args:
                 removed_session_participants = session_manage_args['session_participants']
@@ -576,10 +576,11 @@ class VideoRehabService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=13, id_session=id_session,
-                                                           event_text=gettext('Participant: ') + session_participant)
+                                                           event_text=gettext('Participant') + ': ' +
+                                                                      session_participant)
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Error creating participant left '
-                                                                         'session event ')}
+                                                                         'session event')}
 
             if 'session_devices' in session_manage_args:
                 removed_session_devices = session_manage_args['session_devices']
@@ -590,10 +591,10 @@ class VideoRehabService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=13, id_session=id_session,
-                                                           event_text=gettext('Device: ') + session_device)
+                                                           event_text=gettext('Device') + ': ' + session_device)
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Error creating device left '
-                                                                         'session event ')}
+                                                                         'session event')}
 
             # Create and send leave session event message
             leave_message = messages.LeaveSessionEvent()
@@ -644,7 +645,7 @@ class VideoRehabService(ServiceOpenTera):
                     # Create session join refused event
                     # TODO: Get user name instead of user uuid
                     api_response = self.post_session_event(event_type=14, id_session=session_info['id_session'],
-                                                           event_text=gettext('User ') + parameters['user_uuid'])
+                                                           event_text=gettext('User') + ' ' + parameters['user_uuid'])
 
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Cannot create refused session event')}
@@ -657,7 +658,7 @@ class VideoRehabService(ServiceOpenTera):
                     # Create session join refused event
                     # TODO: Get  participant name instead of uuid
                     api_response = self.post_session_event(event_type=14, id_session=session_info['id_session'],
-                                                           event_text=gettext('Participant ') +
+                                                           event_text=gettext('Participant') + ' ' +
                                                                       parameters['participant_uuid'])
 
                     if api_response.status_code != 200:
@@ -671,7 +672,7 @@ class VideoRehabService(ServiceOpenTera):
                     # Create session join refused event
                     # TODO: Get device name instead of uuid
                     api_response = self.post_session_event(event_type=14, id_session=session_info['id_session'],
-                                                           event_text=gettext('Device ') + parameters['device_uuid'])
+                                                           event_text=gettext('Device') + ' ' + parameters['device_uuid'])
 
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Cannot create refused session event')}
