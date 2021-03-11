@@ -791,6 +791,7 @@ $(document).on('change', '#optChronoType1, #optChronoType2', function(){
         $('#chronosDuration').hide();
     }
 });
+
 /*
 $(document).on('mouseenter', '.dropup', function() {
     console.log("MouseEnter");

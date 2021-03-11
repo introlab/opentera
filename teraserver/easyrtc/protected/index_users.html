@@ -165,18 +165,16 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="measureDialogLongTitle" data-i18n="measureDialog.title">Mesures</h5>
-
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="form-group row pr-2">
                     <label for="measurePartSelect" class="col-form-label col-2" data-i18n="measureDialog.participant">Participant: </label>
                     <select id="measurePartSelect" class="col combobox" onchange="onMeasureParticipantChanged();"></select>
                 </div>
-                <div class="form-group text-center" id="measureAnglesTools" style="display:none;">
-                    <button type="button" id="btnResetAngles" class="btn btn-info" data-i18n="measureDialog.reset" onclick="clearAngleMeasurement();">Reset</button>
-                    <label id="lblMeasureAngles" class="measure-text ml-5" data-i18n="measureDialog.angle">Angle:</label>
-                    <span class="badge badge-primary measure-text" id="lblMeasureAnglesValue" data-i18n="measureDialog.n-a">N/D</span>
-                </div>
+
                 <div style="text-align: center;">
                     <canvas class="video-canvas" id="measureVideoCanvas" style="display:none;"></canvas>
                     <video id="measureVideo" muted="muted" class="preview-video" onpause="resizeCanvasOverElement('measureVideoCanvas', this);"></video>
@@ -184,6 +182,12 @@
                 <div style="text-align: center;">
                     <button type="button" id="btnMeasureAngles" class="btn btn-success" data-toggle="button" aria-pressed="false"
                             data-i18n="measureDialog.measure-angle" onclick="onAngleMeasurementToggle();">Angle</button>
+                    <div id="measureAnglesTools" style="display:none;">
+                        <button type="button" id="btnResetAngles" class="btn btn-info" data-i18n="measureDialog.reset" onclick="clearAngleMeasurement();">Reset</button>
+                        <label id="lblMeasureAngles" class="measure-text ml-5" data-i18n="measureDialog.angle">Angle:</label>
+                        <span class="badge badge-primary measure-text" id="lblMeasureAnglesValue" data-i18n="measureDialog.n-a">N/D</span> /
+                        <span class="badge badge-primary measure-text" id="lblMeasureAnglesCompValue" data-i18n="measureDialog.n-a">N/D</span>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
