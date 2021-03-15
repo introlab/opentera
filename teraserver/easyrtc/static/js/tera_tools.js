@@ -189,7 +189,8 @@ function startAngleMeasurement(){
     $('#measureVideo')[0].pause();
     measuring = true;
     $("#measurePartSelect").attr('disabled',true);
-    showElement("measureAnglesTools");
+    //showElement("measureAnglesTools");
+    $('#measureAnglesTools').css('display', 'inline');
     showElement("measureVideoCanvas");
 }
 
@@ -209,7 +210,7 @@ function clearAngleMeasurement(){
 
     measurePoints = [];
 
-    setAngleValue(translator.translateForKey("measureDialog.n-a", currentLang));
+    setAngleValue(null);
 }
 
 function measureAddAndDrawPoint(pos_x, pos_y){
@@ -237,7 +238,13 @@ function measureDrawLine(x1, y1, x2, y2){
 }
 
 function setAngleValue(value){
-    $('#lblMeasureAnglesValue')[0].innerHTML = value
+    if (value === null) {
+        $('#lblMeasureAnglesValue')[0].innerHTML = translator.translateForKey("measureDialog.n-a", currentLang)
+        $('#lblMeasureAnglesCompValue')[0].innerHTML = translator.translateForKey("measureDialog.n-a", currentLang)
+    }else{
+        $('#lblMeasureAnglesValue')[0].innerHTML = value + "°"
+        $('#lblMeasureAnglesCompValue')[0].innerHTML = (value - 180) + "°"
+    }
 }
 
 function measureCurrentAngle(last_x = null, last_y=null){
@@ -258,7 +265,7 @@ function measureCurrentAngle(last_x = null, last_y=null){
 
     let angle = Math.round(Math.acos((BC*BC+AB*AB-AC*AC) / (2*BC*AB)) * (180 / Math.PI));
 
-    setAngleValue(angle + "°");
+    setAngleValue(angle);
 
 }
 

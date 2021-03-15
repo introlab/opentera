@@ -28,7 +28,7 @@ after {
     clear: both;
 }
 
-button {
+.green-button {
     background: #b5cd60;
     border: 0;
     width: 150px;
@@ -39,7 +39,7 @@ button {
     transition: background 0.3s ease-in-out;
 }
 
-button:hover {
+.green-button:hover {
   background: #16aa56;
 }
 
@@ -96,4 +96,18 @@ video {
 
 .iframe-without-footer{
     height: calc(100% - 50px);
+}
+
+.modal-header-error{
+    background-color: #ab0909;
+    color: white;
+}
+
+.modal-body-error{
+    background-color: white;
+    color: black;
+}
+
+.modal-footer-error{
+    background-color: #ab0909;
 }

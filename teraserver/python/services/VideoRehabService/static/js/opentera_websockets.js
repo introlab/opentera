@@ -87,7 +87,7 @@ function ws_MessageReceived(evt){
         $('#mainview').addClass('iframe-without-footer');
         //window.location.replace("participant_endpoint?token=" + sessionStorage.getItem("participant_token"));
         document.getElementById('mainview').src = "participant_localview?token=" + sessionStorage.getItem("participant_token") +
-        '&message=Votre séance est maintenant terminée. Vous pouvez maintenant vous déconnecter ou fermer cette page.&message_type=light';
+        "&message=" + str_session_complete + ".&message_type=light";
     }
 }
 

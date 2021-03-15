@@ -2,10 +2,27 @@ var service_hostname;
 var service_port;
 
 var current_session_url;
+let currentLang='fr';
 
 function init_dashboard(serv_hostname, serv_port){
     service_hostname = serv_hostname;
     service_port = serv_port;
+}
+
+function init_system(){
+    if (isBrowserSupported()){
+        loginParticipant();
+    }
+    else{
+        let browser_infos = browser.getBrowser().name + " " + browser.getBrowser().version;
+        showError(str_unsupported_browser_title,str_unsupported_browser + ".<br><br><u>" + str_your_browser + "</u>: <strong>" + browser_infos +
+            "</strong><br><br><u>" + str_supported_browsers + "</u>: <strong>Chrome (version 55+), Firefox (version 50+), Safari (version 11+)</strong>", true, false);
+    }
+}
+
+function loginParticipant(){
+    doParticipantLogin(backend_hostname, backend_port, participant_token);
+    document.getElementById('mainview').src = "participant_localview?token=" + participant_token;
 }
 
 let sessionUrlTries = 0;
