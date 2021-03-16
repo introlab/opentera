@@ -13,13 +13,17 @@ async function fillDefaultSourceList(){
 
     // Open a stream to ask for permissions and allow listing of full name of devices.
     try{
-        await navigator.mediaDevices.getUserMedia({
+        /*await navigator.mediaDevices.getUserMedia({
             audio: true,
             video: {
                 width: {ideal: 1280, max: 1920 },
                 height: {ideal: 720, max: 1080 },
-                frameRate: {min: 15}/*, ideal: 30}*/
+                frameRate: {min: 15}//, ideal: 30}
             }
+        });*/
+        await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
         });
     }catch(err) {
         showError("fillDefaultSourceList() - getUserMedia",

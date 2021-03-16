@@ -45,7 +45,7 @@ function setupSharedObjectCallbacks(channel){
     channel.objects.SharedObject.newDataForward.connect(forwardData);
     channel.objects.SharedObject.newSecondSources.connect(selectSecondarySources);
     channel.objects.SharedObject.setLocalMirrorSignal.connect(setLocalMirror);
-    
+
     if (channel.objects.SharedObject.videoSourceRemoved !== undefined)
         channel.objects.SharedObject.videoSourceRemoved.connect(removeVideoSource);
     if (channel.objects.SharedObject.startRecordingRequested !== undefined)
