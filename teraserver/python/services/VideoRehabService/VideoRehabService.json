@@ -20,10 +20,9 @@
 	    "hostname": "127.0.0.1",
 	    "external_port": 40075,
 	    "local_base_port": 8080,
-	    "max_sessions": 10,
+	    "max_sessions": 50,
 	    "working_directory": "../../../easyrtc",
 	    "executable": "node",
-	    "script": "server.js",
-	    "arguments": "port;key"
+	    "script": "server.js"
 	}
 }

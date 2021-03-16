@@ -32,8 +32,8 @@ def load_pem_certificate_from_data(data: bytes):
 
 # info at https://cryptography.io
 def generate_ca_certificate(common_name=socket.gethostname(), country_name=u'CA',
-                            state_or_province=u'Québec', locality_name=u'Sherbrooke',
-                            organization_name=u'Université de Sherbrooke'):
+                            state_or_province=u'State_Or_Province', locality_name=u'Locality Name',
+                            organization_name=u'Organization Name', email=u'test@noemail.com'):
 
     result = {}
 
@@ -51,7 +51,7 @@ def generate_ca_certificate(common_name=socket.gethostname(), country_name=u'CA'
         x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, state_or_province),
         x509.NameAttribute(NameOID.LOCALITY_NAME, locality_name),
         x509.NameAttribute(NameOID.ORGANIZATION_NAME, organization_name),
-        x509.NameAttribute(NameOID.EMAIL_ADDRESS, u'test@noemail.com')
+        x509.NameAttribute(NameOID.EMAIL_ADDRESS, email)
     ])
 
     builder = x509.CertificateSigningRequestBuilder()
@@ -82,8 +82,8 @@ def generate_ca_certificate(common_name=socket.gethostname(), country_name=u'CA'
 
 
 def generate_local_certificate_csr(common_name=socket.gethostname(), country_name=u'CA',
-                                   state_or_province=u'QC', locality_name=u'Sherbrooke',
-                                   organization_name=u'Université de Sherbrooke'):
+                                   state_or_province=u'State_Or_Province', locality_name=u'Locality Name',
+                                   organization_name=u'Organization Name', email=u'test@noemail.com'):
 
     result = {}
 
@@ -100,7 +100,7 @@ def generate_local_certificate_csr(common_name=socket.gethostname(), country_nam
         x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, state_or_province),
         x509.NameAttribute(NameOID.LOCALITY_NAME, locality_name),
         x509.NameAttribute(NameOID.ORGANIZATION_NAME, organization_name),
-        x509.NameAttribute(NameOID.EMAIL_ADDRESS, u'test@noemail.com')
+        x509.NameAttribute(NameOID.EMAIL_ADDRESS, email)
     ])).sign(private_key, hashes.SHA256(), default_backend())
 
     result['csr'] = csr
@@ -109,8 +109,8 @@ def generate_local_certificate_csr(common_name=socket.gethostname(), country_nam
 
 
 def generate_local_certificate(common_name=socket.gethostname(), country_name=u'CA',
-                            state_or_province=u'Québec', locality_name=u'Sherbrooke',
-                            organization_name=u'Université de Sherbrooke'):
+                               state_or_province=u'State_Or_Province', locality_name=u'Locality Name',
+                               organization_name=u'Organization Name', email=u'test@noemail.com'):
 
     result = {}
 
@@ -128,7 +128,7 @@ def generate_local_certificate(common_name=socket.gethostname(), country_name=u'
         x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, state_or_province),
         x509.NameAttribute(NameOID.LOCALITY_NAME, locality_name),
         x509.NameAttribute(NameOID.ORGANIZATION_NAME, organization_name),
-        x509.NameAttribute(NameOID.EMAIL_ADDRESS, u'test@noemail.com')
+        x509.NameAttribute(NameOID.EMAIL_ADDRESS, email)
     ])
 
     builder = x509.CertificateSigningRequestBuilder()
@@ -218,17 +218,17 @@ def generate_local_certificate_with_csr(csr, ca_info):
     # # WARNING, subject needs to be verified by CA, do not use csr subject
     builder = builder.subject_name(
         x509.Name([
-            x509.NameAttribute(NameOID.COMMON_NAME, u'10.0.1.8'),
+            x509.NameAttribute(NameOID.COMMON_NAME, u'127.0.0.1'),
             x509.NameAttribute(NameOID.COUNTRY_NAME, u'CA'),
-            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u'QC'),
-            x509.NameAttribute(NameOID.LOCALITY_NAME, u'Sherbrooke'),
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u'UdeS'),
+            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u'State'),
+            x509.NameAttribute(NameOID.LOCALITY_NAME, u'Locality'),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u'Organization'),
             x509.NameAttribute(NameOID.EMAIL_ADDRESS, u'test@noemail.com')
         ])
     )
 
     builder = builder.add_extension(
-        x509.SubjectAlternativeName([x509.DNSName(u'10.0.1.8')]),
+        x509.SubjectAlternativeName([x509.DNSName(u'localhost')]),
         critical=False
     )
 
@@ -260,20 +260,6 @@ def generate_device_certificate(csr, ca_info, device_uuid):
 
     ca = ca_info['certificate']
     ca_key = ca_info['private_key']
-
-    # # WARNING, subject needs to be verified by CA, do not use csr subject
-    # builder = builder.subject_name(
-    #     x509.Name([
-    #         x509.NameAttribute(NameOID.COMMON_NAME, u'10.0.1.8'),
-    #         x509.NameAttribute(NameOID.USER_ID, str(device_uuid)),
-    #         x509.NameAttribute(NameOID.COUNTRY_NAME, u'CA'),
-    #         x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u'QC'),
-    #         x509.NameAttribute(NameOID.LOCALITY_NAME, u'Sherbrooke'),
-    #         x509.NameAttribute(NameOID.ORGANIZATION_NAME, u'UdeS'),
-    #         x509.NameAttribute(NameOID.EMAIL_ADDRESS, u'test@noemail.com')
-    #     ])
-    # )
-
 
     builder = builder.subject_name(
         x509.Name([
@@ -321,7 +307,6 @@ if __name__ == '__main__':
 
     write_private_key_and_certificate(local_info, keyfile=current_path + '/../../certificates/site_key.pem',
                                       certfile=current_path + '/../../certificates/site_cert.pem')
-
 
     # # Generate signing request
     # client_info = create_certificate_signing_request(device_name='Test Device')

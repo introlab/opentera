@@ -300,13 +300,12 @@ function enlargeView(local, index){
             setCurrentUserLayout(layouts.LARGEVIEW, false, view_id);
         }
     }else{
-        setLargeView(view_id);
+        setLargeView(view_id, false);
     }
 
-
     // Update layouts
-    updateUserRemoteViewsLayout(remoteStreams.length);
     updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    updateUserRemoteViewsLayout(remoteStreams.length);
 
 }
 
@@ -386,9 +385,12 @@ function showError(err_context, err_msg, ui_display, show_retry=true){
     }
 }
 
-function showStatusMsg(status_msg){
+function showStatusMsg(status_msg, timeout = -1){
     $('#statusLabel')[0].innerHTML = status_msg;
     $('#statusAlert').show();
+    if (timeout > 0 ){
+        setTimeout(clearStatusMsg, timeout);
+    }
 }
 
 function clearStatusMsg(){
@@ -482,6 +484,11 @@ function updateLocalConfig(new_config){
         // Mirror changed
         currentConfig['video1Mirror'] = new_config['video1Mirror'];
         setMirror(currentConfig['video1Mirror'], true, 1);
+        if (teraConnected){
+            // Also set shared object status
+            if (SharedObject.setLocalMirror !== undefined)
+                SharedObject.setLocalMirror(currentConfig['video1Mirror']);
+        }
     }
 
     if (new_config['currentVideoSource2Index'] !== currentConfig['currentVideoSource2Index'] ||
@@ -512,11 +519,27 @@ function getTitle(local, index){
     return title;
 }
 
-function showPTZControls(local, index, zoom, presets, settings){
+function setRecordingStatus(local, index, status){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let elem = view_prefix + 'ViewRec' + index;
+    if (status === true)
+        showElement(elem);
+    else
+        hideElement(elem);
+}
+
+function showPTZControls(local, index, zoom, presets, settings, camera = undefined){
     let view_prefix = ((local === true) ? 'local' : 'remote');
     let zoomControls = $("#" + view_prefix + "ZoomButtons" + index);
     let presetControls = $("#" + view_prefix + "PresetButtons" + index);
     let settingsControl = $("#" + view_prefix + "SettingsButton" + index);
+
+    // If not current selected camera and not PTZ for all camera, then hide buttons
+    if (!isCurrentCameraPTZ()){
+        zoom = false;
+        presets = false;
+        settings = false;
+    }
 
     (zoom === true) ? zoomControls.show() : zoomControls.hide();
     (presets === true) ? presetControls.show() : presetControls.hide();
@@ -551,22 +574,24 @@ function refreshRemoteStatusIcons(peerid){
 
     let status = remoteContacts[card_index].status;
 
-    if (status.micro !== undefined) {
-        updateStatusIconState(status.micro, false, index + 1, "Mic");
-    }
+    if (status !== undefined){
+        if (status.micro !== undefined) {
+            updateStatusIconState(status.micro, false, index + 1, "Mic");
+        }
 
-    if (status.micro2 !== undefined){
-        let index2 = getStreamIndexForPeerId(peerid, "2ndStream");
-        if (index2)
-            updateStatusIconState(status.micro2, false, index2+1, "Mic");
-    }
+        if (status.micro2 !== undefined){
+            let index2 = getStreamIndexForPeerId(peerid, "2ndStream");
+            if (index2)
+                updateStatusIconState(status.micro2, false, index2+1, "Mic");
+        }
 
-    if (status.speaker !== undefined) {
-        updateStatusIconState(status.speaker, false, index + 1, "Speaker");
-    }
+        if (status.speaker !== undefined) {
+            updateStatusIconState(status.speaker, false, index + 1, "Speaker");
+        }
 
-    if (status.video !== undefined) {
-        updateStatusIconState(status.video, false, index + 1, "Video");
+        if (status.video !== undefined) {
+            updateStatusIconState(status.video, false, index + 1, "Video");
+        }
     }
 }
 
@@ -606,7 +631,7 @@ function muteSpeakerAll(){
 function showChronosDialog(){
     let partSelect = $('#chronosPartSelect')[0];
     partSelect.options.length = 0;
-    partSelect.options[partSelect.options.length] = new Option("Tous", "0");
+    partSelect.options[partSelect.options.length] = new Option(translator.translateForKey("chronosDialog.all", currentLang), "0");
 
     for (let i=0; i<remoteContacts.length; i++){
         let index = getStreamIndexForPeerId(remoteContacts[i].peerid, 'default');
@@ -614,6 +639,7 @@ function showChronosDialog(){
             partSelect.options[partSelect.options.length] = new Option(getTitle(false, index+1), index+1);
         }
     }
+    partSelect.options[partSelect.options.length] = new Option(translator.translateForKey("chronosDialog.self", currentLang), "-1");
 
     $('#chronosDialog').modal('show');
 
@@ -757,6 +783,14 @@ function resizeCanvasOverElement(canvas, element)
     cv.width = w;
     cv.height =h;
 }
+
+$(document).on('change', '#optChronoType1, #optChronoType2', function(){
+    if ($('#optChronoType1')[0].checked === true){
+        $('#chronosDuration').show();
+    }else{
+        $('#chronosDuration').hide();
+    }
+});
 
 /*
 $(document).on('mouseenter', '.dropup', function() {

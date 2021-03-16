@@ -1,6 +1,8 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="fr">
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <head>
     <title data-i18n="header.title-user">OpenTeraPlus - Vue utilisateur</title>
 
@@ -24,6 +26,12 @@
     <script src="js/tera_medias.js"></script>
     <script src="js/tera_tools.js"></script>
 
+    <!-- Streams recorders -->
+    <script src="js/recordrtc/RecordRTC.js"></script>
+    <script src="js/recordrtc/EBML.js"></script>
+    <script src="js/tera_recorder.js"></script>
+
+    <!-- Translator -->
     <script src="js/simpletranslator/translator.min.js"></script>
 
     <script>
@@ -102,29 +110,43 @@
 
             </div>
             <div class="modal-body">
-                <div class="form-group row pr-2">
-                    <label for="chronosPartSelect" class="col-form-label col-4" data-i18n="chronosDialog.participants">Participant(s): </label>
-                    <select id="chronosPartSelect" class="col"></select>
-                </div>
-                <div class="form-group row pr-2">
-                    <label for="chronosTitleSelect" class="col-form-label col-4" data-i18n="chronosDialog.chrono-label">Type: </label>
-                    <select id="chronosTitleSelect" class="col">
-                        <option value="Exercices" data-i18n="chronosDialog.label-exercices">Exercices</option>
-                        <option value="Repos" data-i18n="chronosDialog.label-rest">Repos</option>
-                    </select>
-                </div>
-                <div class="form-group row pr-2">
-                    <label for="chronosDurationSelect" class="col-form-label col-4" data-i18n="chronosDialog.duration">Durée: </label>
-                    <select id="chronosDurationSelect" class="col">
-                        <option value="15">00:15</option>
-                        <option value="30">00:30</option>
-                        <option value="60">01:00</option>
-                        <option value="120">02:00</option>
-                        <option value="300">05:00</option>
-                        <option value="600">10:00</option>
-                        <option value="900">15:00</option>
-                    </select>
-                </div>
+                <form id="chronosForm">
+                    <div class="form-group row pr-2">
+                        <label for="chronosPartSelect" class="col-form-label col-4" data-i18n="chronosDialog.participants">Participant(s): </label>
+                        <select id="chronosPartSelect" class="col combobox"></select>
+                    </div>
+                    <div class="form-group row pr-2">
+                        <label for="chronosTitleSelect" class="col-form-label col-4" data-i18n="chronosDialog.chrono-label">Libellé: </label>
+                        <select id="chronosTitleSelect" class="col combobox">
+                            <option value="" data-i18n="chronosDialog.label-none" selected>(Aucun)</option>
+                            <option value="Exercices" data-i18n="chronosDialog.label-exercices">Exercices</option>
+                            <option value="Repos" data-i18n="chronosDialog.label-rest">Repos</option>
+                        </select>
+                    </div>
+                    <div class="form-group row pr-2">
+                        <label for="chronosTypeRadio" class="col-form-label col-4" data-i18n="chronosDialog.chrono-type">Type: </label>
+                        <div id="chronosTypeRadio" class="col col-form-label pl-0">
+                            <input id="optChronoType1" value=1 class="mr-1" type="radio" name="optChronoType" data-i18n="chronosDialog.chrono-countdown" checked /><label class="radio-inline pr-2" for="optChronoType1">Décompte</label>
+                            <input id="optChronoType2" value=2 class="mr-1" type="radio" name="optChronoType" data-i18n="chronosDialog.chrono-countup" /><label class="radio-inline" for="optChronoType2">Chronomètre</label>
+                        </div>
+                    </div>
+                    <div id="chronosDuration" class="form-group row pr-2">
+                        <label for="chronosDurationMinutes" class="col-form-label col-4" data-i18n="chronosDialog.duration">Durée: </label>
+                        <!--<select id="chronosDurationSelect" class="col combobox">
+                            <option value="15">00:15</option>
+                            <option value="30">00:30</option>
+                            <option value="60">01:00</option>
+                            <option value="120">02:00</option>
+                            <option value="300">05:00</option>
+                            <option value="600">10:00</option>
+                            <option value="900">15:00</option>
+                        </select>-->
+                        <input id="chronosDurationMinutes" class="col-2" type="number" min="0" max="55" step="1" value="0" />
+                        <label class="col-form-label col-2" data-i18n="chronosDialog.minutes">minutes</label>
+                        <input id="chronosDurationSeconds" class="col-2" type="number" min="0" max="55" step="5" value="30" />
+                        <label class="col-form-label col-2" data-i18n="chronosDialog.seconds">secondes</label>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" id="chronosStart" class="btn btn-success" data-dismiss="modal"
@@ -143,18 +165,16 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="measureDialogLongTitle" data-i18n="measureDialog.title">Mesures</h5>
-
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="form-group row pr-2">
                     <label for="measurePartSelect" class="col-form-label col-2" data-i18n="measureDialog.participant">Participant: </label>
-                    <select id="measurePartSelect" class="col" onchange="onMeasureParticipantChanged();"></select>
+                    <select id="measurePartSelect" class="col combobox" onchange="onMeasureParticipantChanged();"></select>
                 </div>
-                <div class="form-group text-center" id="measureAnglesTools" style="display:none;">
-                    <button type="button" id="btnResetAngles" class="btn btn-info" data-i18n="measureDialog.reset" onclick="clearAngleMeasurement();">Reset</button>
-                    <label id="lblMeasureAngles" class="measure-text ml-5" data-i18n="measureDialog.angle">Angle:</label>
-                    <span class="badge badge-primary measure-text" id="lblMeasureAnglesValue" data-i18n="measureDialog.n-a">N/D</span>
-                </div>
+
                 <div style="text-align: center;">
                     <canvas class="video-canvas" id="measureVideoCanvas" style="display:none;"></canvas>
                     <video id="measureVideo" muted="muted" class="preview-video" onpause="resizeCanvasOverElement('measureVideoCanvas', this);"></video>
@@ -162,6 +182,12 @@
                 <div style="text-align: center;">
                     <button type="button" id="btnMeasureAngles" class="btn btn-success" data-toggle="button" aria-pressed="false"
                             data-i18n="measureDialog.measure-angle" onclick="onAngleMeasurementToggle();">Angle</button>
+                    <div id="measureAnglesTools" style="display:none;">
+                        <button type="button" id="btnResetAngles" class="btn btn-info" data-i18n="measureDialog.reset" onclick="clearAngleMeasurement();">Reset</button>
+                        <label id="lblMeasureAngles" class="measure-text ml-5" data-i18n="measureDialog.angle">Angle:</label>
+                        <span class="badge badge-primary measure-text" id="lblMeasureAnglesValue" data-i18n="measureDialog.n-a">N/D</span> /
+                        <span class="badge badge-primary measure-text" id="lblMeasureAnglesCompValue" data-i18n="measureDialog.n-a">N/D</span>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -201,6 +227,7 @@
 <!-- Main container -->
 <div class="container-fluid h-100" id="mainContainer" style="display: none">
     <div class="row h-100" id="row1">
+
         <div class="d-flex flex-column col-3" id="localViews">
             <div class="row flex-grow-1" id="localView1Row">
                 <!------------------------------ LOCAL VIEW #1 -------------------------------------------------------->
@@ -210,33 +237,73 @@
                      oncontextmenu="resetInactiveTimer(true, 1);showButtons(true, true, 1);">
 
                     <span class="badge badge-info" id="localViewTitle1">Vue locale #1</span>
+                    <span class="badge badge-danger text-white-50" id="localViewRec1" style="display:none;">REC</span>
                     <!-- Video controls -->
                     <div id="localVideoControls1" class="overlay-top-right" style="">
-                        <input id="localBtnStar1" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(true, 1);event.stopPropagation();" style="display: none;"/>
-                        <input id="localBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(true,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localBtnStar1" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(true, 1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localBtnSwapVideo1" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(true,1);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Text display -->
                     <div id="localDisplay1" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="localText1">Temps restant: xx:xx</label>
+                        <label class="chrono" id="localText1" onclick="stopChrono(true, 1);">Temps restant: xx:xx</label>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="localViewControls1" class="overlay-bottom-center">
-                        <input id="localConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(true, 1);event.stopPropagation();" style="display: none;"/>
-                        <input id="localMicStatus1" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(true,1);event.stopPropagation();" style="display: none;"/>
-                        <input id="localVideoStatus1" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(true,1);event.stopPropagation();" style="display: none;"/>
-                        <input id="localSpeakerStatus1" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(true,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localConfig1" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(true, 1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localMicStatus1" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(true,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localVideoStatus1" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(true,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localSpeakerStatus1" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(true,1);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Video sources controls -->
-                    <div id="localViewCameras1" class="overlay-bottom-left">
-                        <input id="localVideoSwap1" type="image" alt="image" src="images/videoswap.png" height=32 onclick="swapVideoSource(true, 1); event.stopPropagation();" style="display:none;"/>
+                    <div id="localViewCameras1" class="mb-5 mb-md-0 overlay-bottom-left">
+                        <input id="localVideoSwap1" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(true, 1); event.stopPropagation();" style="display:none;"/>
                     </div>
 
                     <!-- PTZ controls -->
-                    <div id="localPtzControls1" class="overlay-left" oncontextmenu="" onclick="" onwheel="" style="display: none;">
-                        <div id="localZoomButtons1" style="display: none;">
+                    <div id="localPtzControls1" class="overlay-top-center" oncontextmenu="" onclick="" onwheel="" style="display: none;">
+                        <div class="dropdown">
+                            <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="localZoomButtons1" src="images/zoom_custom.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.zoom" style="display:none;"/>
+                            <div class="dropdown-menu bg-secondary" aria-labelledby="localZoomButtons1" >
+                                <div class="dropdown-item text-light" onclick="zoomMax(true, 1);">
+                                    <input class="tool-icon" id="btnLocalPTZZoomMax" type="image" alt="image" src="images/Zoom-max.png" />
+                                    <label data-i18n="ui.zoom-max">Max</label>
+                                </div>
+                                <div class="dropdown-item text-light" onclick="zoomIn(true, 1);">
+                                    <input class="tool-icon" id="btnLocalPTZZoomIn" type="image" alt="image" src="images/Zoom-in1.png"/>
+                                    <label data-i18n="ui.zoom-in">In</label>
+                                </div>
+                                <div class="dropdown-item text-light" onclick="zoomOut(true, 1);">
+                                    <input class="tool-icon" id="btnLocalPTZZoomOut" type="image" alt="image" src="images/Zoom-out1.png"/>
+                                    <label data-i18n="ui.zoom-out">Out</label>
+                                </div>
+                                <div class="dropdown-item text-light" onclick="zoomMin(true, 1);">
+                                    <input class="tool-icon" id="btnLocalPTZZoomMin" type="image" alt="image" src="images/Zoom-min.png"/>
+                                    <label data-i18n="ui.zoom-min">Min</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="localPresetButtons1" src="images/presets.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.presets" style="display:none;"/>
+                            <div class="dropdown-menu bg-secondary" aria-labelledby="localPresetButtons1">
+                                <div class="dropdown-item text-light" onclick="gotoPreset(event, true, 1, 1);">
+                                    <label data-i18n="ui.preset-1">Position 1</label>
+                                </div>
+                                <div class="dropdown-item text-light" onclick="gotoPreset(event, true, 1, 2);">
+                                    <label data-i18n="ui.preset-2">Position 2</label>
+                                </div>
+                                <div class="dropdown-item text-light" onclick="gotoPreset(event, true, 1, 3);">
+                                    <label data-i18n="ui.preset-3">Position 3</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <input class="btn bg-secondary text-light image-icon" id="localSettingsButton1" type="image" alt="image" src="images/settings.png" onclick="camSettings(true, 1);event.stopPropagation();" style="display: none;"/>
+                        </div>
+
+                        <!--<div id="localZoomButtons1" style="display: none;">
                             <input type="image" alt="Zoom Max" src="images/Zoom-max.png" height=22 onclick="zoomMax(true, 1);;event.stopPropagation();"/>
                             <input type="image" alt="Zoom In" src="images/Zoom-in1.png" height=22 onclick="zoomIn(true, 1);event.stopPropagation();event.stopPropagation();"/>
                             <input type="image" alt="Zoom Out" src="images/Zoom-out1.png" height=22 onclick="zoomOut(true, 1);event.stopPropagation();"/>
@@ -249,13 +316,13 @@
                         </div>
                         <div id="localSettingsButton1" style="display: none;">
                             <input type="image" alt="image" src="images/settings.png" height=22 onclick="camSettings(true, 1);event.stopPropagation();"/>
-                        </div>
+                        </div>-->
                     </div>
                     <!-- Sources controls -->
                     <div id="localSourcesControls1" class="overlay-bottom-right">
-                        <div style="padding-left:20px;padding-top:20px;background-color:rgba(0,0,0,0);">
-                            <input id="localBtnShow2ndVideo1" type="image" alt="image" src="images/show2ndvideo.png" height=32 onclick="btnShow2ndLocalVideoClicked();event.stopPropagation();" style="display: none;"/>
-                            <input id="localBtnShareScreen1" type="image" alt="image" src="images/sharescreen.png" height=32 onclick="btnShareScreenClicked();event.stopPropagation();" style="display: none;"/>
+                        <div style="background-color:rgba(0,0,0,0);">
+                            <input id="localBtnShow2ndVideo1" class="image-icon" type="image" alt="image" src="images/show2ndvideo.png" onclick="btnShow2ndLocalVideoClicked();event.stopPropagation();" style="display: none;"/>
+                            <input id="localBtnShareScreen1" class="image-icon" type="image" alt="image" src="images/sharescreen.png" onclick="btnShareScreenClicked();event.stopPropagation();" style="display: none;"/>
                         </div>
                     </div>
                     <!-- Video ! -->
@@ -275,13 +342,13 @@
 
                     <!-- Video controls -->
                     <div id="localVideoControls2" class="overlay-top-right" style="">
-                        <input id="localBtnStar2" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(true, 2);event.stopPropagation();" style="display: none;"/>
-                        <input id="localBtnSwapVideo2" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(true,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="localBtnStar2" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(true, 2);event.stopPropagation();" style="display: none;"/>
+                        <input id="localBtnSwapVideo2" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(true,2);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="localViewControls2" class="overlay-bottom-center" >
-                        <input id="localMicStatus2" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(true,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="localMicStatus2" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(true,2);event.stopPropagation();" style="display: none;"/>
                         <!--<input id="localVideoStatus2" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(true,2);event.stopPropagation();" style="display: none;"/>
                         <input id="localSpeakerStatus2" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(true,2);event.stopPropagation();" style="display: none;"/>-->
                     </div>
@@ -342,11 +409,12 @@
                      onmouseleave="stopInactiveTimer(false, 1);showButtons(false, false, 1); return false;"
                      oncontextmenu="resetInactiveTimer(false, 1);showButtons(false, true, 1);">
                     <span class="badge badge-primary" id="remoteViewTitle1">Participant #1</span>
+                    <span class="badge badge-danger text-white-50" id="remoteViewRec1" style="display:none;">REC</span>
 
                     <!-- Video controls -->
                     <div id="remoteVideoControls1" class="overlay-top-right" style="">
-                        <input id="remoteBtnStar1" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(false, 1);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteBtnSwapVideo1" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteBtnStar1" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(false, 1);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteBtnSwapVideo1" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(false,1);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Text display -->
@@ -356,15 +424,15 @@
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteViewControls1" class="overlay-bottom-center" >
-                        <input id="remoteConfig1" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(false, 1);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteMicStatus1" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(false,1);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteVideoStatus1" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(false,1);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteSpeakerStatus1" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteConfig1" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(false, 1);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteMicStatus1" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(false,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteVideoStatus1" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(false,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteSpeakerStatus1" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(false,1);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Video source controls -->
                     <div id="remoteViewCameras1" class="overlay-bottom-left">
-                        <input id="remoteVideoSwap1" type="image" alt="image" src="images/videoswap.png" height=32 onclick="swapVideoSource(false, 1); event.stopPropagation();" style="display:none;"/>
+                        <input id="remoteVideoSwap1" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(false, 1); event.stopPropagation();" style="display:none;"/>
                     </div>
 
                     <!-- PTZ controls -->
@@ -403,29 +471,30 @@
                      onmouseleave="stopInactiveTimer(false, 2);showButtons(false, false, 2); return false;"
                      oncontextmenu="resetInactiveTimer(false, 2);showButtons(false, true, 2);">
                     <span class="badge badge-primary" id="remoteViewTitle2">Participant #2</span>
+                    <span class="badge badge-danger text-white-50" id="remoteViewRec2" style="display:none;">REC</span>
 
                     <!-- Video controls -->
                     <div id="remoteVideoControls2" class="overlay-top-right" style="">
-                        <input id="remoteBtnStar2" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(false, 2);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteBtnSwapVideo2" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteBtnStar2" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(false, 2);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteBtnSwapVideo2" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(false,2);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Text display -->
                     <div id="remoteDisplay2" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="remoteText2" onclick="stopChrono(false, 1);">Temps restant: xx:xx</label>
+                        <label class="chrono" id="remoteText2" onclick="stopChrono(false, 2);">Temps restant: xx:xx</label>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteViewControls2" class="overlay-bottom-center" >
-                        <input id="remoteConfig2" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(false, 2);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteMicStatus2" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(false,2);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteVideoStatus2" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(false,2);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteSpeakerStatus2" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteConfig2" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(false, 2);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteMicStatus2" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(false,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteVideoStatus2" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(false,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteSpeakerStatus2" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(false,2);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Video source controls -->
                     <div id="remoteViewCameras2" class="overlay-bottom-left">
-                        <input id="remoteVideoSwap2" type="image" alt="image" src="images/videoswap.png" height=32 onclick="swapVideoSource(false, 2); event.stopPropagation();" style="display:none;"/>
+                        <input id="remoteVideoSwap2" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(false, 2); event.stopPropagation();" style="display:none;"/>
                     </div>
 
                     <!-- PTZ controls -->
@@ -456,28 +525,30 @@
                      onmouseleave="stopInactiveTimer(false, 3);showButtons(false, false, 3); return false;"
                      oncontextmenu="resetInactiveTimer(false, 3);showButtons(false, true, 3);">
                     <span class="badge badge-primary" id="remoteViewTitle3">Participant #3</span>
+                    <span class="badge badge-danger text-white-50" id="remoteViewRec3" style="display:none;">REC</span>
+
                     <!-- Video controls -->
                     <div id="remoteVideoControls3" class="overlay-top-right" style="">
-                        <input id="remoteBtnStar3" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(false, 3);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteBtnSwapVideo3" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,3);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteBtnStar3" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(false, 3);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteBtnSwapVideo3" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(false,3);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Text display -->
                     <div id="remoteDisplay3" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="remoteText3" onclick="stopChrono(false, 1);">Temps restant: xx:xx</label>
+                        <label class="chrono" id="remoteText3" onclick="stopChrono(false, 3);">Temps restant: xx:xx</label>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteViewControls3" class="overlay-bottom-center" >
-                        <input id="remoteConfig3" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(false, 3);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteMicStatus3" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(false,3);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteVideoStatus3" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(false,3);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteSpeakerStatus3" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,3);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteConfig3" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(false, 3);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteMicStatus3" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(false,3);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteVideoStatus3" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(false,3);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteSpeakerStatus3" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(false,3);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Video source controls -->
                     <div id="remoteViewCameras3" class="overlay-bottom-left">
-                        <input id="remoteVideoSwap3" type="image" alt="image" src="images/videoswap.png" height=32 onclick="swapVideoSource(false, 3); event.stopPropagation();" style="display:none;"/>
+                        <input id="remoteVideoSwap3" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(false, 3); event.stopPropagation();" style="display:none;"/>
                     </div>
 
                     <!-- PTZ controls -->
@@ -509,29 +580,30 @@
                      onmouseleave="stopInactiveTimer(false, 4);showButtons(false, false, 4); return false;"
                      oncontextmenu="resetInactiveTimer(true, 4);showButtons(false, true, 4);">
                     <span class="badge badge-primary" id="remoteViewTitle4">Participant #4</span>
+                    <span class="badge badge-danger text-white-50" id="remoteViewRec4" style="display:none;">REC</span>
 
                     <!-- Video controls -->
                     <div id="remoteVideoControls4" class="overlay-top-right" style="">
-                        <input id="remoteBtnStar4" type="image" alt="image" src="images/star.png" height=32 onclick="selectPrimaryView(false, 4);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteBtnSwapVideo4" type="image" alt="image" src="images/swap.png" height=32 onclick="enlargeView(false,4);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteBtnStar4" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(false, 4);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteBtnSwapVideo4" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(false,4);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Text display -->
                     <div id="remoteDisplay4" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="remoteText4" onclick="stopChrono(false, 1);">Temps restant: xx:xx</label>
+                        <label class="chrono" id="remoteText4" onclick="stopChrono(false, 4);">Temps restant: xx:xx</label>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="remoteViewControls4" class="overlay-bottom-center" >
-                        <input id="remoteConfig4" type="image" alt="image" src="images/config.png" height=32 onclick="btnConfigClicked(false, 4);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteMicStatus4" type="image" alt="image" src="images/mic.png" height=32 onclick="muteMicro(false,4);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteVideoStatus4" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(false,4);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteSpeakerStatus4" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(false,4);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteConfig4" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(false, 4);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteMicStatus4" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(false,4);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteVideoStatus4" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(false,4);event.stopPropagation();" style="display: none;"/>
+                        <input id="remoteSpeakerStatus4" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(false,4);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Video sources controls -->
                     <div id="remoteViewCameras4" class="overlay-bottom-left">
-                        <input id="remoteVideoSwap4" type="image" alt="image" src="images/videoswap.png" height=32 onclick="swapVideoSource(false, 4); event.stopPropagation();" style="display:none;"/>
+                        <input id="remoteVideoSwap4" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(false, 4); event.stopPropagation();" style="display:none;"/>
                     </div>
 
                     <!-- PTZ controls -->

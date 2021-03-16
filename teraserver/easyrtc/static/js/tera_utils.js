@@ -11,6 +11,7 @@ function calculateContainsWindow(image){
   const imagePositions = imageComputedStyle.getPropertyValue("object-position").split(" ");
   let naturalWidth = image.naturalWidth;
   let naturalHeight = image.naturalHeight;
+
   if( image.tagName === "VIDEO" ) {
     naturalWidth= image.videoWidth;
     naturalHeight= image.videoHeight;
@@ -19,6 +20,7 @@ function calculateContainsWindow(image){
   const verticalPercentage = parseInt(imagePositions[1]) / 100;
   const naturalRatio = naturalWidth / naturalHeight;
   const visibleRatio = image.clientWidth / image.clientHeight;
+
   if (imageObjectFit === "none")
   {
     coordinates.sourceWidth = image.clientWidth;

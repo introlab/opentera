@@ -1,5 +1,6 @@
 from math import floor
 import datetime
+import traceback
 from services.BureauActif.libbureauactif.db.Base import db
 from services.BureauActif.libbureauactif.db.models.BureauActifCalendarDay import BureauActifCalendarDay
 from services.BureauActif.libbureauactif.db.models.BureauActifCalendarData import BureauActifCalendarData
@@ -62,46 +63,48 @@ class DBManagerBureauActifDataProcess:
         self.data = raw_data['data']
         self.desk_config = raw_data['config']
         self.timers = raw_data['timers']
-
-        # Sort data by time -> use when time on pi de-sync - to remove once the time on pi is fixed
-        # self.data = sorted(self.data, key=lambda x: datetime.datetime.fromisoformat(x[0].lstrip(' ')))
-
         uuid_participant = file_db_entry.data_participant_uuid
-        date_str = raw_data['data'][0][0].lstrip(' ')
-        date = datetime.datetime.fromisoformat(date_str)
-        self.create_calendar_objects(uuid_participant, date)
-        self.create_timeline(uuid_participant, date)
+        
+        try:
+            date_str = raw_data['data'][0][0].lstrip(' ')
+            date = datetime.datetime.fromisoformat(date_str)
+            self.create_calendar_objects(uuid_participant, date)
+            self.create_timeline(uuid_participant, date)
 
-        entries_before_position_change = 0  # Counter of loops before a change of position
-        is_standing = False
-        # 0: datetime, 1: height, 2: button state, 3: presence, 4: expected height
-        for index, val in enumerate(self.data):
-            desk_height = float(val[1])
-            self.expected_desk_height = float(val[4])
+            entries_before_position_change = 0  # Counter of loops before a change of position
+            is_standing = False
+            # 0: datetime, 1: height, 2: button state, 3: presence, 4: expected height
+            for index, val in enumerate(self.data):
+                desk_height = float(val[1])
+                self.expected_desk_height = float(val[4])
 
-            was_standing = is_standing  # Save previous position to check if it changed
-            # Check if desk is in standing position (true) or in seating position (false)
-            is_standing = self.is_desk_up(desk_height)
+                was_standing = is_standing  # Save previous position to check if it changed
+                # Check if desk is in standing position (true) or in seating position (false)
+                is_standing = self.is_desk_up(desk_height)
 
-            self.previous_is_config_respected = self.is_config_respected  # Save if last entry was respecting config
-            # Check if the desk's height matches the expected height
-            self.is_config_respected = self.check_if_config_respected(is_standing)
+                self.previous_is_config_respected = self.is_config_respected  # Save if last entry was respecting config
+                # Check if the desk's height matches the expected height
+                self.is_config_respected = self.check_if_config_respected(is_standing)
 
-            # Check if gap between timestamp of data, meaning no one was present in front of the sensor
-            absent_time = self.get_absent_time(index)
+                # Check if gap between timestamp of data, meaning no one was present in front of the sensor
+                absent_time = self.get_absent_time(index)
 
-            # Check if last entry or position changed or gap in the timeline (absence)
-            if self.is_last_data(index) or was_standing != is_standing or \
-                    absent_time != 0 or self.previous_is_config_respected != self.is_config_respected:
-                self.update_position(was_standing, index, entries_before_position_change)
-                self.update_last_timeline_entry(absent_time, 4, index, entries_before_position_change)
-                entries_before_position_change = 0
-            else:
-                entries_before_position_change += 1
+                # Check if last entry or position changed or gap in the timeline (absence)
+                if self.is_last_data(index) or was_standing != is_standing or \
+                        absent_time != 0 or self.previous_is_config_respected != self.is_config_respected:
+                    self.update_position(was_standing, index, entries_before_position_change)
+                    self.update_last_timeline_entry(absent_time, 4, index, entries_before_position_change)
+                    entries_before_position_change = 0
+                else:
+                    entries_before_position_change += 1
 
-        self.update_expected_data(self.first_position_is_seating())  # Find first position of the day
-        self.save_calendar_data()
-
+            self.update_expected_data(self.first_position_is_seating())  # Find first position of the day
+            self.save_calendar_data()
+        except Exception as error:
+            print("An error occured during data processing for participant " + str(uuid_participant) + ", file " + str(
+                file_db_entry.data_name) + ". Error below.")
+            traceback.print_exception(type(error), error, error.__traceback__)
+        
     def get_absent_time(self, current_index):
         if current_index > 0:
             past_data = self.get_time(current_index - 1)
