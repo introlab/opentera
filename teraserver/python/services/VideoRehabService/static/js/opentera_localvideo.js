@@ -45,14 +45,16 @@ function fillVideoSourceList(selected_source=undefined){
 	.then(function(devices) {
 		devices.forEach(function(device) {
 			if (device.kind === "videoinput"){
-				videoSources[videoSources.length] = device;
-				//select.options[select.options.length] = new Option(device.label.substring(0,device.label.length-12), device.id);
-				select.options[select.options.length] = new Option(device.label, device.id);
-				count++;
-				if (count<2){
-					hideElement("videoSelect"); // Hide if only one video source
-				}else{
-					showElement("videoSelect");
+				if (!device.label.includes(" IR ")) { // Filter "IR" camera, since they won't work.
+					videoSources[videoSources.length] = device;
+					//select.options[select.options.length] = new Option(device.label.substring(0,device.label.length-12), device.id);
+					select.options[select.options.length] = new Option(device.label, device.id);
+					count++;
+					if (count < 2) {
+						hideElement("videoSelect"); // Hide if only one video source
+					} else {
+						showElement("videoSelect");
+					}
 				}
 			}
 			//console.log(device.kind + ": " + device.label + " id = " + device.deviceId);
