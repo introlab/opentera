@@ -8,9 +8,6 @@ from google.protobuf.json_format import MessageToJson
 
 login_api_endpoint = '/api/device/login'
 
-publisher = None
-event_publisher = None
-
 
 async def fetch(client, url, params=None):
     if params is None:
