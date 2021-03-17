@@ -47,6 +47,27 @@ class UserManagerModule(BaseModule):
 
         self.rpc_api['status_devices'] = {'args': [], 'returns': 'dict', 'callback': self.status_devices_rpc_callback}
 
+        self.rpc_api['update_device_status'] = {
+            'args': ['str:uuid', 'str:status'],
+            'returns': 'dict',
+            'callback': self.update_device_status_rpc_callback}
+
+    def update_device_status_rpc_callback(self, uuid: str, status: str):
+        if uuid in self.device_registry.online_devices():
+            self.device_registry.device_update_status(uuid, status)
+            # Send notification
+            from opentera.db.models.TeraDevice import TeraDevice
+            device_data = TeraDevice.get_device_by_uuid(uuid)
+            device_event = DeviceEvent()
+            device_event.device_name = device_data.device_name
+            device_event.device_uuid = uuid
+            device_event.device_status = status
+            device_event.type = DeviceEvent.DEVICE_STATUS_CHANGED
+            self.send_event_message(device_event, self.event_topic_name())
+            return {'uuid': uuid, 'status': status}
+        else:
+            return None
+
     def online_users_rpc_callback(self, *args, **kwargs):
         # print('online_users_rpc_callback', args, kwargs)
         return self.user_registry.online_users()
