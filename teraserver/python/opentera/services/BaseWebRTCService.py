@@ -43,122 +43,10 @@ class BaseWebRTCService(ServiceOpenTera):
     @defer.inlineCallbacks
     def register_to_events(self):
         # Need to register to events produced by UserManagerModule
-        ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+        ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
             ModuleNames.USER_MANAGER_MODULE_NAME), self.user_manager_event_received)
 
-        print('register_to_events: ', ret)
-
-    def user_manager_event_received(self, pattern, channel, message):
-        print('BaseWebRTCService - user_manager_event_received', pattern, channel, message)
-        try:
-            tera_event = messages.TeraEvent()
-            if isinstance(message, str):
-                ret = tera_event.ParseFromString(message.encode('utf-8'))
-            elif isinstance(message, bytes):
-                ret = tera_event.ParseFromString(message)
-
-            user_event = messages.UserEvent()
-            participant_event = messages.ParticipantEvent()
-            device_event = messages.DeviceEvent()
-
-            # Look for UserEvent, ParticipantEvent, DeviceEvent
-            for any_msg in tera_event.events:
-                if any_msg.Unpack(user_event):
-                    self.handle_user_event(user_event)
-                if any_msg.Unpack(participant_event):
-                    self.handle_participant_event(participant_event)
-                if any_msg.Unpack(device_event):
-                    self.handle_device_event(device_event)
-
-        except DecodeError as d:
-            print('BaseWebRTCService - DecodeError ', pattern, channel, message, d)
-        except ParseError as e:
-            print('BaseWebRTCService - Failure in redisMessageReceived', e)
-
-    def handle_user_event(self, event: messages.UserEvent):
-        print('BaseWebRTCService.handle_user_event', event)
-        # Verify each session
-        for id_session in self.sessions:
-            session_info = self.sessions[id_session]
-
-            # Verify if it contains the user_uuid
-            if event.user_uuid in session_info['session_users']:
-                # Verify the event type
-                if event.type == messages.UserEvent.USER_CONNECTED:
-                    # Resend invitation to newly connected user
-                    print('Resending invitation to ', event, session_info)
-
-                    self.send_join_message(session_info=session_info, target_devices=[], target_participants=[],
-                                           target_users=[event.user_uuid])
-
-                elif event.type == messages.UserEvent.USER_DISCONNECTED:
-                    # Terminate session if last user ?
-                    if 'session_creator_user_uuid' in session_info:
-                        if session_info['session_creator_user_uuid'] == event.user_uuid:
-                            manage_session_args = {'id_session': id_session}
-                            self.manage_stop_session(manage_session_args)
-                            # End loop, sessions dict will be changed in manage_stop_session
-                            break
-
-    def handle_participant_event(self, event: messages.ParticipantEvent):
-        print('BaseWebRTCService.handle_participant_event', event)
-        # Verify each session
-        for id_session in self.sessions:
-            session_info = self.sessions[id_session]
-
-            # Verify if it contains the user_uuid
-            if event.participant_uuid in session_info['session_participants']:
-                # Verify the event type
-                if event.type == messages.ParticipantEvent.PARTICIPANT_CONNECTED:
-                    # Resend invitation to newly connected user
-                    print('Resending invitation to ', event, session_info)
-
-                    self.send_join_message(session_info=session_info, target_devices=[],
-                                           target_participants=[event.participant_uuid], target_users=[])
-
-                elif event.type == messages.ParticipantEvent.PARTICIPANT_DISCONNECTED:
-                    # Nothing to do?
-                    pass
-
-    def handle_device_event(self, event: messages.DeviceEvent):
-        print('BaseWebRTCService.handle_device_event', event)
-        # Verify each session
-        for id_session in self.sessions:
-            session_info = self.sessions[id_session]
-
-            # Verify if it contains the user_uuid
-            if event.device_uuid in session_info['session_devices']:
-                # Verify the event type
-                if event.type == messages.DeviceEvent.DEVICE_CONNECTED:
-                    # Resend invitation to newly connected user
-                    print('Resending invitation to ', event, session_info)
-
-                    self.send_join_message(session_info=session_info, target_devices=[event.device_uuid],
-                                           target_participants=[], target_users=[])
-
-                elif event.type == messages.DeviceEvent.DEVICE_DISCONNECTED:
-                    # Nothing to do?
-                    pass
-
-    def setup_rpc_interface(self):
-        self.rpc_api['session_manage'] = {'args': ['str:json_info'],
-                                          'returns': 'dict',
-                                          'callback': self.session_manage}
-
-    def post_session_event(self, event_type: int, id_session: int, event_text: str = None) -> Response:
-        from datetime import datetime
-        api_req = {'session_event': {'id_session_event': 0,
-                                     'id_session': id_session,
-                                     'id_session_event_type': event_type,
-                                     'session_event_datetime': str(datetime.now()),
-                                     'session_event_context': self.service_info['service_key']
-                                     }
-                   }
-
-        if event_text:
-            api_req['session_event']['session_event_text'] = event_text
-
-        return self.post_to_opentera('/api/service/sessions/events', api_req)
+        print(ret1)
 
     def send_join_message(self, session_info, join_msg: str = gettext('Join me!'), target_users: list = None,
                           target_participants: list = None, target_devices: list = None):
@@ -211,8 +99,156 @@ class BaseWebRTCService(ServiceOpenTera):
                                     + device_uuid + '.events')
 
         # Send event to UserManager to change "busy" status
-        self.send_tera_message(join_message, 'service.' + self.service_info['service_key'],
+        self.send_tera_message(join_message, 'service.VideoRehabService',
                                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
+
+    def user_manager_event_received(self, pattern, channel, message):
+        print('VideoRehabService - user_manager_event_received', pattern, channel, message)
+        try:
+            tera_event = messages.TeraEvent()
+            if isinstance(message, str):
+                ret = tera_event.ParseFromString(message.encode('utf-8'))
+            elif isinstance(message, bytes):
+                ret = tera_event.ParseFromString(message)
+
+            user_event = messages.UserEvent()
+            participant_event = messages.ParticipantEvent()
+            device_event = messages.DeviceEvent()
+
+            # Look for UserEvent, ParticipantEvent, DeviceEvent
+            for any_msg in tera_event.events:
+                if any_msg.Unpack(user_event):
+                    self.handle_user_event(user_event)
+                if any_msg.Unpack(participant_event):
+                    self.handle_participant_event(participant_event)
+                if any_msg.Unpack(device_event):
+                    self.handle_device_event(device_event)
+
+        except DecodeError as d:
+            print('VideoRehabService - DecodeError ', pattern, channel, message, d)
+        except ParseError as e:
+            print('VideoRehabService - Failure in redisMessageReceived', e)
+
+    def handle_user_event(self, event: messages.UserEvent):
+        print('VideoRehabService.handle_user_event', event)
+        # Verify each session
+        for id_session in self.sessions:
+            session_info = self.sessions[id_session]
+
+            # Verify if it contains the user_uuid
+            if event.user_uuid in session_info['session_users']:
+                # Verify the event type
+                if event.type == messages.UserEvent.USER_CONNECTED:
+                    # Resend invitation to newly connected user
+                    print('Resending invitation to ', event, session_info)
+
+                    self.send_join_message(session_info=session_info, target_devices=[], target_participants=[],
+                                           target_users=[event.user_uuid])
+
+                elif event.type == messages.UserEvent.USER_DISCONNECTED:
+                    # Terminate session if last user ?
+                    if 'session_creator_user_uuid' in session_info:
+                        if session_info['session_creator_user_uuid'] == event.user_uuid:
+                            manage_session_args = {'id_session': id_session}
+                            self.manage_stop_session(manage_session_args)
+                            # End loop, sessions dict will be changed in manage_stop_session
+                            break
+
+    def handle_participant_event(self, event: messages.ParticipantEvent):
+        print('VideoRehabService.handle_participant_event', event)
+        # Verify each session
+        for id_session in self.sessions:
+            session_info = self.sessions[id_session]
+
+            # Verify if it contains the user_uuid
+            if event.participant_uuid in session_info['session_participants']:
+                # Verify the event type
+                if event.type == messages.ParticipantEvent.PARTICIPANT_CONNECTED:
+                    # Resend invitation to newly connected user
+                    print('Resending invitation to ', event, session_info)
+
+                    self.send_join_message(session_info=session_info, target_devices=[],
+                                           target_participants=[event.participant_uuid], target_users=[])
+
+                elif event.type == messages.ParticipantEvent.PARTICIPANT_DISCONNECTED:
+                    # Nothing to do?
+                    pass
+
+    def handle_device_event(self, event: messages.DeviceEvent):
+        print('VideoRehabService.handle_device_event', event)
+        # Verify each session
+        for id_session in self.sessions:
+            session_info = self.sessions[id_session]
+
+            # Verify if it contains the user_uuid
+            if event.device_uuid in session_info['session_devices']:
+                # Verify the event type
+                if event.type == messages.DeviceEvent.DEVICE_CONNECTED:
+                    # Resend invitation to newly connected user
+                    print('Resending invitation to ', event, session_info)
+
+                    self.send_join_message(session_info=session_info, target_devices=[event.device_uuid],
+                                           target_participants=[], target_users=[])
+
+                elif event.type == messages.DeviceEvent.DEVICE_DISCONNECTED:
+                    # Nothing to do?
+                    pass
+
+    def nodejs_webrtc_message_callback(self, pattern, channel, message):
+        print('WebRTCModule - nodejs_webrtc_message_callback', pattern, channel, message)
+        parts = channel.split(".")
+        if len(parts) == 2:
+            session_key = parts[1]
+            print(session_key)
+            if message == 'Ready!':
+                print('Ready!')
+                self.handle_nodejs_session_ready(session_key)
+
+    def get_session_info_from_key(self, session_key):
+        for session_id in self.sessions:
+            if self.sessions[session_id]['session_key'] == session_key:
+                return self.sessions[session_id]
+        return None
+
+    def handle_nodejs_session_ready(self, session_key):
+        # Should send invitations
+        session_info = self.get_session_info_from_key(session_key)
+
+        if session_info:
+            self.send_join_message(session_info=session_info)
+
+    def setup_rpc_interface(self):
+        # TODO Update rpc interface
+        self.rpc_api['session_manage'] = {'args': ['str:json_info'],
+                                          'returns': 'dict',
+                                          'callback': self.session_manage}
+
+        self.rpc_api['participant_info'] = {'args': ['str:participant_uuid'],
+                                            'returns': 'dict',
+                                            'callback': self.participant_info}
+
+    def participant_info(self, participant_uuid):
+        # Getting participant info from uuid
+        params = {'participant_uuid': participant_uuid}
+        response = self.get_from_opentera('/api/service/participants', params)
+        if response.status_code == 200:
+            return response.json()
+        return {}
+
+    def post_session_event(self, event_type: int, id_session: int, event_text: str = None) -> Response:
+        from datetime import datetime
+        api_req = {'session_event': {'id_session_event': 0,
+                                     'id_session': id_session,
+                                     'id_session_event_type': event_type,  # START session event
+                                     'session_event_datetime': str(datetime.now()),
+                                     'session_event_context': self.service_info['service_key']
+                                     }
+                   }
+
+        if event_text:
+            api_req['session_event']['session_event_text'] = event_text
+
+        return self.post_to_opentera('/api/service/sessions/events', api_req)
 
     def session_manage(self, json_str):
 
@@ -300,10 +336,7 @@ class BaseWebRTCService(ServiceOpenTera):
                 session_info['session_events'] = []
 
             # Create start event in session events
-            from opentera.db.models.TeraSessionEvent import TeraSessionEvent
-
-            api_response = self.post_session_event(event_type=TeraSessionEvent.SessionEventTypes.SESSION_START.value,
-                                                   id_session=session_info['id_session'])
+            api_response = self.post_session_event(event_type=3, id_session=session_info['id_session'])
 
             if api_response.status_code != 200:
                 return {'status': 'error', 'error_text': gettext('Cannot create session event')}
@@ -351,29 +384,6 @@ class BaseWebRTCService(ServiceOpenTera):
         else:
             return {'status': 'error', 'error_text': gettext('Cannot create session')}
 
-    def nodejs_webrtc_message_callback(self, pattern, channel, message):
-        print('WebRTCModule - nodejs_webrtc_message_callback', pattern, channel, message)
-        parts = channel.split(".")
-        if len(parts) == 2:
-            session_key = parts[1]
-            print(session_key)
-            if message == 'Ready!':
-                print('Ready!')
-                self.handle_nodejs_session_ready(session_key)
-
-    def get_session_info_from_key(self, session_key):
-        for session_id in self.sessions:
-            if self.sessions[session_id]['session_key'] == session_key:
-                return self.sessions[session_id]
-        return None
-
-    def handle_nodejs_session_ready(self, session_key):
-        # Should send invitations
-        session_info = self.get_session_info_from_key(session_key)
-
-        if session_info:
-            self.send_join_message(session_info=session_info)
-
     def manage_stop_session(self, session_manage_args: dict):
         id_session = session_manage_args['id_session']
         # id_service = session_manage_args['id_service']
@@ -402,13 +412,13 @@ class BaseWebRTCService(ServiceOpenTera):
 
             for session_event in session_info['session_events']:
                 if session_event['id_session_event_type'] == 3:  # START event
-                    time_diff = datetime.now() - datetime.fromisoformat(session_event['session_event_datetime']). \
+                    time_diff = datetime.now() - datetime.fromisoformat(session_event['session_event_datetime']).\
                         replace(tzinfo=None)
                     duration = int(time_diff.total_seconds())
 
             # Default duration
             if duration == 0:
-                time_diff = datetime.now() - datetime.fromisoformat(session_info['session_start_datetime']). \
+                time_diff = datetime.now() - datetime.fromisoformat(session_info['session_start_datetime']).\
                     replace(tzinfo=None)
                 duration = int(time_diff.total_seconds())
 
@@ -437,7 +447,7 @@ class BaseWebRTCService(ServiceOpenTera):
                 self.send_event_message(stop_session_event, 'websocket.device.' + device_uuid + '.events')
 
             # Send event to UserManager to change "busy" status
-            self.send_tera_message(stop_session_event, 'service.' + self.service_info['service_key'],
+            self.send_tera_message(stop_session_event, 'service.VideoRehabService',
                                    create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
 
             # Remove session from list
@@ -450,7 +460,7 @@ class BaseWebRTCService(ServiceOpenTera):
                     session_info = session_info.pop()
                 return {'status': 'stopped', 'session': session_info}
 
-            return {'status': 'error', 'error_text': gettext('Error stopping session - check server logs. ')}
+            return {'status': 'error', 'error_text': gettext('Error stopping session - check server logs')}
 
         return {'status': 'error', 'error_text': gettext('No matching session to stop')}
 
@@ -475,9 +485,9 @@ class BaseWebRTCService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=12, id_session=id_session,
-                                                           event_text=gettext('User: ') + session_user)
+                                                           event_text=gettext('User') + ': ' + session_user)
                     if api_response.status_code != 200:
-                        return {'status': 'error', 'error_text': gettext('Error creating user invited session event ')}
+                        return {'status': 'error', 'error_text': gettext('Error creating user invited session event')}
 
             if 'session_participants' in session_manage_args:
                 new_session_participants = session_manage_args['session_participants']
@@ -487,10 +497,10 @@ class BaseWebRTCService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=12, id_session=id_session,
-                                                           event_text=gettext('Participant: ') + session_participant)
+                                                           event_text=gettext('Participant') + ': ' + session_participant)
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Error creating participant invited '
-                                                                         'session event ')}
+                                                                         'session event')}
 
             if 'session_devices' in session_manage_args:
                 new_session_devices = session_manage_args['session_devices']
@@ -500,10 +510,10 @@ class BaseWebRTCService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=12, id_session=id_session,
-                                                           event_text=gettext('Device: ') + session_device)
+                                                           event_text=gettext('Device') + ': ' + session_device)
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Error creating device invited '
-                                                                         'session event ')}
+                                                                         'session event')}
 
             # Update session with new invitees
             api_req = {'session': {'id_session': id_session,  # New session
@@ -546,9 +556,9 @@ class BaseWebRTCService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=13, id_session=id_session,
-                                                           event_text=gettext('User: ') + session_user)
+                                                           event_text=gettext('User') + ': ' + session_user)
                     if api_response.status_code != 200:
-                        return {'status': 'error', 'error_text': gettext('Error creating user left session event ')}
+                        return {'status': 'error', 'error_text': gettext('Error creating user left session event')}
 
             if 'session_participants' in session_manage_args:
                 removed_session_participants = session_manage_args['session_participants']
@@ -559,10 +569,11 @@ class BaseWebRTCService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=13, id_session=id_session,
-                                                           event_text=gettext('Participant: ') + session_participant)
+                                                           event_text=gettext('Participant') + ': ' +
+                                                                      session_participant)
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Error creating participant left '
-                                                                         'session event ')}
+                                                                         'session event')}
 
             if 'session_devices' in session_manage_args:
                 removed_session_devices = session_manage_args['session_devices']
@@ -573,10 +584,10 @@ class BaseWebRTCService(ServiceOpenTera):
                     # TODO
                     #     api_response = self.get_from_opentera('/api/service')
                     api_response = self.post_session_event(event_type=13, id_session=id_session,
-                                                           event_text=gettext('Device: ') + session_device)
+                                                           event_text=gettext('Device') + ': ' + session_device)
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Error creating device left '
-                                                                         'session event ')}
+                                                                         'session event')}
 
             # Create and send leave session event message
             leave_message = messages.LeaveSessionEvent()
@@ -627,7 +638,7 @@ class BaseWebRTCService(ServiceOpenTera):
                     # Create session join refused event
                     # TODO: Get user name instead of user uuid
                     api_response = self.post_session_event(event_type=14, id_session=session_info['id_session'],
-                                                           event_text=gettext('User ') + parameters['user_uuid'])
+                                                           event_text=gettext('User') + ' ' + parameters['user_uuid'])
 
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Cannot create refused session event')}
@@ -640,7 +651,7 @@ class BaseWebRTCService(ServiceOpenTera):
                     # Create session join refused event
                     # TODO: Get  participant name instead of uuid
                     api_response = self.post_session_event(event_type=14, id_session=session_info['id_session'],
-                                                           event_text=gettext('Participant ') +
+                                                           event_text=gettext('Participant') + ' ' +
                                                                       parameters['participant_uuid'])
 
                     if api_response.status_code != 200:
@@ -654,7 +665,7 @@ class BaseWebRTCService(ServiceOpenTera):
                     # Create session join refused event
                     # TODO: Get device name instead of uuid
                     api_response = self.post_session_event(event_type=14, id_session=session_info['id_session'],
-                                                           event_text=gettext('Device ') + parameters['device_uuid'])
+                                                           event_text=gettext('Device') + ' ' + parameters['device_uuid'])
 
                     if api_response.status_code != 200:
                         return {'status': 'error', 'error_text': gettext('Cannot create refused session event')}
@@ -675,3 +686,5 @@ class BaseWebRTCService(ServiceOpenTera):
                                    create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
 
             return {'status': 'OK', 'session': session_info}
+
+
