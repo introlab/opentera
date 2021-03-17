@@ -39,5 +39,13 @@ class DeviceRegistry:
         if uuid in self.device_list:
             self.device_status[uuid] = status
 
+    def device_get_status(self, uuid):
+        if uuid in self.device_status:
+            return self.device_status[uuid]
+        return None
+
+    def status_devices(self):
+        return self.device_status
+
     def busy_devices(self):
         return self.device_sessions
