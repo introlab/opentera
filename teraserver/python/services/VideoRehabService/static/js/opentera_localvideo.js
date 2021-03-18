@@ -28,7 +28,14 @@ function initLocalVideo(){
 
 	if (navigator.getUserMedia) {
 		//navigator.getUserMedia({video: true, audio: false}, handleVideo, videoError);
-		navigator.mediaDevices.getUserMedia({video: {facingMode: "user" },
+		navigator.mediaDevices.getUserMedia({video:
+			{
+			width: {ideal: 1280, max: 1920 },
+			height: {ideal: 720, max: 1080 },
+			frameRate: {min: 15},//, ideal: 30},
+			facingMode: "user"
+		},
+		//		{facingMode: "user" },
 			audio: false}).then(initialHandleVideo).catch(videoError);
 	}
 }
@@ -36,7 +43,11 @@ function initLocalVideo(){
 function initialHandleVideo(stream){
 	handleVideo(stream);
 
-	fillVideoSourceList(stream.getVideoTracks()[0].label);
+	// Use setted config if available
+	if (currentConfig.currentVideoName === undefined)
+		fillVideoSourceList(stream.getVideoTracks()[0].label);
+	else
+		fillVideoSourceList(currentConfig.currentVideoName);
 
 }
 
@@ -94,7 +105,11 @@ function updateVideoSource(){
 	let select = document.getElementById('videoSelect');
 	if (select.selectedIndex>=0){
 		currentVideoSourceIndex = select.selectedIndex;
-		let constraints = { deviceId: { exact: videoSources[currentVideoSourceIndex].deviceId } };
+		let constraints = { deviceId: { exact: videoSources[currentVideoSourceIndex].deviceId },
+				width: {ideal: 1280, max: 1920 },
+				height: {ideal: 720, max: 1080 },
+				frameRate: {min: 15}//, ideal: 30}
+			};
 		//console.log(constraints);
 		navigator.mediaDevices.getUserMedia({video: constraints}).then(handleVideo).catch(videoError);
 	}
@@ -105,13 +120,15 @@ function selectVideoSource(source){
 	for (let i=0; i<videoSources.length; i++){
 		console.log(source + " = " + videoSources[i].label + " ?");
 		if (videoSources[i].label.includes(source)){
+			console.log("Found video source at index " + i);
 			let select = document.getElementById('videoSelect');
 			select.selectedIndex = i;
 			currentVideoSourceIndex = i;
-			//updateVideoSource();
-			break;
+			updateVideoSource();
+			return;
 		}
 	}
+	console.error("Video source " + source + " not found.");
 }
 
 function resetInactiveTimer(){

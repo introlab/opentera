@@ -3,11 +3,7 @@ var teraConnected = false;
 let socket = undefined;
 let connected_callback = undefined;
 
-let currentConfig = {'currentVideoSourceIndex': -1,
-    'currentAudioSourceIndex': -1,
-    'currentVideoSource2Index': -1,
-    'currentAudioSource2Index': -1,
-    'video1Mirror': true};
+let currentConfig = {'currentVideoName': undefined};
 
 function connectSharedObject(callback) {
     connected_callback = callback
@@ -42,7 +38,7 @@ function setupSharedObjectCallbacks(channel){
 
     //connect to a signal
     channel.objects.SharedObject.newContactInformation.connect(updateContact);
-    channel.objects.SharedObject.newVideoSource.connect(selectVideoSource);
+    //channel.objects.SharedObject.newVideoSource.connect(selectVideoSource);
     channel.objects.SharedObject.setLocalMirrorSignal.connect(setLocalMirror);
 
     /*if (channel.objects.SharedObject.videoSourceRemoved !== undefined)
@@ -54,7 +50,9 @@ function setupSharedObjectCallbacks(channel){
         //console.log(settings);
         updateContact(settings.contactInfo);
         //selectAudioSource(settings.audio);
-        selectVideoSource(settings.video);
+        let video = JSON.parse(settings.video);
+        //selectVideoSource(video.name);
+        currentConfig.currentVideoName = video.name;
         setLocalMirror(settings.mirror);
         //selectSecondarySources(settings.secondAudioVideo);
         ptz = JSON.parse(settings.ptz);
