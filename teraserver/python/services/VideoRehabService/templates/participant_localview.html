@@ -9,6 +9,9 @@
 	<script src="./static/bootstrap/js/bootstrap.min.js"></script>
 	<script src="./static/js/opentera_localvideo.js"></script>
 	<script src="./static/js/opentera_dashboard.js"></script>
+    <script src="./static/js/opentera_utils.js"></script>
+    <script src="./static/js/opentera_shared_object.js"></script>
+    <script src="./static/js/opentera_ptz.js"></script>
 
     <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
@@ -22,7 +25,7 @@
 
 </head>
 <body onload="init_dashboard('{{ backend_hostname }}', {{ backend_port }});
-initLocalVideo();" style="background-color:black;overflow: hidden;">
+init_localview();" style="background-color:black;overflow: hidden;">
 
 <!-- ErrorDialog -->
 <div class="modal fade" id="errorDialog" tabindex="-1" role="dialog" aria-labelledby="errorDialogCenterTitle"

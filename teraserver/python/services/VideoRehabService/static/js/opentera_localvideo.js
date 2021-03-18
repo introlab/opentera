@@ -2,6 +2,26 @@ let videoSources = [];
 let currentVideoSourceIndex = 0;
 let timerHandle = 0;
 
+function init_localview(){
+	// Check source
+	let urlParams = new URLSearchParams(window.location.search);
+	let sourceParam = urlParams.get('source');
+	if (sourceParam !== null){
+		clientSource = sourceParam;
+	}
+
+	if (clientSource === 'openteraplus'){
+		// Load QWebChannel library
+		include("qrc:///qtwebchannel/qwebchannel.js");
+
+		// Connect shared object
+		connectSharedObject(initLocalVideo);
+
+	}else{
+		initLocalVideo();
+	}
+}
+
 function initLocalVideo(){
 	navigator.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.getUserMedia ||
 		navigator.webkitGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
@@ -94,7 +114,6 @@ function selectVideoSource(source){
 	}
 }
 
-
 function resetInactiveTimer(){
 
 	stopInactiveTimer();
@@ -133,4 +152,11 @@ function toggleButtons(id) {
 
 function isButtonsClosed(id){
 	return document.getElementById(id).style.height === "0%";
+}
+
+function setLocalMirror(mirror){
+	let video_widget = $('#selfVideo');
+	if (video_widget !== undefined){
+		(mirror === true) ? video_widget.addClass('videoMirror') : video_widget.removeClass('videoMirror');
+	}
 }
