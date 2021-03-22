@@ -19,8 +19,11 @@ status_schema = api.schema_model('device_status', {
         'status': {
             'type': 'object'
             },
+        'timestamp': {
+            'type': 'number'
+            },
         },
-    'required': ['status']
+    'required': ['status', 'timestamp']
 })
 
 
@@ -49,6 +52,6 @@ class DeviceQueryStatus(Resource):
         rpc = RedisRPCClient(self.module.config.redis_config)
 
         ret = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'update_device_status',
-                       current_device.device_uuid, json.dumps(request.json['status']))
+                       current_device.device_uuid, json.dumps(request.json['status']), request.json['timestamp'])
 
         return ret

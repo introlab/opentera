@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 class DeviceRegistry:
     def __init__(self):
         self.device_list = list()
@@ -34,10 +37,12 @@ class DeviceRegistry:
             else:
                 print('Error: device ' + uuid + ' wasn\'t in the session ' + session_uuid + '!')
 
-    def device_update_status(self, uuid, status: str):
+    def device_update_status(self, uuid, status: str, timestamp):
         # Only if device is connected
         if uuid in self.device_list:
-            self.device_status[uuid] = status
+            self.device_status[uuid] = {'status': status, 'timestamp': timestamp}
+            return self.device_status[uuid]
+        return None
 
     def device_get_status(self, uuid):
         if uuid in self.device_status:

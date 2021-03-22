@@ -7,6 +7,7 @@ from google.protobuf.json_format import ParseDict, ParseError
 from google.protobuf.json_format import MessageToJson
 
 login_api_endpoint = '/api/device/login'
+status_api_endpoint = '/api/device/status'
 
 
 async def fetch(client, url, params=None):
@@ -17,6 +18,27 @@ async def fetch(client, url, params=None):
             return await resp.json()
         else:
             return {}
+
+
+async def send_device_status(client: aiohttp.ClientSession, url: str, token: str):
+    while True:
+        # Every 10 seconds
+        await asyncio.sleep(1)
+        params = {'token': token}
+
+        from datetime import datetime
+
+        # This can be anything...
+        status = {
+            'status': {'battery': 10.4, 'flag': False},
+            'timestamp': datetime.now().timestamp()
+        }
+
+        async with client.post(url, params=params, json=status, verify_ssl=False) as response:
+            if response.status == 200:
+                print('Sent status')
+            else:
+                print('Send status failed')
 
 
 async def parse_message(client, msg_dict: dict):
@@ -68,13 +90,16 @@ async def parse_message(client, msg_dict: dict):
 
     except ParseError as e:
         print(e)
-
     return
 
 
 async def main(url, token):
 
     async with aiohttp.ClientSession() as client:
+
+        # Create alive publishing task
+        status_task = asyncio.create_task(send_device_status(client, url + status_api_endpoint, token))
+
         params = {'token': token}
         login_info = await fetch(client, url + login_api_endpoint, params)
         print(login_info)
@@ -95,6 +120,10 @@ async def main(url, token):
                 if msg.type == aiohttp.WSMsgType.error:
                     print('websocket error')
                     break
+
+        print('cancel status task')
+        status_task.cancel()
+        await status_task
 
 
 if __name__ == '__main__':
