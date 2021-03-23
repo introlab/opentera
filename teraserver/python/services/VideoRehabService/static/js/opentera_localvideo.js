@@ -56,7 +56,6 @@ function handleVideo(stream) {
 
 	//console.log("Success! Device Name: " + stream.getVideoTracks()[0].label);
 	video.srcObject = stream;
-
 }
 
 function videoError(err) {
@@ -105,6 +104,9 @@ function updateVideoSource(){
 	let select = document.getElementById('videoSelect');
 	if (select.selectedIndex>=0){
 		currentVideoSourceIndex = select.selectedIndex;
+		currentConfig.currentVideoName = videoSources[currentVideoSourceIndex].label;
+		showPTZControls(localPTZCapabilities.zoom, localPTZCapabilities.presets, localPTZCapabilities.settings,
+			currentConfig.currentVideoName);
 		let constraints = { deviceId: { exact: videoSources[currentVideoSourceIndex].deviceId },
 				width: {ideal: 1280, max: 1920 },
 				height: {ideal: 720, max: 1080 },
@@ -151,11 +153,13 @@ function inactiveTimeout(){
 
 
 function openButtons(id) {
-	document.getElementById(id).style.height = "100%";
+	//document.getElementById(id).style.height = "100%";
+	showElement(id);
 }
 
 function closeButtons(id) {
-	document.getElementById(id).style.height = "0%";
+	//document.getElementById(id).style.height = "0%";
+	hideElement(id);
 	stopInactiveTimer();
 }
 
@@ -176,4 +180,23 @@ function setLocalMirror(mirror){
 	if (video_widget !== undefined){
 		(mirror === true) ? video_widget.addClass('videoMirror') : video_widget.removeClass('videoMirror');
 	}
+}
+
+function showPTZControls(zoom, presets, settings, camera = undefined){
+	let zoomControls = $("#zoomButtons");
+	let presetControls = $("#presetButtons");
+	let settingsControl = $("#settingsButton");
+
+	// If not current selected camera and not PTZ for all camera, then hide buttons
+	if (!isCurrentCameraPTZ()){
+		zoom = false;
+		presets = false;
+		settings = false;
+	}
+
+	(zoom === true) ? zoomControls.show() : zoomControls.hide();
+	(presets === true) ? presetControls.show() : presetControls.hide();
+	(settings === true) ? settingsControl.show() : settingsControl.hide();
+
+
 }

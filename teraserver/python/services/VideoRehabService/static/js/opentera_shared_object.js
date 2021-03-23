@@ -55,8 +55,8 @@ function setupSharedObjectCallbacks(channel){
         currentConfig.currentVideoName = video.name;
         setLocalMirror(settings.mirror);
         //selectSecondarySources(settings.secondAudioVideo);
-        ptz = JSON.parse(settings.ptz);
-        //setPTZCapabilities(localContact.uuid, ptz.zoom, ptz.presets, ptz.settings, ptz.camera);
+        let ptz = JSON.parse(settings.ptz);
+        setPTZCapabilities(ptz.zoom, ptz.presets, ptz.settings, ptz.camera);
 
         // Call callback function when we got all the settings
         if (connected_callback !== undefined)
