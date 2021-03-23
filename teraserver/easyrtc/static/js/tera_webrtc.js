@@ -723,24 +723,20 @@ function disconnectedFromSignalingServer(){
 }
 
 function getUuidForPeerId(peerid){
-    remoteContacts.forEach( contact =>
-        {
-            if (contact.peerid === peerid){
-                return contact.uuid;
-            }
+    for (let i=0; i<remoteContacts.length; i++){
+        if (remoteContacts[i].peerid === peerid){
+            return remoteContacts[i].uuid;
         }
-    )
+    }
     return undefined;
 }
 
 function getPeerIdForUuid(uuid){
-    remoteContacts.forEach( contact =>
-        {
-            if (contact.uuid === uuid){
-                return contact.peerid;
-            }
+    for (let i=0; i<remoteContacts.length; i++){
+        if (remoteContacts[i].uuid === uuid){
+            return remoteContacts[i].peerid;
         }
-    )
+    }
     return undefined;
 }
 
@@ -835,9 +831,13 @@ function dataReception(sendercid, msgType, msgData, targeting) {
     if (msgType === "PTZRequest"){
         //console.error("PTZRequest");
         //console.error(msgData);
-        if (teraConnected)
+        if (teraConnected) {
+            if (currentConfig.video1Mirror){
+                // If we are mirrored, we are not on the other end - correct x.
+                msgData.x = msgData.w - msgData.x;
+            }
             SharedObject.imageClicked(localContact.uuid, msgData.x, msgData.y, msgData.w, msgData.h);
-        else
+        }else
             console.error("Not connected to client.");
     }
 
@@ -864,18 +864,12 @@ function dataReception(sendercid, msgType, msgData, targeting) {
             event.shiftKey = true;
             event.ctrlKey = true;
         }
-        gotoPreset(event, 0, msgData.preset);
+        gotoPreset(event, true, 1, msgData.preset);
     }
 
     if (msgType === "CamSettingsRequest"){
         if (teraConnected){
-            let uuid = getUuidForPeerId(sendercid);
-            if (uuid){
-                SharedObject.camSettingsClicked(uuid);
-            }else{
-                showError("dataReception/CamSettingsRequest", "Uuid not found.", false);
-            }
-
+                SharedObject.camSettingsClicked(msgData.uuid);
         }else
             showError("dataReception/CamSettingsRequest", "Not connected to client.", false);
     }

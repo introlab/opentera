@@ -290,16 +290,21 @@ function enlargeView(local, index){
     let view_id = getVideoViewId(local, index);
     let already_large = (view_id === currentLargeViewId);
 
-    if (typeof(setCurrentUserLayout) !== "undefined"){
+    if (typeof(setCurrentUserLayout) !== "undefined"){ // User side
         if (already_large){
             // Minimize the current large view
             // Ensure we have the right layout
             setCurrentUserLayout(layouts.GRID, false);
-        }else{
+        }else{ // Participant side
             // Maximize the selected view
             setCurrentUserLayout(layouts.LARGEVIEW, false, view_id);
         }
     }else{
+        if (already_large){
+            // Reset layout
+            if (remoteStreams.length > 0)
+                view_id = getVideoViewId(false, 1);
+        }
         setLargeView(view_id, false);
     }
 
@@ -535,7 +540,7 @@ function showPTZControls(local, index, zoom, presets, settings, camera = undefin
     let settingsControl = $("#" + view_prefix + "SettingsButton" + index);
 
     // If not current selected camera and not PTZ for all camera, then hide buttons
-    if (!isCurrentCameraPTZ()){
+    if (local === true && !isCurrentCameraPTZ()){
         zoom = false;
         presets = false;
         settings = false;

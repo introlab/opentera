@@ -127,7 +127,7 @@ function camSettings(local, index){
             if (isCurrentCameraPTZ())
                 SharedObject.camSettingsClicked(localContact.uuid);
     }else{
-        let request = "";
+        let request = {"uuid": localContact.uuid};
         if (easyrtc.webSocketConnected) {
             easyrtc.sendDataWS(remoteStreams[index-1].peerid, 'CamSettingsRequest', request, function (ackMesg) {
                 //console.error("ackMsg:",ackMesg);

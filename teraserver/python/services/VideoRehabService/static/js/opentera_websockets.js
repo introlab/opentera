@@ -72,6 +72,10 @@ function ws_MessageReceived(evt){
         current_session_url = json_msg.message.events[0]["sessionUrl"];
         // Append name and uuid
         current_session_url += "&name=" + participant_name.replace("#", "") + "&uuid=" + participant_uuid;
+
+        // Append source if available
+        current_session_url += "&source=" + clientSource;
+
         console.log ("About to join session: " + current_session_url)
         setTimeout(waitDialogTimeout, 3000);
     }
