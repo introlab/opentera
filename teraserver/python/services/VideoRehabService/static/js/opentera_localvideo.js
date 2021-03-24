@@ -29,13 +29,13 @@ function initLocalVideo(){
 	if (navigator.getUserMedia) {
 		//navigator.getUserMedia({video: true, audio: false}, handleVideo, videoError);
 		navigator.mediaDevices.getUserMedia({video:
-			{
+			/*{
 			width: {ideal: 1280, max: 1920 },
 			height: {ideal: 720, max: 1080 },
-			frameRate: {min: 15},//, ideal: 30},
-			facingMode: "user"
-		},
-		//		{facingMode: "user" },
+			frameRate: {min: 15}//,//, ideal: 30},
+			//facingMode: "user"
+		},*/
+				{facingMode: "user" },
 			audio: false}).then(initialHandleVideo).catch(videoError);
 	}
 }
@@ -107,10 +107,10 @@ function updateVideoSource(){
 		currentConfig.currentVideoName = videoSources[currentVideoSourceIndex].label;
 		showPTZControls(localPTZCapabilities.zoom, localPTZCapabilities.presets, localPTZCapabilities.settings,
 			currentConfig.currentVideoName);
-		let constraints = { deviceId: { exact: videoSources[currentVideoSourceIndex].deviceId },
+		let constraints = { deviceId: { exact: videoSources[currentVideoSourceIndex].deviceId }/*,
 				width: {ideal: 1280, max: 1920 },
 				height: {ideal: 720, max: 1080 },
-				frameRate: {min: 15}//, ideal: 30}
+				frameRate: {min: 15}//, ideal: 30}*/
 			};
 		//console.log(constraints);
 		navigator.mediaDevices.getUserMedia({video: constraints}).then(handleVideo).catch(videoError);
