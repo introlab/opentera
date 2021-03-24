@@ -418,6 +418,10 @@ function broadcastlocalCapabilities(){
     }
 }
 
+function broadcastStatus(){
+    sendStatus({"targetRoom":"default"});
+}
+
 function broadcastlocalPTZCapabilities(){
     let request = Object.assign({}, localPTZCapabilities);
 
@@ -795,7 +799,8 @@ function sendStatus(target_peerid){
         "speaker": isStatusIconActive(true, 1, "Speaker"),
         "video": isStatusIconActive(true, 1, "Video"),
         "isUser": !isParticipant,
-        "videoSrcLength": videoSources.length
+        "videoSrcLength": videoSources.length,
+        "secondSource": currentConfig.currentVideoSource2Index > -1
     };
 
     if (easyrtc.webSocketConnected){
@@ -831,30 +836,34 @@ function dataReception(sendercid, msgType, msgData, targeting) {
     if (msgType === "PTZRequest"){
         //console.error("PTZRequest");
         //console.error(msgData);
-        if (teraConnected) {
-            if (currentConfig.video1Mirror){
-                // If we are mirrored, we are not on the other end - correct x.
-                msgData.x = msgData.w - msgData.x;
-            }
-            SharedObject.imageClicked(localContact.uuid, msgData.x, msgData.y, msgData.w, msgData.h);
-        }else
-            console.error("Not connected to client.");
+        if (isCurrentCameraPTZ()){
+            if (teraConnected) {
+                if (currentConfig.video1Mirror){
+                    // If we are mirrored, we are not on the other end - correct x.
+                    msgData.x = msgData.w - msgData.x;
+                }
+                SharedObject.imageClicked(localContact.uuid, msgData.x, msgData.y, msgData.w, msgData.h);
+            }else
+                console.error("Not connected to client.");
+        }
     }
 
     if (msgType === "ZoomRequest"){
         //console.error("ZoomRequest");
         //console.error(msgData);
-        if (teraConnected){
-            if (msgData.value === "in")
-                SharedObject.zoomInClicked(localContact.uuid);
-            if (msgData.value === "out")
-                SharedObject.zoomOutClicked(localContact.uuid);
-            if (msgData.value === "min")
-                SharedObject.zoomMinClicked(localContact.uuid);
-            if (msgData.value === "max")
-                SharedObject.zoomMaxClicked(localContact.uuid);
-        }else
-            console.error("Not connected to client.");
+        if (isCurrentCameraPTZ()) {
+            if (teraConnected) {
+                if (msgData.value === "in")
+                    SharedObject.zoomInClicked(localContact.uuid);
+                if (msgData.value === "out")
+                    SharedObject.zoomOutClicked(localContact.uuid);
+                if (msgData.value === "min")
+                    SharedObject.zoomMinClicked(localContact.uuid);
+                if (msgData.value === "max")
+                    SharedObject.zoomMaxClicked(localContact.uuid);
+            } else
+                console.error("Not connected to client.");
+        }
     }
 
     if (msgType === "PresetRequest"){
@@ -868,10 +877,12 @@ function dataReception(sendercid, msgType, msgData, targeting) {
     }
 
     if (msgType === "CamSettingsRequest"){
-        if (teraConnected){
+        if (isCurrentCameraPTZ()) {
+            if (teraConnected) {
                 SharedObject.camSettingsClicked(msgData.uuid);
-        }else
-            showError("dataReception/CamSettingsRequest", "Not connected to client.", false);
+            } else
+                showError("dataReception/CamSettingsRequest", "Not connected to client.", false);
+        }
     }
 
     if (msgType === "DataForwarding"){
@@ -1003,6 +1014,8 @@ function dataReception(sendercid, msgType, msgData, targeting) {
         }
 
         updateLocalConfig(msgData);
+
+        broadcastStatus();
     }
 
     if (msgType === "nextVideoSource"){
@@ -1030,6 +1043,11 @@ function dataReception(sendercid, msgType, msgData, targeting) {
         }
 
         showStatusMsg(record_msg, 5000); // Display for 5 seconds
+    }
+
+    if (msgType === "shareSecondSource"){
+        localSecondSource = !msgData;
+        btnShow2ndLocalVideoClicked();
     }
 }
 
@@ -1263,5 +1281,16 @@ function broadcastRecordingStatus(status, peerid_target = -1){
     }
     else{
         console.log("Didn't broadcast: not connected yet!");
+    }
+}
+
+function sendShareSecondSource(peerid_target, status){
+    console.log("Sending request to share second source " + status + " to: ", peerid_target);
+    if (easyrtc.webSocketConnected){
+        easyrtc.sendDataWS(peerid_target, 'shareSecondSource', status,function(ackMesg) {
+            if( ackMesg.msgType === 'error' ) {
+                console.error(ackMesg.msgData.errorText);
+            }
+        });
     }
 }

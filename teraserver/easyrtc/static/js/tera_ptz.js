@@ -223,8 +223,11 @@ function setPTZCapabilities(uuid, zoom, presets, settings, camera = undefined){
 }
 
 function isCurrentCameraPTZ() {
+    if (localPTZCapabilities === undefined)
+        return false;
     if (currentConfig['currentVideoSourceIndex'] >= 0 && currentConfig['currentVideoSourceIndex'] < videoSources.length) {
-        if (localPTZCapabilities.camera === undefined ||
+        if ((localPTZCapabilities.camera === undefined && (localPTZCapabilities.zoom === true ||
+            localPTZCapabilities.presets === true || localPTZCapabilities.settings === true))||
             videoSources[currentConfig['currentVideoSourceIndex']].label === localPTZCapabilities.camera){
             return true;
         }

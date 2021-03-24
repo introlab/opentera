@@ -77,20 +77,33 @@ function showButtons(local, show, index){
             if (iconActive === true){
                 screenIcon.show();
             }else{
-                (show === true && !localSecondSource) ? screenIcon.show() : screenIcon.hide();
+                (show === true && (!localSecondSource && local === true)) ? screenIcon.show() : screenIcon.hide();
             }
         }
 
         if (secondSourceIcon.length){
-            // Always hide if no secondary stream selected
-            if (currentConfig.currentVideoSource2Index <0 && currentConfig.currentAudioSource2Index <0)
-                secondSourceIcon.hide();
-            else{
-                let iconActive = isButtonActive(local, index, "Show2ndVideo");
-                if (iconActive === true){
+            let iconActive = isButtonActive(local, index, "Show2ndVideo");
+            if (local === true) {
+                // Always hide if no secondary stream selected
+                if (currentConfig.currentVideoSource2Index < 0 && currentConfig.currentAudioSource2Index < 0)
+                    secondSourceIcon.hide();
+                else {
+                    if (iconActive === true) {
+                        secondSourceIcon.show();
+                    } else {
+                        (show === true && !localScreenSharing) ? secondSourceIcon.show() : secondSourceIcon.hide();
+                    }
+                }
+            }else{
+                if (iconActive === true) {
                     secondSourceIcon.show();
-                }else{
-                    (show === true && !localScreenSharing) ? secondSourceIcon.show() : secondSourceIcon.hide();
+                } else {
+                    if (remoteContacts[index - 1] !== undefined) {
+                        (show === true && remoteContacts[index - 1].status.secondSource === true) ? secondSourceIcon.show() :
+                            secondSourceIcon.hide();
+                    } else {
+                        secondSourceIcon.hide();
+                    }
                 }
             }
         }
@@ -378,6 +391,12 @@ function btnShow2ndLocalVideoClicked(){
     // Show / Hide screen sharing button
     let btn = getButtonIcon(true, 1, "ShareScreen");
     (localSecondSource) ? btn.hide() : btn.show();
+}
+
+function btnShow2ndRemoteVideoClicked(index){
+    let status = !isButtonActive(false, index, "Show2ndVideo");
+    sendShareSecondSource(remoteContacts[index-1].peerid, status);
+    updateButtonIconState(status, false, 1, "Show2ndVideo");
 }
 
 function showError(err_context, err_msg, ui_display, show_retry=true){
