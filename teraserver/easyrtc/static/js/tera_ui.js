@@ -757,9 +757,9 @@ function setPrimaryViewIcon(peer_id, streamName){
 }
 
 function playSound(soundname){
-    if (isWeb){
+    //if (isWeb){
         document.getElementById(soundname).play();
-    }
+    //}
 }
 
 function stopSounds(){
