@@ -17,6 +17,13 @@ class BaseAPITest(unittest.TestCase):
         url = self._make_url(self.host, self.port, self.login_endpoint)
         return get(url=url, verify=False, auth=(username, password), params=payload)
 
+    def _login_with_token(self, token, payload=None):
+        if payload is None:
+            payload = {}
+        payload['token'] = token
+        url = self._make_url(self.host, self.port, self.login_endpoint)
+        return get(url=url, verify=False, params=payload)
+
     def _request_with_http_auth(self, username, password, payload=None, endpoint=None):
         if payload is None:
             payload = {}
@@ -53,6 +60,11 @@ class BaseAPITest(unittest.TestCase):
             payload = {}
         url = self._make_url(self.host, self.port, self.test_endpoint)
         return post(url=url, verify=False, json=payload)
+
+    def _post_with_token(self, token: str, payload=None):
+        params = {'token': token}
+        url = self._make_url(self.host, self.port, self.test_endpoint)
+        return post(url=url, verify=False, params=params, json=payload)
 
     def _delete_with_http_auth(self, username, password, id_to_del: int):
         url = self._make_url(self.host, self.port, self.test_endpoint)
