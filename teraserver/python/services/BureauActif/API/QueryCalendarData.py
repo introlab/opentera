@@ -54,12 +54,15 @@ class QueryCalendarData(Resource):
                     if day is not None:
                         day_json = day.to_json(['timeline'])
 
+                        # At least 0.17 hour (10 minutes) has to be recorded to show data
                         if day.seating is not None and day.standing is not None and day.positionChanges is not None \
                                 and (day.seating.expected + day.standing.expected) > 0.17 \
                                 and day.timeline is not None:
                             day_json['seating'] = day.seating.to_json()
                             day_json['standing'] = day.standing.to_json()
                             day_json['positionChanges'] = day.positionChanges.to_json()
+                            if day.absent is not None:
+                                day_json['absent'] = day.absent.to_json()
 
                             calendar_days_list.append(day_json)
 

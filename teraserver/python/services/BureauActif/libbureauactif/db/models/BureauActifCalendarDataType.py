@@ -27,4 +27,8 @@ class BureauActifCalendarDataType(db.Model, BaseModel):
         data3.name = 'positionChanges'
         db.session.add(data3)
 
+        data4 = BureauActifCalendarDataType()
+        data4.name = 'absent'
+        db.session.add(data4)
+
         db.session.commit()
