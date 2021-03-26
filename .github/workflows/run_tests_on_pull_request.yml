@@ -23,7 +23,7 @@ jobs:
         
     - name: Install system dependencies
       run: | 
-        sudo apt-get install cmake protobuf-compiler wget
+        sudo apt-get install cmake protobuf-compiler wget redis-server
 
     - name: Install Miniconda3
       run: |
@@ -37,11 +37,14 @@ jobs:
         make python-all
 
     - name: Run API Tests
+      working-directory: teraserver/python
       run: |
-        ls -l
-        python -m pip install --upgrade pip
-        python -m pip install flake8 pytest protobuf
-        if [ -f teraserver/python/env/requirements.txt ]; then pip install -r teraserver/python/env/requirements.txt; fi
+        redis-server &
+        sleep 1
+        ./env/python-3.8/bin/python TeraServer.py --enable_tests=1 &
+        sleep 5
+        
+        
         
 
         
