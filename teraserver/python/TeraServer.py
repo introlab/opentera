@@ -243,7 +243,9 @@ if __name__ == '__main__':
 
     user_manager_module = UserManagerModule(config_man)
 
-    service_launcher = ServiceLauncherModule(config_man)
+    # Only launch services if not in test mode
+    if not args.enable_tests:
+        service_launcher = ServiceLauncherModule(config_man)
 
     # This is blocking, running event loop
     twisted_module.run()

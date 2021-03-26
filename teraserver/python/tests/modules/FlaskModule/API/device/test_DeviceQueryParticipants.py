@@ -49,14 +49,15 @@ class DeviceQueryParticipantsTest(unittest.TestCase):
     def test_query_participants_get_with_valid_token(self):
         for device in self.all_devices:
             response = self._token_auth_query_participants(device['device_token'])
-            if device['device_onlineable']:
-                self.assertEqual(response.status_code, 200)
-                participants = response.json()
-                self.assertTrue(participants.__contains__('participants_info'))
+
+            if not device['device_enabled']:
+                # Should always return unauthorized for disabled devices
+                self.assertEqual(response.status_code, 401)
             else:
-                if not device['device_enabled']:
-                    # Should return unauthorized
-                    self.assertEqual(response.status_code, 401)
+                if device['device_onlineable']:
+                    self.assertEqual(response.status_code, 200)
+                    participants = response.json()
+                    self.assertTrue('participants_info' in participants)
                 else:
                     # Should return forbidden (not onlinable but enabled = forbidden)
                     self.assertEqual(response.status_code, 403)
