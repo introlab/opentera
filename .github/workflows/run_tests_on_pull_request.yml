@@ -53,16 +53,33 @@ jobs:
       run: |
         cmake .
         make python-all
+        export OPENTERA_PYTHON=$PWD/python/env/python-3.8/bin/python
+        export PYTHONPATH=$PWD/python
 
-    - name: Run API Tests
+    - name: Start TeraServer With Tests Enabled
       working-directory: teraserver/python
       run: |
-        ./env/python-3.8/bin/python TeraServer.py --enable_tests=1 &
-        sleep 5
+        $OPENTERA_PYTHON TeraServer.py --enable_tests=1 &
+        sleep 10
+                
+    - name: Run Device API Tests
+      working-directory: teraserver/python/tests/opentera/modules/FlaskModule/API/device
+      run: |
+        $OPENTERA_PYTHON -m unittest discover tests "test_*.py"
         
+    - name: Run Participant API Tests
+      working-directory: teraserver/python/tests/opentera/modules/FlaskModule/API/participant
+      run: |
+        $OPENTERA_PYTHON -m unittest discover tests "test_*.py"
         
-        
+    - name: Run User API Tests
+      working-directory: teraserver/python/tests/opentera/modules/FlaskModule/API/user
+      run: |
+        $OPENTERA_PYTHON -m unittest discover tests "test_*.py"
 
-        
-      
+    - name: Run Models Tests
+      working-directory: teraserver/python/tests/opentera/db/models
+      run: |
+        $OPENTERA_PYTHON -m unittest discover tests "test_*.py"
+  
     
