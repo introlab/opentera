@@ -53,8 +53,8 @@ jobs:
       run: |
         cmake .
         make python-all
-        export OPENTERA_PYTHON=$PWD/python/env/python-3.8/bin/python
-        export PYTHONPATH=$PWD/python
+        echo "OPENTERA_PYTHON=$(echo $PWD/python/env/python-3.8/bin/python)" >> $GITHUB_ENV
+        echo "PYTHONPATH=$(echo $PWD/python)" >> $GITHUB_ENV
 
     - name: Start TeraServer With Tests Enabled
       working-directory: teraserver/python
