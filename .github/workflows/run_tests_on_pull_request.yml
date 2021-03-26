@@ -2,10 +2,10 @@
 name: Run Tests on Pull Requests
 on:
   workflow_dispatch:
-    branches: [ main ]
+    branches: [main]
     
   pull_request:
-    branches: [main]
+    branches: [dev, main]
     
 jobs:
   build:
