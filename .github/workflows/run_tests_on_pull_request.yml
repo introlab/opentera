@@ -63,17 +63,17 @@ jobs:
         sleep 10
                 
     - name: Run Device API Tests
-      working-directory: teraserver/python/tests/opentera/modules/FlaskModule/API/device
+      working-directory: teraserver/python/tests/modules/FlaskModule/API/device
       run: |
         $OPENTERA_PYTHON -m unittest discover tests "test_*.py"
         
     - name: Run Participant API Tests
-      working-directory: teraserver/python/tests/opentera/modules/FlaskModule/API/participant
+      working-directory: teraserver/python/tests/modules/FlaskModule/API/participant
       run: |
         $OPENTERA_PYTHON -m unittest discover tests "test_*.py"
         
     - name: Run User API Tests
-      working-directory: teraserver/python/tests/opentera/modules/FlaskModule/API/user
+      working-directory: teraserver/python/tests/modules/FlaskModule/API/user
       run: |
         $OPENTERA_PYTHON -m unittest discover tests "test_*.py"
 
