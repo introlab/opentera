@@ -9,9 +9,10 @@ import sys
 
 class ServiceLauncherModule(BaseModule):
 
-    def __init__(self, config: ConfigManager):
+    def __init__(self, config: ConfigManager, system_only=False):
         BaseModule.__init__(self, ModuleNames.SERVICE_LAUNCHER_NAME.value, config)
         self.processList = []
+        self.launch_system_service_only = system_only
 
     def setup_module_pubsub(self):
         # Additional subscribe here
@@ -23,7 +24,7 @@ class ServiceLauncherModule(BaseModule):
                 print(service)
                 if service.service_key != 'OpenTeraServer':
                     self.launch_service(service)
-            elif service.service_enabled:
+            elif service.service_enabled and not self.launch_system_service_only:
                 self.launch_service(service)
 
     def notify_module_messages(self, pattern, channel, message):
