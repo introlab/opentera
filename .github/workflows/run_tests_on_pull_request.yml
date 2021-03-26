@@ -1,6 +1,5 @@
 # This workflow will run on pull requests
-name: Python package and upload to PyPi
-
+name: Run Tests on Pull Requests
 on:
   workflow_dispatch:
     branches: [ main ]
