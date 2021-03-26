@@ -88,8 +88,6 @@ class UserQueryUsers(Resource):
 
         if users:
             users_list = []
-            online_users = []
-            busy_users = []
             if args['with_status']:
                 # Query users status
                 rpc = RedisRPCClient(self.module.config.redis_config)
