@@ -24,6 +24,8 @@ jobs:
     - name: Install system dependencies
       run: | 
         sudo apt-get install cmake protobuf-compiler wget redis-server postgresql
+        sudo systemctl enable postgresql
+        sudo systemctl start postgresql
         
     - name: Create Database Tables
       run: |
