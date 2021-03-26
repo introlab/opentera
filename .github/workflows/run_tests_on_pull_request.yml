@@ -68,21 +68,21 @@ jobs:
     - name: Run Device API Tests
       working-directory: teraserver/python/tests/modules/FlaskModule/API/device
       run: |
-        $OPENTERA_PYTHON -m unittest discover tests "test_*.py"
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
         
     - name: Run Participant API Tests
       working-directory: teraserver/python/tests/modules/FlaskModule/API/participant
       run: |
-        $OPENTERA_PYTHON -m unittest discover tests "test_*.py"
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
         
     - name: Run User API Tests
       working-directory: teraserver/python/tests/modules/FlaskModule/API/user
       run: |
-        $OPENTERA_PYTHON -m unittest discover tests "test_*.py"
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
 
     - name: Run Models Tests
       working-directory: teraserver/python/tests/opentera/db/models
       run: |
-        $OPENTERA_PYTHON -m unittest discover tests "test_*.py"
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
   
     
