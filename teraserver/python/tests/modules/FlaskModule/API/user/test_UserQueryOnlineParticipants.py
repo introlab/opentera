@@ -1,9 +1,9 @@
 from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
 
 
-class UserQueryOnlineDevicesTest(BaseAPITest):
+class UserQueryOnlineParticipantsTest(BaseAPITest):
     login_endpoint = '/api/user/login'
-    test_endpoint = '/api/user/devices/online'
+    test_endpoint = '/api/user/participants/online'
 
     def setUp(self):
         pass
@@ -32,6 +32,5 @@ class UserQueryOnlineDevicesTest(BaseAPITest):
 
         # Check for important status fields
         for device_info in response.json():
-            self.assertTrue('device_online' in device_info)
-            self.assertTrue('device_busy' in device_info)
-            self.assertTrue('device_status' in device_info)
+            self.assertTrue('participant_online' in device_info)
+            self.assertTrue('participant_busy' in device_info)

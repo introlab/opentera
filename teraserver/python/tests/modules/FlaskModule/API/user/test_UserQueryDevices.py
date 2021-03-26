@@ -1,7 +1,7 @@
 from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
 
 
-class UserQueryDeviceDeviceProjectTest(BaseAPITest):
+class UserQueryDevicesTest(BaseAPITest):
     login_endpoint = '/api/user/login'
     test_endpoint = '/api/user/devices'
 
