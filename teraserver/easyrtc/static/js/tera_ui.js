@@ -77,20 +77,33 @@ function showButtons(local, show, index){
             if (iconActive === true){
                 screenIcon.show();
             }else{
-                (show === true && !localSecondSource) ? screenIcon.show() : screenIcon.hide();
+                (show === true && (!localSecondSource && local === true)) ? screenIcon.show() : screenIcon.hide();
             }
         }
 
         if (secondSourceIcon.length){
-            // Always hide if no secondary stream selected
-            if (currentConfig.currentVideoSource2Index <0 && currentConfig.currentAudioSource2Index <0)
-                secondSourceIcon.hide();
-            else{
-                let iconActive = isButtonActive(local, index, "Show2ndVideo");
-                if (iconActive === true){
+            let iconActive = isButtonActive(local, index, "Show2ndVideo");
+            if (local === true) {
+                // Always hide if no secondary stream selected
+                if (currentConfig.currentVideoSource2Index < 0 && currentConfig.currentAudioSource2Index < 0)
+                    secondSourceIcon.hide();
+                else {
+                    if (iconActive === true) {
+                        secondSourceIcon.show();
+                    } else {
+                        (show === true && !localScreenSharing) ? secondSourceIcon.show() : secondSourceIcon.hide();
+                    }
+                }
+            }else{
+                if (iconActive === true) {
                     secondSourceIcon.show();
-                }else{
-                    (show === true && !localScreenSharing) ? secondSourceIcon.show() : secondSourceIcon.hide();
+                } else {
+                    if (remoteContacts[index - 1] !== undefined) {
+                        (show === true && remoteContacts[index - 1].status.secondSource === true) ? secondSourceIcon.show() :
+                            secondSourceIcon.hide();
+                    } else {
+                        secondSourceIcon.hide();
+                    }
                 }
             }
         }
@@ -290,16 +303,21 @@ function enlargeView(local, index){
     let view_id = getVideoViewId(local, index);
     let already_large = (view_id === currentLargeViewId);
 
-    if (typeof(setCurrentUserLayout) !== "undefined"){
+    if (typeof(setCurrentUserLayout) !== "undefined"){ // User side
         if (already_large){
             // Minimize the current large view
             // Ensure we have the right layout
             setCurrentUserLayout(layouts.GRID, false);
-        }else{
+        }else{ // Participant side
             // Maximize the selected view
             setCurrentUserLayout(layouts.LARGEVIEW, false, view_id);
         }
     }else{
+        if (already_large){
+            // Reset layout
+            if (remoteStreams.length > 0)
+                view_id = getVideoViewId(false, 1);
+        }
         setLargeView(view_id, false);
     }
 
@@ -373,6 +391,12 @@ function btnShow2ndLocalVideoClicked(){
     // Show / Hide screen sharing button
     let btn = getButtonIcon(true, 1, "ShareScreen");
     (localSecondSource) ? btn.hide() : btn.show();
+}
+
+function btnShow2ndRemoteVideoClicked(index){
+    let status = !isButtonActive(false, index, "Show2ndVideo");
+    sendShareSecondSource(remoteContacts[index-1].peerid, status);
+    updateButtonIconState(status, false, 1, "Show2ndVideo");
 }
 
 function showError(err_context, err_msg, ui_display, show_retry=true){
@@ -535,7 +559,7 @@ function showPTZControls(local, index, zoom, presets, settings, camera = undefin
     let settingsControl = $("#" + view_prefix + "SettingsButton" + index);
 
     // If not current selected camera and not PTZ for all camera, then hide buttons
-    if (!isCurrentCameraPTZ()){
+    if (local === true && !isCurrentCameraPTZ()){
         zoom = false;
         presets = false;
         settings = false;
@@ -733,9 +757,9 @@ function setPrimaryViewIcon(peer_id, streamName){
 }
 
 function playSound(soundname){
-    if (isWeb){
+    //if (isWeb){
         document.getElementById(soundname).play();
-    }
+    //}
 }
 
 function stopSounds(){

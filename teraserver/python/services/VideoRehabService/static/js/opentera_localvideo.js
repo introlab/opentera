@@ -2,13 +2,40 @@ let videoSources = [];
 let currentVideoSourceIndex = 0;
 let timerHandle = 0;
 
+function init_localview(){
+	// Check source
+	let urlParams = new URLSearchParams(window.location.search);
+	let sourceParam = urlParams.get('source');
+	if (sourceParam !== null){
+		clientSource = sourceParam;
+	}
+
+	if (clientSource === 'openteraplus'){
+		// Load QWebChannel library
+		include("qrc:///qtwebchannel/qwebchannel.js");
+
+		// Connect shared object
+		connectSharedObject(initLocalVideo);
+
+	}else{
+		initLocalVideo();
+	}
+}
+
 function initLocalVideo(){
 	navigator.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.getUserMedia ||
 		navigator.webkitGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 
 	if (navigator.getUserMedia) {
 		//navigator.getUserMedia({video: true, audio: false}, handleVideo, videoError);
-		navigator.mediaDevices.getUserMedia({video: {facingMode: "user" },
+		navigator.mediaDevices.getUserMedia({video:
+			/*{
+			width: {ideal: 1280, max: 1920 },
+			height: {ideal: 720, max: 1080 },
+			frameRate: {min: 15}//,//, ideal: 30},
+			//facingMode: "user"
+		},*/
+				{facingMode: "user" },
 			audio: false}).then(initialHandleVideo).catch(videoError);
 	}
 }
@@ -16,7 +43,11 @@ function initLocalVideo(){
 function initialHandleVideo(stream){
 	handleVideo(stream);
 
-	fillVideoSourceList(stream.getVideoTracks()[0].label);
+	// Use setted config if available
+	if (currentConfig.currentVideoName === undefined)
+		fillVideoSourceList(stream.getVideoTracks()[0].label);
+	else
+		fillVideoSourceList(currentConfig.currentVideoName);
 
 }
 
@@ -25,7 +56,6 @@ function handleVideo(stream) {
 
 	//console.log("Success! Device Name: " + stream.getVideoTracks()[0].label);
 	video.srcObject = stream;
-
 }
 
 function videoError(err) {
@@ -74,7 +104,14 @@ function updateVideoSource(){
 	let select = document.getElementById('videoSelect');
 	if (select.selectedIndex>=0){
 		currentVideoSourceIndex = select.selectedIndex;
-		let constraints = { deviceId: { exact: videoSources[currentVideoSourceIndex].deviceId } };
+		currentConfig.currentVideoName = videoSources[currentVideoSourceIndex].label;
+		showPTZControls(localPTZCapabilities.zoom, localPTZCapabilities.presets, localPTZCapabilities.settings,
+			currentConfig.currentVideoName);
+		let constraints = { deviceId: { exact: videoSources[currentVideoSourceIndex].deviceId }/*,
+				width: {ideal: 1280, max: 1920 },
+				height: {ideal: 720, max: 1080 },
+				frameRate: {min: 15}//, ideal: 30}*/
+			};
 		//console.log(constraints);
 		navigator.mediaDevices.getUserMedia({video: constraints}).then(handleVideo).catch(videoError);
 	}
@@ -85,15 +122,16 @@ function selectVideoSource(source){
 	for (let i=0; i<videoSources.length; i++){
 		console.log(source + " = " + videoSources[i].label + " ?");
 		if (videoSources[i].label.includes(source)){
+			console.log("Found video source at index " + i);
 			let select = document.getElementById('videoSelect');
 			select.selectedIndex = i;
 			currentVideoSourceIndex = i;
-			//updateVideoSource();
-			break;
+			updateVideoSource();
+			return;
 		}
 	}
+	console.error("Video source " + source + " not found.");
 }
-
 
 function resetInactiveTimer(){
 
@@ -115,11 +153,13 @@ function inactiveTimeout(){
 
 
 function openButtons(id) {
-	document.getElementById(id).style.height = "100%";
+	//document.getElementById(id).style.height = "100%";
+	showElement(id);
 }
 
 function closeButtons(id) {
-	document.getElementById(id).style.height = "0%";
+	//document.getElementById(id).style.height = "0%";
+	hideElement(id);
 	stopInactiveTimer();
 }
 
@@ -133,4 +173,30 @@ function toggleButtons(id) {
 
 function isButtonsClosed(id){
 	return document.getElementById(id).style.height === "0%";
+}
+
+function setLocalMirror(mirror){
+	let video_widget = $('#selfVideo');
+	if (video_widget !== undefined){
+		(mirror === true) ? video_widget.addClass('videoMirror') : video_widget.removeClass('videoMirror');
+	}
+}
+
+function showPTZControls(zoom, presets, settings, camera = undefined){
+	let zoomControls = $("#zoomButtons");
+	let presetControls = $("#presetButtons");
+	let settingsControl = $("#settingsButton");
+
+	// If not current selected camera and not PTZ for all camera, then hide buttons
+	if (!isCurrentCameraPTZ()){
+		zoom = false;
+		presets = false;
+		settings = false;
+	}
+
+	(zoom === true) ? zoomControls.show() : zoomControls.hide();
+	(presets === true) ? presetControls.show() : presetControls.hide();
+	(settings === true) ? settingsControl.show() : settingsControl.hide();
+
+
 }

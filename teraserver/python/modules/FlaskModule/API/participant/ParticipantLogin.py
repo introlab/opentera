@@ -16,6 +16,7 @@ model = api.model('ParticipantLogin', {
     'websocket_url': fields.String,
     'participant_uuid': fields.String,
     'participant_token': fields.String,
+    'participant_name': fields.String,
     'base_token': fields.String
 })
 

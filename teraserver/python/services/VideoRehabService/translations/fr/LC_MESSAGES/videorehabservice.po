@@ -7,17 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-03-11 13:52-0500\n"
+"POT-Creation-Date: 2021-03-24 13:12-0400\n"
 "PO-Revision-Date: 2021-03-11 13:56-0500\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.0\n"
-"X-Generator: Poedit 2.4.2\n"
 
 #: VideoRehabService.py:58
 msgid "Join me!"
@@ -78,12 +77,14 @@ msgstr "Erreur lors de la mise à jour de la séance"
 #: VideoRehabService.py:568
 msgid "Error creating user left session event"
 msgstr ""
-"Erreur lors de la création de l'événement \"Utilisateur a quitté la séance\""
+"Erreur lors de la création de l'événement \"Utilisateur a quitté la "
+"séance\""
 
 #: VideoRehabService.py:582
 msgid "Error creating participant left session event"
 msgstr ""
-"Erreur lors de la création de l'événement \"Participant a quitté la séance\""
+"Erreur lors de la création de l'événement \"Participant a quitté la "
+"séance\""
 
 #: VideoRehabService.py:596
 msgid "Error creating device left session event"
@@ -111,11 +112,12 @@ msgstr "Navigateur non-supporté détecté"
 
 #: templates/participant_dashboard.html:27
 msgid ""
-"Your browser is not supported. Session might or might not work, but it is "
-"recommended to user another browser."
+"Your browser is not supported. Session might or might not work, but it is"
+" recommended to user another browser."
 msgstr ""
 "Votre navigateur Internet n'est pas supporté. La séance peut quand même "
-"fonctionner correctement, mais il est recommandé d'utiliser un autre navigateur."
+"fonctionner correctement, mais il est recommandé d'utiliser un autre "
+"navigateur."
 
 #: templates/participant_dashboard.html:28
 msgid "Your browser"
@@ -131,31 +133,31 @@ msgstr "Impossible de se connecter"
 
 #: templates/participant_dashboard.html:31
 msgid ""
-"Your access might have been disabled or you might be already logged in on "
-"another device"
+"Your access might have been disabled or you might be already logged in on"
+" another device"
 msgstr ""
-"Votre accès peut avoir été désactivé ou vous êtes peut-être déjà connecté sur "
-"un autre appareil"
+"Votre accès peut avoir été désactivé ou vous êtes peut-être déjà connecté"
+" sur un autre appareil"
 
 #: templates/participant_dashboard.html:32
 msgid "Your session is now over. You may now logout or close this page."
 msgstr ""
-"La séance est maintenant terminée. Vous pouvez vous déconnecter ou fermer cette "
-"page."
+"La séance est maintenant terminée. Vous pouvez vous déconnecter ou fermer"
+" cette page."
 
-#: templates/participant_dashboard.html:60
+#: templates/participant_dashboard.html:58
 msgid "Error"
 msgstr "Erreur"
 
-#: templates/participant_dashboard.html:69
+#: templates/participant_dashboard.html:67
 msgid "Retry"
 msgstr "Réessayer"
 
-#: templates/participant_dashboard.html:70
+#: templates/participant_dashboard.html:68
 msgid "Ignore"
 msgstr "Ignorer"
 
-#: templates/participant_dashboard.html:81
+#: templates/participant_dashboard.html:79
 msgid "Logout"
 msgstr "Déconnexion"
 
@@ -187,19 +189,19 @@ msgstr "Nous sommes désolés, une erreur est survenue"
 msgid "OpenTeraPlus - Participant - Local view"
 msgstr "OpenTeraPlus - Participant - Vue locale"
 
-#: templates/participant_localview.html:19
+#: templates/participant_localview.html:22
 msgid "Unable to access camera and/or microphone"
 msgstr "Impossible d'accéder à la caméra et/ou au microphone"
 
-#: templates/participant_localview.html:20
+#: templates/participant_localview.html:23
 msgid "Error message"
 msgstr "Message d'erreur"
 
-#: templates/participant_localview.html:72
+#: templates/participant_localview.html:116
 msgid "Session starting..."
 msgstr "Démarrage de la séance en cours..."
 
-#: templates/participant_localview.html:75
+#: templates/participant_localview.html:119
 msgid "The session is about to start... Enjoy your session!"
 msgstr "La séance est sur le point de démarrer. Bonne séance!"
 
@@ -211,3 +213,4 @@ msgstr "La séance est sur le point de démarrer. Bonne séance!"
 
 #~ msgid "Device: "
 #~ msgstr "Appareil:"
+
