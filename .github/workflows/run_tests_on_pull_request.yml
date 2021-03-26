@@ -26,7 +26,7 @@ jobs:
         
     - name: Install System Dependencies
       run: | 
-        sudo apt-get install cmake protobuf-compiler wget redis-server postgresql
+        sudo apt-get install cmake protobuf-compiler wget redis-server postgresql nginx
         
     - name: Run System Services
       run: |
@@ -58,7 +58,12 @@ jobs:
         make python-all
         echo "OPENTERA_PYTHON=$(echo $PWD/python/env/python-3.8/bin/python)" >> $GITHUB_ENV
         echo "PYTHONPATH=$(echo $PWD/python)" >> $GITHUB_ENV
-
+        
+    - name: Run NGINX Reverse Proxy
+      working-directory: teraserver/python/config
+      run: |
+        ./start_nginx.sh
+      
     - name: Start TeraServer With Tests Enabled
       working-directory: teraserver/python
       run: |
