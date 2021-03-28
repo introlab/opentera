@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>OpenTeraPlus - Participant - Vue locale</title>
+    <title>{{ gettext('OpenTeraPlus - Participant - Local view') }}</title>
 
 	<script src="./static/js/opentera.js"></script>
     <script src="./static/js/jquery-3.5.1.min.js"></script>
@@ -13,6 +13,12 @@
     <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="./static/css/teraplus.css" />
+
+    <!-- Translations -->
+    <script>
+        const str_cant_access_media = "{{ gettext('Unable to access camera and/or microphone') }}";
+        const str_error_message = "{{ gettext('Error message') }}";
+    </script>
 
 </head>
 <body onload="init_dashboard('{{ backend_hostname }}', {{ backend_port }});
@@ -63,10 +69,10 @@ initLocalVideo();" style="background-color:black;overflow: hidden;">
           <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
               <div class="modal-header bg-primary">
-                <h5 class="modal-title ml-auto mr-auto">Démarrage en cours...</h5>
+                <h5 class="modal-title ml-auto mr-auto">{{ gettext('Session starting...') }}</h5>
               </div>
               <div class="modal-body bg-white text-dark ml-auto mr-auto">
-                <p>La séance est en cours de démarrage... Bonne séance!</p>
+                <p>{{ gettext('The session is about to start... Enjoy your session!') }}</p>
               </div>
               <div class="modal-footer bg-primary">
 

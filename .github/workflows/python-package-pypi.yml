@@ -5,7 +5,7 @@ name: Python package and upload to PyPi
 
 on:
   workflow_dispatch:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:

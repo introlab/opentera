@@ -7,110 +7,207 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-01-21 09:18-0500\n"
-"PO-Revision-Date: 2021-01-19 16:16-0500\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2021-03-11 13:52-0500\n"
+"PO-Revision-Date: 2021-03-11 13:56-0500\n"
+"Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.0\n"
+"X-Generator: Poedit 2.4.2\n"
 
 #: VideoRehabService.py:58
 msgid "Join me!"
-msgstr ""
+msgstr "Rejoignez-moi!"
 
 #: VideoRehabService.py:349
 msgid "Cannot create session event"
-msgstr ""
+msgstr "Impossible de créer l'événement de séance"
 
 #: VideoRehabService.py:378
 msgid "Cannot create process"
-msgstr ""
+msgstr "Impossible de démarrer le processus"
 
 #: VideoRehabService.py:392
 msgid "Cannot create session"
-msgstr ""
+msgstr "Impossible de créer la séance"
 
 #: VideoRehabService.py:414
 msgid "Cannot create STOP session event"
-msgstr ""
+msgstr "Impossible de créer l'événement \"Fin de séance\""
 
 #: VideoRehabService.py:470
-msgid "Error stopping session - check server logs. "
-msgstr ""
+msgid "Error stopping session - check server logs"
+msgstr "Erreur lors de l'arrêt de la séance - vérifiez les journaux du serveur"
 
 #: VideoRehabService.py:472
 msgid "No matching session to stop"
-msgstr ""
+msgstr "Aucune séance correspondante à arrêter"
 
-#: VideoRehabService.py:495 VideoRehabService.py:566
-msgid "User: "
-msgstr ""
+#: VideoRehabService.py:495 VideoRehabService.py:566 VideoRehabService.py:648
+msgid "User"
+msgstr "Utilisateur"
 
 #: VideoRehabService.py:497
-msgid "Error creating user invited session event "
-msgstr ""
+msgid "Error creating user invited session event"
+msgstr "Erreur lors de la création de l'événement \"Utilisateur invité\""
 
-#: VideoRehabService.py:507 VideoRehabService.py:579
-msgid "Participant: "
-msgstr ""
+#: VideoRehabService.py:507 VideoRehabService.py:579 VideoRehabService.py:661
+msgid "Participant"
+msgstr "Participant"
 
 #: VideoRehabService.py:509
-msgid "Error creating participant invited session event "
-msgstr ""
+msgid "Error creating participant invited session event"
+msgstr "Erreur lors de la création de l'événement \"Participant invité\""
 
-#: VideoRehabService.py:520 VideoRehabService.py:593
-msgid "Device: "
-msgstr ""
+#: VideoRehabService.py:520 VideoRehabService.py:594 VideoRehabService.py:675
+msgid "Device"
+msgstr "Appareil"
 
 #: VideoRehabService.py:522
-msgid "Error creating device invited session event "
-msgstr ""
+msgid "Error creating device invited session event"
+msgstr "Erreur lors de la création de l'événement \"Appareil invité\""
 
 #: VideoRehabService.py:538
 msgid "Error updating session"
-msgstr ""
+msgstr "Erreur lors de la mise à jour de la séance"
 
 #: VideoRehabService.py:568
-msgid "Error creating user left session event "
+msgid "Error creating user left session event"
 msgstr ""
+"Erreur lors de la création de l'événement \"Utilisateur a quitté la séance\""
 
-#: VideoRehabService.py:581
-msgid "Error creating participant left session event "
+#: VideoRehabService.py:582
+msgid "Error creating participant left session event"
 msgstr ""
+"Erreur lors de la création de l'événement \"Participant a quitté la séance\""
 
-#: VideoRehabService.py:595
-msgid "Error creating device left session event "
-msgstr ""
+#: VideoRehabService.py:596
+msgid "Error creating device left session event"
+msgstr "Erreur lors de la création de l'événement \"Appareil a quitté la séance\""
 
-#: VideoRehabService.py:647
-msgid "User "
-msgstr ""
-
-#: VideoRehabService.py:650 VideoRehabService.py:664 VideoRehabService.py:677
+#: VideoRehabService.py:651 VideoRehabService.py:665 VideoRehabService.py:678
 msgid "Cannot create refused session event"
-msgstr ""
-
-#: VideoRehabService.py:660
-msgid "Participant "
-msgstr ""
-
-#: VideoRehabService.py:674
-msgid "Device "
-msgstr ""
+msgstr "Erreur lors de la création de l'événement \"Invitation refusée\""
 
 #: Views/ParticipantError.py:26
 msgid "Unknown error"
-msgstr ""
+msgstr "Erreur inconnue"
 
 #: Views/ParticipantLocalView.py:26
-msgid "Votre séance débutera bientôt. Merci de patienter!"
-msgstr ""
+msgid "Your session will start soon. Thank you for your patience!"
+msgstr "La séance va démarrer bientôt. Merci de votre patience!"
 
 #: templates/index.html:16
-msgid "En construction...!"
-msgstr ""
+msgid "Work in progress!"
+msgstr "En construction!"
 
+#: templates/participant_dashboard.html:26
+msgid "Unsupported browser detected"
+msgstr "Navigateur non-supporté détecté"
+
+#: templates/participant_dashboard.html:27
+msgid ""
+"Your browser is not supported. Session might or might not work, but it is "
+"recommended to user another browser."
+msgstr ""
+"Votre navigateur Internet n'est pas supporté. La séance peut quand même "
+"fonctionner correctement, mais il est recommandé d'utiliser un autre navigateur."
+
+#: templates/participant_dashboard.html:28
+msgid "Your browser"
+msgstr "Votre navigateur"
+
+#: templates/participant_dashboard.html:29
+msgid "Supported browsers"
+msgstr "Navigateurs compatibles"
+
+#: templates/participant_dashboard.html:30
+msgid "Unable to connect"
+msgstr "Impossible de se connecter"
+
+#: templates/participant_dashboard.html:31
+msgid ""
+"Your access might have been disabled or you might be already logged in on "
+"another device"
+msgstr ""
+"Votre accès peut avoir été désactivé ou vous êtes peut-être déjà connecté sur "
+"un autre appareil"
+
+#: templates/participant_dashboard.html:32
+msgid "Your session is now over. You may now logout or close this page."
+msgstr ""
+"La séance est maintenant terminée. Vous pouvez vous déconnecter ou fermer cette "
+"page."
+
+#: templates/participant_dashboard.html:60
+msgid "Error"
+msgstr "Erreur"
+
+#: templates/participant_dashboard.html:69
+msgid "Retry"
+msgstr "Réessayer"
+
+#: templates/participant_dashboard.html:70
+msgid "Ignore"
+msgstr "Ignorer"
+
+#: templates/participant_dashboard.html:81
+msgid "Logout"
+msgstr "Déconnexion"
+
+#: templates/participant_endpoint.html:14
+msgid "OpenTera - Session completed"
+msgstr "OpenTera - Séance complétée"
+
+#: templates/participant_endpoint.html:20
+msgid "Thank you"
+msgstr "Merci"
+
+#: templates/participant_endpoint.html:21
+msgid "We hope that you enjoyed your session"
+msgstr "Nous espérons que vous avez apprécié votre séance"
+
+#: templates/participant_endpoint.html:23 templates/participant_error.html:25
+msgid "Click here to login again"
+msgstr "Cliquez ici pour vous reconnecter"
+
+#: templates/participant_error.html:14
+msgid "OpenTera - Error"
+msgstr "OpenTera - Erreur"
+
+#: templates/participant_error.html:20
+msgid "We are sorry, an error has happened"
+msgstr "Nous sommes désolés, une erreur est survenue"
+
+#: templates/participant_localview.html:5
+msgid "OpenTeraPlus - Participant - Local view"
+msgstr "OpenTeraPlus - Participant - Vue locale"
+
+#: templates/participant_localview.html:19
+msgid "Unable to access camera and/or microphone"
+msgstr "Impossible d'accéder à la caméra et/ou au microphone"
+
+#: templates/participant_localview.html:20
+msgid "Error message"
+msgstr "Message d'erreur"
+
+#: templates/participant_localview.html:72
+msgid "Session starting..."
+msgstr "Démarrage de la séance en cours..."
+
+#: templates/participant_localview.html:75
+msgid "The session is about to start... Enjoy your session!"
+msgstr "La séance est sur le point de démarrer. Bonne séance!"
+
+#~ msgid "User: "
+#~ msgstr "Utilisateur:"
+
+#~ msgid "Participant: "
+#~ msgstr "Participant:"
+
+#~ msgid "Device: "
+#~ msgstr "Appareil:"

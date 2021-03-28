@@ -37,7 +37,7 @@ authorizations = {
 flask_app = Flask("VideoRehabService")
 
 # Translations
-babel = Babel(flask_app)
+babel = Babel(flask_app, default_domain='videorehabservice')
 
 
 class MyHTTPChannel(HTTPChannel):
@@ -90,7 +90,8 @@ def get_locale():
     # otherwise try to guess the language from the user accept
     # header the browser transmits.  We support fr/en in this
     # example.  The best match wins.
-    return request.accept_languages.best_match(['fr', 'en'])
+    lang = request.accept_languages.best_match(['fr', 'en'])
+    return lang
 
 
 @babel.timezoneselector

@@ -57,8 +57,8 @@ function loginParticipantError(event, status){
 
 	// Redirect to error page
 	document.getElementById('mainview').src = "participant_error?token=" +
-		sessionStorage.getItem("participant_token") + "&error=Impossible de se connecter. " +
-		"Votre accès est peut-être désactivé ou vous êtes déjà connecté sur un autre appareil.";
+		sessionStorage.getItem("participant_token") + "&error=" + str_cant_connect + ". " +
+		str_cant_connect_reasons + ".";
 }
 
 function doLogout(backend_url, backend_port){

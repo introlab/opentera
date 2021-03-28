@@ -62,3 +62,22 @@ function hideElement(id){
 function showElement(id){
 	document.getElementById(id).style.display = "inline";
 }
+
+function isBrowserSupported(){
+    return browser.satisfies({
+        chrome: ">55",
+        firefox: ">50",
+        safari: ">=11",
+        edge: ">79"
+    });
+}
+
+function showError(err_context, err_msg, ui_display, show_retry=true){
+    console.error(err_context + ": " + err_msg);
+
+    if (ui_display === true){
+        $('#errorDialogText')[0].innerHTML = err_msg;
+        $('#errorDialog').modal('show');
+        (show_retry) ? $('#errorRefresh').show() : $('#errorRefresh').hide();
+    }
+}

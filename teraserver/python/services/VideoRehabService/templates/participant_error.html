@@ -11,18 +11,18 @@
     <script src="./static/js/jquery-3.5.1.min.js"></script>
     <script src="./static/bootstrap/js/bootstrap.min.js"></script>
 
-    <title>OpenTera - Erreur</title>
+    <title>{{ gettext('OpenTera - Error') }}</title>
 </head>
 <body >
 <div class="container fluid mt-5">
     <div class="jumbotron jumbotron-fluid bg-danger" >
         <div class="container">
-            <h3 class="text-warning text-center">Nous sommes désolés, une erreur est survenue</h3>
+            <h3 class="text-warning text-center">{{ gettext('We are sorry, an error has happened') }}</h3>
             <p class="lead display-5 bg-dark text-light p-4">{{error_msg}}</p>
         </div>
     </div>
     <p><button id="btnConnect" class="large-button" onclick="window.top.location.href='./participant?token={{participant_token}}'">
-        Cliquez ici pour tenter de vous reconnecter.
+        {{ gettext('Click here to login again') }}
     </button></p>
 </div>
 

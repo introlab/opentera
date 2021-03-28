@@ -31,6 +31,7 @@ function sharedObjectSocketOpened(){
     new QWebChannel(socket, function(channel) {
         SharedObject = channel.objects.SharedObject;
         setupSharedObjectCallbacks(channel);
+        SharedObject.setPageReady();
     });
     teraConnected = true;
 }
@@ -45,6 +46,13 @@ function setupSharedObjectCallbacks(channel){
     channel.objects.SharedObject.newSecondSources.connect(selectSecondarySources);
     channel.objects.SharedObject.setLocalMirrorSignal.connect(setLocalMirror);
 
+    if (channel.objects.SharedObject.videoSourceRemoved !== undefined)
+        channel.objects.SharedObject.videoSourceRemoved.connect(removeVideoSource);
+    if (channel.objects.SharedObject.startRecordingRequested !== undefined)
+        channel.objects.SharedObject.startRecordingRequested.connect(startRecordingRequest);
+    if (channel.objects.SharedObject.stopRecordingRequested !== undefined)
+        channel.objects.SharedObject.stopRecordingRequested.connect(stopRecordingRequest);
+
     //Request settings from client
     channel.objects.SharedObject.getAllSettings(function(settings) {
         settings = JSON.parse(settings);
@@ -55,7 +63,7 @@ function setupSharedObjectCallbacks(channel){
         setLocalMirror(settings.mirror);
         selectSecondarySources(settings.secondAudioVideo);
         ptz = JSON.parse(settings.ptz);
-        setPTZCapabilities(localContact.uuid, ptz.zoom, ptz.presets, ptz.settings);
+        setPTZCapabilities(localContact.uuid, ptz.zoom, ptz.presets, ptz.settings, ptz.camera);
 
         // Connect to signaling server now that we got all the settings
         connect();
@@ -76,4 +84,23 @@ function updateContact(contact)
 
 function setLocalMirror(mirror){
     setMirror(mirror, true, 1);
+}
+
+function startRecordingRequest(){
+    if (!streamRecorder)
+        streamRecorder = new TeraVideoRecorder();
+
+    streamRecorder.startRecording();
+    setRecordingStatus(true,1,true);
+    broadcastRecordingStatus(true);
+}
+
+function stopRecordingRequest(){
+    if (!streamRecorder)
+        return;
+
+    streamRecorder.stopRecording();
+    streamRecorder = null;
+    setRecordingStatus(true,1,false);
+    broadcastRecordingStatus(false);
 }

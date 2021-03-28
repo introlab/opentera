@@ -19,10 +19,18 @@
 		"chrono-label": "Libellé",
 		"label-exercices": "Exercices",
 		"label-rest": "Repos",
+		"label-none": "(Aucun)",
+		"chrono-type": "Type",
+		"chrono-countdown": "Décompte",
+		"chrono-countup": "Chronomètre",
 		"duration": "Durée",
+		"minutes": "minutes",
+		"seconds": "secondes",
 		"start": "Démarrer",
 		"cancel": "Annuler",
-		"completed": "Terminé!"
+		"completed": "Terminé!",
+		"all": "Tous",
+		"self": "Seulement moi"
 	},
 	"measureDialog": {
 		"title": "Mesures",
@@ -50,7 +58,11 @@
 	"status": {
 		"initializing": "Initialisation en cours...",
 		"cant-continue": "Impossible de continuer. Veuillez réessayer.",
-		"lost-connection": "Connexion perdue... Reconnexion en cours..."
+		"lost-connection": "Connexion perdue... Reconnexion en cours...",
+		"user-start-recording": " a démarré l'enregistrement vidéo de cette séance.",
+		"start-recording": "L'enregistrement vidéo de cette séance a été démarré.",
+		"user-stop-recording": " a arrêté l'enregistrement vidéo de cette séance.",
+		"stop-recording": "L'enregistrement vidéo de cette séance a été arrêté."
 	},
 	"ui": {
 		"controls": "Contrôles",
@@ -58,6 +70,15 @@
 		"speaker-all": "Son - Tous",
 		"tools": "Outils",
 		"chronos": "Chronos",
-		"measures": "Mesures"
+		"measures": "Mesures",
+		"zoom": "Zoom",
+		"zoom-max": "Max",
+		"zoom-min": "Min",
+		"zoom-in": "Avant",
+		"zoom-out": "Arrière",
+		"presets": "Positions",
+		"preset-1": "Position 1",
+		"preset-2": "Position 2",
+		"preset-3": "Position 3"
 	}
 }

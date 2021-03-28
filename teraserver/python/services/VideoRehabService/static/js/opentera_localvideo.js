@@ -31,7 +31,7 @@ function handleVideo(stream) {
 function videoError(err) {
 	// do something
 	showError("videoError()",
-		"Impossible d'accéder à la caméra ou au micro.<br><br>Le message d'erreur est:<br>" + err.name + " - " + err.message, true);
+		str_cant_access_media + ".<br><br>" + str_error_message + ":<br>" + err.name + " - " + err.message, true);
 }
 
 
@@ -45,14 +45,16 @@ function fillVideoSourceList(selected_source=undefined){
 	.then(function(devices) {
 		devices.forEach(function(device) {
 			if (device.kind === "videoinput"){
-				videoSources[videoSources.length] = device;
-				//select.options[select.options.length] = new Option(device.label.substring(0,device.label.length-12), device.id);
-				select.options[select.options.length] = new Option(device.label, device.id);
-				count++;
-				if (count<2){
-					hideElement("videoSelect"); // Hide if only one video source
-				}else{
-					showElement("videoSelect");
+				if (!device.label.includes(" IR ")) { // Filter "IR" camera, since they won't work.
+					videoSources[videoSources.length] = device;
+					//select.options[select.options.length] = new Option(device.label.substring(0,device.label.length-12), device.id);
+					select.options[select.options.length] = new Option(device.label, device.id);
+					count++;
+					if (count < 2) {
+						hideElement("videoSelect"); // Hide if only one video source
+					} else {
+						showElement("videoSelect");
+					}
 				}
 			}
 			//console.log(device.kind + ": " + device.label + " id = " + device.deviceId);
@@ -131,14 +133,4 @@ function toggleButtons(id) {
 
 function isButtonsClosed(id){
 	return document.getElementById(id).style.height === "0%";
-}
-
-function showError(err_context, err_msg, ui_display, show_retry=true){
-	console.error(err_context + ": " + err_msg);
-
-	if (ui_display === true){
-		$('#errorDialogText')[0].innerHTML = err_msg;
-		$('#errorDialog').modal('show');
-		(show_retry) ? $('#errorRefresh').show() : $('#errorRefresh').hide();
-	}
 }

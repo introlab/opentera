@@ -19,10 +19,18 @@
 		"chrono-label": "Label",
 		"label-exercices": "Exercices",
 		"label-rest": "Rest",
+		"label-none": "(None)",
+		"chrono-type": "Type",
+		"chrono-countdown": "Countdown",
+		"chrono-countup": "Chronometer",
 		"duration": "Duration",
+		"minutes": "minutes",
+		"seconds": "seconds",
 		"start": "Start",
 		"cancel": "Cancel",
-		"completed": "Completed!"
+		"completed": "Completed!",
+		"all": "All",
+		"self": "Myself only"
 	},
 	"measureDialog": {
 		"title": "Measurements",
@@ -50,7 +58,11 @@
 	"status": {
 		"initializing": "Initializing...",
 		"cant-continue": "Unable to continue. Please try again.",
-		"lost-connection": "Lost connection... Trying to reconnect..."
+		"lost-connection": "Lost connection... Trying to reconnect...",
+		"user-start-recording": " started video recording of this session.",
+		"start-recording": "Video recording of this session started.",
+		"user-stop-recording": " stopped video recording of this session.",
+		"stop-recording": "Video recording of this session stopped."
 	},
 	"ui": {
 		"controls": "Controls",
@@ -58,6 +70,15 @@
 		"speaker-all": "Sound - All",
 		"tools": "Tools",
 		"chronos": "Timers",
-		"measures": "Measurements"
+		"measures": "Measurements",
+		"zoom": "Zoom",
+		"zoom-max": "Max",
+		"zoom-min": "Min",
+		"zoom-in": "Forward",
+		"zoom-out": "Backward",
+		"presets": "Positions",
+		"preset-1": "Position 1",
+		"preset-2": "Position 2",
+		"preset-3": "Position 3"
 	}
 }
