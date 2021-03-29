@@ -130,13 +130,11 @@ class UserQueryDevices(Resource):
 
         try:
             device_list = []
-            online_devices = []
-            busy_devices = []
+
             if has_with_status:
                 # Query status
                 rpc = RedisRPCClient(self.module.config.redis_config)
-                online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
-                busy_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_devices')
+                status_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_devices')
 
             for device in devices:
                 if device is not None:
@@ -204,8 +202,16 @@ class UserQueryDevices(Resource):
                         device_json['device_subtype'] = device.device_subtype.to_json()
 
                     if has_with_status:
-                        device_json['device_busy'] = device.device_uuid in busy_devices
-                        device_json['device_online'] = device.device_uuid in online_devices
+                        if device.device_uuid in status_devices:
+                            # TODO Keep for compatibility. Should only keep device_status
+                            device_json['device_busy'] = status_devices[device.device_uuid]['busy']
+                            device_json['device_online'] = status_devices[device.device_uuid]['online']
+                            device_json['device_status'] = status_devices[device.device_uuid]
+                        else:
+                            # TODO Keep for compatibility. Should only keep device_status
+                            device_json['device_busy'] = False
+                            device_json['device_online'] = False
+                            device_json['device_status'] = None
 
                     device_list.append(device_json)
             return jsonify(device_list)

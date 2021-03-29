@@ -1,8 +1,10 @@
-var service_hostname;
-var service_port;
+let service_hostname;
+let service_port;
 
-var current_session_url;
-let currentLang='fr';
+let current_session_url;
+let currentLang = 'fr';
+
+let clientSource = 'web';
 
 function init_dashboard(serv_hostname, serv_port){
     service_hostname = serv_hostname;
@@ -11,6 +13,17 @@ function init_dashboard(serv_hostname, serv_port){
 
 function init_system(){
     if (isBrowserSupported()){
+        // Check source
+        let urlParams = new URLSearchParams(window.location.search);
+        let sourceParam = urlParams.get('source');
+        if (sourceParam !== null){
+            clientSource = sourceParam;
+            if (sourceParam === 'openteraplus'){
+                // Connected to OpenTeraPlus - hide logout button
+                hideElement('btnLogout');
+            }
+        }
+
         loginParticipant();
     }
     else{
@@ -22,7 +35,8 @@ function init_system(){
 
 function loginParticipant(){
     doParticipantLogin(backend_hostname, backend_port, participant_token);
-    document.getElementById('mainview').src = "participant_localview?token=" + participant_token;
+    document.getElementById('mainview').src = "participant_localview?token=" + participant_token + "&source=" +
+        clientSource;
 }
 
 let sessionUrlTries = 0;

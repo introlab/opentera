@@ -2,7 +2,7 @@ from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
 import datetime
 
 
-class UserQueryServicesTest(BaseAPITest):
+class UserQueryUserPreferencesTest(BaseAPITest):
     login_endpoint = '/api/user/login'
     test_endpoint = '/api/user/users/preferences'
 

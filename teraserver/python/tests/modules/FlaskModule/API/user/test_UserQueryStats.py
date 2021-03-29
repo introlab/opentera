@@ -3,7 +3,7 @@ from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
 import datetime
 
 
-class UserQueryAssetsTest(BaseAPITest):
+class UserQueryStatsTest(BaseAPITest):
     login_endpoint = '/api/user/login'
     test_endpoint = '/api/user/stats'
 

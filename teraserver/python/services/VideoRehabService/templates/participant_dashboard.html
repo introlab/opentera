@@ -34,13 +34,11 @@
 
 	   <!-- Server informations -->
 	   <script>
-			var service_hostname = "{{ hostname }}";
-			var service_port = {{ port }};
-			var backend_hostname = "{{ backend_hostname }}";
-			var backend_port = {{ backend_port }};
-			var participant_token = "{{ participant_token }}";
-			var participant_name = "{{ participant_name }}";
-			var participant_uuid = "{{ participant_uuid }}";
+			let backend_hostname = "{{ backend_hostname }}";
+			let backend_port = {{ backend_port }};
+			let participant_token = "{{ participant_token }}";
+			let participant_name = "{{ participant_name }}";
+			let participant_uuid = "{{ participant_uuid }}";
 
 			const browser = bowser.getParser(window.navigator.userAgent);
 			window.onload = function() {

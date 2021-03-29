@@ -159,7 +159,7 @@ class TeraDevice(db.Model, BaseModel):
                 filter(TeraDevice.device_participants == None).all()
 
     @staticmethod
-    # Unvailable device = device assigned to at least one participant
+    # Unavailable device = device assigned to at least one participant
     def get_unavailable_devices(ignore_disabled=True):
         if ignore_disabled:
             return TeraDevice.query.join(TeraDevice.device_participants).all()
@@ -198,7 +198,7 @@ class TeraDevice(db.Model, BaseModel):
             device3.device_uuid = str(uuid.uuid4())
             device3.id_device_type = TeraDeviceType.get_device_type_by_key('robot').id_device_type
             # device3.create_token()
-            device3.device_enabled = True
+            device3.device_enabled = False
             device3.device_onlineable = True
             # device3.device_sites = [TeraSite.get_site_by_sitename('Default Site')]
             # device3.device_participants = [TeraParticipant.get_participant_by_id(2)]

@@ -9,9 +9,10 @@ import sys
 
 class ServiceLauncherModule(BaseModule):
 
-    def __init__(self, config: ConfigManager):
+    def __init__(self, config: ConfigManager, system_only=False):
         BaseModule.__init__(self, ModuleNames.SERVICE_LAUNCHER_NAME.value, config)
         self.processList = []
+        self.launch_system_service_only = system_only
 
     def setup_module_pubsub(self):
         # Additional subscribe here
@@ -23,7 +24,7 @@ class ServiceLauncherModule(BaseModule):
                 print(service)
                 if service.service_key != 'OpenTeraServer':
                     self.launch_service(service)
-            elif service.service_enabled:
+            elif service.service_enabled and not self.launch_system_service_only:
                 self.launch_service(service)
 
     def notify_module_messages(self, pattern, channel, message):
@@ -55,10 +56,6 @@ class ServiceLauncherModule(BaseModule):
             path = os.path.join(os.getcwd(), 'services', 'BureauActif', 'BureauActifService.py')
             executable_args.append(path)
             working_directory = os.path.join(os.getcwd(), 'services', 'BureauActif')
-        elif service.service_key == "VideoDispatch":
-            path = os.path.join(os.getcwd(), 'services', 'VideoDispatch', 'VideoDispatchService.py')
-            executable_args.append(path)
-            working_directory = os.path.join(os.getcwd(), 'services', 'VideoDispatch')
         elif service.service_key == 'VideoRehabService':
             path = os.path.join(os.getcwd(), 'services', 'VideoRehabService', 'VideoRehabService.py')
             executable_args.append(path)

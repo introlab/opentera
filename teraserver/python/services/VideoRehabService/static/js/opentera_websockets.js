@@ -72,6 +72,10 @@ function ws_MessageReceived(evt){
         current_session_url = json_msg.message.events[0]["sessionUrl"];
         // Append name and uuid
         current_session_url += "&name=" + participant_name.replace("#", "") + "&uuid=" + participant_uuid;
+
+        // Append source if available
+        current_session_url += "&source=" + clientSource;
+
         console.log ("About to join session: " + current_session_url)
         setTimeout(waitDialogTimeout, 3000);
     }
@@ -81,13 +85,14 @@ function ws_MessageReceived(evt){
     (msg_type === "type.googleapis.com/opentera.protobuf.LeaveSessionEvent") &&
     json_msg.message.events[0]["leavingParticipants"].includes(participant_uuid))
     {
-        showElement('btnLogout');
+        if (clientSource === "web")
+            showElement('btnLogout');
         showElement('logos');
         $('#mainview').removeClass('iframe-with-footer');
         $('#mainview').addClass('iframe-without-footer');
         //window.location.replace("participant_endpoint?token=" + sessionStorage.getItem("participant_token"));
         document.getElementById('mainview').src = "participant_localview?token=" + sessionStorage.getItem("participant_token") +
-        "&message=" + str_session_complete + ".&message_type=light";
+        "&message=" + str_session_complete + ".&message_type=light&source=" + clientSource;
     }
 }
 

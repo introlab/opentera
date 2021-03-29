@@ -41,8 +41,11 @@ class UserQueryOnlineDevices(Resource):
             devices = TeraDevice.query.filter(TeraDevice.device_uuid.in_(filtered_devices_uuids)).all()
             devices_json = [device.to_json(minimal=True) for device in devices]
             for device in devices_json:
+                # TODO  remove 'device_online' and 'device_busy' and keep only 'device_status' that contains all info.
+                # TODO Kept here for compatibility
                 device['device_online'] = status_devices[device['device_uuid']]['online']
                 device['device_busy'] = status_devices[device['device_uuid']]['busy']
+                device['device_status'] = status_devices[device['device_uuid']]
 
             return devices_json
 

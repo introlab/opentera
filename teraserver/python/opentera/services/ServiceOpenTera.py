@@ -9,6 +9,7 @@ import opentera.messages.python as messages
 from twisted.internet import defer
 import datetime
 from opentera.logging.LoggingClient import LoggingClient
+from opentera.services.ServiceAccessManager import ServiceAccessManager
 
 
 class ServiceOpenTera(RedisClient):
@@ -37,6 +38,19 @@ class ServiceOpenTera(RedisClient):
 
         # Create service token for service api requests
         self.service_token = self.service_generate_token()
+
+        # Update Service Access information
+        ServiceAccessManager.api_user_token_key = \
+            self.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
+        ServiceAccessManager.api_participant_token_key = \
+            self.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
+        ServiceAccessManager.api_participant_static_token_key = \
+            self.redisGet(RedisVars.RedisVar_ParticipantStaticTokenAPIKey)
+        ServiceAccessManager.api_device_token_key = \
+            self.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
+        ServiceAccessManager.api_device_static_token_key = \
+            self.redisGet(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
+        ServiceAccessManager.config_man = config_man
 
     def redisConnectionMade(self):
         print('*** ServiceOpenTera.redisConnectionMade for', self.config['name'])

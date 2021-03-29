@@ -88,13 +88,10 @@ class UserQueryUsers(Resource):
 
         if users:
             users_list = []
-            online_users = []
-            busy_users = []
             if args['with_status']:
                 # Query users status
                 rpc = RedisRPCClient(self.module.config.redis_config)
-                online_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
-                busy_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'busy_users')
+                status_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_users')
 
             for user in users:
                 if user is not None:
@@ -134,8 +131,12 @@ class UserQueryUsers(Resource):
                         user_json['user_user_groups'] = user_groups_list
 
                     if args['with_status']:
-                        user_json['user_busy'] = user.user_uuid in busy_users
-                        user_json['user_online'] = user.user_uuid in online_users
+                        if user.user_uuid in status_users:
+                            user_json['user_busy'] = status_users[user.user_uuid]['busy']
+                            user_json['user_online'] = status_users[user.user_uuid]['online']
+                        else:
+                            user_json['user_busy'] = False
+                            user_json['user_online'] = False
 
                     users_list.append(user_json)
             return jsonify(users_list)

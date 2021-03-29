@@ -3,7 +3,7 @@ import random
 from opentera.db.models.TeraDeviceType import TeraDeviceType
 
 
-class UserQueryDeviceTypesTest(BaseAPITest):
+class UserQueryDeviceSubTypesTest(BaseAPITest):
     login_endpoint = '/api/user/login'
     test_endpoint = '/api/user/devicesubtypes'
 

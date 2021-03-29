@@ -6,9 +6,12 @@
 
 	<script src="./static/js/opentera.js"></script>
     <script src="./static/js/jquery-3.5.1.min.js"></script>
-	<script src="./static/bootstrap/js/bootstrap.min.js"></script>
+	<script src="./static/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<script src="./static/js/opentera_localvideo.js"></script>
 	<script src="./static/js/opentera_dashboard.js"></script>
+    <script src="./static/js/opentera_utils.js"></script>
+    <script src="./static/js/opentera_shared_object.js"></script>
+    <script src="./static/js/opentera_ptz.js"></script>
 
     <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
@@ -22,7 +25,7 @@
 
 </head>
 <body onload="init_dashboard('{{ backend_hostname }}', {{ backend_port }});
-initLocalVideo();" style="background-color:black;overflow: hidden;">
+init_localview();" style="background-color:black;overflow: hidden;">
 
 <!-- ErrorDialog -->
 <div class="modal fade" id="errorDialog" tabindex="-1" role="dialog" aria-labelledby="errorDialogCenterTitle"
@@ -49,19 +52,60 @@ initLocalVideo();" style="background-color:black;overflow: hidden;">
     <label>{{message}}</label>
 </div>
 <div class="container-fluid" id="mainContainer">
-		<div id="selfView" title="Vidéo locale" onmousemove="resetInactiveTimer();openButtons('navButtons');return false;" width="100%" onmouseleave="closeButtons('navButtons');return false;"  style="overflow: hidden;">
+		<div id="selfView" onmousemove="resetInactiveTimer();openButtons('navButtons');return false;" width="100%" onmouseleave=""  style="overflow: hidden;">
 
-			<div id="navButtons" class="overlay">
-				<div class="overlay-top-center pt-5">
-					<div>
-						<select id="videoSelect" onchange="updateVideoSource();event.stopPropagation();"
-                                onclick="event.stopPropagation();">
-						</select>
-					</div>
-				  </div>
-			</div>
-			<video playsinline="true" autoplay="true" id="selfVideo" muted="muted" volume="1" micEnabled="false"
-                   class="videoMirror mt-3" style="top:30px;"/>
+			<div id="navButtons" class="overlay-top-center w-100" style="display: none;">
+                <select id="videoSelect" onchange="updateVideoSource();event.stopPropagation();"
+                        onclick="event.stopPropagation();">
+                </select>
+            </div>
+            <!-- PTZ controls -->
+            <div id="ptzControls" class="overlay-top-center" oncontextmenu="" onclick="" onwheel="">
+                <div class="dropdown">
+                    <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="zoomButtons" src="static/images/zoom_custom.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.zoom" style="display:none;"/>
+                    <div class="dropdown-menu bg-secondary" aria-labelledby="zoomButtons" >
+                        <div class="dropdown-item text-light" onclick="zoomMax();">
+                            <input class="tool-icon" id="btnPTZZoomMax" type="image" alt="image" src="static/images/Zoom-max.png" />
+                            <label data-i18n="ui.zoom-max">Max</label>
+                        </div>
+                        <div class="dropdown-item text-light" onclick="zoomIn();">
+                            <input class="tool-icon" id="btnPTZZoomIn" type="image" alt="image" src="static/images/Zoom-in1.png"/>
+                            <label data-i18n="ui.zoom-in">In</label>
+                        </div>
+                        <div class="dropdown-item text-light" onclick="zoomOut();">
+                            <input class="tool-icon" id="btnPTZZoomOut" type="image" alt="image" src="static/images/Zoom-out1.png"/>
+                            <label data-i18n="ui.zoom-out">Out</label>
+                        </div>
+                        <div class="dropdown-item text-light" onclick="zoomMin();">
+                            <input class="tool-icon" id="btnPTZZoomMin" type="image" alt="image" src="static/images/Zoom-min.png"/>
+                            <label data-i18n="ui.zoom-min">Min</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="presetButtons" src="static/images/presets.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.presets" style="display:none;"/>
+                    <div class="dropdown-menu bg-secondary" aria-labelledby="presetButtons">
+                        <div class="dropdown-item text-light" onclick="gotoPreset(event, 1);">
+                            <label data-i18n="ui.preset-1">Position 1</label>
+                        </div>
+                        <div class="dropdown-item text-light" onclick="gotoPreset(event, 2);">
+                            <label data-i18n="ui.preset-2">Position 2</label>
+                        </div>
+                        <div class="dropdown-item text-light" onclick="gotoPreset(event, 3);">
+                            <label data-i18n="ui.preset-3">Position 3</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <input class="btn bg-secondary text-light image-icon" id="settingsButton" type="image" alt="image" src="static/images/settings.png" onclick="camSettings();event.stopPropagation();" style="display: none;"/>
+                </div>
+            </div>
+
+			<video playsinline="true" autoplay="true" id="selfVideo" muted="muted"
+                   oncontextmenu="return false;"
+                   onclick="managePTZClickEvent(event);event.stopPropagation();"
+                   onwheel="managePTZMouseWheel(event);event.stopPropagation();"
+                   class="videoMirror mt-3"></video>
 		  </div>
 		</div>
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-03-11 13:52-0500\n"
+"POT-Creation-Date: 2021-03-24 13:12-0400\n"
 "PO-Revision-Date: 2021-01-19 16:16-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -134,19 +134,19 @@ msgstr ""
 msgid "Your session is now over. You may now logout or close this page."
 msgstr ""
 
-#: templates/participant_dashboard.html:60
+#: templates/participant_dashboard.html:58
 msgid "Error"
 msgstr ""
 
-#: templates/participant_dashboard.html:69
+#: templates/participant_dashboard.html:67
 msgid "Retry"
 msgstr ""
 
-#: templates/participant_dashboard.html:70
+#: templates/participant_dashboard.html:68
 msgid "Ignore"
 msgstr ""
 
-#: templates/participant_dashboard.html:81
+#: templates/participant_dashboard.html:79
 msgid "Logout"
 msgstr ""
 
@@ -178,19 +178,19 @@ msgstr ""
 msgid "OpenTeraPlus - Participant - Local view"
 msgstr ""
 
-#: templates/participant_localview.html:19
+#: templates/participant_localview.html:22
 msgid "Unable to access camera and/or microphone"
 msgstr ""
 
-#: templates/participant_localview.html:20
+#: templates/participant_localview.html:23
 msgid "Error message"
 msgstr ""
 
-#: templates/participant_localview.html:72
+#: templates/participant_localview.html:116
 msgid "Session starting..."
 msgstr ""
 
-#: templates/participant_localview.html:75
+#: templates/participant_localview.html:119
 msgid "The session is about to start... Enjoy your session!"
 msgstr ""
 

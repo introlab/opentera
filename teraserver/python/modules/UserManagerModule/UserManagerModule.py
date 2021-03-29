@@ -11,6 +11,8 @@ from opentera.modules.BaseModule import BaseModule, ModuleNames
 from modules.UserManagerModule.UserRegistry import UserRegistry
 from modules.UserManagerModule.ParticipantRegistry import ParticipantRegistry
 from modules.UserManagerModule.DeviceRegistry import DeviceRegistry
+import json
+from datetime import datetime
 
 
 class UserManagerModule(BaseModule):
@@ -29,23 +31,71 @@ class UserManagerModule(BaseModule):
         pass
 
     def setup_rpc_interface(self):
-        self.rpc_api['online_users'] = {'args': [], 'returns': 'list', 'callback': self.online_users_rpc_callback}
-        self.rpc_api['busy_users'] = {'args': [], 'returns': 'dict', 'callback': self.busy_users_rpc_callback}
-        self.rpc_api['status_users'] = {'args': [], 'returns': 'dict', 'callback': self.status_users_rpc_callback}
+        self.rpc_api['online_users'] = {
+            'args': [],
+            'returns': 'list',
+            'callback': self.online_users_rpc_callback}
 
-        self.rpc_api['online_participants'] = {'args': [], 'returns': 'list',
-                                               'callback': self.online_participants_rpc_callback}
-        self.rpc_api['busy_participants'] = {'args': [], 'returns': 'dict',
-                                             'callback': self.busy_participants_rpc_callback}
+        self.rpc_api['busy_users'] = {
+            'args': [],
+            'returns': 'dict',
+            'callback': self.busy_users_rpc_callback}
 
-        self.rpc_api['status_participants'] = {'args': [], 'returns': 'dict',
-                                               'callback': self.status_participants_rpc_callback}
+        self.rpc_api['status_users'] = {
+            'args': [],
+            'returns': 'dict',
+            'callback': self.status_users_rpc_callback}
 
-        self.rpc_api['online_devices'] = {'args': [], 'returns': 'list',
-                                          'callback': self.online_devices_rpc_callback}
-        self.rpc_api['busy_devices'] = {'args': [], 'returns': 'dict', 'callback': self.busy_devices_rpc_callback}
+        self.rpc_api['online_participants'] = {
+            'args': [],
+            'returns': 'list',
+            'callback': self.online_participants_rpc_callback}
 
-        self.rpc_api['status_devices'] = {'args': [], 'returns': 'dict', 'callback': self.status_devices_rpc_callback}
+        self.rpc_api['busy_participants'] = {
+            'args': [],
+            'returns': 'dict',
+            'callback': self.busy_participants_rpc_callback}
+
+        self.rpc_api['status_participants'] = {
+            'args': [],
+            'returns': 'dict',
+            'callback': self.status_participants_rpc_callback}
+
+        self.rpc_api['online_devices'] = {
+            'args': [],
+            'returns': 'list',
+            'callback': self.online_devices_rpc_callback}
+
+        self.rpc_api['busy_devices'] = {
+            'args': [],
+            'returns': 'dict',
+            'callback': self.busy_devices_rpc_callback}
+
+        self.rpc_api['status_devices'] = {
+            'args': [],
+            'returns': 'dict',
+            'callback': self.status_devices_rpc_callback}
+
+        self.rpc_api['update_device_status'] = {
+            'args': ['str:uuid', 'str:status', 'int:timestamp'],
+            'returns': 'dict',
+            'callback': self.update_device_status_rpc_callback}
+
+    def update_device_status_rpc_callback(self, uuid: str, status: str, timestamp):
+        if uuid in self.device_registry.online_devices():
+            status_update = self.device_registry.device_update_status(uuid, status, timestamp)
+            # Send notification
+            from opentera.db.models.TeraDevice import TeraDevice
+            device_data = TeraDevice.get_device_by_uuid(uuid)
+            device_event = DeviceEvent()
+            device_event.device_name = device_data.device_name
+            device_event.device_uuid = uuid
+            device_event.device_status = json.dumps(status_update)
+            device_event.type = DeviceEvent.DEVICE_STATUS_CHANGED
+            self.send_event_message(device_event, self.event_topic_name())
+            return {'uuid': uuid, 'status': status, 'timestamp': timestamp}
+        else:
+            return None
 
     def online_users_rpc_callback(self, *args, **kwargs):
         # print('online_users_rpc_callback', args, kwargs)
@@ -127,8 +177,11 @@ class UserManagerModule(BaseModule):
                 online_flag = True
             if device_uuid in busy_devices:
                 busy_flag = True
-
-            result[device_uuid] = {'online': online_flag, 'busy': busy_flag}
+            # Device status can be none or have any structure
+            result[device_uuid] = {
+                'online': online_flag,
+                'busy': busy_flag,
+                'status': self.device_registry.device_get_status(device_uuid)}
         return result
 
     def setup_module_pubsub(self):
