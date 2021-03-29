@@ -96,7 +96,7 @@ class DeviceQueryStatusTest(BaseAPITest):
                 answer = self._post_with_token(dev['device_token'], payload=device_status)
                 self.assertEqual(400, answer.status_code)
 
-    def test_send_satus_with_good_payload_online_device_should_work(self):
+    def test_send_status_with_good_payload_online_device_should_work(self):
         for dev in self.devices:
             self.assertTrue('device_token' in dev)
 
