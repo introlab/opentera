@@ -153,10 +153,10 @@ class TeraDevice(db.Model, BaseModel):
     def get_available_devices(ignore_disabled=True):
         if ignore_disabled:
             return TeraDevice.query.outerjoin(TeraDevice.device_participants)\
-                .filter(TeraDevice.device_participants is None).all()
+                .filter(TeraDevice.device_participants == None).all()
         else:
             return TeraDevice.query.filter_by(device_enabled=True).outerjoin(TeraDevice.device_participants).\
-                filter(TeraDevice.device_participants is None).all()
+                filter(TeraDevice.device_participants == None).all()
 
     @staticmethod
     # Unavailable device = device assigned to at least one participant
