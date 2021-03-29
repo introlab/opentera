@@ -1,7 +1,7 @@
 from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
 
 
-class UserQueryDeviceDeviceProjectTest(BaseAPITest):
+class UserQueryDevicesTest(BaseAPITest):
     login_endpoint = '/api/user/login'
     test_endpoint = '/api/user/devices'
 
@@ -364,3 +364,15 @@ class UserQueryDeviceDeviceProjectTest(BaseAPITest):
         # Delete the device
         response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=new_id[0])
         self.assertEqual(response.status_code, 200)
+
+    def test_query_device_with_status_as_admin(self):
+        params = {'with_status': True}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+
+        # Check for important status fields
+        for device_info in response.json():
+            self.assertTrue('device_online' in device_info)
+            self.assertTrue('device_busy' in device_info)
+            self.assertTrue('device_status' in device_info)
+
