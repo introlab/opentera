@@ -146,7 +146,7 @@ class UserQueryParticipants(Resource):
                                     part_id=participant.id_participant)
                                 if participant_sessions:
                                     participant_json['participant_lastsession'] = \
-                                        participant_sessions[-1].session_start_datetime.isoformat()
+                                        participant_sessions[0].session_start_datetime.isoformat()
                                 else:
                                     participant_json['participant_lastsession'] = None
 

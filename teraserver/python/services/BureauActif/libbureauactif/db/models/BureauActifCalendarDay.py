@@ -23,6 +23,12 @@ class BureauActifCalendarDay(db.Model, BaseModel):
                                                   "==BureauActifCalendarData.id_calendar_day, "
                                                   "BureauActifCalendarData.id_calendar_data_type==3)",
                                       uselist=False)
+    absent = db.relationship("BureauActifCalendarData",
+                             primaryjoin="and_(BureauActifCalendarDay.id_calendar_day"
+                                         "==BureauActifCalendarData.id_calendar_day, "
+                                         "BureauActifCalendarData.id_calendar_data_type==4)",
+                             uselist=False)
+
     timeline = db.relationship('BureauActifTimelineDay')
 
     def to_json(self, ignore_fields=None, minimal=False):

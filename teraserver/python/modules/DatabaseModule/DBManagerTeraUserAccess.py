@@ -394,7 +394,7 @@ class DBManagerTeraUserAccess:
         if site_id in self.get_accessible_sites_ids():
             query = TeraDevice.query.join(TeraDeviceProject).join(TeraProject) \
                 .filter(TeraProject.id_site == site_id) \
-                .order_by(TeraDevice.id_device.asc())
+                .order_by(TeraDevice.device_name.asc())
             if device_type_id:
                 query = query.filter(TeraDevice.id_device_type == device_type_id)
             if enabled:
@@ -406,7 +406,7 @@ class DBManagerTeraUserAccess:
         devices = []
         if project_id in self.get_accessible_projects_ids():
             query = TeraDevice.query.join(TeraDeviceProject).filter_by(id_project=project_id) \
-                .order_by(TeraDevice.id_device.asc())
+                .order_by(TeraDevice.device_name.asc())
             if device_type_id:
                 query = query.filter(TeraDevice.id_device_type == device_type_id)
             if enabled is not None:
@@ -462,7 +462,7 @@ class DBManagerTeraUserAccess:
         part_ids = self.get_accessible_participants_ids()
         participants = TeraParticipant.query.join(TeraProject) \
             .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids)) \
-            .order_by(TeraParticipant.id_participant.asc()).all()
+            .order_by(TeraParticipant.participant_name.asc()).all()
         return participants
 
     def query_enabled_participants_for_site(self, site_id: int):
@@ -470,14 +470,14 @@ class DBManagerTeraUserAccess:
         participants = TeraParticipant.query.join(TeraProject) \
             .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids)) \
             .filter(TeraParticipant.participant_enabled == true()) \
-            .order_by(TeraParticipant.id_participant.asc()).all()
+            .order_by(TeraParticipant.participant_name.asc()).all()
         return participants
 
     def query_all_participants_for_project(self, project_id: int):
         part_ids = self.get_accessible_participants_ids()
         participants = TeraParticipant.query.filter(TeraParticipant.id_project == project_id,
                                                     TeraParticipant.id_participant.in_(part_ids)) \
-            .order_by(TeraParticipant.id_participant.asc()).all()
+            .order_by(TeraParticipant.participant_name.asc()).all()
         return participants
 
     def query_enabled_participants_for_project(self, project_id: int):
@@ -485,14 +485,14 @@ class DBManagerTeraUserAccess:
         participants = TeraParticipant.query.filter(TeraParticipant.id_project == project_id,
                                                     TeraParticipant.id_participant.in_(part_ids)) \
             .filter(TeraParticipant.participant_enabled == true()) \
-            .order_by(TeraParticipant.id_participant.asc()).all()
+            .order_by(TeraParticipant.participant_name.asc()).all()
         return participants
 
     def query_participants_for_group(self, group_id: int):
         part_ids = self.get_accessible_participants_ids()
         participants = TeraParticipant.query.filter(TeraParticipant.id_participant_group == group_id,
                                                     TeraParticipant.id_participant.in_(part_ids)) \
-            .order_by(TeraParticipant.id_participant.asc()).all()
+            .order_by(TeraParticipant.participant_name.asc()).all()
         return participants
 
     # def query_users_access_for_site(self, site_id: int, admin_only=False):
