@@ -1,0 +1,99 @@
+# This workflow will run on pull requests
+name: Run Tests on Pull Requests
+on:
+  workflow_dispatch:
+    branches: [main]
+    
+  pull_request:
+    branches: [dev, main]
+    
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install System Dependencies
+      run: | 
+        sudo apt-get install cmake protobuf-compiler wget redis-server postgresql nginx
+        
+    - name: Run System Services
+      run: |
+        sudo systemctl enable postgresql
+        sudo systemctl start postgresql
+        
+    - name: Create Database Tables
+      run: |
+        sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"
+        sudo -u postgres psql -c "create database test;"
+        sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"
+        sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"
+        sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"
+        sudo -u postgres psql -c "create database openteralogs;" 
+        sudo -u postgres psql -c "grant all privileges on database openteralogs to TeraAgent;"
+        sudo -u postgres psql -c "create database openterafiles;" 
+        sudo -u postgres psql -c "grant all privileges on database openterafiles to TeraAgent;"
+        sudo -u postgres psql -c "\l"
+        
+    - name: Install Miniconda3
+      run: |
+        echo $HOME
+        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        bash ./Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
+    - name: Run CMake and build
+      working-directory: teraserver
+      run: |
+        cmake .
+        make python-all
+        echo "OPENTERA_PYTHON=$(echo $PWD/python/env/python-3.8/bin/python)" >> $GITHUB_ENV
+        echo "PYTHONPATH=$(echo $PWD/python)" >> $GITHUB_ENV
+    
+    - name: Generate Self Signed TLS Certificates
+      working-directory: teraserver/python
+      run: |
+        $OPENTERA_PYTHON CreateCertificates.py
+    
+    - name: Run NGINX Reverse Proxy
+      working-directory: teraserver/python/config
+      run: |
+        mkdir logs
+        ./start_nginx.sh
+      
+    - name: Start TeraServer With Tests Enabled
+      working-directory: teraserver/python
+      run: |
+        $OPENTERA_PYTHON TeraServer.py --enable_tests=1 &
+        sleep 10
+                
+    - name: Run Device API Tests
+      working-directory: teraserver/python/tests/modules/FlaskModule/API/device
+      run: |
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
+        
+    - name: Run Participant API Tests
+      working-directory: teraserver/python/tests/modules/FlaskModule/API/participant
+      run: |
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
+        
+    - name: Run User API Tests
+      working-directory: teraserver/python/tests/modules/FlaskModule/API/user
+      run: |
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
+
+    - name: Run Models Tests
+      working-directory: teraserver/python/tests/opentera/db/models
+      run: |
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
+  
+    
