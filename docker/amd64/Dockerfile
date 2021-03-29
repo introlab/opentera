@@ -1,5 +1,5 @@
 # Image: introlab3it/openteraserver
-# LABEL version="0.1"
+# LABEL version="1.0.5"
 # LABEL description="OpenTera Test Server from IntRoLab."
 
 FROM ubuntu:18.04
@@ -18,7 +18,7 @@ ENV LC_ALL en_US.UTF-8
 
 # Clone repository
 # ARG CACHE_DATE=2021-02-23
-RUN git clone --recurse-submodules -b dev https://github.com/introlab/opentera.git
+RUN git clone --recurse-submodules -b main https://github.com/introlab/opentera.git
 
 #Create dbs and users
 RUN service postgresql start &&\
