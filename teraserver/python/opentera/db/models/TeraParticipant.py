@@ -166,7 +166,7 @@ class TeraParticipant(db.Model, BaseModel):
             return None
 
         # Check if enabled
-        if not TeraParticipant.participant_enabled or not TeraParticipant.participant_login_enabled:
+        if not participant.participant_enabled or not participant.participant_login_enabled:
             print('TeraUser: verify_password - user ' + username + ' is inactive or login is disabled.')
             return None
 
@@ -181,7 +181,7 @@ class TeraParticipant(db.Model, BaseModel):
     def get_participant_by_token(token):
         participant = TeraParticipant.query.filter_by(participant_token=token).first()
 
-        if participant and TeraParticipant.participant_enabled and TeraParticipant.participant_login_enabled:
+        if participant and participant.participant_enabled and participant.participant_token_enabled:
             # Validate token
             data = jwt.decode(token.encode('utf-8'), TeraServerSettings.get_server_setting_value(
                 TeraServerSettings.ServerParticipantTokenKey), algorithms='HS256')
