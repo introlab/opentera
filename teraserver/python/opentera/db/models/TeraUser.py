@@ -182,17 +182,8 @@ class TeraUser(db.Model, BaseModel):
         # Check password
         if bcrypt.verify(password, user.user_password):
             user.authenticated = True
-            # user.user_login_attempts = 0
-            # db.session.commit()
             return user
 
-        # Wrong password - update login attempt counter
-        # if user.is_max_login_attempts_reached() and user.user_enabled:
-        #     # Disable user
-        #     user.user_enabled = False
-        # else:
-        #     user.user_login_attempts = user.user_login_attempts + 1
-        # db.session.commit()
         return None
 
     @staticmethod
