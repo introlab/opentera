@@ -22,6 +22,9 @@ class RedisVars:
     # For example, a "get" to "service.<uuid>" would get the ServiceInfo object for that service
     RedisVar_ServicePrefixKey = "service."
 
+    # User login attempt counter prefix
+    RedisVar_UserLoginAttemptKey = "UserLoginAttempts."
+
     @classmethod
     def build_service_rpc_topic(cls, service_key) -> str:
         return cls.RedisVar_ServicePrefixKey + service_key + '.rpc'

@@ -48,7 +48,8 @@ class TeraUser(db.Model, BaseModel):
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['authenticated', 'user_password', 'user_user_groups', 'user_sessions'])
+        ignore_fields.extend(['authenticated', 'user_password', 'user_user_groups',
+                              'user_sessions'])
         if minimal:
             ignore_fields.extend(['user_username', 'user_email', 'user_profile', 'user_notes', 'user_lastonline',
                                   'user_superadmin'])
@@ -165,9 +166,10 @@ class TeraUser(db.Model, BaseModel):
         return bcrypt.hash(password)
 
     @staticmethod
-    def verify_password(username, password):
+    def verify_password(username, password, user=None):
         # Query User with that username
-        user = TeraUser.get_user_by_username(username)
+        if user is None:
+            user = TeraUser.get_user_by_username(username)
         if user is None:
             print('TeraUser: verify_password - user ' + username + ' not found.')
             return None
@@ -180,8 +182,17 @@ class TeraUser(db.Model, BaseModel):
         # Check password
         if bcrypt.verify(password, user.user_password):
             user.authenticated = True
+            # user.user_login_attempts = 0
+            # db.session.commit()
             return user
 
+        # Wrong password - update login attempt counter
+        # if user.is_max_login_attempts_reached() and user.user_enabled:
+        #     # Disable user
+        #     user.user_enabled = False
+        # else:
+        #     user.user_login_attempts = user.user_login_attempts + 1
+        # db.session.commit()
         return None
 
     @staticmethod
