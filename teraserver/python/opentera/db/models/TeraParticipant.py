@@ -158,9 +158,11 @@ class TeraParticipant(db.Model, BaseModel):
     #     return False
 
     @staticmethod
-    def verify_password(username, password):
+    def verify_password(username, password, participant=None):
         # Query User with that username
-        participant = TeraParticipant.get_participant_by_username(username)
+        if participant is None:
+            participant = TeraParticipant.get_participant_by_username(username)
+
         if participant is None:
             print('TeraParticipant: verify_password - participant ' + username + ' not found.')
             return None

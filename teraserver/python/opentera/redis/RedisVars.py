@@ -25,6 +25,9 @@ class RedisVars:
     # User login attempt counter prefix
     RedisVar_UserLoginAttemptKey = "UserLoginAttempts."
 
+    # Participant login attempt counter prefix
+    RedisVar_ParticipantLoginAttemptKey = "ParticipantLoginAttempts."
+
     @classmethod
     def build_service_rpc_topic(cls, service_key) -> str:
         return cls.RedisVar_ServicePrefixKey + service_key + '.rpc'

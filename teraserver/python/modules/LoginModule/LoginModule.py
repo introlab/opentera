@@ -205,7 +205,7 @@ class LoginModule(BaseModule):
         else:
             current_attempts = int(current_attempts)
 
-        if current_attempts >= 5:
+        if current_attempts >= 10:
             return False  # Too many attempts in a short period of time will result in temporary disabling (see below)
 
         logged_user = TeraUser.verify_password(username=username, password=password, user=tentative_user)
@@ -277,7 +277,25 @@ class LoginModule(BaseModule):
     def participant_verify_password(self, username, password):
         # print('LoginModule - participant_verify_password for ', username)
 
-        if TeraParticipant.verify_password(username=username, password=password):
+        tentative_participant = TeraParticipant.get_participant_by_username(username)
+        if not tentative_participant:
+            self.logger.log_warning(self.module_name, 'Invalid username', username)
+            return False
+
+        attempts_key = RedisVars.RedisVar_ParticipantLoginAttemptKey + tentative_participant.participant_uuid
+        # Count login attempts
+        current_attempts = self.redisGet(attempts_key)
+        if not current_attempts:
+            current_attempts = 0
+        else:
+            current_attempts = int(current_attempts)
+
+        if current_attempts >= 10:
+            return False  # Too many attempts in a short period of time will result in temporary disabling (see below)
+
+        logged_participant = TeraParticipant.verify_password(username=username, password=password,
+                                                             participant=tentative_participant)
+        if logged_participant:
 
             _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_username(username)
 
@@ -289,9 +307,16 @@ class LoginModule(BaseModule):
             # Flag that participant has full API access
             current_participant.fullAccess = True
 
+            # Clear attempts counter
+            self.redisDelete(attempts_key)
+
             # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
             # self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
+
+        # Update login attempt count
+        current_attempts += 1
+        self.redisSet(attempts_key, current_attempts, 1800)
 
         self.logger.log_warning(self.module_name, 'Invalid password for participant', username)
         return False
