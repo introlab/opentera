@@ -164,8 +164,9 @@ class UserQuerySessionTypesTest(BaseAPITest):
         self.assertTrue(json_data.__contains__('id_service'))
         self.assertTrue(json_data.__contains__('session_type_category'))
         self.assertTrue(json_data.__contains__('session_type_name'))
+        self.assertTrue(json_data.__contains__('session_type_color'))
         if not minimal:
             self.assertTrue(json_data.__contains__('session_type_config'))
             self.assertTrue(json_data.__contains__('session_type_online'))
-            self.assertTrue(json_data.__contains__('session_type_color'))
+
 
