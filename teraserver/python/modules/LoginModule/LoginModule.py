@@ -205,7 +205,7 @@ class LoginModule(BaseModule):
         else:
             current_attempts = int(current_attempts)
 
-        if current_attempts >= 10:
+        if current_attempts >= 5:
             return False  # Too many attempts in a short period of time will result in temporary disabling (see below)
 
         logged_user = TeraUser.verify_password(username=username, password=password, user=tentative_user)
@@ -226,7 +226,7 @@ class LoginModule(BaseModule):
 
         # Update login attempt count
         current_attempts += 1
-        self.redisSet(attempts_key, current_attempts, 1800)
+        self.redisSet(attempts_key, current_attempts, 120)
 
         self.logger.log_warning(self.module_name, 'Invalid password for user', username)
         return False
@@ -290,7 +290,7 @@ class LoginModule(BaseModule):
         else:
             current_attempts = int(current_attempts)
 
-        if current_attempts >= 10:
+        if current_attempts >= 5:
             return False  # Too many attempts in a short period of time will result in temporary disabling (see below)
 
         logged_participant = TeraParticipant.verify_password(username=username, password=password,
@@ -316,7 +316,7 @@ class LoginModule(BaseModule):
 
         # Update login attempt count
         current_attempts += 1
-        self.redisSet(attempts_key, current_attempts, 1800)
+        self.redisSet(attempts_key, current_attempts, 120)
 
         self.logger.log_warning(self.module_name, 'Invalid password for participant', username)
         return False
