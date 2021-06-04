@@ -40,7 +40,6 @@ class TeraSessionType(db.Model, BaseModel):
         if minimal:
             ignore_fields.extend(['session_type_online',
                                   'session_type_profile',
-                                  'session_type_color',
                                   'session_type_config'])
         rval = super().to_json(ignore_fields=ignore_fields)
 

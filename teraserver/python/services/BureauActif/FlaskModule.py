@@ -38,20 +38,6 @@ flask_app = Flask("BureauActifService")
 # Translations
 babel = Babel(flask_app)
 
-# API
-# TODO - Fix auth
-authorizations = {
-    'HTTPAuth': {
-        'type': 'basic',
-        'in': 'header'
-    },
-    'Token Authentication': {
-        'type': 'apiKey',
-        'in': 'header',
-        'name': 'OpenTera'
-    }
-}
-
 
 class MyHTTPChannel(HTTPChannel):
     def allHeadersReceived(self):

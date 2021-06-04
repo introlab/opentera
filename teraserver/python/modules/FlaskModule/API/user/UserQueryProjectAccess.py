@@ -153,6 +153,7 @@ class UserQueryProjectAccess(Resource):
                             project_access_json = {'id_user': user.id_user,
                                                    'id_project': project.id_project,
                                                    'user_name': user.get_fullname(),
+                                                   'user_enabled': user.user_enabled,
                                                    'project_access_role': project_role['project_role']
                                                    if project_role else None,
                                                    'project_access_inherited': project_role['inherited']

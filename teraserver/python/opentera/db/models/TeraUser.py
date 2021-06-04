@@ -48,7 +48,8 @@ class TeraUser(db.Model, BaseModel):
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['authenticated', 'user_password', 'user_user_groups', 'user_sessions'])
+        ignore_fields.extend(['authenticated', 'user_password', 'user_user_groups',
+                              'user_sessions'])
         if minimal:
             ignore_fields.extend(['user_username', 'user_email', 'user_profile', 'user_notes', 'user_lastonline',
                                   'user_superadmin'])
@@ -165,9 +166,10 @@ class TeraUser(db.Model, BaseModel):
         return bcrypt.hash(password)
 
     @staticmethod
-    def verify_password(username, password):
+    def verify_password(username, password, user=None):
         # Query User with that username
-        user = TeraUser.get_user_by_username(username)
+        if user is None:
+            user = TeraUser.get_user_by_username(username)
         if user is None:
             print('TeraUser: verify_password - user ' + username + ' not found.')
             return None

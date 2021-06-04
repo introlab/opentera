@@ -184,7 +184,8 @@ def create_session_type(name: str, online: bool, color: str, id_project: int):
     url = _make_url('/api/user/sessiontypes')
 
     # Check if sessiontype already exists
-    params = {'id_project': id_project}
+    # params = {'id_project': id_project}
+    params = []
     try:
         response = get(url=url, params=params, verify=False, auth=(opentera_user, opentera_password))
     except Exception as e:
@@ -197,7 +198,37 @@ def create_session_type(name: str, online: bool, color: str, id_project: int):
                 if ses_type['session_type_name'] == name \
                         and ses_type['session_type_service_key'] == 'VideoRehabService':
                     print("---- Session type '" + name + "' already existing, skipping creation.")
-                    return ses_type
+
+                    # Check if already assigned to the project
+                    url = _make_url('/api/user/sessiontypeprojects')
+                    params = {'id_session_type': ses_type['id_session_type']}
+                    try:
+                        response = get(url=url, params=params, verify=False, auth=(opentera_user, opentera_password))
+                    except Exception as e:
+                        print(e)
+                        return None
+
+                    if response.status_code == 200:
+                        if response.json():
+                            for ses_type_proj in response.json():
+                                if ses_type_proj['id_project'] == id_project:
+                                    # Ok, association already there!
+                                    return ses_type
+
+                        # Here, we have no association... create it!
+                        params = {'session_type_project': {'id_project': id_project,
+                                  'id_session_type': ses_type['id_session_type'], 'id_session_type_project': 0}
+                                  }
+                        try:
+                            response = post(url=url, json=params, verify=False,
+                                            auth=(opentera_user, opentera_password))
+                        except Exception as e:
+                            print(e)
+                            return {}
+                        if response.status_code == 200:
+                            return ses_type
+
+                        return {}
     else:
         import inspect
         print('Error in ' + inspect.currentframe().f_code.co_name + ': Code=' + str(response.status_code) +
@@ -258,7 +289,8 @@ def create_participant(name: str, active: bool, project_id: int):
     part_dict = {'participant': {'id_participant': 0,
                                  'id_project': project_id,
                                  'participant_name': name,
-                                 'participant_token_enabled': active
+                                 'participant_token_enabled': active,
+                                 'participant_enabled': active
                                  }
                  }
     try:
@@ -373,7 +405,7 @@ if __name__ == '__main__':
 
     # VARIABLES FOR THAT OPERATION
     opentera_id_site = 3    # OpenTera ID Site target
-    teraplus_id_group = 19  # TeraPlus participant group to export as project in the selected site in OpenTera
+    teraplus_id_group = 34  # TeraPlus participant group to export as project in the selected site in OpenTera
 
     # Local variables
     teraplus_usergroups = []
@@ -522,7 +554,7 @@ if __name__ == '__main__':
         part_id = participant[0]
         part_name = participant[1]
         # part_create_date = participant[2]
-        part_active = (participant[3] is not None)
+        part_active = (participant[5] is not None)
 
         print("--> Creating participant '" + part_name + "' (active: " + str(part_active) + ")...")
         rval = create_participant(part_name, part_active, opentera_id_project)
