@@ -1,5 +1,5 @@
 # Image: introlab3it/openteraserver
-# LABEL version="1.0.5"
+# LABEL version="1.0.6"
 # LABEL description="OpenTera Test Server from IntRoLab."
 
 FROM ubuntu:18.04
@@ -17,28 +17,20 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 # Clone repository
-# ARG CACHE_DATE=2021-02-23
+# ARG CACHE_DATE=2021-06-04
 RUN git clone --recurse-submodules -b main https://github.com/introlab/opentera.git
 
 #Create dbs and users
 RUN service postgresql start &&\
-	sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"&&\
-	sudo -u postgres psql -c "create database test" &&\
+	sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'opentera';"&&\
+	sudo -u postgres psql -c "create database opentera" &&\
 	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"&&\
-	sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"&&\
+	sudo -u postgres psql -c "grant all privileges on database opentera to TeraAgent;"&&\
 	sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"&&\
 	sudo -u postgres psql -c "create database openteralogs" &&\
 	sudo -u postgres psql -c "grant all privileges on database openteralogs to TeraAgent;"&&\
 	sudo -u postgres psql -c "create database openterafiles" &&\
 	sudo -u postgres psql -c "grant all privileges on database openterafiles to TeraAgent;"&&\
-	sudo -u postgres psql -c "create database videodispatch" &&\
-	sudo -u postgres psql -c "create user videodispatch with encrypted password 'videodispatch';"&&\
-	sudo -u postgres psql -c "grant all privileges on database videodispatch to videodispatch;"&&\
-	sudo -u postgres psql -c "ALTER USER videodispatch WITH PASSWORD 'videodispatch';"&&\
-	sudo -u postgres psql -c "create database bureauactif" &&\
-	sudo -u postgres psql -c "create user bureauactif with encrypted password 'bureauactif';"&&\
-	sudo -u postgres psql -c "grant all privileges on database bureauactif to bureauactif;"&&\
-	sudo -u postgres psql -c "ALTER USER bureauactif WITH PASSWORD 'bureauactif';"&&\
 	sudo -u postgres psql -c "\l"
 
 #VOLUMES
