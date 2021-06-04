@@ -39,10 +39,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y postgres
 
 #Create dbs and users
 RUN service postgresql start &&\
-	sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"&&\
-	sudo -u postgres psql -c "create database test" &&\
+	sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'opentera';"&&\
+	sudo -u postgres psql -c "create database opentera" &&\
 	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"&&\
-	sudo -u postgres psql -c "grant all privileges on database test to TeraAgent;"&&\
+	sudo -u postgres psql -c "grant all privileges on database opentera to TeraAgent;"&&\
 	sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"&&\
 	sudo -u postgres psql -c "create database openteralogs" &&\
 	sudo -u postgres psql -c "grant all privileges on database openteralogs to TeraAgent;"&&\
