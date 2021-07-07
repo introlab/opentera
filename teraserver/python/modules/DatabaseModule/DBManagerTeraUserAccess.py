@@ -292,17 +292,24 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_sessions(self, admin_only=False):
         from opentera.db.models.TeraSession import TeraSession
-        from opentera.db.models.TeraSessionUsers import TeraSessionUsers
-        from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+        # from opentera.db.models.TeraSessionUsers import TeraSessionUsers
+        # from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
         part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
-        # TODO: CONSIDER SESSIONS CREATED BY USERS AND DEVICES ONLY WITHOUT ANY PARTICIPANT
-        # THIS JOIN TAKES A LONG TIME TO PROCESS... IMPROVE!
-        # sessions = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users). \
-        #     filter(or_(TeraSessionParticipants.id_participant.in_(part_ids),
-        #                TeraSessionUsers.id_user == self.user.id_user,
-        #                TeraSession.id_creator_user == self.user.id_user)).all()
-        sessions = TeraSession.query.join(TeraSession.session_participants). \
-            filter(TeraSessionParticipants.id_participant.in_(part_ids)).all()
+        user_ids = self.get_accessible_users_ids(admin_only=admin_only)
+        device_ids = self.get_accessible_devices_ids(admin_only=admin_only)
+        service_ids = self.get_accessible_services_ids(admin_only=admin_only)
+        # # TODO: CONSIDER SESSIONS CREATED BY USERS AND DEVICES ONLY WITHOUT ANY PARTICIPANT
+        # # THIS JOIN TAKES A LONG TIME TO PROCESS... IMPROVE!
+        # # sessions = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users). \
+        # #     filter(or_(TeraSessionParticipants.id_participant.in_(part_ids),
+        # #                TeraSessionUsers.id_user == self.user.id_user,
+        # #                TeraSession.id_creator_user == self.user.id_user)).all()
+        # sessions = TeraSession.query.join(TeraSession.session_participants). \
+        #     filter(TeraSessionParticipants.id_participant.in_(part_ids)).all()
+        sessions = TeraSession.query.filter(or_(TeraSession.id_creator_user.in_(user_ids),
+                                            TeraSession.id_creator_device.in_(device_ids),
+                                            TeraSession.id_creator_participant.in_(part_ids),
+                                            TeraSession.id_creator_service.in_(service_ids))).all()
         return sessions
 
     def get_accessible_sessions_ids(self, admin_only=False):
