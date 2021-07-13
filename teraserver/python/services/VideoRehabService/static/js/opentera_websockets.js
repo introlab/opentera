@@ -2,7 +2,6 @@ let socketUrl = "";
 let ws = undefined;
 
 function webSocketConnect(){
-
 	if ("WebSocket" in window) {
 	   if (socketUrl === "")
 	        socketUrl = sessionStorage.getItem("websocket_url");
