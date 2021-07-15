@@ -22,6 +22,26 @@ const recorder_config = {
     // disable logs
     disableLogs: true,
 
+    // get intervals based blobs
+    // value in milliseconds
+    timeSlice: 5000,
+
+    // requires timeSlice above
+    // returns blob via callback function
+    ondataavailable: function(blob) {
+
+        //console.log(URL.createObjectURL(blob));
+        //console.log("Saving blob...");
+        if (streamRecorder){
+            streamRecorder.addDataToTempFile(blob);
+        }
+        //RecordRTC.writeToDisk({video: blob});
+        /*streamRecorder.recorder.clearRecordedData();*/
+    },
+
+    discardBlobs: true, // Don't keep blobs in memory!
+
+
     // used by MultiStreamRecorder - to access HTMLCanvasElement
     elementClass: 'multi-streams-mixer',
 
@@ -37,28 +57,66 @@ class TeraVideoRecorder
 {
     constructor(){
         this.recorder = null;
+        this.fileWriter = null;
     }
 
     startRecording(){
         console.log("Starting local recording...");
+
+        // Creating temporary video save file
+        let self = this;
+        window.webkitRequestFileSystem(TEMPORARY, 0, function (filesystem) {
+            filesystem.root.getFile("temp.webm", {create: true}, function(fileEntry) {
+                fileEntry.remove(function() {
+                    filesystem.root.getFile("temp.webm", {create: true}, function(fileEntry) {
+                        fileEntry.createWriter(function(fileWriter) {
+                            self.fileWriter = fileWriter;
+                            self.fileWriter.onwriteend = function(e) {
+                                //console.log("Temp file written!");
+                            };
+                            self.fileWriter.onerror = self.errorHandler;
+                        }, self.errorHandler);
+                    }, self.errorHandler);
+                }, self.errorHandler);
+            }, self.errorHandler);
+        }, {});
+
         let streams = getActiveStreams();
         let stream;
         for (stream of streams)
             this.addVideoToRecorder([stream]);
     }
 
+    errorHandler(e) {
+        console.log(e)
+    }
+
+    addDataToTempFile(blob){
+        if (this.fileWriter === null)
+            return;
+        this.fileWriter.write(blob);
+        /*let self = this;
+        getSeekableBlob(blob, function(seekableBlob) {
+            self.fileWriter.write(seekableBlob);
+        });*/
+
+    }
+
     addVideoToRecorder(stream) {
         if (!this.recorder) {
-            this.recorder = new RecordRTC(stream, recorder_config);
-            this.recorder.startRecording();
+            this.recorder = new MultiStreamRecorder(stream, recorder_config);//RecordRTC(stream, recorder_config);
+            //this.recorder.startRecording();
+            this.recorder.record();
         } else {
-            this.recorder.getInternalRecorder().addStreams(stream);
+            //this.recorder.getInternalRecorder().addStreams(stream);
+            this.recorder.addStreams(stream);
         }
     }
 
     refreshVideosInRecorder(){
         let streams = getActiveStreams();
-        this.recorder.getInternalRecorder().resetVideoStreams(streams);
+        //this.recorder.getInternalRecorder().resetVideoStreams(streams);
+        this.recorder.resetVideoStreams(streams);
     }
 
     stopRecording(){
@@ -66,14 +124,45 @@ class TeraVideoRecorder
             return;
 
         console.log("Stopping local recording.");
+
         let self = this;
-        this.recorder.stopRecording(function() {
-            getSeekableBlob(self.recorder.getBlob(), function(seekableBlob) {
+        //this.recorder.stopRecording(function() {
+        this.fileWriter = null;
+
+        this.recorder.stop(function() {
+            /*getSeekableBlob(self.recorder.getBlob(), function(seekableBlob) {
                 //console.log(url);
                 self.recorder = null;
                 invokeSaveAsDialog(seekableBlob);
+            });*/
+            window.webkitRequestFileSystem(TEMPORARY, 0, function (filesystem) {
+                filesystem.root.getFile("temp.webm", {create: true}, function(fileEntry) {
+                        fileEntry.file(function (fileReader){
+                            console.log(fileReader);
+                            if (fileReader.size > 0){
+                                getSeekableBlob(fileReader, function(seekableBlob) {
+                                    invokeSaveAsDialog(seekableBlob);
+                                    self.recorder.clearRecordedData();
+                                    self.recorder = null;
+                                    fileEntry.remove({},{});
+                                });
+                            }else{
+                                invokeSaveAsDialog(fileReader);
+                                self.recorder.clearRecordedData();
+                                self.recorder = null;
+                                fileEntry.remove({},{});
+                            }
+
+                        }, self.errorHandler);
+
+                    }, self.errorHandler);
+            }, {});
+
+
+
             });
-        });
+
+        //});
     }
 }
 

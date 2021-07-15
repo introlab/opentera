@@ -889,10 +889,14 @@ RecordRTC.writeToDisk = function(options) {
             });
         });
     } else if (options.video) {
-        options.video.getDataURL(function(videoDataURL) {
+        let videoDataURL = URL.createObjectURL(options.video);
+        /*options.video.getDataURL(function(videoDataURL) {
             DiskStorage.Store({
                 videoBlob: videoDataURL
             });
+        });*/
+        DiskStorage.Store({
+            videoBlob: videoDataURL
         });
     } else if (options.gif) {
         options.gif.getDataURL(function(gifDataURL) {
@@ -2150,7 +2154,8 @@ function MediaStreamRecorder(mediaStream, config) {
 
             if (typeof config.timeSlice === 'number') {
                 if (e.data && e.data.size && e.data.size > 100) {
-                    arrayOfBlobs.push(e.data);
+                    if (!config.discardBlobs)
+                        arrayOfBlobs.push(e.data);
                     updateTimeStamp();
 
                     if (typeof config.ondataavailable === 'function') {
@@ -5092,6 +5097,8 @@ function MultiStreamsMixer(arrayOfMediaStreams, elementClass) {
             canvas.width = self.width || 360;
             canvas.height = self.height || 240;
         }
+        //canvas.width=1920;
+        //canvas.height=1080;
 
         if (fullcanvas && fullcanvas instanceof HTMLVideoElement) {
             drawImage(fullcanvas);
@@ -5566,6 +5573,8 @@ function MultiStreamRecorder(arrayOfMediaStreams, options) {
             mixer.releaseStreams();
             mixer = null;
         }
+
+        self.blob = null;
     };
 
     /**
