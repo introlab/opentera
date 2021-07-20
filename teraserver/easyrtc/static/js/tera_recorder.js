@@ -99,7 +99,6 @@ class TeraVideoRecorder
         getSeekableBlob(blob, function(seekableBlob) {
             self.fileWriter.write(seekableBlob);
         });*/
-
     }
 
     addVideoToRecorder(stream) {

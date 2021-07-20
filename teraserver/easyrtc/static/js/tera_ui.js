@@ -544,8 +544,9 @@ function getTitle(local, index){
 }
 
 function setRecordingStatus(local, index, status){
-    let view_prefix = ((local === true) ? 'local' : 'remote');
-    let elem = view_prefix + 'ViewRec' + index;
+    //let view_prefix = ((local === true) ? 'local' : 'remote');
+    //let elem = view_prefix + 'ViewRec' + index;
+    let elem = 'recIndicator';
     if (status === true)
         showElement(elem);
     else

@@ -70,9 +70,11 @@ function joinSession(){
 }
 
 function hideMainViewElement(element_id){
-    document.getElementById('mainview').contentWindow.document.getElementById(element_id).style.display='none';
+    if (document.getElementById('mainview').contentWindow.document.getElementById(element_id))
+        document.getElementById('mainview').contentWindow.document.getElementById(element_id).style.display='none';
 }
 
 function showMainViewElement(element_id){
-    document.getElementById('mainview').contentWindow.document.getElementById(element_id).style.display='inline';
+    if (document.getElementById('mainview').contentWindow.document.getElementById(element_id))
+        document.getElementById('mainview').contentWindow.document.getElementById(element_id).style.display='inline';
 }
