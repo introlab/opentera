@@ -226,8 +226,8 @@
 
 <!-- Main container -->
 <div class="container-fluid h-100" id="mainContainer" style="display: none">
+    <span class="badge badge-danger text-white-50 w-100" id="recIndicator" style="display:none;" data-i18n="status.recording">Cette séance est présentement enregistrée.</span>
     <div class="row h-100" id="row1">
-
         <div class="d-flex flex-column col-3" id="localViews">
             <div class="row flex-grow-1" id="localView1Row">
                 <!------------------------------ LOCAL VIEW #1 -------------------------------------------------------->
@@ -237,7 +237,7 @@
                      oncontextmenu="resetInactiveTimer(true, 1);showButtons(true, true, 1);">
 
                     <span class="badge badge-info" id="localViewTitle1">Vue locale #1</span>
-                    <span class="badge badge-danger text-white-50" id="localViewRec1" style="display:none;">REC</span>
+                    <!--<span class="badge badge-danger text-white-50" id="localViewRec1" style="display:none;">REC</span>-->
                     <!-- Video controls -->
                     <div id="localVideoControls1" class="overlay-top-right" style="">
                         <input id="localBtnStar1" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(true, 1);event.stopPropagation();" style="display: none;"/>
@@ -394,7 +394,7 @@
                      onmouseleave="stopInactiveTimer(false, 1);showButtons(false, false, 1); return false;"
                      oncontextmenu="resetInactiveTimer(false, 1);showButtons(false, true, 1);">
                     <span class="badge badge-primary" id="remoteViewTitle1">Participant #1</span>
-                    <span class="badge badge-danger text-white-50" id="remoteViewRec1" style="display:none;">REC</span>
+                    <!--<span class="badge badge-danger text-white-50" id="remoteViewRec1" style="display:none;">REC</span>-->
 
                     <!-- Video controls -->
                     <div id="remoteVideoControls1" class="overlay-top-right" style="">
@@ -481,7 +481,7 @@
                      onmouseleave="stopInactiveTimer(false, 2);showButtons(false, false, 2); return false;"
                      oncontextmenu="resetInactiveTimer(false, 2);showButtons(false, true, 2);">
                     <span class="badge badge-primary" id="remoteViewTitle2">Participant #2</span>
-                    <span class="badge badge-danger text-white-50" id="remoteViewRec2" style="display:none;">REC</span>
+                    <!--<span class="badge badge-danger text-white-50" id="remoteViewRec2" style="display:none;">REC</span>-->
 
                     <!-- Video controls -->
                     <div id="remoteVideoControls2" class="overlay-top-right" style="">
@@ -560,7 +560,7 @@
                      onmouseleave="stopInactiveTimer(false, 3);showButtons(false, false, 3); return false;"
                      oncontextmenu="resetInactiveTimer(false, 3);showButtons(false, true, 3);">
                     <span class="badge badge-primary" id="remoteViewTitle3">Participant #3</span>
-                    <span class="badge badge-danger text-white-50" id="remoteViewRec3" style="display:none;">REC</span>
+                    <!--<span class="badge badge-danger text-white-50" id="remoteViewRec3" style="display:none;">REC</span>-->
 
                     <!-- Video controls -->
                     <div id="remoteVideoControls3" class="overlay-top-right" style="">
@@ -640,7 +640,7 @@
                      onmouseleave="stopInactiveTimer(false, 4);showButtons(false, false, 4); return false;"
                      oncontextmenu="resetInactiveTimer(true, 4);showButtons(false, true, 4);">
                     <span class="badge badge-primary" id="remoteViewTitle4">Participant #4</span>
-                    <span class="badge badge-danger text-white-50" id="remoteViewRec4" style="display:none;">REC</span>
+                    <!--<span class="badge badge-danger text-white-50" id="remoteViewRec4" style="display:none;">REC</span>-->
 
                     <!-- Video controls -->
                     <div id="remoteVideoControls4" class="overlay-top-right" style="">

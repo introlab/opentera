@@ -18,9 +18,9 @@ function doParticipantLogin(backend_url, backend_port, participant_token){
 
 		// Send AJAX POST query
 		$.ajax({
-          type: "GET",
-          url: 'https://' + backend_url + ':' + backend_port + '/api/participant/login',
-          success: function(response, status, request){
+          	type: "GET",
+          	url: 'https://' + backend_url + ':' + backend_port + '/api/participant/login',
+          	success: function(response, status, request){
                 clearInterval(timerId);
                 timerId=-1;
 

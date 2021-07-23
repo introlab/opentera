@@ -62,7 +62,8 @@
 		"user-start-recording": " a démarré l'enregistrement vidéo de cette séance.",
 		"start-recording": "L'enregistrement vidéo de cette séance a été démarré.",
 		"user-stop-recording": " a arrêté l'enregistrement vidéo de cette séance.",
-		"stop-recording": "L'enregistrement vidéo de cette séance a été arrêté."
+		"stop-recording": "L'enregistrement vidéo de cette séance a été arrêté.",
+		"recording": "Cette séance est présentement enregistrée."
 	},
 	"ui": {
 		"controls": "Contrôles",

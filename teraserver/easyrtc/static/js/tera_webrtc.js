@@ -1025,7 +1025,12 @@ function dataReception(sendercid, msgType, msgData, targeting) {
     if (msgType === "recordStatus"){
         // Show record icon
         let index = getStreamIndexForPeerId(sendercid, 'default');
-        setRecordingStatus(false, index+1, msgData)
+        /*if (index === undefined) {
+            // Got status before stream... must "buf" that status
+            console.log("Got recordStatus, but no stream yet - buffering.");
+        }else {*/
+            setRecordingStatus(false, index + 1, msgData)
+        //}
 
         // Display status message
         let contact_name = getContactNameForPeerId(sendercid);

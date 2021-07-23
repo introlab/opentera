@@ -62,7 +62,8 @@
 		"user-start-recording": " started video recording of this session.",
 		"start-recording": "Video recording of this session started.",
 		"user-stop-recording": " stopped video recording of this session.",
-		"stop-recording": "Video recording of this session stopped."
+		"stop-recording": "Video recording of this session stopped.",
+		"recording": "Session recording in progress."
 	},
 	"ui": {
 		"controls": "Controls",
