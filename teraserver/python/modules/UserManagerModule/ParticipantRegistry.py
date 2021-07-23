@@ -12,8 +12,9 @@ class ParticipantRegistry:
         print('participant_offline', uuid)
         if self.participant_list.__contains__(uuid):
             self.participant_list.remove(uuid)
-        if uuid in self.participant_sessions:
-            del self.participant_sessions[uuid]
+        # Don't remove from sessions, as the participant can still be invited to a session while offline!
+        # if uuid in self.participant_sessions:
+        #     del self.participant_sessions[uuid]
 
     def online_participants(self):
         return self.participant_list

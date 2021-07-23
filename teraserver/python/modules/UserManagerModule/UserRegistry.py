@@ -14,8 +14,9 @@ class UserRegistry:
         print('user_offline', uuid)
         if self.user_list.__contains__(uuid):
             self.user_list.remove(uuid)
-        if uuid in self.user_sessions:
-            del self.user_sessions[uuid]
+        # Don't remove from sessions, as the user can still be invited to a session while offline!
+        # if uuid in self.user_sessions:
+        #     del self.user_sessions[uuid]
 
     def online_users(self):
         return self.user_list
