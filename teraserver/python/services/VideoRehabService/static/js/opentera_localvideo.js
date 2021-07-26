@@ -3,6 +3,7 @@ let currentVideoSourceIndex = 0;
 let timerHandle = 0;
 
 function init_localview(){
+	console.log("Loading local view...");
 	// Check source
 	let urlParams = new URLSearchParams(window.location.search);
 	let sourceParam = urlParams.get('source');

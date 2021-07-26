@@ -34,9 +34,16 @@ function init_system(){
 }
 
 function loginParticipant(){
-    doParticipantLogin(backend_hostname, backend_port, participant_token);
     document.getElementById('mainview').src = "participant_localview?token=" + participant_token + "&source=" +
         clientSource;
+    $('#mainview').on('load', function() {
+        if (ws === undefined){
+            // No websocket connection - login participant
+            console.log("Mainview loaded - login participant...")
+            doParticipantLogin(backend_hostname, backend_port, participant_token);
+        }
+    });
+
 }
 
 let sessionUrlTries = 0;
@@ -63,9 +70,11 @@ function joinSession(){
 }
 
 function hideMainViewElement(element_id){
-    document.getElementById('mainview').contentWindow.document.getElementById(element_id).style.display='none';
+    if (document.getElementById('mainview').contentWindow.document.getElementById(element_id))
+        document.getElementById('mainview').contentWindow.document.getElementById(element_id).style.display='none';
 }
 
 function showMainViewElement(element_id){
-    document.getElementById('mainview').contentWindow.document.getElementById(element_id).style.display='inline';
+    if (document.getElementById('mainview').contentWindow.document.getElementById(element_id))
+        document.getElementById('mainview').contentWindow.document.getElementById(element_id).style.display='inline';
 }
