@@ -16,8 +16,9 @@ class DeviceRegistry:
         print('device_offline', uuid)
         if self.device_list.__contains__(uuid):
             self.device_list.remove(uuid)
-        if uuid in self.device_sessions:
-            del self.device_sessions[uuid]
+        # Don't remove from sessions, as the device can still be invited to a session while offline!
+        # if uuid in self.device_sessions:
+        #     del self.device_sessions[uuid]
         if uuid in self.device_status:
             del self.device_status[uuid]
 
