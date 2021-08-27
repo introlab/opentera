@@ -43,7 +43,7 @@ class ServiceQueryServices(Resource):
         try:
             services_list = []
             for service in services:
-                service_json = service.to_json(minimal=False)
+                service_json = service.to_json(minimal=True)
                 services_list.append(service_json)
 
             return services_list
