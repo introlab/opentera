@@ -52,13 +52,14 @@ class TeraParticipantClient:
 
     def get_participant_infos(self) -> dict:
         # Get information from service rpc function since participant has no rights from the participants api
-        participant_info = self.__rpc_client.call_service(self.__config_man.service_config['name'],
-                                                          'participant_info', self.__participant_uuid)
-        return participant_info
-        # response = self.do_get_request_to_backend('/api/participants/participants')
-        # if response.status_code == 200:
-        #     return response.json()
-        # return {}
+        #participant_info = self.__rpc_client.call_service(self.__config_man.service_config['name'],
+        #                                                  'participant_info', self.__participant_uuid)
+        #return participant_info
+
+        response = self.do_get_request_to_backend('/api/participant/participants')
+        if response.status_code == 200:
+            return response.json()
+        return {}
 
     def do_get_request_to_backend(self, path: str) -> Response:
         from requests import get
