@@ -1,4 +1,4 @@
-![Analytics](https://ga-beacon.appspot.com/UA-27707792-8/github-opentera-main?pixel) 
+![.](https://ga-beacon-279122.nn.r.appspot.com/UA-27707792-8/github-opentera-main?pixel) 
 
 # OpenTera
 We are developing an “Open Source” micro-services structure which will allow:
