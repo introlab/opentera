@@ -126,5 +126,5 @@ class ParticipantQueryParticipantsTest(unittest.TestCase):
     def test_query_base_token(self):
         token = self._get_base_token_with_login_http_auth('participant1', 'opentera')
         response = self._request_with_token_auth(token)
-        # Should not be allowed
-        self.assertEqual(response.status_code, 403)
+        # Now allowed to get participant information with token
+        self.assertEqual(response.status_code, 200)
