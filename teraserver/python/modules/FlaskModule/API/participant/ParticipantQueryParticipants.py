@@ -20,7 +20,7 @@ class ParticipantQueryParticipants(Resource):
         self.module = flaskModule
         Resource.__init__(self, _api)
 
-    @participant_multi_auth.login_required(role='full')
+    @participant_multi_auth.login_required(role='limited')
     @api.expect(get_parser)
     @api.doc(description='Return participant information.',
              responses={200: 'Success',
@@ -31,13 +31,16 @@ class ParticipantQueryParticipants(Resource):
         current_participant = TeraParticipant.get_participant_by_uuid(session['_user_id'])
         participant_access = DBManager.participantAccess(current_participant)
 
-        args = get_parser.parse_args(strict=True)
+        if current_participant.fullAccess:
+            args = get_parser.parse_args(strict=True)
 
-        minimal = False
-        if args['list']:
-            minimal = True
+            minimal = False
+            if args['list']:
+                minimal = True
 
-        return current_participant.to_json(minimal=minimal)
+            return current_participant.to_json(minimal=minimal)
+        else:
+            return {'participant_name': current_participant.participant_name}
 
     @participant_multi_auth.login_required(role='full')
     @api.expect(post_parser)
