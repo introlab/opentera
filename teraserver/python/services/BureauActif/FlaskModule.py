@@ -103,10 +103,10 @@ def get_timezone():
 class CustomAPI(Api):
     @property
     def specs_url(self):
-        '''
+        """
         The Swagger specifications absolute url (ie. `swagger.json`)
         :rtype: str
-        '''
+        """
 
         if 'X-Script-Name' in request.headers:
             return request.headers['X-Script-Name'] + url_for(self.endpoint('specs'), _external=False)
@@ -115,10 +115,10 @@ class CustomAPI(Api):
 
     @property
     def base_url(self):
-        '''
+        """
         The API base absolute url
         :rtype: str
-        '''
+        """
         if 'X-Script-Name' in request.headers:
             return request.headers['X-Script-Name'] + url_for(self.endpoint('root'), _external=True)
         else:
@@ -223,17 +223,19 @@ class FlaskModule(BaseModule):
         from API.QueryRawData import QueryRawData
         from API.QueryCalendarData import QueryCalendarData
         from API.QueryTimelineData import QueryTimelineData
-        from API.QueryLoginType import QueryLoginType
+        from API.QueryAccountInfos import QueryAccountInfos
         from API.QueryServiceInfos import QueryServiceInfos
         from API.QueryDeviceInfos import QueryDeviceInfos
+        from API.QueryPermissions import QueryPermissions
 
         # Resources
-        default_api_ns.add_resource(QueryRawData,       '/rawdata', resource_class_kwargs=kwargs)
-        default_api_ns.add_resource(QueryCalendarData,  '/calendardata', resource_class_kwargs=kwargs)
-        default_api_ns.add_resource(QueryTimelineData,  '/timelinedata', resource_class_kwargs=kwargs)
-        default_api_ns.add_resource(QueryLoginType,     '/me', resource_class_kwargs=kwargs)
-        default_api_ns.add_resource(QueryServiceInfos,  '/serviceinfos', resource_class_kwargs=kwargs)
-        default_api_ns.add_resource(QueryDeviceInfos,   '/deviceinfos', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryRawData, '/rawdata', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryCalendarData, '/calendardata', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryTimelineData, '/timelinedata', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryAccountInfos, '/me', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryServiceInfos, '/serviceinfos', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryDeviceInfos, '/deviceinfos', resource_class_kwargs=kwargs)
+        default_api_ns.add_resource(QueryPermissions, '/permissions', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from Views.Index import Index
