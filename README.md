@@ -42,7 +42,7 @@ OpenTera is licensed under [Apache License 2.0](https://www.apache.org/licenses/
 * [OpenTera WebRTC Libraries](https://github.com/introlab/opentera-webrtc)
 * [OpenTera WebRTC ROS Client and Nodes](https://github.com/introlab/opentera-webrtc-ros)
 * [OpenTera Teleoperation Service](https://github.com/introlab/opentera-teleop-service)
-* [OpenTera WebRTC Teleoperation Frontend] (opentera-webrtc-teleop-frontend)
+* [OpenTera WebRTC Teleoperation Frontend] (https://github.com/introlab/opentera-webrtc-teleop-frontend)
 
 # Dependencies
 OpenTera is based or uses the following Open Source technologies :
