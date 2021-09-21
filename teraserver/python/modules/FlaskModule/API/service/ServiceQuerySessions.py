@@ -16,6 +16,7 @@ from opentera.db.models.TeraDevice import TeraDevice
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query')
 get_parser.add_argument('uuid_session', type=str, help='UUID of the session to query')
+get_parser.add_argument('id_participant', type=int, help='ID of the participant to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_events', type=inputs.boolean, help='Also includes session events')
 
@@ -46,8 +47,12 @@ class ServiceQuerySessions(Resource):
         sessions = []
         if args['id_session']:
             sessions = [TeraSession.get_session_by_id(args['id_session'])]
-        if args['uuid_session']:
-            sessions = [TeraSession.get_session_by_uuid(args['uuid_session'])]
+        elif args['session_uuid']:
+            sessions = [TeraSession.get_session_by_uuid(args['session_uuid'])]
+        elif args['id_participant']:
+            sessions = TeraSession.get_sessions_for_participant(args['id_participant'])
+        else:
+            return gettext('Missing arguments: at least one id is required'), 400
 
         try:
             sessions_list = []
