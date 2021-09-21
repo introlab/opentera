@@ -64,16 +64,21 @@ class TeraSession(db.Model, BaseModel):
         if not minimal:
             # Append list of participants ids and names
             rval['session_participants'] = [{'id_participant': part.id_participant,
+                                             'participant_uuid': part.participant_uuid,
                                              'participant_name': part.participant_name,
                                              'id_project': part.id_project}
                                             for part in self.session_participants]
 
             # Append list of users ids and names
-            rval['session_users'] = [{'id_user': user.id_user, 'user_name': user.get_fullname()}
+            rval['session_users'] = [{'id_user': user.id_user,
+                                      'user_uuid': user.user_uuid,
+                                      'user_name': user.get_fullname()}
                                      for user in self.session_users]
 
             # Append list of devices ids and names
-            rval['session_devices'] = [{'id_device': device.id_device, 'device_name': device.device_name}
+            rval['session_devices'] = [{'id_device': device.id_device,
+                                        'device_uuid': device.device_uuid,
+                                        'device_name': device.device_name}
                                        for device in self.session_devices]
 
             # Append user name
@@ -127,7 +132,7 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_creator_user = session_user
                 ses_type = random.randint(1, 4)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
-                base_session.session_name = "Séance #" + str(i+1)
+                base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
                 base_session.session_duration = random.randint(60, 4800)
                 ses_status = random.randint(0, 4)
@@ -151,7 +156,7 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_creator_device = TeraDevice.get_device_by_id(1)
                 ses_type = random.randint(1, 4)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
-                base_session.session_name = "Séance #" + str(i+1)
+                base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
                 base_session.session_duration = random.randint(60, 4800)
                 ses_status = random.randint(0, 4)
@@ -169,7 +174,7 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_creator_participant = TeraParticipant.get_participant_by_id(1)
                 ses_type = random.randint(1, 4)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
-                base_session.session_name = "Séance #" + str(i+1)
+                base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
                 base_session.session_duration = random.randint(60, 4800)
                 ses_status = random.randint(0, 4)
@@ -184,7 +189,7 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_creator_service = session_service
                 ses_type = random.randint(1, 4)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
-                base_session.session_name = "Séance #" + str(i+1)
+                base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
                 base_session.session_duration = random.randint(60, 4800)
                 ses_status = random.randint(0, 4)
@@ -218,7 +223,7 @@ class TeraSession(db.Model, BaseModel):
     def get_sessions_for_participant(part_id: int):
         from opentera.db.models.TeraParticipant import TeraParticipant
         return TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
-                                                                               part_id)\
+                                                                               part_id) \
             .order_by(TeraSession.session_start_datetime.desc()).all()
 
     @staticmethod
@@ -306,4 +311,3 @@ class TeraSession(db.Model, BaseModel):
     def insert(cls, session):
         session.session_uuid = str(uuid.uuid4())
         super().insert(session)
-
