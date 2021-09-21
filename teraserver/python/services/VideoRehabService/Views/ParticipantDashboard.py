@@ -8,7 +8,7 @@ class ParticipantDashboard(MethodView):
     def __init__(self, *args, **kwargs):
         self.flaskModule = kwargs.get('flaskModule', None)
 
-    @ServiceAccessManager.static_token_required
+    @ServiceAccessManager.token_required(allow_static_tokens=True, allow_dynamic_tokens=False)
     def get(self):
         # print('get')
 
