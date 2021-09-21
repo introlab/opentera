@@ -11,6 +11,7 @@ get_parser.add_argument('id_service', type=int, help='ID of the service to query
 get_parser.add_argument('uuid_service', type=str, help='UUID of the service to query')
 get_parser.add_argument('service_key', type=str, help='Key of the service to query')
 
+
 class ServiceQueryServices(Resource):
 
     def __init__(self, _api, flaskModule=None):

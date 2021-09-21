@@ -18,6 +18,8 @@ import json
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query')
+get_parser.add_argument('session_uuid', type=str, help='Session UUID to query')
+get_parser.add_argument('id_participant', type=int, help='ID of the participant to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_events', type=inputs.boolean, help='Also includes session events')
 
@@ -47,12 +49,14 @@ class ServiceQuerySessions(Resource):
         args = parser.parse_args()
 
         sessions = []
-        # Can only query session with an id
-        if not args['id_session']:
-            return gettext('Missing session id', 400)
-
         if args['id_session']:
             sessions = [TeraSession.get_session_by_id(args['id_session'])]
+        elif args['session_uuid']:
+            sessions = [TeraSession.get_session_by_uuid(args['session_uuid'])]
+        elif args['id_participant']:
+            sessions = TeraSession.get_sessions_for_participant(args['id_participant'])
+        else:
+            return gettext('Missing arguments: at least one id is required'), 400
 
         try:
             sessions_list = []
