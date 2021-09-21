@@ -7,13 +7,10 @@ from opentera.db.models.TeraParticipant import TeraParticipant
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from datetime import datetime
-from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraSession import TeraSession, TeraSessionStatus
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDevice import TeraDevice
-import datetime
-import json
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -44,14 +41,9 @@ class ServiceQuerySessions(Resource):
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
         parser = get_parser
-
         args = parser.parse_args()
 
         sessions = []
-        # Can only query session with an id or uuid
-        if not args['id_session'] and not args['uuid_session']:
-            return gettext('Missing session id or uuid', 400)
-
         if args['id_session']:
             sessions = [TeraSession.get_session_by_id(args['id_session'])]
         if args['uuid_session']:
@@ -135,12 +127,12 @@ class ServiceQuerySessions(Resource):
 
             # Check for default values
             if 'session_start_datetime' not in json_session:
-                json_session['session_start_datetime'] = datetime.datetime.now()
+                json_session['session_start_datetime'] = datetime.now()
 
             if 'session_name' not in json_session:
                 session_name = TeraSessionType.get_session_type_by_id(json_session['id_session_type']).session_type_name
                 session_date = json_session['session_start_datetime']
-                if not isinstance(session_date, datetime.datetime):
+                if not isinstance(session_date, datetime):
                     import dateutil.parser as parser
                     session_date = parser.parse(json_session['session_start_datetime'])
                 # session_name += ' [' + session_date.strftime('%d-%m-%Y %H:%M') + ']'
