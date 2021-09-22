@@ -1,4 +1,4 @@
-![Analytics](https://ga-beacon.appspot.com/UA-27707792-8/github-opentera-main?pixel) 
+![.](https://ga-beacon-279122.nn.r.appspot.com/UA-27707792-8/github-opentera-main?pixel) 
 
 # OpenTera
 We are developing an “Open Source” micro-services structure which will allow:
@@ -31,6 +31,18 @@ First version released, v1.0 This version aims to support tele-rehabilitation vi
 
 # License
 OpenTera is licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt) . 
+
+# Related Projects
+## General
+* [OpenTeraPlus Desktop Application](https://github.com/introlab/openteraplus)
+* [OpenTera WebPortal Service](https://github.com/introlab/opentera-webportal-service)
+
+## Robots
+* [WebRTC Native Libraries](https://github.com/introlab/webrtc-native-build)
+* [OpenTera WebRTC Libraries](https://github.com/introlab/opentera-webrtc)
+* [OpenTera WebRTC ROS Client and Nodes](https://github.com/introlab/opentera-webrtc-ros)
+* [OpenTera Teleoperation Service](https://github.com/introlab/opentera-teleop-service)
+* [OpenTera WebRTC Teleoperation Frontend](https://github.com/introlab/opentera-webrtc-teleop-frontend)
 
 # Dependencies
 OpenTera is based or uses the following Open Source technologies :
