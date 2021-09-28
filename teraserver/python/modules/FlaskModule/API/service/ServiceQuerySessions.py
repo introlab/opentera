@@ -47,8 +47,8 @@ class ServiceQuerySessions(Resource):
         sessions = []
         if args['id_session']:
             sessions = [TeraSession.get_session_by_id(args['id_session'])]
-        elif args['session_uuid']:
-            sessions = [TeraSession.get_session_by_uuid(args['session_uuid'])]
+        elif args['uuid_session']:
+            sessions = [TeraSession.get_session_by_uuid(args['uuid_session'])]
         elif args['id_participant']:
             sessions = TeraSession.get_sessions_for_participant(args['id_participant'])
         else:
