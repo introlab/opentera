@@ -3,10 +3,12 @@ from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
+from modules.DatabaseModule.DBManager import DBManager
 from opentera.db.models.TeraParticipant import TeraParticipant
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from datetime import datetime
+
 from opentera.db.models.TeraSession import TeraSession, TeraSessionStatus
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraUser import TeraUser
@@ -39,17 +41,27 @@ class ServiceQuerySessions(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Logged service doesn\'t have permission to access the requested data'})
     def get(self):
         parser = get_parser
         args = parser.parse_args()
 
+        service_access = DBManager.serviceAccess(current_service)
+
         sessions = []
         if args['id_session']:
+            if args['id_session'] not in service_access.get_accessible_sessions_ids():
+                return gettext('Forbidden'), 403
             sessions = [TeraSession.get_session_by_id(args['id_session'])]
         elif args['uuid_session']:
-            sessions = [TeraSession.get_session_by_uuid(args['uuid_session'])]
+            queried_session = TeraSession.get_session_by_uuid(args['uuid_session'])
+            if queried_session:
+                if queried_session.id_session not in service_access.get_accessible_sessions_ids():
+                    return gettext('Forbidden'), 403
+            sessions = [queried_session]
         elif args['id_participant']:
+            if args['id_participant'] not in service_access.get_accessible_participants_ids():
+                return gettext('Forbidden'), 403
             sessions = TeraSession.get_sessions_for_participant(args['id_participant'])
         else:
             return gettext('Missing arguments: at least one id is required'), 400

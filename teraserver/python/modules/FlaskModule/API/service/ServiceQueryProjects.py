@@ -1,7 +1,9 @@
 from flask_restx import Resource
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import LoginModule
+from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
+from modules.DatabaseModule.DBManager import DBManager
+
 from opentera.db.models.TeraProject import TeraProject
 from sqlalchemy.exc import InvalidRequestError
 
@@ -22,17 +24,21 @@ class ServiceQueryProjects(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Logged service doesn\'t have permission to access the requested data'})
     def get(self):
         parser = get_parser
         args = parser.parse_args()
 
+        service_access = DBManager.serviceAccess(current_service)
+
         projects = []
         # Can only query project with an id
         if not args['id_project']:
-            return gettext('Missing project id', 400)
+            return gettext('Missing project id'), 400
 
         if args['id_project']:
+            if args['id_project'] not in service_access.get_accessible_projects_ids():
+                return gettext('Forbidden'), 403
             projects = [TeraProject.get_project_by_id(args['id_project'])]
 
         try:
