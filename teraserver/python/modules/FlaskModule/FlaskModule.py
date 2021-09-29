@@ -281,6 +281,7 @@ class FlaskModule(BaseModule):
         from .API.service.ServiceQuerySiteProjectAccessRoles import ServiceQuerySiteProjectAccessRoles
         from .API.service.ServiceQueryUsers import ServiceQueryUsers
         from .API.service.ServiceQueryServices import ServiceQueryServices
+        from .API.service.ServiceQueryProjects import ServiceQueryProjects
 
         service_api_ns.add_resource(ServiceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryAssets, '/assets', resource_class_kwargs=kwargs)
@@ -289,6 +290,7 @@ class FlaskModule(BaseModule):
         service_api_ns.add_resource(ServiceQuerySiteProjectAccessRoles, '/users/access', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryUsers, '/users', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryServices, '/services', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryProjects, '/projects', resource_class_kwargs=kwargs)
 
         # Add namespace
         api.add_namespace(service_api_ns)
