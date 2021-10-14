@@ -70,6 +70,8 @@ class ServiceQuerySessions(Resource):
             sessions_list = []
             for ses in sessions:
                 session_json = ses.to_json(args['list'])
+                session_type = TeraSessionType.get_session_type_by_id(ses.id_session_type)
+                session_json['session_type'] = session_type.to_json()
 
                 if args['with_events']:
                     # Get events for session
