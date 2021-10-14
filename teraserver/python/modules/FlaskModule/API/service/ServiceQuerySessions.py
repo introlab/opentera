@@ -21,6 +21,7 @@ get_parser.add_argument('uuid_session', type=str, help='UUID of the session to q
 get_parser.add_argument('id_participant', type=int, help='ID of the participant to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_events', type=inputs.boolean, help='Also includes session events')
+get_parser.add_argument('with_session_type', type=inputs.boolean, help='Also includes session type information')
 
 post_parser = api.parser()
 post_schema = api.schema_model('user_session', {'properties': TeraSession.get_json_schema(),
@@ -70,8 +71,10 @@ class ServiceQuerySessions(Resource):
             sessions_list = []
             for ses in sessions:
                 session_json = ses.to_json(args['list'])
-                session_type = TeraSessionType.get_session_type_by_id(ses.id_session_type)
-                session_json['session_type'] = session_type.to_json()
+
+                if args['with_session_type']:
+                    session_type = TeraSessionType.get_session_type_by_id(ses.id_session_type)
+                    session_json['session_type'] = session_type.to_json()
 
                 if args['with_events']:
                     # Get events for session
