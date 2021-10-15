@@ -12,6 +12,15 @@ function init_dashboard(serv_hostname, serv_port){
 }
 
 function init_system(){
+
+    // Check if we are embedded. If so, hides the top bar
+    if (window.self !== window.top){
+        console.log('Embedded mode. Hiding top bar.');
+        hideElement('communicator');
+        if (document.getElementById('mainview')){
+            document.getElementById('mainview').style.top = '0px'
+        }
+    }
     if (isBrowserSupported()){
         // Check source
         let urlParams = new URLSearchParams(window.location.search);
