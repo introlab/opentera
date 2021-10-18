@@ -48,7 +48,7 @@ This step needs to be done only once.
    ```
 	sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'test';"
 	sudo -u postgres psql -c "create database opentera;" 
-	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'opentera';"
+	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'test';"
 	sudo -u postgres psql -c "grant all privileges on database opentera to TeraAgent;"
 	sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"
 	sudo -u postgres psql -c "create database openteralogs;"
