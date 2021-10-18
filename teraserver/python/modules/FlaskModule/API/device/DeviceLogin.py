@@ -49,11 +49,8 @@ class DeviceLogin(Resource):
 
             return gettext('Device already logged in.'), 403
 
-        if 'X_EXTERNALHOST' in request.headers:
-            if ':' in request.headers['X_EXTERNALHOST']:
-                servername, port = request.headers['X_EXTERNALHOST'].split(':', 1)
-            else:
-                servername = request.headers['X_EXTERNALHOST']
+        if 'X_EXTERNALSERVER' in request.headers:
+            servername = request.headers['X_EXTERNALSERVER']
 
         if 'X_EXTERNALPORT' in request.headers:
             port = request.headers['X_EXTERNALPORT']

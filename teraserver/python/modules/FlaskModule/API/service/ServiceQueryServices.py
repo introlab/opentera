@@ -56,11 +56,8 @@ class ServiceQueryServices(Resource):
                         hostname = self.module.config.server_config['hostname']
                         port = self.module.config.server_config['port']
 
-                        if 'X_EXTERNALHOST' in request.headers:
-                            if ':' in request.headers['X_EXTERNALHOST']:
-                                hostname, port = request.headers['X_EXTERNALHOST'].split(':', 1)
-                            else:
-                                hostname = request.headers['X_EXTERNALHOST']
+                        if 'X_EXTERNALSERVER' in request.headers:
+                            hostname = request.headers['X_EXTERNALSERVER']
 
                         if 'X_EXTERNALPORT' in request.headers:
                             port = request.headers['X_EXTERNALPORT']

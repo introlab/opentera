@@ -12,11 +12,11 @@ class Index(MethodView):
         backend_hostname = self.flaskModule.config.backend_config['hostname']
         backend_port = self.flaskModule.config.backend_config['port']
 
-        if 'X_EXTERNALHOST' in request.headers:
-            backend_hostname = request.headers['X_EXTERNALHOST'];
+        if 'X_EXTERNALSERVER' in request.headers:
+            backend_hostname = request.headers['X_EXTERNALSERVER']
 
         if 'X_EXTERNALPORT' in request.headers:
-            backend_port = request.headers['X_EXTERNALPORT'];
+            backend_port = request.headers['X_EXTERNALPORT']
 
         return render_template('index.html')
 
