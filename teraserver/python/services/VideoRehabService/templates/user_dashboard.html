@@ -2,7 +2,7 @@
 <html>
    <head>
       <meta charset="UTF-8" />
-      <title>{{ gettext('OpenTera - Participant Video Dashboard') }}</title>
+      <title>{{ gettext('OpenTera - User Video Dashboard') }}</title>
 
 	   <link href="./static/images/favicon.ico" rel="icon" type="image/x-icon" />
 	   <link href="./static/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
@@ -18,7 +18,7 @@
       <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
       <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
       <link rel="stylesheet" href="./static/css/main_style.css" />
-	  <link rel="stylesheet" href="./static/css/participant_style.css" />
+	  <link rel="stylesheet" href="./static/css/user_style.css" />
 
       <script src="./static/bootstrap/js/bootstrap.min.js"></script>
 
@@ -37,15 +37,15 @@
 	   <script>
 			let backend_hostname = "{{ backend_hostname }}";
 			let backend_port = {{ backend_port }};
-			let participant_token = "{{ participant_token }}";
-			let participant_name = "{{ participant_name }}";
-			let participant_uuid = "{{ participant_uuid }}";
+			let user_token = "{{ user_token }}";
+			let user_name = "{{ user_name }}";
+			let user_uuid = "{{ user_uuid }}";
 
 			const browser = bowser.getParser(window.navigator.userAgent);
 			window.onload = function() {
 				console.log('Page loaded. Ready to start!');
 				init_dashboard(backend_hostname, backend_port);
-				init_system();
+				//init_system();
 			}
 	   </script>
    </head>
@@ -66,7 +66,7 @@
 			   </div>
 			   <div class="modal-footer modal-footer-error">
 				   <button type="button" id="errorRefresh" class="btn btn-success" data-dismiss="modal" onclick="location.reload();" data-i18n="errorDialog.retry">{{ gettext('Retry') }}</button>
-				   <button type="button" id="errorIgnore" class="btn btn-warning" data-dismiss="modal" onclick="loginParticipant();" data-i18n="errorDialog.ignore">{{ gettext('Ignore') }}</button>
+				   <!--<button type="button" id="errorIgnore" class="btn btn-warning" data-dismiss="modal" onclick="loginParticipant();" data-i18n="errorDialog.ignore">{{ gettext('Ignore') }}</button>-->
 			   </div>
 		   </div>
 	   </div>
@@ -81,7 +81,7 @@
 			<img id="imgStatus" src="./static/images/grey_button.png" width="24px"/>
 		</div>
 		<div align="center" class="name-zone">
-			<label id="displayname">{{ participant_name }}</label>
+			<label id="displayname">{{ user_name }}</label>
 		</div>
 	</div>
 	<iframe id="mainview" class = "iframe-with-footer main-frame" src="" allow="camera; microphone;">Frames not supported in this browser!</iframe>

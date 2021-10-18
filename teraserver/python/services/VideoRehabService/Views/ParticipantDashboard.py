@@ -1,6 +1,8 @@
 from flask.views import MethodView
 from flask import render_template, request
-from opentera.services.ServiceAccessManager import ServiceAccessManager, current_participant_client
+from flask_babel import gettext
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_participant_client, current_login_type\
+    , LoginType
 
 
 class ParticipantDashboard(MethodView):
@@ -22,7 +24,12 @@ class ParticipantDashboard(MethodView):
         if 'X_EXTERNALPORT' in request.headers:
             backend_port = request.headers['X_EXTERNALPORT']
 
-        participant_name = "Anonymous"
+        participant_name = gettext('Anonymous')
+
+        if current_login_type != LoginType.PARTICIPANT_LOGIN:
+            return render_template('participant_error.html', backend_hostname=backend_hostname,
+                                   backend_port=backend_port,
+                                   error_msg=gettext('Only participants can access this page. Sorry.'))
 
         if current_participant_client:
             participant_info = current_participant_client.get_participant_infos()

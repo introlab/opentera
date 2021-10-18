@@ -250,6 +250,13 @@ class FlaskModule(BaseModule):
         flask_app.add_url_rule('/participant_error',
                                view_func=ParticipantError.as_view('participant_error', *args, **kwargs))
 
+        # User
+        from services.VideoRehabService.Views.UserDashboard import UserDashboard
+        from services.VideoRehabService.Views.UserError import UserError
+
+        flask_app.add_url_rule('/user', view_func=UserDashboard.as_view('user_dashboard', *args, **kwargs))
+        flask_app.add_url_rule('/user_error', view_func=UserError.as_view('user_error', *args, **kwargs))
+
 
 @flask_app.after_request
 def apply_caching(response):
