@@ -2,6 +2,8 @@ let videoSources = [];
 let currentVideoSourceIndex = 0;
 let timerHandle = 0;
 
+let currentConfig = {'currentVideoName': undefined};
+
 function init_localview(){
 	console.log("Loading local view...");
 	// Check source
@@ -106,8 +108,10 @@ function updateVideoSource(){
 	if (select.selectedIndex>=0){
 		currentVideoSourceIndex = select.selectedIndex;
 		currentConfig.currentVideoName = videoSources[currentVideoSourceIndex].label;
-		showPTZControls(localPTZCapabilities.zoom, localPTZCapabilities.presets, localPTZCapabilities.settings,
-			currentConfig.currentVideoName);
+		if (typeof(localPTZCapabilities) !== 'undefined'){
+            showPTZControls(localPTZCapabilities.zoom, localPTZCapabilities.presets, localPTZCapabilities.settings,
+                currentConfig.currentVideoName);
+        }
 		let constraints = { deviceId: { exact: videoSources[currentVideoSourceIndex].deviceId }/*,
 				width: {ideal: 1280, max: 1920 },
 				height: {ideal: 720, max: 1080 },

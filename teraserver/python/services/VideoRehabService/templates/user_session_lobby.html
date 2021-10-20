@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ gettext('OpenTeraPlus - User - Session lobby') }}</title>
+
+	<script src="./static/js/opentera.js"></script>
+    <script src="./static/js/jquery-3.5.1.min.js"></script>
+	<script src="./static/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="./static/js/opentera_localvideo.js"></script>
+	<script src="./static/js/opentera_dashboard.js"></script>
+    <script src="./static/js/opentera_utils.js"></script>
+
+    <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./static/css/teraplus.css" />
+
+    <!-- Translations -->
+    <script>
+        const str_cant_access_media = "{{ gettext('Unable to access camera and/or microphone') }}";
+        const str_error_message = "{{ gettext('Error message') }}";
+    </script>
+
+</head>
+<body onload="init_dashboard('{{ backend_hostname }}', {{ backend_port }});
+init_localview();" style="background-color:black;overflow: hidden;">
+
+<!-- ErrorDialog -->
+<div class="modal fade" id="errorDialog" tabindex="-1" role="dialog" aria-labelledby="errorDialogCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-error">
+                <h5 class="modal-title" id="errorDialogLongTitle">Erreur</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body modal-body-error">
+                <label id="errorDialogText">Description de l'erreur.</label><br></p>
+            </div>
+            <div class="modal-footer modal-footer-error">
+                <button type="button" id="errorRefresh" class="btn btn-success" data-dismiss="modal" onclick="location.reload();">Réessayer</button>
+                <button type="button" id="errorIgnore" class="btn btn-danger" data-dismiss="modal">Ignorer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="messages" class="bg-{{message_type}} text-black text-center font-weight-bold p-2 d-none">
+    <label>{{message}}</label>
+</div>
+<div class="container-fluid h-100" id="mainContainer">
+    <div class="row h-100">
+        <div class="col-10">
+            <div id="selfView" onmousemove="resetInactiveTimer();openButtons('navButtons');return false;" width="100%" onmouseleave=""  style="overflow: hidden;">
+                <div id="navButtons" class="overlay-top-center w-100" style="display: none;">
+                    <select id="videoSelect" onchange="updateVideoSource();event.stopPropagation();"
+                            onclick="event.stopPropagation();">
+                    </select>
+                </div>
+                <video playsinline="true" autoplay="true" id="selfVideo" muted="muted"
+                       oncontextmenu="return false;"
+                       class="videoMirror" style="top: 0px;"></video>
+            </div>
+        </div>
+        <div class="col-2" id="sessionPanel" >
+            <div class="card mt-4" id="sessionInfo">
+                <div class="card-header">
+                    {{ session_name }}
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col text-center">
+                            <a href="#" class="btn btn-success w-100 p-4">{{ gettext('Start session') }}</a>
+                        </div>
+                    </div>
+                    {% if session_users %}
+                    <div class="row mt-3">
+                        <div class="col">
+                            <h5 class="card-title text-center">{{ gettext('Users') }}</h5>
+                            <ul class="list-group">
+                                {% for user in session_users %}
+                                <li class="list-group-item p-2">{{ user.user_name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if session_participants %}
+                    <div class="row mt-3">
+                        <div class="col">
+                            <h5 class="card-title text-center">{{ gettext('Participants') }}</h5>
+                            <ul class="list-group">
+                                {% for part in session_participants %}
+                                <li class="list-group-item p-2">{{ part.participant_name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if session_devices %}
+                    <div class="row mt-3">
+                        <div class="col">
+                            <h5 class="card-title text-center">{{ gettext('Devices') }}</h5>
+                            <ul class="list-group">
+                                {% for device in session_devices %}
+                                <li class="list-group-item p-2">{{ device.device_name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="dialogWait" >
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title ml-auto mr-auto">{{ gettext('Session starting...') }}</h5>
+                </div>
+                <div class="modal-body bg-white text-dark ml-auto mr-auto">
+                    <p>{{ gettext('The session is about to start... Enjoy your session!') }}</p>
+                </div>
+                <div class="modal-footer bg-primary">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

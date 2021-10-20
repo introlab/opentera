@@ -1,6 +1,19 @@
 let timerId = -1;
 let timeout = 0;
 
+function loginParticipant(){
+    document.getElementById('mainview').src = "participant_localview?token=" + participant_token + "&source=" +
+        clientSource;
+    $('#mainview').on('load', function() {
+        if (ws === undefined){
+            // No websocket connection - login participant
+            console.log("Mainview loaded - login participant...")
+            doParticipantLogin(backend_hostname, backend_port, participant_token);
+        }
+    });
+
+}
+
 function doParticipantLogin(backend_url, backend_port, participant_token){
     timeout++;
 	if (timerId === -1){
@@ -61,13 +74,12 @@ function loginParticipantError(event, status){
 		str_cant_connect_reasons + ".";
 }
 
-function doLogout(backend_url, backend_port){
+function doParticipantLogout(backend_url, backend_port){
     // Important: OpenTera.js must be included for this to work.
-    // TODO Handle participant logout as well
-    doGetRequest(backend_url, backend_port, '/api/user/logout', logoutSuccess, logoutError);
+    doGetRequest(backend_url, backend_port, '/api/participant/logout', participantLogoutSuccess, participantLogoutError);
 }
 
-function logoutSuccess(response, status, request){
+function participantLogoutSuccess(response, status, request){
     // Redirect to login page
     /*if (sessionStorage.getItem("is_participant") === "false")
     {
@@ -79,6 +91,6 @@ function logoutSuccess(response, status, request){
     //}
 }
 
-function logoutError(event, status){
-    console.log("logoutError: " + status.status + " : " + status.responseText);
+function participantLogoutError(event, status){
+    console.log("Participant logoutError: " + status.status + " : " + status.responseText);
 }

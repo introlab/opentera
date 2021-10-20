@@ -104,7 +104,5 @@ function isCurrentCameraPTZ() {
         currentConfig['currentVideoName'] === localPTZCapabilities.camera){
         return true;
     }
-
-
     return false;
 }
