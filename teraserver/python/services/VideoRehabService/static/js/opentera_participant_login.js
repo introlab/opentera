@@ -76,7 +76,8 @@ function loginParticipantError(event, status){
 
 function doParticipantLogout(backend_url, backend_port){
     // Important: OpenTera.js must be included for this to work.
-    doGetRequest(backend_url, backend_port, '/api/participant/logout', participantLogoutSuccess, participantLogoutError);
+    doGetRequest(backend_url, backend_port, '/api/participant/logout', sessionStorage.getItem('participant_token'),
+    participantLogoutSuccess, participantLogoutError);
 }
 
 function participantLogoutSuccess(response, status, request){

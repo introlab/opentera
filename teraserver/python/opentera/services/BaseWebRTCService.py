@@ -295,7 +295,6 @@ class BaseWebRTCService(ServiceOpenTera):
         id_session = session_manage_args['id_session']
 
         # Get additional "start" arguments
-        parameters = session_manage_args['parameters']
         if 'session_participants' in session_manage_args:
             participants = session_manage_args['session_participants']
         else:
@@ -312,6 +311,10 @@ class BaseWebRTCService(ServiceOpenTera):
         # Call service API to create session
         api_response = None
         if id_session == 0:  # New session request
+            if 'parameters' in session_manage_args:
+                parameters = session_manage_args['parameters']
+            else:
+                parameters = None
             api_req = {'session': {'id_session': 0,  # New session
                                    'id_creator_user': id_creator_user,
                                    'id_session_type': id_session_type,

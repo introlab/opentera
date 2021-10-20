@@ -10,6 +10,7 @@
 	<script src="./static/js/opentera_localvideo.js"></script>
 	<script src="./static/js/opentera_dashboard.js"></script>
     <script src="./static/js/opentera_utils.js"></script>
+    <script src="./static/js/opentera_session_lobby.js"></script>
 
     <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
@@ -71,7 +72,7 @@ init_localview();" style="background-color:black;overflow: hidden;">
                 <div class="card-body">
                     <div class="row">
                         <div class="col text-center">
-                            <a href="#" class="btn btn-success w-100 p-4">{{ gettext('Start session') }}</a>
+                            <a href="#" class="btn btn-success w-100 p-4" onclick="startSession(service_hostname, service_port, '{{ user_token }}', '{{ session_uuid }}');">{{ gettext('Start session') }}</a>
                         </div>
                     </div>
                     {% if session_users %}

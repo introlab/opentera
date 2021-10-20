@@ -77,7 +77,8 @@ function loginUserError(event, status){
 
 function doUserLogout(backend_url, backend_port){
     // Important: OpenTera.js must be included for this to work.
-    doGetRequest(backend_url, backend_port, '/api/user/logout', userLogoutSuccess, userLogoutError);
+    doGetRequest(backend_url, backend_port, '/api/user/logout', sessionStorage.getItem("user_token"),
+    userLogoutSuccess, userLogoutError);
 }
 
 function userLogoutSuccess(response, status, request){

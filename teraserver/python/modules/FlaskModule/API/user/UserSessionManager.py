@@ -136,6 +136,12 @@ class UserSessionManager(Resource):
                     return gettext('Invalid session'), 400
                 if current_session.session_session_type.id_service:
                     json_session_manager['id_service'] = current_session.session_session_type.id_service
+            if 'id_session_type' not in json_session_manager:
+                json_session_manager['id_session_type'] = current_session.id_session_type
+        else:
+            # New session - require session type
+            if 'id_session_type' not in json_session_manager:
+                return gettext('Missing required id_session_type for new sessions'), 400
 
         # Validate user rights if user can access that service
         if 'id_service' in json_session_manager:
