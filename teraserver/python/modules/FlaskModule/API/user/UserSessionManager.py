@@ -128,16 +128,28 @@ class UserSessionManager(Resource):
             ses = user_access.query_session(json_session_manager['id_session'])
             if not ses:
                 return gettext('User doesn\'t have access to that session'), 403
+
+            if not current_session:
+                current_session = TeraSession.get_session_by_id(json_session_manager['id_session'])
+            if not current_session:
+                return gettext('Invalid session'), 400
+
             if 'id_service' not in json_session_manager:
                 # Check if there's a service for that session, and, if so, adds its id.
-                if not current_session:
-                    current_session = TeraSession.get_session_by_id(json_session_manager['id_session'])
-                if not current_session:
-                    return gettext('Invalid session'), 400
                 if current_session.session_session_type.id_service:
                     json_session_manager['id_service'] = current_session.session_session_type.id_service
             if 'id_session_type' not in json_session_manager:
                 json_session_manager['id_session_type'] = current_session.id_session_type
+
+            # Compare session users, participants, devices...
+            if 'session_users' not in json_session_manager:
+                json_session_manager['session_users'] = [user.user_uuid for user in current_session.session_users]
+            if 'session_participants' not in json_session_manager:
+                json_session_manager['session_participants'] = [part.participant_uuid
+                                                                for part in current_session.session_participants]
+            if 'session_devices' not in json_session_manager:
+                json_session_manager['session_devices'] = [device.device_uuid
+                                                           for device in current_session.session_devices]
         else:
             # New session - require session type
             if 'id_session_type' not in json_session_manager:

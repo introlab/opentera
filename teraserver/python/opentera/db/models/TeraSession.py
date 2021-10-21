@@ -85,13 +85,13 @@ class TeraSession(db.Model, BaseModel):
             if self.session_creator_user:
                 rval['session_creator_user'] = self.session_creator_user.get_fullname()
                 rval['session_creator_user_uuid'] = self.session_creator_user.user_uuid
-            elif self.session_creator_device:
+            if self.session_creator_device:
                 rval['session_creator_device'] = self.session_creator_device.device_name
                 rval['session_creator_device_uuid'] = self.session_creator_device.device_uuid
-            elif self.session_creator_participant:
+            if self.session_creator_participant:
                 rval['session_creator_participant'] = self.session_creator_participant.participant_name
                 rval['session_creator_participant_uuid'] = self.session_creator_participant.participant_uuid
-            elif self.session_creator_service:
+            if self.session_creator_service:
                 rval['session_creator_service'] = self.session_creator_service.service_name
                 rval['session_creator_service_uuid'] = self.session_creator_service.service_uuid
 
