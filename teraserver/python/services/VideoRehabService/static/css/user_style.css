@@ -36,3 +36,19 @@
     width:100%;
     border:0;
 }
+
+.user-video {
+    position: unset;
+	width: 100%;
+	height: 100%;
+	/*  -o-object-fit: cover;
+        object-fit: cover;*/
+	-o-object-fit: contain;
+	object-fit: contain;
+	/*  -o-object-fit: fill;
+        object-fit: fill;*/
+	background-color: black;
+	-o-object-position: unset;
+	object-position: unset;
+	/*z-index: 2;*/
+}

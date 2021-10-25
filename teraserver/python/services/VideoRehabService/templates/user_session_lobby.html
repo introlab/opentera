@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ gettext('OpenTeraPlus - User - Session lobby') }}</title>
 
 	<script src="./static/js/opentera.js"></script>
@@ -15,6 +16,7 @@
     <link href="./static/css/fontawesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="./static/css/teraplus.css" />
+    <link rel="stylesheet" href="./static/css/user_style.css" />
 
     <!-- Translations -->
     <script>
@@ -51,20 +53,20 @@ init_localview();" style="background-color:black;overflow: hidden;">
     <label>{{message}}</label>
 </div>
 <div class="container-fluid h-100" id="mainContainer">
-    <div class="row h-100">
-        <div class="col-10">
-            <div id="selfView" onmousemove="resetInactiveTimer();openButtons('navButtons');return false;" width="100%" onmouseleave=""  style="overflow: hidden;">
+    <div class="row h-100 align-items-center">
+        <div class="col-12 col-sm-8 col-xl-10">
+            <div id="selfView" class="h-100 overflow-hidden align-items-lg-center" onmousemove="resetInactiveTimer();openButtons('navButtons');return false;" width="100%" onmouseleave="" >
                 <div id="navButtons" class="overlay-top-center w-100" style="display: none;">
                     <select id="videoSelect" onchange="updateVideoSource();event.stopPropagation();"
                             onclick="event.stopPropagation();">
                     </select>
                 </div>
-                <video playsinline="true" autoplay="true" id="selfVideo" muted="muted"
+                <video class="user-video" playsinline="true" autoplay="true" id="selfVideo" muted="muted"
                        oncontextmenu="return false;"
                        class="videoMirror" style="top: 0px;"></video>
             </div>
         </div>
-        <div class="col-2" id="sessionPanel" >
+        <div class="col-12 col-sm-4 col-xl-2" id="sessionPanel" >
             <div class="card mt-4" id="sessionInfo">
                 <div class="card-header">
                     {{ session_name }}
@@ -76,7 +78,7 @@ init_localview();" style="background-color:black;overflow: hidden;">
                         </div>
                     </div>
                     {% if session_users %}
-                    <div class="row mt-3">
+                    <div class="row mt-3 d-none d-md-flex">
                         <div class="col">
                             <h5 class="card-title text-center">{{ gettext('Users') }}</h5>
                             <ul class="list-group">
@@ -88,7 +90,7 @@ init_localview();" style="background-color:black;overflow: hidden;">
                     </div>
                     {% endif %}
                     {% if session_participants %}
-                    <div class="row mt-3">
+                    <div class="row mt-3 d-none d-md-flex">
                         <div class="col">
                             <h5 class="card-title text-center">{{ gettext('Participants') }}</h5>
                             <ul class="list-group">
@@ -100,7 +102,7 @@ init_localview();" style="background-color:black;overflow: hidden;">
                     </div>
                     {% endif %}
                     {% if session_devices %}
-                    <div class="row mt-3">
+                    <div class="row mt-3 d-none d-md-flex">
                         <div class="col">
                             <h5 class="card-title text-center">{{ gettext('Devices') }}</h5>
                             <ul class="list-group">
