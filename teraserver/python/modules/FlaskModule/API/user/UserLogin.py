@@ -39,6 +39,8 @@ class UserLogin(Resource):
         if 'X_EXTERNALPORT' in request.headers:
             port = request.headers['X_EXTERNALPORT']
 
+        websocket_url = None
+
         # Get user token key from redis
         from opentera.redis.RedisVars import RedisVars
         token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
@@ -50,23 +52,24 @@ class UserLogin(Resource):
         # Verify if user already logged in
         rpc = RedisRPCClient(self.module.config.redis_config)
         online_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
-        if current_user.user_uuid in online_users:
-            self.module.logger.log_warning(self.module.module_name,
-                                           UserLogin.__name__,
-                                           'get', 403,
-                                           'User already logged in', current_user.to_json(minimal=True))
-            return gettext('User already logged in.'), 403
+        if current_user.user_uuid not in online_users:
+            websocket_url = "wss://" + servername + ":" + str(port) + "/wss/user?id=" + session['_id']
+            # self.module.logger.log_warning(self.module.module_name,
+            #                                UserLogin.__name__,
+            #                                'get', 403,
+            #                                'User already logged in', current_user.to_json(minimal=True))
+            # return gettext('User already logged in.'), 403
+            print('Login - setting key with expiration in 60s', session['_id'], session['_user_id'])
+            self.module.redisSet(session['_id'], session['_user_id'], ex=60)
 
         current_user.update_last_online()
         user_token = current_user.get_token(token_key)
 
-        print('Login - setting key with expiration in 60s', session['_id'], session['_user_id'])
-        self.module.redisSet(session['_id'], session['_user_id'], ex=60)
-
         # Return reply as json object
-        reply = {"websocket_url": "wss://" + servername + ":" + str(port) + "/wss/user?id=" + session['_id'],
-                 "user_uuid": session['_user_id'],
+        reply = {"user_uuid": session['_user_id'],
                  "user_token": user_token}
+        if websocket_url:
+            reply["websocket_url"] = websocket_url
 
         # Verify client version (optional for now)
         # And add info to reply
