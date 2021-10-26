@@ -3,8 +3,6 @@ var teraConnected = false;
 let socket = undefined;
 let connected_callback = undefined;
 
-let currentConfig = {'currentVideoName': undefined};
-
 function connectSharedObject(callback) {
     connected_callback = callback
     let baseUrl = "ws://localhost:12345";

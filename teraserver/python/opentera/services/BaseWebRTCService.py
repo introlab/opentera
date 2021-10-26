@@ -66,7 +66,15 @@ class BaseWebRTCService(ServiceOpenTera):
 
         join_message = messages.JoinSessionEvent()
 
-        join_message.session_creator_name = session_info['session_creator_user']
+        # Order is important here if multiple session creator
+        if session_info['id_creator_service']:
+            join_message.session_creator_name = session_info['session_creator_service']
+        if session_info['id_creator_device']:
+            join_message.session_creator_name = session_info['session_creator_device']
+        if session_info['id_creator_participant']:
+            join_message.session_creator_name = session_info['session_creator_participant']
+        if session_info['id_creator_user']:
+            join_message.session_creator_name = session_info['session_creator_user']
         join_message.session_uuid = session_info['session_uuid']
         for user_uuid in users:
             join_message.session_users.extend([user_uuid])
@@ -75,6 +83,8 @@ class BaseWebRTCService(ServiceOpenTera):
         for device_uuid in devices:
             join_message.session_devices.extend([device_uuid])
         join_message.join_msg = join_msg
+        if not parameters:
+            parameters = ''
         join_message.session_parameters = parameters
         join_message.service_uuid = self.service_uuid
 
@@ -295,7 +305,6 @@ class BaseWebRTCService(ServiceOpenTera):
         id_session = session_manage_args['id_session']
 
         # Get additional "start" arguments
-        parameters = session_manage_args['parameters']
         if 'session_participants' in session_manage_args:
             participants = session_manage_args['session_participants']
         else:
@@ -312,6 +321,7 @@ class BaseWebRTCService(ServiceOpenTera):
         # Call service API to create session
         api_response = None
         if id_session == 0:  # New session request
+            parameters = session_manage_args['parameters']
             api_req = {'session': {'id_session': 0,  # New session
                                    'id_creator_user': id_creator_user,
                                    'id_session_type': id_session_type,
@@ -350,7 +360,7 @@ class BaseWebRTCService(ServiceOpenTera):
                 new_event = new_event.pop()
             session_info['session_events'].append(new_event)
 
-            # Replace fields with uuids
+            # Replace fields with uuids if presents
             session_info['session_participants'] = participants
             session_info['session_users'] = users
             session_info['session_devices'] = devices

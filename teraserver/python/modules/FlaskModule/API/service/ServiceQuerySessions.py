@@ -3,23 +3,25 @@ from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
+from modules.DatabaseModule.DBManager import DBManager
 from opentera.db.models.TeraParticipant import TeraParticipant
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from datetime import datetime
-from opentera.db.models.TeraService import TeraService
+
 from opentera.db.models.TeraSession import TeraSession, TeraSessionStatus
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDevice import TeraDevice
-import datetime
-import json
 
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query')
+get_parser.add_argument('uuid_session', type=str, help='UUID of the session to query')
+get_parser.add_argument('id_participant', type=int, help='ID of the participant to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_events', type=inputs.boolean, help='Also includes session events')
+get_parser.add_argument('with_session_type', type=inputs.boolean, help='Also includes session type information')
 
 post_parser = api.parser()
 post_schema = api.schema_model('user_session', {'properties': TeraSession.get_json_schema(),
@@ -40,24 +42,39 @@ class ServiceQuerySessions(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Logged service doesn\'t have permission to access the requested data'})
     def get(self):
         parser = get_parser
-
         args = parser.parse_args()
 
-        sessions = []
-        # Can only query session with an id
-        if not args['id_session']:
-            return gettext('Missing session id', 400)
+        service_access = DBManager.serviceAccess(current_service)
 
+        sessions = []
         if args['id_session']:
+            if args['id_session'] not in service_access.get_accessible_sessions_ids():
+                return gettext('Forbidden'), 403
             sessions = [TeraSession.get_session_by_id(args['id_session'])]
+        elif args['uuid_session']:
+            queried_session = TeraSession.get_session_by_uuid(args['uuid_session'])
+            if queried_session:
+                if queried_session.id_session not in service_access.get_accessible_sessions_ids():
+                    return gettext('Forbidden'), 403
+            sessions = [queried_session]
+        elif args['id_participant']:
+            if args['id_participant'] not in service_access.get_accessible_participants_ids():
+                return gettext('Forbidden'), 403
+            sessions = TeraSession.get_sessions_for_participant(args['id_participant'])
+        else:
+            return gettext('Missing arguments: at least one id is required'), 400
 
         try:
             sessions_list = []
             for ses in sessions:
                 session_json = ses.to_json(args['list'])
+
+                if args['with_session_type']:
+                    session_type = TeraSessionType.get_session_type_by_id(ses.id_session_type)
+                    session_json['session_type'] = session_type.to_json()
 
                 if args['with_events']:
                     # Get events for session
@@ -132,12 +149,12 @@ class ServiceQuerySessions(Resource):
 
             # Check for default values
             if 'session_start_datetime' not in json_session:
-                json_session['session_start_datetime'] = datetime.datetime.now()
+                json_session['session_start_datetime'] = datetime.now()
 
             if 'session_name' not in json_session:
                 session_name = TeraSessionType.get_session_type_by_id(json_session['id_session_type']).session_type_name
                 session_date = json_session['session_start_datetime']
-                if not isinstance(session_date, datetime.datetime):
+                if not isinstance(session_date, datetime):
                     import dateutil.parser as parser
                     session_date = parser.parse(json_session['session_start_datetime'])
                 # session_name += ' [' + session_date.strftime('%d-%m-%Y %H:%M') + ']'
@@ -164,10 +181,18 @@ class ServiceQuerySessions(Resource):
 
         # Manage session participants
         if session_parts_uuids:
+            # Add participants not already there
             current_session_part_uuids = [part.participant_uuid for part in update_session.session_participants]
-            diff_uuids = set(session_parts_uuids).difference(current_session_part_uuids)
+            part_uuids_to_add = set(session_parts_uuids).difference(current_session_part_uuids)
             update_session.session_participants.extend([TeraParticipant.get_participant_by_uuid(part_uuid)
-                                                        for part_uuid in diff_uuids])
+                                                        for part_uuid in part_uuids_to_add])
+
+            # Then, delete participants not present in the posted list
+            current_session_part_uuids.extend(list(part_uuids_to_add))
+            missing_participant_uuids = set(current_session_part_uuids).difference(session_parts_uuids)
+            for participant_uuid in missing_participant_uuids:
+                if participant_uuid in current_session_part_uuids:
+                    update_session.session_participants.remove(TeraParticipant.get_participant_by_uuid(participant_uuid))
 
         # Manage session users
         if session_users_uuids:
@@ -188,5 +213,3 @@ class ServiceQuerySessions(Resource):
             update_session.commit()
 
         return [update_session.to_json()]
-
-

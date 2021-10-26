@@ -25,7 +25,7 @@ function deleteCookie(cname){
     document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;secure;";
 }
 
-function doGetRequest(request_url, request_port, request_path, success_response, error_response, scheme){
+function doGetRequest(request_url, request_port, request_path, token, success_response, error_response, scheme){
     if (success_response === undefined){
         success_response = getRequestSuccess;
     }
@@ -42,7 +42,32 @@ function doGetRequest(request_url, request_port, request_path, success_response,
           success: success_response,
           error: error_response,
           beforeSend: function (xhr) {
-              xhr.setRequestHeader('Authorization', 'OpenTera ' + sessionStorage.getItem("participant_token"));
+              xhr.setRequestHeader('Authorization', 'OpenTera ' + token);
+          }
+        });
+}
+
+function doPostRequest(request_url, request_port, request_path, token, data, success_response, error_response, scheme = 'https'){
+    if (success_response === undefined){
+        success_response = getRequestSuccess;
+    }
+    if (error_response === undefined){
+        error_response = getRequestError;
+    }
+    if (scheme === undefined){
+        scheme = 'https';
+    }
+
+    $.ajax({
+          type: "POST",
+          url: scheme + '://' + request_url + ':' + request_port + request_path,
+          data: data,
+          dataType: "json",
+          contentType: "application/json; charset=utf-8",
+          success: success_response,
+          error: error_response,
+          beforeSend: function (xhr) {
+              xhr.setRequestHeader('Authorization', 'OpenTera ' + token);
           }
         });
 }

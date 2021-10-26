@@ -11,7 +11,19 @@ function init_dashboard(serv_hostname, serv_port){
     service_port = serv_port;
 }
 
-function init_system(){
+function init_system(participant=true){
+
+    if (participant){
+        // Check if we are embedded. If so, hides the top bar
+        if (window.self !== window.top){
+            console.log('Embedded mode. Hiding top bar.');
+            hideElement('communicator');
+            if (document.getElementById('mainview')){
+                document.getElementById('mainview').style.top = '0px'
+            }
+        }
+    }
+
     if (isBrowserSupported()){
         // Check source
         let urlParams = new URLSearchParams(window.location.search);
@@ -24,26 +36,16 @@ function init_system(){
             }
         }
 
-        loginParticipant();
+        if (participant)
+            loginParticipant();
+        else
+            loginUser();
     }
     else{
         let browser_infos = browser.getBrowser().name + " " + browser.getBrowser().version;
         showError(str_unsupported_browser_title,str_unsupported_browser + ".<br><br><u>" + str_your_browser + "</u>: <strong>" + browser_infos +
             "</strong><br><br><u>" + str_supported_browsers + "</u>: <strong>Chrome (version 55+), Firefox (version 50+), Safari (version 11+)</strong>", true, false);
     }
-}
-
-function loginParticipant(){
-    document.getElementById('mainview').src = "participant_localview?token=" + participant_token + "&source=" +
-        clientSource;
-    $('#mainview').on('load', function() {
-        if (ws === undefined){
-            // No websocket connection - login participant
-            console.log("Mainview loaded - login participant...")
-            doParticipantLogin(backend_hostname, backend_port, participant_token);
-        }
-    });
-
 }
 
 let sessionUrlTries = 0;

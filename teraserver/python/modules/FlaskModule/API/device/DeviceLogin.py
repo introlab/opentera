@@ -36,24 +36,10 @@ class DeviceLogin(Resource):
 
         current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
         current_device.update_last_online()
-        args = get_parser.parse_args()
+        # args = get_parser.parse_args()
 
-        # Verify if device already logged in
-        rpc = RedisRPCClient(self.module.config.redis_config)
-        online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
-        if current_device.device_uuid in online_devices:
-            self.module.logger.log_warning(self.module.module_name,
-                                           DeviceLogin.__name__,
-                                           'get', 403,
-                                           'Device already logged in', current_device.to_json(minimal=True))
-
-            return gettext('Device already logged in.'), 403
-
-        if 'X_EXTERNALHOST' in request.headers:
-            if ':' in request.headers['X_EXTERNALHOST']:
-                servername, port = request.headers['X_EXTERNALHOST'].split(':', 1)
-            else:
-                servername = request.headers['X_EXTERNALHOST']
+        if 'X_EXTERNALSERVER' in request.headers:
+            servername = request.headers['X_EXTERNALSERVER']
 
         if 'X_EXTERNALPORT' in request.headers:
             port = request.headers['X_EXTERNALPORT']
@@ -81,6 +67,17 @@ class DeviceLogin(Resource):
 
         # TODO Handle sessions
         if current_device.device_onlineable:
+            # Verify if device already logged in
+            rpc = RedisRPCClient(self.module.config.redis_config)
+            online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
+            if current_device.device_uuid not in online_devices:
+                self.module.logger.log_warning(self.module.module_name,
+                                               DeviceLogin.__name__,
+                                               'get', 403,
+                                               'Device already logged in', current_device.to_json(minimal=True))
+
+                return gettext('Device already logged in.'), 403
+
             # Permanent ?
             session.permanent = True
 

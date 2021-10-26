@@ -40,41 +40,38 @@ class ParticipantLogin(Resource):
     def get(self):
         if current_participant:
 
-            # Verify if participant already logged in
-            rpc = RedisRPCClient(self.module.config.redis_config)
-            online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
-            if current_participant.participant_uuid in online_participants:
-                self.module.logger.log_warning(self.module.module_name,
-                                               ParticipantLogin.__name__,
-                                               'get', 403,
-                                               'Participant already logged in',
-                                               current_participant.to_json(minimal=True))
-                return gettext('Participant already logged in.'), 403
-
-            current_participant.update_last_online()
-            session.permanent = True
-
-            # Redis key is handled in LoginModule
             servername = self.module.config.server_config['hostname']
             port = self.module.config.server_config['port']
 
-            if 'X_EXTERNALHOST' in request.headers:
-                if ':' in request.headers['X_EXTERNALHOST']:
-                    servername, port = request.headers['X_EXTERNALHOST'].split(':', 1)
-                else:
-                    servername = request.headers['X_EXTERNALHOST']
+            if 'X_EXTERNALSERVER' in request.headers:
+                servername = request.headers['X_EXTERNALSERVER']
 
             if 'X_EXTERNALPORT' in request.headers:
                 port = request.headers['X_EXTERNALPORT']
 
-            print('ParticipantLogin - setting key with expiration in 60s', session['_id'], session['_user_id'])
-            self.module.redisSet(session['_id'], session['_user_id'], ex=60)
+            # Verify if participant already logged in
+            rpc = RedisRPCClient(self.module.config.redis_config)
+            online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
+            websocket_url = None
+            if current_participant.participant_uuid not in online_participants:
+                websocket_url = "wss://" + servername + ":" + str(port) + "/wss/participant?id=" + session['_id']
+                # self.module.logger.log_warning(self.module.module_name,
+                #                                ParticipantLogin.__name__,
+                #                                'get', 403,
+                #                                'Participant already logged in',
+                #                                current_participant.to_json(minimal=True))
+                # return gettext('Participant already logged in.'), 403
+                print('ParticipantLogin - setting key with expiration in 60s', session['_id'], session['_user_id'])
+                self.module.redisSet(session['_id'], session['_user_id'], ex=60)
+
+            current_participant.update_last_online()
+            session.permanent = True
 
             # Return reply as json object
-            reply = {"websocket_url": "wss://" + servername + ":"
-                                      + str(port) + "/wss/participant?id=" + session['_id'],
-                     "participant_name": current_participant.participant_name,
+            reply = {"participant_name": current_participant.participant_name,
                      "participant_uuid": session['_user_id']}
+            if websocket_url:
+                reply["websocket_url"] = websocket_url
 
             # Set token according to API access (http auth is full access, token is not)
             if current_participant.fullAccess:

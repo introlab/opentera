@@ -39,7 +39,7 @@ class UserQueryOnlineParticipants(Resource):
 
             # Query participants information
             participants = TeraParticipant.query.filter(TeraParticipant.participant_uuid.in_(
-                filtered_participants_uuids)).all()
+                filtered_participants_uuids)).order_by(TeraParticipant.participant_name.asc()).all()
 
             participants_json = [participant.to_json(minimal=True) for participant in participants]
             for participant in participants_json:

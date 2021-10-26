@@ -1,0 +1,54 @@
+.topbar {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:50px;
+    border:0;
+    background-color: #647E85;
+}
+
+.logo {
+    display:block;
+    position:absolute;
+}
+
+.status-zone {
+    display:block;
+    position:absolute;
+    top:10px;
+    right:0px;
+    padding-right:12.5px;
+}
+
+.name-zone {
+    line-height:50px;
+    display:block;
+    vertical-align:middle;
+    height:50px;
+    margin:auto;
+}
+
+.main-frame {
+    position:absolute;
+    top:50px;
+    left:0;
+    width:100%;
+    border:0;
+}
+
+.user-video {
+    position: unset;
+	width: 100%;
+	height: 100%;
+	/*  -o-object-fit: cover;
+        object-fit: cover;*/
+	-o-object-fit: contain;
+	object-fit: contain;
+	/*  -o-object-fit: fill;
+        object-fit: fill;*/
+	background-color: black;
+	-o-object-position: unset;
+	object-position: unset;
+	/*z-index: 2;*/
+}

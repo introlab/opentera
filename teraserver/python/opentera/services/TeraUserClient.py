@@ -105,7 +105,7 @@ class TeraUserClient:
         response = self.do_get_request_to_backend('/api/user/users?user_uuid=' + self.__user_uuid)
 
         if response.status_code == 200:
-            return response.json()
+            return response.json()[0]
 
         return {}
 
