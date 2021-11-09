@@ -1,5 +1,5 @@
 from flask import session, request
-from flask_restx import Resource, reqparse
+from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_http_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -14,6 +14,8 @@ from opentera.modules.BaseModule import ModuleNames
 # Parser definition(s)
 
 get_parser = api.parser()
+get_parser.add_argument('with_websocket', type=inputs.boolean, help='If set, requires that a websocket url is returned.'
+                                                                    'If not possible to do so, return a 403 error.')
 
 
 class UserLogin(Resource):
@@ -27,6 +29,9 @@ class UserLogin(Resource):
     @api.expect(get_parser)
     @api.doc(description='Login to the server using HTTP Basic Authentification (HTTPAuth)')
     def get(self):
+
+        parser = get_parser
+        args = parser.parse_args()
 
         session.permanent = True
 
@@ -54,13 +59,15 @@ class UserLogin(Resource):
         online_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
         if current_user.user_uuid not in online_users:
             websocket_url = "wss://" + servername + ":" + str(port) + "/wss/user?id=" + session['_id']
-            # self.module.logger.log_warning(self.module.module_name,
-            #                                UserLogin.__name__,
-            #                                'get', 403,
-            #                                'User already logged in', current_user.to_json(minimal=True))
-            # return gettext('User already logged in.'), 403
             print('Login - setting key with expiration in 60s', session['_id'], session['_user_id'])
             self.module.redisSet(session['_id'], session['_user_id'], ex=60)
+        elif args['with_websocket']:
+            # User is online and a websocket is required
+            self.module.logger.log_warning(self.module.module_name,
+                                           UserLogin.__name__,
+                                           'get', 403,
+                                           'User already logged in', current_user.to_json(minimal=True))
+            return gettext('User already logged in.'), 403
 
         current_user.update_last_online()
         user_token = current_user.get_token(token_key)

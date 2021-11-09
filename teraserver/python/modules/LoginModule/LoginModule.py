@@ -78,7 +78,7 @@ class DisabledTokenStorage:
                 # If we continue here, tokens have a valid expiration time.
                 # We should stop looking for expired tokens since they are added chronologically
                 break
-            except jwt.exceptions.ExpiredSignature as e:
+            except jwt.exceptions.ExpiredSignatureError as e:
                 to_be_removed.append(token)
             except jwt.exceptions.PyJWTError as e:
                 print(e)

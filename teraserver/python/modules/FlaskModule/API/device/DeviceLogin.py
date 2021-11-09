@@ -70,7 +70,7 @@ class DeviceLogin(Resource):
             # Verify if device already logged in
             rpc = RedisRPCClient(self.module.config.redis_config)
             online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
-            if current_device.device_uuid not in online_devices:
+            if current_device.device_uuid in online_devices:
                 self.module.logger.log_warning(self.module.module_name,
                                                DeviceLogin.__name__,
                                                'get', 403,
