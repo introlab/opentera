@@ -15,6 +15,7 @@ get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query')
 get_parser.add_argument('id_participant', type=int, help='ID of the participant from which to get all sessions')
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to get all sessions')
+get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all sessions')
 get_parser.add_argument('session_uuid', type=str, help='Session UUID to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
@@ -61,6 +62,9 @@ class UserQuerySessions(Resource):
         elif args['id_user']:
             if args['id_user'] in user_access.get_accessible_users_ids():
                 sessions = TeraSession.get_sessions_for_user(args['id_user'])
+        elif args['id_device']:
+            if args['id_device'] in user_access.get_accessible_devices_ids():
+                sessions = TeraSession.get_sessions_for_device(args['id_device'])
         elif args['session_uuid']:
             session_info = TeraSession.get_session_by_uuid(args['session_uuid'])
             if session_info:
