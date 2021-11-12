@@ -299,11 +299,25 @@ class UserQuerySessionsTest(BaseAPITest):
         # self.assertEqual(json_data['session_participants'][0]['id_participant'], 2)
         # self.assertEqual(json_data['session_participants'][1]['id_participant'], 3)
 
+        # Add parameters
+        json_data = {
+            'session': {
+                'id_session': current_id,
+                'session_parameters': 'ParametersXYZJSONString'
+            }
+        }
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        self.assertEqual(200, response.status_code, msg="Adding Parameters")
+        response_data = response.json()[0]
+        self._checkJson(response_data)
+        self.assertEqual(json_data['session']['session_parameters'], response_data['session_parameters'])
+
         response = self._delete_with_http_auth(username='user4', password='user4', id_to_del=current_id)
         self.assertEqual(403, response.status_code, msg="Delete denied")
 
         response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=current_id)
         self.assertEqual(200, response.status_code, msg="Delete OK")
+
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
@@ -324,3 +338,4 @@ class UserQuerySessionsTest(BaseAPITest):
             self.assertTrue(json_data.__contains__('session_participants'))
             self.assertTrue(json_data.__contains__('session_users'))
             self.assertTrue(json_data.__contains__('session_start_datetime'))
+            self.assertTrue(json_data.__contains__('session_parameters'))
