@@ -1,5 +1,5 @@
 from flask import request
-from flask_restx import Resource, inputs
+from flask_restx import Resource, inputs  # , reqparse
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
@@ -19,14 +19,22 @@ get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query')
 get_parser.add_argument('uuid_session', type=str, help='UUID of the session to query')
 get_parser.add_argument('id_participant', type=int, help='ID of the participant to query')
+get_parser.add_argument('id_user', type=int, help='ID of the user to query')
+get_parser.add_argument('id_device', type=int, help='ID of the device to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_events', type=inputs.boolean, help='Also includes session events')
 get_parser.add_argument('with_session_type', type=inputs.boolean, help='Also includes session type information')
+get_parser.add_argument('status', type=int, help='Limit to specific session status')
+get_parser.add_argument('limit', type=int, help='Maximum number of results to return')
+get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index')
 
 post_parser = api.parser()
 post_schema = api.schema_model('user_session', {'properties': TeraSession.get_json_schema(),
                                                 'type': 'object',
                                                 'location': 'json'})
+
+# delete_parser = reqparse.RequestParser()
+# delete_parser.add_argument('id', type=int, help='Session ID to delete', required=True)
 
 
 class ServiceQuerySessions(Resource):
@@ -63,14 +71,27 @@ class ServiceQuerySessions(Resource):
         elif args['id_participant']:
             if args['id_participant'] not in service_access.get_accessible_participants_ids():
                 return gettext('Forbidden'), 403
-            sessions = TeraSession.get_sessions_for_participant(args['id_participant'])
+            sessions = TeraSession.get_sessions_for_participant(part_id=args['id_participant'],
+                                                                status=args['status'], limit=args['limit'],
+                                                                offset=args['offset'])
+        elif args['id_user']:
+            accessibles_users_ids = service_access.get_accessible_users_ids()
+            if args['id_user'] not in accessibles_users_ids:
+                return gettext('Forbidden'), 403
+            sessions = TeraSession.get_sessions_for_user(user_id=args['id_user'], status=args['status'],
+                                                         limit=args['limit'], offset=args['offset'])
+        elif args['id_device']:
+            if args['id_device'] not in service_access.get_accessible_devices_ids():
+                return gettext('Forbidden'), 403
+            sessions = TeraSession.get_sessions_for_device(device_id=args['id_device'], status=args['status'],
+                                                           limit=args['limit'], offset=args['offset'])
         else:
             return gettext('Missing arguments: at least one id is required'), 400
 
         try:
             sessions_list = []
             for ses in sessions:
-                session_json = ses.to_json(args['list'])
+                session_json = ses.to_json(minimal=args['list'])
 
                 if args['with_session_type']:
                     session_type = TeraSessionType.get_session_type_by_id(ses.id_session_type)
@@ -117,17 +138,31 @@ class ServiceQuerySessions(Resource):
         if 'id_service' not in json_session and json_session['id_session'] == 0:
             json_session['id_creator_service'] = current_service.id_service
 
+        service_access = DBManager.serviceAccess(current_service)
+
         session_parts_uuids = []
         session_users_uuids = []
         session_devices_uuids = []
         if 'session_participants_uuids' in json_session:
+            accessible_participants = service_access.get_accessible_participants()
             session_parts_uuids = json_session['session_participants_uuids']
+            if set(session_parts_uuids).difference([part.participant_uuid for part in accessible_participants]):
+                # At least one participant is not accessible to the service
+                return gettext('Service doesn\'t have access to at least one participant of that session.'), 403
             del json_session['session_participants_uuids']
         if 'session_users_uuids' in json_session:
+            accessible_users = service_access.get_accessible_users()
             session_users_uuids = json_session['session_users_uuids']
+            if set(session_users_uuids).difference([user.user_uuid for user in accessible_users]):
+                # At least one user is not accessible to the service
+                return gettext('Service doesn\'t have access to at least one user of that session.'), 403
             del json_session['session_users_uuids']
         if 'session_devices_uuids' in json_session:
+            accessible_devices = service_access.get_accessible_devices()
             session_devices_uuids = json_session['session_devices_uuids']
+            if set(session_devices_uuids).difference([device.device_uuid for device in accessible_devices]):
+                # At least one device is not accessible to the service
+                return gettext('Service doesn\'t have access to at least one device of that session.'), 403
             del json_session['session_devices_uuids']
 
         # Do the update!
@@ -213,3 +248,56 @@ class ServiceQuerySessions(Resource):
             update_session.commit()
 
         return [update_session.to_json()]
+
+    # @LoginModule.service_token_or_certificate_required
+    # @api.expect(delete_parser)
+    # @api.doc(description='Delete a specific session',
+    #          responses={200: 'Success',
+    #                     403: 'Service can\'t delete session',
+    #                     500: 'Database error.'})
+    # def delete(self):
+    #     parser = delete_parser
+    #
+    #     service_access = DBManager.serviceAccess(current_service)
+    #
+    #     args = parser.parse_args()
+    #     id_todel = args['id']
+    #
+    #     # Check if current service can delete
+    #     # Service can delete a session if it has access to one of its participant
+    #     todel_session = TeraSession.get_session_by_id(id_todel)
+    #     session_parts_ids = [part.id_participant for part in todel_session.session_participants]
+    #     session_users_ids = [user.id_user for user in todel_session.session_users]
+    #     session_devices_ids = [device.id_device for device in todel_session.session_devices]
+    #
+    #     accessibles_part_ids = service_access.get_accessible_participants_ids()
+    #     if set(session_parts_ids).difference(accessibles_part_ids):
+    #         # At least one participant is not accessible to the user
+    #         return gettext('Service doesn\'t have access to at least one participant of that session.'), 403
+    #
+    #     accessibles_user_ids = service_access.get_accessible_users_ids()
+    #     if set(session_users_ids).difference(accessibles_user_ids):
+    #         # At least one session user is not accessible to the user
+    #         return gettext('Service doesn\'t have access to at least one user of that session.'), 403
+    #
+    #     accessibles_device_ids = service_access.get_accessible_devices_ids()
+    #     if set(session_devices_ids).difference(accessibles_device_ids):
+    #         # At least one session user is not accessible to the user
+    #         return gettext('Service doesn\'t have access to at least one device of that session.'), 403
+    #
+    #     from opentera.db.models.TeraSession import TeraSessionStatus
+    #     if todel_session.session_status == TeraSessionStatus.STATUS_INPROGRESS.value:
+    #         return gettext('Session is in progress: can\'t delete that session.'), 403
+    #
+    #     # If we are here, we are allowed to delete. Do so.
+    #     try:
+    #         TeraSession.delete(id_todel=id_todel)
+    #     except exc.SQLAlchemyError as e:
+    #         import sys
+    #         print(sys.exc_info())
+    #         self.module.logger.log_error(self.module.module_name,
+    #                                      ServiceQuerySessions.__name__,
+    #                                      'delete', 500, 'Database error', str(e))
+    #         return gettext('Database error'), 500
+    #
+    #     return '', 200

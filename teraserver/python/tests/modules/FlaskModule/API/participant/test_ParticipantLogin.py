@@ -79,6 +79,6 @@ class ParticipantLoginTest(unittest.TestCase):
         self.assertEqual(tokenauth_response.status_code, 200)
         json_data = tokenauth_response.json()
         self.assertTrue('base_token' in json_data)
-        self.assertTrue('participant_token' in json_data)
+        self.assertFalse('participant_token' in json_data)  # participant_token not there, since token login
         self.assertGreater(len(json_data['base_token']), 0)
-        self.assertIsNone(json_data['participant_token'])
+        # self.assertIsNone(json_data['participant_token'])

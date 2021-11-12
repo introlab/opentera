@@ -1,13 +1,38 @@
-from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
+import os
+from requests import get, delete
+import json
 import datetime
+from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
+from opentera.services.ServiceOpenTera import ServiceOpenTera
+from opentera.services.ServiceConfigManager import ServiceConfigManager
 
 
-class UserQuerySessionsTest(BaseAPITest):
-    login_endpoint = '/api/user/login'
-    test_endpoint = '/api/user/sessions'
+class ServiceSessionsTest(BaseAPITest):
+
+    host = '127.0.0.1'
+    port = 40075
+    test_endpoint = '/api/service/sessions'
+    user_service_endpoint = '/api/user/services'
+    user_session_endpoint = '/api/user/sessions'
+    user_participant_endpoint = '/api/user/participants'
+    service_token = None
 
     def setUp(self):
-        pass
+        # Initialize service from redis, posing as VideoRehabService
+        # Use admin account to get service information (and tokens)
+        response = self._request_with_http_auth(username='admin', password='admin', payload='key=VideoRehabService',
+                                                endpoint=self.user_service_endpoint)
+        self.assertEqual(response.status_code, 200)
+        services = json.loads(response.text)
+        self.assertEqual(len(services), 1)
+
+        service_config = ServiceConfigManager()
+        config_file = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) +
+                                      '../../../../../../services/VideoRehabService/VideoRehabService.json')
+        service_config.load_config(filename=config_file)
+        service_config.service_config['ServiceUUID'] = services[0]['service_uuid']
+        service = ServiceOpenTera(config_man=service_config, service_info=services[0])
+        self.service_token = service.service_token
 
     def tearDown(self):
         pass
@@ -22,14 +47,14 @@ class UserQuerySessionsTest(BaseAPITest):
 
     def test_delete_no_auth(self):
         response = self._delete_with_no_auth(id_to_del=0)
-        self.assertEqual(401, response.status_code)
+        self.assertEqual(405, response.status_code)  # Not implemented
 
-    def test_query_no_params_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin')
+    def test_query_no_params(self):
+        response = self._request_with_token_auth(token=self.service_token)
         self.assertEqual(400, response.status_code)
 
-    def test_query_list_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_session=1&list=1")
+    def test_query_list(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_session=1&list=1")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -38,8 +63,8 @@ class UserQuerySessionsTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item, minimal=True)
 
-    def test_query_specific_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_session=1")
+    def test_query_specific(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_session=1")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -48,15 +73,12 @@ class UserQuerySessionsTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item)
 
-    def test_query_specific_but_invalid_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_session=-1")
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+    def test_query_specific_but_invalid(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_session=-1")
+        self.assertEqual(403, response.status_code)
 
-    def test_query_for_participant_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_participant=1")
+    def test_query_for_participant(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_participant=1")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -68,8 +90,8 @@ class UserQuerySessionsTest(BaseAPITest):
                 participant_count += int(1 == participant['id_participant'])
             self.assertEqual(1, participant_count)
 
-    def test_query_for_participant_as_admin_with_list(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_participant=1&list=1")
+    def test_query_for_participant_with_list(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_participant=1&list=1")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -77,25 +99,24 @@ class UserQuerySessionsTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item, minimal=True)
 
-    def test_query_for_participant_as_admin_with_limit(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_participant=1&limit=2")
+    def test_query_for_participant_with_limit(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_participant=1&limit=2")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
 
         self.assertEqual(2, len(json_data))
 
-    def test_query_for_participant_as_admin_with_limit_and_offset(self):
-        response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload="id_participant=1&limit=2&offset=27")
+    def test_query_for_participant_with_limit_and_offset(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_participant=1&limit=2&offset=27")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
 
         self.assertEqual(1, len(json_data))
 
-    def test_query_for_participant_as_admin_with_status(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_participant=1&status=0")
+    def test_query_for_participant_with_status(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_participant=1&status=0")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -105,9 +126,9 @@ class UserQuerySessionsTest(BaseAPITest):
         for data_item in json_data:
             self.assertEqual(0, data_item['session_status'])
 
-    def test_query_for_participant_as_admin_with_limit_and_offset_and_status_and_list(self):
-        response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload="id_participant=1&list=1&limit=2&offset=11&status=0")
+    def test_query_for_participant_with_limit_and_offset_and_status_and_list(self):
+        response = self._request_with_token_auth(token=self.service_token,
+                                                 payload="id_participant=1&list=1&limit=2&offset=11&status=0")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -117,8 +138,20 @@ class UserQuerySessionsTest(BaseAPITest):
         for data_item in json_data:
             self.assertEqual(0, data_item['session_status'])
 
-    def test_query_for_user_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=2")
+    def test_query_for_not_accessible_user(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_user=1")
+        self.assertEqual(403, response.status_code)
+
+    def test_query_for_not_accessible_participant(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_participant=4")
+        self.assertEqual(403, response.status_code)
+
+    def test_query_for_not_accessible_device(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_device=3")
+        self.assertEqual(403, response.status_code)
+
+    def test_query_for_user(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_user=3")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -127,11 +160,11 @@ class UserQuerySessionsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
             user_count = 0
             for user in data_item['session_users']:
-                user_count += int(2 == user['id_user'])
+                user_count += int(3 == user['id_user'])
             self.assertEqual(1, user_count)
 
-    def test_query_for_user_as_admin_with_list(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=2&list=1")
+    def test_query_for_user_with_list(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_user=3&list=1")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -139,37 +172,36 @@ class UserQuerySessionsTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item, minimal=True)
 
-    def test_query_for_user_as_admin_with_limit(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=1&limit=2")
+    def test_query_for_user_with_limit(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_user=3&limit=2")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
 
         self.assertEqual(2, len(json_data))
 
-    def test_query_for_user_as_admin_with_limit_and_offset(self):
-        response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload="id_user=1&limit=2&offset=7")
+    def test_query_for_user_with_limit_and_offset(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_user=3&limit=2&offset=4")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
 
         self.assertEqual(1, len(json_data))
 
-    def test_query_for_user_as_admin_with_status(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=1&status=0")
+    def test_query_for_user_with_status(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_user=3&status=2")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
 
-        self.assertEqual(3, len(json_data))
+        self.assertEqual(2, len(json_data))
 
         for data_item in json_data:
-            self.assertEqual(0, data_item['session_status'])
+            self.assertEqual(2, data_item['session_status'])
 
-    def test_query_for_user_as_admin_with_limit_and_offset_and_status_and_list(self):
-        response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload="id_user=1&list=1&limit=2&offset=2&status=0")
+    def test_query_for_user_with_limit_and_offset_and_status_and_list(self):
+        response = self._request_with_token_auth(token=self.service_token,
+                                                 payload="id_user=3&list=1&limit=2&offset=1&status=2")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -177,10 +209,10 @@ class UserQuerySessionsTest(BaseAPITest):
         self.assertEqual(1, len(json_data))
 
         for data_item in json_data:
-            self.assertEqual(0, data_item['session_status'])
+            self.assertEqual(2, data_item['session_status'])
 
-    def test_query_for_device_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_device=2")
+    def test_query_for_device(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_device=2")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -191,33 +223,32 @@ class UserQuerySessionsTest(BaseAPITest):
                 device_count += int(2 == device['id_device'])
             self.assertEqual(1, device_count)
 
-    def test_query_for_device_as_admin_with_list(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_device=2&list=1")
+    def test_query_for_device_with_list(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_device=2&list=1")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
         for data_item in json_data:
             self._checkJson(json_data=data_item, minimal=True)
 
-    def test_query_for_device_as_admin_with_limit(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_device=1&limit=2")
+    def test_query_for_device_with_limit(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_device=1&limit=2")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
 
         self.assertEqual(2, len(json_data))
 
-    def test_query_for_device_as_admin_with_limit_and_offset(self):
-        response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload="id_device=1&limit=2&offset=7")
+    def test_query_for_device_with_limit_and_offset(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_device=1&limit=2&offset=7")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
 
         self.assertEqual(1, len(json_data))
 
-    def test_query_for_device_as_admin_with_status(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_device=1&status=0")
+    def test_query_for_device_with_status(self):
+        response = self._request_with_token_auth(token=self.service_token, payload="id_device=1&status=0")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -227,9 +258,9 @@ class UserQuerySessionsTest(BaseAPITest):
         for data_item in json_data:
             self.assertEqual(0, data_item['session_status'])
 
-    def test_query_for_device_as_admin_with_limit_and_offset_and_status_and_list(self):
-        response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload="id_device=1&list=1&limit=2&offset=2&status=0")
+    def test_query_for_device_with_limit_and_offset_and_status_and_list(self):
+        response = self._request_with_token_auth(token=self.service_token,
+                                                 payload="id_device=1&list=1&limit=2&offset=2&status=0")
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -250,19 +281,39 @@ class UserQuerySessionsTest(BaseAPITest):
             }
         }
 
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        response = self._post_with_token(token=self.service_token, payload=json_data)
         self.assertEqual(400, response.status_code, msg="Missing id_session")  # Missing id_session
 
         json_data['session']['id_session'] = 0
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(400, response.status_code, msg="Missing participants")  # Missing participants
+        # response = self._post_with_token(token=self.service_token, payload=json_data)
+        # self.assertEqual(400, response.status_code, msg="Missing participants")  # Missing participants
 
-        json_data['session']['session_participants_ids'] = [1, 2]
-        response = self._post_with_http_auth(username='user4', password='user4', payload=json_data)
+        # Get participants uuids
+        url = self._make_url(self.host, self.port, self.user_participant_endpoint)
+        response = get(url=url, verify=False, auth=('admin', 'admin'), params='id_participant=1')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()))
+        p1_uuid = response.json()[0]['participant_uuid']
+
+        url = self._make_url(self.host, self.port, self.user_participant_endpoint)
+        response = get(url=url, verify=False, auth=('admin', 'admin'), params='id_participant=2')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()))
+        p2_uuid = response.json()[0]['participant_uuid']
+
+        url = self._make_url(self.host, self.port, self.user_participant_endpoint)
+        response = get(url=url, verify=False, auth=('admin', 'admin'), params='id_participant=4')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()))
+        p4_uuid = response.json()[0]['participant_uuid']
+
+        json_data['session']['session_participants_uuids'] = [p1_uuid, p4_uuid]
+        response = self._post_with_token(token=self.service_token, payload=json_data)
         self.assertEqual(403, response.status_code, msg="Post denied for user")  # Forbidden for that user to post that
 
-        json_data['session']['session_users_ids'] = [1]
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        # json_data['session']['session_users_ids'] = [1]
+        json_data['session']['session_participants_uuids'] = [p1_uuid, p2_uuid]
+        response = self._post_with_token(token=self.service_token, payload=json_data)
         self.assertEqual(200, response.status_code, msg="Post new")  # All ok now!
 
         json_data = response.json()[0]
@@ -277,7 +328,7 @@ class UserQuerySessionsTest(BaseAPITest):
             }
         }
 
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        response = self._post_with_token(token=self.service_token, payload=json_data)
         self.assertEqual(200, response.status_code, msg="Post update")
         json_data = response.json()[0]
         self._checkJson(json_data)
@@ -291,7 +342,7 @@ class UserQuerySessionsTest(BaseAPITest):
                 'session_participants_ids': [2, 3]
             }
         }
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        response = self._post_with_token(token=self.service_token, payload=json_data)
         self.assertEqual(200, response.status_code, msg="Remove participants")
         json_data = response.json()[0]
         self._checkJson(json_data)
@@ -299,10 +350,8 @@ class UserQuerySessionsTest(BaseAPITest):
         # self.assertEqual(json_data['session_participants'][0]['id_participant'], 2)
         # self.assertEqual(json_data['session_participants'][1]['id_participant'], 3)
 
-        response = self._delete_with_http_auth(username='user4', password='user4', id_to_del=current_id)
-        self.assertEqual(403, response.status_code, msg="Delete denied")
-
-        response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=current_id)
+        url = self._make_url(self.host, self.port, self.user_session_endpoint)
+        response = delete(url=url, verify=False, auth=('admin', 'admin'), params='id=' + str(current_id))
         self.assertEqual(200, response.status_code, msg="Delete OK")
 
     def _checkJson(self, json_data, minimal=False):

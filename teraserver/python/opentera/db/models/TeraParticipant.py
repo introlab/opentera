@@ -234,6 +234,7 @@ class TeraParticipant(db.Model, BaseModel):
         if test:
             from opentera.db.models.TeraProject import TeraProject
             project1 = TeraProject.get_project_by_projectname('Default Project #1')
+            project2 = TeraProject.get_project_by_projectname('Secret Project #1')
 
             participant1 = TeraParticipant()
             participant1.participant_name = 'Participant #1'
@@ -267,6 +268,17 @@ class TeraParticipant(db.Model, BaseModel):
             participant2.participant_uuid = str(uuid.uuid4())
             participant2.participant_participant_group = None
             participant2.participant_project = project1
+
+            # participant2.create_token()
+            db.session.add(participant2)
+
+            participant2 = TeraParticipant()
+            participant2.participant_name = 'Secret Participant'
+            participant2.participant_enabled = True
+            participant2.participant_token_enabled = True
+            participant2.participant_uuid = str(uuid.uuid4())
+            participant2.participant_participant_group = None
+            participant2.participant_project = project2
 
             # participant2.create_token()
             db.session.add(participant2)

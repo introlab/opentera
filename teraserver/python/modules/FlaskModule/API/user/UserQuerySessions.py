@@ -16,6 +16,9 @@ get_parser.add_argument('id_session', type=int, help='ID of the session to query
 get_parser.add_argument('id_participant', type=int, help='ID of the participant from which to get all sessions')
 get_parser.add_argument('id_user', type=int, help='ID of the user from which to get all sessions')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all sessions')
+get_parser.add_argument('status', type=int, help='Limit to specific session status')
+get_parser.add_argument('limit', type=int, help='Maximum number of results to return')
+get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index')
 get_parser.add_argument('session_uuid', type=str, help='Session UUID to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
@@ -56,15 +59,19 @@ class UserQuerySessions(Resource):
 
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
-                sessions = TeraSession.get_sessions_for_participant(args['id_participant'])
+                sessions = TeraSession.get_sessions_for_participant(part_id=args['id_participant'],
+                                                                    status=args['status'], limit=args['limit'],
+                                                                    offset=args['offset'])
         elif args['id_session']:
             sessions = [user_access.query_session(args['id_session'])]
         elif args['id_user']:
             if args['id_user'] in user_access.get_accessible_users_ids():
-                sessions = TeraSession.get_sessions_for_user(args['id_user'])
+                sessions = TeraSession.get_sessions_for_user(user_id=args['id_user'], status=args['status'],
+                                                             limit=args['limit'], offset=args['offset'])
         elif args['id_device']:
             if args['id_device'] in user_access.get_accessible_devices_ids():
-                sessions = TeraSession.get_sessions_for_device(args['id_device'])
+                sessions = TeraSession.get_sessions_for_device(device_id=args['id_device'], status=args['status'],
+                                                               limit=args['limit'], offset=args['offset'])
         elif args['session_uuid']:
             session_info = TeraSession.get_session_by_uuid(args['session_uuid'])
             if session_info:
