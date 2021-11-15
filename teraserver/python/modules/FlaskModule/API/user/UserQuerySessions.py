@@ -81,12 +81,8 @@ class UserQuerySessions(Resource):
             sessions_list = []
             for ses in sessions:
                 if ses is not None:  # Could be none if no access to specified session
-                    if args['list'] is None:
-                        session_json = ses.to_json()
-                        sessions_list.append(session_json)
-                    else:
-                        session_json = ses.to_json(minimal=True)
-                        sessions_list.append(session_json)
+                    session_json = ses.to_json(minimal=args['list'])
+                    sessions_list.append(session_json)
 
             return jsonify(sessions_list)
 

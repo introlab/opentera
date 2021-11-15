@@ -66,7 +66,8 @@ class TeraSession(db.Model, BaseModel):
             rval['session_participants'] = [{'id_participant': part.id_participant,
                                              'participant_uuid': part.participant_uuid,
                                              'participant_name': part.participant_name,
-                                             'id_project': part.id_project}
+                                             'id_project': part.id_project,
+                                             'project_name': part.participant_project.project_name}
                                             for part in self.session_participants]
 
             # Append list of users ids and names
@@ -308,12 +309,33 @@ class TeraSession(db.Model, BaseModel):
         return id_participant in participant_ids
 
     def get_associated_project_id(self):
-        project_id = None
         if self.session_participants:
             # Return project id for the first participant, since they should all be the same...
-            project_id = self.session_participants[0].id_project
+            return self.session_participants[0].id_project
 
-        return project_id
+        if self.session_creator_participant:
+            return self.session_creator_participant.id_project
+
+        return None
+
+    def get_associated_site_id(self):
+        if self.session_participants:
+            # Return project id for the first participant, since they should all be the same...
+            return self.session_participants[0].participant_project.id_site
+
+        if self.session_creator_participant:
+            return self.session_creator_participant.participant_project.id_site
+
+        return None
+
+    @staticmethod
+    def cancel_past_not_started_sessions():
+        # Set sessions in the "NOT STARTED" state in the past to the "CANCELLED" state
+        TeraSession.query.filter(TeraSession.session_status == TeraSessionStatus.STATUS_NOTSTARTED.value,
+                                 TeraSession.session_start_datetime <= datetime.now()).\
+            update({'session_status': TeraSessionStatus.STATUS_CANCELLED.value})
+
+        db.session.commit()
 
     # THIS SHOULD NOT BE USED ANYMORE, AS DELETES CAN'T OCCUR IF THERE'S STILL ASSOCIATED SESSIONS
     # @staticmethod

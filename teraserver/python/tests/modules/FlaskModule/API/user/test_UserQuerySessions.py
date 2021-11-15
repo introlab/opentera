@@ -318,7 +318,6 @@ class UserQuerySessionsTest(BaseAPITest):
         response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=current_id)
         self.assertEqual(200, response.status_code, msg="Delete OK")
 
-
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
         self.assertTrue(json_data.__contains__('id_session'))
