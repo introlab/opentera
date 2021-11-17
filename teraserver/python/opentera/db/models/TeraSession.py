@@ -66,7 +66,8 @@ class TeraSession(db.Model, BaseModel):
             rval['session_participants'] = [{'id_participant': part.id_participant,
                                              'participant_uuid': part.participant_uuid,
                                              'participant_name': part.participant_name,
-                                             'id_project': part.id_project}
+                                             'id_project': part.id_project,
+                                             'project_name': part.participant_project.project_name}
                                             for part in self.session_participants]
 
             # Append list of users ids and names
@@ -121,11 +122,13 @@ class TeraSession(db.Model, BaseModel):
 
             session_user = TeraUser.get_user_by_id(1)
             session_user2 = TeraUser.get_user_by_id(2)
+            session_user3 = TeraUser.get_user_by_id(3)
             session_part = TeraParticipant.get_participant_by_name('Participant #1')
             session_part2 = TeraParticipant.get_participant_by_name('Participant #2')
             session_service = TeraService.get_service_by_key('VideoRehabService')
             session_device = TeraDevice.get_device_by_id(2)
 
+            default_status = [0, 0, 0, 1, 2, 2, 3, 4]
             # Create user sessions
             for i in range(8):
                 base_session = TeraSession()
@@ -135,7 +138,8 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
                 base_session.session_duration = random.randint(60, 4800)
-                ses_status = random.randint(0, 4)
+                # ses_status = random.randint(0, 4)
+                ses_status = default_status[i]
                 base_session.session_status = ses_status
                 if i < 7:
                     base_session.session_participants = [session_part]
@@ -144,7 +148,7 @@ class TeraSession(db.Model, BaseModel):
                 if i < 4:
                     base_session.session_users = [base_session.session_creator_user]
                 else:
-                    base_session.session_users = [base_session.session_creator_user, session_user2]
+                    base_session.session_users = [base_session.session_creator_user, session_user2, session_user3]
                 if i == 3:
                     base_session.session_devices = [session_device]
                 base_session.session_uuid = str(uuid.uuid4())
@@ -159,12 +163,14 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
                 base_session.session_duration = random.randint(60, 4800)
-                ses_status = random.randint(0, 4)
+                # ses_status = random.randint(0, 4)
+                ses_status = default_status[i]
                 base_session.session_status = ses_status
                 if i < 7:
                     base_session.session_participants = [session_part]
                 else:
                     base_session.session_participants = [session_part, session_part2]
+                base_session.session_devices = [base_session.session_creator_device]
                 base_session.session_uuid = str(uuid.uuid4())
                 db.session.add(base_session)
 
@@ -177,7 +183,8 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
                 base_session.session_duration = random.randint(60, 4800)
-                ses_status = random.randint(0, 4)
+                # ses_status = random.randint(0, 4)
+                ses_status = default_status[i]
                 base_session.session_status = ses_status
                 base_session.session_participants = [base_session.session_creator_participant]
                 base_session.session_uuid = str(uuid.uuid4())
@@ -192,12 +199,14 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
                 base_session.session_duration = random.randint(60, 4800)
-                ses_status = random.randint(0, 4)
+                # ses_status = random.randint(0, 4)
+                ses_status = default_status[i]
                 base_session.session_status = ses_status
                 if i < 3:
                     base_session.session_participants = [session_part]
                 else:
                     base_session.session_participants = [session_part, session_part2]
+                    base_session.session_users = [session_user3]
                 base_session.session_uuid = str(uuid.uuid4())
                 db.session.add(base_session)
 
@@ -220,23 +229,50 @@ class TeraSession(db.Model, BaseModel):
         return TeraSession.query.filter_by(session_name=name).first()
 
     @staticmethod
-    def get_sessions_for_participant(part_id: int):
+    def get_sessions_for_participant(part_id: int, status: int = None, limit: int = None, offset: int = None):
         from opentera.db.models.TeraParticipant import TeraParticipant
-        return TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
-                                                                               part_id) \
-            .order_by(TeraSession.session_start_datetime.desc()).all()
+        query = TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
+                                                                                part_id)
+
+        query = query.order_by(TeraSession.session_start_datetime.desc())
+        if status is not None:
+            query = query.filter(TeraSession.session_status == status)
+        if limit:
+            query = query.limit(limit)
+        if offset:
+            query = query.offset(offset)
+
+        return query.all()
 
     @staticmethod
-    def get_sessions_for_user(user_id: int):
+    def get_sessions_for_user(user_id: int, status: int = None, limit: int = None, offset: int = None):
         from opentera.db.models.TeraUser import TeraUser
-        return TeraSession.query.join(TeraSession.session_users).filter(TeraUser.id_user == user_id) \
-            .order_by(TeraSession.session_start_datetime.desc()).all()
+        query = TeraSession.query.join(TeraSession.session_users).filter(TeraUser.id_user == user_id)
+        query = query.order_by(TeraSession.session_start_datetime.desc())
+
+        if status is not None:
+            query = query.filter(TeraSession.session_status == status)
+        if limit:
+            query = query.limit(limit)
+        if offset:
+            query = query.offset(offset)
+
+        return query.all()
 
     @staticmethod
-    def get_sessions_for_device(device_id: int):
+    def get_sessions_for_device(device_id: int, status: int = None, limit: int = None, offset: int = None):
         from opentera.db.models.TeraDevice import TeraDevice
-        return TeraSession.query.join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id) \
-            .order_by(TeraSession.session_start_datetime.desc()).all()
+        query = TeraSession.query.join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
+        query = query.order_by(TeraSession.session_start_datetime.desc())
+
+        if status is not None:
+            query = query.filter(TeraSession.session_status == status)
+        if limit:
+            query = query.limit(limit)
+        if offset:
+            query = query.offset(offset)
+
+        return query.all()
 
     @staticmethod
     def get_sessions_for_type(session_type_id: int):
@@ -273,12 +309,42 @@ class TeraSession(db.Model, BaseModel):
         return id_participant in participant_ids
 
     def get_associated_project_id(self):
-        project_id = None
         if self.session_participants:
             # Return project id for the first participant, since they should all be the same...
-            project_id = self.session_participants[0].id_project
+            return self.session_participants[0].id_project
 
-        return project_id
+        if self.session_creator_participant:
+            return self.session_creator_participant.id_project
+
+        return None
+
+    def get_associated_site_id(self):
+        if self.session_participants:
+            # Return project id for the first participant, since they should all be the same...
+            return self.session_participants[0].participant_project.id_site
+
+        if self.session_creator_participant:
+            return self.session_creator_participant.participant_project.id_site
+
+        return None
+
+    @staticmethod
+    def cancel_past_not_started_sessions():
+        # Set sessions in the "NOT STARTED" state in the past to the "CANCELLED" state
+        TeraSession.query.filter(TeraSession.session_status == TeraSessionStatus.STATUS_NOTSTARTED.value,
+                                 TeraSession.session_start_datetime <= datetime.now()).\
+            update({'session_status': TeraSessionStatus.STATUS_CANCELLED.value})
+
+        db.session.commit()
+
+    @staticmethod
+    def terminate_past_inprogress_sessions():
+        # Set sessions "IN PROGRESS" which are in the past to the "TERMINATED" state
+        TeraSession.query.filter(TeraSession.session_status == TeraSessionStatus.STATUS_INPROGRESS.value,
+                                 TeraSession.session_start_datetime <= datetime.now()). \
+            update({'session_status': TeraSessionStatus.STATUS_TERMINATED.value})
+
+        db.session.commit()
 
     # THIS SHOULD NOT BE USED ANYMORE, AS DELETES CAN'T OCCUR IF THERE'S STILL ASSOCIATED SESSIONS
     # @staticmethod

@@ -138,3 +138,43 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
         response = self._request_with_token_auth(token)
         # Should not be allowed
         self.assertEqual(response.status_code, 403)
+
+    def test_query_with_limit(self):
+        response = self._request_with_http_auth(username='participant1', password='opentera', payload="limit=2")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(2, len(json_data))
+
+    def test_query_with_limit_and_offset(self):
+        response = self._request_with_http_auth(username='participant1', password='opentera',
+                                                payload="limit=2&offset=27")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(1, len(json_data))
+
+    def test_query_with_status(self):
+        response = self._request_with_http_auth(username='participant1', password='opentera', payload="status=0")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(12, len(json_data))
+
+        for data_item in json_data:
+            self.assertEqual(0, data_item['session_status'])
+
+    def test_query_with_limit_and_offset_and_status_and_list(self):
+        response = self._request_with_http_auth(username='participant1', password='opentera',
+                                                payload="list=1&limit=2&offset=11&status=0")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(1, len(json_data))
+
+        for data_item in json_data:
+            self.assertEqual(0, data_item['session_status'])

@@ -2,6 +2,8 @@ from flask_sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
 
+from twisted.internet import task, reactor
+import datetime
 
 from opentera.db.Base import db
 import opentera.messages.python as messages
@@ -66,6 +68,18 @@ class DBManager (BaseModule):
         BaseModule.__init__(self, ModuleNames.DATABASE_MODULE_NAME.value, config)
 
         self.db_uri = None
+
+        # Database cleanup task set to run at next midnight
+        self.cleanup_database_task = self.start_cleanup_task()
+
+    def start_cleanup_task(self) -> task:
+        # Compute time till next midnight
+        current_datetime = datetime.datetime.now()
+        tomorrow = current_datetime + datetime.timedelta(days=1)
+        seconds_to_midnight = (datetime.datetime.combine(tomorrow, datetime.time.min) - current_datetime).seconds
+
+        return task.deferLater(reactor, seconds_to_midnight, self.cleanup_database)
+        # return task.deferLater(reactor, 5, self.cleanup_database)
 
     def setup_events_for_class(self, cls, event_name):
         import json
@@ -337,6 +351,14 @@ class DBManager (BaseModule):
 
         # Stamp database
         command.stamp(config, revision, sql, tag)
+
+    def cleanup_database(self):
+        print("Cleaning up database...")
+        # Updating session states
+        TeraSession.cancel_past_not_started_sessions()
+        TeraSession.terminate_past_inprogress_sessions()
+        # Reschedule cleanup task
+        self.cleanup_database_task = self.start_cleanup_task()
 
 
 # Fix foreign_keys on sqlite
