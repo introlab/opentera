@@ -173,6 +173,12 @@ class UserQueryParticipants(Resource):
                                     devices.append(device.to_json())
                                 participant_json['participant_devices'] = devices
                                 participant_json['participant_project'] = participant.participant_project.to_json()
+                                last_session = participant.get_last_session()
+                                if last_session:
+                                    participant_json['participant_lastsession'] = \
+                                        last_session.session_start_datetime.isoformat()
+                                else:
+                                    participant_json['participant_lastsession'] = None
 
                         # Update participants status
                         if participant.participant_uuid in status_participants:
