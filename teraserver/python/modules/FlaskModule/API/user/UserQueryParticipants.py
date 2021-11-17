@@ -30,6 +30,10 @@ get_parser.add_argument('enabled', type=inputs.boolean, help='Flag that limits t
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('full', type=inputs.boolean, help='Flag that expands the returned data to include all '
                                                           'information')
+get_parser.add_argument('orderby_recents', type=inputs.boolean, help='Returns participants ordered by most recently '
+                                                                     'updated')
+get_parser.add_argument('limit', type=int, help='Returns at most "limit" participants')
+
 get_parser.add_argument('no_group', type=inputs.boolean,
                         help='Flag that limits the returned data with only participants without a group')
 # get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
@@ -112,6 +116,16 @@ class UserQueryParticipants(Resource):
                     break
                 if participant.id_participant not in user_access.get_accessible_participants_ids():
                     participants = []
+
+        # Sort by recently modified, if needed
+        if args['orderby_recents']:
+            participants = sorted(participants, key=lambda sort_part: sort_part.version_id, reverse=True)
+
+        # Apply limit to number of returned participants
+        if args['limit']:
+            if len(participants) > args['limit']:
+                participants = participants[0:args['limit']]
+
         try:
             if participants:
                 participant_list = []
