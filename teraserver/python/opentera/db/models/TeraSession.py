@@ -337,6 +337,15 @@ class TeraSession(db.Model, BaseModel):
 
         db.session.commit()
 
+    @staticmethod
+    def terminate_past_inprogress_sessions():
+        # Set sessions "IN PROGRESS" which are in the past to the "TERMINATED" state
+        TeraSession.query.filter(TeraSession.session_status == TeraSessionStatus.STATUS_INPROGRESS.value,
+                                 TeraSession.session_start_datetime <= datetime.now()). \
+            update({'session_status': TeraSessionStatus.STATUS_TERMINATED.value})
+
+        db.session.commit()
+
     # THIS SHOULD NOT BE USED ANYMORE, AS DELETES CAN'T OCCUR IF THERE'S STILL ASSOCIATED SESSIONS
     # @staticmethod
     # def delete_orphaned_sessions(commit_changes=True):

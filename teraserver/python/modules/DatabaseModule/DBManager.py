@@ -354,7 +354,9 @@ class DBManager (BaseModule):
 
     def cleanup_database(self):
         print("Cleaning up database...")
+        # Updating session states
         TeraSession.cancel_past_not_started_sessions()
+        TeraSession.terminate_past_inprogress_sessions()
         # Reschedule cleanup task
         self.cleanup_database_task = self.start_cleanup_task()
 
