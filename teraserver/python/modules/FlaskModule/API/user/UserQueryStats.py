@@ -219,10 +219,10 @@ class UserQueryUserStats(Resource):
                     updated_date = datetime.datetime.fromtimestamp(user.version_id/1000)
                     diff_month = UserQueryUserStats.diff_month(today,updated_date)
                     if diff_month >= 1:
-                        warning_users.append({'id_user': user.id_user,
-                                              'user_fullname': user.get_fullname(),
-                                              'last_updated': updated_date.isoformat(),
-                                              'months': diff_month})
+                        warning_neverlogged_users.append({'id_user': user.id_user,
+                                                          'user_fullname': user.get_fullname(),
+                                                          'last_updated': updated_date.isoformat(),
+                                                          'months': diff_month})
             stats['warning_users_count'] = len(warning_users)
             stats['warning_users'] = warning_users
             stats['warning_neverlogged_users_count'] = len(warning_neverlogged_users)

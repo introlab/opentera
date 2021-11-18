@@ -220,9 +220,21 @@ class UserQueryParticipants(Resource):
         json_participant = request.json['participant']
 
         # Validate if we have an id
-        if 'id_participant' not in json_participant or ('id_project' not in json_participant
+        if 'id_participant' not in json_participant:
+            return gettext('Missing id_participant'), 400
+
+        if json_participant['id_participant'] == 0 and ('id_project' not in json_participant
                                                         and 'id_participant_group' not in json_participant):
-            return gettext('Missing id_participant, id_project or id_participant_group'), 400
+            return gettext('Missing id_project or id_participant_group'), 400
+
+        if json_participant['id_participant'] > 0 and ('id_project' not in json_participant
+                                                       and 'id_participant_group' not in json_participant):
+            # Query participant information to get project
+            part = TeraParticipant.get_participant_by_id(json_participant['id_participant'])
+            if part.id_participant_group is not None:
+                json_participant['id_participant_group'] = part.id_participant_group
+            else:
+                json_participant['id_project'] = part.id_project
 
         # User can modify or add a participant if it has admin to that project
         if 'id_project' in json_participant:
