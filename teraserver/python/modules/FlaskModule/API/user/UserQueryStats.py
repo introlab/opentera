@@ -8,6 +8,8 @@ from opentera.db.models.TeraParticipant import TeraParticipant
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager, DBManagerTeraUserAccess
 
+import datetime
+
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -23,6 +25,10 @@ get_parser.add_argument('with_participants', type=inputs.boolean, help='Also inc
                                                                        'not be used with "id_participant", '
                                                                        '"id_user_group", "id_session", "id_user" or '
                                                                        '"id_device".')
+get_parser.add_argument('with_warnings', type=inputs.boolean, help='Also include warning information such as a '
+                                                                   'participant not having sessions for some time or '
+                                                                   'users not having logged on for some time. Can only '
+                                                                   'be used with "id_site" for now.')
 
 
 class UserQueryUserStats(Resource):
@@ -58,7 +64,8 @@ class UserQueryUserStats(Resource):
         if args['id_site']:
             if not args['id_site'] in user_access.get_accessible_sites_ids():
                 return gettext('Forbidden'), 403
-            return UserQueryUserStats.get_site_stats(user_access, args['id_site'], args['with_participants'])
+            return UserQueryUserStats.get_site_stats(user_access, args['id_site'], args['with_participants'],
+                                                     args['with_warnings'])
 
         if args['id_project']:
             if not args['id_project'] in user_access.get_accessible_projects_ids():
@@ -120,7 +127,8 @@ class UserQueryUserStats(Resource):
         return stats
 
     @staticmethod
-    def get_site_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool) -> dict:
+    def get_site_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool, with_warnings: bool) \
+            -> dict:
         from opentera.db.models.TeraSession import TeraSession
         site_projects = user_access.query_projects_for_site(item_id)
         site_users = user_access.query_users_for_site(site_id=item_id)
@@ -149,10 +157,78 @@ class UserQueryUserStats(Resource):
                  'devices_total_count': len(devices)
                  }
         # Add participants information?
+        participants = []
         if with_parts:
             participants = user_access.query_all_participants_for_site(item_id)
             part_stats = [UserQueryUserStats.get_participant_list_stats(part) for part in participants]
             stats['participants'] = part_stats
+
+        # Add warnings information?
+        if with_warnings:
+            today = datetime.datetime.now().date()
+
+            # Participants
+            if len(participants) == 0:
+                participants = user_access.query_all_participants_for_site(item_id)
+            # Keep only enabled participants and with last session within the last 6 months
+            participants = [part for part in participants if part.participant_enabled]
+
+            warning_parts = []
+            no_session_parts = []
+            for part in participants:
+                last_session = part.get_last_session()
+                if last_session:
+                    diff_month = UserQueryUserStats.diff_month(today, last_session.session_start_datetime)
+                    if diff_month >= 6:
+                        warning_parts.append({'id_participant': part.id_participant,
+                                              'participant_name': part.participant_name,
+                                              'project_name': part.participant_project.project_name,
+                                              'last_session': last_session.session_start_datetime.isoformat(),
+                                              'months': diff_month})
+                else:
+                    updated_date = datetime.datetime.fromtimestamp(part.version_id/1000)
+                    diff_month = UserQueryUserStats.diff_month(today, updated_date)
+                    if diff_month >= 1:
+                        no_session_parts.append({'id_participant': part.id_participant,
+                                                 'participant_name': part.participant_name,
+                                                 'project_name': part.participant_project.project_name,
+                                                 'last_updated': updated_date.isoformat(),
+                                                 'months': diff_month})
+            stats['warning_participants_count'] = len(warning_parts)
+            stats['warning_participants'] = warning_parts
+
+            stats['warning_nosession_participants_count'] = len(no_session_parts)
+            stats['warning_nosession_participants'] = no_session_parts
+
+            # Users
+            users = user_access.query_users_for_site(item_id)
+            # Keep only enabled users
+            users = [user for user in users if user.user_enabled and not user.user_superadmin]
+
+            warning_users = []
+            warning_neverlogged_users = []
+            for user in users:
+                if user.user_lastonline:
+                    diff_month = UserQueryUserStats.diff_month(today, user.user_lastonline)
+                    if diff_month >= 3:
+                        warning_users.append({'id_user': user.id_user,
+                                              'user_fullname': user.get_fullname(),
+                                              'user_lastonline': user.user_lastonline.isoformat(),
+                                              'months': diff_month})
+                else:
+                    updated_date = datetime.datetime.fromtimestamp(user.version_id/1000)
+                    diff_month = UserQueryUserStats.diff_month(today,updated_date)
+                    if diff_month >= 1:
+                        warning_users.append({'id_user': user.id_user,
+                                              'user_fullname': user.get_fullname(),
+                                              'last_updated': updated_date.isoformat(),
+                                              'months': diff_month})
+            stats['warning_users_count'] = len(warning_users)
+            stats['warning_users'] = warning_users
+            stats['warning_neverlogged_users_count'] = len(warning_neverlogged_users)
+            stats['warning_neverlogged_users'] = warning_neverlogged_users
+
+            # TODO: Old assets
 
         return stats
 
@@ -188,9 +264,9 @@ class UserQueryUserStats(Resource):
 
     @staticmethod
     def get_participant_group_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool) -> dict:
-        from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
+        # from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
         from opentera.db.models.TeraSession import TeraSession
-        group = TeraParticipantGroup.get_participant_group_by_id(item_id)
+        # group = TeraParticipantGroup.get_participant_group_by_id(item_id)
         participants = user_access.query_participants_for_group(item_id)
         participants_total = len(participants)
 
@@ -291,3 +367,7 @@ class UserQueryUserStats(Resource):
                  'participant_last_online': last_online_date
                  }
         return stats
+
+    @staticmethod
+    def diff_month(d1: datetime, d2: datetime):
+        return (d1.year - d2.year) * 12 + d1.month - d2.month
