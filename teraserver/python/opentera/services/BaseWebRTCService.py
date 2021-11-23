@@ -394,7 +394,7 @@ class BaseWebRTCService(ServiceOpenTera):
             return {'status': 'started', 'session': session_info}
 
         else:
-            return {'status': 'error', 'error_text': gettext('Cannot create session')}
+            return {'status': 'error', 'error_text': gettext('Cannot create session') + ': ' + api_response.text}
 
     def manage_stop_session(self, session_manage_args: dict):
         id_session = session_manage_args['id_session']

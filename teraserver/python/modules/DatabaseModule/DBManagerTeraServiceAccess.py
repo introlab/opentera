@@ -81,7 +81,8 @@ class DBManagerTeraServiceAccess:
         projects = self.get_accessible_projects(admin_only=admin_only)
         users = []
         for project in projects:
-            project_users = project.get_users_in_project()
+            # Always include super admins for services
+            project_users = project.get_users_in_project(include_superadmins=True)
             users.extend([user for user in project_users if user not in users])
 
         # Sort by user first name
