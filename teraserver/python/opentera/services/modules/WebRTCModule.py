@@ -21,7 +21,8 @@ class WebRTCModule(BaseModule):
     def setup_rpc_interface(self):
         pass
 
-    def create_webrtc_session(self, room_name, owner_uuid, users: list, participants: list, devices: list):
+    def create_webrtc_session(self, room_name, owner_uuid, users: list, participants: list, devices: list,
+                              parameters: dict):
         # make sure we kill sessions already started with this owner_uuid or room name
         self.terminate_webrtc_session_with_owner_uuid(owner_uuid)
         self.terminate_webrtc_session_with_room_name(room_name)
@@ -46,7 +47,7 @@ class WebRTCModule(BaseModule):
                           + '/webrtc/' + str(port) + '/devices?key=' + key
 
             if self.launch_node(port=port, key=key, owner=owner_uuid,
-                                users=users, participants=participants, devices=devices):
+                                users=users, participants=participants, devices=devices, parameters=parameters):
                 # Return url
                 return True, {'url_users': url_users,
                               'url_participants': url_participants,
@@ -145,7 +146,7 @@ class WebRTCModule(BaseModule):
         self.used_ports.append(port)
         return port
 
-    def launch_node(self, port, key, owner, users, participants, devices):
+    def launch_node(self, port, key, owner, users, participants, devices, parameters):
         executable_args = [self.config.webrtc_config['executable'],
                            self.config.webrtc_config['script'],
                            '--port=' + str(port),

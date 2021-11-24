@@ -303,6 +303,9 @@ class BaseWebRTCService(ServiceOpenTera):
         id_creator_user = session_manage_args['id_creator_user']
         id_session_type = session_manage_args['id_session_type']
         id_session = session_manage_args['id_session']
+        parameters = {}
+        if 'parameters' in session_manage_args:
+            parameters = session_manage_args['parameters']
 
         # Get additional "start" arguments
         if 'session_participants' in session_manage_args:
@@ -321,7 +324,6 @@ class BaseWebRTCService(ServiceOpenTera):
         # Call service API to create session
         api_response = None
         if id_session == 0:  # New session request
-            parameters = session_manage_args['parameters']
             api_req = {'session': {'id_session': 0,  # New session
                                    'id_creator_user': id_creator_user,
                                    'id_session_type': id_session_type,
@@ -373,9 +375,9 @@ class BaseWebRTCService(ServiceOpenTera):
                                                  self.nodejs_webrtc_message_callback)
 
             # Start WebRTC process
-            # TODO do something with parameters
             retval, process_info = self.webRTCModule.create_webrtc_session(
-                session_info['session_key'], id_creator_user, users, participants, devices)
+                session_info['session_key'], id_creator_user, users, participants, devices,
+                session_info['session_parameters'])
 
             if not retval or not process_info:
                 self.unsubscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
