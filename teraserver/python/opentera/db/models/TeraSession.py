@@ -136,7 +136,7 @@ class TeraSession(db.Model, BaseModel):
                 ses_type = random.randint(1, 4)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
                 base_session.session_name = "Séance #" + str(i + 1)
-                base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
+                base_session.session_start_datetime = datetime.now() - timedelta(days=i)
                 base_session.session_duration = random.randint(60, 4800)
                 # ses_status = random.randint(0, 4)
                 ses_status = default_status[i]
@@ -161,7 +161,7 @@ class TeraSession(db.Model, BaseModel):
                 ses_type = random.randint(1, 4)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
                 base_session.session_name = "Séance #" + str(i + 1)
-                base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
+                base_session.session_start_datetime = datetime.now() - timedelta(days=i)
                 base_session.session_duration = random.randint(60, 4800)
                 # ses_status = random.randint(0, 4)
                 ses_status = default_status[i]
@@ -181,7 +181,7 @@ class TeraSession(db.Model, BaseModel):
                 ses_type = random.randint(1, 4)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
                 base_session.session_name = "Séance #" + str(i + 1)
-                base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
+                base_session.session_start_datetime = datetime.now() - timedelta(days=i)
                 base_session.session_duration = random.randint(60, 4800)
                 # ses_status = random.randint(0, 4)
                 ses_status = default_status[i]
@@ -197,7 +197,7 @@ class TeraSession(db.Model, BaseModel):
                 ses_type = random.randint(1, 4)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
                 base_session.session_name = "Séance #" + str(i + 1)
-                base_session.session_start_datetime = datetime.now() - timedelta(days=random.randint(0, 30))
+                base_session.session_start_datetime = datetime.now() - timedelta(days=i)
                 base_session.session_duration = random.randint(60, 4800)
                 # ses_status = random.randint(0, 4)
                 ses_status = default_status[i]
@@ -229,48 +229,56 @@ class TeraSession(db.Model, BaseModel):
         return TeraSession.query.filter_by(session_name=name).first()
 
     @staticmethod
-    def get_sessions_for_participant(part_id: int, status: int = None, limit: int = None, offset: int = None):
+    def _set_query_parameters(query, status: int = None, limit: int = None, offset: int = None,
+                              start_date: datetime.date = None, end_date: datetime.date = None):
+        if status is not None:
+            query = query.filter(TeraSession.session_status == status)
+        if start_date:
+            query = query.filter(db.func.date(TeraSession.session_start_datetime) >= start_date)
+        if end_date:
+            query = query.filter(db.func.date(TeraSession.session_start_datetime) <= end_date)
+        if limit:
+            query = query.limit(limit)
+        if offset:
+            query = query.offset(offset)
+
+        return query
+
+    @staticmethod
+    def get_sessions_for_participant(part_id: int, status: int = None, limit: int = None, offset: int = None,
+                                     start_date: datetime.date = None, end_date: datetime.date = None):
         from opentera.db.models.TeraParticipant import TeraParticipant
         query = TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
                                                                                 part_id)
 
         query = query.order_by(TeraSession.session_start_datetime.desc())
-        if status is not None:
-            query = query.filter(TeraSession.session_status == status)
-        if limit:
-            query = query.limit(limit)
-        if offset:
-            query = query.offset(offset)
+
+        query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
+                                                  start_date=start_date, end_date=end_date)
 
         return query.all()
 
     @staticmethod
-    def get_sessions_for_user(user_id: int, status: int = None, limit: int = None, offset: int = None):
+    def get_sessions_for_user(user_id: int, status: int = None, limit: int = None, offset: int = None,
+                              start_date: datetime.date = None, end_date: datetime.date = None):
         from opentera.db.models.TeraUser import TeraUser
         query = TeraSession.query.join(TeraSession.session_users).filter(TeraUser.id_user == user_id)
         query = query.order_by(TeraSession.session_start_datetime.desc())
 
-        if status is not None:
-            query = query.filter(TeraSession.session_status == status)
-        if limit:
-            query = query.limit(limit)
-        if offset:
-            query = query.offset(offset)
+        query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
+                                                  start_date=start_date, end_date=end_date)
 
         return query.all()
 
     @staticmethod
-    def get_sessions_for_device(device_id: int, status: int = None, limit: int = None, offset: int = None):
+    def get_sessions_for_device(device_id: int, status: int = None, limit: int = None, offset: int = None,
+                                start_date: datetime.date = None, end_date: datetime.date = None):
         from opentera.db.models.TeraDevice import TeraDevice
         query = TeraSession.query.join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
         query = query.order_by(TeraSession.session_start_datetime.desc())
 
-        if status is not None:
-            query = query.filter(TeraSession.session_status == status)
-        if limit:
-            query = query.limit(limit)
-        if offset:
-            query = query.offset(offset)
+        query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
+                                                  start_date=start_date, end_date=end_date)
 
         return query.all()
 

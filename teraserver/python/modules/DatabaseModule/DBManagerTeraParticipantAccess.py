@@ -18,18 +18,18 @@ class DBManagerTeraParticipantAccess:
     def __init__(self, participant: TeraParticipant):
         self.participant = participant
 
-    def query_session(self, filters: dict, limit: int = None, offset: int = None):
+    # def query_session(self, limit: int = None, offset: int = None):
         # Make sure you filter results with id_participant to return TeraDevices
         # that are accessible by current participant
-        query = TeraSession.query.filter_by(**filters).join(TeraSessionParticipants). \
-            filter_by(id_participant=self.participant.id_participant)
-        if limit:
-            query = query.limit(limit)
-
-        if offset:
-            query = query.offset(offset)
-
-        return query.all()
+        # query = TeraSession.query.filter_by(**filters).join(TeraSessionParticipants). \
+        #     filter_by(id_participant=self.participant.id_participant)
+        # if limit:
+        #     query = query.limit(limit)
+        #
+        # if offset:
+        #     query = query.offset(offset)
+        #
+        # return query.all()
 
     def query_device(self, filters: dict):
         # Make sure you filter results with id_participant to return TeraDevices
