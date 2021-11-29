@@ -27,6 +27,8 @@ get_parser.add_argument('with_session_type', type=inputs.boolean, help='Also inc
 get_parser.add_argument('status', type=int, help='Limit to specific session status')
 get_parser.add_argument('limit', type=int, help='Maximum number of results to return')
 get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index')
+get_parser.add_argument('start_date', type=inputs.date, help='Start date, sessions before that date will be ignored')
+get_parser.add_argument('end_date', type=inputs.date, help='End date, sessions after that date will be ignored')
 
 post_parser = api.parser()
 post_schema = api.schema_model('user_session', {'properties': TeraSession.get_json_schema(),
@@ -73,18 +75,21 @@ class ServiceQuerySessions(Resource):
                 return gettext('Forbidden'), 403
             sessions = TeraSession.get_sessions_for_participant(part_id=args['id_participant'],
                                                                 status=args['status'], limit=args['limit'],
-                                                                offset=args['offset'])
+                                                                offset=args['offset'], start_date=args['start_date'],
+                                                                end_date=args['end_date'])
         elif args['id_user']:
             accessibles_users_ids = service_access.get_accessible_users_ids()
             if args['id_user'] not in accessibles_users_ids:
                 return gettext('Forbidden'), 403
             sessions = TeraSession.get_sessions_for_user(user_id=args['id_user'], status=args['status'],
-                                                         limit=args['limit'], offset=args['offset'])
+                                                         limit=args['limit'], offset=args['offset'],
+                                                         start_date=args['start_date'], end_date=args['end_date'])
         elif args['id_device']:
             if args['id_device'] not in service_access.get_accessible_devices_ids():
                 return gettext('Forbidden'), 403
             sessions = TeraSession.get_sessions_for_device(device_id=args['id_device'], status=args['status'],
-                                                           limit=args['limit'], offset=args['offset'])
+                                                           limit=args['limit'], offset=args['offset'],
+                                                           start_date=args['start_date'], end_date=args['end_date'])
         else:
             return gettext('Missing arguments: at least one id is required'), 400
 

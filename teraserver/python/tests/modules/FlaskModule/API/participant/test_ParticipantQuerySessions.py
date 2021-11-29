@@ -1,7 +1,7 @@
 import unittest
 import os
 from requests import get
-import json
+from datetime import datetime, timedelta
 
 
 class ParticipantQuerySessionsTest(unittest.TestCase):
@@ -178,3 +178,35 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
 
         for data_item in json_data:
             self.assertEqual(0, data_item['session_status'])
+
+    def test_query_with_start_date_and_end_date(self):
+        start_date = (datetime.now() - timedelta(days=6)).date().strftime("%Y-%m-%d")
+        end_date = (datetime.now() - timedelta(days=4)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='participant1', password='opentera',
+                                                payload="start_date=" + start_date +
+                                                        "&end_date=" + end_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(6, len(json_data))
+
+    def test_query_with_start_date(self):
+        start_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='participant1', password='opentera',
+                                                payload="start_date=" + start_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(12, len(json_data))
+
+    def test_query_with_end_date(self):
+        end_date = (datetime.now() - timedelta(days=5)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='participant1', password='opentera',
+                                                payload="end_date=" + end_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(9, len(json_data))

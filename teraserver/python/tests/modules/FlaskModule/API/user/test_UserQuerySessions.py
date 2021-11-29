@@ -1,5 +1,5 @@
 from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
-import datetime
+from datetime import datetime, timedelta
 
 
 class UserQuerySessionsTest(BaseAPITest):
@@ -117,6 +117,38 @@ class UserQuerySessionsTest(BaseAPITest):
         for data_item in json_data:
             self.assertEqual(0, data_item['session_status'])
 
+    def test_query_for_participant_with_start_date_and_end_date(self):
+        start_date = (datetime.now() - timedelta(days=6)).date().strftime("%Y-%m-%d")
+        end_date = (datetime.now() - timedelta(days=4)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_participant=1&start_date=" + start_date +
+                                                        "&end_date=" + end_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(6, len(json_data))
+
+    def test_query_for_participant_with_start_date(self):
+        start_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_participant=1&start_date=" + start_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(12, len(json_data))
+
+    def test_query_for_participant_with_end_date(self):
+        end_date = (datetime.now() - timedelta(days=5)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_participant=1&end_date=" + end_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(9, len(json_data))
+
     def test_query_for_user_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=2")
         self.assertEqual(200, response.status_code)
@@ -179,6 +211,38 @@ class UserQuerySessionsTest(BaseAPITest):
         for data_item in json_data:
             self.assertEqual(0, data_item['session_status'])
 
+    def test_query_for_user_with_start_date_and_end_date(self):
+        start_date = (datetime.now() - timedelta(days=6)).date().strftime("%Y-%m-%d")
+        end_date = (datetime.now() - timedelta(days=4)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_user=3&start_date=" + start_date +
+                                                        "&end_date=" + end_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(2, len(json_data))
+
+    def test_query_for_user_with_start_date(self):
+        start_date = (datetime.now() - timedelta(days=6)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_user=3&start_date=" + start_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(3, len(json_data))
+
+    def test_query_for_user_with_end_date(self):
+        end_date = (datetime.now() - timedelta(days=4)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_user=3&end_date=" + end_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(4, len(json_data))
+
     def test_query_for_device_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_device=2")
         self.assertEqual(200, response.status_code)
@@ -239,12 +303,59 @@ class UserQuerySessionsTest(BaseAPITest):
         for data_item in json_data:
             self.assertEqual(0, data_item['session_status'])
 
+    def test_query_for_device_with_limit_and_list_and_start_date_and_end_date(self):
+        start_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
+        end_date = (datetime.now() - timedelta(days=1)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_device=1&list=1&limit=1&start_date=" + start_date +
+                                                "&end_date=" + end_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(1, len(json_data))
+
+        for data_item in json_data:
+            self.assertEqual(0, data_item['session_status'])
+
+    def test_query_for_device_with_start_date_and_end_date(self):
+        start_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
+        end_date = (datetime.now() - timedelta(days=1)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_device=1&start_date=" + start_date +
+                                                "&end_date=" + end_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(2, len(json_data))
+
+    def test_query_for_device_with_start_date(self):
+        start_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_device=1&start_date=" + start_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(3, len(json_data))
+
+    def test_query_for_device_with_end_date(self):
+        end_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_device=1&end_date=" + end_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(5, len(json_data))
+
     def test_post_and_delete(self):
         # New with minimal infos
         json_data = {
             'session': {
                 'session_name': 'Test Session',
-                'session_start_datetime': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
+                'session_start_datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
                 'id_session_type': 1,
                 'session_status': 2
             }
