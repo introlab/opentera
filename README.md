@@ -1,4 +1,4 @@
-![.](https://ga-beacon-279122.nn.r.appspot.com/UA-27707792-8/github-opentera-main?pixel) 
+[![Actions Status](https://github.com/introlab/opentera/actions/workflows/python-package-pypi.yml/badge.svg)](https://github.com/introlab/opentera/actions)
 
 # OpenTera
 We are developing an “Open Source” micro-services structure which will allow:
