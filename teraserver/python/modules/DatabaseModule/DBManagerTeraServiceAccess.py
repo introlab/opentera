@@ -77,6 +77,20 @@ class DBManagerTeraServiceAccess:
 
         return parts
 
+    def get_accessible_users(self, admin_only=False):
+        projects = self.get_accessible_projects(admin_only=admin_only)
+        users = []
+        for project in projects:
+            # Always include super admins for services
+            project_users = project.get_users_in_project(include_superadmins=True)
+            users.extend([user for user in project_users if user not in users])
+
+        # Sort by user first name
+        return sorted(users, key=lambda suser: suser.user_firstname)
+
+    def get_accessible_users_ids(self, admin_only=False):
+        return [user.id_user for user in self.get_accessible_users(admin_only=admin_only)]
+
     def get_site_role(self, site_id: int, uuid_user: str):
         user = self.get_user_with_uuid(uuid_user)
         sites_roles = user.get_sites_roles()

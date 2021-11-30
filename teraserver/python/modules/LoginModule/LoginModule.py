@@ -78,7 +78,7 @@ class DisabledTokenStorage:
                 # If we continue here, tokens have a valid expiration time.
                 # We should stop looking for expired tokens since they are added chronologically
                 break
-            except jwt.exceptions.ExpiredSignature as e:
+            except jwt.exceptions.ExpiredSignatureError as e:
                 to_be_removed.append(token)
             except jwt.exceptions.PyJWTError as e:
                 print(e)
@@ -161,12 +161,16 @@ class LoginModule(BaseModule):
         # Setup verify password function for users
         user_http_auth.verify_password(self.user_verify_password)
         user_token_auth.verify_token(self.user_verify_token)
+        user_http_auth.error_handler(self.auth_error)
+        user_token_auth.error_handler(self.auth_error)
 
         # Setup verify password function for participants
         participant_http_auth.verify_password(self.participant_verify_password)
         participant_token_auth.verify_token(self.participant_verify_token)
         participant_http_auth.get_user_roles(self.participant_get_user_roles_http)
         participant_token_auth.get_user_roles(self.participant_get_user_roles_token)
+        participant_token_auth.error_handler(self.auth_error)
+        participant_http_auth.error_handler(self.auth_error)
 
     def load_user(self, user_id):
         # print('LoginModule - load_user', self, user_id)
@@ -405,6 +409,10 @@ class LoginModule(BaseModule):
 
         # This should not happen, return no role
         return []
+
+    @staticmethod
+    def auth_error(status):
+        return gettext("Unauthorized"), status
 
     @staticmethod
     def device_token_or_certificate_required(f):

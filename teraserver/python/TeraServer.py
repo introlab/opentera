@@ -248,3 +248,15 @@ if __name__ == '__main__':
     # This is blocking, running event loop
     twisted_module.run()
 
+    service_launcher.terminate_processes()
+
+    # Flush redis database
+    import redis
+
+    redis_client = redis.Redis(host=config_man.redis_config['hostname'],
+                               port=config_man.redis_config['port'],
+                               db=config_man.redis_config['db'],
+                               username=config_man.redis_config['username'],
+                               password=config_man.redis_config['password'])
+
+    redis_client.flushdb()

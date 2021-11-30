@@ -1,7 +1,7 @@
 import unittest
 import os
 from requests import get
-import json
+from datetime import datetime, timedelta
 
 
 class ParticipantQuerySessionsTest(unittest.TestCase):
@@ -138,3 +138,75 @@ class ParticipantQuerySessionsTest(unittest.TestCase):
         response = self._request_with_token_auth(token)
         # Should not be allowed
         self.assertEqual(response.status_code, 403)
+
+    def test_query_with_limit(self):
+        response = self._request_with_http_auth(username='participant1', password='opentera', payload="limit=2")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(2, len(json_data))
+
+    def test_query_with_limit_and_offset(self):
+        response = self._request_with_http_auth(username='participant1', password='opentera',
+                                                payload="limit=2&offset=27")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(1, len(json_data))
+
+    def test_query_with_status(self):
+        response = self._request_with_http_auth(username='participant1', password='opentera', payload="status=0")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(12, len(json_data))
+
+        for data_item in json_data:
+            self.assertEqual(0, data_item['session_status'])
+
+    def test_query_with_limit_and_offset_and_status_and_list(self):
+        response = self._request_with_http_auth(username='participant1', password='opentera',
+                                                payload="list=1&limit=2&offset=11&status=0")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(1, len(json_data))
+
+        for data_item in json_data:
+            self.assertEqual(0, data_item['session_status'])
+
+    def test_query_with_start_date_and_end_date(self):
+        start_date = (datetime.now() - timedelta(days=6)).date().strftime("%Y-%m-%d")
+        end_date = (datetime.now() - timedelta(days=4)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='participant1', password='opentera',
+                                                payload="start_date=" + start_date +
+                                                        "&end_date=" + end_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(6, len(json_data))
+
+    def test_query_with_start_date(self):
+        start_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='participant1', password='opentera',
+                                                payload="start_date=" + start_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(12, len(json_data))
+
+    def test_query_with_end_date(self):
+        end_date = (datetime.now() - timedelta(days=5)).date().strftime("%Y-%m-%d")
+        response = self._request_with_http_auth(username='participant1', password='opentera',
+                                                payload="end_date=" + end_date)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(9, len(json_data))

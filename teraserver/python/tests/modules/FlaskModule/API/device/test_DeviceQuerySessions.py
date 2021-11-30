@@ -1,6 +1,6 @@
 import unittest
 import os
-from requests import get, post
+from requests import get, post, delete
 import json
 from datetime import datetime
 
@@ -96,6 +96,12 @@ class DeviceQuerySessionsTest(unittest.TestCase):
                                                                             session_info=session)
                     print(session_response.text)
                     self.assertEqual(session_response.status_code, 200)
+
+                    current_id = session_response.json()['id_session']
+
+                    url = self._make_url(self.host, self.port, '/api/user/sessions')
+                    response = delete(url=url, verify=False, auth=('admin', 'admin'), params='id=' + str(current_id))
+                    self.assertEqual(200, response.status_code, msg="Delete OK")
                 else:
                     pass
             else:

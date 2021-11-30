@@ -37,7 +37,8 @@ class UserQueryOnlineUsers(Resource):
             filtered_user_uuids = list(set(users_uuids).intersection(accessible_users))
 
             # Query user information
-            users = TeraUser.query.filter(TeraUser.user_uuid.in_(filtered_user_uuids)).all()
+            users = TeraUser.query.filter(TeraUser.user_uuid.in_(filtered_user_uuids))\
+                .order_by(TeraUser.user_firstname.asc()).all()
             users_json = [user.to_json(minimal=True) for user in users]
             for user in users_json:
                 user['user_online'] = status_users[user['user_uuid']]['online']

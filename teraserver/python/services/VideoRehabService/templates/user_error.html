@@ -13,7 +13,7 @@
 
     <title>{{ gettext('OpenTera - Error') }}</title>
 </head>
-<body onload="if ('{{participant_token}}' === '') hideElement('btnConnect'); ">
+<body onload="if ('{{user_token}}' === '') hideElement('btnConnect'); ">
 <div class="container fluid mt-5">
     <div class="jumbotron jumbotron-fluid bg-danger" >
         <div class="container">
@@ -21,7 +21,7 @@
             <p class="lead display-5 bg-dark text-light p-4">{{error_msg}}</p>
         </div>
     </div>
-    <p><button id="btnConnect" class="large-button" onclick="window.top.location.href='./participant?token={{participant_token}}'">
+    <p><button id="btnConnect" class="large-button" onclick="window.top.location.href='./user?token={{user_token}}'">
         {{ gettext('Click here to login again') }}
     </button></p>
 </div>

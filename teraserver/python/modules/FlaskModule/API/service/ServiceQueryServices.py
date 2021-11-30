@@ -1,15 +1,17 @@
-from flask_restx import Resource
+from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from opentera.db.models.TeraService import TeraService
 from sqlalchemy.exc import InvalidRequestError
+from flask import request
 
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_service', type=int, help='ID of the service to query')
 get_parser.add_argument('uuid_service', type=str, help='UUID of the service to query')
 get_parser.add_argument('service_key', type=str, help='Key of the service to query')
+get_parser.add_argument('with_base_url', type=inputs.boolean, help='Also include base external URL for that service')
 
 
 class ServiceQueryServices(Resource):
@@ -45,6 +47,23 @@ class ServiceQueryServices(Resource):
             services_list = []
             for service in services:
                 service_json = service.to_json(minimal=True)
+                if args['with_base_url']:
+                    # Build urls
+                    hostname = service.service_hostname
+                    port = service.service_port
+                    if hostname == 'localhost' or hostname == '127.0.0.1':
+                        # We have a service hosted on localhost - set server URL
+                        hostname = self.module.config.server_config['hostname']
+                        port = self.module.config.server_config['port']
+
+                        if 'X_EXTERNALSERVER' in request.headers:
+                            hostname = request.headers['X_EXTERNALSERVER']
+
+                        if 'X_EXTERNALPORT' in request.headers:
+                            port = request.headers['X_EXTERNALPORT']
+
+                    base_url = 'https://' + hostname + ':' + str(port) + service.service_clientendpoint
+                    service_json['service_base_url'] = base_url
                 services_list.append(service_json)
 
             return services_list
