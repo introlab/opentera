@@ -248,3 +248,5 @@ if __name__ == '__main__':
     # This is blocking, running event loop
     twisted_module.run()
 
+    service_launcher.terminate_processes()
+
