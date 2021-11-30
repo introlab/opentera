@@ -81,3 +81,4 @@ class ServiceLauncherModule(BaseModule):
     def terminate_processes(self):
         for process in self.processList:
             process['process'].terminate()
+        self.processList = []
