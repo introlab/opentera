@@ -14,6 +14,10 @@ class ServiceLauncherModule(BaseModule):
         self.processList = []
         self.launch_system_service_only = system_only
 
+    def __del__(self):
+        for process in self.processList:
+            process['process'].terminate()
+
     def setup_module_pubsub(self):
         # Additional subscribe here
 
