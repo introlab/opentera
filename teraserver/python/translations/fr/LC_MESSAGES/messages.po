@@ -7,16 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-10-26 13:26-0400\n"
-"PO-Revision-Date: 2021-10-26 09:24-0400\n"
+"POT-Creation-Date: 2021-11-30 08:01-0500\n"
+"PO-Revision-Date: 2021-11-30 08:03-0500\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.0\n"
+"X-Generator: Poedit 3.0\n"
 
 #: modules/FlaskModule/API/device/DeviceLogin.py:79
 msgid "Device already logged in."
@@ -26,9 +27,11 @@ msgstr "L'appareil est déjà connecté."
 #: modules/FlaskModule/API/device/DeviceQueryDevices.py:81
 #: modules/FlaskModule/API/service/ServiceQueryProjects.py:41
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:85
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:55
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:61
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:65
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:71
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:75
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:83
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:89
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:129
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:203
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:111
@@ -43,7 +46,7 @@ msgstr "L'appareil est déjà connecté."
 #: modules/FlaskModule/API/user/UserQueryDevices.py:371
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:109
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:163
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:315
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:347
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:201
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:275
 #: modules/FlaskModule/API/user/UserQueryProjects.py:140
@@ -75,14 +78,14 @@ msgstr "L'appareil est déjà connecté."
 #: modules/FlaskModule/API/user/UserQuerySiteAccess.py:272
 #: modules/FlaskModule/API/user/UserQuerySites.py:126
 #: modules/FlaskModule/API/user/UserQuerySites.py:178
-#: modules/FlaskModule/API/user/UserQueryStats.py:50
-#: modules/FlaskModule/API/user/UserQueryStats.py:55
-#: modules/FlaskModule/API/user/UserQueryStats.py:60
-#: modules/FlaskModule/API/user/UserQueryStats.py:65
-#: modules/FlaskModule/API/user/UserQueryStats.py:70
-#: modules/FlaskModule/API/user/UserQueryStats.py:76
-#: modules/FlaskModule/API/user/UserQueryStats.py:81
-#: modules/FlaskModule/API/user/UserQueryStats.py:86
+#: modules/FlaskModule/API/user/UserQueryStats.py:56
+#: modules/FlaskModule/API/user/UserQueryStats.py:61
+#: modules/FlaskModule/API/user/UserQueryStats.py:66
+#: modules/FlaskModule/API/user/UserQueryStats.py:72
+#: modules/FlaskModule/API/user/UserQueryStats.py:77
+#: modules/FlaskModule/API/user/UserQueryStats.py:83
+#: modules/FlaskModule/API/user/UserQueryStats.py:88
+#: modules/FlaskModule/API/user/UserQueryStats.py:93
 #: modules/FlaskModule/API/user/UserQueryUserGroups.py:145
 #: modules/FlaskModule/API/user/UserQueryUserPreferences.py:48
 #: modules/FlaskModule/API/user/UserQueryUserPreferences.py:98
@@ -105,8 +108,8 @@ msgstr "Configuration manquante"
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:183
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:98
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:113
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:144
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:178
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:184
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:218
 #: modules/FlaskModule/API/user/UserQueryAssets.py:143
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:158
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:175
@@ -154,9 +157,9 @@ msgstr "Configuration manquante"
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:162
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:177
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:265
-#: modules/FlaskModule/API/user/UserQuerySessions.py:160
-#: modules/FlaskModule/API/user/UserQuerySessions.py:175
-#: modules/FlaskModule/API/user/UserQuerySessions.py:251
+#: modules/FlaskModule/API/user/UserQuerySessions.py:173
+#: modules/FlaskModule/API/user/UserQuerySessions.py:188
+#: modules/FlaskModule/API/user/UserQuerySessions.py:264
 #: modules/FlaskModule/API/user/UserQuerySiteAccess.py:240
 #: modules/FlaskModule/API/user/UserQuerySiteAccess.py:283
 #: modules/FlaskModule/API/user/UserQuerySites.py:139
@@ -180,7 +183,7 @@ msgstr "Erreur de base de données"
 #: modules/FlaskModule/API/service/ServiceQueryProjects.py:56
 #: modules/FlaskModule/API/service/ServiceQueryServices.py:75
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:61
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:95
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:121
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:82
 #: modules/FlaskModule/API/user/UserQueryProjects.py:108
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:80
@@ -188,7 +191,7 @@ msgstr "Erreur de base de données"
 #: modules/FlaskModule/API/user/UserQueryServices.py:100
 #: modules/FlaskModule/API/user/UserQuerySessionEvents.py:66
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:77
-#: modules/FlaskModule/API/user/UserQuerySessions.py:86
+#: modules/FlaskModule/API/user/UserQuerySessions.py:99
 #: modules/FlaskModule/API/user/UserQuerySites.py:99
 #: modules/FlaskModule/API/user/UserQueryUserPreferences.py:68
 msgid "Invalid request"
@@ -220,13 +223,13 @@ msgstr "Accès interdit pour raison de sécurité"
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:56
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:156
 #: modules/FlaskModule/API/user/UserQueryForms.py:74
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:75
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:79
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:84
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:52
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:64
 #: modules/FlaskModule/API/user/UserQuerySessionEvents.py:50
 #: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:57
-#: modules/FlaskModule/API/user/UserQuerySessions.py:54
+#: modules/FlaskModule/API/user/UserQuerySessions.py:60
 #: modules/FlaskModule/API/user/UserQuerySiteAccess.py:81
 msgid "Missing arguments"
 msgstr "Arguments manquants"
@@ -234,10 +237,8 @@ msgstr "Arguments manquants"
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:80
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:146
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:169
-#: modules/LoginModule/LoginModule.py:415
-#: modules/LoginModule/LoginModule.py:478
-#: modules/LoginModule/LoginModule.py:520
-#: modules/LoginModule/LoginModule.py:538
+#: modules/LoginModule/LoginModule.py:415 modules/LoginModule/LoginModule.py:478
+#: modules/LoginModule/LoginModule.py:520 modules/LoginModule/LoginModule.py:538
 #: modules/LoginModule/LoginModule.py:548
 msgid "Unauthorized"
 msgstr "Non autorisé"
@@ -265,7 +266,11 @@ msgstr "La signature du certificat CSR est invalides"
 msgid "Invalid content type"
 msgstr "Content-Type invalide"
 
-#: modules/FlaskModule/API/participant/ParticipantLogin.py:89
+#: modules/FlaskModule/API/participant/ParticipantLogin.py:72
+msgid "Participant already logged in."
+msgstr "Le participant est déjà connecté."
+
+#: modules/FlaskModule/API/participant/ParticipantLogin.py:96
 msgid "Missing current_participant"
 msgstr "Champ current_participant manquant"
 
@@ -275,7 +280,7 @@ msgstr "Participant hors ligne."
 
 #: modules/FlaskModule/API/participant/ParticipantQueryDevices.py:60
 #: modules/FlaskModule/API/participant/ParticipantQueryParticipants.py:54
-#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:59
+#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:73
 msgid "Not implemented"
 msgstr "Non implémenté"
 
@@ -359,38 +364,54 @@ msgstr "Champ session_event manquant"
 msgid "Missing id_session or id_session_event fields"
 msgstr "Champs manquants: id_session ou id_session_event"
 
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:68
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:94
 msgid "Missing arguments: at least one id is required"
 msgstr "Au moins un champ id manquant"
 
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:109
-#: modules/FlaskModule/API/user/UserQuerySessions.py:106
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:135
+#: modules/FlaskModule/API/user/UserQuerySessions.py:119
 msgid "Missing session"
 msgstr "Champ session manquant"
 
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:115
-#: modules/FlaskModule/API/user/UserQuerySessions.py:112
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:141
+#: modules/FlaskModule/API/user/UserQuerySessions.py:125
 msgid "Missing id_session"
 msgstr "Champ id_session manquant"
 
-#: modules/FlaskModule/API/service/ServiceQuerySessions.py:148
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:156
+msgid "Service doesn't have access to at least one participant of that session."
+msgstr "Le service n'a pas accès à au moins un participant de la séance."
+
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:163
+msgid "Service doesn't have access to at least one user of that session."
+msgstr "Le service n'a pas accès à au moins un utilisateur de la séance."
+
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:170
+msgid "Service doesn't have access to at least one device of that session."
+msgstr "Le service n'a pas accès à au moins un appareil de la séance."
+
+#: modules/FlaskModule/API/service/ServiceQuerySessions.py:188
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:99
 msgid "Missing id_session_type"
 msgstr "Champ id_session_type manquant"
 
-#: modules/FlaskModule/API/user/UserLogin.py:97
+#: modules/FlaskModule/API/user/UserLogin.py:70
+msgid "User already logged in."
+msgstr "L'utilisateur est déjà connecté."
+
+#: modules/FlaskModule/API/user/UserLogin.py:104
 msgid "Client version mismatch"
 msgstr "La version du client ne correspond pas"
 
-#: modules/FlaskModule/API/user/UserLogin.py:109
+#: modules/FlaskModule/API/user/UserLogin.py:116
 msgid "Client major version too old, not accepting login"
 msgstr "La version du client est trop vieille (major), accès refusé"
 
-#: modules/FlaskModule/API/user/UserLogin.py:111
+#: modules/FlaskModule/API/user/UserLogin.py:118
 msgid "Invalid client name :"
 msgstr "Nom du client invalide :"
 
-#: modules/FlaskModule/API/user/UserLogin.py:116
+#: modules/FlaskModule/API/user/UserLogin.py:123
 msgid "Invalid client version handler"
 msgstr "Mauvaise version du client"
 
@@ -462,7 +483,7 @@ msgid "Unexisting ID/Forbidden access"
 msgstr "ID inexistant/Accès interdit"
 
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:83
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:337
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:369
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:188
 msgid "Database Error"
 msgstr "Erreur de bases de données"
@@ -503,35 +524,34 @@ msgstr "ID invalide"
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:391
 msgid ""
-"Can't delete device: please delete all participants association before "
-"deleting."
+"Can't delete device: please delete all participants association before deleting."
 msgstr ""
-"Ne peut pas supprimer l'appareil : s.v.p. effacez les participants "
-"associés au préalable."
+"Ne peut pas supprimer l'appareil : s.v.p. effacez les participants associés au "
+"préalable."
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:394
 msgid ""
-"Can't delete device: please remove all sessions referring to that device "
-"before deleting."
+"Can't delete device: please remove all sessions referring to that device before "
+"deleting."
 msgstr ""
-"Ne peut pas supprimer l'appareil : s.v.p. effacez les séances associées "
-"au préalable."
+"Ne peut pas supprimer l'appareil : s.v.p. effacez les séances associées au "
+"préalable."
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:397
 msgid ""
-"Can't delete device: please remove all sessions created by that device "
-"before deleting."
+"Can't delete device: please remove all sessions created by that device before "
+"deleting."
 msgstr ""
-"Ne peut pas supprimer l'appareil: s.v.p. effacez toues les séances créées"
-" par ce périphérique."
+"Ne peut pas supprimer l'appareil: s.v.p. effacez toues les séances créées par "
+"ce périphérique."
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:399
 msgid ""
-"Can't delete device: please delete all assets created by that device "
-"before deleting."
+"Can't delete device: please delete all assets created by that device before "
+"deleting."
 msgstr ""
-"Ne peut pas supprimer l'appareil:  s.v.p. effacez toutes les données "
-"(assets) au préalable."
+"Ne peut pas supprimer l'appareil:  s.v.p. effacez toutes les données (assets) "
+"au préalable."
 
 #: modules/FlaskModule/API/user/UserQueryDevices.py:416
 msgid "Device successfully deleted"
@@ -564,34 +584,38 @@ msgid ""
 "Can't delete participant group: please delete all sessions from all "
 "participants before deleting."
 msgstr ""
-"Ne peut pas supprimer le groupe de participant: s.v.p. supprimer toutes "
-"les séances de tous les participants avant de supprimer."
+"Ne peut pas supprimer le groupe de participant: s.v.p. supprimer toutes les "
+"séances de tous les participants avant de supprimer."
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:198
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:218
 msgid "Missing participant"
 msgstr "Participant manquant"
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:205
-msgid "Missing id_participant, id_project or id_participant_group"
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:224
+msgid "Missing id_participant"
+msgstr "ID Participant manquant"
+
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:228
+msgid "Missing id_project or id_participant_group"
 msgstr "Champ manquants:  id_participant, id_project ou id_participant_group"
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:211
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:243
 msgid "No admin access to project"
 msgstr "Pas d'accès administrateur à ce projet"
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:219
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:251
 msgid "No admin access to group"
 msgstr "Pas d'accès administrateur à ce groupe"
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:228
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:260
 msgid "Participant group not found."
 msgstr "Le groupe participant n'existe pas."
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:231
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:263
 msgid "Mismatch between id_project and group's project"
 msgstr "Aucune correspondance entre id_project et le projet"
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:330
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:362
 msgid "Can't delete participant: please delete all sessions before deleting."
 msgstr ""
 "Ne peut pas supprimer le participant : s.v.p. supprimez les séances au "
@@ -628,11 +652,11 @@ msgstr "Champs : id_projet oou id_site manquants"
 
 #: modules/FlaskModule/API/user/UserQueryProjects.py:206
 msgid ""
-"Can't delete project: please delete all participants with sessions before"
-" deleting."
+"Can't delete project: please delete all participants with sessions before "
+"deleting."
 msgstr ""
-"Ne peut pas supprimer le projet : s.v.p. supprimerz tous les participants"
-" avec des séances au préalable."
+"Ne peut pas supprimer le projet : s.v.p. supprimerz tous les participants avec "
+"des séances au préalable."
 
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:99
 msgid "Missing service_access"
@@ -645,8 +669,7 @@ msgstr "Champ manquant: id_service_access"
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:107
 msgid "Can't combine id_user_group, id_participant_group and id_device in request"
 msgstr ""
-"Ne peut combiner id_user_group, id_participant et id_device dans  la "
-"requête"
+"Ne peut combiner id_user_group, id_participant et id_device dans  la requête"
 
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:127
 msgid "Bad id_service_role"
@@ -719,11 +742,11 @@ msgstr "Champ session_type_project manquant"
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypeProject.py:131
 msgid ""
-"Trying to associate a session type of type \"service\" with a service not"
-" associated to that project"
+"Trying to associate a session type of type \"service\" with a service not "
+"associated to that project"
 msgstr ""
-"Tentative d'associatoin entre une séance de type service avec un service "
-"qui n'est pas associé au projet"
+"Tentative d'associatoin entre une séance de type service avec un service qui "
+"n'est pas associé au projet"
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:93
 msgid "Missing session_type"
@@ -732,8 +755,8 @@ msgstr "Champ session_type manquant"
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:109
 msgid "User must be admin in at least one site to create new type"
 msgstr ""
-"L'usager doit être administrateur dans au moins un site pour créer un "
-"nouveau type"
+"L'usager doit être administrateur dans au moins un site pour créer un nouveau "
+"type"
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:133
 msgid "Missing id_service for session type of type service"
@@ -746,8 +769,8 @@ msgstr "Pas administrateur pour au moins un projet da la liste"
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:236
 msgid "Cannot delete because you are not admin in all projects."
 msgstr ""
-"Ne peut pas supprimer puisque vous n'êtes pas administrateur dans tous "
-"les projets."
+"Ne peut pas supprimer puisque vous n'êtes pas administrateur dans tous les "
+"projets."
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:241
 msgid "Unable to delete - not admin in at least one project"
@@ -755,32 +778,32 @@ msgstr "Ne peut pas effacer - pas administrateur dans au moins un projet"
 
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:257
 msgid ""
-"Can't delete session type: please delete all sessions with that type "
-"before deleting."
+"Can't delete session type: please delete all sessions with that type before "
+"deleting."
 msgstr ""
-"Ne peut pas supprimer le type de séance : s.v.p. effacer toutes les "
-"séances de ce type d'abord."
+"Ne peut pas supprimer le type de séance : s.v.p. effacer toutes les séances de "
+"ce type d'abord."
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:121
+#: modules/FlaskModule/API/user/UserQuerySessions.py:134
 msgid "Missing session participants and users"
 msgstr "Usagers ou participants manquants pour la session"
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:137
-#: modules/FlaskModule/API/user/UserQuerySessions.py:226
+#: modules/FlaskModule/API/user/UserQuerySessions.py:150
+#: modules/FlaskModule/API/user/UserQuerySessions.py:239
 msgid "User doesn't have access to at least one participant of that session."
 msgstr "L'utilisateur n'a pas acces à au moins un participant de la séance."
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:142
-#: modules/FlaskModule/API/user/UserQuerySessions.py:231
+#: modules/FlaskModule/API/user/UserQuerySessions.py:155
+#: modules/FlaskModule/API/user/UserQuerySessions.py:244
 msgid "User doesn't have access to at least one user of that session."
 msgstr "L'utilisateur n'a pas accès à au moins un utilisateur de la séance."
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:147
-#: modules/FlaskModule/API/user/UserQuerySessions.py:236
+#: modules/FlaskModule/API/user/UserQuerySessions.py:160
+#: modules/FlaskModule/API/user/UserQuerySessions.py:249
 msgid "User doesn't have access to at least one device of that session."
 msgstr "L'utilisateur n'a pas accès à au moins un appareil de la séance."
 
-#: modules/FlaskModule/API/user/UserQuerySessions.py:240
+#: modules/FlaskModule/API/user/UserQuerySessions.py:253
 msgid "Session is in progress: can't delete that session."
 msgstr "La séance est en cours: impossible de supprimer."
 
@@ -802,13 +825,12 @@ msgstr "Champ id_site manquant"
 
 #: modules/FlaskModule/API/user/UserQuerySites.py:190
 msgid ""
-"Can't delete site: please delete all participants with sessions before "
-"deleting."
+"Can't delete site: please delete all participants with sessions before deleting."
 msgstr ""
-"Ne peut pas effacer le site: s.v.p. effacer tous les participants avec "
-"des séances au préalable."
+"Ne peut pas effacer le site: s.v.p. effacer tous les participants avec des "
+"séances au préalable."
 
-#: modules/FlaskModule/API/user/UserQueryStats.py:89
+#: modules/FlaskModule/API/user/UserQueryStats.py:96
 msgid "Missing id argument"
 msgstr "Champ id manquant"
 
@@ -818,8 +840,8 @@ msgstr "Pas d'accès administrateur de site pour au moins un site dans la liste"
 
 #: modules/FlaskModule/API/user/UserQueryUserGroups.py:301
 msgid ""
-"Can't delete user group: please delete all users part of that user group "
-"before deleting."
+"Can't delete user group: please delete all users part of that user group before "
+"deleting."
 msgstr ""
 "Ne peut pas effacer le groupe d'utilisateurs: s.v.p. enlever tous les "
 "utilisateurs de ce groupe avant."
@@ -889,27 +911,26 @@ msgstr "Désolé, vous ne pouvez pas vous supprimer!"
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:361
 msgid ""
-"Can't delete user: please remove all sessions that this user is part of "
-"before deleting."
+"Can't delete user: please remove all sessions that this user is part of before "
+"deleting."
 msgstr ""
 "Ne peut pas effacer l'utilisateur tant que toutes les séances de cet "
 "utilisateur ne sont pas effacées."
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:364
 msgid ""
-"Can't delete user: please remove all sessions created by this user before"
-" deleting."
+"Can't delete user: please remove all sessions created by this user before "
+"deleting."
 msgstr ""
-"Ne peut pas effacer l'utilisateur tant que ses séances ne sont pas "
-"effacées."
+"Ne peut pas effacer l'utilisateur tant que ses séances ne sont pas effacées."
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:366
 msgid ""
 "Can't delete user: please delete all assets created by this user before "
 "deleting."
 msgstr ""
-"Ne peut pas effacer l'utilisateur tant que ses données (assets) ne sont "
-"pas effacées."
+"Ne peut pas effacer l'utilisateur tant que ses données (assets) ne sont pas "
+"effacées."
 
 #: modules/FlaskModule/API/user/UserQueryVersions.py:69
 msgid "Wrong ClientVersions"
@@ -969,8 +990,7 @@ msgstr "Jeton invalide"
 msgid "Invalid Token"
 msgstr "Jeton invalide"
 
-#: opentera/db/models/TeraSessionType.py:129
-#: opentera/forms/TeraSessionForm.py:101
+#: opentera/db/models/TeraSessionType.py:129 opentera/forms/TeraSessionForm.py:101
 msgid "Unknown"
 msgstr "Inconnue"
 
@@ -995,8 +1015,7 @@ msgstr "Protocole"
 msgid "Parameters"
 msgstr "Paramètres"
 
-#: opentera/forms/TeraDeviceForm.py:28
-#: opentera/forms/TeraServiceConfigForm.py:28
+#: opentera/forms/TeraDeviceForm.py:28 opentera/forms/TeraServiceConfigForm.py:28
 msgid "Device ID"
 msgstr "ID Appareil"
 
@@ -1008,8 +1027,7 @@ msgstr "UUID Appareil"
 msgid "Device Name"
 msgstr "Nom Appareil"
 
-#: opentera/forms/TeraDeviceForm.py:31
-#: opentera/forms/TeraDeviceSubTypeForm.py:32
+#: opentera/forms/TeraDeviceForm.py:31 opentera/forms/TeraDeviceSubTypeForm.py:32
 #: opentera/forms/TeraDeviceTypeForm.py:21
 msgid "Device Type ID"
 msgstr "Type d'appareil"
@@ -1039,13 +1057,11 @@ msgstr "Se met en ligne?"
 msgid "Last Connection"
 msgstr "Dernière connexion"
 
-#: opentera/forms/TeraDeviceForm.py:47
-#: opentera/forms/TeraDeviceSubTypeForm.py:24
+#: opentera/forms/TeraDeviceForm.py:47 opentera/forms/TeraDeviceSubTypeForm.py:24
 #: opentera/forms/TeraDeviceTypeForm.py:17
 #: opentera/forms/TeraParticipantForm.py:34
 #: opentera/forms/TeraParticipantGroupForm.py:33
-#: opentera/forms/TeraProjectForm.py:19
-#: opentera/forms/TeraServiceConfigForm.py:18
+#: opentera/forms/TeraProjectForm.py:19 opentera/forms/TeraServiceConfigForm.py:18
 #: opentera/forms/TeraServiceForm.py:18 opentera/forms/TeraSessionForm.py:116
 #: opentera/forms/TeraSessionTypeForm.py:33 opentera/forms/TeraSiteForm.py:12
 #: opentera/forms/TeraUserForm.py:13 opentera/forms/TeraUserGroupForm.py:18
@@ -1176,8 +1192,7 @@ msgstr "Rôle"
 msgid "Site Name"
 msgstr "Nom Site"
 
-#: opentera/forms/TeraServiceConfigForm.py:25
-#: opentera/forms/TeraServiceForm.py:25
+#: opentera/forms/TeraServiceConfigForm.py:25 opentera/forms/TeraServiceForm.py:25
 msgid "Service ID"
 msgstr "ID Service"
 
@@ -1505,87 +1520,86 @@ msgstr "Version Linux du Client"
 msgid "Join me!"
 msgstr "Joins-toi à moi!"
 
-#: opentera/services/BaseWebRTCService.py:354
+#: opentera/services/BaseWebRTCService.py:356
 msgid "Cannot create session event"
 msgstr "Impossible de créer l'événement de séance"
 
-#: opentera/services/BaseWebRTCService.py:383
+#: opentera/services/BaseWebRTCService.py:385
 msgid "Cannot create process"
 msgstr "Impossible de démarrer le processus"
 
-#: opentera/services/BaseWebRTCService.py:397
+#: opentera/services/BaseWebRTCService.py:399
 msgid "Cannot create session"
 msgstr "Impossible de créer la séance"
 
-#: opentera/services/BaseWebRTCService.py:420
+#: opentera/services/BaseWebRTCService.py:422
 msgid "Cannot create STOP session event"
 msgstr "Impossible de créer l'événement de séance \"Arrêt de séance\""
 
-#: opentera/services/BaseWebRTCService.py:476
+#: opentera/services/BaseWebRTCService.py:478
 msgid "Error stopping session - check server logs"
 msgstr ""
-"Erreur lors de l'arrêt de la séance - veuillez vérifier les journaux "
-"système"
+"Erreur lors de l'arrêt de la séance - veuillez vérifier les journaux système"
 
-#: opentera/services/BaseWebRTCService.py:478
+#: opentera/services/BaseWebRTCService.py:480
 msgid "No matching session to stop"
 msgstr "Aucune séance correspondante n'a pu être arrêtée"
 
-#: opentera/services/BaseWebRTCService.py:502
-#: opentera/services/BaseWebRTCService.py:579
-#: opentera/services/BaseWebRTCService.py:666
+#: opentera/services/BaseWebRTCService.py:504
+#: opentera/services/BaseWebRTCService.py:581
+#: opentera/services/BaseWebRTCService.py:668
 msgid "User"
 msgstr "Utilisateur"
 
-#: opentera/services/BaseWebRTCService.py:504
+#: opentera/services/BaseWebRTCService.py:506
 msgid "Error creating user invited session event"
 msgstr "Erreur lors de la création de l'événement de séance 'Utilisateur invité\""
 
-#: opentera/services/BaseWebRTCService.py:516
-#: opentera/services/BaseWebRTCService.py:594
-#: opentera/services/BaseWebRTCService.py:681
+#: opentera/services/BaseWebRTCService.py:518
+#: opentera/services/BaseWebRTCService.py:596
+#: opentera/services/BaseWebRTCService.py:683
 msgid "Participant"
 msgstr "Participant"
 
-#: opentera/services/BaseWebRTCService.py:518
+#: opentera/services/BaseWebRTCService.py:520
 msgid "Error creating participant invited session event"
 msgstr "Erreur lors de la création de l'événement de séance 'Participant invité\""
 
-#: opentera/services/BaseWebRTCService.py:531
-#: opentera/services/BaseWebRTCService.py:610
-#: opentera/services/BaseWebRTCService.py:696
+#: opentera/services/BaseWebRTCService.py:533
+#: opentera/services/BaseWebRTCService.py:612
+#: opentera/services/BaseWebRTCService.py:698
 msgid "Device"
 msgstr "Appareil"
 
-#: opentera/services/BaseWebRTCService.py:533
+#: opentera/services/BaseWebRTCService.py:535
 msgid "Error creating device invited session event"
 msgstr "Erreur lors de la création de l'événement de séance 'Appareil invité\""
 
-#: opentera/services/BaseWebRTCService.py:549
+#: opentera/services/BaseWebRTCService.py:551
 msgid "Error updating session"
 msgstr "Erreur de mise à jour de la séance"
 
-#: opentera/services/BaseWebRTCService.py:581
+#: opentera/services/BaseWebRTCService.py:583
 msgid "Error creating user left session event"
 msgstr ""
-"Erreur lors de la création de l'événement de séance 'Utilisateur a quitté"
-" la séance\""
+"Erreur lors de la création de l'événement de séance 'Utilisateur a quitté la "
+"séance\""
 
-#: opentera/services/BaseWebRTCService.py:596
+#: opentera/services/BaseWebRTCService.py:598
 msgid "Error creating participant left session event"
 msgstr ""
-"Erreur lors de la création de l'événement de séance 'Participant a quitté"
-" la séance\""
+"Erreur lors de la création de l'événement de séance 'Participant a quitté la "
+"séance\""
 
-#: opentera/services/BaseWebRTCService.py:612
+#: opentera/services/BaseWebRTCService.py:614
 msgid "Error creating device left session event"
 msgstr ""
-"Erreur lors de la création de l'événement de séance 'Appareil a quitté la"
-" séance\""
+"Erreur lors de la création de l'événement de séance 'Appareil a quitté la séance"
+"\""
 
-#: opentera/services/BaseWebRTCService.py:669
-#: opentera/services/BaseWebRTCService.py:684
-#: opentera/services/BaseWebRTCService.py:699
+#: opentera/services/BaseWebRTCService.py:671
+#: opentera/services/BaseWebRTCService.py:686
+#: opentera/services/BaseWebRTCService.py:701
 msgid "Cannot create refused session event"
 msgstr "Erreur lors de la création de l'événement de séance 'Invitation refusée\""
 
@@ -1607,83 +1621,4 @@ msgstr "Auteurs"
 
 #: templates/about.html:87
 msgid "Contributors"
-msgstr "Contributeurs"
-
-#~ msgid "Device Type"
-#~ msgstr "Type de périphérique"
-
-#~ msgid "Participants"
-#~ msgstr "Participants"
-
-#~ msgid "Users"
-#~ msgstr "Usagers"
-
-#~ msgid "Session Type Multiuser"
-#~ msgstr "Type de Session multi-usagers"
-
-#~ msgid "Missing parameter"
-#~ msgstr "Paramètre manquant"
-
-#~ msgid "No arguments"
-#~ msgstr "Pas d'arguments"
-
-#~ msgid "Invalid service id"
-#~ msgstr "Champ service_id invalide"
-
-#~ msgid "ProjectAccess: missing argument."
-#~ msgstr "ProjectAcces: argument manquant."
-
-#~ msgid "SiteAccess: missing argument."
-#~ msgstr "SiteAccess: argument manquant."
-
-#~ msgid "Session User Creator ID"
-#~ msgstr "ID de l'usager créateur de Session"
-
-#~ msgid "Session Creator Participant ID"
-#~ msgstr "ID Participant créateur de Session"
-
-#~ msgid "Session Creator Service ID"
-#~ msgstr "ID du Service créateur de Session"
-
-#~ msgid "Missing id_device_type or id_device_subtype"
-#~ msgstr "Champs manquants : id_device ou id_device_subtype"
-
-#~ msgid "Forbidden access"
-#~ msgstr "Accès interdit"
-
-#~ msgid "Last NAme"
-#~ msgstr "Nom"
-
-#~ msgid "Camera Type"
-#~ msgstr "Type de Caméra"
-
-#~ msgid "Network Camera"
-#~ msgstr "Caméra Réseau"
-
-#~ msgid "Screen Capture"
-#~ msgstr "Capture d'Écran"
-
-#~ msgid "RTSP URL"
-#~ msgstr "Addresse RTSP"
-
-#~ msgid "Frames per second (FPS)"
-#~ msgstr "Images par seconde (FPS)"
-
-#~ msgid "Resolution"
-#~ msgstr "Résolution"
-
-#~ msgid "ONVIF (Generic)"
-#~ msgstr "ONVIF (Générique)"
-
-#~ msgid "Participant already logged in."
-#~ msgstr "Participant déjà connecté."
-
-#~ msgid "Missing session id"
-#~ msgstr "Champ session_id manquant"
-
-#~ msgid "User already logged in."
-#~ msgstr "Utilisateur déjà connecté."
-
-#~ msgid "Unauthorized Access"
-#~ msgstr "Non autorisé"
-
+msgstr "Collaborateurs"
