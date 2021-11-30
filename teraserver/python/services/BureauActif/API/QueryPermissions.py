@@ -19,7 +19,7 @@ class QueryPermissions(Resource):
     @api.expect(get_parser)
     @api.doc(description='Gets current login type: device, participant or user and associated informations',
              responses={200: 'Success'})
-    @ServiceAccessManager.token_required
+    @ServiceAccessManager.token_required()
     def get(self):
         parser = get_parser
         args = parser.parse_args()

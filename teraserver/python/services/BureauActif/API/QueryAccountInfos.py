@@ -12,7 +12,7 @@ class QueryAccountInfos(Resource):
 
     @api.doc(description='Gets current login type: device, participant or user and associated informations',
              responses={200: 'Success'})
-    @ServiceAccessManager.token_required
+    @ServiceAccessManager.token_required()
     def get(self):
         account_infos = {
             'login_type': 'unknown',
@@ -36,8 +36,8 @@ class QueryAccountInfos(Resource):
             account_infos['login_type'] = 'user'
             account_infos['login_id'] = current_user_client.id_user
             account_infos['is_super_admin'] = current_user_client.user_superadmin
-            account_infos['username'] = user[0]['user_username']
-            account_infos.update({'sites': user[0]['sites']})
+            account_infos['username'] = user['user_username']
+            account_infos.update({'sites': user['sites']})
 
         return account_infos
 

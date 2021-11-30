@@ -30,7 +30,7 @@ class QueryTimelineData(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
-    @ServiceAccessManager.token_required
+    @ServiceAccessManager.token_required()
     def get(self):
         timeline_access = DBManager.timelineAccess()
         parser = get_parser

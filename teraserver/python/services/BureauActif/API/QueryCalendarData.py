@@ -28,7 +28,7 @@ class QueryCalendarData(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
-    @ServiceAccessManager.token_required
+    @ServiceAccessManager.token_required()
     def get(self):
         calendar_access = DBManager.calendarAccess()
         parser = get_parser

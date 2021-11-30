@@ -30,7 +30,7 @@ class QueryDeviceInfos(Resource):
                         400: 'Missing parameter',
                         403: 'Forbidden - only logged user can get that information'})
     @api.expect(get_parser)
-    @ServiceAccessManager.token_required
+    @ServiceAccessManager.token_required()
     def get(self):
 
         if current_login_type != LoginType.USER_LOGIN:
@@ -62,7 +62,7 @@ class QueryDeviceInfos(Resource):
                         400: 'Missing parameters',
                         403: 'Logged client doesn\'t have permission to access the requested data'
                         })
-    @ServiceAccessManager.token_required
+    @ServiceAccessManager.token_required()
     def post(self):
 
         # Only device can update for now
