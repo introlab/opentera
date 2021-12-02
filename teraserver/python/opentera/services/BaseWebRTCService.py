@@ -47,7 +47,7 @@ class BaseWebRTCService(ServiceOpenTera):
         ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
             ModuleNames.USER_MANAGER_MODULE_NAME), self.user_manager_event_received)
 
-        print(ret1)
+        # print(ret1)
 
     def send_join_message(self, session_info, join_msg: str = gettext('Join me!'), target_users: list = None,
                           target_participants: list = None, target_devices: list = None):
@@ -114,7 +114,7 @@ class BaseWebRTCService(ServiceOpenTera):
                                create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
 
     def user_manager_event_received(self, pattern, channel, message):
-        print('BaseWebRTCService - user_manager_event_received', pattern, channel, message)
+        # print('BaseWebRTCService - user_manager_event_received', pattern, channel, message)
         try:
             tera_event = messages.TeraEvent()
             if isinstance(message, str):
@@ -141,7 +141,7 @@ class BaseWebRTCService(ServiceOpenTera):
             print('BaseWebRTCService - Failure in redisMessageReceived', e)
 
     def handle_user_event(self, event: messages.UserEvent):
-        print('BaseWebRTCService.handle_user_event', event)
+        # print('BaseWebRTCService.handle_user_event', event)
         # Verify each session
         for id_session in self.sessions:
             session_info = self.sessions[id_session]
@@ -151,7 +151,7 @@ class BaseWebRTCService(ServiceOpenTera):
                 # Verify the event type
                 if event.type == messages.UserEvent.USER_CONNECTED:
                     # Resend invitation to newly connected user
-                    print('Resending invitation to ', event, session_info)
+                    # print('Resending invitation to ', event, session_info)
 
                     self.send_join_message(session_info=session_info, target_devices=[], target_participants=[],
                                            target_users=[event.user_uuid])
@@ -166,7 +166,7 @@ class BaseWebRTCService(ServiceOpenTera):
                             break
 
     def handle_participant_event(self, event: messages.ParticipantEvent):
-        print('BaseWebRTCService.handle_participant_event', event)
+        # print('BaseWebRTCService.handle_participant_event', event)
         # Verify each session
         for id_session in self.sessions:
             session_info = self.sessions[id_session]
@@ -176,7 +176,7 @@ class BaseWebRTCService(ServiceOpenTera):
                 # Verify the event type
                 if event.type == messages.ParticipantEvent.PARTICIPANT_CONNECTED:
                     # Resend invitation to newly connected user
-                    print('Resending invitation to ', event, session_info)
+                    # print('Resending invitation to ', event, session_info)
 
                     self.send_join_message(session_info=session_info, target_devices=[],
                                            target_participants=[event.participant_uuid], target_users=[])
@@ -186,7 +186,7 @@ class BaseWebRTCService(ServiceOpenTera):
                     pass
 
     def handle_device_event(self, event: messages.DeviceEvent):
-        print('BaseWebRTCService.handle_device_event', event)
+        # print('BaseWebRTCService.handle_device_event', event)
         # Verify each session
         for id_session in self.sessions:
             session_info = self.sessions[id_session]
@@ -196,7 +196,7 @@ class BaseWebRTCService(ServiceOpenTera):
                 # Verify the event type
                 if event.type == messages.DeviceEvent.DEVICE_CONNECTED:
                     # Resend invitation to newly connected user
-                    print('Resending invitation to ', event, session_info)
+                    # print('Resending invitation to ', event, session_info)
 
                     self.send_join_message(session_info=session_info, target_devices=[event.device_uuid],
                                            target_participants=[], target_users=[])
@@ -206,13 +206,13 @@ class BaseWebRTCService(ServiceOpenTera):
                     pass
 
     def nodejs_webrtc_message_callback(self, pattern, channel, message):
-        print('WebRTCModule - nodejs_webrtc_message_callback', pattern, channel, message)
+        # print('WebRTCModule - nodejs_webrtc_message_callback', pattern, channel, message)
         parts = channel.split(".")
         if len(parts) == 2:
             session_key = parts[1]
-            print(session_key)
+            # print(session_key)
             if message == 'Ready!':
-                print('Ready!')
+                # print('Ready!')
                 self.handle_nodejs_session_ready(session_key)
 
     def get_session_info_from_key(self, session_key):
