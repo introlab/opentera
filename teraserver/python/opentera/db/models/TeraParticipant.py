@@ -144,7 +144,11 @@ class TeraParticipant(db.Model, BaseModel):
         return None
 
     def get_last_session(self):
-        sessions = sorted(self.participant_sessions, key=lambda session: session.session_start_datetime)
+        from opentera.db.models.TeraSession import TeraSessionStatus
+        sessions = [session for session in self.participant_sessions
+                    if session.session_status == TeraSessionStatus.STATUS_COMPLETED.value or
+                    session.session_status == TeraSessionStatus.STATUS_TERMINATED.value]
+        sessions = sorted(sessions, key=lambda session: session.session_start_datetime)
         if sessions:
             return sessions[-1]
         return None

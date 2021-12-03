@@ -34,7 +34,7 @@ class QueryRawData(Resource):
                         403: 'Logged client doesn\'t have permission to access the requested data',
                         404: 'Session to attach data doesn\'t exists or is not available for the logged client',
                         500: 'No participant associated to that device'})
-    @ServiceAccessManager.token_required
+    @ServiceAccessManager.token_required()
     def post(self):
         data_process = DBManager.dataProcess()
 

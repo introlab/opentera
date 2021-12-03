@@ -15,7 +15,7 @@ class QueryServiceInfos(Resource):
 
     @api.doc(description='Gets service informations',
              responses={200: 'Success', 403: 'Forbidden - only logged user can get that information'})
-    @ServiceAccessManager.token_required
+    @ServiceAccessManager.token_required()
     def get(self):
 
         if current_login_type != LoginType.USER_LOGIN:
