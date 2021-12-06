@@ -8,5 +8,5 @@ class TeraSessionParticipants(db.Model, BaseModel):
     id_session = db.Column(db.Integer, db.ForeignKey('t_sessions.id_session'))
     id_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant'))
 
-    session_participant_session = db.relationship('TeraSession')
-    session_participant_participant = db.relationship('TeraParticipant')
+    session_participant_session = db.relationship('TeraSession', viewonly=True)
+    session_participant_participant = db.relationship('TeraParticipant', viewonly=True)

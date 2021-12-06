@@ -7,8 +7,9 @@ class TeraProject(db.Model, BaseModel):
     id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
     project_name = db.Column(db.String, nullable=False, unique=False)
 
-    project_site = db.relationship("TeraSite")
-    project_participants = db.relationship("TeraParticipant", passive_deletes=True)
+    project_site = db.relationship("TeraSite", back_populates='site_projects')
+    project_participants = db.relationship("TeraParticipant", back_populates='participant_project',
+                                           passive_deletes=True)
     project_participants_groups = db.relationship("TeraParticipantGroup", passive_deletes=True)
     project_devices = db.relationship("TeraDevice", secondary="t_devices_projects", back_populates="device_projects")
     project_session_types = db.relationship("TeraSessionType", secondary="t_sessions_types_projects",

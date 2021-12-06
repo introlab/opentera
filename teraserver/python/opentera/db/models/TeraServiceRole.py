@@ -12,9 +12,9 @@ class TeraServiceRole(db.Model, BaseModel):
     id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=True)
     service_role_name = db.Column(db.String(100), nullable=False)
 
-    service_role_service = db.relationship("TeraService")
-    service_role_project = db.relationship('TeraProject')
-    service_role_site = db.relationship('TeraSite')
+    service_role_service = db.relationship("TeraService", viewonly=True)
+    service_role_project = db.relationship('TeraProject', viewonly=True)
+    service_role_site = db.relationship('TeraSite', viewonly=True)
 
     def __init__(self):
         pass

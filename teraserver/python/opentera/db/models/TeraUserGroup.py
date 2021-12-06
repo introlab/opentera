@@ -6,7 +6,8 @@ class TeraUserGroup(db.Model, BaseModel):
     id_user_group = db.Column(db.Integer, db.Sequence('id_usergroup_sequence'), primary_key=True, autoincrement=True)
     user_group_name = db.Column(db.String, nullable=False, unique=False)
 
-    user_group_services_access = db.relationship('TeraServiceAccess', cascade="all,delete")
+    user_group_services_access = db.relationship('TeraServiceAccess', cascade="all,delete",
+                                                 back_populates='service_access_user_group')
     user_group_users = db.relationship("TeraUser", secondary="t_users_users_groups", back_populates="user_user_groups",
                                        passive_deletes=True)
 

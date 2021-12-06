@@ -63,7 +63,7 @@ class BaseModel:
     @staticmethod
     def is_valid_property_name(name: str) -> bool:
         return not name.startswith('__') and not name.startswith('_') and not name.startswith('query') and \
-               not name.startswith('metadata') and name != 'version_id'
+               not name.startswith('metadata') and name != 'version_id' and name != 'registry'
 
     @staticmethod
     def is_valid_property_value(value: str) -> bool:
