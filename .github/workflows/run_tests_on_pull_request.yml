@@ -90,6 +90,11 @@ jobs:
       working-directory: teraserver/python/tests/modules/FlaskModule/API/user
       run: |
         $OPENTERA_PYTHON -m unittest discover . "test_*.py"
+        
+    - name: Run Service API Tests
+      working-directory: teraserver/python/tests/modules/FlaskModule/API/service
+      run: |
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
 
     - name: Run Models Tests
       working-directory: teraserver/python/tests/opentera/db/models
