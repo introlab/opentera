@@ -8,8 +8,8 @@ class TeraServiceProject(db.Model, BaseModel):
     id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
     id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
 
-    service_project_service = db.relationship("TeraService")
-    service_project_project = db.relationship("TeraProject")
+    service_project_service = db.relationship("TeraService", viewonly=True)
+    service_project_project = db.relationship("TeraProject", viewonly=True)
 
     def __init__(self):
         pass

@@ -13,7 +13,7 @@ class TeraServiceConfigSpecific(db.Model, BaseModel):
     service_config_specific_id = db.Column(db.String, nullable=False)
     service_config_specific_config = db.Column(db.String, nullable=False)
 
-    service_config_specific_service_config = db.relationship("TeraServiceConfig")
+    service_config_specific_service_config = db.relationship("TeraServiceConfig", viewonly=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:

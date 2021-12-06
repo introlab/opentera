@@ -31,8 +31,8 @@ class TeraAsset(db.Model, BaseModel):
     asset_service_uuid = db.Column(db.String(36), nullable=False)
     asset_type = db.Column(db.Integer, nullable=False)
 
-    asset_session = db.relationship("TeraSession")
-    asset_device = db.relationship("TeraDevice")
+    asset_session = db.relationship("TeraSession", back_populates='session_assets')
+    asset_device = db.relationship("TeraDevice", back_populates='device_assets')
     asset_user = db.relationship("TeraUser")
     asset_participant = db.relationship("TeraParticipant")
 

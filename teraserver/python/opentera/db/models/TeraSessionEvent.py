@@ -33,7 +33,7 @@ class TeraSessionEvent(db.Model, BaseModel):
     session_event_text = db.Column(db.String, nullable=True)
     session_event_context = db.Column(db.String, nullable=True)
 
-    session_event_session = db.relationship('TeraSession')
+    session_event_session = db.relationship('TeraSession', back_populates='session_events')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
