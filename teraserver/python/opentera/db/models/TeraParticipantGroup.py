@@ -9,7 +9,7 @@ class TeraParticipantGroup(db.Model, BaseModel):
     id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
     participant_group_name = db.Column(db.String, nullable=False, unique=False)
 
-    participant_group_project = db.relationship('TeraProject')
+    participant_group_project = db.relationship('TeraProject', back_populates='project_participants_groups')
     participant_group_participants = db.relationship("TeraParticipant", back_populates='participant_participant_group',
                                                      passive_deletes=True)
 

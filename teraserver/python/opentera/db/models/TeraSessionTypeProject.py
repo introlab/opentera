@@ -10,8 +10,8 @@ class TeraSessionTypeProject(db.Model, BaseModel):
     id_project = db.Column('id_project', db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'),
                            nullable=False)
 
-    session_type_project_session_type = db.relationship("TeraSessionType")
-    session_type_project_project = db.relationship("TeraProject")
+    session_type_project_session_type = db.relationship("TeraSessionType", viewonly=True)
+    session_type_project_project = db.relationship("TeraProject", viewonly=True)
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['session_type_project_session_type', 'session_type_project_project'])
@@ -38,28 +38,28 @@ class TeraSessionTypeProject(db.Model, BaseModel):
             project = TeraProject.get_project_by_projectname('Default Project #1')
 
             stp = TeraSessionTypeProject()
-            stp.session_type_project_session_type = video_session
-            stp.session_type_project_project = project
+            stp.id_session_type = video_session.id_session_type
+            stp.id_project = project.id_project
             db.session.add(stp)
 
             stp = TeraSessionTypeProject()
-            stp.session_type_project_session_type = sensor_session
-            stp.session_type_project_project = project
+            stp.id_session_type = sensor_session.id_session_type
+            stp.id_project = project.id_project
             db.session.add(stp)
 
             stp = TeraSessionTypeProject()
-            stp.session_type_project_session_type = data_session
-            stp.session_type_project_project = project
+            stp.id_session_type = data_session.id_session_type
+            stp.id_project = project.id_project
             db.session.add(stp)
 
             stp = TeraSessionTypeProject()
-            stp.session_type_project_session_type = exerc_session
-            stp.session_type_project_project = project
+            stp.id_session_type = exerc_session.id_session_type
+            stp.id_project = project.id_project
             db.session.add(stp)
 
             stp = TeraSessionTypeProject()
-            stp.session_type_project_session_type = bureau_session
-            stp.session_type_project_project = project
+            stp.id_session_type = bureau_session.id_session_type
+            stp.id_project = project.id_project
             db.session.add(stp)
 
             db.session.commit()
@@ -91,9 +91,9 @@ class TeraSessionTypeProject(db.Model, BaseModel):
                 # We must also associate that service to that project!
                 from opentera.db.models.TeraServiceProject import TeraServiceProject
                 new_service_project = TeraServiceProject()
-                new_service_project.service_project_service = self.session_type_project_session_type \
-                    .session_type_service
-                new_service_project.service_project_project = self.session_type_project_project
+                new_service_project.id_service = self.session_type_project_session_type \
+                    .session_type_service.id_service
+                new_service_project.id_project = self.session_type_project_project.id_project
                 TeraServiceProject.insert(new_service_project)
 
     @classmethod

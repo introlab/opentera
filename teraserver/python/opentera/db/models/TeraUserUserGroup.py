@@ -9,8 +9,8 @@ class TeraUserUserGroup(db.Model, BaseModel):
     id_user_group = db.Column(db.Integer, db.ForeignKey("t_users_groups.id_user_group"),
                               nullable=False)
 
-    user_user_group_user = db.relationship("TeraUser")
-    user_user_group_user_group = db.relationship("TeraUserGroup")  # Fun variable name!
+    user_user_group_user = db.relationship("TeraUser", viewonly=True)
+    user_user_group_user_group = db.relationship("TeraUserGroup", viewonly=True)  # Fun variable name!
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['user_user_group_user', 'user_user_group_user_group'])
@@ -37,28 +37,28 @@ class TeraUserUserGroup(db.Model, BaseModel):
             group4 = TeraUserGroup.get_user_group_by_group_name("Users - Project 1")
 
             user_ug = TeraUserUserGroup()
-            user_ug.user_user_group_user = user1
-            user_ug.user_user_group_user_group = group3
+            user_ug.id_user = user1.id_user
+            user_ug.id_user_group = group3.id_user_group
             db.session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
-            user_ug.user_user_group_user = user2
-            user_ug.user_user_group_user_group = group1
+            user_ug.id_user = user2.id_user
+            user_ug.id_user_group = group1.id_user_group
             db.session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
-            user_ug.user_user_group_user = user3
-            user_ug.user_user_group_user_group = group4
+            user_ug.id_user = user3.id_user
+            user_ug.id_user_group = group4.id_user_group
             db.session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
-            user_ug.user_user_group_user = user3
-            user_ug.user_user_group_user_group = group3
+            user_ug.id_user = user3.id_user
+            user_ug.id_user_group = group3.id_user_group
             db.session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
-            user_ug.user_user_group_user = user4
-            user_ug.user_user_group_user_group = group2
+            user_ug.id_user = user4.id_user
+            user_ug.id_user_group = group2.id_user_group
             db.session.add(user_ug)
 
             db.session.commit()

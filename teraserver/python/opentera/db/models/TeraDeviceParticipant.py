@@ -9,8 +9,8 @@ class TeraDeviceParticipant(db.Model, BaseModel):
     id_participant = db.Column(db.Integer, db.ForeignKey("t_participants.id_participant", ondelete='cascade'),
                                nullable=False)
 
-    device_participant_participant = db.relationship("TeraParticipant", back_populates='participant_devices')
-    device_participant_device = db.relationship("TeraDevice")
+    device_participant_participant = db.relationship("TeraParticipant", viewonly=True)
+    device_participant_device = db.relationship("TeraDevice", viewonly=True)
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['device_participant_participant', 'device_participant_device'])
@@ -34,18 +34,18 @@ class TeraDeviceParticipant(db.Model, BaseModel):
             device3 = TeraDevice.get_device_by_name('Robot A')
 
             dev_participant = TeraDeviceParticipant()
-            dev_participant.device_participant_device = device1
-            dev_participant.device_participant_participant = participant1
+            dev_participant.id_device = device1.id_device
+            dev_participant.id_participant = participant1.id_participant
             db.session.add(dev_participant)
 
             dev_participant = TeraDeviceParticipant()
-            dev_participant.device_participant_device = device1
-            dev_participant.device_participant_participant = participant2
+            dev_participant.id_device = device1.id_device
+            dev_participant.id_participant = participant2.id_participant
             db.session.add(dev_participant)
 
             dev_participant = TeraDeviceParticipant()
-            dev_participant.device_participant_device = device2
-            dev_participant.device_participant_participant = participant2
+            dev_participant.id_device = device2.id_device
+            dev_participant.id_participant = participant2.id_participant
             db.session.add(dev_participant)
 
             db.session.commit()

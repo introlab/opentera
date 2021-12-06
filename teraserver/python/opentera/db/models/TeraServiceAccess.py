@@ -15,7 +15,7 @@ class TeraServiceAccess(db.Model, BaseModel):
                                 nullable=False)
 
     service_access_role = db.relationship("TeraServiceRole")
-    service_access_user_group = db.relationship("TeraUserGroup")
+    service_access_user_group = db.relationship("TeraUserGroup", back_populates='user_group_services_access')
     service_access_device = db.relationship("TeraDevice")
     service_access_participant_group = db.relationship("TeraParticipantGroup")
 
