@@ -9,7 +9,7 @@ class TeraDeviceParticipant(db.Model, BaseModel):
     id_participant = db.Column(db.Integer, db.ForeignKey("t_participants.id_participant", ondelete='cascade'),
                                nullable=False)
 
-    device_participant_participant = db.relationship("TeraParticipant")
+    device_participant_participant = db.relationship("TeraParticipant", back_populates='participant_devices')
     device_participant_device = db.relationship("TeraDevice")
 
     def to_json(self, ignore_fields=[], minimal=False):
