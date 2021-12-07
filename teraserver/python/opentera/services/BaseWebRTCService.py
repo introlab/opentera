@@ -182,8 +182,13 @@ class BaseWebRTCService(ServiceOpenTera):
                                            target_participants=[event.participant_uuid], target_users=[])
 
                 elif event.type == messages.ParticipantEvent.PARTICIPANT_DISCONNECTED:
-                    # Nothing to do?
-                    pass
+                    # End session if the participant was the creator
+                    if 'session_creator_participant_uuid' in session_info:
+                        if session_info['session_creator_participant_uuid'] == event.participant_uuid:
+                            manage_session_args = {'id_session': id_session}
+                            self.manage_stop_session(manage_session_args)
+                            # End loop, sessions dict will be changed in manage_stop_session
+                            break
 
     def handle_device_event(self, event: messages.DeviceEvent):
         # print('BaseWebRTCService.handle_device_event', event)
@@ -202,8 +207,13 @@ class BaseWebRTCService(ServiceOpenTera):
                                            target_participants=[], target_users=[])
 
                 elif event.type == messages.DeviceEvent.DEVICE_DISCONNECTED:
-                    # Nothing to do?
-                    pass
+                    # End session if the device was the creator
+                    if 'session_creator_device_uuid' in session_info:
+                        if session_info['session_creator_device_uuid'] == event.device_uuid:
+                            manage_session_args = {'id_session': id_session}
+                            self.manage_stop_session(manage_session_args)
+                            # End loop, sessions dict will be changed in manage_stop_session
+                            break
 
     def nodejs_webrtc_message_callback(self, pattern, channel, message):
         # print('WebRTCModule - nodejs_webrtc_message_callback', pattern, channel, message)
@@ -300,7 +310,6 @@ class BaseWebRTCService(ServiceOpenTera):
     def manage_start_session(self, session_manage_args: dict):
         # Get "useful" arguments
         id_service = session_manage_args['id_service']
-        id_creator_user = session_manage_args['id_creator_user']
         id_session_type = session_manage_args['id_session_type']
         id_session = session_manage_args['id_session']
         parameters = {}
@@ -324,15 +333,26 @@ class BaseWebRTCService(ServiceOpenTera):
         # Call service API to create session
         api_response = None
         if id_session == 0:  # New session request
-            api_req = {'session': {'id_session': 0,  # New session
-                                   'id_creator_user': id_creator_user,
-                                   'id_session_type': id_session_type,
-                                   'session_participants_uuids': participants,
-                                   'session_users_uuids': users,
-                                   'session_devices_uuids': devices,
-                                   'session_parameters': parameters}
+            api_req = {'id_session': 0,  # New session
+                       'id_session_type': id_session_type,
+                       'session_participants_uuids': participants,
+                       'session_users_uuids': users,
+                       'session_devices_uuids': devices,
+                       'session_parameters': parameters
                        }
+            if 'id_creator_user' in session_manage_args:
+                api_req['id_creator_user'] = session_manage_args['id_creator_user']
 
+            if 'id_creator_participant' in session_manage_args:
+                api_req['id_creator_participant'] = session_manage_args['id_creator_participant']
+
+            if 'id_creator_device' in session_manage_args:
+                api_req['id_creator_device'] = session_manage_args['id_creator_device']
+
+            if 'id_creator_service' in session_manage_args:
+                api_req['id_creator_service'] = session_manage_args['id_creator_service']
+
+            api_req = {'session': api_req}
             api_response = self.post_to_opentera('/api/service/sessions', api_req)
         else:
             api_response = self.get_from_opentera('/api/service/sessions', {'id_session': str(id_session),
@@ -370,13 +390,24 @@ class BaseWebRTCService(ServiceOpenTera):
             # Add session key
             session_info['session_key'] = str(uuid.uuid4())
 
+            # Get session creator uuid
+            creator_uuid = None
+            if 'session_creator_user_uuid' in session_info:
+                creator_uuid = session_info['session_creator_user_uuid']
+            elif 'session_creator_participant_uuid' in session_info:
+                creator_uuid = session_info['session_creator_participant_uuid']
+            elif 'session_creator_device_uuid' in session_info:
+                creator_uuid = session_info['session_creator_device_uuid']
+            elif 'session_creator_service_uuid' in session_info:
+                creator_uuid = session_info['session_creator_service_uuid']
+
             # New WebRTC process with send events on this pattern
             self.subscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
                                                  self.nodejs_webrtc_message_callback)
 
             # Start WebRTC process
             retval, process_info = self.webRTCModule.create_webrtc_session(
-                session_info['session_key'], id_creator_user, users, participants, devices,
+                session_info['session_key'], creator_uuid, users, participants, devices,
                 session_info['session_parameters'])
 
             if not retval or not process_info:
