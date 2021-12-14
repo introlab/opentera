@@ -456,22 +456,23 @@ class BaseWebRTCService(ServiceOpenTera):
             from datetime import datetime
             duration = 0
 
-            for session_event in session_info['session_events']:
+            for session_event in reversed(session_info['session_events']):
                 if session_event['id_session_event_type'] == 3:  # START event
                     time_diff = datetime.now() - datetime.fromisoformat(session_event['session_event_datetime']).\
                         replace(tzinfo=None)
                     duration = int(time_diff.total_seconds())
+                    break
 
             # Default duration
             if duration == 0:
                 time_diff = datetime.now() - datetime.fromisoformat(session_info['session_start_datetime']).\
                     replace(tzinfo=None)
-                duration = int(time_diff.total_seconds())
+                duration = int(abs(time_diff.total_seconds()))  # abs in case of sessions set in the future
 
             # Add current session duration to the total
             duration += session_info['session_duration']
 
-            # Call service API to create session
+            # Call service API to update session
             api_req = {'session': {'id_session': id_session,
                                    'session_status': TeraSessionStatus.STATUS_COMPLETED.value,
                                    'session_duration': duration}}

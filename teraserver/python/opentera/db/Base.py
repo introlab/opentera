@@ -1,9 +1,9 @@
-from flask_sqlalchemy import SQLAlchemy, event
 import inspect
 import datetime
 # import uuid
 import time
 import sqlalchemy.sql.sqltypes
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
