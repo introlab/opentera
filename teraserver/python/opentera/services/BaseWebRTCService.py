@@ -464,10 +464,10 @@ class BaseWebRTCService(ServiceOpenTera):
                     break
 
             # Default duration
-            if duration == 0:
-                time_diff = datetime.now() - datetime.fromisoformat(session_info['session_start_datetime']).\
-                    replace(tzinfo=None)
-                duration = int(abs(time_diff.total_seconds()))  # abs in case of sessions set in the future
+            # if duration == 0:
+            #     time_diff = datetime.now() - datetime.fromisoformat(session_info['session_start_datetime']).\
+            #         replace(tzinfo=None)
+            #     duration = int(abs(time_diff.total_seconds()))  # abs in case of sessions set in the future
 
             # Add current session duration to the total
             duration += session_info['session_duration']

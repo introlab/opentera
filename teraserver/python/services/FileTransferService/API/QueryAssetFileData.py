@@ -34,7 +34,6 @@ class QueryAssetFileData(Resource):
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     @ServiceAccessManager.service_token_required
     def get(self):
-        print('OK!')
         args = get_parser.parse_args()
         return 'Unauthorized', 403
 
@@ -47,7 +46,6 @@ class QueryAssetFileData(Resource):
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     @ServiceAccessManager.service_token_required
     def post(self):
-        print('OK!')
         args = post_parser.parse_args()
 
         if not args['asset_uuid']:
