@@ -160,6 +160,15 @@ class ServiceSessionManager(Resource):
             if 'id_session_type' not in json_session_manager:
                 return gettext('Missing required id_session_type for new sessions'), 400
 
+            # Get associated service from session type
+            from opentera.db.models.TeraSessionType import TeraSessionType
+            current_session_type = TeraSessionType.get_session_type_by_id(json_session_manager['id_session_type'])
+            if not current_session_type:
+                return gettext('Invalid session type'), 400
+
+            if current_session_type.id_service:
+                json_session_manager['id_service'] = current_session_type.id_service
+
         # Validate that we have the correct parameters for invite_reply
         # if json_session_manager['action'] == 'invite_reply':
         #     if 'parameters' not in json_session_manager:

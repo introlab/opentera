@@ -284,6 +284,7 @@ class FlaskModule(BaseModule):
         from .API.service.ServiceQueryProjects import ServiceQueryProjects
         from .API.service.ServiceQuerySites import ServiceQuerySites
         from .API.service.ServiceSessionManager import ServiceSessionManager
+        from .API.service.ServiceQuerySessionTypes import ServiceQuerySessionTypes
 
         service_api_ns.add_resource(ServiceQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryAssets,         '/assets', resource_class_kwargs=kwargs)
@@ -295,6 +296,7 @@ class FlaskModule(BaseModule):
         service_api_ns.add_resource(ServiceQueryProjects,       '/projects', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySites,          '/sites', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceSessionManager,      '/sessions/manager', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQuerySessionTypes,   '/sessiontypes', resource_class_kwargs=kwargs)
 
         # Add namespace
         api.add_namespace(service_api_ns)
