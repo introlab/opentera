@@ -99,6 +99,17 @@ class DBManagerTeraServiceAccess:
     def get_accessible_users_ids(self, admin_only=False):
         return [user.id_user for user in self.get_accessible_users(admin_only=admin_only)]
 
+    def get_accessible_sessions_types(self):
+        from opentera.db.models.TeraSessionType import TeraSessionType
+
+        query = TeraSessionType.query.filter(TeraSessionType.id_service == self.service.id_service)\
+            .order_by(TeraSessionType.session_type_name.asc())
+
+        return query.all()
+
+    def get_accessible_sessions_types_ids(self):
+        return [st.id_session_type for st in self.get_accessible_sessions_types()]
+
     def get_site_role(self, site_id: int, uuid_user: str):
         user = self.get_user_with_uuid(uuid_user)
         sites_roles = user.get_sites_roles()

@@ -312,7 +312,7 @@ class BaseWebRTCService(ServiceOpenTera):
         id_service = session_manage_args['id_service']
         id_session_type = session_manage_args['id_session_type']
         id_session = session_manage_args['id_session']
-        parameters = {}
+        parameters = None
         if 'parameters' in session_manage_args:
             parameters = session_manage_args['parameters']
 
