@@ -44,9 +44,9 @@ class TeraSession(db.Model, BaseModel):
     session_creator_participant = db.relationship('TeraParticipant')
     session_creator_service = db.relationship('TeraService')
 
-    session_session_type = db.relationship('TeraSessionType')
-    session_events = db.relationship('TeraSessionEvent', cascade="delete")
-    session_assets = db.relationship('TeraAsset', cascade='delete')
+    session_session_type = db.relationship('TeraSessionType', back_populates='session_type_sessions')
+    session_events = db.relationship('TeraSessionEvent', cascade="delete", back_populates='session_event_session')
+    session_assets = db.relationship('TeraAsset', cascade='delete', back_populates='asset_session')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:

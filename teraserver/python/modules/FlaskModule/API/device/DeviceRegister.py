@@ -3,7 +3,7 @@ from flask_babel import gettext
 from flask import jsonify
 from flask import request
 from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address, get_ipaddr
+from flask_limiter.util import get_remote_address
 import base64
 from opentera.crypto.crypto_utils import generate_device_certificate, load_private_pem_key, load_pem_certificate
 from cryptography import x509
@@ -20,7 +20,7 @@ import uuid
 from modules.FlaskModule.FlaskModule import flask_app
 from sqlalchemy.exc import SQLAlchemyError
 
-limiter = Limiter(flask_app, key_func=get_ipaddr)
+limiter = Limiter(flask_app, key_func=get_remote_address)
 
 
 class DeviceRegister(Resource):

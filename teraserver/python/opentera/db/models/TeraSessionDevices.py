@@ -7,5 +7,5 @@ class TeraSessionDevices(db.Model, BaseModel):
     id_session = db.Column(db.Integer, db.ForeignKey('t_sessions.id_session', ondelete='cascade'))
     id_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device'))
 
-    session_device_session = db.relationship('TeraSession', cascade="delete")
-    session_device_device = db.relationship('TeraDevice')
+    session_device_session = db.relationship('TeraSession', viewonly=True)
+    session_device_device = db.relationship('TeraDevice', viewonly=True)

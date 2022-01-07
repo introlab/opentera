@@ -8,7 +8,7 @@ file(MAKE_DIRECTORY ${ENV_PATH})
 
 # Define packages to install
 set (conda_packages
-    protobuf
+    protobuf==3.18.1
 )
 
 if(WIN32)

@@ -40,14 +40,15 @@ class TeraParticipant(db.Model, BaseModel):
     id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
 
     participant_devices = db.relationship("TeraDevice", secondary="t_devices_participants",
-                                          back_populates="device_participants")
+                                          back_populates="device_participants", viewonly=True)
 
     participant_sessions = db.relationship("TeraSession", secondary="t_sessions_participants",
                                            back_populates="session_participants", passive_deletes=True)
 
-    participant_participant_group = db.relationship("TeraParticipantGroup")
+    participant_participant_group = db.relationship("TeraParticipantGroup",
+                                                    back_populates='participant_group_participants')
 
-    participant_project = db.relationship("TeraProject")
+    participant_project = db.relationship("TeraProject", back_populates='project_participants')
 
     authenticated = False
     fullAccess = False
@@ -144,7 +145,11 @@ class TeraParticipant(db.Model, BaseModel):
         return None
 
     def get_last_session(self):
-        sessions = sorted(self.participant_sessions, key=lambda session: session.session_start_datetime)
+        from opentera.db.models.TeraSession import TeraSessionStatus
+        sessions = [session for session in self.participant_sessions
+                    if session.session_status == TeraSessionStatus.STATUS_COMPLETED.value or
+                    session.session_status == TeraSessionStatus.STATUS_TERMINATED.value]
+        sessions = sorted(sessions, key=lambda session: session.session_start_datetime)
         if sessions:
             return sessions[-1]
         return None

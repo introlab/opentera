@@ -7,8 +7,9 @@ class TeraProject(db.Model, BaseModel):
     id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
     project_name = db.Column(db.String, nullable=False, unique=False)
 
-    project_site = db.relationship("TeraSite")
-    project_participants = db.relationship("TeraParticipant", passive_deletes=True)
+    project_site = db.relationship("TeraSite", back_populates='site_projects')
+    project_participants = db.relationship("TeraParticipant", back_populates='participant_project',
+                                           passive_deletes=True)
     project_participants_groups = db.relationship("TeraParticipantGroup", passive_deletes=True)
     project_devices = db.relationship("TeraDevice", secondary="t_devices_projects", back_populates="device_projects")
     project_session_types = db.relationship("TeraSessionType", secondary="t_sessions_types_projects",
@@ -48,11 +49,11 @@ class TeraProject(db.Model, BaseModel):
 
         return users_ids
 
-    def get_users_in_project(self, include_superadmins=False):
+    def get_users_in_project(self, include_superadmins=False, include_site_access=False):
         import modules.Globals as Globals
         from opentera.db.models.TeraServiceAccess import TeraServiceAccess
         from opentera.db.models.TeraUser import TeraUser
-        # Get all users who has a role in the project
+        # Get all users who have a role in the project
         project_access = TeraServiceAccess.get_service_access_for_project(id_service=Globals.opentera_service_id,
                                                                           id_project=self.id_project)
 
@@ -65,10 +66,17 @@ class TeraProject(db.Model, BaseModel):
                     if user not in users:
                         users.append(user)
 
-        # Also appends users with site access but no direct access to project ??
-        # site_access = TeraServiceAccess.get_service_access_for_site(id_service=Globals.opentera_service_id,
-        #                                                             id_site=self.id_site)
-        # .....
+        # Also appends users with site access but no direct access to project
+        if include_site_access:
+            site_access = TeraServiceAccess.get_service_access_for_site(id_service=Globals.opentera_service_id,
+                                                                        id_site=self.id_site)
+            for access in site_access:
+                if access.service_access_role.service_role_name == 'admin':
+                    if access.service_access_user_group:
+                        access_users = access.service_access_user_group.user_group_users
+                        for user in access_users:
+                            if user not in users:
+                                users.append(user)
 
         # Also appends super admins!
         if include_superadmins:

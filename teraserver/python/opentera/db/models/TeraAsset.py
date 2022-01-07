@@ -21,8 +21,7 @@ class TeraAsset(db.Model, BaseModel):
     id_asset = db.Column(db.Integer, db.Sequence('id_asset_sequence'), primary_key=True, autoincrement=True)
     id_session = db.Column(db.Integer, db.ForeignKey("t_sessions.id_session", ondelete='cascade'), nullable=False)
     id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device"), nullable=True)
-    id_participant = db.Column(db.Integer, db.ForeignKey("t_participants.id_participant"),
-                               nullable=True)
+    id_participant = db.Column(db.Integer, db.ForeignKey("t_participants.id_participant"), nullable=True)
     id_user = db.Column(db.Integer, db.ForeignKey("t_users.id_user"), nullable=True)
     # Put a description of the asset here
     asset_name = db.Column(db.String, nullable=False)
@@ -31,8 +30,8 @@ class TeraAsset(db.Model, BaseModel):
     asset_service_uuid = db.Column(db.String(36), nullable=False)
     asset_type = db.Column(db.Integer, nullable=False)
 
-    asset_session = db.relationship("TeraSession")
-    asset_device = db.relationship("TeraDevice")
+    asset_session = db.relationship("TeraSession", back_populates='session_assets')
+    asset_device = db.relationship("TeraDevice", back_populates='device_assets')
     asset_user = db.relationship("TeraUser")
     asset_participant = db.relationship("TeraParticipant")
 

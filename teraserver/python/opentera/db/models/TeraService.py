@@ -23,8 +23,8 @@ class TeraService(db.Model, BaseModel):
     service_editable_config = db.Column(db.Boolean, nullable=False, default=False)
     service_default_config = db.Column(db.String, nullable=True, default='{}')
 
-    service_roles = db.relationship('TeraServiceRole')
-    service_projects = db.relationship('TeraServiceProject')
+    service_roles = db.relationship('TeraServiceRole', cascade='delete')
+    service_projects = db.relationship('TeraServiceProject', cascade='delete')
 
     def __init__(self):
         pass

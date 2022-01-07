@@ -8,8 +8,8 @@ class TeraDeviceProject(db.Model, BaseModel):
     id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
     id_project = db.Column(db.Integer, db.ForeignKey("t_projects.id_project", ondelete='cascade'), nullable=False)
 
-    device_project_project = db.relationship("TeraProject")
-    device_project_device = db.relationship("TeraDevice")
+    device_project_project = db.relationship("TeraProject", viewonly=True)
+    device_project_device = db.relationship("TeraDevice", viewonly=True)
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['device_project_project', 'device_project_device'])
@@ -34,18 +34,18 @@ class TeraDeviceProject(db.Model, BaseModel):
             project3 = TeraProject.get_project_by_projectname('Secret Project #1')
 
             dev_proj = TeraDeviceProject()
-            dev_proj.device_project_device = device1
-            dev_proj.device_project_project = project1
+            dev_proj.id_device = device1.id_device
+            dev_proj.id_project = project1.id_project
             db.session.add(dev_proj)
 
             dev_proj = TeraDeviceProject()
-            dev_proj.device_project_device = device2
-            dev_proj.device_project_project = project1
+            dev_proj.id_device = device2.id_device
+            dev_proj.id_project = project1.id_project
             db.session.add(dev_proj)
 
             dev_proj = TeraDeviceProject()
-            dev_proj.device_project_device = device1
-            dev_proj.device_project_project = project3
+            dev_proj.id_device = device1.id_device
+            dev_proj.id_project = project3.id_project
             db.session.add(dev_proj)
 
             db.session.commit()

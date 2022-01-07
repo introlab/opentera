@@ -24,13 +24,13 @@ class TeraSessionType(db.Model, BaseModel):
     session_type_color = db.Column(db.String(7), nullable=False)
     session_type_category = db.Column(db.Integer, nullable=False)
 
-    session_type_session_type_projects = db.relationship("TeraSessionTypeProject", passive_deletes=True)
+    session_type_session_type_projects = db.relationship("TeraSessionTypeProject", viewonly=True)
     session_type_projects = db.relationship("TeraProject", secondary="t_sessions_types_projects",
                                             back_populates="project_session_types")
 
     session_type_service = db.relationship("TeraService")
 
-    session_type_sessions = db.relationship("TeraSession", passive_deletes=True)
+    session_type_sessions = db.relationship("TeraSession", passive_deletes=True, back_populates='session_session_type')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
