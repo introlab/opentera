@@ -66,7 +66,8 @@ class UserQueryServiceProjects(Resource):
         if args['id_project']:
             if args['id_project'] in user_access.get_accessible_projects_ids():
                 service_projects = user_access.query_services_projects_for_project(project_id=args['id_project'],
-                                                                                   include_other_services=args['with_services'])
+                                                                                   include_other_services=
+                                                                                   args['with_services'])
         else:
             if args['id_service']:
                 if args['id_service'] in user_access.get_accessible_services_ids():
@@ -81,14 +82,18 @@ class UserQueryServiceProjects(Resource):
                     obj_type = inspect(sp)
                     if not obj_type.transient:
                         json_sp['service_name'] = sp.service_project_service.service_name
+                        json_sp['service_key'] = sp.service_project_service.service_key
                         json_sp['project_name'] = sp.service_project_project.project_name
                     else:
                         # Temporary object, a not-committed object, result of listing projects not associated in a
                         # service.
                         if sp.id_service:
-                            json_sp['service_name'] = TeraService.get_service_by_id(sp.id_service).service_name
+                            service = TeraService.get_service_by_id(sp.id_service)
+                            json_sp['service_name'] = service.service_name
+                            json_sp['service_key'] = service.service_key
                         else:
                             json_sp['service_name'] = None
+                            json_sp['service_key'] = None
                         if sp.id_project:
                             json_sp['project_name'] = TeraProject.get_project_by_id(sp.id_project).project_name
                         else:
