@@ -318,5 +318,14 @@ def apply_caching(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "*"
+
+    # Request processing time
+    import time
+    print(f"Process time: {(time.time() - g.start_time)*1000} ms")
     return response
 
+
+@flask_app.before_request
+def compute_request_time():
+    import time
+    g.start_time = time.time()
