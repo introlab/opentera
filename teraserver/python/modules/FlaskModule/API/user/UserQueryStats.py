@@ -309,9 +309,9 @@ class UserQueryUserStats(Resource):
         sessions_total_time = sum([ses.session_duration for ses in participant.participant_sessions])
         sessions_mean_time = sessions_total_time / len(participant.participant_sessions)
         sessions_assets_total = sum([len(ses.session_assets) for ses in participant.participant_sessions])
-        users_involved = set()
-        for ses in participant.participant_sessions:
-            users_involved = users_involved.union(set([user for user in ses.session_users]))
+        # users_involved = set()
+        # for ses in participant.participant_sessions:
+        #     users_involved = users_involved.union(set([user for user in ses.session_users]))
 
         stats = {'sessions_total_count': len(participant.participant_sessions),
                  'sessions_total_time': sessions_total_time,
@@ -326,7 +326,7 @@ class UserQueryUserStats(Resource):
                                                   if ses.session_status == TeraSessionStatus.STATUS_CANCELLED.value]),
                  'sessions_terminated_count': len([ses.id_session for ses in participant.participant_sessions
                                                   if ses.session_status == TeraSessionStatus.STATUS_TERMINATED.value]),
-                 'users_total_count': len(users_involved),
+                 # 'users_total_count': len(users_involved),
                  'assets_total_count': sessions_assets_total,
                  'tests_total_count': 0}
         return stats

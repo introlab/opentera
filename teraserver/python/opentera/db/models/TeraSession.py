@@ -138,10 +138,13 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=i)
                 base_session.session_duration = random.randint(60, 4800)
-                # ses_status = random.randint(0, 4)
-                ses_status = default_status[i]
+                if i < len(default_status):
+                    # ses_status = random.randint(0, 4)
+                    ses_status = default_status[i]
+                else:
+                    ses_status = 2
                 base_session.session_status = ses_status
-                if i < 7:
+                if i < 7 or i > 10:
                     base_session.session_participants = [session_part]
                 else:
                     base_session.session_participants = [session_part, session_part2]
