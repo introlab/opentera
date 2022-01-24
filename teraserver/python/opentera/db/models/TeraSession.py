@@ -388,4 +388,19 @@ class TeraSession(db.Model, BaseModel):
     @classmethod
     def insert(cls, session):
         session.session_uuid = str(uuid.uuid4())
+
+        if type(session.session_parameters) is dict:
+            # Dumps dictionnary into json
+            import json
+            session.session_parameters = json.dumps(session.session_parameters)
+
         super().insert(session)
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        if 'session_parameters' in values:
+            if type(values['session_parameters']) is dict:
+                # Dumps dictionnary into json
+                import json
+                values['session_parameters'] = json.dumps(values['session_parameters'])
+        super().update(update_id=update_id, values=values)
