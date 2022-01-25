@@ -3,6 +3,7 @@ from opentera.db.Base import db, BaseModel
 from enum import Enum, unique
 from datetime import datetime, timedelta
 import random
+from sqlalchemy import asc
 
 
 class TeraSessionEvent(db.Model, BaseModel):
@@ -83,4 +84,4 @@ class TeraSessionEvent(db.Model, BaseModel):
     def get_events_for_session(id_session: int):
         from .TeraSession import TeraSession
         return db.session.query(TeraSessionEvent).join(TeraSessionEvent.session_event_session)\
-            .filter(TeraSession.id_session == id_session)
+            .filter(TeraSession.id_session == id_session).order_by(asc(TeraSessionEvent.session_event_datetime)).all()
