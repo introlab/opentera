@@ -4,6 +4,7 @@ from enum import Enum
 import random
 from datetime import datetime, timedelta
 import uuid
+import json
 
 
 class TeraSessionStatus(Enum):
@@ -63,6 +64,14 @@ class TeraSession(db.Model, BaseModel):
         rval = super().to_json(ignore_fields=ignore_fields)
 
         if not minimal:
+
+            # Convert session_parameters to dict if possible
+            try:
+               params = json.loads(rval['session_parameters'])
+               rval['session_parameters'] = params
+            except ValueError as e:
+                pass
+
             # Append list of participants ids and names
             rval['session_participants'] = [{'id_participant': part.id_participant,
                                              'participant_uuid': part.participant_uuid,
@@ -401,7 +410,6 @@ class TeraSession(db.Model, BaseModel):
 
         if type(session.session_parameters) is dict:
             # Dumps dictionnary into json
-            import json
             session.session_parameters = json.dumps(session.session_parameters)
 
         super().insert(session)
@@ -411,6 +419,5 @@ class TeraSession(db.Model, BaseModel):
         if 'session_parameters' in values:
             if type(values['session_parameters']) is dict:
                 # Dumps dictionnary into json
-                import json
                 values['session_parameters'] = json.dumps(values['session_parameters'])
         super().update(update_id=update_id, values=values)
