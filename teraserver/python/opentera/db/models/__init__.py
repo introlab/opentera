@@ -40,6 +40,7 @@ EventNameClassMap = {
     TeraParticipantGroup.get_model_name(): TeraParticipantGroup,
     TeraProject.get_model_name(): TeraProject,
     TeraSession.get_model_name(): TeraSession,
+    TeraSessionType.get_model_name(): TeraSessionType,
     TeraSite.get_model_name(): TeraSite,
     TeraUser.get_model_name(): TeraUser,
     TeraUserGroup.get_model_name(): TeraUserGroup

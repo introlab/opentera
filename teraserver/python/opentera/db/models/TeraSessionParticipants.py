@@ -10,3 +10,7 @@ class TeraSessionParticipants(db.Model, BaseModel):
 
     session_participant_session = db.relationship('TeraSession', viewonly=True)
     session_participant_participant = db.relationship('TeraParticipant', viewonly=True)
+
+    @staticmethod
+    def get_session_count_for_participant(id_participant: int) -> int:
+        return TeraSessionParticipants.count_with_filters({'id_participant': id_participant})
