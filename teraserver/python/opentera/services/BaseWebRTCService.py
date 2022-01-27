@@ -84,8 +84,14 @@ class BaseWebRTCService(ServiceOpenTera):
             join_message.session_devices.extend([device_uuid])
         join_message.join_msg = join_msg
         if not parameters:
-            parameters = ''
+            parameters = {}
+
+        # Conversion to str
+        if type(parameters) is dict:
+            parameters = json.dumps(parameters)
+
         join_message.session_parameters = parameters
+
         join_message.service_uuid = self.service_uuid
 
         # Send invitations (as events) for users, participants and devices
