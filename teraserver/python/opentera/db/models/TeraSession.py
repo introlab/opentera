@@ -66,11 +66,12 @@ class TeraSession(db.Model, BaseModel):
         if not minimal:
 
             # Convert session_parameters to dict if possible
-            try:
-               params = json.loads(rval['session_parameters'])
-               rval['session_parameters'] = params
-            except ValueError as e:
-                pass
+            if rval['session_parameters']:
+                try:
+                    params = json.loads(rval['session_parameters'])
+                    rval['session_parameters'] = params
+                except ValueError as e:
+                    pass
 
             # Append list of participants ids and names
             rval['session_participants'] = [{'id_participant': part.id_participant,
