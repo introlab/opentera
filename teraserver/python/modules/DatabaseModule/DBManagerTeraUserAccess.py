@@ -712,6 +712,7 @@ class DBManagerTeraUserAccess:
 
         session_ids = self.get_accessible_sessions_ids()
         device_ids = self.get_accessible_devices_ids()
+        # TODO: Check for participants, users and service access
         return TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids)) \
             .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None)) \
             .filter(TeraAsset.asset_service_uuid == uuid_service).all()

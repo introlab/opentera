@@ -4,6 +4,7 @@ from enum import Enum
 import random
 from datetime import datetime, timedelta
 import uuid
+import json
 
 
 class TeraSessionStatus(Enum):
@@ -34,10 +35,11 @@ class TeraSession(db.Model, BaseModel):
     session_parameters = db.Column(db.String, nullable=True)
 
     session_participants = db.relationship("TeraParticipant", secondary="t_sessions_participants",
-                                           back_populates="participant_sessions")
-    session_users = db.relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions")
+                                           back_populates="participant_sessions", lazy='joined')
+    session_users = db.relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions",
+                                    lazy='joined')
     session_devices = db.relationship("TeraDevice", secondary="t_sessions_devices",
-                                      back_populates="device_sessions")
+                                      back_populates="device_sessions", lazy='joined')
 
     session_creator_user = db.relationship('TeraUser')
     session_creator_device = db.relationship('TeraDevice')
@@ -62,6 +64,15 @@ class TeraSession(db.Model, BaseModel):
         rval = super().to_json(ignore_fields=ignore_fields)
 
         if not minimal:
+
+            # Convert session_parameters to dict if possible
+            if rval['session_parameters']:
+                try:
+                    params = json.loads(rval['session_parameters'])
+                    rval['session_parameters'] = params
+                except ValueError as e:
+                    pass
+
             # Append list of participants ids and names
             rval['session_participants'] = [{'id_participant': part.id_participant,
                                              'participant_uuid': part.participant_uuid,
@@ -138,10 +149,13 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=i)
                 base_session.session_duration = random.randint(60, 4800)
-                # ses_status = random.randint(0, 4)
-                ses_status = default_status[i]
+                if i < len(default_status):
+                    # ses_status = random.randint(0, 4)
+                    ses_status = default_status[i]
+                else:
+                    ses_status = 2
                 base_session.session_status = ses_status
-                if i < 7:
+                if i < 7 or i > 10:
                     base_session.session_participants = [session_part]
                 else:
                     base_session.session_participants = [session_part, session_part2]
@@ -246,7 +260,8 @@ class TeraSession(db.Model, BaseModel):
 
     @staticmethod
     def get_sessions_for_participant(part_id: int, status: int = None, limit: int = None, offset: int = None,
-                                     start_date: datetime.date = None, end_date: datetime.date = None):
+                                     start_date: datetime.date = None, end_date: datetime.date = None,
+                                     filters: dict = None):
         from opentera.db.models.TeraParticipant import TeraParticipant
         query = TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
                                                                                 part_id)
@@ -256,11 +271,14 @@ class TeraSession(db.Model, BaseModel):
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
 
+        if filters:
+            query = query.filter_by(**filters)
+
         return query.all()
 
     @staticmethod
     def get_sessions_for_user(user_id: int, status: int = None, limit: int = None, offset: int = None,
-                              start_date: datetime.date = None, end_date: datetime.date = None):
+                              start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None):
         from opentera.db.models.TeraUser import TeraUser
         query = TeraSession.query.join(TeraSession.session_users).filter(TeraUser.id_user == user_id)
         query = query.order_by(TeraSession.session_start_datetime.desc())
@@ -268,17 +286,23 @@ class TeraSession(db.Model, BaseModel):
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
 
+        if filters:
+            query = query.filter_by(**filters)
+
         return query.all()
 
     @staticmethod
     def get_sessions_for_device(device_id: int, status: int = None, limit: int = None, offset: int = None,
-                                start_date: datetime.date = None, end_date: datetime.date = None):
+                                start_date: datetime.date = None, end_date: datetime.date = None, filters:dict = None):
         from opentera.db.models.TeraDevice import TeraDevice
         query = TeraSession.query.join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
         query = query.order_by(TeraSession.session_start_datetime.desc())
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
+
+        if filters:
+            query = query.filter_by(**filters)
 
         return query.all()
 
@@ -384,4 +408,17 @@ class TeraSession(db.Model, BaseModel):
     @classmethod
     def insert(cls, session):
         session.session_uuid = str(uuid.uuid4())
+
+        if type(session.session_parameters) is dict:
+            # Dumps dictionnary into json
+            session.session_parameters = json.dumps(session.session_parameters)
+
         super().insert(session)
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        if 'session_parameters' in values:
+            if type(values['session_parameters']) is dict:
+                # Dumps dictionnary into json
+                values['session_parameters'] = json.dumps(values['session_parameters'])
+        super().update(update_id=update_id, values=values)

@@ -50,6 +50,16 @@ class TeraSessionType(db.Model, BaseModel):
                 rval['session_type_service_uuid'] = self.session_type_service.service_uuid
         return rval
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_session_type': self.id_session_type, 'id_service': self.id_service}
+
     @staticmethod
     def create_defaults(test=False):
         # from opentera.db.models.TeraProject import TeraProject
