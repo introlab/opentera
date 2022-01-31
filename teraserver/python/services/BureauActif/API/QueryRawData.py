@@ -102,7 +102,7 @@ class QueryRawData(Resource):
                                     'id_session': id_session,
                                     'id_device': id_device,
                                     'asset_name': filename,
-                                    'asset_type': 2  # Hard coded for now as RAW_DATA
+                                    'asset_type': 'application/octet-stream'
                                     }}
 
             post_result = Globals.service.post_to_opentera(api_url='/api/service/assets', json_data=json_asset)
