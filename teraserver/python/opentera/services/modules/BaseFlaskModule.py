@@ -37,7 +37,7 @@ authorizations = {
 }
 
 # Flask application
-flask_app = Flask("OpenTeraService")
+flask_app = None
 
 # Translations
 babel = Babel(flask_app, default_domain='danceservice')
@@ -140,12 +140,10 @@ class CustomAPI(Api):
             return url_for(self.endpoint('root'), _external=False)
 
 
-api = CustomAPI(flask_app, version='1.0.0', title='OpenTera Service API',
-                description='OpenTera Service API Documentation', doc='/doc', prefix='/api',
-                authorizations=authorizations)
+api = None
 
 # Namespaces
-default_api_ns = api.namespace('', description='default API')
+default_api_ns = None
 
 
 class DefaultAssetAPI(Resource):
@@ -169,14 +167,21 @@ class BaseFlaskModule(BaseModule, ABC):
         BaseModule.__init__(self, config.service_config['name'] + '.FlaskModule', config)
 
         # Update contextual names based on service
-        flask_app.import_name = config.service_config['name']
-        babel.domain_instance = config.service_config['name']
-        api.title = config.service_config['name'] + ' API'
-        api.description = config.service_config['name'] + " Service API Documentation"
-        api.version = api_version
+        global flask_app
+        flask_app = Flask(config.service_config['name'])
+        global babel
+        babel = Babel(flask_app, default_domain=config.service_config['name'])
+        global api
+        api = CustomAPI(flask_app, version=api_version, title=config.service_config['name'] + ' API',
+                        description=config.service_config['name'] + ' API Documentation', doc='/doc', prefix='/api',
+                        authorizations=authorizations)
+        global default_api_ns
+        default_api_ns = api.namespace('', description='default API')
 
+        # Init flask config
         flask_app.debug = config.service_config['debug_mode']
         flask_app.config.update({'SESSION_TYPE': 'redis'})
+
         import redis
         redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
                                    % self.config.redis_config)
