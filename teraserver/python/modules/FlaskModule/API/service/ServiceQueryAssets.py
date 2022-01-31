@@ -3,7 +3,7 @@ from flask_restx import Resource, reqparse
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
-from opentera.db.models.TeraAsset import TeraAsset, AssetType
+from opentera.db.models.TeraAsset import TeraAsset
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy import exc
 
@@ -41,6 +41,7 @@ class ServiceQueryAssets(Resource):
         args = get_parser.parse_args()
 
         # If we have no arguments, don't do anything!
+        assets = []
         if not any(args.values()):
             return gettext('Missing arguments'), 400
         elif args['id_device']:
@@ -98,8 +99,7 @@ class ServiceQueryAssets(Resource):
         if 'asset_name' in asset_info and not asset_info['asset_name']:
             return gettext('Invalid asset name'), 400
 
-        if 'asset_type' in asset_info and not asset_info['asset_type'] \
-                                              in [asset_type.value for asset_type in AssetType]:
+        if 'asset_type' in asset_info:
             return gettext('Invalid asset type'), 400
 
         # Check if the service can create/update that asset

@@ -4,7 +4,7 @@ from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
-from opentera.db.models.TeraAsset import TeraAsset, AssetType
+from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraService import TeraService
 from werkzeug.utils import secure_filename
 
@@ -175,7 +175,7 @@ class UserQueryAssets(Resource):
                 new_asset = TeraAsset()
                 new_asset.asset_name = filename
                 # TODO HARDCODED ASSET TYPE FOR NOW
-                new_asset.asset_type = AssetType.RAW_FILE.value
+                new_asset.asset_type = 'application/octet-stream'  # AssetType.RAW_FILE.value
                 new_asset.id_session = args['id_session']
                 # TODO Asset associated to us
                 new_asset.id_user = current_user.id_user
