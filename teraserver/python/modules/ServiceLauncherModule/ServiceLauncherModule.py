@@ -24,7 +24,7 @@ class ServiceLauncherModule(BaseModule):
         services = TeraService.query.all()
         for service in services:
             if service.service_system:
-                print(service)
+                # print(service)
                 if service.service_key != 'OpenTeraServer':
                     self.launch_service(service)
             elif service.service_enabled and not self.launch_system_service_only:
@@ -34,7 +34,7 @@ class ServiceLauncherModule(BaseModule):
         """
         We have received a published message from redis
         """
-        print('ServiceLauncherModule - Received message ', pattern, channel, message)
+        # print('ServiceLauncherModule - Received message ', pattern, channel, message)
         pass
 
     def setup_rpc_interface(self):

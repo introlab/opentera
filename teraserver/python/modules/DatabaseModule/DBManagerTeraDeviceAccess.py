@@ -75,10 +75,23 @@ class DBManagerTeraDeviceAccess:
             types.append(my_type.id_session_type)
         return types
 
-    def get_accessible_assets(self, id_asset=None):
+    def get_accessible_assets(self, id_asset: int = None, uuid_asset: str = None):
         from opentera.db.models.TeraAsset import TeraAsset
         query = TeraAsset.query.filter(TeraAsset.id_device == self.device.id_device)
         if id_asset:
             query = query.filter(TeraAsset.id_asset == id_asset)
+        elif uuid_asset:
+            query = query.filter(TeraAsset.asset_uuid == uuid_asset)
 
         return query.all()
+
+    def get_accessible_services(self):
+        from opentera.db.models.TeraService import TeraService
+        from opentera.db.models.TeraServiceProject import TeraServiceProject
+
+        accessible_projects_ids = [proj.id_project for proj in self.device.device_projects]
+        query = TeraService.query.filter_by(service_system=False).join(TeraServiceProject).filter(
+                TeraServiceProject.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
+
+        return query.all()
+

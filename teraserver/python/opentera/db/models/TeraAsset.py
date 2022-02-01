@@ -100,6 +100,10 @@ class TeraAsset(db.Model, BaseModel):
         return TeraAsset.query.filter_by(id_asset=asset_id).first()
 
     @staticmethod
+    def get_asset_by_uuid(asset_uuid: str):
+        return TeraAsset.query.filter_by(asset_uuid=asset_uuid).first()
+
+    @staticmethod
     def get_assets_for_device(device_id: int):
         # return TeraAsset.query.filter_by(id_device=device_id).all()
         from opentera.db.models.TeraSession import TeraSession

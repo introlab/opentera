@@ -30,15 +30,6 @@ get_parser.add_argument('id_creator_device', type=int, help='ID of the device fr
                                                             'assets.')
 
 
-# POST
-post_parser = api.parser()
-post_parser.add_argument('id_session', type=int, help='ID of session to add the assets')
-
-# DELETE
-delete_parser = api.parser()
-delete_parser.add_argument('id', type=int, help='Specific asset ID to delete', required=True)
-
-
 class UserQueryAssets(Resource):
 
     def __init__(self, _api, *args, **kwargs):
@@ -100,27 +91,31 @@ class UserQueryAssets(Resource):
             return gettext('Missing argument'), 400
 
         assets_list = []
+        servername = self.module.config.server_config['hostname']
+        port = self.module.config.server_config['port']
+        if 'X_EXTERNALSERVER' in request.headers:
+            servername = request.headers['X_EXTERNALSERVER']
+
+        if 'X_EXTERNALPORT' in request.headers:
+            port = request.headers['X_EXTERNALPORT']
+
+        services_infos = [{service.service_uuid: service.service_clientendpoint}
+                          for service in user_access.get_accessible_services()]
         for asset in assets:
             asset_json = asset.to_json()
 
             # We have previously verified that the service is available to the user
-            from opentera.db.models.TeraService import TeraService
-            service = TeraService.get_service_by_uuid(asset.asset_service_uuid)
-
-            servername = self.module.config.server_config['hostname']
-            port = self.module.config.server_config['port']
-            if 'X_EXTERNALSERVER' in request.headers:
-                servername = request.headers['X_EXTERNALSERVER']
-
-            if 'X_EXTERNALPORT' in request.headers:
-                port = request.headers['X_EXTERNALPORT']
-
-            asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
-                                            + service.service_clientendpoint \
-                                            + 'api/assets/infos?asset_uuid=' + asset.asset_uuid
-            asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
-                                      + service.service_clientendpoint \
-                                      + 'api/assets?asset_uuid=' + asset.asset_uuid
+            if asset.asset_uuid in services_infos:
+                asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
+                                                + services_infos[asset.asset_service_uuid] \
+                                                + 'api/assets/infos?asset_uuid=' + asset.asset_uuid
+                asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
+                                          + services_infos[asset.asset_service_uuid] \
+                                          + 'api/assets?asset_uuid=' + asset.asset_uuid
+            else:
+                # Service not found or unavaiable for current user
+                asset_json['asset_infos_url'] = None
+                asset_json['asset_url'] = None
 
             assets_list.append(asset_json)
 
@@ -129,7 +124,6 @@ class UserQueryAssets(Resource):
     @user_multi_auth.login_required
     @api.doc(description='Update asset information.',
              responses={501, 'No access from here'})
-    @api.expect(post_parser)
     def post(self):
         return gettext('Asset information update and creation must be done directly into a service (such as '
                        'Filetransfer service)'), 501
@@ -197,7 +191,6 @@ class UserQueryAssets(Resource):
     @api.doc(description='Delete asset.',
              responses={501: 'Unable to delete asset information from here',
                         })
-    @api.expect(delete_parser)
     def delete(self):
         return gettext('Asset information deletion must be done directly into a service (such as '
                        'Filetransfer service)'), 501
