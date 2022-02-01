@@ -127,8 +127,20 @@ class TeraAsset(db.Model, BaseModel):
         return TeraAsset.query.filter_by(service_uuid=service_uuid).all()
 
     @staticmethod
-    def get_assets_for_service(service_id: int):
+    def get_assets_created_by_service(service_id: int):
         return TeraAsset.query.filter_by(id_service=service_id).all()
+
+    @staticmethod
+    def get_assets_created_by_user(user_id: int):
+        return TeraAsset.query.filter_by(id_user=user_id).all()
+
+    @staticmethod
+    def get_assets_created_by_participant(participant_id: int):
+        return TeraAsset.query.filter_by(id_participant=participant_id).all()
+
+    @staticmethod
+    def get_assets_created_by_device(device_id: int):
+        return TeraAsset.query.filter_by(id_device=device_id).all()
 
     @classmethod
     def insert(cls, asset):

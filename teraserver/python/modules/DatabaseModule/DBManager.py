@@ -298,7 +298,7 @@ class DBManager (BaseModule):
         db.create_all()
 
         # Apply any database upgrade, if needed
-        self.upgrade_db()
+        # self.upgrade_db()
 
         # Now ready for events
         self.setup_events()
