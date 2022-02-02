@@ -59,7 +59,7 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(response.status_code, 400)
 
     def test_query_assets_by_service_uuid(self):
-        payload = {'service_uuid': '00000000-0000-0000-0000-000000000001'}
+        payload = {'service_uuid': '00000000-0000-0000-0000-000000000001', 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -70,7 +70,7 @@ class ServiceSessionsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
 
     def test_query_device_assets(self):
-        payload = {'id_device': 1}
+        payload = {'id_device': 1, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -81,7 +81,7 @@ class ServiceSessionsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
 
     def test_query_device_assets_no_access(self):
-        payload = {'id_device': 4}
+        payload = {'id_device': 4, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 403)
 
@@ -94,7 +94,7 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(len(json_data), 3)
 
         for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            self._checkJson(json_data=data_item, minimal=True)
 
     def test_query_session_assets_no_access(self):
         payload = {'id_session': 100}
@@ -102,7 +102,7 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(response.status_code, 403)
 
     def test_query_participant_assets(self):
-        payload = {'id_participant': 1}
+        payload = {'id_participant': 1, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -113,12 +113,12 @@ class ServiceSessionsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
 
     def test_query_participant_assets_no_access(self):
-        payload = {'id_participant': 4}
+        payload = {'id_participant': 4, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 403)
 
     def test_query_user_assets(self):
-        payload = {'id_user': 1}
+        payload = {'id_user': 1, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -129,12 +129,12 @@ class ServiceSessionsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
 
     def test_query_user_assets_no_access(self):
-        payload = {'id_user': 6}
+        payload = {'id_user': 6, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 403)
 
     def test_query_asset(self):
-        payload = {'id_asset': 1}
+        payload = {'id_asset': 1, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -145,14 +145,14 @@ class ServiceSessionsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
 
     def test_query_asset_no_access(self):
-        payload = {'id_asset': 5}
+        payload = {'id_asset': 5, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         json_data = response.json()
         self.assertEqual(len(json_data), 0)
         self.assertEqual(response.status_code, 200)
 
     def test_query_assets_created_by_service(self):
-        payload = {'id_creator_service': 1}
+        payload = {'id_creator_service': 1, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -163,7 +163,7 @@ class ServiceSessionsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_user(self):
-        payload = {'id_creator_user': 1}
+        payload = {'id_creator_user': 1, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -174,12 +174,12 @@ class ServiceSessionsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_user_no_access(self):
-        payload = {'id_creator_user': 6}
+        payload = {'id_creator_user': 6, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 403)
 
     def test_query_assets_created_by_participant(self):
-        payload = {'id_creator_participant': 1}
+        payload = {'id_creator_participant': 1, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -190,12 +190,12 @@ class ServiceSessionsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_participant_no_access(self):
-        payload = {'id_creator_participant': 4}
+        payload = {'id_creator_participant': 4, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 403)
 
     def test_query_assets_created_by_device(self):
-        payload = {'id_creator_device': 1}
+        payload = {'id_creator_device': 1, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -206,7 +206,7 @@ class ServiceSessionsTest(BaseAPITest):
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_device_no_access(self):
-        payload = {'id_creator_device': 4}
+        payload = {'id_creator_device': 4, 'with_urls': True}
         response = self._request_with_token_auth(token=self.service_token, payload=payload)
         self.assertEqual(response.status_code, 403)
 

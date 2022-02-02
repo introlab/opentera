@@ -1,5 +1,5 @@
 from flask import request
-from flask_restx import Resource, reqparse
+from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
@@ -24,6 +24,7 @@ get_parser.add_argument('id_creator_participant', type=int, help='ID of the part
                                                                  'created assets.')
 get_parser.add_argument('id_creator_device', type=int, help='ID of the device from which to request all created '
                                                             'assets.')
+get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download/upload url')
 
 post_parser = api.parser()
 
@@ -99,24 +100,26 @@ class ServiceQueryAssets(Resource):
 
         if 'X_EXTERNALPORT' in request.headers:
             port = request.headers['X_EXTERNALPORT']
-
-        services_infos = [{service.service_uuid: service.service_clientendpoint}
-                          for service in TeraService.query.filter(TeraService.service_enabled == True).all()]
+        services_infos = []
+        if args['with_urls']:
+            services_infos = [{service.service_uuid: service.service_clientendpoint}
+                              for service in TeraService.query.filter(TeraService.service_enabled == True).all()]
 
         for asset in assets:
             asset_json = asset.to_json()
 
-            if asset.asset_uuid in services_infos:
-                asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
-                                                + services_infos[asset.asset_service_uuid] \
-                                                + 'api/assets/infos?asset_uuid=' + asset.asset_uuid
-                asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
-                                          + services_infos[asset.asset_service_uuid] \
-                                          + 'api/assets?asset_uuid=' + asset.asset_uuid
-            else:
-                # Service not found or unavaiable for current user
-                asset_json['asset_infos_url'] = None
-                asset_json['asset_url'] = None
+            if args['with_urls']:
+                if asset.asset_uuid in services_infos:
+                    asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
+                                                    + services_infos[asset.asset_service_uuid] \
+                                                    + 'api/assets/infos?asset_uuid=' + asset.asset_uuid
+                    asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
+                                              + services_infos[asset.asset_service_uuid] \
+                                              + 'api/assets?asset_uuid=' + asset.asset_uuid
+                else:
+                    # Service not found or unavaiable for current user
+                    asset_json['asset_infos_url'] = None
+                    asset_json['asset_url'] = None
 
             assets_list.append(asset_json)
 

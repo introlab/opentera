@@ -25,11 +25,11 @@ class DeviceQueryAssetsTest(BaseAPITest):
         self.assertEqual(401, response.status_code)
 
     def test_query_assets_get_id(self):
-        response = self._request_with_token_auth(self.device_token, 'id_asset=4')
+        response = self._request_with_token_auth(self.device_token, 'id_asset=4&with_urls=True')
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
         self.assertEqual(len(json_data), 1)
-        self._checkJson(json_data=json_data[0], minimal=True)
+        self._checkJson(json_data=json_data[0])
 
     def test_query_assets_get_id_forbidden(self):
         response = self._request_with_token_auth(self.device_token, 'id_asset=1')
@@ -83,5 +83,6 @@ class DeviceQueryAssetsTest(BaseAPITest):
         self.assertTrue(json_data.__contains__('asset_service_uuid'))
         self.assertTrue(json_data.__contains__('asset_type'))
         self.assertTrue(json_data.__contains__('asset_datetime'))
-        self.assertTrue(json_data.__contains__('asset_infos_url'))
-        self.assertTrue(json_data.__contains__('asset_url'))
+        if not minimal:
+            self.assertTrue(json_data.__contains__('asset_infos_url'))
+            self.assertTrue(json_data.__contains__('asset_url'))

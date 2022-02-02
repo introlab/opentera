@@ -47,7 +47,7 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
     def test_query_device_assets_as_admin(self):
-        payload = {'id_device': 1}
+        payload = {'id_device': 1, 'with_urls': True}
         response = self._request_with_http_auth(username='admin', password='admin', payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -63,7 +63,7 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 403)
 
     def test_query_session_assets_as_admin(self):
-        payload = {'id_session': 2}
+        payload = {'id_session': 2, 'with_urls': True}
         response = self._request_with_http_auth(username='admin', password='admin', payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -79,7 +79,7 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 403)
 
     def test_query_participant_assets_as_admin(self):
-        payload = {'id_participant': 1}
+        payload = {'id_participant': 1, 'with_urls': True}
         response = self._request_with_http_auth(username='admin', password='admin', payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -103,7 +103,7 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(len(json_data), 4)
 
         for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            self._checkJson(json_data=data_item, minimal=True)
 
     def test_query_user_assets_no_access(self):
         payload = {'id_user': 1}
@@ -111,7 +111,7 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 403)
 
     def test_query_asset_as_admin(self):
-        payload = {'id_asset': 1}
+        payload = {'id_asset': 1, 'with_urls': True}
         response = self._request_with_http_auth(username='admin', password='admin', payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -129,7 +129,7 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
     def test_query_assets_created_by_service_as_admin(self):
-        payload = {'id_creator_service': 1}
+        payload = {'id_creator_service': 1, 'with_urls': True}
         response = self._request_with_http_auth(username='admin', password='admin', payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -145,7 +145,7 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 403)
 
     def test_query_assets_created_by_user_as_admin(self):
-        payload = {'id_creator_user': 1}
+        payload = {'id_creator_user': 1, 'with_urls': True}
         response = self._request_with_http_auth(username='admin', password='admin', payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -161,7 +161,7 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 403)
 
     def test_query_assets_created_by_participant_as_admin(self):
-        payload = {'id_creator_participant': 1}
+        payload = {'id_creator_participant': 1, 'with_urls': True}
         response = self._request_with_http_auth(username='admin', password='admin', payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -177,7 +177,7 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 403)
 
     def test_query_assets_created_by_device_as_admin(self):
-        payload = {'id_creator_device': 1}
+        payload = {'id_creator_device': 1, 'with_urls': True}
         response = self._request_with_http_auth(username='admin', password='admin', payload=payload)
         self.assertEqual(response.status_code, 200)
 
@@ -232,5 +232,6 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertTrue(json_data.__contains__('asset_service_uuid'))
         self.assertTrue(json_data.__contains__('asset_type'))
         self.assertTrue(json_data.__contains__('asset_datetime'))
-        self.assertTrue(json_data.__contains__('asset_infos_url'))
-        self.assertTrue(json_data.__contains__('asset_url'))
+        if not minimal:
+            self.assertTrue(json_data.__contains__('asset_infos_url'))
+            self.assertTrue(json_data.__contains__('asset_url'))

@@ -1,5 +1,5 @@
 from flask import session, request
-from flask_restx import Resource
+from flask_restx import Resource, inputs
 from modules.LoginModule.LoginModule import LoginModule
 from modules.Globals import db_man
 from modules.FlaskModule.FlaskModule import device_api_ns as api
@@ -9,6 +9,7 @@ from opentera.db.models.TeraDevice import TeraDevice
 get_parser = api.parser()
 get_parser.add_argument('asset_uuid', type=str, help='Asset UUID to query', default=None)
 get_parser.add_argument('id_asset', type=int, help='Asset ID to query', default=None)
+get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download/upload url')
 
 post_parser = api.parser()
 
@@ -40,25 +41,27 @@ class DeviceQueryAssets(Resource):
 
         if 'X_EXTERNALPORT' in request.headers:
             port = request.headers['X_EXTERNALPORT']
-
-        services_infos = [{service.service_uuid: service.service_clientendpoint}
-                          for service in device_access.get_accessible_services()]
+        services_infos = []
+        if args['with_urls']:
+            services_infos = [{service.service_uuid: service.service_clientendpoint}
+                              for service in device_access.get_accessible_services()]
         assets_json = []
         for asset in assets:
             asset_json = asset.to_json()
 
-            # We have previously verified that the service is available to the user
-            if asset.asset_uuid in services_infos:
-                asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
-                                                + services_infos[asset.asset_service_uuid] \
-                                                + 'api/assets/infos?asset_uuid=' + asset.asset_uuid
-                asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
-                                          + services_infos[asset.asset_service_uuid] \
-                                          + 'api/assets?asset_uuid=' + asset.asset_uuid
-            else:
-                # Service not found or unavaiable for current user
-                asset_json['asset_infos_url'] = None
-                asset_json['asset_url'] = None
+            if args['with_urls']:
+                # We have previously verified that the service is available to the user
+                if asset.asset_uuid in services_infos:
+                    asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
+                                                    + services_infos[asset.asset_service_uuid] \
+                                                    + 'api/assets/infos?asset_uuid=' + asset.asset_uuid
+                    asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
+                                              + services_infos[asset.asset_service_uuid] \
+                                              + 'api/assets?asset_uuid=' + asset.asset_uuid
+                else:
+                    # Service not found or unavaiable for current user
+                    asset_json['asset_infos_url'] = None
+                    asset_json['asset_url'] = None
 
             assets_json.append(asset_json)
 
