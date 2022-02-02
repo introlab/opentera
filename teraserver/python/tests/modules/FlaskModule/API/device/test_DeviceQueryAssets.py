@@ -20,6 +20,10 @@ class DeviceQueryAssetsTest(BaseAPITest):
     def tearDown(self):
         pass
 
+    def test_no_auth(self):
+        response = self._request_with_no_auth()
+        self.assertEqual(401, response.status_code)
+
     def test_query_assets_get_id(self):
         response = self._request_with_token_auth(self.device_token, 'id_asset=4')
         self.assertEqual(response.status_code, 200)

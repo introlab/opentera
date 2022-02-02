@@ -276,9 +276,6 @@ class DBManager (BaseModule):
             # Apply any database upgrade, if needed
             self.upgrade_db()
 
-        # Apply any database upgrade, if needed
-        self.upgrade_db()
-
         # Now ready for events
         self.setup_events()
 

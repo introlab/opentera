@@ -48,7 +48,7 @@ class UserQueryAssets(Resource):
 
         args = get_parser.parse_args()
 
-        # If we have no arguments, return all assets
+        # At least one argument required
         if not any(args.values()):
             return gettext('No arguments specified'), 400
         elif args['id_device']:

@@ -128,7 +128,7 @@ class TeraAsset(db.Model, BaseModel):
 
     @staticmethod
     def get_assets_owned_by_service(service_uuid: str):
-        return TeraAsset.query.filter_by(service_uuid=service_uuid).all()
+        return TeraAsset.query.filter_by(asset_service_uuid=service_uuid).all()
 
     @staticmethod
     def get_assets_created_by_service(service_id: int):

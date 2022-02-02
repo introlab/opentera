@@ -4,6 +4,7 @@ from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraService import TeraService
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy import exc
 
@@ -14,6 +15,15 @@ get_parser.add_argument('id_asset', type=int, help='Specific ID of asset to quer
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all assets')
 get_parser.add_argument('id_session', type=int, help='ID of session from which to request all assets')
 get_parser.add_argument('id_participant', type=int, help='ID of participant from which to request all assets')
+get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all assets.')
+get_parser.add_argument('service_uuid', type=str, help='Query all assets associated with that service uuid')
+get_parser.add_argument('id_creator_service', type=int, help='ID of the service from which to request all created '
+                                                             'assets.')
+get_parser.add_argument('id_creator_user', type=int, help='ID of the user from which to request all created assets.')
+get_parser.add_argument('id_creator_participant', type=int, help='ID of the participant from which to request all '
+                                                                 'created assets.')
+get_parser.add_argument('id_creator_device', type=int, help='ID of the device from which to request all created '
+                                                            'assets.')
 
 post_parser = api.parser()
 
@@ -43,31 +53,71 @@ class ServiceQueryAssets(Resource):
         # If we have no arguments, don't do anything!
         assets = []
         if not any(args.values()):
-            return gettext('Missing arguments'), 400
+            return gettext('No arguments specified'), 400
         elif args['id_device']:
             if args['id_device'] not in service_access.get_accessible_devices_ids():
                 return gettext('Device access denied'), 403
             assets = TeraAsset.get_assets_for_device(device_id=args['id_device'])
         elif args['id_session']:
-            if not args['id_session'] in service_access.get_accessible_sessions_ids():
+            if args['id_session'] not in service_access.get_accessible_sessions_ids():
                 return gettext('Session access denied'), 403
             assets = TeraAsset.get_assets_for_session(session_id=args['id_session'])
         elif args['id_participant']:
             if args['id_participant'] not in service_access.get_accessible_participants_ids():
                 return gettext('Participant access denied'), 403
             assets = TeraAsset.get_assets_for_participant(part_id=args['id_participant'])
+        elif args['id_user']:
+            if args['id_user'] not in service_access.get_accessible_users_ids():
+                return gettext("User access denied"), 403
+            assets = TeraAsset.get_assets_for_user(user_id=args['id_user'])
+        elif args['id_creator_service']:
+            assets = TeraAsset.get_assets_created_by_service(service_id=args['id_creator_service'])
+        elif args['id_creator_user']:
+            if args['id_creator_user'] not in service_access.get_accessible_users_ids():
+                return gettext("User access denie"), 403
+            assets = TeraAsset.get_assets_created_by_user(user_id=args['id_creator_user'])
+        elif args['id_creator_participant']:
+            if args['id_creator_participant'] not in service_access.get_accessible_participants_ids():
+                return gettext("Participant access denied"), 403
+            assets = TeraAsset.get_assets_created_by_participant(participant_id=args['id_creator_participant'])
+        elif args['id_creator_device']:
+            if args['id_creator_device'] not in service_access.get_accessible_devices_ids():
+                return gettext("Device access denied"), 403
+            assets = TeraAsset.get_assets_created_by_device(device_id=args['id_creator_device'])
         elif args['id_asset']:
-            assets = [TeraAsset.get_asset_by_id(args['id_asset'])]
-            if assets[0] is not None:
-                if assets[0].id_device is not None and assets[0].id_device not in \
-                        service_access.get_accessible_devices_ids():
-                    return gettext('Permission denied'), 403
-                if not assets[0].id_session in service_access.get_accessible_sessions_ids():
-                    return gettext('Permission denied'), 403
+            assets = service_access.query_asset(args['id_asset'])
+        elif args['service_uuid']:
+            assets = TeraAsset.get_assets_owned_by_service(service_uuid=args['service_uuid'])
+        else:
+            return gettext('Missing argument'), 400
 
         assets_list = []
+        servername = self.module.config.server_config['hostname']
+        port = self.module.config.server_config['port']
+        if 'X_EXTERNALSERVER' in request.headers:
+            servername = request.headers['X_EXTERNALSERVER']
+
+        if 'X_EXTERNALPORT' in request.headers:
+            port = request.headers['X_EXTERNALPORT']
+
+        services_infos = [{service.service_uuid: service.service_clientendpoint}
+                          for service in TeraService.query.filter(TeraService.service_enabled == True).all()]
+
         for asset in assets:
             asset_json = asset.to_json()
+
+            if asset.asset_uuid in services_infos:
+                asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
+                                                + services_infos[asset.asset_service_uuid] \
+                                                + 'api/assets/infos?asset_uuid=' + asset.asset_uuid
+                asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
+                                          + services_infos[asset.asset_service_uuid] \
+                                          + 'api/assets?asset_uuid=' + asset.asset_uuid
+            else:
+                # Service not found or unavaiable for current user
+                asset_json['asset_infos_url'] = None
+                asset_json['asset_url'] = None
+
             assets_list.append(asset_json)
 
         return assets_list
@@ -93,21 +143,22 @@ class ServiceQueryAssets(Resource):
         if 'id_asset' not in asset_info:
             return gettext('Missing id_asset field'), 400
 
-        if 'id_session' in asset_info and asset_info['id_session'] < 1:
-            return gettext('Unknown session'), 400
+        if asset_info['id_asset'] == 0:
+            if 'id_session' not in asset_info:
+                return gettext('Unknown session'), 400
+
+            if 'asset_type' not in asset_info or ('asset_type' in asset_info and not asset_info['asset_type']):
+                return gettext('Invalid asset type'), 400
 
         if 'asset_name' in asset_info and not asset_info['asset_name']:
             return gettext('Invalid asset name'), 400
-
-        if 'asset_type' in asset_info:
-            return gettext('Invalid asset type'), 400
 
         # Check if the service can create/update that asset
         if asset_info['id_asset'] != 0 and 'id_session' not in asset_info:
             # Updating asset - get asset and validate session asset
             asset = TeraAsset.get_asset_by_id(asset_info['id_asset'])
             if asset:
-                args['id_session'] = asset.id_session
+                asset_info['id_session'] = asset.id_session
 
         if asset_info['id_session'] not in service_access.get_accessible_sessions_ids(True):
             return gettext('Service can\'t create assets for that session'), 403
@@ -145,7 +196,6 @@ class ServiceQueryAssets(Resource):
                                              'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
-        # TODO: Publish update to everyone who is subscribed to assets updates
         update_asset = TeraAsset.get_asset_by_id(asset_info['id_asset'])
 
         return [update_asset.to_json()]
