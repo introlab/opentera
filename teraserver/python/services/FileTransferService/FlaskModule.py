@@ -226,8 +226,8 @@ class FlaskModule(BaseModule):
     def init_api(self):
         # Default arguments
         kwargs = {'flaskModule': self}
-        from .API.QueryAssetFileData import QueryAssetFileData
-        file_api_ns.add_resource(QueryAssetFileData, '/assets', resource_class_kwargs=kwargs)
+        from API.QueryAssetFileInfos import QueryAssetFileInfos
+        file_api_ns.add_resource(QueryAssetFileInfos, '/assets/infos', resource_class_kwargs=kwargs)
 
     def init_views(self):
         # Default arguments

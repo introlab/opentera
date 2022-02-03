@@ -121,7 +121,7 @@ if __name__ == '__main__':
         Globals.db_man.create_defaults(Globals.config_man)
 
     # Create the Service
-    service = FileTransferService(Globals.config_man, service_info)
+    Globals.service = FileTransferService(Globals.config_man, service_info)
 
     # Start App / reactor events
     reactor.run()
