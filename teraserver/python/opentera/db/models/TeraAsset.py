@@ -146,6 +146,22 @@ class TeraAsset(db.Model, BaseModel):
     def get_assets_created_by_device(device_id: int):
         return TeraAsset.query.filter_by(id_device=device_id).all()
 
+    @staticmethod
+    def get_access_token(asset_uuids: list, token_key: str, expiration=3600):
+        import time
+        import jwt
+
+        # Creating token with user info
+        now = time.time()
+        payload = {
+            'iat': int(now),
+            'exp': int(now) + expiration,
+            'iss': 'TeraServer',
+            'asset_uuids': asset_uuids
+        }
+
+        return jwt.encode(payload, token_key, algorithm='HS256')
+
     @classmethod
     def insert(cls, asset):
         # Generate UUID

@@ -4,12 +4,13 @@ from modules.LoginModule.LoginModule import LoginModule
 from modules.Globals import db_man
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraAsset import TeraAsset
 
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('asset_uuid', type=str, help='Asset UUID to query', default=None)
 get_parser.add_argument('id_asset', type=int, help='Asset ID to query', default=None)
-get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download/upload url')
+get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download-upload url')
 
 post_parser = api.parser()
 
@@ -36,6 +37,7 @@ class DeviceQueryAssets(Resource):
         # Create response
         servername = self.module.config.server_config['hostname']
         port = self.module.config.server_config['port']
+        access_token = None
         if 'X_EXTERNALSERVER' in request.headers:
             servername = request.headers['X_EXTERNALSERVER']
 
@@ -43,21 +45,33 @@ class DeviceQueryAssets(Resource):
             port = request.headers['X_EXTERNALPORT']
         services_infos = []
         if args['with_urls']:
-            services_infos = [{service.service_uuid: service.service_clientendpoint}
-                              for service in device_access.get_accessible_services()]
+            services_infos = {service.service_uuid: service.service_clientendpoint
+                              for service in device_access.get_accessible_services()}
+
+            # Access token
+            from opentera.redis.RedisVars import RedisVars
+            token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
+            access_token = TeraAsset.get_access_token(asset_uuids=[asset.asset_uuid for asset in assets],
+                                                      token_key=token_key, expiration=1800)
+
         assets_json = []
         for asset in assets:
             asset_json = asset.to_json()
 
             if args['with_urls']:
                 # We have previously verified that the service is available to the user
-                if asset.asset_uuid in services_infos:
+                if asset.asset_service_uuid in services_infos:
                     asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
                                                     + services_infos[asset.asset_service_uuid] \
                                                     + 'api/assets/infos?asset_uuid=' + asset.asset_uuid
                     asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
                                               + services_infos[asset.asset_service_uuid] \
                                               + 'api/assets?asset_uuid=' + asset.asset_uuid
+
+                    if not assets_json:
+                        # Append access token to first item only
+                        asset_json['access_token'] = access_token
+
                 else:
                     # Service not found or unavaiable for current user
                     asset_json['asset_infos_url'] = None
