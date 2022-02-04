@@ -9,10 +9,11 @@ import sys
 
 class ServiceLauncherModule(BaseModule):
 
-    def __init__(self, config: ConfigManager, system_only=False):
+    def __init__(self, config: ConfigManager, system_only=False, enable_tests=False):
         BaseModule.__init__(self, ModuleNames.SERVICE_LAUNCHER_NAME.value, config)
         self.processList = []
         self.launch_system_service_only = system_only
+        self.enable_tests = enable_tests
 
     def __del__(self):
         self.terminate_processes()
@@ -54,6 +55,8 @@ class ServiceLauncherModule(BaseModule):
         elif service.service_key == 'FileTransferService':
             path = os.path.join(os.getcwd(), 'services', 'FileTransferService', 'FileTransferService.py')
             executable_args.append(path)
+            if self.enable_tests:
+                executable_args.append('--enable_tests=1')
             working_directory = os.path.join(os.getcwd(), 'services', 'FileTransferService')
         elif service.service_key == 'BureauActif':
             path = os.path.join(os.getcwd(), 'services', 'BureauActif', 'BureauActifService.py')

@@ -22,6 +22,11 @@ get_parser.add_argument('access_token', type=str, required=True, help='Access to
                                                                       'can be accessed.')
 get_parser.add_argument('asset_uuid', type=str, required=True, help='UUID of the asset to download')
 
+delete_parser = api.parser()
+delete_parser.add_argument('uuid', type=str, help='UUID of the asset do delete')
+delete_parser.add_argument('access_token', type=str, required=True, help='Access token proving that the requested '
+                                                                         'asset can be deleted.')
+
 
 class QueryAssetFile(Resource):
 
@@ -39,17 +44,8 @@ class QueryAssetFile(Resource):
     def get(self):
         args = get_parser.parse_args()
 
-        try:
-            access_token = jwt.decode(args['access_token'], ServiceAccessManager.api_service_token_key,
-                                      algorithms='HS256')
-        except jwt.PyJWTError:
-            return gettext('Invalid access token'), 403
-
-        if 'asset_uuids' not in access_token:
-            return gettext('Invalid access token'), 403
-
-        if args['asset_uuid'] not in access_token['asset_uuids']:
-            return gettext('Forbidden'), 403
+        if not Globals.service.has_access_to_asset(args['access_token'], args['asset_uuid']):
+            return gettext('Access denied to asset'), 403
 
         # Ok, all is fine, we can provide the requested file
         asset = AssetFileData.get_asset_for_uuid(uuid_asset=args['asset_uuid'])
@@ -68,7 +64,7 @@ class QueryAssetFile(Resource):
         if not request.content_type.__contains__('multipart/form-data'):
             return gettext('Wrong content type'), 400
 
-        if 'file_asset' not in request.files:
+        if 'file_asset' not in request.form:
             return gettext('Missing file asset information'), 400
 
         if 'file' not in request.files:
@@ -76,12 +72,12 @@ class QueryAssetFile(Resource):
 
         file = request.files['file']
 
-        if 'filename' not in file:
+        if not file.filename:
             return gettext('Missing filename'), 400
 
         # Check for required assets field
         try:
-            asset_json = json.loads(request.files['file_asset'])
+            asset_json = json.loads(request.form['file_asset'])
         except json.JSONDecodeError as err:
             return gettext('Invalid file_asset format'), 400
 
@@ -91,19 +87,19 @@ class QueryAssetFile(Resource):
         # Check if session is accessible for the requester
         response = None
         if current_login_type == LoginType.USER_LOGIN:
-            response = current_user_client.do_get_request_to_backend('/api/user/sessions&id_session=' +
+            response = current_user_client.do_get_request_to_backend('/api/user/sessions?id_session=' +
                                                                      str(asset_json['id_session']))
         if current_login_type == LoginType.PARTICIPANT_LOGIN:
-            response = current_participant_client.do_get_request_to_backend('/api/participant/sessions&id_session=' +
+            response = current_participant_client.do_get_request_to_backend('/api/participant/sessions?id_session=' +
                                                                             str(asset_json['id_session']))
         if current_login_type == LoginType.DEVICE_LOGIN:
-            response = current_device_client.do_get_request_to_backend('/api/device/sessions&id_session=' +
+            response = current_device_client.do_get_request_to_backend('/api/device/sessions?id_session=' +
                                                                        str(asset_json['id_session']))
         if current_login_type == LoginType.SERVICE_LOGIN:
-            response = current_service_client.do_get_request_to_backend('/api/service/sessions&id_session=' +
+            response = current_service_client.do_get_request_to_backend('/api/service/sessions?id_session=' +
                                                                         str(asset_json['id_session']))
 
-        if not response or response.status_code != 200:
+        if not response or response.status_code != 200 or not response.json():
             return gettext('Session access is forbidden'), 403
 
         # Manage id creator. Currently, only services can specify creators manually. Others are defined to the current
@@ -114,10 +110,10 @@ class QueryAssetFile(Resource):
                 return gettext('Missing at least one ID creator'), 400
         else:
             # Remove all present ids
-            asset_json.pop('id_device')
-            asset_json.pop('id_participant')
-            asset_json.pop('id_user')
-            asset_json.pop('id_service')
+            asset_json.pop('id_device', None)
+            asset_json.pop('id_participant', None)
+            asset_json.pop('id_user', None)
+            asset_json.pop('id_service', None)
             if current_login_type == LoginType.USER_LOGIN:
                 asset_json['id_user'] = current_user_client.id_user
             if current_login_type == LoginType.PARTICIPANT_LOGIN:
@@ -133,31 +129,25 @@ class QueryAssetFile(Resource):
             asset_json['asset_datetime'] = datetime.now().isoformat()
 
         # OK, all set! Do the asset creation request...
-        response = Globals.service.post_to_opentera('/api/services/assets', asset_json)
+        asset_json['id_asset'] = 0  # New asset creation
+        response = Globals.service.post_to_opentera('/api/service/assets', {'asset': asset_json})
         if response.status_code != 200:
             return gettext('Unable to create asset') + ': ' + response.text, response.status_code
 
         # Create the asset in the local database
-        try:
-            new_asset_json = json.loads(response.json)
-        except json.JSONDecodeError:
-            return gettext('Unable to parse created asset'), 500
-
+        new_asset_json = response.json()[0]
         asset_uuid = new_asset_json['asset_uuid']
+
+        filename = os.path.join(flask_app.config['UPLOAD_FOLDER'], asset_uuid)
 
         asset_file = AssetFileData()
         asset_file.asset_uuid = asset_uuid
         asset_file.asset_original_filename = secure_filename(file.filename)
-        asset_file.asset_file_size = file.stream.tell()
+        asset_file.asset_file_size = file.content_length
         AssetFileData.insert(asset_file)
 
         # Finally... save the file itself!
-        import os
-        filename = os.path.join(flask_app.config['UPLOAD_FOLDER'], asset_uuid)
-        with open(filename, 'wb') as fo:
-            chunk = 8192
-            while not request.stream.is_exhausted:
-                fo.write(request.stream.read(chunk))
+        file.save(filename)
 
         # All done here - return asset info, including AssetFileData
         return new_asset_json.update(asset_file.to_json())
@@ -229,3 +219,34 @@ class QueryAssetFile(Resource):
         #         return file_asset.to_json()
         #
         # return 'Unauthorized (invalid content type)', 403
+
+    @api.expect(delete_parser, validate=True)
+    @api.doc(description='Delete asset',
+             responses={200: 'Success - asset deleted',
+                        400: 'Bad request',
+                        403: 'Access denied to the requested asset'})
+    @ServiceAccessManager.service_or_others_token_required(allow_dynamic_tokens=True, allow_static_tokens=False)
+    def delete(self):
+        parser = delete_parser
+
+        args = parser.parse_args()
+        uuid_todel = args['uuid']
+
+        if not Globals.service.has_access_to_asset(args['access_token'], uuid_todel):
+            return gettext('Access denied to asset'), 403
+
+        # Delete from OpenTera Server
+        response = Globals.service.delete_from_opentera('/api/service/assets', {'uuid': uuid_todel})
+        if response.status_code != 200:
+            return gettext('Unable to delete asset') + ': ' + response.text, response.status_code
+
+        # Delete local asset information
+        asset = AssetFileData.get_asset_for_uuid(uuid_asset=uuid_todel)
+        if not asset:
+            return gettext('Access denied to asset'), 403
+
+        # If we are here, we are allowed to delete. Do so.
+        if not asset.delete_file_asset(flask_app.config['UPLOAD_FOLDER']):
+            return gettext('Error occured when deleting file asset'), 500
+
+        return '', 200

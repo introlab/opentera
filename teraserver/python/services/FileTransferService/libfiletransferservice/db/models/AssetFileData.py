@@ -1,5 +1,6 @@
 from services.FileTransferService.libfiletransferservice.db.Base import db
 from opentera.db.Base import BaseModel
+from sqlalchemy import exc
 import os
 
 
@@ -10,7 +11,7 @@ class AssetFileData(db.Model, BaseModel):
 
     asset_uuid = db.Column(db.String(36), nullable=False, unique=True)
     asset_original_filename = db.Column(db.String, nullable=False)
-    asset_file_size = db.Column(db.Integer, nullable=False)
+    asset_file_size = db.Column(db.BigInteger, nullable=False)
     # asset_md5 = db.Column(db.String, nullable=False)  # Not used now
 
     @staticmethod
@@ -20,6 +21,25 @@ class AssetFileData(db.Model, BaseModel):
     @staticmethod
     def get_assets_for_uuids(uuids_asset: list):
         return AssetFileData.query.filter(AssetFileData.asset_uuid.in_(uuids_asset)).all()
+
+    def delete_file_asset(self, file_folder: str) -> bool:
+        # Delete related file from system
+        file_name = os.path.join(file_folder, self.asset_uuid)
+        if os.path.exists(file_name):
+            # print('AssetFileData: Deleted ' + file_name)
+            os.remove(file_name)
+        else:
+            # print('AssetFileData: File not found: ' + file_name)
+            return False
+
+        # Delete self from database
+        try:
+            db.session.delete(self)
+            self.commit()
+        except exc.SQLAlchemyError:
+            return False
+
+        return True
 
     # def delete(self, id_todel):
     #     AssetFileData.delete_files([self])

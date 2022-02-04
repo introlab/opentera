@@ -29,7 +29,7 @@ get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include ass
 post_parser = api.parser()
 
 delete_parser = api.parser()
-delete_parser.add_argument('id', type=int, help='Site ID to delete', required=True)
+delete_parser.add_argument('uuid', type=int, help='Asset UUID to delete', required=True)
 
 
 class ServiceQueryAssets(Resource):
@@ -164,7 +164,7 @@ class ServiceQueryAssets(Resource):
             if 'asset_type' not in asset_info or ('asset_type' in asset_info and not asset_info['asset_type']):
                 return gettext('Invalid asset type'), 400
 
-        if 'asset_name' in asset_info and not asset_info['asset_name']:
+        if 'asset_name' not in asset_info and not asset_info['asset_name']:
             return gettext('Invalid asset name'), 400
 
         # Check if the service can create/update that asset
@@ -225,9 +225,9 @@ class ServiceQueryAssets(Resource):
         parser = delete_parser
 
         args = parser.parse_args()
-        id_todel = args['id']
+        uuid_todel = args['uuid']
 
-        asset = TeraAsset.get_asset_by_id(id_todel)
+        asset = TeraAsset.get_asset_by_uuid(uuid_todel)
 
         if not asset:
             return gettext('Missing arguments'), 400
@@ -237,7 +237,7 @@ class ServiceQueryAssets(Resource):
 
         # If we are here, we are allowed to delete. Do so.
         try:
-            TeraAsset.delete(id_todel=id_todel)
+            TeraAsset.delete(id_todel=asset.id_asset)
         except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())

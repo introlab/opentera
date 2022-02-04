@@ -206,4 +206,3 @@ class TeraService(db.Model, BaseModel):
             del values['service_uuid']
 
         super().update(update_id, values)
-

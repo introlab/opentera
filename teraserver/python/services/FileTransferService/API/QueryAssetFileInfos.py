@@ -1,17 +1,12 @@
-import os
-import hashlib
-from datetime import datetime
-
 import jwt
-from werkzeug.utils import secure_filename
 from flask import request
 from flask_babel import gettext
 from flask_restx import Resource, reqparse
 from services.FileTransferService.FlaskModule import file_api_ns as api
-from opentera.services.ServiceAccessManager import ServiceAccessManager, current_service_client, current_login_type, current_user_client, current_device_client
-from services.FileTransferService.FlaskModule import flask_app
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_service_client, current_login_type, \
+    current_user_client, current_device_client
 from services.FileTransferService.libfiletransferservice.db.models.AssetFileData import AssetFileData
-from services.FileTransferService.libfiletransferservice.db.Base import db
+import services.FileTransferService.Globals as Globals
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -43,6 +38,7 @@ post_schema = api.schema_model('assets_uuids', {'properties': {
                                                 }
                                )
 
+
 class QueryAssetFileInfos(Resource):
 
     def __init__(self, _api, *args, **kwargs):
@@ -59,17 +55,8 @@ class QueryAssetFileInfos(Resource):
     def get(self):
         args = get_parser.parse_args()
 
-        try:
-            access_token = jwt.decode(args['access_token'], ServiceAccessManager.api_service_token_key,
-                                      algorithms='HS256')
-        except jwt.PyJWTError:
-            return gettext('Invalid access token'), 403
-
-        if 'asset_uuids' not in access_token:
-            return gettext('Invalid access token'), 403
-
-        if args['asset_uuid'] not in access_token['asset_uuids']:
-            return gettext('Forbidden'), 403
+        if not Globals.service.has_access_to_asset(args['access_token'], args['asset_uuid']):
+            return gettext('Access denied for that asset'), 403
 
         # Ok, all is fine, we can provide the requested information
         asset = AssetFileData.get_asset_for_uuid(uuid_asset=args['asset_uuid'])
@@ -94,16 +81,7 @@ class QueryAssetFileInfos(Resource):
         if 'asset_uuids' not in request.json and 'file_asset' not in request.json:
             return gettext('Badly formatted request'), 400
 
-        try:
-            access_token = jwt.decode(request.json['access_token'], ServiceAccessManager.api_service_token_key,
-                                      algorithms='HS256')
-        except jwt.PyJWTError:
-            return gettext('Invalid access token'), 403
-
-        if 'asset_uuids' not in access_token:
-            return gettext('Invalid access token'), 403
-
-        allowed_asset_uuids = access_token['asset_uuids']
+        allowed_asset_uuids = Globals.service.get_accessible_asset_uuids(request.json['access_token'])
 
         if 'asset_uuids' in request.json:
             # Query assets data
@@ -124,7 +102,7 @@ class QueryAssetFileInfos(Resource):
             if asset_json['asset_uuid'] not in allowed_asset_uuids:
                 return gettext('Forbidden'), 403
 
-            # Only change possible here is the original file name, as other informations are linked to the file itself
+            # Only change possible here is the original file name, as other information are linked to the file itself
             if 'asset_original_filename' not in asset_json:
                 return gettext('Only original can be changed from here'), 400
 

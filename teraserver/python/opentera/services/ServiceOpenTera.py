@@ -3,7 +3,7 @@ import json
 import time
 from opentera.redis.RedisVars import RedisVars
 from opentera.redis.RedisClient import RedisClient
-from requests import get, post, Response
+from requests import get, post, Response, delete
 from opentera.services.ServiceConfigManager import ServiceConfigManager
 import opentera.messages.python as messages
 from twisted.internet import defer
@@ -165,6 +165,12 @@ class ServiceOpenTera(RedisClient):
         url = "https://" + self.backend_hostname + ':' + str(self.backend_port) + api_url
         request_headers = {'Authorization': 'OpenTera ' + self.service_token}
         return get(url=url, verify=False, headers=request_headers, params=params)
+
+    def delete_from_opentera(self, api_url: str, params: dict) -> Response:
+        # Synchronous call to OpenTera backend
+        url = "https://" + self.backend_hostname + ':' + str(self.backend_port) + api_url
+        request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+        return delete(url=url, verify=False, headers=request_headers, params=params)
 
     def send_event_message(self, event, topic: str):
         message = self.create_event_message(topic)
