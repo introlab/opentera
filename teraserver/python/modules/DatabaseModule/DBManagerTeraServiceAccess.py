@@ -145,3 +145,18 @@ class DBManagerTeraServiceAccess:
             sites = [site for site in sites if site.id_site in acc_sites_ids]
 
         return sites
+
+    def query_asset(self, asset_id: int):
+        from opentera.db.models.TeraAsset import TeraAsset
+        from sqlalchemy import or_
+
+        # If a service has access to a session, it should have access to its assets
+        session_ids = self.get_accessible_sessions_ids()
+        # device_ids = self.get_accessible_devices_ids()
+        # participant_ids = self.get_accessible_participants_ids()
+        # user_ids = self.get_accessible_users_ids()
+        # service_ids = self.get_accessible_services_ids()
+
+        return TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids)).filter(TeraAsset.id_asset == asset_id)\
+            .all()
+        # .filter(or_(TeraAsset.id_service.in_(service_ids), TeraAsset.id_service == None)) \

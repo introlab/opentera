@@ -11,14 +11,14 @@ from twisted.python import log
 import sys
 import os
 
-from opentera.services.ServiceOpenTera import ServiceOpenTera
+from opentera.services.ServiceOpenTeraWithAssets import ServiceOpenTeraWithAssets
 from sqlalchemy.exc import OperationalError
 from services.FileTransferService.FlaskModule import FlaskModule
 
 
-class FileTransferService(ServiceOpenTera):
+class FileTransferService(ServiceOpenTeraWithAssets):
     def __init__(self, config_man: ConfigManager, this_service_info):
-        ServiceOpenTera.__init__(self, config_man, this_service_info)
+        ServiceOpenTeraWithAssets.__init__(self, config_man, this_service_info)
 
         self.verify_file_upload_directory(config_man)
 
@@ -50,9 +50,13 @@ class FileTransferService(ServiceOpenTera):
 
 
 if __name__ == '__main__':
-
     # Very first thing, log to stdout
     log.startLogging(sys.stdout)
+
+    import argparse
+    parser = argparse.ArgumentParser(description='FileTransfer Service')
+    parser.add_argument('--enable_tests', help='Test mode for service.', default=False)
+    args = parser.parse_args()
 
     # Load configuration
     if not Globals.config_man.load_config('FileTransferService.json'):
@@ -112,7 +116,10 @@ if __name__ == '__main__':
     }
 
     try:
-        Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
+        if args.enable_tests:
+            Globals.db_man.open_local(None, echo=True)
+        else:
+            Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
     except OperationalError as e:
         print("Unable to connect to database - please check settings in config file!", e)
         quit()
@@ -121,7 +128,7 @@ if __name__ == '__main__':
         Globals.db_man.create_defaults(Globals.config_man)
 
     # Create the Service
-    service = FileTransferService(Globals.config_man, service_info)
+    Globals.service = FileTransferService(Globals.config_man, service_info)
 
     # Start App / reactor events
     reactor.run()

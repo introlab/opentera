@@ -51,9 +51,14 @@ class BaseAPITest(unittest.TestCase):
         url = self._make_url(self.host, self.port, self.test_endpoint)
         return post(url=url, verify=False, auth=(username, password), json=payload)
 
-    def _post_file_with_http_auth(self, username, password, params=None, files=None, data=None):
+    def _post_file_with_http_auth(self, username, password, files=None, data=None):
         url = self._make_url(self.host, self.port, self.test_endpoint)
-        return post(url=url, verify=False, auth=(username, password), params=params, files=files, data=data)
+        return post(url=url, verify=False, auth=(username, password), files=files, data=data)
+
+    def _post_file_with_token(self, token:str, files=None, data=None):
+        url = self._make_url(self.host, self.port, self.test_endpoint)
+        params = {'token': token}
+        return post(url=url, verify=False, params=params, files=files, data=data)
 
     def _post_with_no_auth(self, payload=None):
         if payload is None:
@@ -69,6 +74,12 @@ class BaseAPITest(unittest.TestCase):
     def _delete_with_http_auth(self, username, password, id_to_del: int):
         url = self._make_url(self.host, self.port, self.test_endpoint)
         return delete(url=url, verify=False, auth=(username, password), params='id=' + str(id_to_del))
+
+    def _delete_with_token(self, token: str, id_to_del: int):
+        params = {'token': token,
+                  'id': id_to_del}
+        url = self._make_url(self.host, self.port, self.test_endpoint)
+        return delete(url=url, verify=False, params=params)
 
     def _delete_with_http_auth_plus(self, username, password, payload=None):
         if payload is None:

@@ -266,10 +266,15 @@ class DBManager (BaseModule):
 
         # Init tables
         # db.drop_all()
-        db.create_all()
-
-        # Apply any database upgrade, if needed
-        self.upgrade_db()
+        tables = db.engine.table_names()
+        if not tables:
+            # Create all tables
+            db.create_all()
+            # New database - stamp with current revision version
+            self.stamp_db()
+        else:
+            # Apply any database upgrade, if needed
+            self.upgrade_db()
 
         # Now ready for events
         self.setup_events()
@@ -295,10 +300,15 @@ class DBManager (BaseModule):
         db.app = flask_app
 
         # Init tables
-        db.create_all()
-
-        # Apply any database upgrade, if needed
-        self.upgrade_db()
+        tables = db.engine.table_names()
+        if not tables:
+            # Create all tables
+            db.create_all()
+            # New database - stamp with current revision version
+            self.stamp_db()
+        else:
+            # Apply any database upgrade, if needed
+            self.upgrade_db()
 
         # Now ready for events
         self.setup_events()

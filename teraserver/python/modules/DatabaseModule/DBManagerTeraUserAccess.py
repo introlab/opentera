@@ -298,7 +298,6 @@ class DBManagerTeraUserAccess:
         user_ids = self.get_accessible_users_ids(admin_only=admin_only)
         device_ids = self.get_accessible_devices_ids(admin_only=admin_only)
         service_ids = self.get_accessible_services_ids(admin_only=admin_only)
-        # # TODO: CONSIDER SESSIONS CREATED BY USERS AND DEVICES ONLY WITHOUT ANY PARTICIPANT
         # # THIS JOIN TAKES A LONG TIME TO PROCESS... IMPROVE!
         # # sessions = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users). \
         # #     filter(or_(TeraSessionParticipants.id_participant.in_(part_ids),
@@ -706,16 +705,24 @@ class DBManagerTeraUserAccess:
                 TeraSessionType.id_service.in_(service_ids)).self_group())).all()
         return session_types
 
-    def query_assets_for_service(self, uuid_service: str):
+    def query_assets_associated_to_service(self, uuid_service: str):
         from opentera.db.models.TeraAsset import TeraAsset
         from sqlalchemy import or_
 
+        # If user has access to session, it should have access to its assets
         session_ids = self.get_accessible_sessions_ids()
-        device_ids = self.get_accessible_devices_ids()
-        # TODO: Check for participants, users and service access
-        return TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids)) \
-            .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None)) \
-            .filter(TeraAsset.asset_service_uuid == uuid_service).all()
+        # device_ids = self.get_accessible_devices_ids()
+        # participant_ids = self.get_accessible_participants_ids()
+        # user_ids = self.get_accessible_users_ids()
+        service_ids = self.get_accessible_services_ids()
+
+        return TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids))\
+            .filter(TeraAsset.asset_service_uuid == uuid_service) \
+            .filter(or_(TeraAsset.id_service.in_(service_ids), TeraAsset.id_service == None)) \
+            .all()
+        # .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None)) \
+        # .filter(or_(TeraAsset.id_participant.in_(participant_ids), TeraAsset.id_participant == None)) \
+        # .filter(or_(TeraAsset.id_user.in_(user_ids), TeraAsset.id_user == None)) \
 
     def query_projects_for_service(self, service_id: int, site_id: int = None, include_other_projects=False):
         from opentera.db.models.TeraServiceProject import TeraServiceProject
@@ -967,3 +974,22 @@ class DBManagerTeraUserAccess:
                                                                              .id_service.in_(accessible_services_ids))
 
         return query.all()
+
+    def query_asset(self, asset_id: int):
+        from opentera.db.models.TeraAsset import TeraAsset
+        from sqlalchemy import or_
+
+        # If a user has access to a session, it should have access to its assets
+        session_ids = self.get_accessible_sessions_ids()
+        # device_ids = self.get_accessible_devices_ids()
+        # participant_ids = self.get_accessible_participants_ids()
+        # user_ids = self.get_accessible_users_ids()
+        service_ids = self.get_accessible_services_ids()
+
+        return TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids)) \
+            .filter(or_(TeraAsset.id_service.in_(service_ids), TeraAsset.id_service == None)) \
+            .filter(TeraAsset.id_asset == asset_id).all()
+
+    #     .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None)) \
+    #     .filter(or_(TeraAsset.id_participant.in_(participant_ids), TeraAsset.id_participant == None)) \
+    #     .filter(or_(TeraAsset.id_user.in_(user_ids), TeraAsset.id_user == None)) \

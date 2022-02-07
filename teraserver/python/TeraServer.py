@@ -243,7 +243,7 @@ if __name__ == '__main__':
 
     user_manager_module = UserManagerModule(config_man)
 
-    service_launcher = ServiceLauncherModule(config_man, system_only=args.enable_tests)
+    service_launcher = ServiceLauncherModule(config_man, system_only=args.enable_tests, enable_tests=args.enable_tests)
 
     # This is blocking, running event loop
     twisted_module.run()
