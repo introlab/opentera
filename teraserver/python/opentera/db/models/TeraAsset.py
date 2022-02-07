@@ -147,7 +147,7 @@ class TeraAsset(db.Model, BaseModel):
         return TeraAsset.query.filter_by(id_device=device_id).all()
 
     @staticmethod
-    def get_access_token(asset_uuids: list, token_key: str, expiration=3600):
+    def get_access_token(asset_uuids: list, token_key: str, requester_uuid: str, expiration=3600):
         import time
         import jwt
 
@@ -157,7 +157,8 @@ class TeraAsset(db.Model, BaseModel):
             'iat': int(now),
             'exp': int(now) + expiration,
             'iss': 'TeraServer',
-            'asset_uuids': asset_uuids
+            'asset_uuids': asset_uuids,
+            'requester_uuid': requester_uuid
         }
 
         return jwt.encode(payload, token_key, algorithm='HS256')

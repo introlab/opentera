@@ -29,7 +29,7 @@ get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include ass
 post_parser = api.parser()
 
 delete_parser = api.parser()
-delete_parser.add_argument('uuid', type=int, help='Asset UUID to delete', required=True)
+delete_parser.add_argument('uuid', type=str, help='Asset UUID to delete', required=True)
 
 
 class ServiceQueryAssets(Resource):
@@ -110,7 +110,8 @@ class ServiceQueryAssets(Resource):
             from opentera.redis.RedisVars import RedisVars
             token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
             access_token = TeraAsset.get_access_token(asset_uuids=[asset.asset_uuid for asset in assets],
-                                                      token_key=token_key, expiration=1800)
+                                                      token_key=token_key, requester_uuid=current_service.service_uuid,
+                                                      expiration=1800)
 
         for asset in assets:
             asset_json = asset.to_json()
@@ -119,10 +120,10 @@ class ServiceQueryAssets(Resource):
                 if asset.asset_service_uuid in services_infos:
                     asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
                                                     + services_infos[asset.asset_service_uuid] \
-                                                    + 'api/assets/infos?asset_uuid=' + asset.asset_uuid
+                                                    + '/api/assets/infos?asset_uuid=' + asset.asset_uuid
                     asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
                                               + services_infos[asset.asset_service_uuid] \
-                                              + 'api/assets?asset_uuid=' + asset.asset_uuid
+                                              + '/api/assets?asset_uuid=' + asset.asset_uuid
 
                     if not assets_list:
                         # Append access token to first item only

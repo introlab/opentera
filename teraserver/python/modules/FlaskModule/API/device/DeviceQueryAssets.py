@@ -52,7 +52,8 @@ class DeviceQueryAssets(Resource):
             from opentera.redis.RedisVars import RedisVars
             token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
             access_token = TeraAsset.get_access_token(asset_uuids=[asset.asset_uuid for asset in assets],
-                                                      token_key=token_key, expiration=1800)
+                                                      token_key=token_key, requester_uuid=device.device_uuid,
+                                                      expiration=1800)
 
         assets_json = []
         for asset in assets:
@@ -63,10 +64,10 @@ class DeviceQueryAssets(Resource):
                 if asset.asset_service_uuid in services_infos:
                     asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
                                                     + services_infos[asset.asset_service_uuid] \
-                                                    + 'api/assets/infos?asset_uuid=' + asset.asset_uuid
+                                                    + '/api/assets/infos?asset_uuid=' + asset.asset_uuid
                     asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
                                               + services_infos[asset.asset_service_uuid] \
-                                              + 'api/assets?asset_uuid=' + asset.asset_uuid
+                                              + '/api/assets?asset_uuid=' + asset.asset_uuid
 
                     if not assets_json:
                         # Append access token to first item only

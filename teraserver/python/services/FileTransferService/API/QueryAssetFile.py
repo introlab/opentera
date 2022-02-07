@@ -86,21 +86,44 @@ class QueryAssetFile(Resource):
 
         # Check if session is accessible for the requester
         response = None
-        if current_login_type == LoginType.USER_LOGIN:
-            response = current_user_client.do_get_request_to_backend('/api/user/sessions?id_session=' +
-                                                                     str(asset_json['id_session']))
-        if current_login_type == LoginType.PARTICIPANT_LOGIN:
-            response = current_participant_client.do_get_request_to_backend('/api/participant/sessions?id_session=' +
-                                                                            str(asset_json['id_session']))
-        if current_login_type == LoginType.DEVICE_LOGIN:
-            response = current_device_client.do_get_request_to_backend('/api/device/sessions?id_session=' +
-                                                                       str(asset_json['id_session']))
+        # if current_login_type == LoginType.USER_LOGIN:
+        #     response = current_user_client.do_get_request_to_backend('/api/user/sessions?id_session=' +
+        #                                                              str(asset_json['id_session']))
+        # if current_login_type == LoginType.PARTICIPANT_LOGIN:
+        #     response = current_participant_client.do_get_request_to_backend('/api/participant/sessions?id_session=' +
+        #                                                                     str(asset_json['id_session']))
+        # if current_login_type == LoginType.DEVICE_LOGIN:
+        #     response = current_device_client.do_get_request_to_backend('/api/device/sessions?id_session=' +
+        #                                                                str(asset_json['id_session']))
         if current_login_type == LoginType.SERVICE_LOGIN:
             response = current_service_client.do_get_request_to_backend('/api/service/sessions?id_session=' +
                                                                         str(asset_json['id_session']))
+        else:
+            response = Globals.service.get_from_opentera('/api/service/sessions', {'id_session': asset_json['id_session']})
 
         if not response or response.status_code != 200 or not response.json():
             return gettext('Session access is forbidden'), 403
+
+        session_json = response.json()[0]
+        if current_login_type == LoginType.USER_LOGIN:
+            if 'session_users' not in session_json or (
+                    current_user_client.user_uuid not in [user['user_uuid'] for user in session_json['session_users']]
+                    and current_user_client.id_user != session_json['id_creator_user']):
+                return gettext('Session access is forbidden'), 403
+
+        if current_login_type == LoginType.DEVICE_LOGIN:
+            if 'session_devices' not in session_json or (
+                    current_device_client.device_uuid not in
+                    [device['device_uuid'] for device in session_json['session_devices']]
+                    and current_device_client.id_device != session_json['id_creator_device']):
+                return gettext('Session access is forbidden'), 403
+
+        if current_login_type == LoginType.PARTICIPANT_LOGIN:
+            if 'session_participants' not in session_json or (
+                    current_participant_client.participant_uuid not in
+                    [part['participant_uuid'] for part in session_json['session_participants']]
+                    and current_participant_client.id_participant != session_json['id_creator_participant']):
+                return gettext('Session access is forbidden'), 403
 
         # Manage id creator. Currently, only services can specify creators manually. Others are defined to the current
         # value
@@ -150,7 +173,8 @@ class QueryAssetFile(Resource):
         file.save(filename)
 
         # All done here - return asset info, including AssetFileData
-        return new_asset_json.update(asset_file.to_json())
+        full_json = {**new_asset_json, **asset_file.to_json()}
+        return full_json
 
         #
         # if not args['asset_uuid']:

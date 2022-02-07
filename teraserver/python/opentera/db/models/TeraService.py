@@ -151,7 +151,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/file'
         new_service.service_enabled = True
-        new_service.service_system = True
+        new_service.service_system = False
         db.session.add(new_service)
 
         new_service = TeraService()

@@ -105,23 +105,425 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
 
     def test_full_as_user(self):
         file_asset = {}
-        files = {'file': ('testfile', open('testfile', 'rb'), 'application/octet-stream'),
-                 'file_asset': (None, json.dumps(file_asset), 'application/json')}
-        response = self._post_file_with_token(self.user_token, files=files)
-        self.assertEqual(response.status_code, 400, 'Missing infos in file_asset')
+        with open('testfile', 'rb') as f:
+            files = {'file': ('testfile', f, 'application/octet-stream',
+                              {'Content-Length': self.test_file_size}),
+                     'file_asset': (None, json.dumps(file_asset), 'application/json')}
+            response = self._post_file_with_token(self.user_token, files=files)
+            self.assertEqual(response.status_code, 400, 'Missing infos in file_asset')
 
         file_asset['id_session'] = 100
         file_asset['asset_name'] = "Test Asset"
         file_asset['asset_type'] = 'application/octet-stream'
-        files = {'file': ('testfile', open('testfile', 'rb'), 'application/octet-stream'),
-                 'file_asset': (None, json.dumps(file_asset), 'application/json')}
-        response = self._post_file_with_token(self.user_token, files=files)
-        self.assertEqual(response.status_code, 403, 'Forbidden access to session')
+        with open('testfile', 'rb') as f:
+            files = {'file': ('testfile', f, 'application/octet-stream',
+                              {'Content-Length': self.test_file_size}),
+                     'file_asset': (None, json.dumps(file_asset), 'application/json')}
+            response = self._post_file_with_token(self.user_token, files=files)
+            self.assertEqual(response.status_code, 403, 'Forbidden access to session')
 
         file_asset['id_session'] = 1  # OK, OK... I'll do something right for once!
-        files = {'file': ('testfile', open('testfile', 'rb'), 'application/octet-stream'),
-                 'file_asset': (None, json.dumps(file_asset), 'application/json')}
-        response = self._post_file_with_token(self.user_token, files=files)
-        self.assertEqual(response.status_code, 200, 'Asset post OK')
+        with open('testfile', 'rb') as f:
+            files = {'file': ('testfile', f, 'application/octet-stream',
+                              {'Content-Length': self.test_file_size}),
+                     'file_asset': (None, json.dumps(file_asset), 'application/json')}
+            response = self._post_file_with_token(self.user_token, files=files)
+            self.assertEqual(response.status_code, 200, 'Asset post OK')
+            json_data = response.json()
+            self.assertTrue(json_data.__contains__('asset_uuid'))
+            self.assertTrue(json_data.__contains__('id_asset'))
 
+        asset_uuid = json_data['asset_uuid']
+        asset_id = json_data['id_asset']
 
+        # Query asset information to make sure it was properly created
+        payload = {'id_asset': asset_id, 'with_urls': True}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=payload,
+                                                endpoint='/api/user/assets')
+        self.assertEqual(response.status_code, 200)
+
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+        self.assertEqual(json_data[0]['id_asset'], asset_id)
+
+        asset_infos_url = json_data[0]['asset_infos_url']
+        asset_url = json_data[0]['asset_url']
+        access_token = json_data[0]['access_token']
+
+        # Get specific service information on that URL
+        response = self._request_full_url_with_token_auth(token=self.user_token, full_url=asset_infos_url)
+        self.assertEqual(response.status_code, 400, 'Missing access token')
+
+        response = self._request_full_url_with_token_auth(token=self.user_token,
+                                                          full_url=asset_infos_url + '&access_token=123124')
+        self.assertEqual(response.status_code, 403, 'Forbidden - invalid token')
+
+        response = self._request_full_url_with_token_auth(token=self.user_token,
+                                                          full_url=asset_infos_url + '&access_token=' + access_token)
+        self.assertEqual(response.status_code, 200, 'Service asset infos OK')
+        json_data = response.json()
+        self.assertTrue(json_data.__contains__('asset_uuid'))
+        self.assertEqual(json_data['asset_uuid'], asset_uuid)
+
+        # Change original file name with a POST query
+        params = {}
+        response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
+        self.assertEqual(response.status_code, 403, 'Missing access token')
+
+        params = {'access_token': access_token}
+        response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
+        self.assertEqual(response.status_code, 400, 'Badly formatted request')
+
+        params = {'access_token': access_token,
+                  'file_asset': {}}
+        response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
+        self.assertEqual(response.status_code, 400, 'Missing asset UUID')
+
+        params = {'access_token': access_token,
+                  'file_asset': {'asset_uuid': '1111111'}}
+        response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
+        self.assertEqual(response.status_code, 403, 'Forbidden access to UUID')
+
+        params = {'access_token': access_token,
+                  'file_asset': {'asset_uuid': asset_uuid}}
+        response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
+        self.assertEqual(response.status_code, 400, 'No file name')
+
+        params = {'access_token': access_token,
+                  'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2'}}
+        response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
+        self.assertEqual(response.status_code, 200, 'Original file name changed')
+        self.assertEqual(response.json()['asset_original_filename'], 'testfile2')
+
+        # Try to download that file now from the file URL
+        response = self._request_full_url_with_token_auth(token=self.user_token, full_url=asset_url)
+        self.assertEqual(response.status_code, 400, 'Missing access token')
+
+        response = self._request_full_url_with_token_auth(token=self.user_token,
+                                                          full_url=asset_url + '&access_token=123124')
+        self.assertEqual(response.status_code, 403, 'Forbidden access with invalid token')
+
+        request_headers = {'Authorization': 'OpenTera ' + self.user_token}
+        response = get(url=asset_url + '&access_token=' + access_token, headers=request_headers, verify=False,
+                       stream=True)
+        self.assertEqual(response.status_code, 200, 'Downloading file')
+        with open('testfile2', 'wb') as download_file:
+            for chunk in response.iter_content(chunk_size=4096):
+                download_file.write(chunk)
+
+        import filecmp
+        self.assertTrue(filecmp.cmp('testfile', 'testfile2'))
+        os.remove('testfile2')
+
+        # Delete asset from service
+        response = self._delete_with_token_plus(token=self.user_token)
+        self.assertEqual(response.status_code, 400, 'Missing uuid')
+
+        response = self._delete_with_token_plus(token=self.user_token, payload={'uuid': asset_uuid})
+        self.assertEqual(response.status_code, 400, 'Missing access token')
+
+        response = self._delete_with_token_plus(token=self.user_token, payload={'uuid': asset_uuid,
+                                                                                'access_token': 123})
+        self.assertEqual(response.status_code, 403, 'Forbidden access')
+
+        response = self._delete_with_token_plus(token=self.user_token, payload={'uuid': asset_uuid,
+                                                                                'access_token': access_token})
+        self.assertEqual(response.status_code, 200, 'Delete OK')
+
+    def test_full_as_device(self):
+        file_asset = dict()
+        file_asset['id_session'] = 100
+        file_asset['asset_name'] = "Test Asset"
+        file_asset['asset_type'] = 'application/octet-stream'
+        with open('testfile', 'rb') as f:
+            files = {'file': ('testfile', f, 'application/octet-stream',
+                              {'Content-Length': self.test_file_size}),
+                     'file_asset': (None, json.dumps(file_asset), 'application/json')}
+            response = self._post_file_with_token(self.device_token, files=files)
+            self.assertEqual(response.status_code, 403, 'Forbidden access to session')
+
+        file_asset['id_session'] = 9
+        with open('testfile', 'rb') as f:
+            files = {'file': ('testfile', f, 'application/octet-stream',
+                              {'Content-Length': self.test_file_size}),
+                     'file_asset': (None, json.dumps(file_asset), 'application/json')}
+            response = self._post_file_with_token(self.device_token, files=files)
+            self.assertEqual(response.status_code, 200, 'Asset post OK')
+            json_data = response.json()
+            self.assertTrue(json_data.__contains__('asset_uuid'))
+            self.assertTrue(json_data.__contains__('id_asset'))
+
+        asset_uuid = json_data['asset_uuid']
+        asset_id = json_data['id_asset']
+
+        # Query asset information to make sure it was properly created
+        payload = {'id_asset': asset_id, 'with_urls': True}
+        response = self._request_with_token_auth(token=self.device_token, payload=payload,
+                                                 endpoint='/api/device/assets')
+        self.assertEqual(response.status_code, 200)
+
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+        self.assertEqual(json_data[0]['id_asset'], asset_id)
+
+        asset_infos_url = json_data[0]['asset_infos_url']
+        asset_url = json_data[0]['asset_url']
+        access_token = json_data[0]['access_token']
+
+        # Get specific service information on that URL
+        response = self._request_full_url_with_token_auth(token=self.device_token,
+                                                          full_url=asset_infos_url + '&access_token=123124')
+        self.assertEqual(response.status_code, 403, 'Forbidden - invalid token')
+
+        response = self._request_full_url_with_token_auth(token=self.device_token,
+                                                          full_url=asset_infos_url + '&access_token=' + access_token)
+        self.assertEqual(response.status_code, 200, 'Service asset infos OK')
+        json_data = response.json()
+        self.assertTrue(json_data.__contains__('asset_uuid'))
+        self.assertEqual(json_data['asset_uuid'], asset_uuid)
+
+        # Change original file name with a POST query
+        params = {'access_token': access_token,
+                  'file_asset': {'asset_uuid': '1111111'}}
+        response = self._post_with_token(token=self.device_token, payload=params, endpoint=self.test_infos_endpoint)
+        self.assertEqual(response.status_code, 403, 'Forbidden access to UUID')
+
+        params = {'access_token': access_token,
+                  'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2'}}
+        response = self._post_with_token(token=self.device_token, payload=params, endpoint=self.test_infos_endpoint)
+        self.assertEqual(response.status_code, 200, 'Original file name changed')
+        self.assertEqual(response.json()['asset_original_filename'], 'testfile2')
+
+        # Try to download that file now from the file URL
+        response = self._request_full_url_with_token_auth(token=self.device_token,
+                                                          full_url=asset_url + '&access_token=123124')
+        self.assertEqual(response.status_code, 403, 'Forbidden access with invalid token')
+
+        request_headers = {'Authorization': 'OpenTera ' + self.device_token}
+        response = get(url=asset_url + '&access_token=' + access_token, headers=request_headers, verify=False,
+                       stream=True)
+        self.assertEqual(response.status_code, 200, 'Downloading file')
+        with open('testfile2', 'wb') as download_file:
+            for chunk in response.iter_content(chunk_size=4096):
+                download_file.write(chunk)
+
+        import filecmp
+        self.assertTrue(filecmp.cmp('testfile', 'testfile2'))
+        os.remove('testfile2')
+
+        # Delete asset from service
+        response = self._delete_with_token_plus(token=self.device_token, payload={'uuid': asset_uuid,
+                                                                                  'access_token': 123})
+        self.assertEqual(response.status_code, 403, 'Forbidden access')
+
+        response = self._delete_with_token_plus(token=self.device_token, payload={'uuid': asset_uuid,
+                                                                                  'access_token': access_token})
+        self.assertEqual(response.status_code, 200, 'Delete OK')
+
+    # def test_full_as_dynamic_participant(self):
+    #     file_asset = dict()
+    #     file_asset['id_session'] = 100
+    #     file_asset['asset_name'] = "Test Asset"
+    #     file_asset['asset_type'] = 'application/octet-stream'
+    #     with open('testfile', 'rb') as f:
+    #         files = {'file': ('testfile', f, 'application/octet-stream',
+    #                           {'Content-Length': self.test_file_size}),
+    #                  'file_asset': (None, json.dumps(file_asset), 'application/json')}
+    #         response = self._post_file_with_token(self.participant_dynamic_token, files=files)
+    #         self.assertEqual(response.status_code, 403, 'Forbidden access to session')
+    #
+    #     file_asset['id_session'] = 9
+    #     with open('testfile', 'rb') as f:
+    #         files = {'file': ('testfile', f, 'application/octet-stream',
+    #                           {'Content-Length': self.test_file_size}),
+    #                  'file_asset': (None, json.dumps(file_asset), 'application/json')}
+    #         response = self._post_file_with_token(self.participant_dynamic_token, files=files)
+    #         self.assertEqual(response.status_code, 200, 'Asset post OK')
+    #         json_data = response.json()
+    #         self.assertTrue(json_data.__contains__('asset_uuid'))
+    #         self.assertTrue(json_data.__contains__('id_asset'))
+    #
+    #     asset_uuid = json_data['asset_uuid']
+    #     asset_id = json_data['id_asset']
+    #
+    #     # Query asset information to make sure it was properly created
+    #     payload = {'id_asset': asset_id, 'with_urls': True}
+    #     response = self._request_with_http_auth(username='admin', password='admin', payload=payload,
+    #                                             endpoint='/api/user/assets')
+    #     self.assertEqual(response.status_code, 200)
+    #
+    #     json_data = response.json()
+    #     self.assertEqual(len(json_data), 1)
+    #     self.assertEqual(json_data[0]['id_asset'], asset_id)
+    #
+    #     asset_infos_url = json_data[0]['asset_infos_url']
+    #     asset_url = json_data[0]['asset_url']
+    #     access_token = json_data[0]['access_token']
+    #
+    #     # Get specific service information on that URL
+    #     response = self._request_full_url_with_token_auth(token=self.participant_dynamic_token,
+    #                                                       full_url=asset_infos_url + '&access_token=123124')
+    #     self.assertEqual(response.status_code, 403, 'Forbidden - invalid token')
+    #
+    #     response = self._request_full_url_with_token_auth(token=self.participant_dynamic_token,
+    #                                                       full_url=asset_infos_url + '&access_token=' + access_token)
+    #     self.assertEqual(response.status_code, 200, 'Service asset infos OK')
+    #     json_data = response.json()
+    #     self.assertTrue(json_data.__contains__('asset_uuid'))
+    #     self.assertEqual(json_data['asset_uuid'], asset_uuid)
+    #
+    #     # Change original file name with a POST query
+    #     params = {'access_token': access_token,
+    #               'file_asset': {'asset_uuid': '1111111'}}
+    #     response = self._post_with_token(token=self.participant_dynamic_token, payload=params,
+    #                                      endpoint=self.test_infos_endpoint)
+    #     self.assertEqual(response.status_code, 403, 'Forbidden access to UUID')
+    #
+    #     params = {'access_token': access_token,
+    #               'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2'}}
+    #     response = self._post_with_token(token=self.participant_dynamic_token, payload=params,
+    #                                      endpoint=self.test_infos_endpoint)
+    #     self.assertEqual(response.status_code, 200, 'Original file name changed')
+    #     self.assertEqual(response.json()['asset_original_filename'], 'testfile2')
+    #
+    #     # Try to download that file now from the file URL
+    #     response = self._request_full_url_with_token_auth(token=self.participant_dynamic_token,
+    #                                                       full_url=asset_url + '&access_token=123124')
+    #     self.assertEqual(response.status_code, 403, 'Forbidden access with invalid token')
+    #
+    #     request_headers = {'Authorization': 'OpenTera ' + self.participant_dynamic_token}
+    #     response = get(url=asset_url + '&access_token=' + access_token, headers=request_headers, verify=False,
+    #                    stream=True)
+    #     self.assertEqual(response.status_code, 200, 'Downloading file')
+    #     with open('testfile2', 'wb') as download_file:
+    #         for chunk in response.iter_content(chunk_size=4096):
+    #             download_file.write(chunk)
+    #
+    #     import filecmp
+    #     self.assertTrue(filecmp.cmp('testfile', 'testfile2'))
+    #     os.remove('testfile2')
+    #
+    #     # Delete asset from service
+    #     response = self._delete_with_token_plus(token=self.participant_dynamic_token, payload={'uuid': asset_uuid,
+    #                                                                                            'access_token': 123})
+    #     self.assertEqual(response.status_code, 403, 'Forbidden access')
+    #
+    #     response = self._delete_with_token_plus(token=self.participant_dynamic_token,
+    #                                             payload={'uuid': asset_uuid, 'access_token': access_token})
+    #     self.assertEqual(response.status_code, 200, 'Delete OK')
+
+    def test_full_as_static_participant(self):
+        file_asset = dict()
+        file_asset['id_session'] = 9
+        file_asset['asset_name'] = "Test Asset"
+        file_asset['asset_type'] = 'application/octet-stream'
+        with open('testfile', 'rb') as f:
+            files = {'file': ('testfile', f, 'application/octet-stream',
+                              {'Content-Length': self.test_file_size}),
+                     'file_asset': (None, json.dumps(file_asset), 'application/json')}
+            response = self._post_file_with_token(self.participant_static_token, files=files)
+            self.assertEqual(response.status_code, 403, 'Asset post forbidden for static token')
+
+    def test_full_as_service(self):
+        file_asset = dict()
+        file_asset['id_session'] = 100
+        file_asset['asset_name'] = "Test Asset"
+        file_asset['asset_type'] = 'application/octet-stream'
+        with open('testfile', 'rb') as f:
+            files = {'file': ('testfile', f, 'application/octet-stream',
+                              {'Content-Length': self.test_file_size}),
+                     'file_asset': (None, json.dumps(file_asset), 'application/json')}
+            response = self._post_file_with_token(self.service_token, files=files)
+            self.assertEqual(response.status_code, 403, 'Forbidden access to session')
+
+        file_asset['id_session'] = 27
+        with open('testfile', 'rb') as f:
+            files = {'file': ('testfile', f, 'application/octet-stream',
+                              {'Content-Length': self.test_file_size}),
+                     'file_asset': (None, json.dumps(file_asset), 'application/json')}
+            response = self._post_file_with_token(self.service_token, files=files)
+            self.assertEqual(response.status_code, 400, 'Missing id creator')
+
+        file_asset['id_user'] = 2
+        with open('testfile', 'rb') as f:
+            files = {'file': ('testfile', f, 'application/octet-stream',
+                              {'Content-Length': self.test_file_size}),
+                     'file_asset': (None, json.dumps(file_asset), 'application/json')}
+            response = self._post_file_with_token(self.service_token, files=files)
+            self.assertEqual(response.status_code, 200, 'Asset Post OK')
+
+            json_data = response.json()
+            self.assertTrue(json_data.__contains__('asset_uuid'))
+            self.assertTrue(json_data.__contains__('id_asset'))
+
+        asset_uuid = json_data['asset_uuid']
+        asset_id = json_data['id_asset']
+
+        # Query asset information to make sure it was properly created
+        payload = {'id_asset': asset_id, 'with_urls': True}
+        response = self._request_with_token_auth(token=self.service_token, payload=payload,
+                                                 endpoint='/api/service/assets')
+        self.assertEqual(response.status_code, 200)
+
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+        self.assertEqual(json_data[0]['id_asset'], asset_id)
+
+        asset_infos_url = json_data[0]['asset_infos_url']
+        asset_url = json_data[0]['asset_url']
+        access_token = json_data[0]['access_token']
+
+        # Get specific service information on that URL
+        response = self._request_full_url_with_token_auth(token=self.service_token,
+                                                          full_url=asset_infos_url + '&access_token=123124')
+        self.assertEqual(response.status_code, 403, 'Forbidden - invalid token')
+
+        response = self._request_full_url_with_token_auth(token=self.service_token,
+                                                          full_url=asset_infos_url + '&access_token=' + access_token)
+        self.assertEqual(response.status_code, 200, 'Service asset infos OK')
+        json_data = response.json()
+        self.assertTrue(json_data.__contains__('asset_uuid'))
+        self.assertEqual(json_data['asset_uuid'], asset_uuid)
+
+        # Change original file name with a POST query
+        params = {'access_token': access_token,
+                  'file_asset': {'asset_uuid': '1111111'}}
+        response = self._post_with_token(token=self.service_token, payload=params,
+                                         endpoint=self.test_infos_endpoint)
+        self.assertEqual(response.status_code, 403, 'Forbidden access to UUID')
+
+        params = {'access_token': access_token,
+                  'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2'}}
+        response = self._post_with_token(token=self.service_token, payload=params,
+                                         endpoint=self.test_infos_endpoint)
+        self.assertEqual(response.status_code, 200, 'Original file name changed')
+        self.assertEqual(response.json()['asset_original_filename'], 'testfile2')
+
+        # Try to download that file now from the file URL
+        response = self._request_full_url_with_token_auth(token=self.service_token,
+                                                          full_url=asset_url + '&access_token=123124')
+        self.assertEqual(response.status_code, 403, 'Forbidden access with invalid token')
+
+        request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+        response = get(url=asset_url + '&access_token=' + access_token, headers=request_headers, verify=False,
+                       stream=True)
+        self.assertEqual(response.status_code, 200, 'Downloading file')
+        with open('testfile2', 'wb') as download_file:
+            for chunk in response.iter_content(chunk_size=4096):
+                download_file.write(chunk)
+
+        import filecmp
+        self.assertTrue(filecmp.cmp('testfile', 'testfile2'))
+        os.remove('testfile2')
+
+        # Delete asset from service
+        response = self._delete_with_token_plus(token=self.service_token, payload={'uuid': asset_uuid,
+                                                                                   'access_token': 123})
+        self.assertEqual(response.status_code, 403, 'Forbidden access')
+
+        response = self._delete_with_token_plus(token=self.service_token,
+                                                payload={'uuid': asset_uuid, 'access_token': access_token})
+        self.assertEqual(response.status_code, 200, 'Delete OK')
+
+    def test_multiple_queries_as_post(self):
+        pass
