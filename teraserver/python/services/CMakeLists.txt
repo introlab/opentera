@@ -1,1 +1,2 @@
 add_subdirectory(VideoRehabService)
+add_subdirectory(FileTransferService)

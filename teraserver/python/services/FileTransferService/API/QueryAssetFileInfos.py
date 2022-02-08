@@ -104,7 +104,7 @@ class QueryAssetFileInfos(Resource):
 
             # Only change possible here is the original file name, as other information are linked to the file itself
             if 'asset_original_filename' not in asset_json:
-                return gettext('Only original can be changed from here'), 400
+                return gettext('Only original filename can be changed from here'), 400
 
             asset = AssetFileData.get_asset_for_uuid(asset_json['asset_uuid'])
 

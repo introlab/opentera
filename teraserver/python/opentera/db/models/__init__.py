@@ -49,7 +49,6 @@ EventNameClassMap = {
 # All exported symbols
 __all__ = ['TeraAsset',
            'TeraDevice',
-           # 'TeraDeviceData',
            'TeraDeviceParticipant',
            'TeraDeviceProject',
            'TeraDeviceSubType',

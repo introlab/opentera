@@ -22,7 +22,7 @@ import os
 flask_app = Flask("FileTransferService")
 
 # Translations
-babel = Babel(flask_app)
+babel = Babel(flask_app, default_domain='filetransferservice')
 
 
 class MyHTTPChannel(HTTPChannel):

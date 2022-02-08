@@ -70,7 +70,7 @@ class UserQueryAssets(Resource):
             assets = TeraAsset.get_assets_created_by_service(service_id=args['id_creator_service'])
         elif args['id_creator_user']:
             if args['id_creator_user'] not in user_access.get_accessible_users_ids():
-                return gettext("User access denie"), 403
+                return gettext("User access denied"), 403
             assets = TeraAsset.get_assets_created_by_user(user_id=args['id_creator_user'])
         elif args['id_creator_participant']:
             if args['id_creator_participant'] not in user_access.get_accessible_participants_ids():
