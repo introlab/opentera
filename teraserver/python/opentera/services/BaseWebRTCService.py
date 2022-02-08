@@ -44,10 +44,10 @@ class BaseWebRTCService(ServiceOpenTera):
     @defer.inlineCallbacks
     def register_to_events(self):
         # Need to register to events produced by UserManagerModule
-        ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+        yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
             ModuleNames.USER_MANAGER_MODULE_NAME), self.user_manager_event_received)
 
-        # print(ret1)
+        super().register_to_events()
 
     def send_join_message(self, session_info, join_msg: str = gettext('Join me!'), target_users: list = None,
                           target_participants: list = None, target_devices: list = None):
