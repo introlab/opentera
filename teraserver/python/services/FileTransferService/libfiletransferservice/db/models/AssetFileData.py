@@ -22,6 +22,7 @@ class AssetFileData(db.Model, BaseModel):
     def get_assets_for_uuids(uuids_asset: list):
         return AssetFileData.query.filter(AssetFileData.asset_uuid.in_(uuids_asset)).all()
 
+    # Delete this asset. file_folder is required to delete the file too.
     def delete_file_asset(self, file_folder: str) -> bool:
         # Delete related file from system
         file_name = os.path.join(file_folder, self.asset_uuid)

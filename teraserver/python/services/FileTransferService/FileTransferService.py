@@ -6,7 +6,7 @@ from opentera.services.ServiceAccessManager import ServiceAccessManager
 from opentera.redis.RedisVars import RedisVars
 
 # Twisted
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.python import log
 import sys
 import os
@@ -14,6 +14,7 @@ import os
 from opentera.services.ServiceOpenTeraWithAssets import ServiceOpenTeraWithAssets
 from sqlalchemy.exc import OperationalError
 from services.FileTransferService.FlaskModule import FlaskModule
+import opentera.messages.python as messages
 
 
 class FileTransferService(ServiceOpenTeraWithAssets):
@@ -31,7 +32,7 @@ class FileTransferService(ServiceOpenTeraWithAssets):
         # self.application = service.Application(self.config['name'])
 
     def verify_file_upload_directory(self, config: ConfigManager, create=True):
-        file_upload_path = config.filetransfer_config['upload_directory']
+        file_upload_path = config.filetransfer_config['files_directory']
 
         if not os.path.exists(file_upload_path):
             if create:
@@ -44,9 +45,19 @@ class FileTransferService(ServiceOpenTeraWithAssets):
     def notify_service_messages(self, pattern, channel, message):
         pass
 
-    # @defer.inlineCallbacks
+    @defer.inlineCallbacks
     def register_to_events(self):
-        pass
+        super().register_to_events()
+
+    def asset_event_received(self, event: messages.DatabaseEvent):
+        if event.object_type == 'asset':
+            if event.type == messages.DatabaseEvent.DB_DELETE:
+                print("FileTransfer Service - Delete Asset Event")
+                asset_info = json.loads(event.object_value)
+                from services.FileTransferService.libfiletransferservice.db.models.AssetFileData import AssetFileData
+                asset = AssetFileData.get_asset_for_uuid(asset_info['asset_uuid'])
+                if asset:
+                    asset.delete_file_asset(flask_app.config['UPLOAD_FOLDER'])
 
 
 if __name__ == '__main__':

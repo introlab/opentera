@@ -127,43 +127,42 @@ class FlaskModule(BaseModule):
         kwargs = {'flaskModule': self}
 
         # Users...
-        from .API.user.UserLogin import UserLogin
-        from .API.user.UserLogout import UserLogout
-        from .API.user.UserQueryUsers import UserQueryUsers
-        from .API.user.UserQueryUserPreferences import UserQueryUserPreferences
-        from .API.user.UserQueryUserGroups import UserQueryUserGroups
-        from .API.user.UserQueryForms import UserQueryForms
-        from .API.user.UserQueryOnlineUsers import UserQueryOnlineUsers
-        from .API.user.UserQueryOnlineParticipants import UserQueryOnlineParticipants
-        from .API.user.UserQueryOnlineDevices import UserQueryOnlineDevices
-        from .API.user.UserQuerySites import UserQuerySites
-        from .API.user.UserQueryProjects import UserQueryProjects
-        from .API.user.UserQueryParticipants import UserQueryParticipants
-        from .API.user.UserQueryDevices import UserQueryDevices
-        from .API.user.UserQuerySiteAccess import UserQuerySiteAccess
-        from .API.user.UserQueryDeviceSites import UserQueryDeviceSites
-        from .API.user.UserQueryDeviceProjects import UserQueryDeviceProjects
-        from .API.user.UserQueryDeviceParticipants import UserQueryDeviceParticipants
-        from .API.user.UserQueryProjectAccess import UserQueryProjectAccess
-        from .API.user.UserQueryParticipantGroup import UserQueryParticipantGroup
-        from .API.user.UserQuerySessions import UserQuerySessions
-        from .API.user.UserQuerySessionTypes import UserQuerySessionTypes
-        from .API.user.UserQuerySessionEvents import UserQuerySessionEvents
+        from modules.FlaskModule.API.user.UserLogin import UserLogin
+        from modules.FlaskModule.API.user.UserLogout import UserLogout
+        from modules.FlaskModule.API.user.UserQueryUsers import UserQueryUsers
+        from modules.FlaskModule.API.user.UserQueryUserPreferences import UserQueryUserPreferences
+        from modules.FlaskModule.API.user.UserQueryUserGroups import UserQueryUserGroups
+        from modules.FlaskModule.API.user.UserQueryForms import UserQueryForms
+        from modules.FlaskModule.API.user.UserQueryOnlineUsers import UserQueryOnlineUsers
+        from modules.FlaskModule.API.user.UserQueryOnlineParticipants import UserQueryOnlineParticipants
+        from modules.FlaskModule.API.user.UserQueryOnlineDevices import UserQueryOnlineDevices
+        from modules.FlaskModule.API.user.UserQuerySites import UserQuerySites
+        from modules.FlaskModule.API.user.UserQueryProjects import UserQueryProjects
+        from modules.FlaskModule.API.user.UserQueryParticipants import UserQueryParticipants
+        from modules.FlaskModule.API.user.UserQueryDevices import UserQueryDevices
+        from modules.FlaskModule.API.user.UserQuerySiteAccess import UserQuerySiteAccess
+        from modules.FlaskModule.API.user.UserQueryDeviceSites import UserQueryDeviceSites
+        from modules.FlaskModule.API.user.UserQueryDeviceProjects import UserQueryDeviceProjects
+        from modules.FlaskModule.API.user.UserQueryDeviceParticipants import UserQueryDeviceParticipants
+        from modules.FlaskModule.API.user.UserQueryProjectAccess import UserQueryProjectAccess
+        from modules.FlaskModule.API.user.UserQueryParticipantGroup import UserQueryParticipantGroup
+        from modules.FlaskModule.API.user.UserQuerySessions import UserQuerySessions
+        from modules.FlaskModule.API.user.UserQuerySessionTypes import UserQuerySessionTypes
+        from modules.FlaskModule.API.user.UserQuerySessionEvents import UserQuerySessionEvents
         # from .API.user.UserQueryDeviceData import UserQueryDeviceData
-        from .API.user.UserQuerySessionTypeProject import UserQuerySessionTypeProject
-        from .API.user.UserQueryDeviceTypes import UserQueryDeviceTypes
-        from .API.user.UserQueryDeviceSubTypes import UserQueryDeviceSubTypes
-        from .API.user.UserQueryAssets import UserQueryAssets
-        from .API.user.UserQueryServices import UserQueryServices
-        from .API.user.UserQueryServiceProjects import UserQueryServiceProjects
-        from .API.user.UserQueryServiceAccess import UserQueryServiceAccess
-        from .API.user.UserSessionManager import UserSessionManager
-        from .API.user.UserQueryServiceConfigs import UserQueryServiceConfig
-        from .API.user.UserQueryStats import UserQueryUserStats
-        from .API.user.UserQueryUserUserGroups import UserQueryUserUserGroups
-        from .API.user.UserRefreshToken import UserRefreshToken
-        from .API.user.UserQueryVersions import UserQueryVersions
-
+        from modules.FlaskModule.API.user.UserQuerySessionTypeProject import UserQuerySessionTypeProject
+        from modules.FlaskModule.API.user.UserQueryDeviceTypes import UserQueryDeviceTypes
+        from modules.FlaskModule.API.user.UserQueryDeviceSubTypes import UserQueryDeviceSubTypes
+        from modules.FlaskModule.API.user.UserQueryAssets import UserQueryAssets
+        from modules.FlaskModule.API.user.UserQueryServices import UserQueryServices
+        from modules.FlaskModule.API.user.UserQueryServiceProjects import UserQueryServiceProjects
+        from modules.FlaskModule.API.user.UserQueryServiceAccess import UserQueryServiceAccess
+        from modules.FlaskModule.API.user.UserSessionManager import UserSessionManager
+        from modules.FlaskModule.API.user.UserQueryServiceConfigs import UserQueryServiceConfig
+        from modules.FlaskModule.API.user.UserQueryStats import UserQueryUserStats
+        from modules.FlaskModule.API.user.UserQueryUserUserGroups import UserQueryUserUserGroups
+        from modules.FlaskModule.API.user.UserRefreshToken import UserRefreshToken
+        from modules.FlaskModule.API.user.UserQueryVersions import UserQueryVersions
         # Resources
         user_api_ns.add_resource(UserLogin,                 '/login', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserLogout,                '/logout', resource_class_kwargs=kwargs)
@@ -208,40 +207,26 @@ class FlaskModule(BaseModule):
         kwargs = {'flaskModule': self}
 
         # Devices
-        from .API.device.DeviceLogin import DeviceLogin
-        from .API.device.DeviceLogout import DeviceLogout
-        # from .API.device.DeviceUpload import DeviceUpload
-        from .API.device.DeviceRegister import DeviceRegister
-        from .API.device.DeviceQuerySessions import DeviceQuerySessions
-        from .API.device.DeviceQuerySessionEvents import DeviceQuerySessionEvents
-        from .API.device.DeviceQueryDevices import DeviceQueryDevices
-        from .API.device.DeviceQueryAssets import DeviceQueryAssets
-        from .API.device.DeviceQueryParticipants import DeviceQueryParticipants
-        from .API.device.DeviceQueryStatus import DeviceQueryStatus
+        from modules.FlaskModule.API.device.DeviceLogin import DeviceLogin
+        from modules.FlaskModule.API.device.DeviceLogout import DeviceLogout
+        from modules.FlaskModule.API.device.DeviceRegister import DeviceRegister
+        from modules.FlaskModule.API.device.DeviceQuerySessions import DeviceQuerySessions
+        from modules.FlaskModule.API.device.DeviceQuerySessionEvents import DeviceQuerySessionEvents
+        from modules.FlaskModule.API.device.DeviceQueryDevices import DeviceQueryDevices
+        from modules.FlaskModule.API.device.DeviceQueryAssets import DeviceQueryAssets
+        from modules.FlaskModule.API.device.DeviceQueryParticipants import DeviceQueryParticipants
+        from modules.FlaskModule.API.device.DeviceQueryStatus import DeviceQueryStatus
 
         # Resources
-        # TODO remove legacy endpoint 'device_login'
-        device_api_ns.add_resource(DeviceLogin, '/device_login', resource_class_kwargs=kwargs)
-        device_api_ns.add_resource(DeviceLogin, '/login', resource_class_kwargs=kwargs)
-
-        # TODO remove legacy endpoint 'device_logout'
-        device_api_ns.add_resource(DeviceLogout, '/device_logout', resource_class_kwargs=kwargs)
-        device_api_ns.add_resource(DeviceLogout, '/logout', resource_class_kwargs=kwargs)
-
-        # TODO remove legacy endpoint 'device_upload'
-        # device_api_ns.add_resource(DeviceUpload, '/device_upload', resource_class_kwargs=kwargs)
-        # device_api_ns.add_resource(DeviceUpload, '/upload', resource_class_kwargs=kwargs)
-
-        # TODO remove legacy endpoint 'device_register'
-        device_api_ns.add_resource(DeviceRegister, '/device_register', resource_class_kwargs=kwargs)
-        device_api_ns.add_resource(DeviceRegister, '/register', resource_class_kwargs=kwargs)
-
-        device_api_ns.add_resource(DeviceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
-        device_api_ns.add_resource(DeviceQuerySessionEvents, '/sessionevents', resource_class_kwargs=kwargs)
-        device_api_ns.add_resource(DeviceQueryDevices, '/devices', resource_class_kwargs=kwargs)
-        device_api_ns.add_resource(DeviceQueryAssets, '/assets', resource_class_kwargs=kwargs)
-        device_api_ns.add_resource(DeviceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
-        device_api_ns.add_resource(DeviceQueryStatus, '/status', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceLogin,                 '/login', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceLogout,                '/logout', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceRegister,              '/register', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQuerySessions,         '/sessions', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQuerySessionEvents,    '/sessions/events', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQueryDevices,          '/devices', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQueryAssets,           '/assets', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQueryParticipants,     '/participants', resource_class_kwargs=kwargs)
+        device_api_ns.add_resource(DeviceQueryStatus,           '/status', resource_class_kwargs=kwargs)
 
         # Finally add namespace
         api.add_namespace(device_api_ns)
@@ -251,21 +236,21 @@ class FlaskModule(BaseModule):
         kwargs = {'flaskModule': self}
 
         # Participants
-        from .API.participant.ParticipantLogin import ParticipantLogin
-        from .API.participant.ParticipantLogout import ParticipantLogout
-        # from .API.participant.ParticipantQueryDeviceData import ParticipantQueryDeviceData
-        from .API.participant.ParticipantQueryDevices import ParticipantQueryDevices
-        from .API.participant.ParticipantQueryParticipants import ParticipantQueryParticipants
-        from .API.participant.ParticipantQuerySessions import ParticipantQuerySessions
-        from .API.participant.ParticipantRefreshToken import ParticipantRefreshToken
+        from modules.FlaskModule.API.participant.ParticipantLogin import ParticipantLogin
+        from modules.FlaskModule.API.participant.ParticipantLogout import ParticipantLogout
+        from modules.FlaskModule.API.participant.ParticipantQueryDevices import ParticipantQueryDevices
+        from modules.FlaskModule.API.participant.ParticipantQueryParticipants import ParticipantQueryParticipants
+        from modules.FlaskModule.API.participant.ParticipantQuerySessions import ParticipantQuerySessions
+        from modules.FlaskModule.API.participant.ParticipantRefreshToken import ParticipantRefreshToken
+        from modules.FlaskModule.API.participant.ParticipantQueryAssets import ParticipantQueryAssets
         # Resources
-        participant_api_ns.add_resource(ParticipantLogin, '/login', resource_class_kwargs=kwargs)
-        participant_api_ns.add_resource(ParticipantLogout, '/logout', resource_class_kwargs=kwargs)
-        # participant_api_ns.add_resource(ParticipantQueryDeviceData, '/data', resource_class_kwargs=kwargs)
-        participant_api_ns.add_resource(ParticipantQueryDevices, '/devices', resource_class_kwargs=kwargs)
-        participant_api_ns.add_resource(ParticipantQueryParticipants, '/participants', resource_class_kwargs=kwargs)
-        participant_api_ns.add_resource(ParticipantQuerySessions, '/sessions', resource_class_kwargs=kwargs)
-        participant_api_ns.add_resource(ParticipantRefreshToken, '/refresh_token', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantLogin,               '/login', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantLogout,              '/logout', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantQueryAssets,         '/assets', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantQueryDevices,        '/devices', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantQuerySessions,       '/sessions', resource_class_kwargs=kwargs)
+        participant_api_ns.add_resource(ParticipantRefreshToken,        '/refresh_token', resource_class_kwargs=kwargs)
 
         api.add_namespace(participant_api_ns)
 
@@ -274,17 +259,17 @@ class FlaskModule(BaseModule):
         kwargs = {'flaskModule': self}
 
         # Services
-        from .API.service.ServiceQueryParticipants import ServiceQueryParticipants
-        from .API.service.ServiceQueryAssets import ServiceQueryAssets
-        from .API.service.ServiceQuerySessions import ServiceQuerySessions
-        from .API.service.ServiceQuerySessionEvents import ServiceQuerySessionEvents
-        from .API.service.ServiceQuerySiteProjectAccessRoles import ServiceQuerySiteProjectAccessRoles
-        from .API.service.ServiceQueryUsers import ServiceQueryUsers
-        from .API.service.ServiceQueryServices import ServiceQueryServices
-        from .API.service.ServiceQueryProjects import ServiceQueryProjects
-        from .API.service.ServiceQuerySites import ServiceQuerySites
-        from .API.service.ServiceSessionManager import ServiceSessionManager
-        from .API.service.ServiceQuerySessionTypes import ServiceQuerySessionTypes
+        from modules.FlaskModule.API.service.ServiceQueryParticipants import ServiceQueryParticipants
+        from modules.FlaskModule.API.service.ServiceQueryAssets import ServiceQueryAssets
+        from modules.FlaskModule.API.service.ServiceQuerySessions import ServiceQuerySessions
+        from modules.FlaskModule.API.service.ServiceQuerySessionEvents import ServiceQuerySessionEvents
+        from modules.FlaskModule.API.service.ServiceQuerySiteProjectAccessRoles import ServiceQuerySiteProjectAccessRoles
+        from modules.FlaskModule.API.service.ServiceQueryUsers import ServiceQueryUsers
+        from modules.FlaskModule.API.service.ServiceQueryServices import ServiceQueryServices
+        from modules.FlaskModule.API.service.ServiceQueryProjects import ServiceQueryProjects
+        from modules.FlaskModule.API.service.ServiceQuerySites import ServiceQuerySites
+        from modules.FlaskModule.API.service.ServiceSessionManager import ServiceSessionManager
+        from modules.FlaskModule.API.service.ServiceQuerySessionTypes import ServiceQuerySessionTypes
 
         service_api_ns.add_resource(ServiceQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryAssets,         '/assets', resource_class_kwargs=kwargs)
@@ -302,7 +287,7 @@ class FlaskModule(BaseModule):
         api.add_namespace(service_api_ns)
 
     def init_views(self):
-        from .Views.About import About
+        from modules.FlaskModule.Views.About import About
 
         # Default arguments
         args = []

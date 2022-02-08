@@ -169,7 +169,7 @@ class FlaskModule(BaseModule):
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
 
         # TODO set upload folder in config
-        flask_app.config.update({'UPLOAD_FOLDER': config.filetransfer_config['upload_directory']})
+        flask_app.config.update({'UPLOAD_FOLDER': config.filetransfer_config['files_directory']})
 
         # Not sure.
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})

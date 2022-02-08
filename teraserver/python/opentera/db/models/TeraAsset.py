@@ -20,6 +20,8 @@ class TeraAsset(db.Model, BaseModel):
     __tablename__ = 't_assets'
     id_asset = db.Column(db.Integer, db.Sequence('id_asset_sequence'), primary_key=True, autoincrement=True)
     id_session = db.Column(db.Integer, db.ForeignKey("t_sessions.id_session", ondelete='cascade'), nullable=False)
+    # Creator of that asset - multiple could be used to indicate, for example, an asset created by a device for a
+    # specific participant in a session
     id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device"), nullable=True)
     id_participant = db.Column(db.Integer, db.ForeignKey("t_participants.id_participant"), nullable=True)
     id_user = db.Column(db.Integer, db.ForeignKey("t_users.id_user"), nullable=True)

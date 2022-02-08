@@ -1,8 +1,6 @@
 import os
-import hashlib
 from datetime import datetime
 
-import jwt
 import json
 from werkzeug.utils import secure_filename
 from flask import request, send_file
@@ -85,21 +83,12 @@ class QueryAssetFile(Resource):
             return gettext('Missing required field(s) in asset descriptor'), 400
 
         # Check if session is accessible for the requester
-        response = None
-        # if current_login_type == LoginType.USER_LOGIN:
-        #     response = current_user_client.do_get_request_to_backend('/api/user/sessions?id_session=' +
-        #                                                              str(asset_json['id_session']))
-        # if current_login_type == LoginType.PARTICIPANT_LOGIN:
-        #     response = current_participant_client.do_get_request_to_backend('/api/participant/sessions?id_session=' +
-        #                                                                     str(asset_json['id_session']))
-        # if current_login_type == LoginType.DEVICE_LOGIN:
-        #     response = current_device_client.do_get_request_to_backend('/api/device/sessions?id_session=' +
-        #                                                                str(asset_json['id_session']))
         if current_login_type == LoginType.SERVICE_LOGIN:
             response = current_service_client.do_get_request_to_backend('/api/service/sessions?id_session=' +
                                                                         str(asset_json['id_session']))
         else:
-            response = Globals.service.get_from_opentera('/api/service/sessions', {'id_session': asset_json['id_session']})
+            response = Globals.service.get_from_opentera('/api/service/sessions',
+                                                         {'id_session': asset_json['id_session']})
 
         if not response or response.status_code != 200 or not response.json():
             return gettext('Session access is forbidden'), 403
@@ -131,12 +120,9 @@ class QueryAssetFile(Resource):
             if 'id_device' not in asset_json and 'id_participant' not in asset_json \
                     and 'id_user' not in asset_json and 'id_service' not in asset_json:
                 return gettext('Missing at least one ID creator'), 400
+            asset_json['id_service'] = current_service_client.get_service_infos()['id_service']
         else:
-            # Remove all present ids
-            asset_json.pop('id_device', None)
-            asset_json.pop('id_participant', None)
-            asset_json.pop('id_user', None)
-            asset_json.pop('id_service', None)
+            # Prevent creating an asset for someone else
             if current_login_type == LoginType.USER_LOGIN:
                 asset_json['id_user'] = current_user_client.id_user
             if current_login_type == LoginType.PARTICIPANT_LOGIN:

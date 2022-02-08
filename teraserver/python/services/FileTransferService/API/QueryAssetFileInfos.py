@@ -86,9 +86,9 @@ class QueryAssetFileInfos(Resource):
         if 'asset_uuids' in request.json:
             # Query assets data
             requested_assets_uuids = request.json['asset_uuids']
-            if not list(set(requested_assets_uuids) - set(allowed_asset_uuids)):
+            if list(set(requested_assets_uuids) - set(allowed_asset_uuids)):
                 # At least one id was requested but not allowed
-                return gettext('Access denied for at least one requested asset')
+                return gettext('Access denied for at least one requested asset'), 403
 
             assets = AssetFileData.get_assets_for_uuids(requested_assets_uuids)
 

@@ -2,6 +2,7 @@
 import txredisapi as txredis
 from twisted.internet import defer
 
+
 class redisProtocol(txredis.SubscriberProtocol):
     def __init__(self, charset=None, errors="strict", parent=None, *args, **kwargs):
         # print('redisProtocol init with args', charset, errors, parent, args, kwargs)

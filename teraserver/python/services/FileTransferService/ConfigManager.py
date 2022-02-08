@@ -9,7 +9,7 @@ class FileTransferConfig:
 
     def validate_filetransfer_config(self, config: dict):
         if 'FileTransfer' in config:
-            required_fields = ['upload_directory']
+            required_fields = ['files_directory']
             for field in required_fields:
                 if field not in config['FileTransfer']:
                     print('ERROR: FileTransferConfig - missing field :' + field)
