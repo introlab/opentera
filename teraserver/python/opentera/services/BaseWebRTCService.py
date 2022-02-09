@@ -407,14 +407,14 @@ class BaseWebRTCService(ServiceOpenTera):
             elif 'session_creator_service_uuid' in session_info:
                 creator_uuid = session_info['session_creator_service_uuid']
 
+            session_info['session_creator_uuid'] = creator_uuid
+
             # New WebRTC process with send events on this pattern
             self.subscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
                                                  self.nodejs_webrtc_message_callback)
 
             # Start WebRTC process
-            retval, process_info = self.webRTCModule.create_webrtc_session(
-                session_info['session_key'], creator_uuid, users, participants, devices,
-                session_info['session_parameters'])
+            retval, process_info = self.webRTCModule.create_webrtc_session(session_info)
 
             if not retval or not process_info:
                 self.unsubscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
