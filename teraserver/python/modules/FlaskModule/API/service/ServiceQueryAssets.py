@@ -178,6 +178,31 @@ class ServiceQueryAssets(Resource):
         if asset_info['id_session'] not in service_access.get_accessible_sessions_ids(True):
             return gettext('Service can\'t create assets for that session'), 403
 
+        # Replace creator uuids with ids if required
+        if 'participant_uuid' in asset_info:
+            from opentera.db.models.TeraParticipant import TeraParticipant
+            part = TeraParticipant.get_participant_by_uuid(asset_info['participant_uuid'])
+            if not part:
+                return gettext('Invalid participant'), 400
+            asset_info.pop('participant_uuid')
+            asset_info['id_participant'] = part.id_participant
+
+        if 'user_uuid' in asset_info:
+            from opentera.db.models.TeraUser import TeraUser
+            user = TeraUser.get_user_by_uuid(asset_info['user_uuid'])
+            if not user:
+                return gettext('Invalid user'), 400
+            asset_info.pop('user_uuid')
+            asset_info['id_user'] = user.id_user
+
+        if 'device_uuid' in asset_info:
+            from opentera.db.models.TeraDevice import TeraDevice
+            device = TeraDevice.get_device_by_uuid(asset_info['device_uuid'])
+            if not device:
+                return gettext('Invalid device'), 400
+            asset_info.pop('device_uuid')
+            asset_info['id_device'] = device.id_device
+
         # Create a new asset?
         if asset_info['id_asset'] == 0:
             try:
