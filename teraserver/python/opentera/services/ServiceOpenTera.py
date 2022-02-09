@@ -70,7 +70,7 @@ class ServiceOpenTera(RedisClient):
 
     def register_to_events(self):
         # Should be implemented in derived classes
-        pass
+        yield None
 
     def notify_service_messages(self, pattern, channel, message):
         pass

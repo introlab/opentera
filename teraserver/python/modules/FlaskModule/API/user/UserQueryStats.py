@@ -309,13 +309,15 @@ class UserQueryUserStats(Resource):
     def get_participant_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:
         from opentera.db.models.TeraParticipant import TeraParticipant
         from opentera.db.models.TeraSession import TeraSessionStatus
+        from opentera.db.models.TeraAsset import TeraAsset
         participant = TeraParticipant.get_participant_by_id(item_id)
         sessions_total_time = sum([ses.session_duration for ses in participant.participant_sessions])
         if len(participant.participant_sessions) > 0:
             sessions_mean_time = sessions_total_time / len(participant.participant_sessions)
         else:
             sessions_mean_time = 0
-        sessions_assets_total = sum([len(ses.session_assets) for ses in participant.participant_sessions])
+        sessions_assets_total = len(TeraAsset.get_assets_for_participant(item_id))
+        # sum([len(ses.session_assets) for ses in participant.participant_sessions])
         # users_involved = set()
         # for ses in participant.participant_sessions:
         #     users_involved = users_involved.union(set([user for user in ses.session_users]))
