@@ -107,9 +107,10 @@ class TeraSession(db.Model, BaseModel):
                 rval['session_creator_service'] = self.session_creator_service.service_name
                 rval['session_creator_service_uuid'] = self.session_creator_service.service_uuid
 
-            # Append session components
-            # from opentera.db.models.TeraDeviceData import TeraDeviceData
-            # rval['session_has_device_data'] = len(TeraDeviceData.get_data_for_session(self.id_session)) > 0
+        # Append session stats
+        from opentera.db.models.TeraAsset import TeraAsset
+        rval['session_assets_count'] = TeraAsset.get_count({'id_session': self.id_session})
+        # rval['session_has_device_data'] = len(TeraDeviceData.get_data_for_session(self.id_session)) > 0
         return rval
 
     def to_json_create_event(self):

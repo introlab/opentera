@@ -49,7 +49,11 @@ class TeraAsset(db.Model, BaseModel):
         ignore_fields.extend(['asset_session', 'asset_device', 'asset_user', 'asset_participant', 'asset_service',
                               'asset_service_owner'])
 
-        return super().to_json(ignore_fields=ignore_fields)
+        asset_json = super().to_json(ignore_fields=ignore_fields)
+        if not minimal:
+            asset_json['asset_service_owner_name'] = self.asset_service_owner.service_name
+
+        return asset_json
 
     def to_json_create_event(self):
         return self.to_json(minimal=True)

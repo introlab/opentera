@@ -24,6 +24,7 @@ get_parser.add_argument('id_creator_participant', type=int, help='ID of the part
                                                                  'created assets.')
 get_parser.add_argument('id_creator_device', type=int, help='ID of the device from which to request all created '
                                                             'assets.')
+
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download-upload url')
 
 

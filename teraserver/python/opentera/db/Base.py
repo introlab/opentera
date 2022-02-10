@@ -89,9 +89,11 @@ class BaseModel:
         return clean_values
 
     @classmethod
-    def get_count(cls):
-        count = db.session.query(cls).count()
-        return count
+    def get_count(cls, filters: dict = None) -> int:
+        query = db.session.query(cls)
+        if filters:
+            query = query.filter_by(**filters)
+        return query.count()
 
     @classmethod
     def get_primary_key_name(cls) -> str:
