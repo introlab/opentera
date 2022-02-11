@@ -29,6 +29,14 @@ class BaseModel:
                 if self.is_valid_property_value(value):
                     if isinstance(value, datetime.datetime):
                         value = value.isoformat()
+                    if isinstance(value, datetime.timedelta):
+                        # Strip too many zeros at the end
+                        value_times = str(value).split(".")
+                        if len(value_times) > 1:
+                            value_times[1] = value_times[1][0:3]
+                            value = value_times[0] + '.' + value_times[1]
+                        else:
+                            value = value_times[0]
                     pr[name] = value
         return pr
 

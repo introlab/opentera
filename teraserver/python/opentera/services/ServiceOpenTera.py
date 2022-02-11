@@ -50,6 +50,8 @@ class ServiceOpenTera(RedisClient):
             self.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
         ServiceAccessManager.api_device_static_token_key = \
             self.redisGet(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
+        ServiceAccessManager.api_service_token_key = \
+            self.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
         ServiceAccessManager.config_man = config_man
 
     def redisConnectionMade(self):
