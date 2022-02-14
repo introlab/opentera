@@ -17,11 +17,12 @@ get_parser = api.parser()
 get_parser.add_argument('id_service', type=int, help='ID of the service to query')
 get_parser.add_argument('id_project', type=int, help='ID of the project to query services from')
 get_parser.add_argument('id', type=int, help='Alias for "id_service"')
-get_parser.add_argument('uuid', type=str, help='Service UUID to query')
-get_parser.add_argument('key', type=str, help='Service Key to query')
+get_parser.add_argument('service_uuid', type=str, help='Service UUID to query')
+get_parser.add_argument('uuid', type=str, help='Alias for "service_uuid"')
+get_parser.add_argument('service_key', type=str, help='Service Key to query')
+get_parser.add_argument('key', type=str, help='Alias for "service_key"')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_config', type=inputs.boolean, help='Only return services with editable configuration')
-get_parser.add_argument('with_projects', type=inputs.boolean, help='Return services with service projects')
 
 
 # post_parser = reqparse.RequestParser()
@@ -57,20 +58,26 @@ class UserQueryServices(Resource):
         if args['id']:
             args['id_service'] = args['id']
 
+        if args['key']:
+            args['service_key'] = args['key']
+
+        if args['uuid']:
+            args['service_uuid'] = args['uuid']
+
         if args['id_service']:
             if args['id_service'] in user_access.get_accessible_services_ids():
                 services = [TeraService.get_service_by_id(args['id_service'])]
-        elif args['uuid']:
+        elif args['service_uuid']:
             # If we have a service uuid, ensure that service is accessible
-            service = TeraService.get_service_by_uuid(args['uuid'])
+            service = TeraService.get_service_by_uuid(args['service_uuid'])
             if service and service.id_service in user_access.get_accessible_services_ids():
                 services = [service]
-        elif args['key']:
-            service = TeraService.get_service_by_key(args['key'])
+        elif args['service_key']:
+            service = TeraService.get_service_by_key(args['service_key'])
             if service and service.id_service in user_access.get_accessible_services_ids():
                 services = [service]
         elif args['id_project']:
-            services = user_access.query_services_for_project(args['id_project'])
+            services = user_access.query_services_for_project(project_id=args['id_project'])
         else:
             # No arguments - return all acceessible services
             services = user_access.get_accessible_services(include_system_services=args['with_config'])
@@ -82,12 +89,7 @@ class UserQueryServices(Resource):
                 if args['with_config']:
                     if not service.service_editable_config:
                         continue
-                if args['with_projects']:
-                    # Get all current association for service
-                    current_projects = TeraServiceProject.get_projects_for_service(id_service=service.id_service)
-                    service_projects = []
-                    for project in current_projects:
-                        service_projects.append(project.to_json())
+
                 service_json = service.to_json(minimal=args['list'])
                 services_list.append(service_json)
 

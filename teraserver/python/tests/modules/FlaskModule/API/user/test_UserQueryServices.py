@@ -28,7 +28,7 @@ class UserQueryServicesTest(BaseAPITest):
         response = self._request_with_http_auth(username='admin', password='admin')
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
-        self.assertEqual(len(json_data), 3)
+        self.assertEqual(len(json_data), 4)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -59,16 +59,16 @@ class UserQueryServicesTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item, minimal=True)
 
-    def test_query_list_with_project_as_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload={"list": True, 'with_projects': True})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
-
-        for data_item in json_data:
-            self._checkJson(json_data=data_item, minimal=True)
+    # def test_query_list_with_project_as_as_admin(self):
+    #     response = self._request_with_http_auth(username='admin', password='admin',
+    #                                             payload={"list": True, 'with_projects': True})
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response.headers['Content-Type'], 'application/json')
+    #     json_data = response.json()
+    #     self.assertGreater(len(json_data), 0)
+    #
+    #     for data_item in json_data:
+    #         self._checkJson(json_data=data_item, minimal=True)
 
     def test_query_specific_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=1")
@@ -213,7 +213,9 @@ class UserQueryServicesTest(BaseAPITest):
 
         if not minimal:
             self.assertTrue(json_data.__contains__('service_roles'))
+            self.assertTrue(json_data.__contains__('service_projects'))
             # self.assertTrue(json_data.__contains__('service_editable_config'))
         else:
             self.assertFalse(json_data.__contains__('service_roles'))
+            self.assertFalse(json_data.__contains__('service_projects'))
             # self.assertFalse(json_data.__contains__('service_editable_config'))

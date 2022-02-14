@@ -79,7 +79,7 @@ class QueryAssetFile(Resource):
         except json.JSONDecodeError as err:
             return gettext('Invalid file_asset format'), 400
 
-        if 'id_session' not in asset_json or 'asset_name' not in asset_json or 'asset_type' not in asset_json:
+        if 'id_session' not in asset_json or 'asset_name' not in asset_json:
             return gettext('Missing required field(s) in asset descriptor'), 400
 
         # Check if session is accessible for the requester
@@ -133,6 +133,17 @@ class QueryAssetFile(Resource):
         # Set asset managed to this service
         asset_json['asset_service_uuid'] = Globals.service.service_info['service_uuid']
 
+        # Set asset type if missing
+        original_filename = secure_filename(file.filename)
+        if 'asset_type' not in asset_json:
+            # Set the asset type based on the filename
+            import mimetypes
+            mime = mimetypes.guess_type(original_filename)[0]
+            if mime:
+                asset_json['asset_type'] = mime
+            else:
+                return gettext('Unable to determine asset type. Please specify manually'), 400
+
         # Set asset datetime to current if not specified
         if 'asset_datetime' not in asset_json:
             asset_json['asset_datetime'] = datetime.now().isoformat()
@@ -151,7 +162,7 @@ class QueryAssetFile(Resource):
 
         asset_file = AssetFileData()
         asset_file.asset_uuid = asset_uuid
-        asset_file.asset_original_filename = secure_filename(file.filename)
+        asset_file.asset_original_filename = original_filename
         asset_file.asset_file_size = file.content_length
         AssetFileData.insert(asset_file)
 
