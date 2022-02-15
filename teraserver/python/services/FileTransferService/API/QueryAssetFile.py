@@ -95,10 +95,23 @@ class QueryAssetFile(Resource):
 
         session_json = response.json()[0]
         if current_login_type == LoginType.USER_LOGIN:
-            if 'session_users' not in session_json or (
-                    current_user_client.user_uuid not in [user['user_uuid'] for user in session_json['session_users']]
-                    and current_user_client.id_user != session_json['id_creator_user']):
-                return gettext('Session access is forbidden'), 403
+            if not current_user_client.user_superadmin:
+                access_allowed = False
+                # Project admins are always allowed to add files to any session
+                if 'session_participants' in session_json:
+                    if len(session_json['session_participants']) > 0:
+                        id_project = session_json['session_participants'][0]['id_project']
+                        if current_user_client.get_role_for_project(id_project=id_project) == 'admin':
+                            access_allowed = True
+
+                if not access_allowed:
+                    if not 'session_users' not in session_json or (
+                            current_user_client.user_uuid not in
+                            [user['user_uuid'] for user in session_json['session_users']]
+                            and current_user_client.id_user != session_json['id_creator_user']):
+                        access_allowed = True
+                if not access_allowed:
+                    return gettext('Session access is forbidden'), 403
 
         if current_login_type == LoginType.DEVICE_LOGIN:
             if 'session_devices' not in session_json or (

@@ -480,7 +480,6 @@ class ServiceSessionsTest(BaseAPITest):
         if not minimal:
             self.assertTrue(json_data.__contains__('session_comments'))
             self.assertTrue(json_data.__contains__('session_duration'))
-            # self.assertTrue(json_data.__contains__('session_has_device_data'))
             self.assertTrue(json_data.__contains__('session_participants'))
             self.assertTrue(json_data.__contains__('session_users'))
             self.assertTrue(json_data.__contains__('session_start_datetime'))

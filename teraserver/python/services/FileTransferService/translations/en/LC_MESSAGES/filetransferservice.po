@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-02-08 13:54-0500\n"
+"POT-Creation-Date: 2022-02-15 10:44-0500\n"
 "PO-Revision-Date: 2021-01-19 16:16-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: API/QueryAssetFile.py:46 API/QueryAssetFile.py:246 API/QueryAssetFile.py:256
+#: API/QueryAssetFile.py:46 API/QueryAssetFile.py:257 API/QueryAssetFile.py:267
 msgid "Access denied to asset"
 msgstr ""
 
@@ -55,15 +55,19 @@ msgstr ""
 msgid "Missing at least one ID creator"
 msgstr ""
 
-#: API/QueryAssetFile.py:144
+#: API/QueryAssetFile.py:145
+msgid "Unable to determine asset type. Please specify manually"
+msgstr ""
+
+#: API/QueryAssetFile.py:155
 msgid "Unable to create asset"
 msgstr ""
 
-#: API/QueryAssetFile.py:251
+#: API/QueryAssetFile.py:262
 msgid "Unable to delete asset"
 msgstr ""
 
-#: API/QueryAssetFile.py:260
+#: API/QueryAssetFile.py:271
 msgid "Error occured when deleting file asset"
 msgstr ""
 
