@@ -155,7 +155,7 @@ class QueryAssetFile(Resource):
             if mime:
                 asset_json['asset_type'] = mime
             else:
-                return gettext('Unable to determine asset type. Please specify manually'), 400
+                asset_json['asset_type'] = 'application/octet-stream'  # General content type, unknown
 
         # Set asset datetime to current if not specified
         if 'asset_datetime' not in asset_json:
@@ -190,6 +190,15 @@ class QueryAssetFile(Resource):
 
         # All done here - return asset info, including AssetFileData
         full_json = {**new_asset_json, **asset_file.to_json()}
+
+        # Create asset infos + download url
+        servername = Globals.service.service_info['service_hostname']
+        port = request.headers.environ['HTTP_X_EXTERNALPORT']
+        endpoint = Globals.service.service_info['service_clientendpoint']
+        full_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) + endpoint\
+                                       + '/api/assets/infos?asset_uuid=' + asset_uuid
+        full_json['asset_url'] = 'https://' + servername + ':' + str(port) + endpoint\
+                                 + '/api/assets?asset_uuid=' + asset_uuid
         return full_json
 
         #
