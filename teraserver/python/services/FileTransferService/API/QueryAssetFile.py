@@ -173,10 +173,16 @@ class QueryAssetFile(Resource):
 
         filename = os.path.join(flask_app.config['UPLOAD_FOLDER'], asset_uuid)
 
+        file_size = file.content_length
+        if file_size == 0:
+            # No specified content length - find the file size manually
+            file_size = file.seek(0, os.SEEK_END)
+            file.seek(0)
+
         asset_file = AssetFileData()
         asset_file.asset_uuid = asset_uuid
         asset_file.asset_original_filename = original_filename
-        asset_file.asset_file_size = file.content_length
+        asset_file.asset_file_size = file_size
         AssetFileData.insert(asset_file)
 
         # Finally... save the file itself!
