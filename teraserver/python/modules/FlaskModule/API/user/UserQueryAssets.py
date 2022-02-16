@@ -12,6 +12,7 @@ from modules.DatabaseModule.DBManager import DBManager
 # GET
 get_parser = api.parser()
 get_parser.add_argument('id_asset', type=int, help='Specific ID of asset to query information.')
+get_parser.add_argument('asset_uuid', type=str, help='Specific UUID of asset to query information.')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all assets')
 get_parser.add_argument('id_session', type=int, help='ID of session from which to request all assets')
 get_parser.add_argument('id_participant', type=int, help='ID of participant from which to request all assets')
@@ -82,7 +83,9 @@ class UserQueryAssets(Resource):
                 return gettext("Device access denied"), 403
             assets = TeraAsset.get_assets_created_by_device(device_id=args['id_creator_device'])
         elif args['id_asset']:
-            assets = user_access.query_asset(args['id_asset'])
+            assets = user_access.query_asset(asset_id=args['id_asset'])
+        elif args['asset_uuid']:
+            assets = user_access.query_asset(asset_uuid=args['asset_uuid'])
         elif args['service_uuid']:
             assets = user_access.query_assets_associated_to_service(args['service_uuid'])
         else:

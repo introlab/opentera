@@ -57,6 +57,7 @@ class FileTransferService(ServiceOpenTeraWithAssets):
                 from services.FileTransferService.libfiletransferservice.db.models.AssetFileData import AssetFileData
                 asset = AssetFileData.get_asset_for_uuid(asset_info['asset_uuid'])
                 if asset:
+                    flask_app.app_context().push()
                     asset.delete_file_asset(flask_app.config['UPLOAD_FOLDER'])
 
 

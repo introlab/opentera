@@ -195,10 +195,19 @@ class QueryAssetFile(Resource):
         servername = Globals.service.service_info['service_hostname']
         port = request.headers.environ['HTTP_X_EXTERNALPORT']
         endpoint = Globals.service.service_info['service_clientendpoint']
+        # Access token
+        from opentera.redis.RedisVars import RedisVars
+        from opentera.db.models.TeraAsset import TeraAsset
+        token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
+        access_token = TeraAsset.get_access_token(asset_uuids=[asset_uuid], token_key=token_key,
+                                                  requester_uuid=Globals.service.get_current_requester_uuid(),
+                                                  expiration=1800)
+
         full_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) + endpoint\
                                        + '/api/assets/infos?asset_uuid=' + asset_uuid
         full_json['asset_url'] = 'https://' + servername + ':' + str(port) + endpoint\
                                  + '/api/assets?asset_uuid=' + asset_uuid
+        full_json['access_token'] = access_token
         return full_json
 
         #
@@ -289,13 +298,14 @@ class QueryAssetFile(Resource):
         if response.status_code != 200:
             return gettext('Unable to delete asset') + ': ' + response.text, response.status_code
 
-        # Delete local asset information
-        asset = AssetFileData.get_asset_for_uuid(uuid_asset=uuid_todel)
-        if not asset:
-            return gettext('Access denied to asset'), 403
-
-        # If we are here, we are allowed to delete. Do so.
-        if not asset.delete_file_asset(flask_app.config['UPLOAD_FOLDER']):
-            return gettext('Error occured when deleting file asset'), 500
+        # Local asset information will be deleted when receiving asset deletion event (in asset_event_received)
+        # Delete local asset information - not needed anymore
+        # asset = AssetFileData.get_asset_for_uuid(uuid_asset=uuid_todel)
+        # if not asset:
+        #     return gettext('Access denied to asset'), 403
+        #
+        # # If we are here, we are allowed to delete. Do so.
+        # if not asset.delete_file_asset(flask_app.config['UPLOAD_FOLDER']):
+        #     return gettext('Error occured when deleting file asset'), 500
 
         return '', 200

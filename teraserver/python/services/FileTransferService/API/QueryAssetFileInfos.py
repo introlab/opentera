@@ -75,7 +75,7 @@ class QueryAssetFileInfos(Resource):
                         403: 'Access denied to the requested asset'})
     @ServiceAccessManager.service_or_others_token_required(allow_dynamic_tokens=True, allow_static_tokens=False)
     def post(self):
-        if 'access_token' not in request.json:
+        if not request.json or 'access_token' not in request.json:
             return gettext('Missing access token'), 403
 
         if 'asset_uuids' not in request.json and 'file_asset' not in request.json:

@@ -975,9 +975,12 @@ class DBManagerTeraUserAccess:
 
         return query.all()
 
-    def query_asset(self, asset_id: int):
+    def query_asset(self, asset_id: int = None, asset_uuid: str = None):
         from opentera.db.models.TeraAsset import TeraAsset
         from sqlalchemy import or_
+
+        if not asset_id and not asset_uuid:
+            return None
 
         # If a user has access to a session, it should have access to its assets
         session_ids = self.get_accessible_sessions_ids()
@@ -986,9 +989,15 @@ class DBManagerTeraUserAccess:
         # user_ids = self.get_accessible_users_ids()
         service_ids = self.get_accessible_services_ids()
 
-        return TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids)) \
-            .filter(or_(TeraAsset.id_service.in_(service_ids), TeraAsset.id_service == None)) \
-            .filter(TeraAsset.id_asset == asset_id).all()
+        query = TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids))\
+            .filter(or_(TeraAsset.id_service.in_(service_ids), TeraAsset.id_service == None))
+
+        if asset_id:
+            query = query.filter(TeraAsset.id_asset == asset_id)
+        elif asset_uuid:
+            query = query.filter(TeraAsset.asset_uuid == asset_uuid)
+
+        return query.all()
 
     #     .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None)) \
     #     .filter(or_(TeraAsset.id_participant.in_(participant_ids), TeraAsset.id_participant == None)) \
