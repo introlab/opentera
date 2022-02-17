@@ -1,7 +1,5 @@
 from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
 
-import datetime
-
 
 class UserQueryAssetsTest(BaseAPITest):
     login_endpoint = '/api/user/login'
@@ -52,9 +50,13 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_device_assets_no_access(self):
@@ -68,9 +70,13 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 3)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 3)
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_session_assets_no_access(self):
@@ -84,9 +90,13 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 4)
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_participant_assets_no_access(self):
@@ -116,9 +126,13 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_asset_no_access(self):
@@ -134,9 +148,13 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 0)
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_service_no_access(self):
@@ -150,9 +168,13 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_user_no_access(self):
@@ -166,9 +188,13 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_participant_no_access(self):
@@ -182,9 +208,13 @@ class UserQueryAssetsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_device_no_access(self):
@@ -199,7 +229,7 @@ class UserQueryAssetsTest(BaseAPITest):
         files = {'upload_file': ('foobar.txt', f, 'text/x-spam')}
         params = {'id_session': 1}
         response = self._post_file_with_http_auth(username='admin', password='admin',
-                                                  params=params, files=files)
+                                                  files=files)
         # self.assertEqual(response.status_code, 200)
         self.assertEqual(response.status_code, 501)
 
@@ -207,17 +237,15 @@ class UserQueryAssetsTest(BaseAPITest):
         response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=1)
         self.assertEqual(response.status_code, 501)
 
-    # def test_post_as_admin_huge(self):
-    #     # Creating fake data
-    #     import io
-    #     import os
-    #     # 1 MB file
-    #     f = io.BytesIO(os.urandom(1024 * 1024 * 1))
-    #     files = {'upload_file': ('foobar.txt', f, 'text/x-spam')}
-    #     params = {'id_session': 1}
-    #     response = self._post_file_with_http_auth(username='admin', password='admin',
-    #                                               params=params, files=files)
-    #     self.assertEqual(response.status_code, 200)
+    def test_query_session_assets_as_admin_token_only(self):
+        payload = {'id_session': 2, 'with_urls': True, 'with_only_token': True}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=payload)
+        self.assertEqual(response.status_code, 200)
+
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+        self.assertFalse(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

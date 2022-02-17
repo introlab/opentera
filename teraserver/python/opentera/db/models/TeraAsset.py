@@ -97,6 +97,7 @@ class TeraAsset(db.Model, BaseModel):
             new_asset.asset_uuid = str(uuid.uuid4())
             new_asset.asset_service_uuid = '00000000-0000-0000-0000-000000000001'
             new_asset.asset_type = 'video/mpeg'
+            new_asset.id_service = 1
             db.session.add(new_asset)
 
             db.session.commit()

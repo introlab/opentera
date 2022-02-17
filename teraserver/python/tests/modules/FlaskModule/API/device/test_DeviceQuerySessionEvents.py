@@ -11,7 +11,7 @@ class DeviceQuerySessionEventsTest(unittest.TestCase):
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
     device_query_session_endpoint = '/api/device/sessions'
-    device_query_session_events_endpoint = '/api/device/sessionevents'
+    device_query_session_events_endpoint = '/api/device/sessions/events'
     user_device_endpoint = '/api/user/devices'
     all_devices = None
 

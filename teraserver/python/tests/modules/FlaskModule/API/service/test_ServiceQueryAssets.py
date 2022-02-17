@@ -1,7 +1,6 @@
 import os
-from requests import get, delete
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
 from opentera.services.ServiceOpenTera import ServiceOpenTera
 from opentera.services.ServiceConfigManager import ServiceConfigManager
@@ -64,9 +63,13 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 4)
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_device_assets(self):
@@ -75,9 +78,14 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
+        self._checkJson(json_data=assets[0])
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_device_assets_no_access(self):
@@ -107,9 +115,14 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 4)
+        self._checkJson(json_data=assets[0])
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_participant_assets_no_access(self):
@@ -123,9 +136,14 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 4)
+        self._checkJson(json_data=assets[0])
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_user_assets_no_access(self):
@@ -139,9 +157,14 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
+        self._checkJson(json_data=assets[0])
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_asset_no_access(self):
@@ -157,9 +180,13 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_user(self):
@@ -168,9 +195,14 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
+        self._checkJson(json_data=assets[0])
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_user_no_access(self):
@@ -184,9 +216,14 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
+        self._checkJson(json_data=assets[0])
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_participant_no_access(self):
@@ -200,9 +237,14 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
+        self._checkJson(json_data=assets[0])
 
-        for data_item in json_data:
+        for data_item in assets:
             self._checkJson(json_data=data_item)
 
     def test_query_assets_created_by_device_no_access(self):
@@ -237,6 +279,7 @@ class ServiceSessionsTest(BaseAPITest):
         json_data = response.json()[0]
         self._checkJson(json_data, minimal=True)
         current_id = json_data['id_asset']
+        current_uuid = json_data['asset_uuid']
 
         json_data = {
             'asset': {
@@ -254,12 +297,22 @@ class ServiceSessionsTest(BaseAPITest):
         self.assertEqual(json_data['asset_service_uuid'], self.service_uuid)
 
         # Delete
-        response = self._delete_with_token(token=self.service_token, id_to_del=current_id)
+        response = self._delete_uuid_with_token(token=self.service_token, uuid_to_del=current_uuid)
         self.assertEqual(200, response.status_code, msg="Delete OK")
 
         # Bad delete
-        response = self._delete_with_token(token=self.service_token, id_to_del=current_id)
+        response = self._delete_uuid_with_token(token=self.service_token, uuid_to_del=current_uuid)
         self.assertEqual(400, response.status_code, msg="Wrong delete")
+
+    def test_query_session_assets_as_admin_token_only(self):
+        payload = {'id_session': 2, 'with_urls': True, 'with_only_token': True}
+        response = self._request_with_token_auth(token=self.service_token, payload=payload)
+        self.assertEqual(response.status_code, 200)
+
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+        self.assertFalse(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

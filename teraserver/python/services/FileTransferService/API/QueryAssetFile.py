@@ -204,9 +204,9 @@ class QueryAssetFile(Resource):
                                                   expiration=1800)
 
         full_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) + endpoint\
-                                       + '/api/assets/infos?asset_uuid=' + asset_uuid
+                                       + '/api/assets/infos'  # ?asset_uuid=' + asset_uuid
         full_json['asset_url'] = 'https://' + servername + ':' + str(port) + endpoint\
-                                 + '/api/assets?asset_uuid=' + asset_uuid
+                                 + '/api/assets'  # ?asset_uuid=' + asset_uuid
         full_json['access_token'] = access_token
         return full_json
 

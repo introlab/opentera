@@ -142,12 +142,16 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self.assertEqual(json_data[0]['id_asset'], asset_id)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
+        self.assertEqual(assets[0]['id_asset'], asset_id)
 
-        asset_infos_url = json_data[0]['asset_infos_url']
-        asset_url = json_data[0]['asset_url']
-        access_token = json_data[0]['access_token']
+        asset_infos_url = assets[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
+        asset_url = assets[0]['asset_url'] + '?asset_uuid=' + asset_uuid
+        access_token = json_data['access_token']
 
         # Get specific service information on that URL
         response = self._request_full_url_with_token_auth(token=self.user_token, full_url=asset_infos_url)
@@ -262,12 +266,16 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self.assertEqual(json_data[0]['id_asset'], asset_id)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
+        self.assertEqual(assets[0]['id_asset'], asset_id)
 
-        asset_infos_url = json_data[0]['asset_infos_url']
-        asset_url = json_data[0]['asset_url']
-        access_token = json_data[0]['access_token']
+        asset_infos_url = assets[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
+        asset_url = assets[0]['asset_url'] + '?asset_uuid=' + asset_uuid
+        access_token = json_data['access_token']
 
         # Get specific service information on that URL
         response = self._request_full_url_with_token_auth(token=self.device_token,
@@ -352,12 +360,16 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self.assertEqual(json_data[0]['id_asset'], asset_id)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
+        self.assertEqual(assets[0]['id_asset'], asset_id)
 
-        asset_infos_url = json_data[0]['asset_infos_url']
-        asset_url = json_data[0]['asset_url']
-        access_token = json_data[0]['access_token']
+        asset_infos_url = assets[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
+        asset_url = assets[0]['asset_url'] + '?asset_uuid=' + asset_uuid
+        access_token = json_data['access_token']
 
         # Get specific service information on that URL
         response = self._request_full_url_with_token_auth(token=self.participant_dynamic_token,
@@ -465,12 +477,16 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self.assertEqual(json_data[0]['id_asset'], asset_id)
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        assets = json_data["assets"]
+        self.assertTrue(len(assets), 1)
+        self.assertEqual(assets[0]['id_asset'], asset_id)
 
-        asset_infos_url = json_data[0]['asset_infos_url']
-        asset_url = json_data[0]['asset_url']
-        access_token = json_data[0]['access_token']
+        asset_infos_url = assets[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
+        asset_url = assets[0]['asset_url'] + '?asset_uuid=' + asset_uuid
+        access_token = json_data['access_token']
 
         # Get specific service information on that URL
         response = self._request_full_url_with_token_auth(token=self.service_token,
@@ -553,8 +569,10 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 3)
-        access_token = json_data[0]['access_token']
+        self.assertEqual(len(json_data), 2)
+        self.assertTrue(json_data.__contains__("assets"))
+        self.assertTrue(json_data.__contains__("access_token"))
+        access_token = json_data['access_token']
 
         # Try to post to query assets
         asset_uuids.append('xxxxxxx')
