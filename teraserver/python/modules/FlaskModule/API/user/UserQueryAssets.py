@@ -29,6 +29,8 @@ get_parser.add_argument('id_creator_device', type=int, help='ID of the device fr
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download-upload url')
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
+get_parser.add_argument('full', type=inputs.boolean, help='Also include names of sessions, users, services, ... in the '
+                                                          'reply')
 
 
 class UserQueryAssets(Resource):
@@ -117,7 +119,7 @@ class UserQueryAssets(Resource):
                 return {'access_token': access_token}
 
         for asset in assets:
-            asset_json = asset.to_json()
+            asset_json = asset.to_json(minimal=not args['full'])
 
             if args['with_urls']:
                 # We have previously verified that the service is available to the user

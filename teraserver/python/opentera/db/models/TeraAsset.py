@@ -52,6 +52,16 @@ class TeraAsset(db.Model, BaseModel):
         asset_json = super().to_json(ignore_fields=ignore_fields)
         if not minimal:
             asset_json['asset_service_owner_name'] = self.asset_service_owner.service_name
+            asset_json['asset_session_name'] = self.asset_session.session_name
+            if self.id_device:
+                asset_json['asset_device'] = self.asset_device.device_name
+            if self.id_user:
+                asset_json['asset_user'] = self.asset_user.get_fullname()
+            if self.id_participant:
+                asset_json['asset_participant'] = self.asset_participant.participant_name
+            if self.id_service:
+                asset_json['asset_service'] = self.asset_service.service_name
+
 
         return asset_json
 
