@@ -65,16 +65,16 @@ class UserQueryServices(Resource):
             args['service_uuid'] = args['uuid']
 
         if args['id_service']:
-            if args['id_service'] in user_access.get_accessible_services_ids():
+            if args['id_service'] in user_access.get_accessible_services_ids(include_system_services=True):
                 services = [TeraService.get_service_by_id(args['id_service'])]
         elif args['service_uuid']:
             # If we have a service uuid, ensure that service is accessible
             service = TeraService.get_service_by_uuid(args['service_uuid'])
-            if service and service.id_service in user_access.get_accessible_services_ids():
+            if service and service.id_service in user_access.get_accessible_services_ids(include_system_services=True):
                 services = [service]
         elif args['service_key']:
             service = TeraService.get_service_by_key(args['service_key'])
-            if service and service.id_service in user_access.get_accessible_services_ids():
+            if service and service.id_service in user_access.get_accessible_services_ids(include_system_services=True):
                 services = [service]
         elif args['id_project']:
             services = user_access.query_services_for_project(project_id=args['id_project'])
@@ -86,6 +86,8 @@ class UserQueryServices(Resource):
             services_list = []
 
             for service in services:
+                if service.service_key == 'OpenTeraServer':
+                    continue  # Never return OpenTeraServer service with that API
                 if args['with_config']:
                     if not service.service_editable_config:
                         continue
@@ -134,19 +136,24 @@ class UserQueryServices(Resource):
             return gettext('Forbidden'), 403
 
         # Manage service roles
+        has_service_roles = False
         service_roles = []
         if 'roles' in json_service:
             service_roles = json_service.pop('roles')
+            has_service_roles = True
 
         # Do the update!
         import jsonschema
         if json_service['id_service'] > 0:
             # Already existing
             try:
-                if 'service_system' in json_service:
-                    service = TeraService.get_service_by_id(json_service['id_service'])
-                    if service.service_system != json_service['service_system']:
-                        return gettext('Can\'t change system services from that API'), 403
+                service = TeraService.get_service_by_id(json_service['id_service'])
+                if service.service_key == 'OpenTeraServer':
+                    return gettext('OpenTera service can\'t be updated using this API'), 403
+                # if 'service_system' in json_service:
+                #     service = TeraService.get_service_by_id(json_service['id_service'])
+                #     if service.service_system != json_service['service_system']:
+                #         return gettext('Can\'t change system services from that API'), 403
                 TeraService.update(json_service['id_service'], json_service)
             except exc.SQLAlchemyError as e:
                 import sys
@@ -178,7 +185,7 @@ class UserQueryServices(Resource):
         update_service = TeraService.get_service_by_id(json_service['id_service'])
 
         # Service roles
-        if len(service_roles) > 0:
+        if has_service_roles:
             # Check if there's some roles for the updated service that we need to delete
             roles_ids = [role['id_service_role'] for role in service_roles]
             id_roles_to_delete = set([role.id_service_role for role in update_service.service_roles]) \

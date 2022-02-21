@@ -88,7 +88,7 @@ class UserQueryProjects(Resource):
             projects_list = []
 
             for project in projects:
-                if args['list'] is None or args['list'] == False:
+                if args['list'] is None or args['list'] is False:
                     project_json = project.to_json()
                     project_json['project_role'] = user_access.get_project_role(project.id_project)
                     projects_list.append(project_json)

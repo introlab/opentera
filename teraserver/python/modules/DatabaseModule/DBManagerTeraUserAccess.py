@@ -296,6 +296,8 @@ class DBManagerTeraUserAccess:
         # from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
         part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
         user_ids = self.get_accessible_users_ids(admin_only=admin_only)
+        # Also includes super admins users in the list - be transparent !
+        user_ids.extend([user.id_user for user in TeraUser.get_superadmins() if user.id_user not in user_ids])
         device_ids = self.get_accessible_devices_ids(admin_only=admin_only)
         service_ids = self.get_accessible_services_ids(admin_only=admin_only)
         # # THIS JOIN TAKES A LONG TIME TO PROCESS... IMPROVE!
@@ -325,9 +327,10 @@ class DBManagerTeraUserAccess:
         from opentera.db.models.TeraServiceRole import TeraServiceRole
         from opentera.db.models.TeraServiceProject import TeraServiceProject
 
-        if self.user.user_superadmin or all_services:
-            if include_system_services:
+        if self.user.user_superadmin:
+            if self.user.user_superadmin:
                 return TeraService.query.all()
+        if all_services:
             return TeraService.query.filter_by(service_system=False).all()
 
         accessible_projects_ids = self.get_accessible_projects_ids()
@@ -752,7 +755,7 @@ class DBManagerTeraUserAccess:
     def query_services_projects_for_project(self, project_id: int, include_other_services=False):
         from opentera.db.models.TeraServiceProject import TeraServiceProject
         from opentera.db.models.TeraService import TeraService
-        services_ids = self.get_accessible_services_ids()
+        services_ids = self.get_accessible_services_ids(include_system_services=True)
 
         service_projects = TeraServiceProject.query.filter(TeraServiceProject.id_service.in_(services_ids)) \
             .filter_by(id_project=project_id).all()

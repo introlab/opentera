@@ -38,6 +38,7 @@ class TeraServiceForm:
                                       item_required=False))
         section.add_item(TeraFormItem("service_endpoint_device", gettext("Service Device Endpoint"), "text",
                                       item_required=False))
+        section.add_item(TeraFormItem("service_system", gettext("System Service"), "boolean", item_required=True))
         section.add_item(TeraFormItem("service_enabled", gettext("Service Enabled"), "boolean", item_required=True))
         section.add_item(TeraFormItem("service_editable_config", gettext("Service has editable config"), "boolean",
                                       item_required=False))

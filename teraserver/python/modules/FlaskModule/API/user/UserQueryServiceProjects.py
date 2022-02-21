@@ -83,6 +83,7 @@ class UserQueryServiceProjects(Resource):
                     if not obj_type.transient:
                         json_sp['service_name'] = sp.service_project_service.service_name
                         json_sp['service_key'] = sp.service_project_service.service_key
+                        json_sp['service_system'] = sp.service_project_service.service_system
                         json_sp['project_name'] = sp.service_project_project.project_name
                     else:
                         # Temporary object, a not-committed object, result of listing projects not associated in a
@@ -91,9 +92,11 @@ class UserQueryServiceProjects(Resource):
                             service = TeraService.get_service_by_id(sp.id_service)
                             json_sp['service_name'] = service.service_name
                             json_sp['service_key'] = service.service_key
+                            json_sp['service_system'] = service.service_system
                         else:
                             json_sp['service_name'] = None
                             json_sp['service_key'] = None
+                            json_sp['service_system'] = None
                         if sp.id_project:
                             json_sp['project_name'] = TeraProject.get_project_by_id(sp.id_project).project_name
                         else:

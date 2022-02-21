@@ -107,7 +107,7 @@ class UserQueryAssets(Resource):
         services_infos = []
         if (args['with_urls'] or args['with_only_token']) and assets:
             services_infos = {service.service_uuid: service.service_clientendpoint
-                              for service in user_access.get_accessible_services()}
+                              for service in user_access.get_accessible_services(include_system_services=True)}
 
             # Access token
             from opentera.redis.RedisVars import RedisVars

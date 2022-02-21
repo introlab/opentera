@@ -192,6 +192,12 @@ class UserQueryServicesTest(BaseAPITest):
         self.assertEqual(json_data['service_enabled'], False)
         self.assertEqual(json_data['service_name'], 'Test2')
 
+        # Check that default service roles (admin, user) were created
+        self.assertTrue(json_data.__contains__('service_roles'))
+        self.assertEqual(len(json_data['service_roles']), 2)
+        self.assertEqual(json_data['service_roles'][0]['service_role_name'], 'admin')
+        self.assertEqual(json_data['service_roles'][1]['service_role_name'], 'user')
+
         response = self._delete_with_http_auth(username='user4', password='user4', id_to_del=current_id)
         self.assertEqual(response.status_code, 403, msg="Delete denied")
 
