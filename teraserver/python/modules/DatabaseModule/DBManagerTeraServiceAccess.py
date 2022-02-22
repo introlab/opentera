@@ -1,6 +1,8 @@
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models import TeraUser
 
+from sqlalchemy import or_, and_
+
 
 class DBManagerTeraServiceAccess:
     def __init__(self, service: TeraService):
@@ -46,11 +48,23 @@ class DBManagerTeraServiceAccess:
 
     def get_accessible_sessions(self, admin_only=False):
         from opentera.db.models.TeraSession import TeraSession
-        from opentera.db.models.TeraParticipant import TeraParticipant
 
         part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
-        return TeraSession.query.join(TeraSession.session_participants). \
-            filter(TeraParticipant.id_participant.in_(part_ids)).all()
+        user_ids = self.get_accessible_users_ids(admin_only=admin_only)
+        # Also includes super admins users in the list
+        user_ids.extend([user.id_user for user in TeraUser.get_superadmins() if user.id_user not in user_ids])
+        device_ids = self.get_accessible_devices_ids(admin_only=admin_only)
+        sessions = TeraSession.query.filter(or_(TeraSession.id_creator_user.in_(user_ids),
+                                                TeraSession.id_creator_device.in_(device_ids),
+                                                TeraSession.id_creator_participant.in_(part_ids),
+                                                TeraSession.id_creator_service.in_([self.service.id_service]))).all()
+        return sessions
+        # from opentera.db.models.TeraSession import TeraSession
+        # from opentera.db.models.TeraParticipant import TeraParticipant
+        #
+        # part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
+        # return TeraSession.query.join(TeraSession.session_participants). \
+        #     filter(TeraParticipant.id_participant.in_(part_ids)).all()
 
     def get_accessible_sessions_ids(self, admin_only=False):
         ses_ids = []
