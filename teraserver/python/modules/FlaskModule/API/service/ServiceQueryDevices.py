@@ -72,15 +72,15 @@ class ServiceQueryDevices(Resource):
                 device_json = device.to_json()
 
                 if args['with_type_info']:
-                    device_type: TeraDeviceType = TeraDeviceType.get_device_type_by_id(device.id_device_type)
-                    if device_type:
-                        device_json['device_type_info'] = device_type.to_json(minimal=True)
+                    if device.device_type:
+                        device_json['device_type_info'] = device.device_type.to_json(minimal=True)
 
                 if args['with_subtype_info']:
-                    device_subtype: TeraDeviceSubType = \
-                        TeraDeviceSubType.get_device_subtype_by_id(device.id_device_subtype)
-                    if device_subtype:
-                        device_json['device_subtype_info'] = device_subtype.to_json(minimal=True)
+                    # Device_subtype can be null
+                    if device.device_subtype:
+                        device_json['device_subtype_info'] = device.device_subtype.to_json(minimal=True)
+                    else:
+                        device_json['device_subtype_info'] = None
 
                 return device_json
 
