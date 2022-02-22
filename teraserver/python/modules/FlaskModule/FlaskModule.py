@@ -270,13 +270,15 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQuerySites import ServiceQuerySites
         from modules.FlaskModule.API.service.ServiceSessionManager import ServiceSessionManager
         from modules.FlaskModule.API.service.ServiceQuerySessionTypes import ServiceQuerySessionTypes
+        from modules.FlaskModule.API.service.ServiceQueryDevices import ServiceQueryDevices
 
+        service_api_ns.add_resource(ServiceQueryUsers, '/users', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryDevices, '/devices', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryAssets,         '/assets', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySessions,       '/sessions', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySessionEvents,  '/sessions/events', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySiteProjectAccessRoles, '/users/access', resource_class_kwargs=kwargs)
-        service_api_ns.add_resource(ServiceQueryUsers,          '/users', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryServices,       '/services', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryProjects,       '/projects', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySites,          '/sites', resource_class_kwargs=kwargs)
