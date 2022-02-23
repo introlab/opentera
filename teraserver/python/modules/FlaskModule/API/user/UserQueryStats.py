@@ -79,7 +79,9 @@ class UserQueryUserStats(Resource):
                                                                   args['with_participants'])
 
         if args['id_session']:
-            if not args['id_session'] in user_access.get_accessible_sessions_ids():
+            # if not args['id_session'] in user_access.get_accessible_sessions_ids():
+            #     return gettext('Forbidden'), 403
+            if not user_access.query_session(session_id=args['id_session']):
                 return gettext('Forbidden'), 403
             return UserQueryUserStats.get_session_stats(user_access, args['id_session'])
 

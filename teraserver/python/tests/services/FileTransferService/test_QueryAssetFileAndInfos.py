@@ -142,16 +142,12 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)
-        self.assertTrue(json_data.__contains__("assets"))
-        self.assertTrue(json_data.__contains__("access_token"))
-        assets = json_data["assets"]
-        self.assertTrue(len(assets), 1)
-        self.assertEqual(assets[0]['id_asset'], asset_id)
+        self.assertTrue(len(json_data), 1)
+        self.assertEqual(json_data[0]['id_asset'], asset_id)
 
-        asset_infos_url = assets[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
-        asset_url = assets[0]['asset_url'] + '?asset_uuid=' + asset_uuid
-        access_token = json_data['access_token']
+        asset_infos_url = json_data[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
+        asset_url = json_data[0]['asset_url'] + '?asset_uuid=' + asset_uuid
+        access_token = json_data[0]['access_token']
 
         # Get specific service information on that URL
         response = self._request_full_url_with_token_auth(token=self.user_token, full_url=asset_infos_url)
@@ -171,29 +167,26 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         # Change original file name with a POST query
         params = {}
         response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
-        self.assertEqual(response.status_code, 403, 'Missing access token')
+        self.assertEqual(response.status_code, 400, 'Missing file asset info')
 
         params = {'access_token': access_token}
         response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 400, 'Badly formatted request')
 
-        params = {'access_token': access_token,
-                  'file_asset': {}}
+        params = {'file_asset': {}}
         response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 400, 'Missing asset UUID')
 
-        params = {'access_token': access_token,
-                  'file_asset': {'asset_uuid': '1111111'}}
+        params = {'file_asset': {'asset_uuid': '1111111', 'access_token': access_token}}
         response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 403, 'Forbidden access to UUID')
 
-        params = {'access_token': access_token,
-                  'file_asset': {'asset_uuid': asset_uuid}}
+        params = {'file_asset': {'asset_uuid': asset_uuid, 'access_token': access_token}}
         response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 400, 'No file name')
 
-        params = {'access_token': access_token,
-                  'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2'}}
+        params = {'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2',
+                                 'access_token': access_token}}
         response = self._post_with_token(token=self.user_token, payload=params, endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 200, 'Original file name changed')
         self.assertEqual(response.json()['asset_original_filename'], 'testfile2')
@@ -266,16 +259,12 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)
-        self.assertTrue(json_data.__contains__("assets"))
-        self.assertTrue(json_data.__contains__("access_token"))
-        assets = json_data["assets"]
-        self.assertTrue(len(assets), 1)
-        self.assertEqual(assets[0]['id_asset'], asset_id)
+        self.assertEqual(len(json_data), 1)
+        self.assertEqual(json_data[0]['id_asset'], asset_id)
 
-        asset_infos_url = assets[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
-        asset_url = assets[0]['asset_url'] + '?asset_uuid=' + asset_uuid
-        access_token = json_data['access_token']
+        asset_infos_url = json_data[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
+        asset_url = json_data[0]['asset_url'] + '?asset_uuid=' + asset_uuid
+        access_token = json_data[0]['access_token']
 
         # Get specific service information on that URL
         response = self._request_full_url_with_token_auth(token=self.device_token,
@@ -290,13 +279,12 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(json_data['asset_uuid'], asset_uuid)
 
         # Change original file name with a POST query
-        params = {'access_token': access_token,
-                  'file_asset': {'asset_uuid': '1111111'}}
+        params = {'file_asset': {'asset_uuid': '1111111', 'access_token': access_token}}
         response = self._post_with_token(token=self.device_token, payload=params, endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 403, 'Forbidden access to UUID')
 
-        params = {'access_token': access_token,
-                  'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2'}}
+        params = {'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2',
+                                 'access_token': access_token}}
         response = self._post_with_token(token=self.device_token, payload=params, endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 200, 'Original file name changed')
         self.assertEqual(response.json()['asset_original_filename'], 'testfile2')
@@ -360,16 +348,12 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)
-        self.assertTrue(json_data.__contains__("assets"))
-        self.assertTrue(json_data.__contains__("access_token"))
-        assets = json_data["assets"]
-        self.assertTrue(len(assets), 1)
-        self.assertEqual(assets[0]['id_asset'], asset_id)
+        self.assertTrue(len(json_data), 1)
+        self.assertEqual(json_data[0]['id_asset'], asset_id)
 
-        asset_infos_url = assets[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
-        asset_url = assets[0]['asset_url'] + '?asset_uuid=' + asset_uuid
-        access_token = json_data['access_token']
+        asset_infos_url = json_data[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
+        asset_url = json_data[0]['asset_url'] + '?asset_uuid=' + asset_uuid
+        access_token = json_data[0]['access_token']
 
         # Get specific service information on that URL
         response = self._request_full_url_with_token_auth(token=self.participant_dynamic_token,
@@ -384,14 +368,13 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(json_data['asset_uuid'], asset_uuid)
 
         # Change original file name with a POST query
-        params = {'access_token': access_token,
-                  'file_asset': {'asset_uuid': '1111111'}}
+        params = {'file_asset': {'asset_uuid': '1111111', 'access_token': access_token}}
         response = self._post_with_token(token=self.participant_dynamic_token, payload=params,
                                          endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 403, 'Forbidden access to UUID')
 
-        params = {'access_token': access_token,
-                  'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2'}}
+        params = {'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2',
+                                 'access_token': access_token}}
         response = self._post_with_token(token=self.participant_dynamic_token, payload=params,
                                          endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 200, 'Original file name changed')
@@ -477,16 +460,12 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)
-        self.assertTrue(json_data.__contains__("assets"))
-        self.assertTrue(json_data.__contains__("access_token"))
-        assets = json_data["assets"]
-        self.assertTrue(len(assets), 1)
-        self.assertEqual(assets[0]['id_asset'], asset_id)
+        self.assertTrue(len(json_data), 1)
+        self.assertEqual(json_data[0]['id_asset'], asset_id)
 
-        asset_infos_url = assets[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
-        asset_url = assets[0]['asset_url'] + '?asset_uuid=' + asset_uuid
-        access_token = json_data['access_token']
+        asset_infos_url = json_data[0]['asset_infos_url'] + '?asset_uuid=' + asset_uuid
+        asset_url = json_data[0]['asset_url'] + '?asset_uuid=' + asset_uuid
+        access_token = json_data[0]['access_token']
 
         # Get specific service information on that URL
         response = self._request_full_url_with_token_auth(token=self.service_token,
@@ -501,14 +480,13 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(json_data['asset_uuid'], asset_uuid)
 
         # Change original file name with a POST query
-        params = {'access_token': access_token,
-                  'file_asset': {'asset_uuid': '1111111'}}
+        params = {'file_asset': {'asset_uuid': '1111111', 'access_token': access_token}}
         response = self._post_with_token(token=self.service_token, payload=params,
                                          endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 403, 'Forbidden access to UUID')
 
-        params = {'access_token': access_token,
-                  'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2'}}
+        params = {'file_asset': {'asset_uuid': asset_uuid, 'asset_original_filename': 'testfile2',
+                                 'access_token': access_token}}
         response = self._post_with_token(token=self.service_token, payload=params,
                                          endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 200, 'Original file name changed')
@@ -569,22 +547,19 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)
-        self.assertTrue(json_data.__contains__("assets"))
-        self.assertTrue(json_data.__contains__("access_token"))
-        access_token = json_data['access_token']
+        self.assertEqual(len(json_data), 3)
 
         # Try to post to query assets
-        asset_uuids.append('xxxxxxx')
-        params = {'access_token': access_token,
-                  'asset_uuids': asset_uuids}
+        params = {'assets': [{'access_token': json_data[0]['access_token'],
+                              'asset_uuid': 'xxxxxxx'}]}
         response = self._post_with_token(token=self.user_token, payload=params,
                                          endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 403, 'At least one bad asset in the query')
-        asset_uuids.pop()  # Remove bad asset
 
-        params = {'access_token': access_token,
-                  'asset_uuids': asset_uuids}
+        assets = []
+        for asset in json_data:
+            assets.append({'asset_uuid': asset['asset_uuid'], 'access_token': asset['access_token']})
+        params = {'assets': assets}
         response = self._post_with_token(token=self.user_token, payload=params,
                                          endpoint=self.test_infos_endpoint)
         self.assertEqual(response.status_code, 200, 'Asset query is fine')
@@ -592,7 +567,8 @@ class FileTransferAssetFileAndInfosTest(BaseAPITest):
         self.assertEqual(len(json_data), 3)
 
         # Delete created assets
-        for asset_uuid in asset_uuids:
-            response = self._delete_with_token_plus(token=self.user_token, payload={'uuid': asset_uuid,
-                                                                                    'access_token': access_token})
+        for asset in assets:
+            response = self._delete_with_token_plus(token=self.user_token, payload={'uuid': asset['asset_uuid'],
+                                                                                    'access_token':
+                                                                                        asset['access_token']})
             self.assertEqual(response.status_code, 200, 'Delete OK')

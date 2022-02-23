@@ -7,6 +7,7 @@ from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraAsset import TeraAsset
 
 from modules.DatabaseModule.DBManager import DBManager
+from opentera.redis.RedisVars import RedisVars
 
 # Parser definition(s)
 # GET
@@ -109,17 +110,30 @@ class UserQueryAssets(Resource):
             services_infos = {service.service_uuid: service.service_clientendpoint
                               for service in user_access.get_accessible_services(include_system_services=True)}
 
-            # Access token
-            from opentera.redis.RedisVars import RedisVars
-            token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
-            access_token = TeraAsset.get_access_token(asset_uuids=[asset.asset_uuid for asset in assets],
-                                                      token_key=token_key, requester_uuid=current_user.user_uuid,
-                                                      expiration=1800)
-            if args['with_only_token']:
-                return {'access_token': access_token}
+            # # Access token
+            # from opentera.redis.RedisVars import RedisVars
+            # token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
+            # access_token = TeraAsset.get_access_token(asset_uuids=[asset.asset_uuid for asset in assets],
+            #                                           token_key=token_key, requester_uuid=current_user.user_uuid,
+            #                                           expiration=1800)
+            # if args['with_only_token']:
+            #     return {'access_token': access_token}
 
         for asset in assets:
-            asset_json = asset.to_json(minimal=not args['full'])
+            if args['with_only_token']:
+                asset_json = {'asset_uuid': asset.asset_uuid}
+            else:
+                asset_json = asset.to_json(minimal=not args['full'])
+
+            # Access token
+            if args['with_urls'] or args['with_only_token']:
+                # Access token
+                token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
+                access_token = TeraAsset.get_access_token(asset_uuids=asset.asset_uuid,
+                                                          token_key=token_key,
+                                                          requester_uuid=current_user.user_uuid,
+                                                          expiration=1800)
+                asset_json['access_token'] = access_token
 
             if args['with_urls']:
                 # We have previously verified that the service is available to the user
@@ -130,9 +144,7 @@ class UserQueryAssets(Resource):
                     asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
                                               + services_infos[asset.asset_service_uuid] \
                                               + '/api/assets'  # ?asset_uuid=' + asset.asset_uuid
-                    # if not assets_list:
-                    #     # Append access token to first item only
-                    #     asset_json['access_token'] = access_token
+
                 else:
                     # Service not found or unavaiable for current user
                     asset_json['asset_infos_url'] = None
@@ -140,10 +152,10 @@ class UserQueryAssets(Resource):
 
             assets_list.append(asset_json)
 
-        if access_token:
-            return {'access_token': access_token, 'assets': assets_list}
-        else:
-            return assets_list
+        # if access_token:
+        #     return {'access_token': access_token, 'assets': assets_list}
+        # else:
+        return assets_list
 
     @user_multi_auth.login_required
     @api.doc(description='Delete asset.',

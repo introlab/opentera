@@ -349,7 +349,7 @@ class TeraSession(db.Model, BaseModel):
         if self.session_creator_participant:
             return self.session_creator_participant.id_project
 
-        return None
+        return None  # No participant - we can't know, for sure, into which project this session is related...
 
     def get_associated_site_id(self):
         if self.session_participants:

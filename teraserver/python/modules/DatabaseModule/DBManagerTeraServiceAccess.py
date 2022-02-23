@@ -1,7 +1,7 @@
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models import TeraUser
 
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, not_
 
 
 class DBManagerTeraServiceAccess:
@@ -48,6 +48,9 @@ class DBManagerTeraServiceAccess:
 
     def get_accessible_sessions(self, admin_only=False):
         from opentera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraSessionUsers import TeraSessionUsers
+        from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+        from opentera.db.models.TeraSessionDevices import TeraSessionDevices
 
         part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
         user_ids = self.get_accessible_users_ids(admin_only=admin_only)
@@ -58,6 +61,25 @@ class DBManagerTeraServiceAccess:
                                                 TeraSession.id_creator_device.in_(device_ids),
                                                 TeraSession.id_creator_participant.in_(part_ids),
                                                 TeraSession.id_creator_service.in_([self.service.id_service]))).all()
+
+        # Also check for sessions which users we have access to were part
+        sessions_ids = [session.id_session for session in sessions]
+        other_sessions = TeraSessionUsers.query.filter(TeraSessionUsers.id_user.in_(user_ids)). \
+            filter(not_(TeraSessionUsers.id_session.in_(sessions_ids)))
+        sessions.extend(other_sessions)
+
+        # ... and sessions which participants we have access to were part
+        sessions_ids = [session.id_session for session in sessions]
+        other_sessions = TeraSessionParticipants.query.filter(TeraSessionParticipants.id_participant.in_(part_ids)). \
+            filter(not_(TeraSessionParticipants.id_session.in_(sessions_ids)))
+        sessions.extend(other_sessions)
+
+        # ... and sessions which devices we have access to were part!
+        sessions_ids = [session.id_session for session in sessions]
+        other_sessions = TeraSessionDevices.query.filter(TeraSessionDevices.id_device.in_(device_ids)). \
+            filter(not_(TeraSessionDevices.id_session.in_(sessions_ids)))
+        sessions.extend(other_sessions)
+
         return sessions
         # from opentera.db.models.TeraSession import TeraSession
         # from opentera.db.models.TeraParticipant import TeraParticipant

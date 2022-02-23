@@ -30,11 +30,15 @@ get_parser.add_argument('asset_uuid', type=str, required=True, help='UUID of the
 #                                                                 },
 #                                                 }
 #                                )
-post_schema = api.schema_model('assets_uuids', {'properties': {
-                                                                'assets_uuids': {
-                                                                    'type': 'array',
+post_schema = api.schema_model('assets', {'properties': {
+                                                                'asset_uuid': {
+                                                                    'type': 'string',
                                                                     'location': 'json'}
-                                                                },
+                                                                ,
+                                                                'access_token': {
+                                                                    'type': 'string',
+                                                                    'location': 'json'}
+                                                                }
                                                 }
                                )
 
@@ -75,29 +79,39 @@ class QueryAssetFileInfos(Resource):
                         403: 'Access denied to the requested asset'})
     @ServiceAccessManager.service_or_others_token_required(allow_dynamic_tokens=True, allow_static_tokens=False)
     def post(self):
-        if not request.json or 'access_token' not in request.json:
-            return gettext('Missing access token'), 403
-
-        if 'asset_uuids' not in request.json and 'file_asset' not in request.json:
+        if 'assets' not in request.json and 'file_asset' not in request.json:
             return gettext('Badly formatted request'), 400
 
-        allowed_asset_uuids = Globals.service.get_accessible_asset_uuids(request.json['access_token'])
+        if 'assets' in request.json:
+            # Verify access tokens
+            assets = request.json['assets']
+            requested_assets_uuids = []
+            for asset in assets:
+                if 'access_token' not in asset:
+                    return gettext('Missing access token for at least one requested asset'), 400
+                if 'asset_uuid' not in asset:
+                    return gettext('Missing asset UUID for at least one requested asset'), 400
 
-        if 'asset_uuids' in request.json:
+                if not Globals.service.has_access_to_asset(access_token=asset['access_token'],
+                                                           asset_uuid=asset['asset_uuid']):
+                    return gettext('Access denied for at least one requested asset'), 403
+                requested_assets_uuids.append(asset['asset_uuid'])
+
             # Query assets data
-            requested_assets_uuids = request.json['asset_uuids']
-            if list(set(requested_assets_uuids) - set(allowed_asset_uuids)):
-                # At least one id was requested but not allowed
-                return gettext('Access denied for at least one requested asset'), 403
-
             assets = AssetFileData.get_assets_for_uuids(requested_assets_uuids)
 
             return [asset.to_json() for asset in assets]
         else:
             # Update file asset
             asset_json = request.json['file_asset']
+
+            if 'access_token' not in asset_json:
+                return gettext('Missing access token'), 400
+
             if 'asset_uuid' not in asset_json:
                 return gettext('Missing asset uuid'), 400
+
+            allowed_asset_uuids = Globals.service.get_accessible_asset_uuids(asset_json['access_token'])
 
             if asset_json['asset_uuid'] not in allowed_asset_uuids:
                 return gettext('Forbidden'), 403

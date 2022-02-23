@@ -6,6 +6,8 @@ from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraAsset import TeraAsset
 
+from opentera.redis.RedisVars import RedisVars
+
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('asset_uuid', type=str, help='Asset UUID to query', default=None)
@@ -48,20 +50,33 @@ class DeviceQueryAssets(Resource):
         services_infos = []
         if (args['with_urls'] or args['with_only_token']) and assets:
             services_infos = {service.service_uuid: service.service_clientendpoint
-                              for service in device_access.get_accessible_services()}
+                              for service in device_access.get_accessible_services(include_system_services=True)}
 
             # Access token
-            from opentera.redis.RedisVars import RedisVars
-            token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
-            access_token = TeraAsset.get_access_token(asset_uuids=[asset.asset_uuid for asset in assets],
-                                                      token_key=token_key, requester_uuid=device.device_uuid,
-                                                      expiration=1800)
-            if args['with_only_token']:
-                return {'access_token': access_token}
+            # from opentera.redis.RedisVars import RedisVars
+            # token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
+            # access_token = TeraAsset.get_access_token(asset_uuids=[asset.asset_uuid for asset in assets],
+            #                                           token_key=token_key, requester_uuid=device.device_uuid,
+            #                                           expiration=1800)
+            # if args['with_only_token']:
+            #     return {'access_token': access_token}
 
         assets_json = []
         for asset in assets:
-            asset_json = asset.to_json()
+            if args['with_only_token']:
+                asset_json = {'asset_uuid': asset.asset_uuid}
+            else:
+                asset_json = asset.to_json()
+
+            # Access token
+            if args['with_urls'] or args['with_only_token']:
+                # Access token
+                token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
+                access_token = TeraAsset.get_access_token(asset_uuids=asset.asset_uuid,
+                                                          token_key=token_key,
+                                                          requester_uuid=device.device_uuid,
+                                                          expiration=1800)
+                asset_json['access_token'] = access_token
 
             if args['with_urls']:
                 # We have previously verified that the service is available to the user
@@ -84,8 +99,5 @@ class DeviceQueryAssets(Resource):
 
             assets_json.append(asset_json)
 
-        if access_token:
-            return {'access_token': access_token, 'assets': assets_json}
-        else:
-            return assets_json
+        return assets_json
 

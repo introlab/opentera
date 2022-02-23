@@ -14,7 +14,7 @@ from opentera.db.models.TeraDeviceProject import TeraDeviceProject
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, not_
 
 
 class DBManagerTeraUserAccess:
@@ -292,12 +292,13 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_sessions(self, admin_only=False):
         from opentera.db.models.TeraSession import TeraSession
-        # from opentera.db.models.TeraSessionUsers import TeraSessionUsers
-        # from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+        from opentera.db.models.TeraSessionUsers import TeraSessionUsers
+        from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+        from opentera.db.models.TeraSessionDevices import TeraSessionDevices
         part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
         user_ids = self.get_accessible_users_ids(admin_only=admin_only)
-        # Also includes super admins users in the list - be transparent !
-        user_ids.extend([user.id_user for user in TeraUser.get_superadmins() if user.id_user not in user_ids])
+        # Also includes super admins users in the list ??
+        # user_ids.extend([user.id_user for user in TeraUser.get_superadmins() if user.id_user not in user_ids])
         device_ids = self.get_accessible_devices_ids(admin_only=admin_only)
         service_ids = self.get_accessible_services_ids(admin_only=admin_only)
         # # THIS JOIN TAKES A LONG TIME TO PROCESS... IMPROVE!
@@ -311,6 +312,25 @@ class DBManagerTeraUserAccess:
                                             TeraSession.id_creator_device.in_(device_ids),
                                             TeraSession.id_creator_participant.in_(part_ids),
                                             TeraSession.id_creator_service.in_(service_ids))).all()
+
+        # Also check for sessions which we were part
+        sessions_ids = [session.id_session for session in sessions]
+        other_sessions = TeraSessionUsers.query.filter_by(id_user=self.user.id_user).\
+            filter(not_(TeraSessionUsers.id_session.in_(sessions_ids)))
+        sessions.extend(other_sessions)
+
+        # ... and sessions which participants we have access to were part
+        sessions_ids = [session.id_session for session in sessions]
+        other_sessions = TeraSessionParticipants.query.filter(TeraSessionParticipants.id_participant.in_(part_ids)). \
+            filter(not_(TeraSessionParticipants.id_session.in_(sessions_ids)))
+        sessions.extend(other_sessions)
+
+        # ... and sessions which devices we have access to were part!
+        sessions_ids = [session.id_session for session in sessions]
+        other_sessions = TeraSessionDevices.query.filter(TeraSessionDevices.id_device.in_(device_ids)). \
+            filter(not_(TeraSessionDevices.id_session.in_(sessions_ids)))
+        sessions.extend(other_sessions)
+
         return sessions
 
     def get_accessible_sessions_ids(self, admin_only=False):
@@ -666,7 +686,7 @@ class DBManagerTeraUserAccess:
             if session.id_creator_user == self.user.id_user:
                 return session
 
-            # Check if we are parts of the users of that session
+            # Check if we are part of the users of that session
             if session.has_user(self.user.id_user):
                 return session
 

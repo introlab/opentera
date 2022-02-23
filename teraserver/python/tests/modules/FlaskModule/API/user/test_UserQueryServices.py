@@ -28,7 +28,7 @@ class UserQueryServicesTest(BaseAPITest):
         response = self._request_with_http_auth(username='admin', password='admin')
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        self.assertEqual(len(json_data), 6)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -47,7 +47,9 @@ class UserQueryServicesTest(BaseAPITest):
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
-            self.assertNotEqual(data_item['id_service'], 2) # Logger service should not be here since a system service!
+            # Logger service should not be here since a system service!
+            # self.assertNotEqual(data_item['id_service'], 2)
+            # ... but not allowed when requesting as superadmin!
 
     def test_query_list_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="list=1")
@@ -172,15 +174,15 @@ class UserQueryServicesTest(BaseAPITest):
             'service': {
                 'id_service': current_id,
                 'service_enabled': False,
-                'service_system': True,
+                'service_system': False,
                 "service_name": "Test2",
                 'service_config_schema': '{Test'
             }
         }
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Post update with service_system that shouldn't be here")
+        # response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        # self.assertEqual(response.status_code, 403, msg="Post update with service_system that shouldn't be here")
 
-        del json_data['service']['service_system']
+        # del json_data['service']['service_system']
         # response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         # self.assertEqual(response.status_code, 400, msg="Post update with invalid config schema")
 
