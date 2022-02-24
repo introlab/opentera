@@ -8,8 +8,8 @@ class TeraServiceSite(db.Model, BaseModel):
     id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
     id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
 
-    service_site_service = db.relationship("TeraService")
-    service_site_site = db.relationship("TeraSite")
+    service_site_service = db.relationship("TeraService", viewonly=True)
+    service_site_site = db.relationship("TeraSite", viewonly=True)
 
     def __init__(self):
         pass
@@ -50,19 +50,39 @@ class TeraServiceSite(db.Model, BaseModel):
             site1 = TeraSite.get_site_by_sitename('Default Site')
             site2 = TeraSite.get_site_by_sitename('Top Secret Site')
 
-            service_bureau = TeraService.get_service_by_key('BureauActif')
+            service_rehab = TeraService.get_service_by_key('VideoRehabService')
+            service_filetransfer = TeraService.get_service_by_key('FileTransferService')
 
             service_site = TeraServiceSite()
             service_site.id_site = site1.id_site
-            service_site.id_service = service_bureau.id_service
+            service_site.id_service = service_rehab.id_service
+            db.session.add(service_site)
+
+            service_site = TeraServiceSite()
+            service_site.id_site = site1.id_site
+            service_site.id_service = service_filetransfer.id_service
             db.session.add(service_site)
 
             service_site = TeraServiceSite()
             service_site.id_site = site2.id_site
-            service_site.id_service = service_bureau.id_service
+            service_site.id_service = service_rehab.id_service
             db.session.add(service_site)
 
             db.session.commit()
+        else:
+            # Automatically associate services that are in a project to that site
+            from opentera.db.models.TeraServiceProject import TeraServiceProject
+            for sp in TeraServiceProject.query_with_filters():
+                project_site_id = sp.service_project_project.id_site
+                if not TeraServiceSite.get_service_site_for_service_site(site_id=project_site_id,
+                                                                         service_id=
+                                                                         sp.service_project_service.id_service):
+                    # No association - create a new one
+                    service_site = TeraServiceSite()
+                    service_site.id_site = project_site_id
+                    service_site.id_service = sp.service_project_service.id_service
+                    db.session.add(service_site)
+                    db.session.commit()
 
     @staticmethod
     def delete_with_ids(service_id: int, site_id: int):

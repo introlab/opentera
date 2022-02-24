@@ -760,7 +760,6 @@ class DBManagerTeraUserAccess:
         service_projects = query.all()
         if include_other_projects:
             # We must add the missing projects in the list
-            projects_ids = self.get_accessible_projects_ids()
             missing_projects_ids = set(projects_ids).difference([sp.id_project for sp in service_projects])
             for missing_project_id in missing_projects_ids:
                 service_project = TeraServiceProject()
@@ -799,44 +798,53 @@ class DBManagerTeraUserAccess:
         services = [sp.service_project_service for sp in services_projects]
         return services
 
-    # def query_services_roles_for_project(self, project_id: int):
-    #     from opentera.db.models.TeraServiceAccess import TeraServiceAccess
-    #     group_ids = self.get_accessible_users_groups_ids()
-    #     participant_groups_ids = self.get_accessible_groups_ids()
-    #     device_ids = self.get_accessible_devices_ids()
-    #
-    #     service_projects_roles = TeraServiceAccess.query.filter(or_(
-    #         TeraServiceAccess.id_user_group.in_(group_ids),
-    #         TeraServiceAccess.id_device.in_(device_ids),
-    #         TeraServiceAccess.id_participant_group.in_(participant_groups_ids)))\
-    #         .join(TeraServiceAccess.service_access_role).filter_by(id_project=project_id).all()
-    #
-    #     # if include_empty_services:
-    #     #     # We must add missing services in the list
-    #     #     services_ids = self.get_accessible_services_ids()
-    #     #     missing_services_ids = set(services_ids).difference([sp.id_service for sp in service_projects_roles])
-    #     #     for missing_service_id in missing_services_ids:
-    #     #         service_project_role = TeraServiceProjectRole()
-    #     #         service_project_role.id_project = project_id
-    #     #         service_project_role.id_service = missing_service_id
-    #     #         service_project_role.id_service_role = None
-    #     #         service_projects_roles.append(service_project_role)
-    #
-    #     return service_projects_roles
-    #
-    # def query_services_roles_for_service(self, service_id: int):
-    #     from opentera.db.models.TeraServiceAccess import TeraServiceAccess
-    #     group_ids = self.get_accessible_users_groups_ids()
-    #     participant_groups_ids = self.get_accessible_groups_ids()
-    #     device_ids = self.get_accessible_devices_ids()
-    #
-    #     service_projects_roles = TeraServiceAccess.query.filter(or_(
-    #         TeraServiceAccess.id_user_group.in_(group_ids),
-    #         TeraServiceAccess.id_device.in_(device_ids),
-    #         TeraServiceAccess.id_participant_group.in_(participant_groups_ids)))\
-    #         .join(TeraServiceAccess.service_access_role).filter_by(id_service=service_id).all()
-    #
-    #     return service_projects_roles
+    def query_sites_for_service(self, service_id: int, include_other_sites=False):
+        from opentera.db.models.TeraServiceSite import TeraServiceSite
+        site_ids = self.get_accessible_sites_ids()
+
+        query = TeraServiceSite.query.filter(TeraServiceSite.id_site.in_(site_ids)) \
+            .filter_by(id_service=service_id)
+
+        service_sites = query.all()
+        if include_other_sites:
+            # We must add the missing sites in the list
+            missing_sites_ids = set(site_ids).difference([ss.id_site for ss in service_sites])
+            for missing_site_id in missing_sites_ids:
+                service_site = TeraServiceSite()
+                service_site.id_site = missing_site_id
+                service_site.id_service = None
+                service_site.service_site_site = TeraSite.get_site_by_id(missing_site_id)
+                service_sites.append(service_site)
+
+        # Sort by site name
+        return sorted(service_sites, key=lambda ss: ss.service_site_site.site_name)
+
+    def query_services_sites_for_site(self, site_id: int, include_other_services=False):
+        from opentera.db.models.TeraServiceSite import TeraServiceSite
+        from opentera.db.models.TeraService import TeraService
+        services_ids = self.get_accessible_services_ids(include_system_services=True)
+
+        service_sites = TeraServiceSite.query.filter(TeraServiceSite.id_service.in_(services_ids)) \
+            .filter_by(id_site=site_id).all()
+
+        if include_other_services:
+            # We must add the missing services in the list, even if we don't have access to them
+            services_ids = self.get_accessible_services_ids(all_services=True)
+            missing_services_ids = set(services_ids).difference([ss.id_service for ss in service_sites])
+            for missing_service_id in missing_services_ids:
+                service_site = TeraServiceSite()
+                service_site.id_site = None
+                service_site.id_service = missing_service_id
+                service_site.service_site_service = TeraService.get_service_by_id(missing_service_id)
+                service_sites.append(service_site)
+
+        # Sort by service name
+        return sorted(service_sites, key=lambda ss: ss.service_site_service.service_name)
+
+    def query_services_for_site(self, site_id: int, include_other_services=False):
+        services_sites = self.query_services_sites_for_site(site_id, include_other_services)
+        services = [ss.service_site_service for ss in services_sites]
+        return services
 
     def query_users_usergroups_for_usergroup(self, user_group_id: int, enabled_only: bool = False,
                                              include_other_users: bool = False):

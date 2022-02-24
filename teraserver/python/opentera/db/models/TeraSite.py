@@ -48,13 +48,13 @@ class TeraSite(db.Model, BaseModel):
     def get_site_by_id(site_id: int):
         return TeraSite.query.filter_by(id_site=site_id).first()
 
-    @staticmethod
-    def query_data(filter_args):
-        if isinstance(filter_args, tuple):
-            return TeraSite.query.filter_by(*filter_args).all()
-        if isinstance(filter_args, dict):
-            return TeraSite.query.filter_by(**filter_args).all()
-        return None
+    # @staticmethod
+    # def query_data(filter_args):
+    #     if isinstance(filter_args, tuple):
+    #         return TeraSite.query.filter_by(*filter_args).all()
+    #     if isinstance(filter_args, dict):
+    #         return TeraSite.query.filter_by(**filter_args).all()
+    #     return None
 
     @classmethod
     def delete(cls, id_todel):

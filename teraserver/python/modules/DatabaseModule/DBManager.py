@@ -22,7 +22,6 @@ from opentera.db.models.TeraDeviceSubType import TeraDeviceSubType
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraSessionType import TeraSessionType
-# from opentera.db.models.TeraDeviceData import TeraDeviceData
 from opentera.db.models.TeraDeviceProject import TeraDeviceProject
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraServerSettings import TeraServerSettings
@@ -32,7 +31,7 @@ from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 from opentera.db.models.TeraServiceProject import TeraServiceProject
-# from opentera.db.models.TeraServiceSite import TeraServiceSite
+from opentera.db.models.TeraServiceSite import TeraServiceSite
 from opentera.db.models.TeraUserGroup import TeraUserGroup
 from opentera.db.models.TeraUserPreference import TeraUserPreference
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
@@ -195,9 +194,9 @@ class DBManager (BaseModule):
             print('No service - project association - creating defaults')
             TeraServiceProject.create_defaults(test)
 
-        # if TeraServiceSite.get_count() == 0:
-        #     print('No service - site association - creating defaults')
-        #     TeraServiceSite.create_defaults(test)
+        if TeraServiceSite.get_count() == 0:
+            print('No service - site association - creating defaults')
+            TeraServiceSite.create_defaults(test)
 
         if TeraParticipantGroup.get_count() == 0:
             print("No participant groups - creating defaults")

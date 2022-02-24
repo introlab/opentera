@@ -27,7 +27,7 @@ get_parser.add_argument('with_roles', type=inputs.boolean, help='Used with id_pr
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('service_project', type=str, location='json',
 #                          help='Service - project association to create / update', required=True)
-post_schema = api.schema_model('user_service_project', {'properties': TeraServiceProject.get_json_schema(),
+post_schema = api.schema_model('service_project', {'properties': TeraServiceProject.get_json_schema(),
                                                         'type': 'object',
                                                         'location': 'json'})
 
@@ -161,6 +161,7 @@ class UserQueryServiceProjects(Resource):
             if 'services' not in request.json['project']:
                 return gettext('Missing services'), 400
             id_project = request.json['project']['id_project']
+
             # Only site admin can modify
             from opentera.db.models.TeraProject import TeraProject
             project = TeraProject.get_project_by_id(id_project)
