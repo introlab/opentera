@@ -51,7 +51,6 @@ class TeraServiceProject(db.Model, BaseModel):
             project2 = TeraProject.get_project_by_projectname('Default Project #2')
 
             servicefile = TeraService.get_service_by_key('FileTransferService')
-            # serviceviddispatch = TeraService.get_service_by_key('VideoDispatch')
             servicevideorehab = TeraService.get_service_by_key('VideoRehabService')
 
             service_project = TeraServiceProject()

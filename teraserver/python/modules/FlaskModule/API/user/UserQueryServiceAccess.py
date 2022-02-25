@@ -205,7 +205,7 @@ class UserQueryServiceAccess(Resource):
             return gettext('Not found'), 400
 
         if todel_access.service_access_role.id_service not \
-                in user_access.get_accessible_services_ids(include_system_services=False):
+                in user_access.get_accessible_services_ids():
             return gettext('Forbidden'), 403
 
         if todel_access.id_user_group:

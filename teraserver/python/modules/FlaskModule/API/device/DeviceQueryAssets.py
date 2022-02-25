@@ -50,7 +50,7 @@ class DeviceQueryAssets(Resource):
         services_infos = []
         if (args['with_urls'] or args['with_only_token']) and assets:
             services_infos = {service.service_uuid: service.service_clientendpoint
-                              for service in device_access.get_accessible_services(include_system_services=True)}
+                              for service in device_access.get_accessible_services()}
 
             # Access token
             # from opentera.redis.RedisVars import RedisVars

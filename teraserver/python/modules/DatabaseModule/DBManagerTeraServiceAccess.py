@@ -97,9 +97,18 @@ class DBManagerTeraServiceAccess:
         return ses_ids
 
     def get_accessibles_sites(self):
-        projects = self.get_accessible_projects()
-        sites = set([project.project_site for project in projects])
-        return list(sites)
+        # projects = self.get_accessible_projects()
+        # sites = set([project.project_site for project in projects])
+        # return list(sites)
+
+        # Build site list - get sites where that service is associated
+        from opentera.db.models.TeraServiceSite import TeraServiceSite
+        service_sites = TeraServiceSite.get_sites_for_service(self.service.id_service)
+
+        site_list = []
+        for service_site in service_sites:
+            site_list.append(service_site.service_site_service)
+        return site_list
 
     def get_accessibles_sites_ids(self):
         return [site.id_site for site in self.get_accessibles_sites()]

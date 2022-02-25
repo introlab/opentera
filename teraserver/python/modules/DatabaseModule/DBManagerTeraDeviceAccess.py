@@ -1,4 +1,3 @@
-
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraDevice import TeraDevice
@@ -85,7 +84,7 @@ class DBManagerTeraDeviceAccess:
 
         return query.all()
 
-    def get_accessible_services(self, include_system_services=False):
+    def get_accessible_services(self):
         from opentera.db.models.TeraService import TeraService
         from opentera.db.models.TeraServiceProject import TeraServiceProject
 
@@ -93,9 +92,6 @@ class DBManagerTeraDeviceAccess:
 
         query = TeraService.query.join(TeraServiceProject).filter(
             TeraServiceProject.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
-
-        if not include_system_services:
-            query = query.filter_by(service_system=False)
 
         return query.all()
 

@@ -127,7 +127,8 @@ class UserQuerySessionTypeProject(Resource):
 
                 # Get services for that project
                 if session_type.session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE and \
-                        session_type.id_session not in user_access.query_services_projects_for_project(json_stp['id_project']):
+                        session_type.id_session not in user_access.\
+                        query_services_projects_for_project(json_stp['id_project']):
                     return gettext('Trying to associate a session type of type "service" with a service not associated '
                                    'to that project'), 400
 

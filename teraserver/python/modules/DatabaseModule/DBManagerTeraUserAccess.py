@@ -342,37 +342,37 @@ class DBManagerTeraUserAccess:
 
         return ses_ids
 
-    def get_accessible_services(self, admin_only=False, include_system_services=False, all_services=False):
+    def get_accessible_services(self, admin_only=False):
         from opentera.db.models.TeraService import TeraService
         from opentera.db.models.TeraServiceRole import TeraServiceRole
         from opentera.db.models.TeraServiceProject import TeraServiceProject
+        from opentera.db.models.TeraServiceSite import TeraServiceSite
 
         if self.user.user_superadmin:
             if self.user.user_superadmin:
                 return TeraService.query.all()
-        if all_services:
-            return TeraService.query.filter_by(service_system=False).all()
 
+        # Accessible services are those from projects and sites where the user is admin
         accessible_projects_ids = self.get_accessible_projects_ids()
-        if not include_system_services:
-            query = TeraService.query.filter_by(service_system=False).join(TeraServiceProject).filter(
-                TeraServiceProject.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
-        else:
-            query = TeraService.query.join(TeraServiceProject).filter(TeraServiceProject
-                                                                      .id_project.in_(accessible_projects_ids)) \
-                .group_by(TeraService.id_service)
+        admin_sites_ids = self.get_accessible_sites_ids(admin_only=True)
+        query = TeraService.query.outerjoin(TeraServiceProject).outerjoin(TeraServiceSite).filter(or_(
+            TeraServiceProject.id_project.in_(accessible_projects_ids),
+            TeraServiceSite.id_site.in_(admin_sites_ids)
+        ))
+
+        # if not include_system_services:
+        #     query = query.filter(TeraService.service_system == False)
 
         if admin_only:
             query = query.join(TeraServiceRole).filter(TeraServiceRole.service_role_name == 'admin')
 
+        query = query.group_by(TeraService.id_service)
         return query.all()
 
-    def get_accessible_services_ids(self, admin_only=False, include_system_services=False, all_services=False):
+    def get_accessible_services_ids(self, admin_only=False):
         services_ids = []
 
-        for service in self.get_accessible_services(admin_only=admin_only,
-                                                    include_system_services=include_system_services,
-                                                    all_services=all_services):
+        for service in self.get_accessible_services(admin_only=admin_only):
             services_ids.append(service.id_service)
 
         return services_ids
@@ -773,16 +773,23 @@ class DBManagerTeraUserAccess:
 
     def query_services_projects_for_project(self, project_id: int, include_other_services=False):
         from opentera.db.models.TeraServiceProject import TeraServiceProject
+        from opentera.db.models.TeraServiceSite import TeraServiceSite
         from opentera.db.models.TeraService import TeraService
-        services_ids = self.get_accessible_services_ids(include_system_services=True)
+        from opentera.db.models.TeraProject import TeraProject
+        services_ids = self.get_accessible_services_ids()
 
         service_projects = TeraServiceProject.query.filter(TeraServiceProject.id_service.in_(services_ids)) \
             .filter_by(id_project=project_id).all()
 
         if include_other_services:
             # We must add the missing services in the list, even if we don't have access to them
-            services_ids = self.get_accessible_services_ids(all_services=True)
-            missing_services_ids = set(services_ids).difference([sp.id_service for sp in service_projects])
+            # services_ids = self.get_accessible_services_ids(all_services=True)
+            project = TeraProject.get_project_by_id(project_id=project_id)
+            if not project:
+                return []
+            other_services = TeraServiceSite.get_services_for_site(id_site=project.id_site)
+            other_services_ids = [service.id_service for service in other_services]
+            missing_services_ids = set(other_services_ids).difference([sp.id_service for sp in service_projects])
             for missing_service_id in missing_services_ids:
                 service_project = TeraServiceProject()
                 service_project.id_project = None
@@ -822,14 +829,18 @@ class DBManagerTeraUserAccess:
     def query_services_sites_for_site(self, site_id: int, include_other_services=False):
         from opentera.db.models.TeraServiceSite import TeraServiceSite
         from opentera.db.models.TeraService import TeraService
-        services_ids = self.get_accessible_services_ids(include_system_services=True)
+        services_ids = self.get_accessible_services_ids()
 
         service_sites = TeraServiceSite.query.filter(TeraServiceSite.id_service.in_(services_ids)) \
             .filter_by(id_site=site_id).all()
 
         if include_other_services:
             # We must add the missing services in the list, even if we don't have access to them
-            services_ids = self.get_accessible_services_ids(all_services=True)
+            if self.user.user_superadmin:
+                other_services = TeraService.query_with_filters()
+            else:
+                other_services = TeraServiceSite.get_services_for_site(id_site=site_id)
+            services_ids = [service.id_service for service in other_services]
             missing_services_ids = set(services_ids).difference([ss.id_service for ss in service_sites])
             for missing_service_id in missing_services_ids:
                 service_site = TeraServiceSite()
@@ -933,7 +944,7 @@ class DBManagerTeraUserAccess:
 
     def query_service_configs(self, service_id: int = None, user_id: int = None, device_id: int = None,
                               participant_id: int = None, include_services_without_config: bool = False):
-        if service_id and service_id not in self.get_accessible_services_ids(include_system_services=True):
+        if service_id and service_id not in self.get_accessible_services_ids():
             return None
         if user_id and user_id not in self.get_accessible_users_ids():
             return None
@@ -972,7 +983,7 @@ class DBManagerTeraUserAccess:
 
         if include_services_without_config:
             # Also create "empty" configs for service not in the list
-            services = self.get_accessible_services(include_system_services=True)
+            services = self.get_accessible_services()
             missing_services = set(services).difference([sc.service_config_service for sc in services_configs])
             for service in missing_services:
                 # Check if that service allows for editable configs. If not, ignore!
@@ -989,7 +1000,7 @@ class DBManagerTeraUserAccess:
                              service_id: int = None):
         from opentera.db.models.TeraServiceAccess import TeraServiceAccess
         from opentera.db.models.TeraServiceRole import TeraServiceRole
-        accessible_services_ids = self.get_accessible_services_ids(include_system_services=True)
+        accessible_services_ids = self.get_accessible_services_ids()
 
         query = TeraServiceAccess.query
         if user_group_id:

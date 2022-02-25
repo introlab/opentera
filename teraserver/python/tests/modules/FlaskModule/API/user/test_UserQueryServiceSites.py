@@ -44,7 +44,7 @@ class UserQueryServiceSitesTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        self.assertEqual(len(json_data), 3)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -95,7 +95,7 @@ class UserQueryServiceSitesTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        self.assertEqual(len(json_data), 2)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -107,7 +107,7 @@ class UserQueryServiceSitesTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        self.assertEqual(len(json_data), 3)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item, minimal=True)
@@ -143,7 +143,7 @@ class UserQueryServiceSitesTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        self.assertEqual(len(json_data), 3)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -301,15 +301,16 @@ class UserQueryServiceSitesTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 4)  # Everything was added
 
-        json_data = {'site': {'id_site': 1, 'services': [{'id_service': 3},
+        json_data = {'site': {'id_site': 1, 'services': [{'id_service': 2},
+                                                         {'id_service': 3},
                                                          {'id_service': 5}]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Remove 2 services")
+        self.assertEqual(response.status_code, 200, msg="Remove 1 service")
 
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)  # Back to the default state
+        self.assertEqual(len(json_data), 3)  # Back to the default state
 
     def test_post_service_site_and_delete(self):
         # Service-Project update
@@ -335,7 +336,7 @@ class UserQueryServiceSitesTest(BaseAPITest):
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
-        self.assertEqual(len(json_data), 3)
+        self.assertEqual(len(json_data), 4)
 
         current_id = None
         for sp in json_data:
@@ -357,7 +358,7 @@ class UserQueryServiceSitesTest(BaseAPITest):
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)  # Back to initial state!
+        self.assertEqual(len(json_data), 3)  # Back to initial state!
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

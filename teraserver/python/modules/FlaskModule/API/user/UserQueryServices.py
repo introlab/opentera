@@ -16,6 +16,7 @@ from flask_babel import gettext
 get_parser = api.parser()
 get_parser.add_argument('id_service', type=int, help='ID of the service to query')
 get_parser.add_argument('id_project', type=int, help='ID of the project to query services from')
+get_parser.add_argument('id_site', type=int, help='ID of the site to query services from')
 get_parser.add_argument('id', type=int, help='Alias for "id_service"')
 get_parser.add_argument('service_uuid', type=str, help='Service UUID to query')
 get_parser.add_argument('uuid', type=str, help='Alias for "service_uuid"')
@@ -65,22 +66,24 @@ class UserQueryServices(Resource):
             args['service_uuid'] = args['uuid']
 
         if args['id_service']:
-            if args['id_service'] in user_access.get_accessible_services_ids(include_system_services=True):
+            if args['id_service'] in user_access.get_accessible_services_ids():
                 services = [TeraService.get_service_by_id(args['id_service'])]
         elif args['service_uuid']:
             # If we have a service uuid, ensure that service is accessible
             service = TeraService.get_service_by_uuid(args['service_uuid'])
-            if service and service.id_service in user_access.get_accessible_services_ids(include_system_services=True):
+            if service and service.id_service in user_access.get_accessible_services_ids():
                 services = [service]
         elif args['service_key']:
             service = TeraService.get_service_by_key(args['service_key'])
-            if service and service.id_service in user_access.get_accessible_services_ids(include_system_services=True):
+            if service and service.id_service in user_access.get_accessible_services_ids():
                 services = [service]
         elif args['id_project']:
             services = user_access.query_services_for_project(project_id=args['id_project'])
+        elif args['id_site']:
+            services = user_access.query_services_for_site(site_id=args['id_site'])
         else:
             # No arguments - return all acceessible services
-            services = user_access.get_accessible_services(include_system_services=args['with_config'])
+            services = user_access.get_accessible_services()
 
         try:
             services_list = []

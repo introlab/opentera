@@ -72,7 +72,7 @@ class UserQueryAssets(Resource):
                 return gettext("User access denied"), 403
             assets = TeraAsset.get_assets_for_user(user_id=args['id_user'])
         elif args['id_creator_service']:
-            if args['id_creator_service'] not in user_access.get_accessible_services_ids(include_system_services=True):
+            if args['id_creator_service'] not in user_access.get_accessible_services_ids():
                 return gettext("Service access denied"), 403
             assets = TeraAsset.get_assets_created_by_service(service_id=args['id_creator_service'])
         elif args['id_creator_user']:
@@ -108,7 +108,7 @@ class UserQueryAssets(Resource):
         services_infos = []
         if (args['with_urls'] or args['with_only_token']) and assets:
             services_infos = {service.service_uuid: service.service_clientendpoint
-                              for service in user_access.get_accessible_services(include_system_services=True)}
+                              for service in user_access.get_accessible_services()}
 
             # # Access token
             # from opentera.redis.RedisVars import RedisVars

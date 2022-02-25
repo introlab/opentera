@@ -18,7 +18,8 @@ get_parser.add_argument('id', type=int, help='Alias for "id_group"')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 # post_parser = reqparse.RequestParser()
-# post_parser.add_argument('group', type=str, location='json', help='Participant group to create / update', required=True)
+# post_parser.add_argument('group', type=str, location='json', help='Participant group to create / update',
+# required=True)
 post_schema = api.schema_model('user_participant_group', {'properties': TeraParticipantGroup.get_json_schema(),
                                                           'type': 'object',
                                                           'location': 'json'})

@@ -52,6 +52,7 @@ class TeraServiceSite(db.Model, BaseModel):
 
             service_rehab = TeraService.get_service_by_key('VideoRehabService')
             service_filetransfer = TeraService.get_service_by_key('FileTransferService')
+            service_logging = TeraService.get_service_by_key('LoggingService')
 
             service_site = TeraServiceSite()
             service_site.id_site = site1.id_site
@@ -64,8 +65,13 @@ class TeraServiceSite(db.Model, BaseModel):
             db.session.add(service_site)
 
             service_site = TeraServiceSite()
+            service_site.id_site = site1.id_site
+            service_site.id_service = service_logging.id_service
+            db.session.add(service_site)
+
+            service_site = TeraServiceSite()
             service_site.id_site = site2.id_site
-            service_site.id_service = service_rehab.id_service
+            service_site.id_service = service_filetransfer.id_service
             db.session.add(service_site)
 
             db.session.commit()

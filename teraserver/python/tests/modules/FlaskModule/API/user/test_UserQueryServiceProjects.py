@@ -55,7 +55,7 @@ class UserQueryServiceProjectsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 6)
+        self.assertEqual(len(json_data), 3)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -143,7 +143,7 @@ class UserQueryServiceProjectsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        self.assertEqual(len(json_data), 3)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -281,17 +281,23 @@ class UserQueryServiceProjectsTest(BaseAPITest):
                                                                {'id_service': 4},
                                                                {'id_service': 5}]}}
         response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Add all services OK")
+        self.assertEqual(response.status_code, 403, msg="One service not allowed - not part of the site project!")
+
+        json_data = {'project': {'id_project': 1, 'services': [{'id_service': 2},
+                                                               {'id_service': 3},
+                                                               {'id_service': 5}]}}
+        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
+        self.assertEqual(response.status_code, 200, msg="New service association OK")
 
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
-        self.assertEqual(len(json_data), 4)  # Everything was added
+        self.assertEqual(len(json_data), 3)  # Everything was added
 
         json_data = {'project': {'id_project': 1, 'services': [{'id_service': 3},
                                                                {'id_service': 5}]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Remove 2 services")
+        self.assertEqual(response.status_code, 200, msg="Remove 1 service")
 
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
@@ -314,6 +320,10 @@ class UserQueryServiceProjectsTest(BaseAPITest):
 
         json_data = {'service_project': {'id_project': 1, 'id_service': 4}}
         response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
+        self.assertEqual(response.status_code, 403, msg="Add new association not OK - project not part of the site")
+
+        json_data = {'service_project': {'id_project': 1, 'id_service': 2}}
+        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Add new association OK")
 
         params = {'id_project': 1}
@@ -324,7 +334,7 @@ class UserQueryServiceProjectsTest(BaseAPITest):
 
         current_id = None
         for sp in json_data:
-            if sp['id_service'] == 4:
+            if sp['id_service'] == 2:
                 current_id = sp['id_service_project']
                 break
         self.assertFalse(current_id is None)

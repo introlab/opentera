@@ -66,9 +66,10 @@ class UserQueryProjects(Resource):
                 user_access = DBManager.userAccess(queried_user)
                 projects = user_access.get_accessible_projects()
         elif args['id_service']:
-            projects = [project.service_project_project
-                        for project in
-                        user_access.query_projects_for_service(args['id_service'], site_id=args['id_site'])]
+            if args['id_service'] in user_access.get_accessible_services_ids():
+                projects = [project.service_project_project
+                            for project in
+                            user_access.query_projects_for_service(args['id_service'], site_id=args['id_site'])]
         elif args['id_site']:
             # If we have a site id, query for projects of that site
             projects = user_access.query_projects_for_site(site_id=args['id_site'])
