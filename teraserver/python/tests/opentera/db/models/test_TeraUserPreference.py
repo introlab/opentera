@@ -102,8 +102,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
         TeraUserPreference.insert_or_update_or_delete_user_preference(user_id=1, app_tag='newapp',
                                                                       prefs={'key': 'value'})
 
-        preference: TeraUserPreference = \
-            self.assertIsNotNone(TeraUserPreference.get_user_preferences_for_user_and_app(1,'newapp'))
+        self.assertIsNotNone(TeraUserPreference.get_user_preferences_for_user_and_app(1,'newapp'))
 
         # Update
         TeraUserPreference.insert_or_update_or_delete_user_preference(user_id=1, app_tag='newapp',
