@@ -1,20 +1,9 @@
-import unittest
-import os
-
 from modules.DatabaseModule.DBManager import DBManager
-
 from opentera.db.models.TeraUser import TeraUser
-from opentera.config.ConfigManager import ConfigManager
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
 class DBManagerTeraUserAccessTest(BaseModelsTest):
-
-    filename = os.path.join(os.path.dirname(__file__), 'DBManagerTeraUserAccessTest.db')
-
-    SQLITE = {
-        'filename': filename
-    }
 
     def setUp(self):
         super().setUp()

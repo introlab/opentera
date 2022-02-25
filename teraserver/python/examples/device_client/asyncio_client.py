@@ -33,7 +33,18 @@ async def send_device_status(client: aiohttp.ClientSession, url: str, token: str
 
             # This can be anything...
             status = {
-                'status': {'battery': 10.4, 'charging': False},
+                'status': {'battery': 10.4,
+                           'isCharging': False,
+                           'batteryVoltage': 14.5,
+                           'batteryCurrent': 1.0,
+                           'batteryLevel': 56,
+                           'cpuUsage': 80,
+                           'memUsage': 34,
+                           'diskUsage': 21,
+                           'wifiNetwork': 'testnetwork',
+                           'wifiStrength': 100,
+                           'localIp': '192.168.1.100'
+                           },
                 'timestamp': datetime.now().timestamp()
             }
 

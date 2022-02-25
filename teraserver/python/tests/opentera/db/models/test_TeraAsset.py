@@ -1,20 +1,8 @@
-import unittest
-import os
-
-from modules.DatabaseModule.DBManager import DBManager
-
 from opentera.db.models.TeraAsset import TeraAsset
-from opentera.config.ConfigManager import ConfigManager
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
 class TeraAssetTest(BaseModelsTest):
-
-    filename = os.path.join(os.path.dirname(__file__), 'TeraAssetTest.db')
-
-    SQLITE = {
-        'filename': filename
-    }
 
     def test_defaults(self):
         for asset in TeraAsset.query.all():
