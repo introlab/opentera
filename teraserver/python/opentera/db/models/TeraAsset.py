@@ -42,12 +42,21 @@ class TeraAsset(db.Model, BaseModel):
     asset_service = db.relationship("TeraService", foreign_keys="TeraAsset.id_service", lazy='joined')
     asset_service_owner = db.relationship("TeraService", foreign_keys="TeraAsset.asset_service_uuid", lazy='joined')
 
+    def from_json(self, json, ignore_fields=None):
+        if ignore_fields is None:
+            ignore_fields = []
+
+        ignore_fields.extend(['asset_session', 'asset_device', 'asset_user', 'asset_participant', 'asset_service',
+                              'asset_service_owner', 'asset_service_owner_name', 'asset_session_name'])
+
+        super().from_json(json, ignore_fields)
+
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
 
         ignore_fields.extend(['asset_session', 'asset_device', 'asset_user', 'asset_participant', 'asset_service',
-                              'asset_service_owner'])
+                              'asset_service_owner', 'asset_service_owner_name', 'asset_session_name'])
 
         asset_json = super().to_json(ignore_fields=ignore_fields)
         if not minimal:
@@ -61,7 +70,6 @@ class TeraAsset(db.Model, BaseModel):
                 asset_json['asset_participant'] = self.asset_participant.participant_name
             if self.id_service:
                 asset_json['asset_service'] = self.asset_service.service_name
-
 
         return asset_json
 

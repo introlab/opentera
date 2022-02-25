@@ -1,20 +1,11 @@
-import unittest
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
-import os
-from opentera.config.ConfigManager import ConfigManager
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
 class TeraUserTest(BaseModelsTest):
-
-    filename = os.path.join(os.path.dirname(__file__), 'TeraUserTest.db')
-
-    SQLITE = {
-        'filename': filename
-    }
 
     def test_empty(self):
         pass

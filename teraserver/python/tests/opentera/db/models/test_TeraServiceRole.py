@@ -1,4 +1,3 @@
-import os
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
 from opentera.db.Base import db
@@ -7,12 +6,6 @@ from opentera.db.models.TeraServiceRole import TeraServiceRole
 
 
 class TeraServiceRoleTest(BaseModelsTest):
-
-    filename = os.path.join(os.path.dirname(__file__), 'TeraServiceRoleTest.db')
-
-    SQLITE = {
-        'filename': filename
-    }
 
     def test_nullable_args(self):
         new_service_role = TeraServiceRole()
