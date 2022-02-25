@@ -96,7 +96,7 @@ class UserQuerySessionTypesTest(BaseAPITest):
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 400, msg="Missing id_service")  # Missing id_service
 
-        json_data['session_type']['id_service'] = 1
+        json_data['session_type']['id_service'] = 5
         json_data['session_type']['session_type_projects'] = [{'id_project': 1}, {'id_project': 3}]
         response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
         self.assertEqual(response.status_code, 403, msg="No access to project!")
@@ -105,7 +105,11 @@ class UserQuerySessionTypesTest(BaseAPITest):
         self.assertEqual(response.status_code, 403, msg="Post denied for user")  # Forbidden for that user to post that
 
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post new")  # All ok now!
+        self.assertEqual(response.status_code, 400, msg="Post new, bad service project association")
+
+        json_data['session_type']['id_service'] = 3
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        self.assertEqual(response.status_code, 200, msg="Post OK")
 
         json_data = response.json()[0]
         self._checkJson(json_data)
@@ -157,6 +161,19 @@ class UserQuerySessionTypesTest(BaseAPITest):
 
         response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=current_id)
         self.assertEqual(response.status_code, 200, msg="Delete OK")
+
+        # Remove created project-service association
+        params = {'id_project': 3}
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params,
+                                                endpoint='/api/user/services/projects')
+        self.assertEqual(response.status_code, 200)
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+        id_service_project = json_data[0]['id_service_project']
+
+        response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=id_service_project,
+                                               endpoint='/api/user/services/projects')
+        self.assertEqual(response.status_code, 200, msg='Back to default state!')
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

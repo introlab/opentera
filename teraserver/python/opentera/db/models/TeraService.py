@@ -25,6 +25,7 @@ class TeraService(db.Model, BaseModel):
 
     service_roles = db.relationship('TeraServiceRole', cascade='delete')
     service_projects = db.relationship('TeraServiceProject', cascade='delete')
+    service_sites = db.relationship('TeraServiceSite', cascade='delete')
 
     def __init__(self):
         pass
@@ -39,7 +40,7 @@ class TeraService(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend(['service_roles', 'service_projects'])
+        ignore_fields.extend(['service_roles', 'service_projects', 'service_sites'])
 
         if minimal:
             ignore_fields.extend(['service_default_config'])

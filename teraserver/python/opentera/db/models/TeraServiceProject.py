@@ -1,4 +1,5 @@
 from opentera.db.Base import db, BaseModel
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraServiceProject(db.Model, BaseModel):
@@ -68,11 +69,56 @@ class TeraServiceProject(db.Model, BaseModel):
             service_project.id_service = servicefile.id_service
             db.session.add(service_project)
 
+            service_project = TeraServiceProject()
+            service_project.id_project = 3
+            service_project.id_service = servicefile.id_service
+            db.session.add(service_project)
+
             db.session.commit()
+
+    @classmethod
+    def insert(cls, stp):
+        # Check if that site of that project has the site associated to it
+        from opentera.db.models.TeraServiceSite import TeraServiceSite
+        from opentera.db.models.TeraProject import TeraProject
+        project = TeraProject.get_project_by_id(project_id=stp.id_project)
+        service_site = TeraServiceSite.get_service_site_for_service_site(site_id=project.id_site,
+                                                                         service_id=stp.id_service)
+        if not service_site:
+            raise IntegrityError(params='Service not associated to project site', orig='TeraServiceProject.insert',
+                                 statement='insert')
+        super().insert(stp)
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        values = cls.clean_values(values)
+        stp = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
+        stp.from_json(values)
+        # Check if that site of that project has the site associated to it
+        from opentera.db.models.TeraServiceSite import TeraServiceSite
+        service_site = TeraServiceSite.get_service_site_for_service_site(site_id=stp.service_project_project.id_site,
+                                                                         service_id=stp.id_service)
+        if not service_site:
+            raise IntegrityError(params='Service not associated to project site', orig='TeraServiceProject.update',
+                                 statement='update')
+        cls.commit()
 
     @staticmethod
     def delete_with_ids(service_id: int, project_id: int):
         delete_obj = TeraServiceProject.query.filter_by(id_service=service_id, id_project=project_id).first()
         if delete_obj:
-            db.session.delete(delete_obj)
-            db.session.commit()
+            TeraServiceProject.delete(delete_obj.id_service_project)
+
+    @classmethod
+    def delete(cls, id_todel):
+        from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+        # Delete all session type association to that project
+        delete_obj = TeraServiceProject.query.filter_by(id_service_project=id_todel).first()
+
+        if delete_obj:
+            session_types = TeraSessionTypeProject.query_sessions_types_for_project(delete_obj.id_project)
+            for session_type in session_types:
+                TeraSessionTypeProject.delete(session_type.id_session_type_project)
+
+            # Ok, delete it
+            super().delete(id_todel)

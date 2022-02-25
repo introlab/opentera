@@ -5,8 +5,9 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraServiceProject import TeraServiceProject
 from modules.DatabaseModule.DBManager import DBManager
-from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.exc import InvalidRequestError, IntegrityError
 from sqlalchemy import exc
 from flask_babel import gettext
 
@@ -73,7 +74,7 @@ class UserQuerySessionTypes(Resource):
         except InvalidRequestError:
             self.module.logger.log_error(self.module.module_name,
                                          UserQuerySessionTypes.__name__,
-                                         'get', 500, 'InvalidRequestError', e)
+                                         'get', 500, 'InvalidRequestError')
             return gettext('Invalid request'), 500
 
     @user_multi_auth.login_required
@@ -185,7 +186,6 @@ class UserQuerySessionTypes(Resource):
                 # New session type - directly update the list
                 update_session_type.session_type_projects = [TeraProject.get_project_by_id(project_id)
                                                              for project_id in st_projects_ids]
-                update_session_type.commit()
             else:
                 # Updated session type - first, we add projects not already there
                 update_st_current_projects = [project.id_project for project in
@@ -194,8 +194,8 @@ class UserQuerySessionTypes(Resource):
                 update_session_type.session_type_projects.extend([TeraProject.get_project_by_id(project_id)
                                                                   for project_id in projects_to_add])
 
-                # Then, we delete groups that the current user has access, but are not present in the posted list,
-                # without touching groups already there
+                # Then, we delete projects that the current user has access, but are not present in the posted list,
+                # without touching projects already there
                 current_user_projects = user_access.get_accessible_projects_ids(admin_only=True)
                 update_st_current_projects.extend(list(projects_to_add))
                 missing_projects = set(current_user_projects).difference(st_projects_ids)
@@ -203,10 +203,23 @@ class UserQuerySessionTypes(Resource):
                     if project_id in update_st_current_projects:
                         update_session_type.session_type_projects.remove(TeraProject.get_project_by_id(project_id))
 
-                update_session_type.commit()
+            # Check if it's a session type of type service and where the services are all associated to that project
+            if update_session_type.session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE.value:
+                service_projects_ids = [service.id_project for service in TeraServiceProject.get_projects_for_service(
+                    update_session_type.id_service)]
+                current_projects_ids = [project.id_project for project in update_session_type.session_type_projects]
+                if set(current_projects_ids).difference(service_projects_ids):
+                    return gettext('Session type has a a service not associated to its project'), 400
+
+            # Commit the changes we made!
+            update_session_type.commit()
+
             # Ensure that the newly added session types projects have a correct service project association, if required
             for stp in update_session_type.session_type_session_type_projects:
-                stp.check_integrity()
+                try:
+                    stp.check_integrity()
+                except IntegrityError:
+                    return gettext('Session type has a a service not associated to its project'), 400
 
         return [update_session_type.to_json()]
 

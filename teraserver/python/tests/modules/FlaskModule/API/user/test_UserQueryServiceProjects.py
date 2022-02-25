@@ -89,6 +89,19 @@ class UserQueryServiceProjectsTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item)
 
+    def test_query_service_with_projects_and_with_sites_as_admin(self):
+        params = {'id_service': 3, 'with_projects': 1, 'with_sites': 1}  # File transfer service
+        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 3)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            self.assertTrue(data_item.__contains__('id_site'))
+            self.assertTrue(data_item.__contains__('site_name'))
+
     def test_query_service_with_roles_as_admin(self):
         params = {'id_service': 5, 'with_roles': 1}  # Videorehab service
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
@@ -252,6 +265,15 @@ class UserQueryServiceProjectsTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 2)  # Back to the default state
 
+        # Recreate default associations - session types
+        json_data = {'session_type_project': [{'id_session_type': 1, 'id_project': 1},
+                                              {'id_session_type': 2, 'id_project': 1},
+                                              {'id_session_type': 3, 'id_project': 1},
+                                              {'id_session_type': 4, 'id_project': 1},
+                                              {'id_session_type': 5, 'id_project': 1}]}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+                                             endpoint='/api/user/sessiontypeprojects')
+
     def test_post_project(self):
         # Project update
         json_data = {'project': {}}
@@ -304,6 +326,15 @@ class UserQueryServiceProjectsTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 2)  # Back to the default state
 
+        # Recreate default associations - session types
+        json_data = {'session_type_project': [{'id_session_type': 1, 'id_project': 1},
+                                              {'id_session_type': 2, 'id_project': 1},
+                                              {'id_session_type': 3, 'id_project': 1},
+                                              {'id_session_type': 4, 'id_project': 1},
+                                              {'id_session_type': 5, 'id_project': 1}]}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+                                             endpoint='/api/user/sessiontypeprojects')
+
     def test_post_service_project_and_delete(self):
         # Service-Project update
         json_data = {'service_project': {}}
@@ -350,6 +381,15 @@ class UserQueryServiceProjectsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
         self.assertEqual(len(json_data), 2)  # Back to initial state!
+
+        # Recreate default associations - session types
+        json_data = {'session_type_project': [{'id_session_type': 1, 'id_project': 1},
+                                              {'id_session_type': 2, 'id_project': 1},
+                                              {'id_session_type': 3, 'id_project': 1},
+                                              {'id_session_type': 4, 'id_project': 1},
+                                              {'id_session_type': 5, 'id_project': 1}]}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+                                             endpoint='/api/user/sessiontypeprojects')
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
