@@ -51,10 +51,12 @@ class BaseAPITest(unittest.TestCase):
         url = self._make_url(self.host, self.port, self.test_endpoint)
         return get(url=url, verify=False, params=payload)
 
-    def _post_with_http_auth(self, username, password, payload=None):
+    def _post_with_http_auth(self, username, password, payload=None, endpoint=None):
         if payload is None:
             payload = {}
-        url = self._make_url(self.host, self.port, self.test_endpoint)
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        url = self._make_url(self.host, self.port, endpoint)
         return post(url=url, verify=False, auth=(username, password), json=payload)
 
     def _post_file_with_http_auth(self, username, password, files=None, data=None):
@@ -82,8 +84,11 @@ class BaseAPITest(unittest.TestCase):
         url = self._make_url(self.host, self.port, endpoint)
         return post(url=url, verify=False, headers=request_headers, json=payload)
 
-    def _delete_with_http_auth(self, username, password, id_to_del: int):
-        url = self._make_url(self.host, self.port, self.test_endpoint)
+    def _delete_with_http_auth(self, username, password, id_to_del: int, endpoint=None):
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        url = self._make_url(self.host, self.port, endpoint)
+
         return delete(url=url, verify=False, auth=(username, password), params='id=' + str(id_to_del))
 
     def _delete_with_token(self, token: str, id_to_del: int):

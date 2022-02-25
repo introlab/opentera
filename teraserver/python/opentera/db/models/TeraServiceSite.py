@@ -94,5 +94,18 @@ class TeraServiceSite(db.Model, BaseModel):
     def delete_with_ids(service_id: int, site_id: int):
         delete_obj = TeraServiceSite.query.filter_by(id_service=service_id, id_site=site_id).first()
         if delete_obj:
-            db.session.delete(delete_obj)
-            db.session.commit()
+            TeraServiceSite.delete(delete_obj.id_service_site)
+
+    @classmethod
+    def delete(cls, id_todel):
+        from opentera.db.models.TeraServiceProject import TeraServiceProject
+        # Delete all association with projects for that site
+        delete_obj = TeraServiceSite.query.filter_by(id_service_site=id_todel).first()
+
+        if delete_obj:
+            projects = TeraServiceProject.get_projects_for_service(delete_obj.id_service)
+            for service_project in projects:
+                TeraServiceProject.delete(service_project.id_service_project)
+
+            # Ok, delete it
+            super().delete(id_todel)

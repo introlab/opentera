@@ -24,6 +24,8 @@ get_parser.add_argument('with_services', type=inputs.boolean, help='Used with id
                                                                    'don\'t have any association with that project')
 get_parser.add_argument('with_roles', type=inputs.boolean, help='Used with id_project. Returns detailled information on'
                                                                 'each role for this service.')
+get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_service. Also return site information '
+                                                                'of the returned projects.')
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('service_project', type=str, location='json',
@@ -86,6 +88,9 @@ class UserQueryServiceProjects(Resource):
                         json_sp['service_key'] = sp.service_project_service.service_key
                         json_sp['service_system'] = sp.service_project_service.service_system
                         json_sp['project_name'] = sp.service_project_project.project_name
+                        if args['with_sites']:
+                            json_sp['id_site'] = sp.service_project_project.id_site
+                            json_sp['site_name'] = sp.service_project_project.project_site.site_name
                     else:
                         # Temporary object, a not-committed object, result of listing projects not associated in a
                         # service.
@@ -99,7 +104,11 @@ class UserQueryServiceProjects(Resource):
                             json_sp['service_key'] = None
                             json_sp['service_system'] = None
                         if sp.id_project:
-                            json_sp['project_name'] = TeraProject.get_project_by_id(sp.id_project).project_name
+                            project = TeraProject.get_project_by_id(sp.id_project)
+                            json_sp['project_name'] = project.project_name
+                            if args['with_sites']:
+                                json_sp['id_site'] = project.id_site
+                                json_sp['site_name'] = project.project_site.site_name
                         else:
                             json_sp['project_name'] = None
                 if args['with_roles']:
