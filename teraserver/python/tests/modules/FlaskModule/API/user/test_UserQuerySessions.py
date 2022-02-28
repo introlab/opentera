@@ -149,6 +149,19 @@ class UserQuerySessionsTest(BaseAPITest):
 
         self.assertEqual(9, len(json_data))
 
+    def test_query_for_participant_with_session_type(self):
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload="id_participant=1&with_session_type=1")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+
+        self.assertEqual(28, len(json_data))
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+            self.assertTrue(data_item.__contains__('session_type_name'))
+            self.assertTrue(data_item.__contains__('session_type_color'))
+
     def test_query_for_user_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=2")
         self.assertEqual(200, response.status_code)

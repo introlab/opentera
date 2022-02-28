@@ -29,13 +29,17 @@ class TeraSessionForm:
 
         # Building lists
         # Session types
-        ses_types = []
-
         if not project_info:
             ses_types = user_access.get_accessible_session_types()
         else:
             ses_types_projects = user_access.query_session_types_for_project(project_info.id_project)
             ses_types = [ses_type.session_type_project_session_type for ses_type in ses_types_projects]
+
+        if specific_session_id:
+            # Make sure that the session type is there even if it's not related to that project anymore. This could
+            # happen if a session type was removed from that project after the session was created
+            if session_info.id_session_type not in [ses_type.id_session_type for ses_type in ses_types]:
+                ses_types.append(session_info.session_session_type)
 
         st_list = []
         for st in ses_types:
