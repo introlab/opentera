@@ -13,11 +13,12 @@ from datetime import datetime
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('device_uuid', type=str, help='Device uuid of the device to query')
-get_parser.add_argument('with_type_info', type=inputs.boolean, help='Give more information about type',
+get_parser.add_argument('with_device_type', type=inputs.boolean, help='Give more information about type',
                         default=False)
-get_parser.add_argument('with_subtype_info', type=inputs.boolean, help='Give more information about subtype',
+get_parser.add_argument('with_device_subtype', type=inputs.boolean, help='Give more information about subtype',
                         default=False)
-
+get_parser.add_argument('with_device_assets', type=inputs.boolean, help='Give more information about assets',
+                        default=False)
 # Unused for now
 # post_parser = api.parser()
 
@@ -71,16 +72,21 @@ class ServiceQueryDevices(Resource):
             if device:
                 device_json = device.to_json()
 
-                if args['with_type_info']:
+                if args['with_device_type']:
                     if device.device_type:
-                        device_json['device_type_info'] = device.device_type.to_json(minimal=True)
+                        device_json['device_type'] = device.device_type.to_json(minimal=True)
 
-                if args['with_subtype_info']:
+                if args['with_device_subtype']:
                     # Device_subtype can be null
                     if device.device_subtype:
-                        device_json['device_subtype_info'] = device.device_subtype.to_json(minimal=True)
+                        device_json['device_subtype'] = device.device_subtype.to_json(minimal=True)
                     else:
-                        device_json['device_subtype_info'] = None
+                        device_json['device_subtype'] = None
+
+                if args['with_device_assets']:
+                    device_json['device_assets'] = []
+                    for asset in device.device_assets:
+                        device_json['device_assets'].append(asset.to_json(minimal=True))
 
                 return device_json
 
