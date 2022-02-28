@@ -13,7 +13,7 @@ from modules.FlaskModule.FlaskModule import flask_app
 import redis
 
 
-class FakeFlaskModule:
+class FakeFlaskModule(BaseModule):
     def __init__(self,  config: ConfigManager):
         BaseModule.__init__(self, ModuleNames.FLASK_MODULE_NAME.value, config)
 
@@ -28,6 +28,7 @@ class FakeFlaskModule:
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
         # Create session
         self.session = Session(flask_app)
+
 
 
 class BaseServiceAPITest(unittest.TestCase):
@@ -88,3 +89,12 @@ class BaseServiceAPITest(unittest.TestCase):
             endpoint = self.test_endpoint
         headers = {'Authorization': 'OpenTera ' + token}
         return client.post(endpoint, headers=headers, query_string=params, json=json)
+
+    def _delete_with_service_token_auth(self, client: FlaskClient, token: str = '',
+                                        params: dict = {}, endpoint: str = ''):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        headers = {'Authorization': 'OpenTera ' + token}
+        return client.delete(endpoint, headers=headers, query_string=params)
