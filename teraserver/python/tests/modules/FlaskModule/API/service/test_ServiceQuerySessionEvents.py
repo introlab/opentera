@@ -1,6 +1,5 @@
 from BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
-from modules.FlaskModule.API.service.ServiceQuerySessionEvents import ServiceQuerySessionEvents
 
 
 class ServiceQueryParticipantsTest(BaseServiceAPITest):
@@ -10,6 +9,7 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
         from modules.FlaskModule.FlaskModule import service_api_ns
         from BaseServiceAPITest import FakeFlaskModule
         # Setup minimal API
+        from modules.FlaskModule.API.service.ServiceQuerySessionEvents import ServiceQuerySessionEvents
         kwargs = {'flaskModule': FakeFlaskModule(config=BaseServiceAPITest.getConfig())}
         service_api_ns.add_resource(ServiceQuerySessionEvents, '/sessions/events', resource_class_kwargs=kwargs)
 

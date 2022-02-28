@@ -7,11 +7,27 @@ from flask.testing import FlaskClient
 from opentera.redis.RedisVars import RedisVars
 from opentera.redis.RedisClient import RedisClient
 from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraServerSettings import TeraServerSettings
+from flask_session import Session
+from modules.FlaskModule.FlaskModule import flask_app
+import redis
 
 
 class FakeFlaskModule:
     def __init__(self,  config: ConfigManager):
         BaseModule.__init__(self, ModuleNames.FLASK_MODULE_NAME.value, config)
+
+        flask_app.debug = False
+        flask_app.secret_key = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerUUID)
+        flask_app.config.update({'SESSION_TYPE': 'redis'})
+        redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
+                                   % self.config.redis_config)
+
+        flask_app.config.update({'SESSION_REDIS': redis_url})
+        flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
+        flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        # Create session
+        self.session = Session(flask_app)
 
 
 class BaseServiceAPITest(unittest.TestCase):
@@ -56,7 +72,7 @@ class BaseServiceAPITest(unittest.TestCase):
         self.service_token = service.get_token(self.service_key)
         self.service_uuid = service.service_uuid
 
-    def _get_with_service_token_auth(self, client: FlaskClient, token, params=None, endpoint=None):
+    def _get_with_service_token_auth(self, client: FlaskClient, token, params={}, endpoint=None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -64,7 +80,8 @@ class BaseServiceAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.get(endpoint, headers=headers, query_string=params)
 
-    def _post_with_service_token_auth(self, client: FlaskClient, token, json=None, params=None, endpoint=None):
+    def _post_with_service_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
+                                      params: dict = {}, endpoint: str = ''):
         if params is None:
             params = {}
         if endpoint is None:

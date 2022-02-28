@@ -22,31 +22,8 @@ get_parser.add_argument('with_device_assets', type=inputs.boolean, help='Give mo
 # Unused for now
 # post_parser = api.parser()
 
-device_schema = api.schema_model('device', {
-    'properties': {
-        'device': {
-            'type': 'object',
-            'properties': {
-                'id_device': {
-                    'type': 'integer'
-                },
-                'id_device_type': {
-                    'type': 'integer'
-                },
-                'id_device_subtype': {
-                    'type': 'integer'
-                },
-                'device_name': {
-                    'type': 'string'
-                },
-            },
-            'required': ['id_device', 'device_name', 'id_device_type', 'id_device_subtype']
-        },
-
-    },
-    'type': 'object',
-    'required': ['device']
-})
+device_schema = api.schema_model('service_device',
+                               {'properties': TeraDevice.get_json_schema(), 'type': 'object', 'location': 'json'})
 
 
 class ServiceQueryDevices(Resource):
@@ -113,42 +90,31 @@ class ServiceQueryDevices(Resource):
         if device_info['id_device_type'] < 1:
             return gettext('Unknown device type'), 403
 
-        if device_info['id_device_subtype'] < 1:
+        # id_device_subtype = 0 means no subtype
+        if device_info['id_device_subtype'] < 0:
             return gettext('Unknown device subtype'), 403
 
         # Everything ok...
+        device: TeraDevice = TeraDevice()
+
         # Create a new device?
         if device_info['id_device'] == 0:
             # Create device
-            device: TeraDevice = TeraDevice()
             device.device_name = device_info['device_name']
-            device.device_uuid = str(uuid.uuid4())
             device.id_device_type = device_info['id_device_type']
             device.id_device_subtype = device_info['id_device_subtype']
 
             # By default enabled & onlineable ?
             device.device_enabled = True
             device.device_onlineable = True
-            device.device_lastonline = datetime.now()
 
-            # Generate token
-            device.create_token()
-            db.session.add(device)
-            db.session.commit()
+            # Will generate token, last online
+            TeraDevice.insert(device)
         else:
             # Update device
-            device: TeraDevice = TeraDevice.get_device_bt_id(device_info['id_device'])
-            device.device_name = device_info['device_name']
-            device.id_device_type = device_info['id_device_type']
-            device.id_device_subtype = device_info['id_device_subtype']
-
-            device.device_enabled = True
-            device.device_onlineable = True
-            device.device_lastonline = datetime.now()
-            # Re-Generate token
-            device.create_token()
-            db.session.add(device)
-            db.session.commit()
+            TeraDevice.update(device_info['id_device'], device_info)
+            # Update info
+            device = TeraDevice.get_device_by_id(device_info['id_device'])
 
         # Return device information
         return device.to_json(minimal=False)

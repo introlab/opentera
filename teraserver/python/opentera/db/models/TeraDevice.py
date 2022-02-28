@@ -37,9 +37,9 @@ class TeraDevice(db.Model, BaseModel):
                                           back_populates="participant_devices", passive_deletes=True)
     device_sessions = db.relationship("TeraSession", secondary="t_sessions_devices", back_populates="session_devices",
                                       passive_deletes=True)
-    device_type = db.relationship('TeraDeviceType')
-    device_subtype = db.relationship('TeraDeviceSubType')
-    device_assets = db.relationship('TeraAsset', passive_deletes=True, back_populates='asset_device')
+    device_type = db.relationship('TeraDeviceType', lazy='joined')
+    device_subtype = db.relationship('TeraDeviceSubType', lazy='joined')
+    device_assets = db.relationship('TeraAsset', passive_deletes=True, back_populates='asset_device', lazy='select')
 
     authenticated = False
 
