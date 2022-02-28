@@ -80,6 +80,13 @@ class TeraSessionTypeProject(db.Model, BaseModel):
     def query_session_type_project_for_session_type_project(project_id: int, session_type_id: int):
         return TeraSessionTypeProject.query.filter_by(id_project=project_id, id_session_type=session_type_id).first()
 
+    @staticmethod
+    def query_session_type_project_for_project_and_service(project_id: int, service_id: int):
+        from opentera.db.models.TeraSessionType import TeraSessionType
+        return TeraSessionTypeProject.query.join(TeraSessionType).\
+            filter(TeraSessionType.id_service == service_id).\
+            filter(TeraSessionTypeProject.id_project == project_id).all()
+
     def check_integrity(self):
         from opentera.db.models.TeraSessionType import TeraSessionType
         # If that session type is related to a service, make sure that the service is associated to that project

@@ -46,7 +46,7 @@ class TeraSession(db.Model, BaseModel):
     session_creator_participant = db.relationship('TeraParticipant')
     session_creator_service = db.relationship('TeraService')
 
-    session_session_type = db.relationship('TeraSessionType', back_populates='session_type_sessions')
+    session_session_type = db.relationship('TeraSessionType', back_populates='session_type_sessions', lazy='joined')
     session_events = db.relationship('TeraSessionEvent', cascade="delete", back_populates='session_event_session')
     session_assets = db.relationship('TeraAsset', cascade='delete', back_populates='asset_session')
 
