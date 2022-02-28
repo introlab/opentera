@@ -50,7 +50,7 @@ class BaseServiceAPITest(unittest.TestCase):
 
         self.service_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
         if not self.service_key:
-            self.service_key = 'test_ServiceQueryDevices_key'
+            self.service_key = 'BaseServiceAPITest'
             LoginModule.redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_key)
 
         self.service_token = service.get_token(self.service_key)
