@@ -63,3 +63,11 @@ class BaseServiceAPITest(unittest.TestCase):
             endpoint = self.test_endpoint
         headers = {'Authorization': 'OpenTera ' + token}
         return client.get(endpoint, headers=headers, query_string=params)
+
+    def _post_with_service_token_auth(self, client: FlaskClient, token, json=None, params=None, endpoint=None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        headers = {'Authorization': 'OpenTera ' + token}
+        return client.post(endpoint, headers=headers, query_string=params, json=json)

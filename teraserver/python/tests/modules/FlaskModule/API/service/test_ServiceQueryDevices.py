@@ -1,7 +1,7 @@
 from BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 from modules.FlaskModule.API.service.ServiceQueryDevices import ServiceQueryDevices
-
+from opentera.db.models.TeraDevice import TeraDevice
 
 class ServiceQueryDevicesTest(BaseServiceAPITest):
     test_endpoint = '/api/service/devices'
@@ -30,3 +30,15 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=None, endpoint=self.test_endpoint)
         self.assertEqual(400, response.status_code)
+
+    def test_endpoint_with_token_auth_with_device_uuid(self):
+        # Get all devices from DB
+        devices: list[TeraDevice] = TeraDevice.query.all()
+        for device in devices:
+            device_uuid: str = device.device_uuid
+            params = {'device_uuid': device_uuid}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            device_json = device.to_json()
+            self.assertEqual(device_json, response.json)
