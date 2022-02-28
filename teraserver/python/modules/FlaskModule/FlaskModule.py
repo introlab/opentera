@@ -49,7 +49,7 @@ api = CustomAPI(flask_app, version='1.0.0', title='OpenTeraServer API',
 user_api_ns = api.namespace('user', description='API for user calls')
 device_api_ns = api.namespace('device', description='API for device calls')
 participant_api_ns = api.namespace('participant', description='API for participant calls')
-service_api_ns = api.namespace('service', descriptino='API for service calls')
+service_api_ns = api.namespace('service', description='API for service calls')
 
 
 @babel.localeselector
@@ -228,7 +228,7 @@ class FlaskModule(BaseModule):
         device_api_ns.add_resource(DeviceQueryParticipants,     '/participants', resource_class_kwargs=kwargs)
         device_api_ns.add_resource(DeviceQueryStatus,           '/status', resource_class_kwargs=kwargs)
 
-        # Finally add namespace
+        # Finally, add namespace
         api.add_namespace(device_api_ns)
 
     def init_participant_api(self):

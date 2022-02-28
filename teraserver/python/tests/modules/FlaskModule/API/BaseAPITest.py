@@ -1,6 +1,11 @@
 import unittest
 from requests import get, post, delete
 
+from opentera.db.Base import db
+from modules.DatabaseModule.DBManager import DBManager
+from opentera.config.ConfigManager import ConfigManager
+from opentera.modules.BaseModule import BaseModule, ModuleNames
+
 
 class BaseAPITest(unittest.TestCase):
     host = '127.0.0.1'
@@ -63,7 +68,7 @@ class BaseAPITest(unittest.TestCase):
         url = self._make_url(self.host, self.port, self.test_endpoint)
         return post(url=url, verify=False, auth=(username, password), files=files, data=data)
 
-    def _post_file_with_token(self, token:str, files=None, data=None):
+    def _post_file_with_token(self, token: str, files=None, data=None):
         url = self._make_url(self.host, self.port, self.test_endpoint)
         # params = {'token': token}
         request_headers = {'Authorization': 'OpenTera ' + token}
