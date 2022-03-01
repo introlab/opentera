@@ -97,6 +97,8 @@ class ServiceQueryParticipants(Resource):
             return gettext('Invalid participant email'), 403
 
         # Everything ok...
+        participant: TeraParticipant = TeraParticipant()
+
         # Create a new participant?
         if participant_info['id_participant'] == 0:
             # Create participant
@@ -108,22 +110,13 @@ class ServiceQueryParticipants(Resource):
             participant.participant_enabled = True
             participant.participant_login_enabled = True
             participant.participant_lastonline = datetime.now()
-            # Generate token
-            participant.create_token()
-            db.session.add(participant)
-            db.session.commit()
+            # Will generate token, last online
+            TeraParticipant.insert(participant)
         else:
             # Update participant
+            TeraParticipant.update(participant_info['id_participant'], participant_info)
+            # Update info
             participant = TeraParticipant.get_participant_by_id(participant_info['id_participant'])
-            participant.participant_name = participant_info['participant_name']
-            participant.participant_email = participant_info['participant_email']
-            participant.participant_enabled = True
-            participant.participant_login_enabled = True
-            participant.participant_lastonline = datetime.now()
-            # Re-Generate token
-            participant.create_token()
-            db.session.add(participant)
-            db.session.commit()
 
         # Return participant information
         return participant.to_json(minimal=False)
