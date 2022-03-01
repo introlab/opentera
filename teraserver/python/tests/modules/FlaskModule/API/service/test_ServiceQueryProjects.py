@@ -52,6 +52,6 @@ class ServiceQueryProjectsTest(BaseServiceAPITest):
 
         for id_project in denied_id_projects:
             params = {'id_project': id_project}
-            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token, params=params,
-                                                         endpoint=self.test_endpoint)
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
             self.assertEqual(403, response.status_code)
