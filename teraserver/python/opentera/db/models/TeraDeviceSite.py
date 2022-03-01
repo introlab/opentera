@@ -80,16 +80,16 @@ class TeraDeviceSite(db.Model, BaseModel):
     def query_sites_for_device(device_id: int):
         return TeraDeviceSite.query.filter_by(id_device=device_id).all()
 
-    # @staticmethod
-    # def query_sites_for_device(device_id: int) -> list:
-    #     from opentera.db.models.TeraProject import TeraProject
-    #     return TeraDeviceProject.query.filter_by(id_device=device_id).join(TeraDeviceProject.device_project_project)\
-    #         .join(TeraProject.project_site).all()
-    #     # TeraSite.query.join(TeraSite.site_projects).join(TeraDeviceProject.device_project_project)\
-    #     # .filter(id_device=device_id).all()
+    @classmethod
+    def delete(cls, id_todel):
+        from opentera.db.models.TeraDeviceProject import TeraDeviceProject
+        # Delete all association with projects for that site
+        delete_obj = TeraDeviceSite.query.filter_by(id_device_site=id_todel).first()
 
-    # @staticmethod
-    # def query_devices_for_site(site_id: int) -> list:
-    #     from opentera.db.models.TeraDevice import TeraDevice
-    #     return TeraDeviceProject.query.join(TeraDeviceProject.device_project_project).filter_by(id_site=site_id).all()
-    #     # return TeraDevice.query.join(TeraDevice.device_projects).filter_by(id_site=site_id).all()
+        if delete_obj:
+            projects = TeraDeviceProject.query_projects_for_device(delete_obj.id_device)
+            for device_project in projects:
+                TeraDeviceProject.delete(device_project.id_device_project)
+
+            # Ok, delete it
+            super().delete(id_todel)

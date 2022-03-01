@@ -66,16 +66,33 @@ class TeraDeviceProject(db.Model, BaseModel):
     def query_projects_for_device(device_id: int):
         return TeraDeviceProject.query.filter_by(id_device=device_id).all()
 
-    @staticmethod
-    def query_sites_for_device(device_id: int) -> list:
-        from opentera.db.models.TeraProject import TeraProject
-        return TeraDeviceProject.query.filter_by(id_device=device_id).join(TeraDeviceProject.device_project_project)\
-            .join(TeraProject.project_site).all()
-        # TeraSite.query.join(TeraSite.site_projects).join(TeraDeviceProject.device_project_project)\
-        # .filter(id_device=device_id).all()
+    @classmethod
+    def delete(cls, id_todel):
+        from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 
-    @staticmethod
-    def query_devices_for_site(site_id: int) -> list:
-        from opentera.db.models.TeraDevice import TeraDevice
-        return TeraDeviceProject.query.join(TeraDeviceProject.device_project_project).filter_by(id_site=site_id).all()
-        # return TeraDevice.query.join(TeraDevice.device_projects).filter_by(id_site=site_id).all()
+        # Delete participants association with that device
+        associated_participants = TeraDeviceParticipant.query_participants_for_device(
+            device_id=cls.device_project_device.id_device)
+        for part in associated_participants:
+            if part.device_participant_participant.participant_project.id_project == cls.id_project:
+                device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
+                    device_id=cls.device_project_device.id_device, participant_id=part.id_participant)
+                if device_part:
+                    TeraDeviceParticipant.delete(device_part.id_device_participant)
+
+        # Ok, delete it
+        super().delete(id_todel)
+
+    # @staticmethod
+    # def query_sites_for_device(device_id: int) -> list:
+    #     from opentera.db.models.TeraProject import TeraProject
+    #     return TeraDeviceProject.query.filter_by(id_device=device_id).join(TeraDeviceProject.device_project_project)\
+    #         .join(TeraProject.project_site).all()
+    #     # TeraSite.query.join(TeraSite.site_projects).join(TeraDeviceProject.device_project_project)\
+    #     # .filter(id_device=device_id).all()
+
+    # @staticmethod
+    # def query_devices_for_site(site_id: int) -> list:
+    #     from opentera.db.models.TeraDevice import TeraDevice
+    #     return TeraDeviceProject.query.join(TeraDeviceProject.device_project_project).filter_by(id_site=site_id).all()
+    #     # return TeraDevice.query.join(TeraDevice.device_projects).filter_by(id_site=site_id).all()

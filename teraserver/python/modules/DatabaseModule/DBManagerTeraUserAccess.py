@@ -11,6 +11,7 @@ from opentera.db.models.TeraDeviceSubType import TeraDeviceSubType
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraDeviceProject import TeraDeviceProject
+from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 
@@ -459,9 +460,9 @@ class DBManagerTeraUserAccess:
     def query_sites_for_device(self, device_id: int):
         sites = []
         if device_id in self.get_accessible_devices_ids():
-            site_devices = TeraDeviceProject.query_sites_for_device(device_id)
+            site_devices = TeraDeviceSite.query_sites_for_device(device_id)
             for site_device in site_devices:
-                sites.append(site_device.device_project_project.project_site)
+                sites.append(site_device.device_site_site)
         return sites
 
     def query_session_type_by_id(self, session_type_id: int):
@@ -652,11 +653,11 @@ class DBManagerTeraUserAccess:
     def query_device_participants_for_site(self, site_id: int):
         device_parts = []
         if site_id in self.get_accessible_sites_ids():
-            device_sites = TeraDeviceProject.query_devices_for_site(site_id=site_id)
+            device_sites = TeraDeviceSite.query_devices_for_site(site_id=site_id)
             device_ids = list()
             for device_site in device_sites:
-                if device_site.device_project_device.id_device not in device_ids:
-                    device_ids.append(device_site.device_project_device.id_device)
+                if device_site.device_site_device.id_device not in device_ids:
+                    device_ids.append(device_site.device_site_device.id_device)
                 device_parts = TeraDeviceParticipant.query.join(TeraDeviceParticipant.device_participant_device) \
                     .join(TeraParticipant).join(TeraParticipant.participant_project).join(TeraProject.project_site) \
                     .filter_by(id_site=site_id).filter(TeraDevice.id_device.in_(device_ids)).all()
