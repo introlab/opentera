@@ -113,7 +113,7 @@ class TeraServiceProject(db.Model, BaseModel):
     def delete(cls, id_todel):
         from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
         # Delete all session type association to that project
-        delete_obj : TeraServiceProject = TeraServiceProject.query.filter_by(id_service_project=id_todel).first()
+        delete_obj: TeraServiceProject = TeraServiceProject.query.filter_by(id_service_project=id_todel).first()
 
         if delete_obj:
             session_types = TeraSessionTypeProject.query_session_type_project_for_project_and_service(

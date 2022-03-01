@@ -4,7 +4,7 @@ from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDeviceProject import TeraDeviceProject
-from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -18,9 +18,6 @@ get_parser.add_argument('id_project', type=int, help='ID of the project from whi
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ids only)')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('device_project', type=str, location='json',
-#                          help='Device-project association to create / update', required=True)
 post_schema = api.schema_model('user_device_project', {'properties': TeraDeviceProject.get_json_schema(),
                                                        'type': 'object',
                                                        'location': 'json'})
@@ -105,10 +102,23 @@ class UserQueryDeviceProjects(Resource):
             if 'id_device' not in json_device_project or 'id_project' not in json_device_project:
                 return gettext('Missing fields in body'), 400
 
+            # Only site admin can modify
+            from opentera.db.models.TeraProject import TeraProject
+            project = TeraProject.get_project_by_id(json_device_project['id_project'])
+            if user_access.get_site_role(project.id_site) != 'admin':
+                return gettext('Forbidden'), 403
+
             # Check if current user can modify the posted device
             if json_device_project['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True) or\
                     json_device_project['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
                 return gettext('Forbidden'), 403
+
+            # Check if the device is part of the project site
+            device_site = TeraDeviceSite.get_device_site_id_for_device_and_site(site_id=project.id_site,
+                                                                                device_id=
+                                                                                json_device_project['id_device'])
+            if not device_site:
+                return gettext('Project site is not part of the associated site for that device'), 403
 
             # Check if already exists
             device_project = TeraDeviceProject.get_device_project_id_for_device_and_project(
@@ -174,16 +184,6 @@ class UserQueryDeviceProjects(Resource):
                 device_project.device_project_device.id_device not in \
                 user_access.get_accessible_devices_ids(admin_only=True):
             return gettext('Forbidden'), 403
-
-        # Delete participants associated with that device, since the project was changed.
-        associated_participants = TeraDeviceParticipant.query_participants_for_device(
-            device_id=device_project.device_project_device.id_device)
-        for part in associated_participants:
-            if part.device_participant_participant.participant_project.id_project == device_project.id_project:
-                device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
-                    device_id=device_project.device_project_device.id_device, participant_id=part.id_participant)
-                if device_part:
-                    TeraDeviceParticipant.delete(device_part.id_device_participant)
 
         # If we are here, we are allowed to delete. Do so.
         try:
