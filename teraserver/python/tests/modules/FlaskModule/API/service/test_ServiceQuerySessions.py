@@ -123,7 +123,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(0, data_item['session_status'])
 
     def test_get_endpoint_query_for_participant_with_limit_and_offset_and_status_and_list(self):
-        params = {'id_participant': 1, 'list':1, 'limit':2, 'offset':11, 'status': 0}
+        params = {'id_participant': 1, 'list': 1, 'limit': 2, 'offset': 11, 'status': 0}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
         self.assertEqual(200, response.status_code)
@@ -183,7 +183,6 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
         params = {'id_user': 3}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
-        # TODO Fixme
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
 
@@ -195,10 +194,9 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(1, user_count)
 
     def test_get_endpoint_query_for_user_with_list(self):
-        params = {'id_user': 3, 'list':1}
+        params = {'id_user': 3, 'list': 1}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
-        # TODO Fixme
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         for data_item in response.json:
@@ -208,7 +206,6 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
         params = {'id_user': 3, 'limit': 2}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
-        # TODO Fixme
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(2, len(response.json))
@@ -217,7 +214,6 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
         params = {'id_user': 3, 'limit': 2, 'offset': 4}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
-        # TODO Fixme
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(1, len(response.json))
@@ -226,7 +222,6 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
         params = {'id_user': 3, 'status': 2}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
-        # TODO Fixme
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(2, len(response.json))
@@ -239,7 +234,6 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
 
-        # TODO Fixme
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(1, len(response.json))
@@ -254,7 +248,6 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
         params = {'id_user': 3, 'start_date': start_date, 'end_date': end_date}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
-        # TODO Fixme
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(2, len(response.json))
@@ -265,7 +258,6 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
         params = {'id_user': 3, 'start_date': start_date}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
-        # TODO Fixme
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(3, len(response.json))
@@ -276,7 +268,6 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
         params = {'id_user': 3, 'end_date': end_date}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
-        # TODO Fixme
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(4, len(response.json))

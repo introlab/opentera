@@ -2,7 +2,7 @@ from BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 
 
-class ServiceQueryParticipantsTest(BaseServiceAPITest):
+class ServiceQuerySessionManagerTest(BaseServiceAPITest):
     test_endpoint = '/api/sessions/manager'
 
     def setUp(self):

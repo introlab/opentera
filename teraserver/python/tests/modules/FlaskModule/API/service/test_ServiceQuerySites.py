@@ -2,7 +2,7 @@ from BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 
 
-class ServiceQueryParticipantsTest(BaseServiceAPITest):
+class ServiceQuerySitesTest(BaseServiceAPITest):
     test_endpoint = '/api/service/sites'
 
     def setUp(self):

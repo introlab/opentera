@@ -34,7 +34,7 @@ class ServiceQueryServices(Resource):
         services = []
         # Can only query service with a key, id or uuid
         if not args['service_key'] and not args['id_service'] and not args['uuid_service']:
-            return gettext('Missing service key, id or uuid', 400)
+            return gettext('Missing service key, id or uuid'), 400
 
         if args['id_service']:
             services = [TeraService.get_service_by_id(args['id_service'])]

@@ -65,10 +65,11 @@ class BaseServiceAPITest(unittest.TestCase):
         # Initialize service from redis, posing as VideoRehabService
         service: TeraService = TeraService.get_service_by_key('VideoRehabService')
 
-        self.service_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
-        if not self.service_key:
+        if not LoginModule.redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
             self.service_key = 'BaseServiceAPITest'
             LoginModule.redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_key)
+        else:
+            self.service_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
 
         self.service_token = service.get_token(self.service_key)
         self.service_uuid = service.service_uuid
