@@ -23,6 +23,7 @@ from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraDeviceProject import TeraDeviceProject
+from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
@@ -222,6 +223,10 @@ class DBManager (BaseModule):
             TeraDeviceProject.create_defaults(test)
             TeraDeviceParticipant.create_defaults(test)
             TeraServiceAccess.create_defaults(test)
+
+        if TeraDeviceSite.get_count() == 0:
+            print('No device-site association - creating defaults')
+            TeraDeviceSite.create_defaults(test)
 
         if TeraSessionType.get_count() == 0:
             print("No session type - creating defaults")
