@@ -51,4 +51,3 @@ class ServiceQueryUsersTest(BaseServiceAPITest):
             self.assertEqual(200, response.status_code)
             user_json = user.to_json()
             self.assertEqual(user_json, response.json)
-    
