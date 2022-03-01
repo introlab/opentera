@@ -32,6 +32,12 @@ class ServiceQueryServicesTest(BaseServiceAPITest):
                                                      params=None, endpoint=self.test_endpoint)
         self.assertEqual(400, response.status_code)
 
+    def test_get_endpoint_with_token_auth_and_invalid_params(self):
+        params = {'my_invalid_param': True}
+        response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                     params=params, endpoint=self.test_endpoint)
+        self.assertEqual(400, response.status_code)
+
     def test_get_endpoint_with_token_auth_and_id_service(self):
 
         services: list[TeraService] = TeraService.query.all()
