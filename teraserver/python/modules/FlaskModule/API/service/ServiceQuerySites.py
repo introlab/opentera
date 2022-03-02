@@ -27,7 +27,7 @@ class ServiceQuerySites(Resource):
                         403: 'Logged service doesn\'t have permission to access the requested data'})
     def get(self):
         parser = get_parser
-        args = parser.parse_args()
+        args = parser.parse_args(strict=True)
 
         service_access = DBManager.serviceAccess(current_service)
 

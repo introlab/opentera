@@ -107,7 +107,7 @@ class DBManagerTeraServiceAccess:
 
         site_list = []
         for service_site in service_sites:
-            site_list.append(service_site.service_site_service)
+            site_list.append(service_site.service_site_site)
         return site_list
 
     def get_accessibles_sites_ids(self):
