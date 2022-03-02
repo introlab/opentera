@@ -189,7 +189,7 @@ class UserQueryServiceSites(Resource):
             if 'id_service' not in json_ss or 'id_site' not in json_ss:
                 return gettext('Badly formatted request'), 400
 
-            if 'id_service_project' not in json_ss:
+            if 'id_service_site' not in json_ss:
                 # Check if already exists
                 ss = TeraServiceSite.get_service_site_for_service_site(site_id=int(json_ss['id_site']),
                                                                        service_id=int(json_ss['id_service']))

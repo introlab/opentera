@@ -59,26 +59,35 @@ class TeraDeviceProject(db.Model, BaseModel):
         return TeraDeviceProject.query.filter_by(id_project=project_id, id_device=device_id).first()
 
     @staticmethod
-    def query_devices_for_project(project_id: int):
+    def get_devices_for_project(project_id: int):
         return TeraDeviceProject.query.filter_by(id_project=project_id).all()
 
     @staticmethod
-    def query_projects_for_device(device_id: int):
+    def get_projects_for_device(device_id: int):
         return TeraDeviceProject.query.filter_by(id_device=device_id).all()
+
+    @staticmethod
+    def delete_with_ids(device_id: int, project_id: int):
+        delete_obj = TeraDeviceProject.query.filter_by(id_device=device_id, id_project=project_id).first()
+        if delete_obj:
+            TeraDeviceProject.delete(delete_obj.id_device_project)
 
     @classmethod
     def delete(cls, id_todel):
         from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 
-        # Delete participants association with that device
-        associated_participants = TeraDeviceParticipant.query_participants_for_device(
-            device_id=cls.device_project_device.id_device)
-        for part in associated_participants:
-            if part.device_participant_participant.participant_project.id_project == cls.id_project:
-                device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
-                    device_id=cls.device_project_device.id_device, participant_id=part.id_participant)
-                if device_part:
-                    TeraDeviceParticipant.delete(device_part.id_device_participant)
+        delete_obj: TeraDeviceProject = TeraDeviceProject.query.filter_by(id_device_project=id_todel).first()
+
+        if delete_obj:
+            # Delete participants association with that device
+            associated_participants = TeraDeviceParticipant.query_participants_for_device(
+                device_id=delete_obj.device_project_device.id_device)
+            for part in associated_participants:
+                if part.device_participant_participant.participant_project.id_project == delete_obj.id_project:
+                    device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
+                        device_id=delete_obj.device_project_device.id_device, participant_id=part.id_participant)
+                    if device_part:
+                        TeraDeviceParticipant.delete(device_part.id_device_participant)
 
         # Ok, delete it
         super().delete(id_todel)

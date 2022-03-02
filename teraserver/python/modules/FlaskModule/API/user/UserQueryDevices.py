@@ -181,7 +181,7 @@ class UserQueryDevices(Resource):
                     if has_projects:
                         # Add projects
                         projects_list = []
-                        device_projects = TeraDeviceProject.query_projects_for_device(device.id_device)
+                        device_projects = TeraDeviceProject.get_projects_for_device(device.id_device)
                         for device_project in device_projects:
                             ignore_project_fields = []
                             if has_list:

@@ -1,4 +1,5 @@
 from sqlalchemy import true
+from typing import List
 
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraUserGroup import TeraUserGroup
@@ -140,8 +141,10 @@ class DBManagerTeraUserAccess:
         if self.user.user_superadmin:
             return TeraDevice.query.all()
 
-        proj_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
-        query = TeraDevice.query.join(TeraDeviceProject).filter(TeraDeviceProject.id_project.in_(proj_id_list))
+        # proj_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
+        # query = TeraDevice.query.join(TeraDeviceProject).filter(TeraDeviceProject.id_project.in_(proj_id_list))
+        site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
+        query = TeraDevice.query.join(TeraDeviceSite).filter(TeraDeviceSite.id_site.in_(site_id_list))
         return query.all()
 
     def get_accessible_devices_uuids(self, admin_only=False):
@@ -253,15 +256,6 @@ class DBManagerTeraUserAccess:
             for site in site_roles:
                 if not admin_only or (admin_only and site_roles[site]['site_role'] == 'admin'):
                     site_list.append(site)
-
-            # for site_access in self.user.user_user_group.user_group_sites_access:
-            #     if not admin_only or (admin_only and site_access.site_access_role == 'admin'):
-            #         site_list.append(site_access.site_access_site)
-            # # Also get sites from which we don't have a specific role, but that we have at least a project access into
-            # # it
-            # for project_access in self.user.user_user_group.user_group_projects_access:
-            #     if project_access.project_access_project.project_site not in site_list:
-            #         site_list.append(project_access.project_access_project.project_site)
 
         return site_list
 
@@ -393,38 +387,15 @@ class DBManagerTeraUserAccess:
         if len(role) == 1:
             return role[0]
         return None
-        # role_name = None
-        # site_roles = self.user.get_sites_roles()
-        # for site in site_roles:
-        #     if site.id_site == site_id:
-        #         role_name = site_roles[site]
-        #         break
-        # return role_name
-
-        # if self.user.user_superadmin:
-        #     # SuperAdmin is always admin.
-        #     return 'admin'
-        #
-        # role = TeraSiteAccess.query.filter_by(id_user_group=self.user.id_user_group, id_site=site_id).first()
-        # if role is not None:
-        #     role_name = role.site_access_role
-        # else:
-        #     # By default, if we have an access to any project in that site, we are a "user" of that site
-        #     role_name = None
-        #     project_access = TeraProjectAccess.get_projects_access_for_user_group(self.user.id_user_group)
-        #     for pa in project_access:
-        #         if pa.project_access_project.id_site == site_id:
-        #             role_name = 'user'
-        #             break
-        #
-        # return role_name
 
     def query_devices_for_site(self, site_id: int, device_type_id: int, enabled: bool = False):
         devices = []
         if site_id in self.get_accessible_sites_ids():
-            query = TeraDevice.query.join(TeraDeviceProject).join(TeraProject) \
-                .filter(TeraProject.id_site == site_id) \
-                .order_by(TeraDevice.device_name.asc())
+            query = TeraDevice.query.join(TeraDeviceSite).filter(TeraDeviceSite.id_site == site_id).\
+                order_by(TeraDevice.device_name.asc())
+        #     query = TeraDevice.query.join(TeraDeviceProject).join(TeraProject) \
+        #         .filter(TeraProject.id_site == site_id) \
+        #         .order_by(TeraDevice.device_name.asc())
             if device_type_id:
                 query = query.filter(TeraDevice.id_device_type == device_type_id)
             if enabled:
@@ -432,9 +403,10 @@ class DBManagerTeraUserAccess:
             devices = query.all()
         return devices
 
-    def query_devices_for_project(self, project_id: int, device_type_id: int, enabled: bool = False):
+    def query_devices_for_project(self, project_id: int, device_type_id: int = None, enabled: bool = False):
         devices = []
-        if project_id in self.get_accessible_projects_ids():
+        projects_ids = self.get_accessible_projects_ids()
+        if project_id in projects_ids:
             query = TeraDevice.query.join(TeraDeviceProject).filter_by(id_project=project_id) \
                 .order_by(TeraDevice.device_name.asc())
             if device_type_id:
@@ -442,7 +414,99 @@ class DBManagerTeraUserAccess:
             if enabled is not None:
                 query = query.filter(TeraDevice.device_enabled == enabled)
             devices = query.all()
+
         return devices
+
+    def query_devices_projects_for_project(self, project_id: int, include_other_devices=False):
+        from opentera.db.models.TeraProject import TeraProject
+        devices_ids = self.get_accessible_devices_ids()
+
+        device_projects = TeraDeviceProject.query.filter(TeraDeviceProject.id_device.in_(devices_ids)) \
+            .filter_by(id_project=project_id).all()
+
+        if include_other_devices:
+            # We must add the missing devices in the list
+            project = TeraProject.get_project_by_id(project_id=project_id)
+            if not project:
+                return []
+            other_devices = TeraDeviceSite.get_devices_for_site(site_id=project.id_site)
+            other_devices_ids = [device.id_device for device in other_devices]
+            missing_devices_ids = set(other_devices_ids).difference([dp.id_device for dp in device_projects])
+            for missing_device_id in missing_devices_ids:
+                device_project = TeraDeviceProject()
+                device_project.id_project = None
+                device_project.id_device = missing_device_id
+                device_project.device_project_device = TeraDevice.get_device_by_id(missing_device_id)
+                device_projects.append(device_project)
+
+        # Sort by device name
+        return sorted(device_projects, key=lambda dp: dp.device_project_device.device_name)
+
+    def query_devices_sites_for_site(self, site_id: int, include_other_devices=False):
+        device_sites = TeraDeviceSite.get_devices_for_site(site_id=site_id)
+
+        if include_other_devices:
+            # We must add the missing devices in the list, even if we don't have access to them
+            if self.user.user_superadmin:
+                other_devices = TeraDevice.query_with_filters()
+            else:
+                sites_ids = self.get_accessible_sites_ids()
+                other_devices = TeraDevice.query.join(TeraDeviceSite).filter(TeraDeviceSite.id_site.in_(sites_ids)) \
+                    .all()
+            device_ids = [device.id_device for device in other_devices]
+            missing_devices_ids = set(device_ids).difference([ds.id_device for ds in device_sites])
+            for missing_device_id in missing_devices_ids:
+                device_site = TeraDeviceSite()
+                device_site.id_site = None
+                device_site.id_device = missing_device_id
+                device_site.device_site_device = TeraDevice.get_device_by_id(missing_device_id)
+                device_sites.append(device_site)
+
+        # Sort by device name
+        return sorted(device_sites, key=lambda ds: ds.device_site_device.device_name)
+
+    def query_devices_sites_for_device(self, device_id: int, include_other_sites=False):
+        site_ids = self.get_accessible_sites_ids()
+
+        query = TeraDeviceSite.query.filter(TeraDeviceSite.id_site.in_(site_ids)) \
+            .filter_by(id_device=device_id)
+
+        device_sites = query.all()
+        if include_other_sites:
+            # We must add the missing sites in the list
+            missing_sites_ids = set(site_ids).difference([ds.id_site for ds in device_sites])
+            for missing_site_id in missing_sites_ids:
+                device_site = TeraDeviceSite()
+                device_site.id_site = missing_site_id
+                device_site.id_device = None
+                device_site.device_site_site = TeraSite.get_site_by_id(missing_site_id)
+                device_site.append(device_site)
+
+        # Sort by site name
+        return sorted(device_sites, key=lambda ds: ds.device_site_site.site_name)
+
+    def query_devices_projects_for_device(self, device_id: int, site_id: int = None, include_other_projects=False):
+        projects_ids = self.get_accessible_projects_ids()
+
+        query = TeraDeviceProject.query.filter(TeraDeviceProject.id_project.in_(projects_ids)) \
+            .filter_by(id_device=device_id)
+
+        if site_id:
+            query = query.join(TeraProject).filter(TeraProject.id_site == site_id)
+
+        device_projects = query.all()
+        if include_other_projects:
+            # We must add the missing projects in the list
+            missing_projects_ids = set(projects_ids).difference([dp.id_project for dp in device_projects])
+            for missing_project_id in missing_projects_ids:
+                device_project = TeraDeviceProject()
+                device_project.id_project = missing_project_id
+                device_project.id_device = None
+                device_project.device_project_project = TeraProject.get_project_by_id(missing_project_id)
+                device_projects.append(device_project)
+
+        # Sort by project
+        return sorted(device_projects, key=lambda dp: dp.device_project_project.project_name)
 
     def query_devices_by_type(self, id_type_device: int):
         accessibles_devices = self.get_accessible_devices_ids()
@@ -460,7 +524,7 @@ class DBManagerTeraUserAccess:
     def query_sites_for_device(self, device_id: int):
         sites = []
         if device_id in self.get_accessible_devices_ids():
-            site_devices = TeraDeviceSite.query_sites_for_device(device_id)
+            site_devices = TeraDeviceSite.get_sites_for_device(device_id)
             for site_device in site_devices:
                 sites.append(site_device.device_site_site)
         return sites
@@ -840,7 +904,9 @@ class DBManagerTeraUserAccess:
             if self.user.user_superadmin:
                 other_services = TeraService.query_with_filters()
             else:
-                other_services = TeraServiceSite.get_services_for_site(id_site=site_id)
+                sites_ids = self.get_accessible_sites_ids()
+                other_services = TeraService.query.join(TeraServiceSite).filter(TeraServiceSite.id_site.in_(sites_ids))\
+                    .all()
             services_ids = [service.id_service for service in other_services]
             missing_services_ids = set(services_ids).difference([ss.id_service for ss in service_sites])
             for missing_service_id in missing_services_ids:
