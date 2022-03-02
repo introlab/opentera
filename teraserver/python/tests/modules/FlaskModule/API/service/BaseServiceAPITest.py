@@ -87,6 +87,7 @@ class BaseServiceAPITest(unittest.TestCase):
         self.assertIsNotNone(self.service_key)
         self.service_token = service.get_token(self.service_key)
         self.service_uuid = service.service_uuid
+        self.id_service = service.id_service
 
     def _get_with_service_token_auth(self, client: FlaskClient, token, params={}, endpoint=None):
         if params is None:

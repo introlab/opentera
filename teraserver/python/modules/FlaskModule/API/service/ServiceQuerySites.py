@@ -3,7 +3,6 @@ from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
-
 from opentera.db.models.TeraSite import TeraSite
 
 # Parser definition(s)
@@ -26,8 +25,7 @@ class ServiceQuerySites(Resource):
                         501: 'Not implemented.',
                         403: 'Logged service doesn\'t have permission to access the requested data'})
     def get(self):
-        parser = get_parser
-        args = parser.parse_args(strict=True)
+        args = get_parser.parse_args(strict=True)
 
         service_access = DBManager.serviceAccess(current_service)
 
