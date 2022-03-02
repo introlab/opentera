@@ -21,7 +21,7 @@ class ServiceQuerySessionEventsTest(BaseServiceAPITest):
         self.test_client = flask_app.test_client()
 
     def tearDown(self):
-        super().teardown()
+        super().tearDown()
 
     def test_endpoint_no_auth(self):
         response = self.test_client.get(self.test_endpoint)
