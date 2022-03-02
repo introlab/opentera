@@ -33,7 +33,7 @@ class ServiceQuerySites(Resource):
 
         sites = []
         if args['id_site']:
-            if args['id_site'] not in service_access.get_accessible_sites_ids():
+            if args['id_site'] not in service_access.get_accessibles_sites_ids():
                 return gettext('Forbidden'), 403
             sites = [TeraSite.get_site_by_id(args['id_site'])]
         elif args['id_user']:
