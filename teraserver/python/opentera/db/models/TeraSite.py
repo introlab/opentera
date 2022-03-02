@@ -9,7 +9,7 @@ class TeraSite(db.Model, BaseModel):
 
     # site_devices = db.relationship("TeraDeviceSite")
     site_projects = db.relationship("TeraProject", cascade="delete", passive_deletes=True,
-                                    back_populates='project_site')
+                                    back_populates='project_site', lazy='joined')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:

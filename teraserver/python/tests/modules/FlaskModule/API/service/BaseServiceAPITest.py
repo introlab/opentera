@@ -27,8 +27,6 @@ class FakeFlaskModule(BaseModule):
         flask_app.config.update({'SESSION_REDIS': redis_url})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
-        # Create session
-        self.session = Session(flask_app)
 
 
 class BaseServiceAPITest(unittest.TestCase):
@@ -65,7 +63,9 @@ class BaseServiceAPITest(unittest.TestCase):
         return config
 
     def setUp(self):
-        pass
+        # Create session
+        self.session = Session(flask_app)
+        print('My flask session', self.session)
 
     def tearDown(self):
         # Make sure pending queries are rollbacked.
