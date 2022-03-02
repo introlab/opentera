@@ -1,3 +1,5 @@
+from typing import List
+
 from BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraParticipant import TeraParticipant
@@ -35,7 +37,7 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_with_wrong_params(self):
         # Get all participants from DB
-        participants: list[TeraParticipant] = TeraParticipant.query.all()
+        participants: List[TeraParticipant] = TeraParticipant.query.all()
         for participant in participants:
             params = {'participant_uuid_wrong': participant.participant_uuid}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -44,7 +46,7 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_with_participant_uuid(self):
         # Get all participants from DB
-        participants: list[TeraParticipant] = TeraParticipant.query.all()
+        participants: List[TeraParticipant] = TeraParticipant.query.all()
         for participant in participants:
             params = {'participant_uuid': participant.participant_uuid}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,

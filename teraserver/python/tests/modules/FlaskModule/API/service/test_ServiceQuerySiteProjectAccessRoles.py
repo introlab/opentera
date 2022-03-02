@@ -31,4 +31,4 @@ class ServiceQuerySiteProjectAccessRolesTest(BaseServiceAPITest):
     def test_endpoint_with_token_auth_no_params(self):
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=None, endpoint=self.test_endpoint)
-        self.assertEqual(500, response.status_code)
+        self.assertEqual(400, response.status_code)

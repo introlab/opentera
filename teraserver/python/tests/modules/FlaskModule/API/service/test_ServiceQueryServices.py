@@ -1,3 +1,5 @@
+from typing import List
+
 from BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraService import TeraService
@@ -41,7 +43,7 @@ class ServiceQueryServicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_and_id_service(self):
 
-        services: list[TeraService] = TeraService.query.all()
+        services: List[TeraService] = TeraService.query.all()
         for service in services:
             params = {'id_service': service.id_service}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -53,7 +55,7 @@ class ServiceQueryServicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_and_id_service_with_base_url(self):
 
-        services: list[TeraService] = TeraService.query.all()
+        services: List[TeraService] = TeraService.query.all()
         for service in services:
             params = {
                 'id_service': service.id_service,
@@ -68,7 +70,7 @@ class ServiceQueryServicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_and_uuid_service(self):
 
-        services: list[TeraService] = TeraService.query.all()
+        services: List[TeraService] = TeraService.query.all()
         for service in services:
             params = {'uuid_service': service.service_uuid}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -80,7 +82,7 @@ class ServiceQueryServicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_and_uuid_service_with_base_url(self):
 
-        services: list[TeraService] = TeraService.query.all()
+        services: List[TeraService] = TeraService.query.all()
         for service in services:
             params = {
                 'uuid_service': service.service_uuid,
@@ -95,7 +97,7 @@ class ServiceQueryServicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_and_service_key(self):
 
-        services: list[TeraService] = TeraService.query.all()
+        services: List[TeraService] = TeraService.query.all()
         for service in services:
             params = {'service_key': service.service_key}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -107,7 +109,7 @@ class ServiceQueryServicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_and_service_key_with_base_url(self):
 
-        services: list[TeraService] = TeraService.query.all()
+        services: List[TeraService] = TeraService.query.all()
         for service in services:
             params = {
                 'service_key': service.service_key,

@@ -41,7 +41,7 @@ class ServiceQuerySessionTypesTest(BaseServiceAPITest):
                                                      params=None, endpoint=self.test_endpoint)
         self.assertEqual(200, response.status_code)
 
-        session_types : list[TeraSessionType] = TeraSessionType.query.all()
+        session_types: List[TeraSessionType] = TeraSessionType.query.all()
         service: TeraService = TeraService.get_service_by_uuid(self.service_uuid)
         from modules.DatabaseModule.DBManager import DBManager
         service_access = DBManager.serviceAccess(service)

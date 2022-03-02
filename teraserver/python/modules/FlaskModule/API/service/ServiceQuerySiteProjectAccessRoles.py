@@ -39,7 +39,7 @@ class ServiceQuerySiteProjectAccessRoles(Resource):
 
         # Can only query permissions with an id
         if not args['id_project'] and not args['id_site']:
-            return gettext('Missing arguments', 400)
+            return gettext('Missing arguments'), 400
 
         if args['id_project']:
             project_admin_info['project_role'] = service_access.get_project_role(args['id_project'], args['uuid_user'])

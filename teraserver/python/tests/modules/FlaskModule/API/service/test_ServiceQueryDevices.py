@@ -1,3 +1,5 @@
+from typing import List
+
 from BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraDevice import TeraDevice
@@ -36,7 +38,7 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_with_wrong_params(self):
         # Get all devices from DB
-        devices: list[TeraDevice] = TeraDevice.query.all()
+        devices: List[TeraDevice] = TeraDevice.query.all()
         for device in devices:
             device_uuid: str = device.device_uuid
             params = {'device_uuid_wrong': device_uuid}
@@ -46,7 +48,7 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_with_device_uuid(self):
         # Get all devices from DB
-        devices: list[TeraDevice] = TeraDevice.query.all()
+        devices: List[TeraDevice] = TeraDevice.query.all()
         for device in devices:
             device_uuid: str = device.device_uuid
             params = {'device_uuid': device_uuid}
@@ -61,7 +63,7 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_with_device_uuid_and_device_type(self):
         # Get all devices from DB
-        devices: list[TeraDevice] = TeraDevice.query.all()
+        devices: List[TeraDevice] = TeraDevice.query.all()
         for device in devices:
             device_uuid: str = device.device_uuid
             params = {'device_uuid': device_uuid, 'with_device_type': True}
@@ -77,7 +79,7 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_with_device_uuid_and_device_subtype(self):
         # Get all devices from DB
-        devices: list[TeraDevice] = TeraDevice.query.all()
+        devices: List[TeraDevice] = TeraDevice.query.all()
         for device in devices:
             device_uuid: str = device.device_uuid
             params = {'device_uuid': device_uuid, 'with_device_subtype': True}
@@ -97,7 +99,7 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_with_device_uuid_and_device_subtype(self):
         # Get all devices from DB
-        devices: list[TeraDevice] = TeraDevice.query.all()
+        devices: List[TeraDevice] = TeraDevice.query.all()
         for device in devices:
             device_uuid: str = device.device_uuid
             params = {'device_uuid': device_uuid, 'with_device_subtype': True}
@@ -117,7 +119,7 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
 
     def test_get_endpoint_with_token_auth_with_device_uuid_and_device_assets(self):
         # Get all devices from DB
-        devices: list[TeraDevice] = TeraDevice.query.all()
+        devices: List[TeraDevice] = TeraDevice.query.all()
         for device in devices:
             device_uuid: str = device.device_uuid
             params = {'device_uuid': device_uuid, 'with_device_assets': True}
