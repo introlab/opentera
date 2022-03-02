@@ -1,4 +1,5 @@
 import unittest
+from opentera.db.Base import db
 from modules.DatabaseModule.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule
 from opentera.config.ConfigManager import ConfigManager
@@ -30,7 +31,6 @@ class FakeFlaskModule(BaseModule):
         self.session = Session(flask_app)
 
 
-
 class BaseServiceAPITest(unittest.TestCase):
 
     test_endpoint = ''
@@ -41,7 +41,7 @@ class BaseServiceAPITest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._config = BaseServiceAPITest.getConfig()
-        cls._db_man = DBManager(cls._config)
+        cls._db_man: DBManager = DBManager(cls._config)
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)
 
@@ -53,7 +53,10 @@ class BaseServiceAPITest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        cls._config = None
+        cls._db_man = None
+        LoginModule.redis_client = None
+        db.session.remove()
 
     @classmethod
     def getConfig(cls) -> ConfigManager:
@@ -61,9 +64,19 @@ class BaseServiceAPITest(unittest.TestCase):
         config.create_defaults()
         return config
 
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        # Make sure pending queries are rollbacked.
+        db.session.rollback()
+
     def setup_service_token(self):
         # Initialize service from redis, posing as VideoRehabService
         service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+
+        self.assertIsNotNone(service)
+        self.assertIsNotNone(LoginModule.redis_client)
 
         if not LoginModule.redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
             self.service_key = 'BaseServiceAPITest'
@@ -71,6 +84,7 @@ class BaseServiceAPITest(unittest.TestCase):
         else:
             self.service_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
 
+        self.assertIsNotNone(self.service_key)
         self.service_token = service.get_token(self.service_key)
         self.service_uuid = service.service_uuid
 

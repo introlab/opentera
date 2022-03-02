@@ -6,6 +6,7 @@ class ServiceQuerySessionManagerTest(BaseServiceAPITest):
     test_endpoint = '/api/sessions/manager'
 
     def setUp(self):
+        super().setUp()
         from modules.FlaskModule.FlaskModule import service_api_ns
         from BaseServiceAPITest import FakeFlaskModule
         # Setup minimal API
@@ -20,7 +21,7 @@ class ServiceQuerySessionManagerTest(BaseServiceAPITest):
         self.test_client = flask_app.test_client()
 
     def tearDown(self):
-        pass
+        super().teardown()
 
     def test_endpoint_no_auth(self):
         response = self.test_client.get(self.test_endpoint)

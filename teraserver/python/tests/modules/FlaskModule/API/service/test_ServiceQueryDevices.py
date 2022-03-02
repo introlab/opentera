@@ -7,6 +7,7 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
     test_endpoint = '/api/service/devices'
 
     def setUp(self):
+        super().setUp()
         from modules.FlaskModule.FlaskModule import service_api_ns
         from BaseServiceAPITest import FakeFlaskModule
 
@@ -22,7 +23,7 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
         self.test_client = flask_app.test_client()
 
     def tearDown(self):
-        pass
+        super().teardown()
 
     def test_get_endpoint_no_auth(self):
         response = self.test_client.get(self.test_endpoint)
