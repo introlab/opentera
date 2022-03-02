@@ -892,21 +892,24 @@ class DBManagerTeraUserAccess:
         return sorted(service_sites, key=lambda ss: ss.service_site_site.site_name)
 
     def query_services_sites_for_site(self, site_id: int, include_other_services=False):
+        import modules.Globals as Globals
+
         from opentera.db.models.TeraServiceSite import TeraServiceSite
         from opentera.db.models.TeraService import TeraService
         services_ids = self.get_accessible_services_ids()
 
         service_sites = TeraServiceSite.query.filter(TeraServiceSite.id_service.in_(services_ids)) \
-            .filter_by(id_site=site_id).all()
+            .filter_by(id_site=site_id).filter(TeraServiceSite.id_service != Globals.opentera_service_id).all()
 
         if include_other_services:
             # We must add the missing services in the list, even if we don't have access to them
             if self.user.user_superadmin:
-                other_services = TeraService.query_with_filters()
+                other_services = [service for service in TeraService.query_with_filters()
+                                  if service.service_key != 'OpenTeraServer']
             else:
                 sites_ids = self.get_accessible_sites_ids()
                 other_services = TeraService.query.join(TeraServiceSite).filter(TeraServiceSite.id_site.in_(sites_ids))\
-                    .all()
+                    .filter(TeraService.service_key != 'OpenTeraServer').all()
             services_ids = [service.id_service for service in other_services]
             missing_services_ids = set(services_ids).difference([ss.id_service for ss in service_sites])
             for missing_service_id in missing_services_ids:
