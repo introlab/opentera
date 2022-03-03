@@ -74,7 +74,7 @@ class TeraSessionForm:
             devices = user_access.get_accessible_devices()
         else:
             devices = [dev.device_project_device for dev in
-                       TeraDeviceProject.query_devices_for_project(project_info.id_project)]
+                       TeraDeviceProject.get_devices_for_project(project_info.id_project)]
 
         devices_list = list()
         for device in devices:
