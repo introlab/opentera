@@ -18,8 +18,6 @@ get_parser.add_argument('id_device', type=int, help='ID of the device from which
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ids only)')
-get_parser.add_argument('with_projects', type=inputs.boolean, help='Used with id_device. Also return projects that '
-                                                                   'don\'t have any association with that device')
 get_parser.add_argument('with_devices', type=inputs.boolean, help='Used with id_project. Also return devices that '
                                                                   'don\'t have any association with that project')
 get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_service. Also return site information '
