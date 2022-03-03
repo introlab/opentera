@@ -2,17 +2,17 @@ from BaseUserAPITest import BaseUserAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 
 
-class UserQueryUserGroupsTest(BaseUserAPITest):
-    test_endpoint = '/api/user/usergroups'
+class UserQuerySitesTest(BaseUserAPITest):
+    test_endpoint = '/api/user/sites'
 
     def setUp(self):
         super().setUp()
         from modules.FlaskModule.FlaskModule import user_api_ns
         from BaseUserAPITest import FakeFlaskModule
         # Setup minimal API
-        from modules.FlaskModule.API.user.UserQueryUserGroups import UserQueryUserGroups
+        from modules.FlaskModule.API.user.UserQuerySites import UserQuerySites
         kwargs = {'flaskModule': FakeFlaskModule(config=BaseUserAPITest.getConfig())}
-        user_api_ns.add_resource(UserQueryUserGroups, '/usergroups', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQuerySites, '/sites', resource_class_kwargs=kwargs)
 
         # Create test client
         self.test_client = flask_app.test_client()

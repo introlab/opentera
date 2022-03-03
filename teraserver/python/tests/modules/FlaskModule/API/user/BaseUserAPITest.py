@@ -6,8 +6,6 @@ from opentera.config.ConfigManager import ConfigManager
 from opentera.modules.BaseModule import BaseModule, ModuleNames
 from flask.testing import FlaskClient
 from opentera.redis.RedisVars import RedisVars
-from opentera.redis.RedisClient import RedisClient
-from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 from flask_session import Session
 from modules.FlaskModule.FlaskModule import flask_app
@@ -19,7 +17,7 @@ class FakeFlaskModule(BaseModule):
         BaseModule.__init__(self, ModuleNames.FLASK_MODULE_NAME.value, config)
 
         flask_app.debug = False
-        flask_app.test = True
+        flask_app.testing = True
         flask_app.secret_key = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerUUID)
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
@@ -33,16 +31,15 @@ class FakeFlaskModule(BaseModule):
         self.session = Session(flask_app)
 
 
-class BaseServiceAPITest(unittest.TestCase):
-
-    test_endpoint = ''
-    service_token = None
-    service_uuid = None
-    service_key = None
+class BaseUserAPITest(unittest.TestCase):
+    test_endpoint: str = ''
+    user_token_key = TeraServerSettings.generate_token_key(32)
+    participant_token_key = TeraServerSettings.generate_token_key(32)
+    service_token_key = TeraServerSettings.generate_token_key(32)
 
     @classmethod
     def setUpClass(cls):
-        cls._config = BaseServiceAPITest.getConfig()
+        cls._config = BaseUserAPITest.getConfig()
         cls._db_man: DBManager = DBManager(cls._config)
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)
@@ -67,31 +64,50 @@ class BaseServiceAPITest(unittest.TestCase):
         return config
 
     def setUp(self):
-        self.setup_service_token()
+        # Setup required keys
+        self.setup_redis_keys()
 
     def tearDown(self):
         # Make sure pending queries are rollbacked.
         db.session.rollback()
 
-    def setup_service_token(self):
-        # Initialize service from redis, posing as VideoRehabService
-        service: TeraService = TeraService.get_service_by_key('VideoRehabService')
-
-        self.assertIsNotNone(service)
-        self.assertIsNotNone(LoginModule.redis_client)
-
+    def setup_redis_keys(self):
+        # Initialize keys (create only if not found)
+        # Service (dynamic)
         if not LoginModule.redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
-            self.service_key = 'BaseServiceAPITest'
-            LoginModule.redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_key)
+            LoginModule.redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_token_key)
         else:
-            self.service_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
+            self.service_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
 
-        self.assertIsNotNone(self.service_key)
-        self.service_token = service.get_token(self.service_key)
-        self.service_uuid = service.service_uuid
-        self.id_service = service.id_service
+        # User (dynamic)
+        if not LoginModule.redis_client.exists(RedisVars.RedisVar_UserTokenAPIKey):
+            LoginModule.redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, self.user_token_key)
+        else:
+            self.user_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_UserTokenAPIKey).decode('utf-8')
 
-    def _get_with_service_token_auth(self, client: FlaskClient, token, params={}, endpoint=None):
+        # Participant (dynamic)
+        if not LoginModule.redis_client.exists(RedisVars.RedisVar_ParticipantTokenAPIKey):
+            LoginModule.redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, self.participant_token_key)
+        else:
+            self.participant_token_key = LoginModule.redis_client.get(
+                RedisVars.RedisVar_ParticipantTokenAPIKey).decode('utf-8')
+
+        if not LoginModule.redis_client.exists(RedisVars.RedisVar_DeviceTokenAPIKey):
+            LoginModule.redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey,
+                                         TeraServerSettings.get_server_setting_value(
+                                             TeraServerSettings.ServerDeviceTokenKey))
+
+        if not LoginModule.redis_client.exists(RedisVars.RedisVar_DeviceStaticTokenAPIKey):
+            LoginModule.redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey,
+                                         TeraServerSettings.get_server_setting_value(
+                                             TeraServerSettings.ServerDeviceTokenKey))
+
+        if not LoginModule.redis_client.exists(RedisVars.RedisVar_ParticipantStaticTokenAPIKey):
+            LoginModule.redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey,
+                                         TeraServerSettings.get_server_setting_value(
+                                             TeraServerSettings.ServerParticipantTokenKey))
+
+    def _get_with_user_token_auth(self, client: FlaskClient, token, params={}, endpoint=None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -99,7 +115,7 @@ class BaseServiceAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.get(endpoint, headers=headers, query_string=params)
 
-    def _post_with_service_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
+    def _post_with_user_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
                                       params: dict = {}, endpoint: str = ''):
         if params is None:
             params = {}
@@ -108,7 +124,7 @@ class BaseServiceAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
-    def _delete_with_service_token_auth(self, client: FlaskClient, token: str = '',
+    def _delete_with_user_token_auth(self, client: FlaskClient, token: str = '',
                                         params: dict = {}, endpoint: str = ''):
         if params is None:
             params = {}

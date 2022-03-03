@@ -20,9 +20,6 @@ class ServiceQuerySiteProjectAccessRolesTest(BaseServiceAPITest):
         kwargs = {'flaskModule': FakeFlaskModule(config=BaseServiceAPITest.getConfig())}
         service_api_ns.add_resource(ServiceQuerySiteProjectAccessRoles, '/users/access', resource_class_kwargs=kwargs)
 
-        # Setup token
-        self.setup_service_token()
-
         # Create test client
         self.test_client = flask_app.test_client()
 
