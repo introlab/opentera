@@ -480,7 +480,7 @@ class DBManagerTeraUserAccess:
                 device_site.id_site = missing_site_id
                 device_site.id_device = None
                 device_site.device_site_site = TeraSite.get_site_by_id(missing_site_id)
-                device_site.append(device_site)
+                device_sites.append(device_site)
 
         # Sort by site name
         return sorted(device_sites, key=lambda ds: ds.device_site_site.site_name)

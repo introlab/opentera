@@ -24,7 +24,7 @@ get_parser.add_argument('with_projects', type=inputs.boolean, help='Used with id
                                                                    'don\'t have any association with that device')
 get_parser.add_argument('with_devices', type=inputs.boolean, help='Used with id_project. Also return devices that '
                                                                   'don\'t have any association with that project')
-get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_service. Also return site information '
+get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_device. Also return site information '
                                                                 'of the returned projects.')
 
 post_schema = api.schema_model('user_device_project', {'properties': TeraDeviceProject.get_json_schema(),
@@ -134,10 +134,6 @@ class UserQueryDeviceProjects(Resource):
             if 'projects' not in request.json['device']:
                 return gettext('Missing projects'), 400
             id_device = request.json['device']['id_device']
-
-            # Only super admins can modify a device like that
-            if not current_user.user_superadmin:
-                return '', 403
 
             # Get all current association for device
             current_projects = TeraDeviceProject.get_projects_for_device(device_id=id_device)

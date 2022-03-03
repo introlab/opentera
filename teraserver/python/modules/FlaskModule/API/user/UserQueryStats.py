@@ -132,6 +132,10 @@ class UserQueryUserStats(Resource):
     def get_site_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool, with_warnings: bool) \
             -> dict:
         from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+        from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
+        from opentera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraDeviceSite import TeraDeviceSite
+
         site_projects = user_access.query_projects_for_site(item_id)
         site_users = user_access.query_users_for_site(site_id=item_id)
         site_users_enabled = user_access.query_users_for_site(site_id=item_id, enabled_only=True)
@@ -139,17 +143,18 @@ class UserQueryUserStats(Resource):
         participants_total = 0
         participants_enabled = 0
         sessions_total = 0
-        devices = []
+        # devices = []
         for project in site_projects:
-            site_groups_total += len(project.project_participants_groups)
-            participants_total += len(project.project_participants)
-            participants_enabled += len([part for part in project.project_participants if part.participant_enabled])
-            devices.extend([device.id_device for device in project.project_devices])
+            site_groups_total += TeraParticipantGroup.count_with_filters({'id_project': project.id_project})
+            participants_total += TeraParticipant.count_with_filters({'id_project': project.id_project})
+            participants_enabled += TeraParticipant.count_with_filters({'id_project': project.id_project,
+                                                                        'participant_enabled': True})
+            # devices.extend([device.id_device for device in project.project_devices])
             for part in project.project_participants:
                 sessions_total += TeraSessionParticipants.get_session_count_for_participant(
                     id_participant=part.id_participant)
 
-        devices = set(devices)  # Remove duplicates
+        # devices = set(devices)  # Remove duplicates
         stats = {'users_total_count': len(site_users),
                  'users_enabled_count': len(site_users_enabled),
                  'projects_count': len(site_projects),
@@ -157,7 +162,7 @@ class UserQueryUserStats(Resource):
                  'participants_total_count': participants_total,
                  'participants_enabled_count': participants_enabled,
                  'sessions_total_count': sessions_total,
-                 'devices_total_count': len(devices)
+                 'devices_total_count': TeraDeviceSite.count_with_filters({'id_site': item_id})
                  }
         # Add participants information?
         participants = []
