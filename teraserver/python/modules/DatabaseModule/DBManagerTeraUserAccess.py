@@ -717,7 +717,7 @@ class DBManagerTeraUserAccess:
     def query_device_participants_for_site(self, site_id: int):
         device_parts = []
         if site_id in self.get_accessible_sites_ids():
-            device_sites = TeraDeviceSite.query_devices_for_site(site_id=site_id)
+            device_sites = TeraDeviceSite.get_devices_for_site(site_id=site_id)
             device_ids = list()
             for device_site in device_sites:
                 if device_site.device_site_device.id_device not in device_ids:

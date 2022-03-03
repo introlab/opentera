@@ -3,7 +3,7 @@ from modules.FlaskModule.FlaskModule import flask_app
 
 
 class UserQuerySessionTypeProjectTest(BaseUserAPITest):
-    test_endpoint = '/api/user/sessiontyprojects'
+    test_endpoint = '/api/user/sessiontypeprojects'
 
     def setUp(self):
         super().setUp()
@@ -22,4 +22,12 @@ class UserQuerySessionTypeProjectTest(BaseUserAPITest):
 
     def test_get_endpoint_no_auth(self):
         response = self.test_client.get(self.test_endpoint)
+        self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_invalid_http_auth(self):
+        response = self._get_with_user_http_auth(self.test_client)
+        self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_invalid_token_auth(self):
+        response = self._get_with_user_token_auth(self.test_client)
         self.assertEqual(401, response.status_code)
