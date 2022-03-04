@@ -124,7 +124,7 @@ class UserQueryDeviceTypesTest(BaseAPITest):
                                   'id_device_type': new_id[1]+1,
                                   'device_type_key': 'new_device_3'}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
 
         # Update the name of an unexisting device (no ID)
         params = {'device_type': {'device_type_name': 'NEW_DEVICE_TYPE',
@@ -193,7 +193,7 @@ class UserQueryDeviceTypesTest(BaseAPITest):
         # Try deleting again an unexisting Device type
         params = {'id': new_id[1]}
         response = self._delete_with_http_auth_plus(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
 
     def test_query_delete_as_user(self):
 
