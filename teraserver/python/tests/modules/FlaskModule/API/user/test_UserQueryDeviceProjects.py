@@ -219,7 +219,7 @@ class UserQueryDeviceProjectsTest(BaseAPITest):
 
         json_data = {'device': {'id_device': 1, 'projects': []}}
         response = self._post_with_http_auth(username='user', password='user', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Only super admins can change things here")
+        self.assertEqual(response.status_code, 403, msg="Only project/site admins can change things here")
 
         json_data = {'device': {'id_device': 2, 'projects': []}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
