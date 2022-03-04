@@ -117,8 +117,11 @@ class UserQueryDeviceSubTypes(Resource):
         if json_device_subtype['id_device_subtype'] > 0:
             # Already existing
             try:
-                json_device_subtype['id_device_type'] = TeraDeviceSubType.\
-                    get_device_subtype(json_device_subtype['id_device_subtype']).id_device_type
+                device_subtype: TeraDeviceSubType = \
+                    TeraDeviceSubType.get_device_subtype(json_device_subtype['id_device_subtype'])
+                if not device_subtype:
+                    return gettext('Invalid device subtype'), 400
+                json_device_subtype['id_device_type'] = device_subtype.id_device_type
                 TeraDeviceSubType.update(json_device_subtype['id_device_subtype'], json_device_subtype)
             except exc.SQLAlchemyError as e:
                 import sys
