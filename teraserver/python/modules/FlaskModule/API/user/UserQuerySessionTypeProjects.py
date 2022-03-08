@@ -30,7 +30,7 @@ delete_parser.add_argument('id', type=int, help='Specific device-type - project 
                                                 ' of the association itself!', required=True)
 
 
-class UserQuerySessionTypeProject(Resource):
+class UserQuerySessionTypeProjects(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
@@ -76,7 +76,7 @@ class UserQuerySessionTypeProject(Resource):
 
         except InvalidRequestError as e:
             self.module.logger.log_error(self.module.module_name,
-                                         UserQuerySessionTypeProject.__name__,
+                                         UserQuerySessionTypeProjects.__name__,
                                          'get', 500, 'InvalidRequestError', e)
             return '', 500
 
@@ -112,7 +112,7 @@ class UserQuerySessionTypeProject(Resource):
                 return gettext('Access denied'), 403
 
             # Check if already exists
-            stp = TeraSessionTypeProject.query_session_type_project_for_session_type_project(
+            stp = TeraSessionTypeProject.get_session_type_project_for_session_type_project(
                 project_id=json_stp['id_project'], session_type_id=json_stp['id_session_type'])
 
             if stp:
@@ -141,7 +141,7 @@ class UserQuerySessionTypeProject(Resource):
                     import sys
                     print(sys.exc_info())
                     self.module.logger.log_error(self.module.module_name,
-                                                 UserQuerySessionTypeProject.__name__,
+                                                 UserQuerySessionTypeProjects.__name__,
                                                  'post', 500, 'Database error', e)
                     return gettext('Database error'), 500
             else:
@@ -190,7 +190,7 @@ class UserQuerySessionTypeProject(Resource):
             import sys
             print(sys.exc_info())
             self.module.logger.log_error(self.module.module_name,
-                                         UserQuerySessionTypeProject.__name__,
+                                         UserQuerySessionTypeProjects.__name__,
                                          'delete', 500, 'Database error', e)
             return gettext('Database error'), 500
 

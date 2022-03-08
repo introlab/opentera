@@ -20,6 +20,7 @@ from .TeraSessionDevices import TeraSessionDevices
 from .TeraSessionEvent import TeraSessionEvent
 from .TeraSessionParticipants import TeraSessionParticipants
 from .TeraSessionType import TeraSessionType
+from .TeraSessionTypeSite import TeraSessionTypeSite
 from .TeraSessionTypeProject import TeraSessionTypeProject
 from .TeraSessionUsers import TeraSessionUsers
 from .TeraSite import TeraSite
@@ -72,6 +73,7 @@ __all__ = ['TeraAsset',
            'TeraSessionParticipants',
            'TeraSessionType',
            'TeraSessionTypeProject',
+           'TeraSessionTypeSite',
            'TeraSessionUsers',
            'TeraSite',
            'TeraTest',

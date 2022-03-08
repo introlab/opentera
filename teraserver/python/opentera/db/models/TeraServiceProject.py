@@ -116,7 +116,7 @@ class TeraServiceProject(db.Model, BaseModel):
         delete_obj: TeraServiceProject = TeraServiceProject.query.filter_by(id_service_project=id_todel).first()
 
         if delete_obj:
-            session_types = TeraSessionTypeProject.query_session_type_project_for_project_and_service(
+            session_types = TeraSessionTypeProject.get_session_type_project_for_project_and_service(
                 project_id=delete_obj.id_project, service_id=delete_obj.id_service)
             for session_type in session_types:
                 TeraSessionTypeProject.delete(session_type.id_session_type_project)

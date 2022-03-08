@@ -143,7 +143,11 @@ class UserQueryDeviceProjects(Resource):
             todel_ids = set(current_projects_ids).difference(received_projects_ids)
             # Also filter projects already there
             received_projects_ids = set(received_projects_ids).difference(current_projects_ids)
+            from opentera.db.models.TeraProject import TeraProject
             for proj_id in todel_ids:
+                project = TeraProject.get_project_by_id(proj_id)
+                if user_access.get_site_role(project.id_site) != 'admin':
+                    return gettext('Access denied'), 403
                 TeraDeviceProject.delete_with_ids(device_id=id_device, project_id=proj_id)
             # Build projects association to add
             json_dps = [{'id_device': id_device, 'id_project': project_id} for project_id in received_projects_ids]

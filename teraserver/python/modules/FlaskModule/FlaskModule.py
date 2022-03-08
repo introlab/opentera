@@ -149,7 +149,8 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQuerySessions import UserQuerySessions
         from modules.FlaskModule.API.user.UserQuerySessionTypes import UserQuerySessionTypes
         from modules.FlaskModule.API.user.UserQuerySessionEvents import UserQuerySessionEvents
-        from modules.FlaskModule.API.user.UserQuerySessionTypeProject import UserQuerySessionTypeProject
+        from modules.FlaskModule.API.user.UserQuerySessionTypeSites import UserQuerySessionTypeSites
+        from modules.FlaskModule.API.user.UserQuerySessionTypeProjects import UserQuerySessionTypeProjects
         from modules.FlaskModule.API.user.UserQueryDeviceTypes import UserQueryDeviceTypes
         from modules.FlaskModule.API.user.UserQueryDeviceSubTypes import UserQueryDeviceSubTypes
         from modules.FlaskModule.API.user.UserQueryAssets import UserQueryAssets
@@ -179,15 +180,20 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQueryDevices,          '/devices', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryOnlineDevices,    '/devices/online', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceSites,      '/devicesites', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryDeviceSites,      '/device/sites', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceProjects,   '/deviceprojects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryDeviceProjects,   '/device/projects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceParticipants, '/deviceparticipants', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryDeviceParticipants, '/device/participants', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySiteAccess,       '/siteaccess', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryProjectAccess,    '/projectaccess', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryParticipantGroup, '/groups', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessions,         '/sessions', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserSessionManager,        '/sessions/manager', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessionTypes,     '/sessiontypes', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQuerySessionTypeProject, '/sessiontypeprojects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQuerySessionTypeProjects, '/sessiontypeprojects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQuerySessionTypeProjects, '/sessiontypes/projects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQuerySessionTypeSites, '/sessiontypes/sites', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessionEvents,    '/sessions/events', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceTypes,      '/devicetypes', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceSubTypes,   '/devicesubtypes', resource_class_kwargs=kwargs)

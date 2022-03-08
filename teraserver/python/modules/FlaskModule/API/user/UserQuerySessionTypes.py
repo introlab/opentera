@@ -56,6 +56,7 @@ class UserQuerySessionTypes(Resource):
         elif args['id_project']:
             session_types_projects = user_access.query_session_types_for_project(args['id_project'])
             session_types = [stp.session_type_project_session_type for stp in session_types_projects]
+            # TODO: Add session types for sites
         else:
             session_types = user_access.get_accessible_session_types()
 

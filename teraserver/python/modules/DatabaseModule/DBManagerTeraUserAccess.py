@@ -15,6 +15,7 @@ from opentera.db.models.TeraDeviceProject import TeraDeviceProject
 from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
+from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 
 from sqlalchemy import or_, and_, not_
 
@@ -268,14 +269,22 @@ class DBManagerTeraUserAccess:
         return sites_ids
 
     def get_accessible_session_types(self, admin_only=False):
-        from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+        # from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+        # if self.user.user_superadmin:
+        #     return TeraSessionType.query.all()
+        #
+        # project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
+        # # return TeraSessionType.query.filter(TeraProject.id_project.in_(project_id_list)).all()
+        # return TeraSessionType.query.join(TeraSessionTypeProject) \
+        #     .filter(TeraSessionTypeProject.id_project.in_(project_id_list)).all()
+        from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
         if self.user.user_superadmin:
             return TeraSessionType.query.all()
 
-        project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
-        # return TeraSessionType.query.filter(TeraProject.id_project.in_(project_id_list)).all()
-        return TeraSessionType.query.join(TeraSessionTypeProject) \
-            .filter(TeraSessionTypeProject.id_project.in_(project_id_list)).all()
+        site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
+        query = TeraSessionType.query.join(TeraSessionTypeSite)\
+            .filter(TeraSessionTypeSite.id_site.in_(site_id_list))
+        return query.all()
 
     def get_accessible_session_types_ids(self, admin_only=False):
         st_ids = []
@@ -835,6 +844,49 @@ class DBManagerTeraUserAccess:
 
         # Sort by project id
         return sorted(service_projects, key=lambda sp: sp.service_project_project.project_name)
+
+    def query_session_types_sites_for_site(self, site_id: int, include_other_session_types=False):
+        st_sites = TeraSessionTypeSite.get_sessions_types_for_site(site_id=site_id)
+
+        if include_other_session_types:
+            # We must add the missing session types in the list, even if we don't have access to them
+            if self.user.user_superadmin:
+                other_sts = TeraSessionType.query_with_filters()
+            else:
+                sites_ids = self.get_accessible_sites_ids()
+                other_sts = TeraSessionType.query.join(TeraSessionTypeSite)\
+                    .filter(TeraSessionTypeSite.id_site.in_(sites_ids)).all()
+            st_ids = [st.id_session_type for st in other_sts]
+            missing_st_ids = set(st_ids).difference([st.id_session_type for st in st_sites])
+            for missing_st_id in missing_st_ids:
+                st_site = TeraDeviceSite()
+                st_site.id_site = None
+                st_site.id_session_type = missing_st_id
+                st_site.session_type_site_session_type = TeraSessionType.get_session_type_by_id(missing_st_id)
+                st_sites.append(st_site)
+
+        # Sort by device name
+        return sorted(st_sites, key=lambda s: s.session_type_site_session_type.session_type_name)
+
+    def query_session_types_sites_for_session_type(self, session_type_id: int, include_other_sites=False):
+        site_ids = self.get_accessible_sites_ids()
+
+        query = TeraSessionTypeSite.query.filter(TeraSessionTypeSite.id_site.in_(site_ids)) \
+            .filter_by(id_session_type=session_type_id)
+
+        st_sites = query.all()
+        if include_other_sites:
+            # We must add the missing sites in the list
+            missing_sites_ids = set(site_ids).difference([s.id_site for s in st_sites])
+            for missing_site_id in missing_sites_ids:
+                st_site = TeraSessionTypeSite()
+                st_site.id_site = missing_site_id
+                st_site.id_session_type = None
+                st_site.session_type_site_site = TeraSite.get_site_by_id(missing_site_id)
+                st_sites.append(st_site)
+
+        # Sort by site name
+        return sorted(st_sites, key=lambda s: s.session_type_site_site.site_name)
 
     def query_services_projects_for_project(self, project_id: int, include_other_services=False):
         from opentera.db.models.TeraServiceProject import TeraServiceProject

@@ -69,19 +69,19 @@ class TeraSessionTypeProject(db.Model, BaseModel):
         return TeraSessionTypeProject.query.filter_by(id_session_type_project=stp_id).first()
 
     @staticmethod
-    def query_projects_for_session_type(session_type_id: int):
+    def get_projects_for_session_type(session_type_id: int):
         return TeraSessionTypeProject.query.filter_by(id_session_type=session_type_id).all()
 
     @staticmethod
-    def query_sessions_types_for_project(project_id: int):
+    def get_sessions_types_for_project(project_id: int):
         return TeraSessionTypeProject.query.filter_by(id_project=project_id).all()
 
     @staticmethod
-    def query_session_type_project_for_session_type_project(project_id: int, session_type_id: int):
+    def get_session_type_project_for_session_type_project(project_id: int, session_type_id: int):
         return TeraSessionTypeProject.query.filter_by(id_project=project_id, id_session_type=session_type_id).first()
 
     @staticmethod
-    def query_session_type_project_for_project_and_service(project_id: int, service_id: int):
+    def get_session_type_project_for_project_and_service(project_id: int, service_id: int):
         from opentera.db.models.TeraSessionType import TeraSessionType
         return TeraSessionTypeProject.query.join(TeraSessionType).\
             filter(TeraSessionType.id_service == service_id).\
