@@ -109,6 +109,9 @@ class UserQueryDeviceTypes(Resource):
         if json_device_type['id_device_type'] > 0:
             # Already existing
             try:
+                device_type: TeraDeviceType = TeraDeviceType.get_device_type_by_id(json_device_type['id_device_type'])
+                if not device_type:
+                    return gettext('Invalid device type'), 400
                 TeraDeviceType.update(json_device_type['id_device_type'], json_device_type)
             except exc.SQLAlchemyError as e:
                 import sys
@@ -164,6 +167,9 @@ class UserQueryDeviceTypes(Resource):
         elif args['device_type_key']:
             device_type_to_del = TeraDeviceType.get_device_type_by_key(args['device_type_key'])
         else:
+            return gettext('Device type not found'), 400
+
+        if not device_type_to_del:
             return gettext('Device type not found'), 400
 
         # if device_type_to_del.id_device_type in user_access.get_accessible_devices_types_ids():

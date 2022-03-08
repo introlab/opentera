@@ -115,7 +115,7 @@ class UserQueryDeviceSubTypesTest(BaseAPITest):
         params = {'device_subtype': {'device_subtype_name': 'New_Device_Subtype', 'id_device_subtype': new_id[1]+1,
                                      'id_device_type': 3}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
 
         # Delete the objects created by the test
         for id_to_del in new_id:

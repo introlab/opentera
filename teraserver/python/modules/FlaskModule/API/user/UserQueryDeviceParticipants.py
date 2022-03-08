@@ -148,7 +148,7 @@ class UserQueryDeviceParticipants(Resource):
             if json_device_part['id_device_participant'] > 0:
                 # Already existing
                 try:
-                    TeraDeviceParticipant.update_(json_device_part['id_device_participant'], json_device_part)
+                    TeraDeviceParticipant.update(json_device_part['id_device_participant'], json_device_part)
                 except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())

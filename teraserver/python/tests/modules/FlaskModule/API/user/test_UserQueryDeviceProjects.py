@@ -219,7 +219,7 @@ class UserQueryDeviceProjectsTest(BaseAPITest):
 
         json_data = {'device': {'id_device': 1, 'projects': []}}
         response = self._post_with_http_auth(username='user', password='user', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Only super admins can change things here")
+        self.assertEqual(response.status_code, 403, msg="Only project/site admins can change things here")
 
         json_data = {'device': {'id_device': 2, 'projects': []}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
@@ -255,6 +255,14 @@ class UserQueryDeviceProjectsTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
         self.assertEqual(len(json_data), 1)
+
+        # Reassign all devices to participants (initial state)
+        json_data = {'device_participant': [{'id_device': 1, 'id_participant': 1},
+                                            {'id_device': 1, 'id_participant': 2},
+                                            {'id_device': 2, 'id_participant': 2}]}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+                                             endpoint='/api/user/deviceparticipants')
+        self.assertEqual(response.status_code, 200)
 
     def test_post_project(self):
         # Project update
@@ -309,6 +317,14 @@ class UserQueryDeviceProjectsTest(BaseAPITest):
                                                               {'id_device': 2}]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Back to initial state")
+
+        # Reassign all devices to participants (initial state)
+        json_data = {'device_participant': [{'id_device': 1, 'id_participant': 1},
+                                            {'id_device': 1, 'id_participant': 2},
+                                            {'id_device': 2, 'id_participant': 2}]}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+                                             endpoint='/api/user/deviceparticipants')
+        self.assertEqual(response.status_code, 200)
 
     def test_post_device_project_and_delete(self):
         # Device-Project update
@@ -377,6 +393,14 @@ class UserQueryDeviceProjectsTest(BaseAPITest):
                                                              {'id_project': 2}]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Back to initial state")
+
+        # Reassign all devices to participants (initial state)
+        json_data = {'device_participant': [{'id_device': 1, 'id_participant': 1},
+                                            {'id_device': 1, 'id_participant': 2},
+                                            {'id_device': 2, 'id_participant': 2}]}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+                                             endpoint='/api/user/deviceparticipants')
+        self.assertEqual(response.status_code, 200)
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

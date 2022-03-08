@@ -10,6 +10,7 @@ from opentera.db.models.TeraServerSettings import TeraServerSettings
 from flask_session import Session
 from modules.FlaskModule.FlaskModule import flask_app
 import redis
+from requests.auth import _basic_auth_str
 
 
 class FakeFlaskModule(BaseModule):
@@ -66,10 +67,11 @@ class BaseUserAPITest(unittest.TestCase):
     def setUp(self):
         # Setup required keys
         self.setup_redis_keys()
+        self.session = db.create_scoped_session()
 
     def tearDown(self):
         # Make sure pending queries are rollbacked.
-        db.session.rollback()
+        self.session.remove()
 
     def setup_redis_keys(self):
         # Initialize keys (create only if not found)
@@ -107,12 +109,22 @@ class BaseUserAPITest(unittest.TestCase):
                                          TeraServerSettings.get_server_setting_value(
                                              TeraServerSettings.ServerParticipantTokenKey))
 
-    def _get_with_user_token_auth(self, client: FlaskClient, token, params={}, endpoint=None):
+    def _get_with_user_token_auth(self, client: FlaskClient, token: str = '', params={}, endpoint=None):
         if params is None:
             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
         headers = {'Authorization': 'OpenTera ' + token}
+        return client.get(endpoint, headers=headers, query_string=params)
+
+    def _get_with_user_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
+                                 params={}, endpoint=None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+
+        headers = {'Authorization': _basic_auth_str(username, password)}
         return client.get(endpoint, headers=headers, query_string=params)
 
     def _post_with_user_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
@@ -124,11 +136,29 @@ class BaseUserAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
+    def _post_with_user_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
+                                  json: dict = {}, params: dict = {}, endpoint: str = ''):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        headers = {'Authorization': _basic_auth_str(username, password)}
+        return client.post(endpoint, headers=headers, query_string=params, json=json)
+
     def _delete_with_user_token_auth(self, client: FlaskClient, token: str = '',
-                                        params: dict = {}, endpoint: str = ''):
+                                     params: dict = {}, endpoint: str = ''):
         if params is None:
             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
         headers = {'Authorization': 'OpenTera ' + token}
+        return client.delete(endpoint, headers=headers, query_string=params)
+
+    def _delete_with_user_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
+                                    params: dict = {}, endpoint: str = ''):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        headers = {'Authorization': _basic_auth_str(username, password)}
         return client.delete(endpoint, headers=headers, query_string=params)

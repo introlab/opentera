@@ -141,6 +141,13 @@ class UserQueryDeviceProjects(Resource):
             received_projects_ids = [proj['id_project'] for proj in request.json['device']['projects']]
             # Difference - we must delete projects not anymore in the list
             todel_ids = set(current_projects_ids).difference(received_projects_ids)
+
+            # Improve - not efficient at all...
+            for id_project in todel_ids:
+                project = TeraProject.get_project_by_id(id_project)
+                if user_access.get_site_role(project.id_site) != 'admin':
+                    return gettext('Access denied'), 403
+
             # Also filter projects already there
             received_projects_ids = set(received_projects_ids).difference(current_projects_ids)
             from opentera.db.models.TeraProject import TeraProject
@@ -160,7 +167,6 @@ class UserQueryDeviceProjects(Resource):
             id_project = request.json['project']['id_project']
 
             # Only site admin can modify
-            from opentera.db.models.TeraProject import TeraProject
             project = TeraProject.get_project_by_id(id_project)
             if user_access.get_site_role(project.id_site) != 'admin':
                 return gettext('Access denied'), 403
@@ -197,7 +203,6 @@ class UserQueryDeviceProjects(Resource):
             if 'id_device' not in json_dp or 'id_project' not in json_dp:
                 return '', 400
 
-            from opentera.db.models.TeraProject import TeraProject
             project = TeraProject.get_project_by_id(json_dp['id_project'])
             if user_access.get_site_role(project.id_site) != 'admin':
                 return gettext('Access denied'), 403
