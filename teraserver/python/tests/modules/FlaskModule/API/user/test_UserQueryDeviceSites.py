@@ -212,17 +212,17 @@ class UserQueryDeviceSitesTest(BaseAPITest):
         response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
         self.assertEqual(response.status_code, 403, msg="Nope, not site admin either!")
 
-        json_data = {'device': {'id_device': 1, 'sites': []}}
+        json_data = {'device': {'id_device': 2, 'sites': []}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Remove from all projects OK")
 
-        params = {'id_device': 1}
+        params = {'id_device': 2}
         response = self._request_with_http_auth(username='admin', password='admin', payload=params)
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
         self.assertEqual(len(json_data), 0)  # Everything was deleted!
 
-        json_data = {'device': {'id_device': 1, 'sites': [{'id_site': 1},
+        json_data = {'device': {'id_device': 2, 'sites': [{'id_site': 1},
                                                           {'id_site': 2}]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Add all sites OK")
@@ -232,7 +232,7 @@ class UserQueryDeviceSitesTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 2)  # Everything was added
 
-        json_data = {'device': {'id_device': 1, 'sites': [{'id_site': 2}]}}
+        json_data = {'device': {'id_device': 2, 'sites': [{'id_site': 2}]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Remove one site")
 
@@ -241,13 +241,12 @@ class UserQueryDeviceSitesTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 1)
 
-        json_data = {'device': {'id_device': 1, 'sites': [{'id_site': 1},
-                                                          {'id_site': 2}]}}
+        json_data = {'device': {'id_device': 2, 'sites': [{'id_site': 1}]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Add all sites OK")
 
         # Recreate default associations - projects
-        json_data = {'device': {'id_device': 1, 'projects': [{'id_project': 1},
+        json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1},
                                                              {'id_project': 2}
                                                              ]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
@@ -310,12 +309,17 @@ class UserQueryDeviceSitesTest(BaseAPITest):
         json_data = {'device': {'id_device': 1, 'projects': [{'id_project': 1},
                                                              {'id_project': 2}]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
-                                             endpoint='/api/user/deviceprojects')
+                                             endpoint='/api/user/device/projects')
         self.assertEqual(response.status_code, 200)
 
         json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1}]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
-                                             endpoint='/api/user/deviceprojects')
+                                             endpoint='/api/user/device/projects')
+        self.assertEqual(response.status_code, 200)
+
+        json_data = {'device_participant': {'id_device': 2, 'id_participant': 1}}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+                                             endpoint='/api/user/device/participants')
         self.assertEqual(response.status_code, 200)
 
     def test_post_device_site_and_delete(self):
