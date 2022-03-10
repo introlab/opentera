@@ -5,15 +5,24 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraProject import TeraProject
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy import exc
+from sqlalchemy import exc, inspect
 from flask_babel import gettext
 
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_project', type=int, help='Project ID to query associated session types from')
 get_parser.add_argument('id_session_type', type=int, help='Session type ID to query associated projects from')
+
+get_parser.add_argument('with_projects', type=inputs.boolean, help='Used with id_session_type. Also return projects '
+                                                                   'that don\'t have any association with that type')
+get_parser.add_argument('with_session_type', type=inputs.boolean, help='Used with id_project. Also return types that '
+                                                                       'don\'t have any association with that project')
+get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_session_type. Also return site '
+                                                                'information of the returned projects.')
+
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ids only)')
 
@@ -57,22 +66,45 @@ class UserQuerySessionTypeProjects(Resource):
             return gettext('Missing arguments'), 400
 
         if args['id_project']:
-            session_type_projects = user_access.query_session_types_for_project(project_id=args['id_project'])
-        else:
-            if args['id_session_type']:
-                if args['id_session_type'] in user_access.get_accessible_session_types_ids():
-                    session_type_projects = TeraSessionTypeProject.get_projects_for_session_type(
-                        args['id_session_type'])
+            session_type_projects = user_access.query_session_types_for_project(project_id=args['id_project'],
+                                                                                include_other_session_types=
+                                                                                args['with_session_type'])
+        elif args['id_session_type']:
+            session_type_projects = user_access.query_projects_for_session_type(session_type_id=
+                                                                                args['id_session_type'],
+                                                                                include_other_projects=
+                                                                                args['with_projects'])
         try:
             stp_list = []
             for stp in session_type_projects:
                 json_stp = stp.to_json()
                 if args['list'] is None:
-                    json_stp['session_type_name'] = stp.session_type_project_session_type.session_type_name
-                    json_stp['project_name'] = stp.session_type_project_project.project_name
+                    obj_type = inspect(stp)
+                    if not obj_type.transient:
+                        json_stp['session_type_name'] = stp.session_type_project_session_type.session_type_name
+                        json_stp['project_name'] = stp.session_type_project_project.project_name
+                        if args['with_sites']:
+                            json_stp['id_site'] = stp.session_type_project_project.id_site
+                            json_stp['site_name'] = stp.session_type_project_project.project_site.site_name
+                    else:
+                        # Temporary object, a not-committed object, result of listing projects not associated to a
+                        # session type.
+                        if stp.id_session_type:
+                            st: TeraSessionType = TeraSessionType.get_session_type_by_id(stp.id_session_type)
+                            json_stp['session_type_name'] = st.session_type_name
+                        else:
+                            json_stp['session_type_name'] = None
+                        if stp.id_project:
+                            proj = TeraProject.get_project_by_id(stp.id_project)
+                            json_stp['project_name'] = proj.project_name
+                            if args['with_sites']:
+                                json_stp['id_site'] = proj.id_site
+                                json_stp['site_name'] = proj.project_site.site_name
+                        else:
+                            json_stp['project_name'] = None
                 stp_list.append(json_stp)
 
-            return jsonify(stp_list)
+            return stp_list
 
         except InvalidRequestError as e:
             self.module.logger.log_error(self.module.module_name,
