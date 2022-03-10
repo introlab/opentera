@@ -553,13 +553,24 @@ class DBManagerTeraUserAccess:
 
         return projects.all()
 
-    def query_projects_for_session_type(self, session_type_id: int):
+    def query_projects_for_session_type(self, session_type_id: int, include_other_projects: bool = False):
         from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
         proj_ids = self.get_accessible_projects_ids()
-        projects = TeraProject.query.join(TeraSessionTypeProject.session_type_project_project).filter(
-            TeraSessionTypeProject.id_session_type == session_type_id).filter(TeraProject.id_project.in_(proj_ids)) \
-            .all()
-        return projects
+        st_projects = TeraSessionTypeProject.query.filter(TeraSessionTypeProject.id_session_type == session_type_id)\
+            .filter(TeraSessionTypeProject.id_project.in_(proj_ids)).all()
+
+        if include_other_projects:
+            # We must add the missing projects
+            missing_proj_ids = set(proj_ids).difference([sp.id_project for sp in st_projects])
+            for missing_proj_id in missing_proj_ids:
+                st_project = TeraSessionTypeProject()
+                st_project.id_project = missing_proj_id
+                st_project.id_session_type = None
+                st_project.session_type_project_project = TeraProject.get_project_by_id(missing_proj_id)
+                st_projects.append(st_project)
+
+        # Sort by project id
+        return sorted(st_projects, key=lambda sp: sp.session_type_project_project.project_name)
 
     def query_all_participants_for_site(self, site_id: int):
         part_ids = self.get_accessible_participants_ids()
@@ -788,7 +799,7 @@ class DBManagerTeraUserAccess:
     #         .filter_by(id_device_type=device_type_id).all()
     #     return session_types
 
-    def query_session_types_for_project(self, project_id: int):
+    def query_session_types_for_project(self, project_id: int, include_other_session_types: bool = False):
         from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
         from opentera.db.models.TeraSessionType import TeraSessionType
         session_types_ids = self.get_accessible_session_types_ids()
@@ -797,10 +808,23 @@ class DBManagerTeraUserAccess:
         session_types = TeraSessionTypeProject.query.filter(TeraSessionTypeProject.id_session_type.
                                                             in_(session_types_ids)) \
             .filter_by(id_project=project_id).join(TeraSessionType).filter(or_(
-            TeraSessionType.session_type_category != TeraSessionType.SessionCategoryEnum.SERVICE.value, and_(
-                TeraSessionType.session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE.value,
-                TeraSessionType.id_service.in_(service_ids)).self_group())).all()
-        return session_types
+                TeraSessionType.session_type_category != TeraSessionType.SessionCategoryEnum.SERVICE.value, and_(
+                    TeraSessionType.session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE.value,
+                    TeraSessionType.id_service.in_(service_ids)).self_group())).all()
+
+        if include_other_session_types:
+            # We must add the missing session types in the list
+            st_ids = [st.id_project for st in session_types]
+            missing_st_ids = set(session_types_ids).difference(st_ids)
+            for missing_st_id in missing_st_ids:
+                st_proj = TeraSessionTypeProject()
+                st_proj.id_session_type = missing_st_id
+                st_proj.id_project = None
+                st_proj.session_type_project_session_type = TeraSessionType.get_session_type_by_id(missing_st_id)
+                session_types.append(st_proj)
+
+        # Sort by name
+        return sorted(session_types, key=lambda s: s.session_type_project_session_type.session_type_name)
 
     def query_assets_associated_to_service(self, uuid_service: str):
         from opentera.db.models.TeraAsset import TeraAsset
@@ -842,7 +866,7 @@ class DBManagerTeraUserAccess:
                 service_project.service_project_project = TeraProject.get_project_by_id(missing_project_id)
                 service_projects.append(service_project)
 
-        # Sort by project id
+        # Sort by project
         return sorted(service_projects, key=lambda sp: sp.service_project_project.project_name)
 
     def query_session_types_sites_for_site(self, site_id: int, include_other_session_types=False):
