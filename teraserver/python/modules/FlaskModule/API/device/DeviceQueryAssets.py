@@ -1,7 +1,7 @@
 from flask import session, request
 from flask_restx import Resource, inputs
 from modules.LoginModule.LoginModule import LoginModule
-from modules.Globals import db_man
+from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraAsset import TeraAsset
@@ -35,7 +35,7 @@ class DeviceQueryAssets(Resource):
         device = TeraDevice.get_device_by_uuid(session['_user_id'])
         args = get_parser.parse_args()
 
-        device_access = db_man.deviceAccess(device)
+        device_access = DBManager.deviceAccess(device)
         assets = device_access.get_accessible_assets(id_asset=args['id_asset'], uuid_asset=args['asset_uuid'])
 
         # Create response

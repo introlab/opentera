@@ -1,7 +1,7 @@
 from flask import session, request
-from flask_restx import Resource, reqparse
+from flask_restx import Resource
 from modules.LoginModule.LoginModule import LoginModule
-from modules.Globals import db_man
+from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.redis.RedisRPCClient import RedisRPCClient
@@ -16,10 +16,10 @@ post_parser = api.parser()
 
 class DeviceLogin(Resource):
 
-    def __init__(self, _api, flaskModule=None):
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        self.flaskModule = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
         Resource.__init__(self, _api)
-        self.parser = reqparse.RequestParser()
 
     @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)
@@ -31,15 +31,15 @@ class DeviceLogin(Resource):
     def get(self):
 
         # Redis key is handled in LoginModule
-        servername = self.module.config.server_config['hostname']
-        port = self.module.config.server_config['port']
+        server_name = self.flaskModule.config.server_config['hostname']
+        port = self.flaskModule.config.server_config['port']
 
         current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
         current_device.update_last_online()
-        # args = get_parser.parse_args()
+        args = get_parser.parse_args(strict=True)
 
         if 'X_EXTERNALSERVER' in request.headers:
-            servername = request.headers['X_EXTERNALSERVER']
+            server_name = request.headers['X_EXTERNALSERVER']
 
         if 'X_EXTERNALPORT' in request.headers:
             port = request.headers['X_EXTERNALPORT']
@@ -47,7 +47,7 @@ class DeviceLogin(Resource):
         # Reply device information
         response = {'device_info': current_device.to_json(minimal=False)}
 
-        device_access = db_man.deviceAccess(current_device)
+        device_access = DBManager.deviceAccess(current_device)
 
         # Reply participant information
         participants = device_access.get_accessible_participants()
@@ -67,25 +67,30 @@ class DeviceLogin(Resource):
 
         # TODO Handle sessions
         if current_device.device_onlineable:
-            # Verify if device already logged in
-            rpc = RedisRPCClient(self.module.config.redis_config)
-            online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
-            if current_device.device_uuid in online_devices:
-                self.module.logger.log_warning(self.module.module_name,
-                                               DeviceLogin.__name__,
-                                               'get', 403,
-                                               'Device already logged in', current_device.to_json(minimal=True))
+            if not self.test:
+                # Verify if device already logged in
+                rpc = RedisRPCClient(self.flaskModule.config.redis_config)
+                online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
 
-                return gettext('Device already logged in.'), 403
+                if online_devices is None:
+                    return gettext('Unable to get online devices.'), 403
+
+                if current_device.device_uuid in online_devices:
+                    self.flaskModule.logger.log_warning(self.flaskModule.module_name,
+                                                        DeviceLogin.__name__,
+                                                        'get', 403,
+                                                        'Device already logged in', current_device.to_json(minimal=True))
+
+                    return gettext('Device already logged in.'), 403
 
             # Permanent ?
             session.permanent = True
 
             print('DeviceLogin - setting key with expiration in 60s', session['_id'], session['_user_id'])
-            self.module.redisSet(session['_id'], session['_user_id'], ex=60)
+            self.flaskModule.redisSet(session['_id'], session['_user_id'], ex=60)
 
             # Add websocket URL
-            response['websocket_url'] = "wss://" + servername + ":" + str(port) + "/wss/device?id=" + session['_id']
+            response['websocket_url'] = "wss://" + server_name + ":" + str(port) + "/wss/device?id=" + session['_id']
 
         # Return reply as json object
         return response

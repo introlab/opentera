@@ -4,7 +4,7 @@ from flask_babel import gettext
 from sqlalchemy import exc
 
 from modules.LoginModule.LoginModule import LoginModule
-from modules.Globals import db_man
+from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
 
@@ -36,7 +36,7 @@ class DeviceQueryDevices(Resource):
         # Reply device information
         response = {'device_info': device.to_json(minimal=True)}
 
-        device_access = db_man.deviceAccess(device)
+        device_access = DBManager.deviceAccess(device)
 
         # Reply participant information
         participants = device_access.get_accessible_participants()

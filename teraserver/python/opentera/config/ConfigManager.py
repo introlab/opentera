@@ -39,6 +39,8 @@ class ConfigManager:
         for field in server_required_fields:
             self.server_config[field] = ''
         self.server_config['upload_path'] = 'uploads'
+        self.server_config['hostname'] = '127.0.0.1'
+        self.server_config['port'] = 12345
 
         # Database fake config
         database_required_fields = ['name', 'port', 'url', 'username', 'password']

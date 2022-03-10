@@ -1,7 +1,7 @@
 from flask import session, request
 from flask_restx import Resource, inputs
 from modules.LoginModule.LoginModule import participant_multi_auth
-from modules.Globals import db_man
+from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraAsset import TeraAsset
@@ -33,7 +33,7 @@ class ParticipantQueryAssets(Resource):
         participant = TeraParticipant.get_participant_by_uuid(session['_user_id'])
         args = get_parser.parse_args()
 
-        participant_access = db_man.participantAccess(participant)
+        participant_access = DBManager.participantAccess(participant)
         assets = participant_access.get_accessible_assets(id_asset=args['id_asset'], uuid_asset=args['asset_uuid'])
 
         # Create response
