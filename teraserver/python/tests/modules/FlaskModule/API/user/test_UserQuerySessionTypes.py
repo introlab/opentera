@@ -77,6 +77,38 @@ class UserQuerySessionTypesTest(BaseAPITest):
         for data_item in json_data:
             self._checkJson(json_data=data_item, minimal=True)
 
+    def test_query_specific_site_as_admin(self):
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_site=2")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 1)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_site=1&list=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 5)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item, minimal=True)
+
+    def test_query_specific_site_as_user(self):
+        response = self._request_with_http_auth(username='user', password='user', payload="id_site=2")
+        self.assertEqual(response.status_code, 403)
+
+        response = self._request_with_http_auth(username='user', password='user', payload="id_site=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 5)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+
     def test_post_and_delete(self):
         # New with minimal infos
         json_data = {
@@ -96,19 +128,28 @@ class UserQuerySessionTypesTest(BaseAPITest):
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 400, msg="Missing id_service")  # Missing id_service
 
-        json_data['session_type']['id_service'] = 5
-        json_data['session_type']['session_type_projects'] = [{'id_project': 1}, {'id_project': 3}]
-        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="No access to project!")
-
-        response = self._post_with_http_auth(username='user4', password='user4', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Post denied for user")  # Forbidden for that user to post that
-
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         self.assertEqual(response.status_code, 400, msg="Post new, bad service project association")
 
         json_data['session_type']['id_service'] = 3
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
+        self.assertEqual(response.status_code, 400, msg="Missing session_type_sites for siteadmin")
+
+        json_data['session_type']['session_type_sites'] = [{'id_site': 1}]
+        json_data['session_type']['session_type_projects'] = [{'id_project': 1}, {'id_project': 3}]
+        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
+        self.assertEqual(response.status_code, 403, msg="No access to project!")
+
+        json_data['session_type']['session_type_sites'] = [{'id_site': 2}]
+        json_data['session_type']['session_type_projects'] = [{'id_project': 1}, {'id_project': 2}]
+        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
+        self.assertEqual(response.status_code, 403, msg="No access to site")
+
+        json_data['session_type']['session_type_sites'] = [{'id_site': 1}]
+        response = self._post_with_http_auth(username='user4', password='user4', payload=json_data)
+        self.assertEqual(response.status_code, 403, msg="Post denied for user")  # Forbidden for that user to post that
+
+        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
         self.assertEqual(response.status_code, 200, msg="Post OK")
 
         json_data = response.json()[0]
@@ -120,7 +161,7 @@ class UserQuerySessionTypesTest(BaseAPITest):
                 'id_session_type': current_id,
                 'session_type_category': 2,
                 'session_type_name': 'Test 2',
-                'session_type_projects': [{'id_project': 1}, {'id_project': 2}]
+                'session_type_projects': [{'id_project': 1}]
             }
         }
 
@@ -134,20 +175,20 @@ class UserQuerySessionTypesTest(BaseAPITest):
         # Check that the untouched project is still there
         response = self._request_with_http_auth(username='admin', password='admin',
                                                 payload="id_session_type=" + str(current_id),
-                                                endpoint='/api/user/sessiontypeprojects')
+                                                endpoint='/api/user/sessiontypes/projects')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         reply_data = response.json()
-        self.assertEqual(len(reply_data), 3)
+        self.assertEqual(len(reply_data), 1)
 
-        json_data['session_type']['session_type_projects'] = [{'id_project': 1}]
+        json_data['session_type']['session_type_projects'] = [{'id_project': 1}, {'id_project': 2}]
         response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Changed user groups")
+        self.assertEqual(response.status_code, 200, msg="Changed projects")
 
         # Check that the untouched project is still there
         response = self._request_with_http_auth(username='admin', password='admin',
                                                 payload="id_session_type=" + str(current_id),
-                                                endpoint='/api/user/sessiontypeprojects')
+                                                endpoint='/api/user/sessiontypes/projects')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         reply_data = response.json()
@@ -157,9 +198,6 @@ class UserQuerySessionTypesTest(BaseAPITest):
         self.assertEqual(response.status_code, 403, msg="Delete denied")
 
         response = self._delete_with_http_auth(username='siteadmin', password='siteadmin', id_to_del=current_id)
-        self.assertEqual(response.status_code, 403, msg="Can't delete because not admin on all projects")
-
-        response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=current_id)
         self.assertEqual(response.status_code, 200, msg="Delete OK")
 
         # Remove created project-service association

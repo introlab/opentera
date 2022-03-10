@@ -284,7 +284,7 @@ class UserQueryServiceSitesTest(BaseAPITest):
                                               {'id_session_type': 4, 'id_project': 1},
                                               {'id_session_type': 5, 'id_project': 1}]}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
-                                             endpoint='/api/user/sessiontypeprojects')
+                                             endpoint='/api/user/sessiontypes/projects')
         self.assertEqual(response.status_code, 200)
 
     def test_post_site(self):
@@ -356,7 +356,7 @@ class UserQueryServiceSitesTest(BaseAPITest):
                                               {'id_session_type': 4, 'id_project': 1},
                                               {'id_session_type': 5, 'id_project': 1}]}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
-                                             endpoint='/api/user/sessiontypeprojects')
+                                             endpoint='/api/user/sessiontypes/projects')
         self.assertEqual(response.status_code, 200)
 
     def test_post_service_site_and_delete(self):
@@ -427,7 +427,7 @@ class UserQueryServiceSitesTest(BaseAPITest):
                                               {'id_session_type': 4, 'id_project': 1},
                                               {'id_session_type': 5, 'id_project': 1}]}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
-                                             endpoint='/api/user/sessiontypeprojects')
+                                             endpoint='/api/user/sessiontypes/projects')
         self.assertEqual(response.status_code, 200)
 
     def _checkJson(self, json_data, minimal=False):

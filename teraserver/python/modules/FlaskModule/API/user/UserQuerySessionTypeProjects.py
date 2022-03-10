@@ -61,7 +61,7 @@ class UserQuerySessionTypeProjects(Resource):
         else:
             if args['id_session_type']:
                 if args['id_session_type'] in user_access.get_accessible_session_types_ids():
-                    session_type_projects = TeraSessionTypeProject.query_projects_for_session_type(
+                    session_type_projects = TeraSessionTypeProject.get_projects_for_session_type(
                         args['id_session_type'])
         try:
             stp_list = []
@@ -137,6 +137,8 @@ class UserQuerySessionTypeProjects(Resource):
                 # Already existing
                 try:
                     TeraSessionTypeProject.update(json_stp['id_session_type_project'], json_stp)
+                except exc.IntegrityError:
+                    return gettext('Data integrity error - is the session type associated to the project\'s site?'), 400
                 except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
@@ -151,6 +153,8 @@ class UserQuerySessionTypeProjects(Resource):
                     TeraSessionTypeProject.insert(new_stp)
                     # Update ID for further use
                     json_stp['id_session_type_project'] = new_stp.id_session_type_project
+                except exc.IntegrityError:
+                    return gettext('Data integrity error - is the session type associated to the project\'s site?'), 400
                 except exc.SQLAlchemyError:
                     import sys
                     print(sys.exc_info())

@@ -150,7 +150,6 @@ class UserQueryDeviceProjects(Resource):
 
             # Also filter projects already there
             received_projects_ids = set(received_projects_ids).difference(current_projects_ids)
-            from opentera.db.models.TeraProject import TeraProject
             for proj_id in todel_ids:
                 project = TeraProject.get_project_by_id(proj_id)
                 if user_access.get_site_role(project.id_site) != 'admin':

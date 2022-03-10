@@ -12,7 +12,7 @@ class UserQuerySessionTypeProjectTest(BaseUserAPITest):
         # Setup minimal API
         from modules.FlaskModule.API.user.UserQuerySessionTypeProjects import UserQuerySessionTypeProjects
         kwargs = {'flaskModule': FakeFlaskModule(config=BaseUserAPITest.getConfig())}
-        user_api_ns.add_resource(UserQuerySessionTypeProjects, '/sessiontypeprojects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQuerySessionTypeProjects, '/sessiontypes/projects', resource_class_kwargs=kwargs)
 
         # Create test client
         self.test_client = flask_app.test_client()

@@ -1,4 +1,5 @@
 from opentera.db.Base import db, BaseModel
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraSessionTypeProject(db.Model, BaseModel):
@@ -105,11 +106,32 @@ class TeraSessionTypeProject(db.Model, BaseModel):
 
     @classmethod
     def insert(cls, stp):
+        # Check if that site of that project has the site associated to it
+        from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+        from opentera.db.models.TeraProject import TeraProject
+        project = TeraProject.get_project_by_id(project_id=stp.id_project)
+        st_site = TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(site_id=project.id_site,
+                                                                                      session_type_id=
+                                                                                      stp.id_session_type)
+        if not st_site:
+            raise IntegrityError(params='Session type not associated to project site',
+                                 orig='TeraSessionTypeProject.insert', statement='insert')
         super().insert(stp)
         stp.check_integrity()
 
     @classmethod
     def update(cls, update_id: int, values: dict):
-        super().update(update_id, values)
+        values = cls.clean_values(values)
+        stp = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
+        stp.from_json(values)
+        # Check if that site of that project has the site associated to the session type
+        from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+        st_site = TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(
+            site_id=stp.session_type_project_project.id_site, session_type_id=stp.id_session_type)
+        if not st_site:
+            raise IntegrityError(params='Session type not associated to project site',
+                                 orig='TeraSessionTypeProject.update', statement='update')
+
         stp = TeraSessionTypeProject.get_session_type_project_by_id(update_id)
         stp.check_integrity()
+        cls.commit()
