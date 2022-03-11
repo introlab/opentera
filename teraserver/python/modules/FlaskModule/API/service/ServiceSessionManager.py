@@ -91,7 +91,7 @@ class ServiceSessionManager(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
-        self._test = kwargs.get('test', False)
+        self.test = kwargs.get('test', False)
 
     @LoginModule.service_token_or_certificate_required
     @api.expect(session_manager_schema)
@@ -201,7 +201,7 @@ class ServiceSessionManager(Resource):
             service = TeraService.get_service_by_id(json_session_manager['id_service'])
             if not service:
                 return gettext('Service not found'), 400
-            if not self._test:
+            if not self.test:
                 rpc = RedisRPCClient(self.module.config.redis_config)
                 answer = rpc.call_service(service.service_key, 'session_manage', json.dumps(request.json))
             else:

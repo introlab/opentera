@@ -31,9 +31,10 @@ class DeviceRegister(Resource):
     """
     decorators = [limiter.limit("10/minute", error_message='Rate Limited')]
 
-    def __init__(self, _api, flaskModule=None):
-        Resource.__init__(self, _api)
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
         self.ca_info = dict()
 
@@ -44,8 +45,6 @@ class DeviceRegister(Resource):
         # Load CA certificate
         self.ca_info['certificate'] = load_pem_certificate(self.module.config.server_config['ssl_path'] + '/'
                                                            + self.module.config.server_config['ca_certificate'])
-
-        print(self.ca_info)
 
     def create_device(self, name, device_json=None):
         # Create TeraDevice

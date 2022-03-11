@@ -17,9 +17,9 @@ post_parser = api.parser()
 class DeviceLogin(Resource):
 
     def __init__(self, _api, *args, **kwargs):
-        self.flaskModule = kwargs.get('flaskModule', None)
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
-        Resource.__init__(self, _api)
 
     @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)
@@ -31,8 +31,8 @@ class DeviceLogin(Resource):
     def get(self):
 
         # Redis key is handled in LoginModule
-        server_name = self.flaskModule.config.server_config['hostname']
-        port = self.flaskModule.config.server_config['port']
+        server_name = self.module.config.server_config['hostname']
+        port = self.module.config.server_config['port']
 
         current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
         current_device.update_last_online()
@@ -69,25 +69,22 @@ class DeviceLogin(Resource):
         if current_device.device_onlineable:
             if not self.test:
                 # Verify if device already logged in
-                rpc = RedisRPCClient(self.flaskModule.config.redis_config)
+                rpc = RedisRPCClient(self.module.config.redis_config)
                 online_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_devices')
 
                 if online_devices is None:
                     return gettext('Unable to get online devices.'), 403
 
                 if current_device.device_uuid in online_devices:
-                    self.flaskModule.logger.log_warning(self.flaskModule.module_name,
-                                                        DeviceLogin.__name__,
-                                                        'get', 403,
-                                                        'Device already logged in', current_device.to_json(minimal=True))
+                    self.module.logger.log_warning(self.module.module_name,
+                                                   DeviceLogin.__name__,
+                                                   'get', 403,
+                                                   'Device already logged in', current_device.to_json(minimal=True))
 
                     return gettext('Device already logged in.'), 403
 
-            # Permanent ?
-            session.permanent = True
-
             print('DeviceLogin - setting key with expiration in 60s', session['_id'], session['_user_id'])
-            self.flaskModule.redisSet(session['_id'], session['_user_id'], ex=60)
+            self.module.redisSet(session['_id'], session['_user_id'], ex=60)
 
             # Add websocket URL
             response['websocket_url'] = "wss://" + server_name + ":" + str(port) + "/wss/device?id=" + session['_id']

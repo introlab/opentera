@@ -17,9 +17,10 @@ post_parser = api.parser()
 
 class DeviceQueryDevices(Resource):
 
-    def __init__(self, _api, flaskModule=None):
-        Resource.__init__(self, _api)
-        self.module = flaskModule
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)

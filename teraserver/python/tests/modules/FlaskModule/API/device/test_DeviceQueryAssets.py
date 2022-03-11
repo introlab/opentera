@@ -1,86 +1,199 @@
-from requests import get
-import json
-from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
+from typing import List
+
+from BaseDeviceAPITest import BaseDeviceAPITest
+from modules.FlaskModule.FlaskModule import flask_app
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraAsset import TeraAsset
 
 
-class DeviceQueryAssetsTest(BaseAPITest):
-    login_endpoint = '/api/device/login'
+class DeviceQueryAssetsTest(BaseDeviceAPITest):
     test_endpoint = '/api/device/assets'
-    device_token = None
 
     def setUp(self):
-        # Get device token
-        params = {'id_device': 1}
-        response = self._request_with_http_auth('admin', 'admin', params, '/api/user/devices')
-        self.assertEqual(response.status_code, 200)
-        device_info = response.json()
-        self.assertTrue(device_info[0].__contains__('device_token'))
-        self.device_token = device_info[0]['device_token']
+        super().setUp()
+        from modules.FlaskModule.FlaskModule import device_api_ns
+        from BaseDeviceAPITest import FakeFlaskModule
+        # Setup minimal API
+        from modules.FlaskModule.API.device.DeviceQueryAssets import DeviceQueryAssets
+        kwargs = {
+            'flaskModule': FakeFlaskModule(config=BaseDeviceAPITest.getConfig()),
+            'test': True
+        }
+        device_api_ns.add_resource(DeviceQueryAssets, '/assets', resource_class_kwargs=kwargs)
+
+        # Create test client
+        self.test_client = flask_app.test_client()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
-    def test_no_auth(self):
-        response = self._request_with_no_auth()
+    def test_get_endpoint_no_auth(self):
+        response = self.test_client.get(self.test_endpoint)
         self.assertEqual(401, response.status_code)
 
-    def test_query_assets_get_id(self):
-        response = self._request_with_token_auth(self.device_token, 'id_asset=4&with_urls=True')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertTrue(len(json_data), 1)
-        self._checkJson(json_data=json_data[0])
+    def test_get_endpoint_invalid_token_auth(self):
+        response = self._get_with_device_token_auth(self.test_client, token='invalid')
+        self.assertEqual(401, response.status_code)
 
-    def test_query_assets_get_id_forbidden(self):
-        response = self._request_with_token_auth(self.device_token, 'id_asset=1')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+    def test_get_endpoint_with_token_auth_no_param(self):
+        devices: List[TeraDevice] = TeraDevice.query.all()
+        for device in devices:
+            if device.device_token:
+                if device.device_enabled:
+                    response = self._get_with_device_token_auth(self.test_client, token=device.device_token)
+                    self.assertEqual(200, response.status_code)
 
-    def test_query_assets_get_uuid(self):
-        response = self._request_with_token_auth(self.device_token, 'id_asset=4')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        asset_uuid = json_data[0]['asset_uuid']
-        response = self._request_with_token_auth(self.device_token, 'asset_uuid=' + asset_uuid)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self._checkJson(json_data=json_data[0], minimal=True)
+                    for asset_json in response.json:
+                        self._checkJson(asset_json, minimal=True)
 
-    def test_query_assets_get_uuid_forbidden(self):
-        params = {'id_asset': 1}
-        response = self._request_with_http_auth('admin', 'admin', params, '/api/user/assets')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self.assertTrue(json_data[0].__contains__('asset_uuid'))
-        asset_uuid = json_data[0]['asset_uuid']
-        response = self._request_with_token_auth(self.device_token, 'asset_uuid=' + asset_uuid)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+                else:
+                    response = self._get_with_device_token_auth(self.test_client, token=device.device_token)
+                    self.assertEqual(401, response.status_code)
 
-    def test_query_assets_all(self):
-        response = self._request_with_token_auth(self.device_token)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        for asset_info in json_data:
-            self._checkJson(json_data=asset_info, minimal=True)
+    def test_get_endpoint_with_token_auth_with_urls(self):
+        devices: List[TeraDevice] = TeraDevice.query.all()
+        params = {
+            'with_urls': True
+        }
+        for device in devices:
+            if device.device_token:
+                if device.device_enabled:
+                    response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                params=params)
+                    self.assertEqual(200, response.status_code)
 
-    def test_query_assets_all_token_only(self):
-        payload = {'with_only_token': True}
-        response = self._request_with_token_auth(token=self.device_token, payload=payload)
-        self.assertEqual(response.status_code, 200)
+                    for asset_json in response.json:
+                        self._checkJson(asset_json, minimal=False)
 
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        for data_item in json_data:
-            self.assertFalse(data_item.__contains__("asset_name"))
-            self.assertTrue(data_item.__contains__("asset_uuid"))
-            self.assertTrue(data_item.__contains__("access_token"))
+                else:
+                    response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                params=params)
+                    self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_with_token_auth_with_asset_uuid(self):
+        devices: List[TeraDevice] = TeraDevice.query.all()
+
+        for device in devices:
+            for asset in TeraAsset.get_assets_for_device(device.id_device):
+                self.assertEqual(asset.id_device, device.id_device)
+                params = {
+                    'asset_uuid': asset.asset_uuid,
+                    'with_urls': True
+                }
+
+                if device.device_token:
+                    if device.device_enabled:
+                        response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                    params=params)
+                        self.assertEqual(200, response.status_code)
+
+                        for asset_json in response.json:
+                            self.assertEqual(asset.asset_uuid, asset_json['asset_uuid'])
+                            self._checkJson(asset_json, minimal=False)
+
+                    else:
+                        response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                    params=params)
+                        self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_with_token_auth_with_asset_id(self):
+        devices: List[TeraDevice] = TeraDevice.query.all()
+
+        for device in devices:
+            for asset in TeraAsset.get_assets_for_device(device.id_device):
+                self.assertEqual(asset.id_device, device.id_device)
+                params = {
+                    'id_asset': asset.id_asset,
+                    'with_urls': True
+                }
+
+                if device.device_token:
+                    if device.device_enabled:
+                        response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                    params=params)
+                        self.assertEqual(200, response.status_code)
+
+                        for asset_json in response.json:
+                            self.assertEqual(asset.id_asset, asset_json['id_asset'])
+                            self._checkJson(asset_json, minimal=False)
+
+                    else:
+                        response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                    params=params)
+                        self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_with_token_auth_with_forbidden_id_asset(self):
+        devices: List[TeraDevice] = TeraDevice.query.all()
+
+        for device in devices:
+            for asset in TeraAsset.query.all():
+                params = {
+                    'id_asset': asset.id_asset,
+                    'with_urls': True
+                }
+
+                if device.device_token:
+                    if device.device_enabled:
+                        if asset.id_device != device.id_device:
+                            response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                        params=params)
+                            # TODO should have 403 instead?
+                            self.assertEqual(200, response.status_code)
+                            self.assertEqual(0, len(response.json))
+
+                    else:
+                        response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                    params=params)
+                        self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_with_token_auth_with_forbidden_uuid_asset(self):
+        devices: List[TeraDevice] = TeraDevice.query.all()
+
+        for device in devices:
+            for asset in TeraAsset.query.all():
+                params = {
+                    'asset_uuid': asset.asset_uuid,
+                    'with_urls': True
+                }
+
+                if device.device_token:
+                    if device.device_enabled:
+                        if asset.id_device != device.id_device:
+                            response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                        params=params)
+                            # TODO should have 403 instead?
+                            self.assertEqual(200, response.status_code)
+                            self.assertEqual(0, len(response.json))
+
+                    else:
+                        response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                    params=params)
+                        self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_with_token_auth_with_token_only(self):
+        devices: List[TeraDevice] = TeraDevice.query.all()
+
+        for device in devices:
+            for asset in TeraAsset.get_assets_for_device(device.id_device):
+                self.assertEqual(asset.id_device, device.id_device)
+                params = {
+                    'id_asset': asset.id_asset,
+                    'with_only_token': True
+                }
+
+                if device.device_token:
+                    if device.device_enabled:
+                        response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                    params=params)
+                        self.assertEqual(200, response.status_code)
+                        for json_asset in response.json:
+                            self.assertFalse('asset_name' in json_asset)
+                            self.assertTrue('asset_uuid' in json_asset)
+                            self.assertTrue('access_token' in json_asset)
+                    else:
+                        response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                    params=params)
+                        self.assertEqual(401, response.status_code)
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

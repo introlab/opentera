@@ -26,9 +26,10 @@ model = api.model('ParticipantLogin', {
 class ParticipantLogin(Resource):
 
     # Handle auth
-    def __init__(self, _api, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self, _api)
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     # @participant_http_auth.login_required
     @participant_multi_auth.login_required(role='limited')
@@ -72,7 +73,6 @@ class ParticipantLogin(Resource):
                 return gettext('Participant already logged in.'), 403
 
             current_participant.update_last_online()
-            session.permanent = True
 
             # Return reply as json object
             reply = {"participant_name": current_participant.participant_name,

@@ -58,10 +58,10 @@ class UserQueryDeviceParticipantsTest(BaseUserAPITest):
             self.session.add(device)  # Required for lazy loading
             self.assertEqual(len(device.device_participants), len(response.json))
 
-            # Assuming same order here
+            # May not be in same order
+            participant_ids = [participant.id_participant for participant in device.device_participants]
             for index in range(len(response.json)):
-                self.assertEqual(device.device_participants[index].id_participant,
-                                 response.json[index]['id_participant'])
+                self.assertTrue(response.json[index]['id_participant'] in participant_ids)
 
     def test_get_endpoint_with_http_auth_admin_and_id_participant(self):
         participants: List[TeraParticipant] = TeraParticipant.query.all()
@@ -74,7 +74,7 @@ class UserQueryDeviceParticipantsTest(BaseUserAPITest):
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
-            self.session.add(participant)  # Required for lazy loading
+            # self.session.add(participant)  # Required for lazy loading
             self.assertEqual(len(participant.participant_devices), len(response.json))
 
             # Assuming same order here

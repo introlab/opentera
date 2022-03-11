@@ -14,9 +14,10 @@ post_parser = api.parser()
 class ParticipantLogout(Resource):
 
     # Handle auth
-    def __init__(self, _api, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self, _api)
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @api.expect(get_parser)
     @api.doc(description='Logout participant',

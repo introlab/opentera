@@ -23,7 +23,7 @@ class UserLogin(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
-        self.parser = reqparse.RequestParser()
+        self.test = kwargs.get('test', False)
 
     @user_http_auth.login_required
     @api.expect(get_parser)
@@ -32,8 +32,6 @@ class UserLogin(Resource):
 
         parser = get_parser
         args = parser.parse_args()
-
-        session.permanent = True
 
         # Redis key is handled in LoginModule
         servername = self.module.config.server_config['hostname']
