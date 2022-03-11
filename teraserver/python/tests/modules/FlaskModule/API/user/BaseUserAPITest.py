@@ -109,7 +109,7 @@ class BaseUserAPITest(unittest.TestCase):
                                          TeraServerSettings.get_server_setting_value(
                                              TeraServerSettings.ServerParticipantTokenKey))
 
-    def _get_with_user_token_auth(self, client: FlaskClient, token: str = '', params={}, endpoint=None):
+    def _get_with_user_token_auth(self, client: FlaskClient, token: str = '', params=None, endpoint=None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -118,7 +118,7 @@ class BaseUserAPITest(unittest.TestCase):
         return client.get(endpoint, headers=headers, query_string=params)
 
     def _get_with_user_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
-                                 params={}, endpoint=None):
+                                 params=None, endpoint=None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -128,7 +128,7 @@ class BaseUserAPITest(unittest.TestCase):
         return client.get(endpoint, headers=headers, query_string=params)
 
     def _post_with_user_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
-                                      params: dict = {}, endpoint: str = ''):
+                                   params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -137,7 +137,7 @@ class BaseUserAPITest(unittest.TestCase):
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
     def _post_with_user_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
-                                  json: dict = {}, params: dict = {}, endpoint: str = ''):
+                                  json: dict = {}, params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -146,7 +146,7 @@ class BaseUserAPITest(unittest.TestCase):
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
     def _delete_with_user_token_auth(self, client: FlaskClient, token: str = '',
-                                     params: dict = {}, endpoint: str = ''):
+                                     params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -155,7 +155,7 @@ class BaseUserAPITest(unittest.TestCase):
         return client.delete(endpoint, headers=headers, query_string=params)
 
     def _delete_with_user_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
-                                    params: dict = {}, endpoint: str = ''):
+                                    params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:

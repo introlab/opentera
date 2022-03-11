@@ -814,7 +814,7 @@ class DBManagerTeraUserAccess:
 
         if include_other_session_types:
             # We must add the missing session types in the list
-            st_ids = [st.id_project for st in session_types]
+            st_ids = [st.id_session_type for st in session_types]
             missing_st_ids = set(session_types_ids).difference(st_ids)
             for missing_st_id in missing_st_ids:
                 st_proj = TeraSessionTypeProject()
