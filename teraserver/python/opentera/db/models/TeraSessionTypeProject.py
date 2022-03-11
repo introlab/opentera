@@ -88,6 +88,13 @@ class TeraSessionTypeProject(db.Model, BaseModel):
             filter(TeraSessionType.id_service == service_id).\
             filter(TeraSessionTypeProject.id_project == project_id).all()
 
+    @staticmethod
+    def delete_with_ids(session_type_id: int, project_id: int):
+        delete_obj: TeraSessionTypeProject = TeraSessionTypeProject.query.filter_by(id_session_type=session_type_id,
+                                                                                    id_project=project_id).first()
+        if delete_obj:
+            TeraSessionTypeProject.delete(delete_obj.id_session_type_project)
+
     def check_integrity(self):
         from opentera.db.models.TeraSessionType import TeraSessionType
         # If that session type is related to a service, make sure that the service is associated to that project

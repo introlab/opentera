@@ -1,9 +1,9 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraProject import TeraProject
 from modules.DatabaseModule.DBManager import DBManager
@@ -54,7 +54,6 @@ class UserQuerySessionTypeProjects(Resource):
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error when getting association'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         parser = get_parser
@@ -123,90 +122,128 @@ class UserQuerySessionTypeProjects(Resource):
                         500: 'Internal error occured when saving association'})
     def post(self):
         # parser = post_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        # Using request.json instead of parser, since parser messes up the json!
-        if 'session_type_project' not in request.json:
-            return gettext('Field session_type_project missing'), 400
+        accessible_projects_ids = user_access.get_accessible_projects_ids(admin_only=True)
+        if 'session_type' in request.json:
+            # We have a session_type. Get list of items
+            if 'id_session_type' not in request.json['session_type']:
+                return gettext('Missing id_session_type'), 400
+            if 'projects' not in request.json['session_type']:
+                return gettext('Missing projects'), 400
+            id_session_type = request.json['session_type']['id_session_type']
 
-        json_stps = request.json['session_type_project']
-        if not isinstance(json_stps, list):
-            json_stps = [json_stps]
+            if id_session_type not in user_access.get_accessible_session_types_ids(admin_only=True):
+                return gettext("Access denied"), 403
 
-        # Validate if we have an id
-        for json_stp in json_stps:
-            if 'id_session_type' not in json_stp or 'id_project' not in json_stp:
-                return '', 400
+            # Get all current association for session type
+            current_projects = TeraSessionTypeProject.get_projects_for_session_type(session_type_id=id_session_type)
+            current_projects_ids = [proj.id_project for proj in current_projects]
+            received_proj_ids = [proj['id_project'] for proj in request.json['session_type']['projects']]
+            # Difference - we must delete sites not anymore in the list
+            todel_ids = set(current_projects_ids).difference(received_proj_ids)
+            # Also filter projects already there
+            received_proj_ids = set(received_proj_ids).difference(current_projects_ids)
+            for proj_id in todel_ids:
+                if proj_id in accessible_projects_ids:  # Don't remove from the list if not admin for that project!
+                    TeraSessionTypeProject.delete_with_ids(session_type_id=id_session_type, project_id=proj_id)
+            # Build projects association to add
+            json_stp = [{'id_session_type': id_session_type, 'id_project': proj_id} for proj_id in received_proj_ids]
+        elif 'project' in request.json:
+            # We have a project. Get list of items
+            if 'id_project' not in request.json['project']:
+                return gettext('Missing project ID'), 400
+            if 'sessiontypes' not in request.json['project']:
+                return gettext('Missing session types'), 400
+            id_project = request.json['project']['id_project']
 
-            # Check if current user can modify the posted information
-            if json_stp['id_session_type'] not in user_access.get_accessible_session_types_ids(admin_only=True):
+            # Check if admin for that project
+            if user_access.get_project_role(project_id=id_project) != 'admin':
                 return gettext('Access denied'), 403
 
-            # Check if already exists
-            stp = TeraSessionTypeProject.get_session_type_project_for_session_type_project(
-                project_id=json_stp['id_project'], session_type_id=json_stp['id_session_type'])
+            # Get all current association for site
+            current_session_types = TeraSessionTypeProject.get_sessions_types_for_project(project_id=id_project)
+            current_session_types_ids = [st.id_session_type for st in current_session_types]
+            received_st_ids = [st['id_session_type'] for st in request.json['project']['sessiontypes']]
+            # Difference - we must delete types not anymore in the list
+            todel_ids = set(current_session_types_ids).difference(received_st_ids)
+            # Also filter session types already there
+            received_st_ids = set(received_st_ids).difference(current_session_types_ids)
+            for st_id in todel_ids:
+                TeraSessionTypeProject.delete_with_ids(session_type_id=st_id, project_id=id_project)
+            # Build associations to add
+            json_stp = [{'id_session_type': st_id, 'id_project': id_project} for st_id in received_st_ids]
+        elif 'session_type_project' in request.json:
+            json_stp = request.json['session_type_project']
+            if not isinstance(json_stp, list):
+                json_stp = [json_stp]
+        else:
+            return gettext('Unknown format'), 400
 
-            if stp:
-                json_stp['id_session_type_project'] = stp.id_session_type_project
-            else:
-                json_stp['id_session_type_project'] = 0
+        # Validate if we have an id and access
+        for json_st in json_stp:
+            if 'id_session_type' not in json_st or 'id_project' not in json_st:
+                return gettext('Badly formatted request'), 400
 
-            # Check if we try to change the associated project
-            if 'id_project' in json_stp:
-                # Check if we have a service type session type
-                session_type = TeraSessionType.get_session_type_by_id(json_stp['id_session_type'])
+            if json_st['id_project'] not in accessible_projects_ids:
+                return gettext('Forbidden'), 403
 
-                # Get services for that project
-                if session_type.session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE and \
-                        session_type.id_session not in user_access.\
-                        query_services_projects_for_project(json_stp['id_project']):
-                    return gettext('Trying to associate a session type of type "service" with a service not associated '
-                                   'to that project'), 400
+            proj = TeraProject.get_project_by_id(json_st['id_project'])
+            site_access = TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(site_id=proj.id_site,
+                                                                                              session_type_id=
+                                                                                              json_st['id_session_type']
+                                                                                              )
+            if not site_access:
+                return gettext('At least one session type is not associated to the site of its project'), 403
+
+        for json_st in json_stp:
+            if 'id_session_type_project' not in json_st:
+                # Check if already exists
+                st = TeraSessionTypeProject.\
+                    get_session_type_project_for_session_type_project(project_id=int(json_st['id_project']),
+                                                                      session_type_id=int(json_st['id_session_type']))
+                if st:
+                    json_st['id_session_type_project'] = st.id_session_type_project
+                else:
+                    json_st['id_session_type_project'] = 0
 
             # Do the update!
-            if json_stp['id_session_type_project'] > 0:
+            if int(json_st['id_session_type_project']) > 0:
                 # Already existing
                 try:
-                    TeraSessionTypeProject.update(json_stp['id_session_type_project'], json_stp)
-                except exc.IntegrityError:
-                    return gettext('Data integrity error - is the session type associated to the project\'s site?'), 400
+                    TeraSessionTypeProject.update(int(json_st['id_session_type_project']), json_st)
                 except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
                     self.module.logger.log_error(self.module.module_name,
                                                  UserQuerySessionTypeProjects.__name__,
-                                                 'post', 500, 'Database error', e)
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
             else:
                 try:
                     new_stp = TeraSessionTypeProject()
-                    new_stp.from_json(json_stp)
+                    new_stp.from_json(json_st)
                     TeraSessionTypeProject.insert(new_stp)
                     # Update ID for further use
-                    json_stp['id_session_type_project'] = new_stp.id_session_type_project
-                except exc.IntegrityError:
-                    return gettext('Data integrity error - is the session type associated to the project\'s site?'), 400
-                except exc.SQLAlchemyError:
+                    json_st['id_session_type_project'] = new_stp.id_session_type_project
+                except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
+                    self.module.logger.log_error(self.module.module_name,
+                                                 UserQuerySessionTypeProjects.__name__,
+                                                 'post', 500, 'Database error', str(e))
                     return gettext('Database error'), 500
 
-        update_stp = json_stps
-
-        return jsonify(update_stp)
+        return json_stp
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)
     @api.doc(description='Delete a specific session-type - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (no access to session-type or project)',
-                        500: 'Association not found or database error.'})
+                        400: 'Association not found (invalid id?)'})
     def delete(self):
         parser = delete_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()
@@ -215,7 +252,7 @@ class UserQuerySessionTypeProjects(Resource):
         # Check if current user can delete
         stp = TeraSessionTypeProject.get_session_type_project_by_id(id_todel)
         if not stp:
-            return gettext('Not found'), 500
+            return gettext('Not found'), 400
 
         if stp.id_session_type not in user_access.get_accessible_session_types_ids(admin_only=True):
             return gettext('Access denied'), 403

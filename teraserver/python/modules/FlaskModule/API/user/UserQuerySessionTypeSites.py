@@ -190,7 +190,7 @@ class UserQuerySessionTypeSites(Resource):
                                                                                          int(json_st['id_session_type'])
                                                                                          )
                 if st:
-                    json_st['id_session_type_site'] = st.id_session_type
+                    json_st['id_session_type_site'] = st.id_session_type_site
                 else:
                     json_st['id_session_type_site'] = 0
 
