@@ -35,12 +35,16 @@ class ConfigManager:
     def create_defaults(self):
         # Server fake config
         server_required_fields = ['name', 'port', 'use_ssl', 'ssl_path', 'hostname', 'site_certificate',
-                                  'site_private_key', 'ca_certificate', 'ca_private_key', 'upload_path']
+                                  'site_private_key', 'ca_certificate', 'ca_private_key', 'upload_path',
+                                  'enable_docs']
+
         for field in server_required_fields:
             self.server_config[field] = ''
+
         self.server_config['upload_path'] = 'uploads'
         self.server_config['hostname'] = '127.0.0.1'
-        self.server_config['port'] = 12345
+        self.server_config['port'] = 4040
+        self.server_config['enable_docs'] = True
 
         # Database fake config
         database_required_fields = ['name', 'port', 'url', 'username', 'password']
@@ -73,6 +77,10 @@ class ConfigManager:
         # Add optional debug flag
         if 'debug_mode' not in config:
             config['debug_mode'] = False
+
+        # Add optional enable docs
+        if 'enable_docs' not in config:
+            config['enable_docs'] = False
 
         return rval
 

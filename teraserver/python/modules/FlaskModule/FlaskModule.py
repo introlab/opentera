@@ -5,7 +5,9 @@ from opentera.config.ConfigManager import ConfigManager
 from flask_babel import Babel
 from opentera.modules.BaseModule import BaseModule, ModuleNames
 from opentera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.OpenTeraServerVersion import opentera_server_version_string
 import redis
+from modules.Globals import opentera_doc_url
 
 # Flask application
 flask_app = Flask("TeraServer")
@@ -33,16 +35,17 @@ authorizations = {
 class CustomAPI(Api):
     @property
     def specs_url(self):
-        '''
+        """
         The Swagger specifications absolute url (ie. `swagger.json`)
 
         :rtype: str
-        '''
+        """
         return url_for(self.endpoint('specs'), _external=False)
 
 
-api = CustomAPI(flask_app, version='1.0.0', title='OpenTeraServer API',
-                description='TeraServer API Documentation', doc='/doc', prefix='/api',
+# if doc is set to False, documentation is disabled
+api = CustomAPI(flask_app, version=opentera_server_version_string, title='OpenTeraServer API',
+                description='TeraServer API Documentation', doc=opentera_doc_url, prefix='/api',
                 authorizations=authorizations)
 
 # Namespaces
@@ -80,7 +83,7 @@ class FlaskModule(BaseModule):
 
         # Use debug mode flag
         flask_app.debug = config.server_config['debug_mode']
-        # flask_app.secret_key = 'development'
+
         # Change secret key to use server UUID
         # This is used for session encryption
         flask_app.secret_key = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerUUID)
@@ -296,6 +299,7 @@ class FlaskModule(BaseModule):
 
     def init_views(self):
         from modules.FlaskModule.Views.About import About
+        from modules.FlaskModule.Views.DisabledDoc import DisabledDoc
 
         # Default arguments
         args = []
@@ -303,6 +307,10 @@ class FlaskModule(BaseModule):
 
         # About
         flask_app.add_url_rule('/about', view_func=About.as_view('about', *args, **kwargs))
+
+        if not self.config.server_config['enable_docs']:
+            # Disabled docs view
+            flask_app.add_url_rule('/doc', view_func=DisabledDoc.as_view('doc', *args, **kwargs))
 
 
 @flask_app.after_request
