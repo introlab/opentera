@@ -7,6 +7,8 @@ from sqlalchemy import exc
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
+from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+from opentera.db.models.TeraSessionType import TeraSessionType
 from modules.DatabaseModule.DBManager import DBManager
 from flask_babel import gettext
 
@@ -141,6 +143,27 @@ class UserQueryProjects(Resource):
                 json_project['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True):
             return gettext('Forbidden'), 403
 
+        update_session_types = False
+        session_types_ids = []
+        accessible_st_ids = []
+        if 'sessiontypes' in json_project:
+            session_types = json_project.pop('sessiontypes')
+            if not isinstance(session_types, list):
+                session_types = [session_types]
+            session_types_ids = [session_type['id_session_type'] for session_type in session_types]
+            accessible_st_ids = user_access.get_accessible_session_types_ids()
+            if set(session_types_ids).difference(accessible_st_ids):
+                # We have some session types not accessible
+                return gettext('No access to a session type for at least one of it'), 403
+
+            site_session_types = TeraSessionTypeSite.get_sessions_types_for_site(site_id=json_project['id_site'])
+            site_session_types_ids = [st.id_session_type for st in site_session_types]
+
+            if set(session_types_ids).difference(site_session_types_ids):
+                # We have some session types not associated to the project site
+                return gettext('At least one session type is not associated to the project site'), 403
+            update_session_types = True
+
         # Do the update!
         if json_project['id_project'] > 0:
             # Already existing
@@ -169,10 +192,33 @@ class UserQueryProjects(Resource):
                                              'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
-        # TODO: Publish update to everyone who is subscribed to sites update...
         update_project = TeraProject.get_project_by_id(json_project['id_project'])
 
-        return jsonify([update_project.to_json()])
+        if update_session_types:
+            # Associate session types to that project
+            if new_project:
+                # New session type - directly update the list
+                update_project.project_session_types = [TeraSessionType.get_session_type_by_id(st_id)
+                                                        for st_id in session_types_ids]
+            else:
+                # Updated projects - first, we add session types not already there
+                current_st_ids = [st.id_session_type for st in update_project.project_session_types]
+                st_to_add = set(session_types_ids).difference(current_st_ids)
+                update_project.project_session_types.extend([TeraSessionType.get_session_type_by_id(st_id)
+                                                             for st_id in st_to_add])
+
+                # Then, we delete session types that the current user has access, but are not present in the list,
+                # without touching session types already there
+                current_st_ids.extend(list(st_to_add))
+                missing_st_list = set(accessible_st_ids).difference(session_types_ids)
+                for st_id in missing_st_list:
+                    if st_id in current_st_ids:
+                        update_project.project_session_types.remove(TeraSessionType.get_session_type_by_id(st_id))
+
+            # Commit the changes we made!
+            update_project.commit()
+
+        return [update_project.to_json()]
 
     @user_multi_auth.login_required
     @api.expect(delete_parser)
