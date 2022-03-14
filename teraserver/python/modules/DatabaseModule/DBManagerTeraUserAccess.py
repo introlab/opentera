@@ -814,8 +814,11 @@ class DBManagerTeraUserAccess:
 
         if include_other_session_types:
             # We must add the missing session types in the list
+            project = TeraProject.get_project_by_id(project_id)
+            site_sts = TeraSessionTypeSite.get_sessions_types_for_site(project.id_site)
+            site_st_ids = [st.id_session_type for st in site_sts]
             st_ids = [st.id_session_type for st in session_types]
-            missing_st_ids = set(session_types_ids).difference(st_ids)
+            missing_st_ids = set(site_st_ids).difference(st_ids)
             for missing_st_id in missing_st_ids:
                 st_proj = TeraSessionTypeProject()
                 st_proj.id_session_type = missing_st_id
@@ -883,7 +886,7 @@ class DBManagerTeraUserAccess:
             st_ids = [st.id_session_type for st in other_sts]
             missing_st_ids = set(st_ids).difference([st.id_session_type for st in st_sites])
             for missing_st_id in missing_st_ids:
-                st_site = TeraDeviceSite()
+                st_site = TeraSessionTypeSite()
                 st_site.id_site = None
                 st_site.id_session_type = missing_st_id
                 st_site.session_type_site_session_type = TeraSessionType.get_session_type_by_id(missing_st_id)

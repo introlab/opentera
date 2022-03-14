@@ -66,14 +66,16 @@ class UserQuerySessionTypeProjects(Resource):
             return gettext('Missing arguments'), 400
 
         if args['id_project']:
-            session_type_projects = user_access.query_session_types_for_project(project_id=args['id_project'],
-                                                                                include_other_session_types=
-                                                                                args['with_session_type'])
+            if args['id_project'] in user_access.get_accessible_projects_ids():
+                session_type_projects = user_access.query_session_types_for_project(project_id=args['id_project'],
+                                                                                    include_other_session_types=
+                                                                                    args['with_session_type'])
         elif args['id_session_type']:
-            session_type_projects = user_access.query_projects_for_session_type(session_type_id=
-                                                                                args['id_session_type'],
-                                                                                include_other_projects=
-                                                                                args['with_projects'])
+            if args['id_session_type'] in user_access.get_accessible_session_types_ids():
+                session_type_projects = user_access.query_projects_for_session_type(session_type_id=
+                                                                                    args['id_session_type'],
+                                                                                    include_other_projects=
+                                                                                    args['with_projects'])
         try:
             stp_list = []
             for stp in session_type_projects:
