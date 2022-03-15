@@ -37,6 +37,7 @@
 		"close": "Close",
 		"participant": "Participant",
 		"measure-angle": "Measure Angle",
+		"measure-angle-stop": "Stop Angle Measure",
 		"reset": "Reset",
 		"angle": "Angle",
 		"n-a": "N/A"

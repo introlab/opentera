@@ -2,7 +2,7 @@
 var local_peerid = "0";
 
 // Contact cards
-var localContact = {}; // {uuid, name, peerid}
+var localContact = {}; // {uuid, name, peerid, status}
 var remoteContacts = []; // Used to store information about everyone that has connected (contactinfos)
                             // {uuid, name, peerid}
 let remoteStreams = []; // {peerid, streamname, stream: MediaStream}, order is important as it is linked to each view!
@@ -64,6 +64,8 @@ function muteMicro(local, index, new_state){
 
         easyrtc.enableMicrophone(new_state);  // Fix me: doesn't seem to work if specifying stream name....
 
+        localContact.status.microMuted = !new_state;
+
         //console.log(request);
         if (easyrtc.webSocketConnected) {
             easyrtc.sendDataWS({targetRoom: "default"}, 'updateStatus', request,
@@ -108,6 +110,8 @@ function muteVideo(local, index, new_state){
             showError("muteVideo", "Trying to mute video on a local stream not present: index = " + (index-1), false);
         }
 
+        localContact.status.videoMuted = !new_state;
+
         if (easyrtc.webSocketConnected) {
             easyrtc.sendDataWS({targetRoom: "default"}, 'updateStatus', request,
                 function (ackMesg) {
@@ -148,6 +152,8 @@ function muteSpeaker(local, index, new_state){
             let video_widget = getVideoWidget(false, i);
             video_widget.prop('muted', !new_state);
         }
+
+        localContact.status.speakerMuted = !new_state;
 
         if (easyrtc.webSocketConnected) {
             easyrtc.sendDataWS({targetRoom: "default"}, 'updateStatus', request,
@@ -230,7 +236,8 @@ function setPrimaryView(peer_id, streamname){
                 index = getStreamIndexForPeerId(primaryView.peerid, primaryView.streamName);
             else{
                 // Local view is primary view - don't do anything!
-                //index = getLocalStreamIndex(primaryView.streamName);
+                index = getLocalStreamIndex(primaryView.streamName);
+                enlargeView(true, index+1);
                 setPrimaryViewIcon(primaryView.peerid, primaryView.streamName);
                 return;
             }
@@ -273,7 +280,7 @@ function updateLocalAudioVideoSource(streamindex){
                     exact: videoSources[currentConfig.currentVideoSourceIndex].deviceId
                 }}
         }
-        easyrtc.enableAudio(true);
+        easyrtc.enableAudio(!localContact.status.microMuted);
         easyrtc.enableVideo(true);
 
         // Disable all tracks before creating, if needed
@@ -368,8 +375,9 @@ function localVideoStreamSuccess(stream){
         }
         easyrtc.setVideoObjectSrc(getVideoWidget(true, local_index+1)[0], stream);
 
-        // Clear status icons
-        updateStatusIconState(true, true, local_index+1, 'Mic');
+        // Update status icons
+        easyrtc.enableMicrophone(!localContact.status.microMuted)
+        updateStatusIconState(!localContact.status.microMuted, true, local_index+1, 'Mic');
         updateStatusIconState(true, true, local_index+1, 'Video');
 
     }else{
@@ -794,13 +802,14 @@ function getLocalStreamIndex(streamname = 'default'){
 
 function sendStatus(target_peerid){
     let request = {"peerid": local_peerid,
-        "micro": isStatusIconActive(true, 1, "Mic"),
+        "micro": !localContact.status.microMuted,
         "micro2":isStatusIconActive(true, 2, "Mic"),
-        "speaker": isStatusIconActive(true, 1, "Speaker"),
-        "video": isStatusIconActive(true, 1, "Video"),
+        "speaker": !localContact.status.speakerMuted,
+        "video": !localContact.status.videoMuted,
         "isUser": !isParticipant,
         "videoSrcLength": videoSources.length,
-        "secondSource": currentConfig.currentVideoSource2Index > -1
+        "secondSource": currentConfig.currentVideoSource2Index > -1,
+        "sharing2ndSource": localContact.status.sharing2ndSource
     };
 
     if (easyrtc.webSocketConnected){
@@ -1051,8 +1060,11 @@ function dataReception(sendercid, msgType, msgData, targeting) {
     }
 
     if (msgType === "shareSecondSource"){
-        localSecondSource = !msgData;
-        btnShow2ndLocalVideoClicked();
+        if (targeting.targetEasyrtcid === local_peerid){
+            // Message sent directly to us
+            localContact.status.sharing2ndSource = !msgData;
+            btnShow2ndLocalVideoClicked();
+        }
     }
 }
 
@@ -1201,6 +1213,9 @@ function share2ndStream(local, start){
     }
 
     updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+
+    // Send status update
+    sendStatus({"targetRoom": "default"});
 }
 
 function enableAllTracks(stream, enable){
