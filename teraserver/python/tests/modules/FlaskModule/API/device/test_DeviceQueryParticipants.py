@@ -10,7 +10,7 @@ class DeviceQueryParticipantsTest(unittest.TestCase):
     port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
-    device_query_participants_endpoint = '/api/device/participants'
+    device_query_participants_endpoint = '/api/devices/participants'
     user_device_endpoint = '/api/user/devices'
     all_devices = None
 

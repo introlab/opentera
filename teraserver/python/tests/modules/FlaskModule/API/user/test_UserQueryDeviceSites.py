@@ -309,17 +309,17 @@ class UserQueryDeviceSitesTest(BaseAPITest):
         json_data = {'device': {'id_device': 1, 'projects': [{'id_project': 1},
                                                              {'id_project': 2}]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
-                                             endpoint='/api/user/device/projects')
+                                             endpoint='/api/user/devices/projects')
         self.assertEqual(response.status_code, 200)
 
         json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1}]}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
-                                             endpoint='/api/user/device/projects')
+                                             endpoint='/api/user/devices/projects')
         self.assertEqual(response.status_code, 200)
 
         json_data = {'device_participant': {'id_device': 2, 'id_participant': 1}}
         response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
-                                             endpoint='/api/user/device/participants')
+                                             endpoint='/api/user/devices/participants')
         self.assertEqual(response.status_code, 200)
 
     def test_post_device_site_and_delete(self):
