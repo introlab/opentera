@@ -6,6 +6,7 @@ from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from opentera.db.models.TeraServiceProject import TeraServiceProject
+from opentera.db.models.TeraServiceSite import TeraServiceSite
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError, IntegrityError
 from sqlalchemy import exc
@@ -153,6 +154,17 @@ class UserQuerySessionTypes(Resource):
             if set(st_sites_ids).difference(admin_sites_ids):
                 # We have some sites where we are not admin
                 return gettext('No site admin access for at least one site in the list'), 403
+            # Check if we have a service session type and if that service is associated to that site
+            if not current_user.user_superadmin:  # Super admin can always add service to a site, but not site admins
+                if 'session_type_category' in json_session_type and 'id_service' in json_session_type:
+                    if json_session_type['session_type_category'] == TeraSessionType.SessionCategoryEnum.SERVICE.value:
+                        for site_id in st_sites_ids:
+                            service_site = TeraServiceSite.\
+                                get_service_site_for_service_site(site_id=site_id,
+                                                                  service_id=json_session_type['id_service'])
+                            if not service_site:
+                                return gettext('At least one site isn\'t associated with the service of that session '
+                                               'type'), 403
             update_st_sites = True
 
         st_projects_ids = []
@@ -231,6 +243,10 @@ class UserQuerySessionTypes(Resource):
             # Commit the changes we made!
             update_session_type.commit()
 
+            # Ensure that the newly added session types sites have a correct service site association, if required
+            for sts in update_session_type.session_type_session_type_sites:
+                sts.check_integrity()
+
         # Update session type projects, if needed
         if update_st_projects:
             from opentera.db.models.TeraProject import TeraProject
@@ -278,7 +294,7 @@ class UserQuerySessionTypes(Resource):
                 try:
                     stp.check_integrity()
                 except IntegrityError:
-                    return gettext('Session type has a a service not associated to its project'), 400
+                    return gettext('Session type has a a service not associated to its site'), 400
 
         return [update_session_type.to_json()]
 

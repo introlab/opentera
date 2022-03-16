@@ -73,7 +73,7 @@ class UserQueryServiceSitesTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        self.assertEqual(len(json_data), 1)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -263,6 +263,10 @@ class UserQueryServiceSitesTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 2)  # Back to initial state
 
+        json_data = {'service': {'id_service': 5, 'sites': [{'id_site': 1}]}}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        self.assertEqual(response.status_code, 200, msg="Back to initial sites OK")
+
         # Recreate default associations - projects
         json_data = {'service': {'id_service': 3, 'projects': [{'id_project': 1},
                                                                {'id_project': 2},
@@ -278,6 +282,15 @@ class UserQueryServiceSitesTest(BaseAPITest):
         self.assertEqual(response.status_code, 200)
 
         # Recreate default associations - session types
+        json_data = {'site': {'id_site': 1, 'sessiontypes': [{'id_session_type': 1},
+                                                             {'id_session_type': 2},
+                                                             {'id_session_type': 3},
+                                                             {'id_session_type': 4},
+                                                             {'id_session_type': 5}]}}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+                                             endpoint='/api/user/sessiontypes/sites')
+        self.assertEqual(response.status_code, 200)
+
         json_data = {'session_type_project': [{'id_session_type': 1, 'id_project': 1},
                                               {'id_session_type': 2, 'id_project': 1},
                                               {'id_session_type': 3, 'id_project': 1},
@@ -336,6 +349,18 @@ class UserQueryServiceSitesTest(BaseAPITest):
         json_data = response.json()
         self.assertEqual(len(json_data), 3)  # Back to the default state
 
+        # Recreate default associations - sites
+        # json_data = {'service': {'id_service': 3, 'sites': [{'id_site': 1},
+        #                                                     {'id_site': 2}]}}
+        # response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+        #                                      endpoint='/api/user/services/sites')
+        # self.assertEqual(response.status_code, 200)
+        #
+        # json_data = {'service': {'id_service': 5, 'sites': [{'id_site': 1}]}}
+        # response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+        #                                      endpoint='/api/user/services/sites')
+        # self.assertEqual(response.status_code, 200)
+
         # Recreate default associations - projects
         json_data = {'service': {'id_service': 3, 'projects': [{'id_project': 1},
                                                                {'id_project': 2},
@@ -349,7 +374,16 @@ class UserQueryServiceSitesTest(BaseAPITest):
                                              endpoint='/api/user/services/projects')
         self.assertEqual(response.status_code, 200)
 
-        # Recreate defaulta associations - session types
+        # Recreate defaults associations - session types
+        json_data = {'site': {'id_site': 1, 'sessiontypes': [{'id_session_type': 1},
+                                                             {'id_session_type': 2},
+                                                             {'id_session_type': 3},
+                                                             {'id_session_type': 4},
+                                                             {'id_session_type': 5}]}}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+                                             endpoint='/api/user/sessiontypes/sites')
+        self.assertEqual(response.status_code, 200)
+
         json_data = {'session_type_project': [{'id_session_type': 1, 'id_project': 1},
                                               {'id_session_type': 2, 'id_project': 1},
                                               {'id_session_type': 3, 'id_project': 1},
@@ -420,7 +454,16 @@ class UserQueryServiceSitesTest(BaseAPITest):
                                              endpoint='/api/user/services/projects')
         self.assertEqual(response.status_code, 200)
 
-        # Recreate defaulta associations - session types
+        # Recreate defaults associations - session types
+        json_data = {'site': {'id_site': 1, 'sessiontypes': [{'id_session_type': 1},
+                                                             {'id_session_type': 2},
+                                                             {'id_session_type': 3},
+                                                             {'id_session_type': 4},
+                                                             {'id_session_type': 5}]}}
+        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
+                                             endpoint='/api/user/sessiontypes/sites')
+        self.assertEqual(response.status_code, 200)
+
         json_data = {'session_type_project': [{'id_session_type': 1, 'id_project': 1},
                                               {'id_session_type': 2, 'id_project': 1},
                                               {'id_session_type': 3, 'id_project': 1},

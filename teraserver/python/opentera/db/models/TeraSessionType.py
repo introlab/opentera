@@ -25,6 +25,8 @@ class TeraSessionType(db.Model, BaseModel):
     session_type_category = db.Column(db.Integer, nullable=False)
 
     session_type_session_type_projects = db.relationship("TeraSessionTypeProject", viewonly=True)
+    session_type_session_type_sites = db.relationship("TeraSessionTypeSite", viewonly=True)
+
     session_type_projects = db.relationship("TeraProject", secondary="t_sessions_types_projects",
                                             back_populates="project_session_types")
     session_type_sites = db.relationship("TeraSite", secondary="t_sessions_types_sites")
@@ -38,7 +40,7 @@ class TeraSessionType(db.Model, BaseModel):
             ignore_fields = []
         ignore_fields.extend(['session_type_projects', 'session_type_devices_types', 'SessionCategoryEnum',
                               'session_type_service', 'session_type_sessions', 'session_type_session_type_projects',
-                              'session_type_sites'])
+                              'session_type_sites', 'session_type_session_type_sites'])
         if minimal:
             ignore_fields.extend(['session_type_online',
                                   'session_type_profile',

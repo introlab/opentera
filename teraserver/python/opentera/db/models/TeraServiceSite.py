@@ -107,5 +107,11 @@ class TeraServiceSite(db.Model, BaseModel):
             for service_project in projects:
                 TeraServiceProject.delete(service_project.id_service_project)
 
+            from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+            session_types = TeraSessionTypeSite.get_session_type_site_for_site_and_service(
+                site_id=delete_obj.id_site, service_id=delete_obj.id_service)
+            for session_type in session_types:
+                TeraSessionTypeSite.delete(session_type.id_session_type_site)
+
             # Ok, delete it
             super().delete(id_todel)

@@ -63,7 +63,7 @@ class TeraSessionTypeSite(db.Model, BaseModel):
             db.session.add(sts)
 
             sts = TeraSessionTypeSite()
-            sts.id_session_type = video_session.id_session_type
+            sts.id_session_type = exerc_session.id_session_type
             sts.id_site = secret_site.id_site
             db.session.add(sts)
 
@@ -98,6 +98,13 @@ class TeraSessionTypeSite(db.Model, BaseModel):
     @staticmethod
     def get_session_type_site_for_session_type_and_site(site_id: int, session_type_id: int):
         return TeraSessionTypeSite.query.filter_by(id_site=site_id, id_session_type=session_type_id).first()
+
+    @staticmethod
+    def get_session_type_site_for_site_and_service(site_id: int, service_id: int):
+        from opentera.db.models.TeraSessionType import TeraSessionType
+        return TeraSessionTypeSite.query.join(TeraSessionType). \
+            filter(TeraSessionType.id_service == service_id). \
+            filter(TeraSessionTypeSite.id_site == site_id).all()
 
     def check_integrity(self):
         from opentera.db.models.TeraSessionType import TeraSessionType
