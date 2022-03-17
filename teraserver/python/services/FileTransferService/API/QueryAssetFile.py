@@ -192,8 +192,16 @@ class QueryAssetFile(Resource):
         full_json = {**new_asset_json, **asset_file.to_json()}
 
         # Create asset infos + download url
-        servername = Globals.service.service_info['service_hostname']
-        port = request.headers.environ['HTTP_X_EXTERNALPORT']
+        if 'X_EXTERNALSERVER' in request.headers:
+            servername = request.headers['X_EXTERNALSERVER']
+        else:
+            servername = self.module.config.service_config['hostname']
+
+        if 'X_EXTERNALPORT' in request.headers:
+            port = request.headers['X_EXTERNALPORT']
+        else:
+            port = self.module.config.service_config['port']
+
         endpoint = Globals.service.service_info['service_clientendpoint']
         # Access token
         from opentera.redis.RedisVars import RedisVars
