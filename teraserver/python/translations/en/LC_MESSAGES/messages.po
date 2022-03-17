@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-03-16 15:02-0400\n"
+"POT-Creation-Date: 2022-03-17 14:37-0400\n"
 "PO-Revision-Date: 2021-01-25 13:01-0500\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -45,7 +45,7 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryDeviceSubTypes.py:115
 #: modules/FlaskModule/API/user/UserQueryDeviceSubTypes.py:175
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:107
-#: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:188
+#: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:195
 #: modules/FlaskModule/API/user/UserQueryDevices.py:267
 #: modules/FlaskModule/API/user/UserQueryDevices.py:271
 #: modules/FlaskModule/API/user/UserQueryDevices.py:372
@@ -136,7 +136,7 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryDeviceSubTypes.py:186
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:123
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:138
-#: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:186
+#: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:193
 #: modules/FlaskModule/API/user/UserQueryDevices.py:302
 #: modules/FlaskModule/API/user/UserQueryDevices.py:317
 #: modules/FlaskModule/API/user/UserQueryDevices.py:408
@@ -673,7 +673,13 @@ msgstr ""
 msgid "Device type not found"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:190
+#: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:185
+msgid ""
+"Can't delete device type: please delete all associated devices before "
+"deleting."
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:197
 msgid "Device type successfully deleted"
 msgstr ""
 
@@ -1773,5 +1779,4 @@ msgstr ""
 #: templates/disabled_doc.html:48
 msgid "Documentation is disabled!"
 msgstr ""
-
 

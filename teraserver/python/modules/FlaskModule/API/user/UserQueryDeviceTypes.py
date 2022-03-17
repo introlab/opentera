@@ -177,6 +177,13 @@ class UserQueryDeviceTypes(Resource):
         if user_access.user.user_superadmin:
             try:
                 TeraDeviceType.delete(id_todel=device_type_to_del.id_device_type)
+
+            except exc.IntegrityError as e:
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryDeviceTypes.__name__,
+                                             'delete', 500, 'Database error', str(e))
+                return gettext('Can\'t delete device type: please delete all associated devices before deleting.'), 500
+
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
