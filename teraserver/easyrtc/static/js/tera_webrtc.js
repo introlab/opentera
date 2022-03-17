@@ -280,7 +280,11 @@ function updateLocalAudioVideoSource(streamindex){
                     exact: videoSources[currentConfig.currentVideoSourceIndex].deviceId
                 }}
         }
-        easyrtc.enableAudio(!localContact.status.microMuted);
+        let microMute = false;
+        if (localContact && localContact.status && localContact.status.microMuted){
+            microMute = localContact.status.microMuted;
+        }
+        easyrtc.enableAudio(!microMute);
         easyrtc.enableVideo(true);
 
         // Disable all tracks before creating, if needed
