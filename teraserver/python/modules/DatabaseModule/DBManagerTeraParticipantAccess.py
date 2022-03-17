@@ -1,16 +1,5 @@
-
-from opentera.db.models.TeraUser import TeraUser
-from opentera.db.models.TeraSite import TeraSite
-from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraParticipant import TeraParticipant
-from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
-from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
-from opentera.db.models.TeraDeviceType import TeraDeviceType
-from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraDevice import TeraDevice
-#from opentera.db.models.TeraDeviceData import TeraDeviceData
-from opentera.db.models.TeraDeviceProject import TeraDeviceProject
-from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 
 
@@ -38,10 +27,22 @@ class DBManagerTeraParticipantAccess:
             filter_by(id_participant=self.participant.id_participant).all()
         return result
 
-    # def query_device_data(self, filters: dict):
-    #     # Make sure you filter results with id_participant to return TeraDeviceData
-    #     # that are accessible by current participant
-    #     result = TeraDeviceData.query.filter_by(**filters).join(TeraSession).join(TeraSessionParticipants).\
-    #         filter_by(id_participant=self.participant.id_participant).all()
-    #     return result
+    def get_accessible_assets(self, id_asset: int = None, uuid_asset: str = None):
+        from opentera.db.models.TeraAsset import TeraAsset
+
+        # A participant can only have access to assets that are directly assigned to them (where id_participant is set
+        # to their value)
+        query = TeraAsset.query.filter(TeraAsset.id_participant == self.participant.id_participant)
+        if id_asset:
+            query = query.filter(TeraAsset.id_asset == id_asset)
+        elif uuid_asset:
+            query = query.filter(TeraAsset.asset_uuid == uuid_asset)
+
+        return query.all()
+
+    def get_accessible_services(self):
+        from opentera.db.models.TeraServiceProject import TeraServiceProject
+        service_projects = TeraServiceProject.get_services_for_project(id_project=self.participant.id_project)
+
+        return [service_project.service_project_service for service_project in service_projects]
 

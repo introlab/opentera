@@ -22,7 +22,7 @@ OpenTera is based or uses the following Open Source technologies :
 * [txredisapi, Apache License 2.0](https://github.com/fiorix/txredisapi) 
 * [SQLAlchemy, MIT](https://www.sqlalchemy.org)
 * [Twisted, MIT](https://twistedmatrix.com)
-* [PostgreSQL,  PostgreSQL License(MIT/BSD like)](https://www.postgresql.org)
+* [PostgreSQL, PostgreSQL License(MIT/BSD like)](https://www.postgresql.org)
 * [Node.js, Node license](https://nodejs.org/en/)
 
 # Authors

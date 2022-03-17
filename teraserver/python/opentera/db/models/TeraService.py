@@ -25,6 +25,7 @@ class TeraService(db.Model, BaseModel):
 
     service_roles = db.relationship('TeraServiceRole', cascade='delete')
     service_projects = db.relationship('TeraServiceProject', cascade='delete')
+    service_sites = db.relationship('TeraServiceSite', cascade='delete')
 
     def __init__(self):
         pass
@@ -39,7 +40,7 @@ class TeraService(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend(['service_roles', 'service_projects', 'service_system'])
+        ignore_fields.extend(['service_roles', 'service_projects', 'service_sites'])
 
         if minimal:
             ignore_fields.extend(['service_default_config'])
@@ -199,6 +200,20 @@ class TeraService(db.Model, BaseModel):
         service.service_uuid = str(uuid.uuid4())
         super().insert(service)
 
+        # Create default admin-user role for each service
+        from opentera.db.models.TeraServiceRole import TeraServiceRole
+        new_role = TeraServiceRole()
+        new_role.id_service = service.id_service
+        new_role.service_role_name = 'admin'
+        db.session.add(new_role)
+
+        new_role = TeraServiceRole()
+        new_role.id_service = service.id_service
+        new_role.service_role_name = 'user'
+        db.session.add(new_role)
+
+        db.session.commit()
+
     @classmethod
     def update(cls, update_id: int, values: dict):
         # Prevent changes on UUID
@@ -206,4 +221,3 @@ class TeraService(db.Model, BaseModel):
             del values['service_uuid']
 
         super().update(update_id, values)
-

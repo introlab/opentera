@@ -1,20 +1,10 @@
-import unittest
-from modules.DatabaseModule.DBManager import DBManager
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSession import TeraSession, TeraSessionStatus
-import os
-from opentera.config.ConfigManager import ConfigManager
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
 class TeraSessionTest(BaseModelsTest):
-
-    filename = os.path.join(os.path.dirname(__file__), 'TeraSessionTest.db')
-
-    SQLITE = {
-        'filename': filename
-    }
 
     def test_session_defaults(self):
         for session in TeraSession.query.all():

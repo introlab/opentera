@@ -25,8 +25,11 @@ class TeraSessionType(db.Model, BaseModel):
     session_type_category = db.Column(db.Integer, nullable=False)
 
     session_type_session_type_projects = db.relationship("TeraSessionTypeProject", viewonly=True)
+    session_type_session_type_sites = db.relationship("TeraSessionTypeSite", viewonly=True)
+
     session_type_projects = db.relationship("TeraProject", secondary="t_sessions_types_projects",
                                             back_populates="project_session_types")
+    session_type_sites = db.relationship("TeraSite", secondary="t_sessions_types_sites")
 
     session_type_service = db.relationship("TeraService")
 
@@ -36,7 +39,8 @@ class TeraSessionType(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
         ignore_fields.extend(['session_type_projects', 'session_type_devices_types', 'SessionCategoryEnum',
-                              'session_type_service', 'session_type_sessions', 'session_type_session_type_projects'])
+                              'session_type_service', 'session_type_sessions', 'session_type_session_type_projects',
+                              'session_type_sites', 'session_type_session_type_sites'])
         if minimal:
             ignore_fields.extend(['session_type_online',
                                   'session_type_profile',
@@ -49,6 +53,16 @@ class TeraSessionType(db.Model, BaseModel):
                 rval['session_type_service_key'] = self.session_type_service.service_key
                 rval['session_type_service_uuid'] = self.session_type_service.service_uuid
         return rval
+
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_session_type': self.id_session_type, 'id_service': self.id_service}
 
     @staticmethod
     def create_defaults(test=False):
@@ -104,14 +118,14 @@ class TeraSessionType(db.Model, BaseModel):
         db.session.add(robot_session)
 
         bureau_session = TeraSessionType()
-        bureau_session.session_type_name = "Bureau Actif"
+        bureau_session.session_type_name = "FileTransfer"
         bureau_session.session_type_online = False
         bureau_session.session_type_config = ""
         bureau_session.session_type_color = "#FF00FF"
         bureau_session.session_type_category = TeraSessionType.SessionCategoryEnum.SERVICE.value
         # robot_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
         #     int(TeraDeviceType.DeviceTypeEnum.ROBOT.value))]
-        bureau_session.id_service = TeraService.get_service_by_key('BureauActif').id_service
+        bureau_session.id_service = TeraService.get_service_by_key('FileTransferService').id_service
         db.session.add(bureau_session)
 
         db.session.commit()

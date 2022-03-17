@@ -14,8 +14,8 @@ from sqlalchemy import exc
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query events for', required=True)
 
-post_schema = api.schema_model('service_session_event', {'properties': TeraSessionEvent.get_json_schema(),
-                                                         'type': 'object', 'location': 'json'})
+post_schema = api.schema_model('session_event', {'properties': TeraSessionEvent.get_json_schema(),
+                                                 'type': 'object', 'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Session event ID to delete', required=True)
@@ -26,6 +26,7 @@ class ServiceQuerySessionEvents(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @LoginModule.service_token_or_certificate_required
     @api.expect(get_parser)
@@ -78,6 +79,10 @@ class ServiceQuerySessionEvents(Resource):
         # Validate if we have an id
         if 'id_session' not in json_event or 'id_session_event' not in json_event:
             return gettext('Missing id_session or id_session_event fields'), 400
+
+        service_access = DBManager.serviceAccess(current_service)
+        if not json_event['id_session'] in service_access.get_accessible_sessions_ids():
+            return gettext('Forbidden'), 403
 
         parent_session = TeraSession.get_session_by_id(json_event['id_session'])
 

@@ -24,24 +24,13 @@ limitations under the License.
 
 import pathlib
 import sys
-
-from modules.LoginModule.LoginModule import LoginModule
-from modules.FlaskModule.FlaskModule import FlaskModule
-from modules.TwistedModule.TwistedModule import TwistedModule
-from modules.ServiceLauncherModule.ServiceLauncherModule import ServiceLauncherModule
-
-from opentera.config.ConfigManager import ConfigManager
-import modules.Globals as Globals
-
-from modules.UserManagerModule.UserManagerModule import UserManagerModule
-from modules.DatabaseModule.DBManager import DBManager
-
-
 import os
-
+import argparse
 from sqlalchemy.exc import OperationalError
 import opentera.crypto.crypto_utils as crypto
 from opentera.utils.TeraVersions import TeraVersions
+from opentera.config.ConfigManager import ConfigManager
+import modules.Globals as Globals
 
 
 def generate_certificates(config: ConfigManager):
@@ -157,7 +146,6 @@ def init_services(config: ConfigManager):
 
 
 if __name__ == '__main__':
-    import argparse
     parser = argparse.ArgumentParser(description='OpenTera Server')
     parser.add_argument('--enable_tests', help='Test mode for server.', default=False)
     args = parser.parse_args()
@@ -191,22 +179,18 @@ if __name__ == '__main__':
     # Generate certificate (if required)
     generate_certificates(config_man)
 
-    # Verify file upload path, create if does not exist
-    # TODO Remove this, not needed. Now handled by FileTransferService
-    # verify_file_upload_directory(config_man, True)
-
-    # DATABASE CONFIG AND OPENING
-    #############################
-    # POSTGRES = {
-    #     'user': config_man.db_config['username'],
-    #     'pw': config_man.db_config['password'],
-    #     'db': config_man.db_config['name'],
-    #     'host': config_man.db_config['url'],
-    #     'port': config_man.db_config['port']
-    # }
-    Globals.db_man = DBManager(config_man)
-
     try:
+
+        if config_man.server_config['enable_docs']:
+            Globals.opentera_doc_url = '/doc'
+        else:
+            Globals.opentera_doc_url = False
+
+        # DB Manager initialized first
+        from modules.DatabaseModule.DBManager import DBManager
+
+        Globals.db_man = DBManager(config_man)
+
         # Echo will be set by "debug_mode" flag
         if args.enable_tests:
             # In RAM SQLITE DB for tests
@@ -223,6 +207,13 @@ if __name__ == '__main__':
     except OperationalError as e:
         print("Unable to connect to database - please check settings in config file!", e)
         quit()
+
+    # Other modules are imported here so globals are initialized first (this is ugly)
+    from modules.LoginModule.LoginModule import LoginModule
+    from modules.FlaskModule.FlaskModule import FlaskModule
+    from modules.TwistedModule.TwistedModule import TwistedModule
+    from modules.ServiceLauncherModule.ServiceLauncherModule import ServiceLauncherModule
+    from modules.UserManagerModule.UserManagerModule import UserManagerModule
 
     # Create Redis variables shared with services
     init_shared_variables(config=config_man)
@@ -243,11 +234,12 @@ if __name__ == '__main__':
 
     user_manager_module = UserManagerModule(config_man)
 
-    service_launcher = ServiceLauncherModule(config_man, system_only=args.enable_tests)
+    service_launcher = ServiceLauncherModule(config_man, system_only=args.enable_tests, enable_tests=args.enable_tests)
 
     # This is blocking, running event loop
     twisted_module.run()
 
+    # Cleaning up
     service_launcher.terminate_processes()
 
     # Flush redis database

@@ -42,6 +42,7 @@ class UserQueryServiceConfig(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
@@ -153,7 +154,7 @@ class UserQueryServiceConfig(Resource):
 
         # Validate if we can modify
         if 'id_service' in json_config:
-            if json_config['id_service'] not in user_access.get_accessible_services_ids(include_system_services=True):
+            if json_config['id_service'] not in user_access.get_accessible_services_ids():
                 return gettext('Forbidden'), 403
 
         if 'id_device' in json_config:
@@ -245,7 +246,7 @@ class UserQueryServiceConfig(Resource):
         # Check if current user can delete
         todel_config = TeraServiceConfig.get_service_config_by_id(id_todel)
 
-        if todel_config.id_service not in user_access.get_accessible_services_ids(include_system_services=True):
+        if todel_config.id_service not in user_access.get_accessible_services_ids():
             return gettext('Forbidden'), 403
 
         if todel_config.id_user:

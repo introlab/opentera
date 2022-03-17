@@ -52,8 +52,9 @@ get_parser.add_argument(name='key', type=str, help='Specific key of subitem to q
 class UserQueryForms(Resource):
 
     def __init__(self, _api, *args, **kwargs):
-        self.module = kwargs.get('flaskModule', None)
         Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
@@ -99,7 +100,10 @@ class UserQueryForms(Resource):
             return jsonify(TeraSessionTypeForm.get_session_type_form(user_access=user_access))
 
         if args['type'] == 'session_type_config':
-            return TeraSessionTypeConfigForm.get_session_type_config_form(user_access=user_access)
+            if not args['id']:
+                return gettext('Missing session type id'), 400
+            return TeraSessionTypeConfigForm.get_session_type_config_form(user_access=user_access,
+                                                                          id_session_type=args['id'])
 
         if args['type'] == 'session':
             return jsonify(TeraSessionForm.get_session_form(user_access=user_access,

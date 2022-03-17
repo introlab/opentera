@@ -10,9 +10,10 @@ get_parser = api.parser()
 
 class ParticipantRefreshToken(Resource):
 
-    def __init__(self, _api, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self, _api)
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @participant_token_auth.login_required(role='full')
     @api.expect(get_parser)

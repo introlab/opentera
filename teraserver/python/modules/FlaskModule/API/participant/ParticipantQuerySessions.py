@@ -10,6 +10,7 @@ from modules.DatabaseModule.DBManager import DBManager
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query')
+get_parser.add_argument('session_uuid', type=str, help='Session UUID to query')
 get_parser.add_argument('status', type=int, help='Limit to specific session status')
 get_parser.add_argument('limit', type=int, help='Maximum number of results to return')
 get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index')
@@ -23,9 +24,10 @@ post_parser = api.parser()
 
 class ParticipantQuerySessions(Resource):
 
-    def __init__(self, _api, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self, _api)
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @participant_multi_auth.login_required(role='full')
     @api.expect(get_parser)
@@ -49,13 +51,13 @@ class ParticipantQuerySessions(Resource):
         if args['id_session']:
             filters['id_session'] = args['id_session']
 
-        if args['status'] is not None:
-            filters['session_status'] = args['status']
+        if args['session_uuid']:
+            filters['session_uuid'] = args['session_uuid']
 
         # List comprehension, get all sessions with filter
         sessions_list = [data.to_json(minimal=minimal) for data in TeraSession.get_sessions_for_participant(
             part_id=current_participant.id_participant, status=args['status'], limit=args['limit'],
-            offset=args['offset'], start_date=args['start_date'], end_date=args['end_date'])]
+            offset=args['offset'], start_date=args['start_date'], end_date=args['end_date'], filters=filters)]
         #  participant_access.query_session(filters=filters, limit=args['limit'], offset=args['offset'],
         #                                  start_date=args['start_date'], end_date=args['end_date'])]
 

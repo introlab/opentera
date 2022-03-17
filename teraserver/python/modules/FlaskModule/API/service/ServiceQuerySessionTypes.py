@@ -10,9 +10,10 @@ get_parser = api.parser()
 
 class ServiceQuerySessionTypes(Resource):
 
-    def __init__(self, _api, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self, _api)
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @LoginModule.service_token_or_certificate_required
     @api.expect(get_parser)
@@ -23,7 +24,7 @@ class ServiceQuerySessionTypes(Resource):
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
         parser = get_parser
-        args = parser.parse_args()
+        args = parser.parse_args(strict=True)
 
         service_access = DBManager.serviceAccess(current_service)
 

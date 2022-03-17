@@ -22,7 +22,7 @@ import os
 flask_app = Flask("FileTransferService")
 
 # Translations
-babel = Babel(flask_app)
+babel = Babel(flask_app, default_domain='filetransferservice')
 
 
 class MyHTTPChannel(HTTPChannel):
@@ -145,7 +145,7 @@ api = CustomAPI(flask_app, version='1.0.0', title='FileTransferService API',
                 authorizations=authorizations)
 
 # Namespaces
-file_api_ns = api.namespace('file', description='FileTransferService API')
+file_api_ns = api.namespace('', description='FileTransferService API')
 
 
 class FlaskModule(BaseModule):
@@ -169,7 +169,7 @@ class FlaskModule(BaseModule):
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
 
         # TODO set upload folder in config
-        flask_app.config.update({'UPLOAD_FOLDER': config.filetransfer_config['upload_directory']})
+        flask_app.config.update({'UPLOAD_FOLDER': config.filetransfer_config['files_directory']})
 
         # Not sure.
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
@@ -226,8 +226,11 @@ class FlaskModule(BaseModule):
     def init_api(self):
         # Default arguments
         kwargs = {'flaskModule': self}
-        from .API.QueryAssetFileData import QueryAssetFileData
-        file_api_ns.add_resource(QueryAssetFileData, '/assets', resource_class_kwargs=kwargs)
+        from API.QueryAssetFileInfos import QueryAssetFileInfos
+        from API.QueryAssetFile import QueryAssetFile
+
+        file_api_ns.add_resource(QueryAssetFileInfos, '/assets/infos', resource_class_kwargs=kwargs)
+        file_api_ns.add_resource(QueryAssetFile,      '/assets', resource_class_kwargs=kwargs)
 
     def init_views(self):
         # Default arguments
@@ -242,4 +245,3 @@ def apply_caching(response):
     response.headers["Access-Control-Allow-Headers"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "*"
     return response
-

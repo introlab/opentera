@@ -28,7 +28,7 @@ class UserQueryServicesTest(BaseAPITest):
         response = self._request_with_http_auth(username='admin', password='admin')
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
-        self.assertEqual(len(json_data), 3)
+        self.assertEqual(len(json_data), 5)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -47,21 +47,12 @@ class UserQueryServicesTest(BaseAPITest):
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
-            self.assertNotEqual(data_item['id_service'], 2) # Logger service should not be here since a system service!
+            # Logger service should not be here since a system service!
+            # self.assertNotEqual(data_item['id_service'], 2)
+            # ... but not allowed when requesting as superadmin!
 
     def test_query_list_as_admin(self):
         response = self._request_with_http_auth(username='admin', password='admin', payload="list=1")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
-
-        for data_item in json_data:
-            self._checkJson(json_data=data_item, minimal=True)
-
-    def test_query_list_with_project_as_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload={"list": True, 'with_projects': True})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
@@ -107,6 +98,16 @@ class UserQueryServicesTest(BaseAPITest):
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_data = response.json()
         self.assertEqual(len(json_data), 2)
+
+        for data_item in json_data:
+            self._checkJson(json_data=data_item)
+
+    def test_query_services_for_site_as_admin(self):
+        response = self._request_with_http_auth(username='admin', password='admin', payload="id_site=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json()
+        self.assertEqual(len(json_data), 3)
 
         for data_item in json_data:
             self._checkJson(json_data=data_item)
@@ -172,15 +173,15 @@ class UserQueryServicesTest(BaseAPITest):
             'service': {
                 'id_service': current_id,
                 'service_enabled': False,
-                'service_system': True,
+                'service_system': False,
                 "service_name": "Test2",
                 'service_config_schema': '{Test'
             }
         }
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Post update with service_system that shouldn't be here")
+        # response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
+        # self.assertEqual(response.status_code, 403, msg="Post update with service_system that shouldn't be here")
 
-        del json_data['service']['service_system']
+        # del json_data['service']['service_system']
         # response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
         # self.assertEqual(response.status_code, 400, msg="Post update with invalid config schema")
 
@@ -191,6 +192,12 @@ class UserQueryServicesTest(BaseAPITest):
         self._checkJson(json_data)
         self.assertEqual(json_data['service_enabled'], False)
         self.assertEqual(json_data['service_name'], 'Test2')
+
+        # Check that default service roles (admin, user) were created
+        self.assertTrue(json_data.__contains__('service_roles'))
+        self.assertEqual(len(json_data['service_roles']), 2)
+        self.assertEqual(json_data['service_roles'][0]['service_role_name'], 'admin')
+        self.assertEqual(json_data['service_roles'][1]['service_role_name'], 'user')
 
         response = self._delete_with_http_auth(username='user4', password='user4', id_to_del=current_id)
         self.assertEqual(response.status_code, 403, msg="Delete denied")
@@ -213,7 +220,9 @@ class UserQueryServicesTest(BaseAPITest):
 
         if not minimal:
             self.assertTrue(json_data.__contains__('service_roles'))
+            self.assertTrue(json_data.__contains__('service_projects'))
             # self.assertTrue(json_data.__contains__('service_editable_config'))
         else:
             self.assertFalse(json_data.__contains__('service_roles'))
+            self.assertFalse(json_data.__contains__('service_projects'))
             # self.assertFalse(json_data.__contains__('service_editable_config'))

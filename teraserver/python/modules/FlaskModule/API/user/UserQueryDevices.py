@@ -19,7 +19,7 @@ get_parser.add_argument('uuid', type=str, help='Alias for "device_uuid"')
 get_parser.add_argument('id_site', type=int, help='ID of the site from which to get all associated devices')
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all associated devices')
 get_parser.add_argument('id_device_type', type=int, help='ID of device type from which to get all devices. Can be '
-                                                      'combined with id_site or id_project.')
+                                                         'combined with id_site or id_project.')
 get_parser.add_argument('id_device_subtype', type=int, help='Device subtype id to get all devices of that subtype.')
 get_parser.add_argument('name', type=str, help='Name of the device to query')
 # get_parser.add_argument('available', type=inputs.boolean, help='Flag that indicates if only available (devices not '
@@ -60,6 +60,7 @@ class UserQueryDevices(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
@@ -181,7 +182,7 @@ class UserQueryDevices(Resource):
                     if has_projects:
                         # Add projects
                         projects_list = []
-                        device_projects = TeraDeviceProject.query_projects_for_device(device.id_device)
+                        device_projects = TeraDeviceProject.get_projects_for_device(device.id_device)
                         for device_project in device_projects:
                             ignore_project_fields = []
                             if has_list:

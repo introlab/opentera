@@ -3,6 +3,7 @@ from opentera.db.Base import db, BaseModel
 from enum import Enum, unique
 from datetime import datetime, timedelta
 import random
+from sqlalchemy import asc
 
 
 class TeraSessionEvent(db.Model, BaseModel):
@@ -23,6 +24,17 @@ class TeraSessionEvent(db.Model, BaseModel):
         SESSION_JOIN = 12
         SESSION_LEAVE = 13
         SESSION_JOIN_REFUSED = 14
+        # Those events are generic and are usually service dependant.
+        CUSTOM_EVENT1 = 100
+        CUSTOM_EVENT2 = 101
+        CUSTOM_EVENT3 = 102
+        CUSTOM_EVENT4 = 103
+        CUSTOM_EVENT5 = 104
+        CUSTOM_EVENT6 = 105
+        CUSTOM_EVENT7 = 106
+        CUSTOM_EVENT8 = 107
+        CUSTOM_EVENT9 = 108
+        CUSTOM_EVENT10 = 109
 
     __tablename__ = 't_sessions_events'
     id_session_event = db.Column(db.Integer, db.Sequence('id_session_events_sequence'), primary_key=True,
@@ -72,4 +84,4 @@ class TeraSessionEvent(db.Model, BaseModel):
     def get_events_for_session(id_session: int):
         from .TeraSession import TeraSession
         return db.session.query(TeraSessionEvent).join(TeraSessionEvent.session_event_session)\
-            .filter(TeraSession.id_session == id_session)
+            .filter(TeraSession.id_session == id_session).order_by(asc(TeraSessionEvent.session_event_datetime)).all()

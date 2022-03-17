@@ -10,5 +10,8 @@ db_man = DBManager()
 # Redis client & keys
 redis_client = None
 
+# Service
+service = None
+
 
 

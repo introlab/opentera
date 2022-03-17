@@ -1,6 +1,6 @@
 import unittest
 import os
-from requests import get, post
+from requests import get, post, delete
 import json
 import opentera.crypto.crypto_utils as crypto
 from cryptography.hazmat.primitives import hashes, serialization
@@ -42,6 +42,21 @@ class DeviceRegisterTest(unittest.TestCase):
         url = self._make_url(self.host, self.port, self.device_logout_endpoint)
         request_headers = {'Authorization': 'OpenTera ' + token}
         return get(url=url, verify=False, headers=request_headers)
+
+    def _request_with_http_auth(self, username, password, payload=None, endpoint=None):
+        if payload is None:
+            payload = {}
+        if endpoint is None:
+            endpoint = self.device_register_endpoint
+        url = self._make_url(self.host, self.port, endpoint)
+        return get(url=url, verify=False, auth=(username, password), params=payload)
+
+    def _delete_with_http_auth(self, username, password, id_to_del: int, endpoint=None):
+        if endpoint is None:
+            endpoint = self.device_register_endpoint
+        url = self._make_url(self.host, self.port, endpoint)
+
+        return delete(url=url, verify=False, auth=(username, password), params='id=' + str(id_to_del))
 
     def _device_api_post(self, token, endpoint, **kwargs):
         url = self._make_url(self.host, self.port, endpoint)
@@ -96,6 +111,16 @@ class DeviceRegisterTest(unittest.TestCase):
         response = self._token_auth(token_dict['token'])
         self.assertEqual(response.status_code, 401)
 
+        # Delete created device
+        response = self._request_with_http_auth(username='admin', password='admin', payload={'name': 'Device Name'},
+                                                endpoint='/api/user/devices')
+        self.assertTrue(response.status_code, 200)
+        id_device = response.json()[0]['id_device']
+
+        response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=id_device,
+                                               endpoint='/api/user/devices')
+        self.assertTrue(response.status_code, 200)
+
     def test_device_register_with_certificate_csr(self):
 
         # This is required since the server will throttle device creations
@@ -124,5 +149,15 @@ class DeviceRegisterTest(unittest.TestCase):
         response = self._certificate_auth(certificate, private_key)
         self.assertTrue(response.status_code, 200)
 
+        # Delete created device
+        response = self._request_with_http_auth(username='admin', password='admin',
+                                                payload={'name': 'Test Device with Certificate'},
+                                                endpoint='/api/user/devices')
+        self.assertTrue(response.status_code, 200)
+        id_device = response.json()[0]['id_device']
+
+        response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=id_device,
+                                               endpoint='/api/user/devices')
+        self.assertTrue(response.status_code, 200)
 
 

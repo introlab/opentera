@@ -50,6 +50,7 @@ class UserQueryDeviceParticipants(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
@@ -148,7 +149,7 @@ class UserQueryDeviceParticipants(Resource):
             if json_device_part['id_device_participant'] > 0:
                 # Already existing
                 try:
-                    TeraDeviceParticipant.update_(json_device_part['id_device_participant'], json_device_part)
+                    TeraDeviceParticipant.update(json_device_part['id_device_participant'], json_device_part)
                 except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())

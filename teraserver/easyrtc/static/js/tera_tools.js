@@ -192,6 +192,10 @@ function startAngleMeasurement(){
     //showElement("measureAnglesTools");
     $('#measureAnglesTools').css('display', 'inline');
     showElement("measureVideoCanvas");
+    let angle_btn = $('#btnMeasureAngles');
+    angle_btn.html(translator.translateForKey("measureDialog.measure-angle-stop"));
+    angle_btn.addClass('btn-danger');
+    angle_btn.removeClass('btn-success');
 }
 
 function stopAngleMeasurement(){
@@ -201,6 +205,12 @@ function stopAngleMeasurement(){
     hideElement("measureAnglesTools");
     clearAngleMeasurement();
     hideElement("measureVideoCanvas");
+
+    // Change button label
+    let angle_btn = $('#btnMeasureAngles');
+    angle_btn.html(translator.translateForKey("measureDialog.measure-angle"));
+    angle_btn.removeClass('btn-danger');
+    angle_btn.addClass('btn-success');
 }
 
 function clearAngleMeasurement(){

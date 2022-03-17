@@ -91,6 +91,7 @@ class ServiceSessionManager(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @LoginModule.service_token_or_certificate_required
     @api.expect(session_manager_schema)
@@ -112,7 +113,7 @@ class ServiceSessionManager(Resource):
         json_session_manager = request.json['session_manage']
 
         if 'action' not in json_session_manager:
-            return gettext('Missing action', 400)
+            return gettext('Missing action'), 400
 
         # Check if we have a creator ID on new session. If we don't, set the creator id to the current service id
         if 'id_creator_service' not in json_session_manager and 'id_session' not in json_session_manager \
@@ -200,8 +201,11 @@ class ServiceSessionManager(Resource):
             service = TeraService.get_service_by_id(json_session_manager['id_service'])
             if not service:
                 return gettext('Service not found'), 400
-            rpc = RedisRPCClient(self.module.config.redis_config)
-            answer = rpc.call_service(service.service_key, 'session_manage', json.dumps(request.json))
+            if not self.test:
+                rpc = RedisRPCClient(self.module.config.redis_config)
+                answer = rpc.call_service(service.service_key, 'session_manage', json.dumps(request.json))
+            else:
+                answer = json_session_manager
         else:
             # TODO: Manage other session types
             return gettext('Not implemented yet'), 501

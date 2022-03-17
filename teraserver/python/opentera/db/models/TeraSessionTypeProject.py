@@ -1,4 +1,5 @@
 from opentera.db.Base import db, BaseModel
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraSessionTypeProject(db.Model, BaseModel):
@@ -69,16 +70,30 @@ class TeraSessionTypeProject(db.Model, BaseModel):
         return TeraSessionTypeProject.query.filter_by(id_session_type_project=stp_id).first()
 
     @staticmethod
-    def query_projects_for_session_type(session_type_id: int):
+    def get_projects_for_session_type(session_type_id: int):
         return TeraSessionTypeProject.query.filter_by(id_session_type=session_type_id).all()
 
     @staticmethod
-    def query_sessions_types_for_project(project_id: int):
+    def get_sessions_types_for_project(project_id: int):
         return TeraSessionTypeProject.query.filter_by(id_project=project_id).all()
 
     @staticmethod
-    def query_session_type_project_for_session_type_project(project_id: int, session_type_id: int):
+    def get_session_type_project_for_session_type_project(project_id: int, session_type_id: int):
         return TeraSessionTypeProject.query.filter_by(id_project=project_id, id_session_type=session_type_id).first()
+
+    @staticmethod
+    def get_session_type_project_for_project_and_service(project_id: int, service_id: int):
+        from opentera.db.models.TeraSessionType import TeraSessionType
+        return TeraSessionTypeProject.query.join(TeraSessionType).\
+            filter(TeraSessionType.id_service == service_id).\
+            filter(TeraSessionTypeProject.id_project == project_id).all()
+
+    @staticmethod
+    def delete_with_ids(session_type_id: int, project_id: int):
+        delete_obj: TeraSessionTypeProject = TeraSessionTypeProject.query.filter_by(id_session_type=session_type_id,
+                                                                                    id_project=project_id).first()
+        if delete_obj:
+            TeraSessionTypeProject.delete(delete_obj.id_session_type_project)
 
     def check_integrity(self):
         from opentera.db.models.TeraSessionType import TeraSessionType
@@ -98,11 +113,32 @@ class TeraSessionTypeProject(db.Model, BaseModel):
 
     @classmethod
     def insert(cls, stp):
+        # Check if that site of that project has the site associated to it
+        from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+        from opentera.db.models.TeraProject import TeraProject
+        project = TeraProject.get_project_by_id(project_id=stp.id_project)
+        st_site = TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(site_id=project.id_site,
+                                                                                      session_type_id=
+                                                                                      stp.id_session_type)
+        if not st_site:
+            raise IntegrityError(params='Session type not associated to project site',
+                                 orig='TeraSessionTypeProject.insert', statement='insert')
         super().insert(stp)
         stp.check_integrity()
 
     @classmethod
     def update(cls, update_id: int, values: dict):
-        super().update(update_id, values)
+        values = cls.clean_values(values)
+        stp = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
+        stp.from_json(values)
+        # Check if that site of that project has the site associated to the session type
+        from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+        st_site = TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(
+            site_id=stp.session_type_project_project.id_site, session_type_id=stp.id_session_type)
+        if not st_site:
+            raise IntegrityError(params='Session type not associated to project site',
+                                 orig='TeraSessionTypeProject.update', statement='update')
+
         stp = TeraSessionTypeProject.get_session_type_project_by_id(update_id)
         stp.check_integrity()
+        cls.commit()

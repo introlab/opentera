@@ -152,6 +152,7 @@ class LoginModule(BaseModule):
         flask_app.config.update({'REMEMBER_COOKIE_NAME': 'OpenTera',
                                  'REMEMBER_COOKIE_DURATION': 14,
                                  'REMEMBER_COOKIE_SECURE': True,
+                                 'USE_PERMANENT_SESSION': True,
                                  'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
                                  'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
 

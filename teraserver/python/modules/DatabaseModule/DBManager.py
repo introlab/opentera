@@ -22,17 +22,18 @@ from opentera.db.models.TeraDeviceSubType import TeraDeviceSubType
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraSessionType import TeraSessionType
-# from opentera.db.models.TeraDeviceData import TeraDeviceData
 from opentera.db.models.TeraDeviceProject import TeraDeviceProject
+from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from opentera.db.models.TeraSessionEvent import TeraSessionEvent
 from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 from opentera.db.models.TeraServiceProject import TeraServiceProject
-# from opentera.db.models.TeraServiceSite import TeraServiceSite
+from opentera.db.models.TeraServiceSite import TeraServiceSite
 from opentera.db.models.TeraUserGroup import TeraUserGroup
 from opentera.db.models.TeraUserPreference import TeraUserPreference
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
@@ -195,9 +196,9 @@ class DBManager (BaseModule):
             print('No service - project association - creating defaults')
             TeraServiceProject.create_defaults(test)
 
-        # if TeraServiceSite.get_count() == 0:
-        #     print('No service - site association - creating defaults')
-        #     TeraServiceSite.create_defaults(test)
+        if TeraServiceSite.get_count() == 0:
+            print('No service - site association - creating defaults')
+            TeraServiceSite.create_defaults(test)
 
         if TeraParticipantGroup.get_count() == 0:
             print("No participant groups - creating defaults")
@@ -224,10 +225,17 @@ class DBManager (BaseModule):
             TeraDeviceParticipant.create_defaults(test)
             TeraServiceAccess.create_defaults(test)
 
+        if TeraDeviceSite.get_count() == 0:
+            print('No device-site association - creating defaults')
+            TeraDeviceSite.create_defaults(test)
+
         if TeraSessionType.get_count() == 0:
             print("No session type - creating defaults")
             TeraSessionType.create_defaults(test)
             TeraSessionTypeProject.create_defaults(test)
+
+        if TeraSessionTypeSite.get_count() == 0:
+            TeraSessionTypeSite.create_defaults(test)
 
         if TeraSession.get_count() == 0:
             print('No session - creating defaults')
@@ -266,10 +274,15 @@ class DBManager (BaseModule):
 
         # Init tables
         # db.drop_all()
-        db.create_all()
-
-        # Apply any database upgrade, if needed
-        self.upgrade_db()
+        tables = db.engine.table_names()
+        if not tables:
+            # Create all tables
+            db.create_all()
+            # New database - stamp with current revision version
+            self.stamp_db()
+        else:
+            # Apply any database upgrade, if needed
+            self.upgrade_db()
 
         # Now ready for events
         self.setup_events()
@@ -295,10 +308,15 @@ class DBManager (BaseModule):
         db.app = flask_app
 
         # Init tables
-        db.create_all()
-
-        # Apply any database upgrade, if needed
-        self.upgrade_db()
+        tables = db.engine.table_names()
+        if not tables:
+            # Create all tables
+            db.create_all()
+            # New database - stamp with current revision version
+            self.stamp_db()
+        else:
+            # Apply any database upgrade, if needed
+            self.upgrade_db()
 
         # Now ready for events
         self.setup_events()

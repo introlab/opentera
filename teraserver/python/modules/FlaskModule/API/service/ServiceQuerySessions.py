@@ -42,9 +42,10 @@ post_schema = api.schema_model('user_session', {'properties': TeraSession.get_js
 class ServiceQuerySessions(Resource):
 
     # Handle auth
-    def __init__(self, _api, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self, _api)
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @LoginModule.service_token_or_certificate_required
     @api.expect(get_parser)

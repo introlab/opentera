@@ -3,6 +3,7 @@ from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraServiceProject import TeraServiceProject
+from opentera.db.models.TeraServiceSite import TeraServiceSite
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraProject import TeraProject
@@ -23,13 +24,15 @@ get_parser.add_argument('with_services', type=inputs.boolean, help='Used with id
                                                                    'don\'t have any association with that project')
 get_parser.add_argument('with_roles', type=inputs.boolean, help='Used with id_project. Returns detailled information on'
                                                                 'each role for this service.')
+get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_service. Also return site information '
+                                                                'of the returned projects.')
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('service_project', type=str, location='json',
 #                          help='Service - project association to create / update', required=True)
-post_schema = api.schema_model('user_service_project', {'properties': TeraServiceProject.get_json_schema(),
-                                                        'type': 'object',
-                                                        'location': 'json'})
+post_schema = api.schema_model('service_project', {'properties': TeraServiceProject.get_json_schema(),
+                                                   'type': 'object',
+                                                   'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific service - project association ID to delete. '
@@ -42,6 +45,7 @@ class UserQueryServiceProjects(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
@@ -83,7 +87,11 @@ class UserQueryServiceProjects(Resource):
                     if not obj_type.transient:
                         json_sp['service_name'] = sp.service_project_service.service_name
                         json_sp['service_key'] = sp.service_project_service.service_key
+                        json_sp['service_system'] = sp.service_project_service.service_system
                         json_sp['project_name'] = sp.service_project_project.project_name
+                        if args['with_sites']:
+                            json_sp['id_site'] = sp.service_project_project.id_site
+                            json_sp['site_name'] = sp.service_project_project.project_site.site_name
                     else:
                         # Temporary object, a not-committed object, result of listing projects not associated in a
                         # service.
@@ -91,11 +99,17 @@ class UserQueryServiceProjects(Resource):
                             service = TeraService.get_service_by_id(sp.id_service)
                             json_sp['service_name'] = service.service_name
                             json_sp['service_key'] = service.service_key
+                            json_sp['service_system'] = service.service_system
                         else:
                             json_sp['service_name'] = None
                             json_sp['service_key'] = None
+                            json_sp['service_system'] = None
                         if sp.id_project:
-                            json_sp['project_name'] = TeraProject.get_project_by_id(sp.id_project).project_name
+                            project = TeraProject.get_project_by_id(sp.id_project)
+                            json_sp['project_name'] = project.project_name
+                            if args['with_sites']:
+                                json_sp['id_site'] = project.id_site
+                                json_sp['site_name'] = project.project_site.site_name
                         else:
                             json_sp['project_name'] = None
                 if args['with_roles']:
@@ -158,6 +172,7 @@ class UserQueryServiceProjects(Resource):
             if 'services' not in request.json['project']:
                 return gettext('Missing services'), 400
             id_project = request.json['project']['id_project']
+
             # Only site admin can modify
             from opentera.db.models.TeraProject import TeraProject
             project = TeraProject.get_project_by_id(id_project)
@@ -168,10 +183,12 @@ class UserQueryServiceProjects(Resource):
             current_services = TeraServiceProject.get_services_for_project(id_project=id_project)
             current_services_ids = [service.id_service for service in current_services]
             received_services_ids = [service['id_service'] for service in request.json['project']['services']]
+
             # Difference - we must delete services not anymore in the list
             todel_ids = set(current_services_ids).difference(received_services_ids)
             # Also filter services already there
             received_services_ids = set(received_services_ids).difference(current_services_ids)
+
             for service_id in todel_ids:
                 TeraServiceProject.delete_with_ids(service_id=service_id, project_id=id_project)
             # Build projects association to add
@@ -202,6 +219,12 @@ class UserQueryServiceProjects(Resource):
             project = TeraProject.get_project_by_id(json_sp['id_project'])
             if user_access.get_site_role(project.id_site) != 'admin':
                 return gettext('Access denied'), 403
+
+            # Check if the service is part of the project site
+            site_service = TeraServiceSite.get_service_site_for_service_site(site_id=project.id_site,
+                                                                             service_id=json_sp['id_service'])
+            if not site_service:
+                return gettext('At least one service is not part of the allowed service for that project site'), 403
 
         for json_sp in json_sps:
             if 'id_service_project' not in json_sp:
