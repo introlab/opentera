@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-03-17 14:37-0400\n"
-"PO-Revision-Date: 2022-03-17 14:49-0400\n"
+"POT-Creation-Date: 2022-03-18 15:00-0400\n"
+"PO-Revision-Date: 2022-03-18 15:02-0400\n"
 "Last-Translator: \n"
 "Language-Team: fr <LL@li.org>\n"
 "Language: fr\n"
@@ -38,8 +38,6 @@ msgstr "L'appareil est déjà connecté."
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:84
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:90
 #: modules/FlaskModule/API/service/ServiceQuerySites.py:36
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:130
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:204
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:350
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:117
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:294
@@ -123,9 +121,9 @@ msgstr "Configuration manquante"
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:118
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:185
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:219
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:159
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:176
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:215
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:162
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:179
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:221
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:237
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:251
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:361
@@ -540,11 +538,21 @@ msgstr ""
 "La suppression d'information sur les ressources doivent être fait directement "
 "dans un service (comme le service de transfert de fichiers - FileTransfer)"
 
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:146
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:128
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:207
+msgid "User is not admin of the participant's project"
+msgstr "L’utilisateur n’est pas administrateur du projet du participant"
+
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:131
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:210
+msgid "Access denied to device"
+msgstr "Aucun accès à l’appareil"
+
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:149
 msgid "Device not assigned to project or participant"
 msgstr "Appareil non assigné à un projet ou un participant"
 
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:200
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:203
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:345
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:206
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:68

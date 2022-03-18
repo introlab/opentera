@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-03-17 14:37-0400\n"
+"POT-Creation-Date: 2022-03-18 15:00-0400\n"
 "PO-Revision-Date: 2021-01-25 13:01-0500\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -37,8 +37,6 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:84
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:90
 #: modules/FlaskModule/API/service/ServiceQuerySites.py:36
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:130
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:204
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:350
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:117
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:294
@@ -122,9 +120,9 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:118
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:185
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:219
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:159
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:176
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:215
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:162
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:179
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:221
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:237
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:251
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:361
@@ -536,11 +534,21 @@ msgid ""
 "Filetransfer service)"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:146
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:128
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:207
+msgid "User is not admin of the participant's project"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:131
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:210
+msgid "Access denied to device"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:149
 msgid "Device not assigned to project or participant"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:200
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:203
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:345
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:206
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:68

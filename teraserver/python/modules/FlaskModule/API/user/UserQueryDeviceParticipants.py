@@ -119,16 +119,19 @@ class UserQueryDeviceParticipants(Resource):
         if not isinstance(json_device_parts, list):
             json_device_parts = [json_device_parts]
 
-        # Validate if we have an id
+        # Validate access before updating
         for json_device_part in json_device_parts:
             if 'id_participant' not in json_device_part or 'id_device' not in json_device_part:
                 return '', 400
 
-            # Check if current user can modify the posted device
-            if json_device_part['id_participant'] not in user_access.get_accessible_participants_ids(admin_only=True) \
-                    or json_device_part['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
-                return gettext('Forbidden'), 403
+            if json_device_part['id_participant'] not in user_access.get_accessible_participants_ids(admin_only=True):
+                return gettext("User is not admin of the participant's project"), 403
 
+            if json_device_part['id_device'] not in user_access.get_accessible_devices_ids(admin_only=False):
+                return gettext("Access denied to device"), 403
+
+        # Update participants devices
+        for json_device_part in json_device_parts:
             # Check if already exists
             device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
                 device_id=json_device_part['id_device'], participant_id=json_device_part['id_participant'])
@@ -199,9 +202,12 @@ class UserQueryDeviceParticipants(Resource):
         if not device_part:
             return gettext('Not found'), 400
 
-        if device_part.id_participant not in user_access.get_accessible_participants_ids(admin_only=True) or \
-                device_part.id_device not in user_access.get_accessible_devices_ids(admin_only=True):
-            return gettext('Forbidden'), 403
+        # Validate access before updating
+        if device_part.id_participant not in user_access.get_accessible_participants_ids(admin_only=True):
+            return gettext("User is not admin of the participant's project"), 403
+
+        if device_part.id_device not in user_access.get_accessible_devices_ids(admin_only=False):
+            return gettext("Access denied to device"), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
