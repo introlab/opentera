@@ -64,6 +64,17 @@ class BaseUserAPITest(unittest.TestCase):
         config.create_defaults()
         return config
 
+    @classmethod
+    def reset_database(cls):
+        # db.close()
+        # Create all tables
+        config = cls.getConfig()
+        manager = DBManager(config)
+        manager.open_local({}, echo=False, ram=True)
+
+        # Creating default users / tests. Time-consuming, only once per test file.
+        manager.create_defaults(config, test=True)
+
     def setUp(self):
         # Setup required keys
         self.setup_redis_keys()

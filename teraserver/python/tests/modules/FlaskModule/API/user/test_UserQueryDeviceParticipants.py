@@ -8,6 +8,7 @@ from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 from opentera.db.models.TeraDeviceType import TeraDeviceType
 from opentera.db.models.TeraUser import TeraUser
+from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 
 
 class UserQueryDeviceParticipantsTest(BaseUserAPITest):
@@ -138,3 +139,78 @@ class UserQueryDeviceParticipantsTest(BaseUserAPITest):
                 self.assertIsNotNone(user_access)
                 self.assertEqual(len(user_access.query_device_participants_by_type
                                      (device_type.id_device_type, participant.id_participant)), len(response.json))
+
+    def test_post_endpoint_with_http_auth_standard_user_and_id_device_must_be_forbidden(self):
+        participants: List[TeraParticipant] = TeraParticipant.query.all()
+
+        for participant in participants:
+            devices: list[TeraDevice] = TeraDevice.query.all()
+
+            for device in devices:
+                json_request = {
+                    'device_participant': {
+                        'id_device': device.id_device,
+                        'id_participant': participant.id_participant
+                    }
+                }
+                response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
+                                                          json=json_request)
+                self.assertEqual(403, response.status_code)
+
+    def test_post_endpoint_with_http_auth_project_admin_id_device_is_allowed_for_project(self):
+        user: TeraUser = TeraUser.get_user_by_username('user3')
+        access: DBManagerTeraUserAccess = DBManagerTeraUserAccess(user)
+
+        all_participants = [participant.id_participant for participant in TeraParticipant.query.all()]
+        all_devices = [device.id_device for device in TeraDevice.query.all()]
+        accessible_participants = access.get_accessible_participants_ids()
+        accessible_devices = access.get_accessible_devices_ids()
+
+        for id_participant in all_participants:
+            for id_device in all_devices:
+                json_request = {
+                    'device_participant': {
+                        'id_device': id_device,
+                        'id_participant': id_participant
+                    }
+                }
+                response = self._post_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                          json=json_request)
+
+                # Do we have access to this participant ?
+                if id_participant in accessible_participants and id_device in accessible_devices:
+                    self.assertEqual(200, response.status_code)
+                else:
+                    self.assertEqual(403, response.status_code)
+
+        # reset database, we have changed participant-device associations
+        BaseUserAPITest.reset_database()
+
+    def test_post_endpoint_with_http_auth_site_admin_id_device_is_allowed_for_site(self):
+        user: TeraUser = TeraUser.get_user_by_username('siteadmin')
+        access: DBManagerTeraUserAccess = DBManagerTeraUserAccess(user)
+
+        all_participants = [participant.id_participant for participant in TeraParticipant.query.all()]
+        all_devices = [device.id_device for device in TeraDevice.query.all()]
+        accessible_participants = access.get_accessible_participants_ids()
+        accessible_devices = access.get_accessible_devices_ids()
+
+        for id_participant in all_participants:
+            for id_device in all_devices:
+                json_request = {
+                    'device_participant': {
+                        'id_device': id_device,
+                        'id_participant': id_participant
+                    }
+                }
+                response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                          json=json_request)
+
+                # Do we have access to this participant ?
+                if id_participant in accessible_participants and id_device in accessible_devices:
+                    self.assertEqual(200, response.status_code)
+                else:
+                    self.assertEqual(403, response.status_code)
+
+        # reset database, we have changed participant-device associations
+        BaseUserAPITest.reset_database()
