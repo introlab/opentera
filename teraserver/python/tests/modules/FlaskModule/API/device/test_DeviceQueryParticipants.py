@@ -10,7 +10,7 @@ class DeviceQueryParticipantsTest(unittest.TestCase):
     port = 40075
     device_login_endpoint = '/api/device/login'
     device_logout_endpoint = '/api/device/logout'
-    device_query_participants_endpoint = '/api/devices/participants'
+    device_query_participants_endpoint = '/api/device/participants'
     user_device_endpoint = '/api/user/devices'
     all_devices = None
 
@@ -52,18 +52,18 @@ class DeviceQueryParticipantsTest(unittest.TestCase):
 
             if not device['device_enabled']:
                 # Should always return unauthorized for disabled devices
-                self.assertEqual(response.status_code, 401)
+                self.assertEqual(401, response.status_code)
             else:
                 if device['device_onlineable']:
-                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(200, response.status_code)
                     participants = response.json()
                     self.assertTrue('participants_info' in participants)
                 else:
                     # Should return forbidden (not onlinable but enabled = forbidden)
-                    self.assertEqual(response.status_code, 403)
+                    self.assertEqual(403, response.status_code)
 
     def test_query_participants_get_with_invalid_token(self):
         for device in self.all_devices:
             response = self._token_auth_query_participants(device['device_token'] + str('invalid'))
             # Should return unauthorized
-            self.assertEqual(response.status_code, 401)
+            self.assertEqual(401, response.status_code)
