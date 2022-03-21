@@ -75,6 +75,7 @@ class UserQueryDeviceProjects(Resource):
                                                                                 args['with_devices'])
         try:
             device_project_list = []
+            accessible_part_ids = user_access.get_accessible_participants_ids()
             for dp in device_project:
                 json_dp = dp.to_json()
 
@@ -83,7 +84,9 @@ class UserQueryDeviceProjects(Resource):
                     if not obj_type.transient:
                         json_dp['project_name'] = dp.device_project_project.project_name
                         json_dp['device_name'] = dp.device_project_device.device_name
-                        json_dp['device_available'] = not dp.device_project_device.device_participants
+                        json_dp['device_available'] = len([part.id_participant for part in
+                                                           dp.device_project_device.device_participants
+                                                           if part.id_participant in accessible_part_ids]) == 0
                         if args['with_sites']:
                             json_dp['id_site'] = dp.device_project_project.id_site
                             json_dp['site_name'] = dp.device_project_project.project_site.site_name
@@ -93,7 +96,10 @@ class UserQueryDeviceProjects(Resource):
                         if dp.id_device:
                             device = TeraDevice.get_device_by_id(dp.id_device)
                             json_dp['device_name'] = device.device_name
-                            json_dp['device_available'] = not device.device_participants
+                            json_dp['device_available'] = len([part.id_participant for part in
+                                                               device.device_participants
+                                                               if part.id_participant in accessible_part_ids]) == 0
+                            #  not device.device_participants
                         else:
                             json_dp['device_name'] = None
                             json_dp['device_available'] = False

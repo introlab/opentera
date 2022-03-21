@@ -63,13 +63,14 @@ class UserQueryDeviceSites(Resource):
         if args['id_device']:
             if args['id_device'] in user_access.get_accessible_devices_ids():
                 device_sites = user_access.query_devices_sites_for_device(device_id=args['id_device'],
-                                                                         include_other_sites=args['with_sites'])
+                                                                          include_other_sites=args['with_sites'])
         elif args['id_site']:
             if args['id_site'] in user_access.get_accessible_sites_ids():
                 device_sites = user_access.query_devices_sites_for_site(site_id=args['id_site'],
                                                                         include_other_devices=args['with_devices'])
         try:
             ds_list = []
+            accessible_part_ids = user_access.get_accessible_participants_ids()
             for ds in device_sites:
                 json_ds = ds.to_json()
                 if args['list'] is None:
@@ -77,14 +78,20 @@ class UserQueryDeviceSites(Resource):
                     if not obj_type.transient:
                         json_ds['device_name'] = ds.device_site_device.device_name
                         json_ds['site_name'] = ds.device_site_site.site_name
-                        json_ds['device_available'] = not ds.device_site_device.device_participants
+                        json_ds['device_available'] = len([part.id_participant for part in
+                                                           ds.device_site_device.device_participants
+                                                           if part.id_participant in accessible_part_ids]) == 0
+                        # not ds.device_site_device.device_participants
                     else:
                         # Temporary object, a not-committed object, result of listing sites not associated in a
                         # device.
                         if ds.id_device:
                             device: TeraDevice = TeraDevice.get_device_by_id(ds.id_device)
                             json_ds['device_name'] = device.device_name
-                            json_ds['device_available'] = not device.device_participants
+                            json_ds['device_available'] = len([part.id_participant for part in
+                                                               device.device_participants
+                                                               if part.id_participant in accessible_part_ids]) == 0
+                            # not device.device_participants
                         else:
                             json_ds['device_name'] = None
                             json_ds['device_available'] = False

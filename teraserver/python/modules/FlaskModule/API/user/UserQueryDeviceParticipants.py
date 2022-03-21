@@ -72,7 +72,8 @@ class UserQueryDeviceParticipants(Resource):
 
         if args['id_device']:
             if args['id_device'] in user_access.get_accessible_devices_ids():
-                device_part = TeraDeviceParticipant.query_participants_for_device(device_id=args['id_device'])
+                device_part = user_access.query_device_participants_for_device(args['id_device'])
+                # TeraDeviceParticipant.query_participants_for_device(device_id=args['id_device'])
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
                 if args['id_device_type']:

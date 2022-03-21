@@ -753,6 +753,11 @@ class DBManagerTeraUserAccess:
             .order_by(TeraDeviceParticipant.id_device_participant.asc()).all()
         return device_parts
 
+    def query_device_participants_for_device(self, device_id: int):
+        device_parts = TeraDeviceParticipant.query.filter_by(id_device=device_id).\
+            filter(TeraDeviceParticipant.id_participant.in_(self.get_accessible_participants_ids())).all()
+        return device_parts
+
     def query_session(self, session_id: int):
         from opentera.db.models.TeraParticipant import TeraParticipant
         from opentera.db.models.TeraSession import TeraSession

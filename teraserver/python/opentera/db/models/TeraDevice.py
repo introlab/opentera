@@ -147,23 +147,23 @@ class TeraDevice(db.Model, BaseModel):
     def get_device_by_id(device_id):
         return TeraDevice.query.filter_by(id_device=device_id).first()
 
-    @staticmethod
-    # Available device = device not assigned to any participant
-    def get_available_devices(ignore_disabled=True):
-        if ignore_disabled:
-            return TeraDevice.query.outerjoin(TeraDevice.device_participants)\
-                .filter(TeraDevice.device_participants is None).all()
-        else:
-            return TeraDevice.query.filter_by(device_enabled=True).outerjoin(TeraDevice.device_participants).\
-                filter(TeraDevice.device_participants is None).all()
-
-    @staticmethod
-    # Unavailable device = device assigned to at least one participant
-    def get_unavailable_devices(ignore_disabled=True):
-        if ignore_disabled:
-            return TeraDevice.query.join(TeraDevice.device_participants).all()
-        else:
-            return TeraDevice.query.filter_by(device_enabled=True).join(TeraDevice.device_participants).all()
+    # @staticmethod
+    # # Available device = device not assigned to any participant
+    # def get_available_devices(ignore_disabled=True):
+    #     if ignore_disabled:
+    #         return TeraDevice.query.outerjoin(TeraDevice.device_participants)\
+    #             .filter(TeraDevice.device_participants is None).all()
+    #     else:
+    #         return TeraDevice.query.filter_by(device_enabled=True).outerjoin(TeraDevice.device_participants).\
+    #             filter(TeraDevice.device_participants is None).all()
+    #
+    # @staticmethod
+    # # Unavailable device = device assigned to at least one participant
+    # def get_unavailable_devices(ignore_disabled=True):
+    #     if ignore_disabled:
+    #         return TeraDevice.query.join(TeraDevice.device_participants).all()
+    #     else:
+    #         return TeraDevice.query.filter_by(device_enabled=True).join(TeraDevice.device_participants).all()
 
     @staticmethod
     def create_defaults(test=False):
