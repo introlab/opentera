@@ -5,6 +5,7 @@ from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraService import TeraService
 
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.redis.RedisVars import RedisVars
@@ -108,8 +109,11 @@ class UserQueryAssets(Resource):
             port = request.headers['X_EXTERNALPORT']
         services_infos = []
         if (args['with_urls'] or args['with_only_token']) and assets:
+            # services_infos = {service.service_uuid: service.service_clientendpoint
+            #                   for service in user_access.get_accessible_services()}
+            # Load all enabled services
             services_infos = {service.service_uuid: service.service_clientendpoint
-                              for service in user_access.get_accessible_services()}
+                              for service in TeraService.query_with_filters({'service_enabled': True})}
 
             # # Access token
             # from opentera.redis.RedisVars import RedisVars
