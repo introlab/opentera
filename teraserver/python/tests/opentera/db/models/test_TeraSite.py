@@ -1,4 +1,3 @@
-import os
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
 from opentera.db.Base import db
@@ -7,12 +6,6 @@ from opentera.db.models.TeraSite import TeraSite
 
 
 class TeraSiteTest(BaseModelsTest):
-
-    filename = os.path.join(os.path.dirname(__file__), 'TeraSiteTest.db')
-
-    SQLITE = {
-        'filename': filename
-    }
 
     def test_nullable_args(self):
         new_site = TeraSite()
@@ -44,27 +37,27 @@ class TeraSiteTest(BaseModelsTest):
 
     def test_to_json_create_event(self):
         new_site = TeraSite()
-        new_site.site_name = 'Site Name'
+        new_site.site_name = 'test_to_json_create_event'
         db.session.add(new_site)
         db.session.commit()
         db.session.rollback()
         new_site_json = new_site.to_json_create_event()
-        self.assertEqual(new_site_json['site_name'], 'Site Name')
+        self.assertEqual(new_site_json['site_name'], new_site.site_name)
         self.assertGreaterEqual(new_site_json['id_site'], 1)
 
     def test_to_json_update_event(self):
         new_site = TeraSite()
-        new_site.site_name = 'Site Name'
+        new_site.site_name = 'test_to_json_update_event'
         db.session.add(new_site)
         db.session.commit()
         db.session.rollback()
         new_site_json = new_site.to_json_update_event()
-        self.assertEqual(new_site_json['site_name'], 'Site Name')
+        self.assertEqual(new_site_json['site_name'], new_site.site_name)
         self.assertGreaterEqual(new_site_json['id_site'], 1)
 
     def test_to_json_delete_event(self):
         new_site = TeraSite()
-        new_site.site_name = 'Site Name'
+        new_site.site_name = 'test_to_json_delete_event'
         db.session.add(new_site)
         db.session.commit()
         new_site_json_delete = new_site.to_json_delete_event()
@@ -73,14 +66,14 @@ class TeraSiteTest(BaseModelsTest):
     def test_get_site_by_sitename(self):
         db.session.rollback()
         new_site = TeraSite()
-        new_site.site_name = 'Site Name'
+        new_site.site_name = 'test_get_site_by_sitename'
         db.session.add(new_site)
-        same_site = TeraSite.get_site_by_sitename(sitename='Site Name')
+        same_site = TeraSite.get_site_by_sitename(sitename=new_site.site_name)
         self.assertEqual(new_site, same_site)
 
     def test_get_site_by_id(self):
         new_site = TeraSite()
-        new_site.site_name = 'Site Name'
+        new_site.site_name = 'test_get_site_by_id'
         db.session.add(new_site)
         db.session.commit()
         same_site = TeraSite.get_site_by_id(site_id=new_site.id_site)
@@ -88,12 +81,12 @@ class TeraSiteTest(BaseModelsTest):
 
     def test_insert_and_delete(self):
         new_site = TeraSite()
-        new_site.site_name = 'Site Name'
+        new_site.site_name = 'test_insert_and_delete'
         TeraSite.insert(site=new_site)
         self.assertGreaterEqual(new_site.id_site, 1)
         id_to_del = TeraSite.get_site_by_id(new_site.id_site).id_site
         TeraSite.delete(id_todel=id_to_del)
         Same_site = TeraSite()
-        Same_site.site_name = 'Site Name'
+        Same_site.site_name = 'test_insert_and_delete'
         db.session.add(Same_site)
         db.session.commit()

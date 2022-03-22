@@ -23,6 +23,7 @@ get_parser.add_argument('session_uuid', type=str, help='Session UUID to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('start_date', type=inputs.date, help='Start date, sessions before that date will be ignored')
 get_parser.add_argument('end_date', type=inputs.date, help='End date, sessions after that date will be ignored')
+get_parser.add_argument('with_session_type', type=inputs.boolean, help='Include session type informations')
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
@@ -39,6 +40,7 @@ class UserQuerySessions(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
@@ -88,6 +90,11 @@ class UserQuerySessions(Resource):
             for ses in sessions:
                 if ses is not None:  # Could be none if no access to specified session
                     session_json = ses.to_json(minimal=args['list'])
+
+                    if args['with_session_type']:
+                        session_json['session_type_name'] = ses.session_session_type.session_type_name
+                        session_json['session_type_color'] = ses.session_session_type.session_type_color
+
                     sessions_list.append(session_json)
 
             return jsonify(sessions_list)
@@ -207,6 +214,11 @@ class UserQuerySessions(Resource):
         if session_users_ids or session_parts_ids or session_devices_ids:
             # Commit the changes
             update_session.commit()
+
+        update_session_json = update_session.to_json()
+        # Also include session type information
+        update_session_json['session_type_name'] = update_session.session_session_type.session_type_name
+        update_session_json['session_type_color'] = update_session.session_session_type.session_type_color
 
         return [update_session.to_json()]
 

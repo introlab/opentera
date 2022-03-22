@@ -50,6 +50,7 @@ class UserQueryDeviceParticipants(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
@@ -71,7 +72,8 @@ class UserQueryDeviceParticipants(Resource):
 
         if args['id_device']:
             if args['id_device'] in user_access.get_accessible_devices_ids():
-                device_part = TeraDeviceParticipant.query_participants_for_device(device_id=args['id_device'])
+                device_part = user_access.query_device_participants_for_device(args['id_device'])
+                # TeraDeviceParticipant.query_participants_for_device(device_id=args['id_device'])
         elif args['id_participant']:
             if args['id_participant'] in user_access.get_accessible_participants_ids():
                 if args['id_device_type']:
@@ -118,16 +120,19 @@ class UserQueryDeviceParticipants(Resource):
         if not isinstance(json_device_parts, list):
             json_device_parts = [json_device_parts]
 
-        # Validate if we have an id
+        # Validate access before updating
         for json_device_part in json_device_parts:
             if 'id_participant' not in json_device_part or 'id_device' not in json_device_part:
                 return '', 400
 
-            # Check if current user can modify the posted device
-            if json_device_part['id_participant'] not in user_access.get_accessible_participants_ids(admin_only=True) \
-                    or json_device_part['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
-                return gettext('Forbidden'), 403
+            if json_device_part['id_participant'] not in user_access.get_accessible_participants_ids(admin_only=True):
+                return gettext("User is not admin of the participant's project"), 403
 
+            if json_device_part['id_device'] not in user_access.get_accessible_devices_ids(admin_only=False):
+                return gettext("Access denied to device"), 403
+
+        # Update participants devices
+        for json_device_part in json_device_parts:
             # Check if already exists
             device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
                 device_id=json_device_part['id_device'], participant_id=json_device_part['id_participant'])
@@ -148,7 +153,7 @@ class UserQueryDeviceParticipants(Resource):
             if json_device_part['id_device_participant'] > 0:
                 # Already existing
                 try:
-                    TeraDeviceParticipant.update_(json_device_part['id_device_participant'], json_device_part)
+                    TeraDeviceParticipant.update(json_device_part['id_device_participant'], json_device_part)
                 except exc.SQLAlchemyError as e:
                     import sys
                     print(sys.exc_info())
@@ -198,9 +203,12 @@ class UserQueryDeviceParticipants(Resource):
         if not device_part:
             return gettext('Not found'), 400
 
-        if device_part.id_participant not in user_access.get_accessible_participants_ids(admin_only=True) or \
-                device_part.id_device not in user_access.get_accessible_devices_ids(admin_only=True):
-            return gettext('Forbidden'), 403
+        # Validate access before updating
+        if device_part.id_participant not in user_access.get_accessible_participants_ids(admin_only=True):
+            return gettext("User is not admin of the participant's project"), 403
+
+        if device_part.id_device not in user_access.get_accessible_devices_ids(admin_only=False):
+            return gettext("Access denied to device"), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:

@@ -2,7 +2,7 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule
-from modules.Globals import db_man
+from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
 
@@ -13,9 +13,11 @@ post_parser = api.parser()
 
 
 class DeviceQueryParticipants(Resource):
-    def __init__(self, _api, flaskModule=None):
-        Resource.__init__(self, _api)
-        self.module = flaskModule
+
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @LoginModule.device_token_or_certificate_required
     @api.expect(get_parser)

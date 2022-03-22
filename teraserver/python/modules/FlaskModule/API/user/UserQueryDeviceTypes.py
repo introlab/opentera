@@ -35,6 +35,7 @@ class UserQueryDeviceTypes(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
@@ -109,6 +110,9 @@ class UserQueryDeviceTypes(Resource):
         if json_device_type['id_device_type'] > 0:
             # Already existing
             try:
+                device_type: TeraDeviceType = TeraDeviceType.get_device_type_by_id(json_device_type['id_device_type'])
+                if not device_type:
+                    return gettext('Invalid device type'), 400
                 TeraDeviceType.update(json_device_type['id_device_type'], json_device_type)
             except exc.SQLAlchemyError as e:
                 import sys
@@ -166,10 +170,20 @@ class UserQueryDeviceTypes(Resource):
         else:
             return gettext('Device type not found'), 400
 
+        if not device_type_to_del:
+            return gettext('Device type not found'), 400
+
         # if device_type_to_del.id_device_type in user_access.get_accessible_devices_types_ids():
         if user_access.user.user_superadmin:
             try:
                 TeraDeviceType.delete(id_todel=device_type_to_del.id_device_type)
+
+            except exc.IntegrityError as e:
+                self.module.logger.log_error(self.module.module_name,
+                                             UserQueryDeviceTypes.__name__,
+                                             'delete', 500, 'Database error', str(e))
+                return gettext('Can\'t delete device type: please delete all associated devices before deleting.'), 500
+
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())

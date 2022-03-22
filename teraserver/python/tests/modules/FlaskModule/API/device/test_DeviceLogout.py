@@ -1,55 +1,48 @@
-import unittest
-import os
-from requests import get
-import json
+from BaseDeviceAPITest import BaseDeviceAPITest
+from modules.FlaskModule.FlaskModule import flask_app
+from opentera.db.models.TeraDevice import TeraDevice
 
 
-class DeviceLogoutTest(unittest.TestCase):
-
-    host = '127.0.0.1'
-    port = 40075
-    device_login_endpoint = '/api/device/login'
-    device_logout_endpoint = '/api/device/logout'
-    user_device_endpoint = '/api/user/devices'
-    all_devices = None
+class DeviceLogoutTest(BaseDeviceAPITest):
+    test_endpoint = '/api/device/logout'
 
     def setUp(self):
-        # Use admin account to get device information (and tokens)
-        response = self._http_auth_devices('admin', 'admin')
-        self.assertEqual(response.status_code, 200)
-        self.all_devices = json.loads(response.text)
-        self.assertGreater(len(self.all_devices), 0)
+        super().setUp()
+        from modules.FlaskModule.FlaskModule import device_api_ns
+        from BaseDeviceAPITest import FakeFlaskModule
+        # Setup minimal API
+        from modules.FlaskModule.API.device.DeviceLogout import DeviceLogout
+        kwargs = {
+            'flaskModule': FakeFlaskModule(config=BaseDeviceAPITest.getConfig()),
+            'test': True
+        }
+        device_api_ns.add_resource(DeviceLogout, '/logout', resource_class_kwargs=kwargs)
+
+        # Create test client
+        self.test_client = flask_app.test_client()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
-    def _make_url(self, hostname, port, endpoint):
-        return 'https://' + hostname + ':' + str(port) + endpoint
+    def test_get_endpoint_no_auth(self):
+        response = self.test_client.get(self.test_endpoint)
+        self.assertEqual(401, response.status_code)
 
-    def _http_auth_devices(self, username, password):
-        url = self._make_url(self.host, self.port, self.user_device_endpoint)
-        return get(url=url, verify=False, auth=(username, password))
+    def test_get_endpoint_invalid_token_auth(self):
+        response = self._get_with_device_token_auth(self.test_client, token='invalid')
+        self.assertEqual(401, response.status_code)
 
-    def _token_auth(self, token):
-        url = self._make_url(self.host, self.port, self.device_login_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
+    def test_get_endpoint_with_token_auth(self):
+        devices = []
+        # Warning, device is updated on login, ORM will render the object "dirty".
+        for device in TeraDevice.query.all():
+            devices.append(device.to_json(minimal=False))
 
-    def _token_auth_logout(self, token):
-        url = self._make_url(self.host, self.port, self.device_logout_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
-
-    def test_device_logout_with_token(self):
-        for device in self.all_devices:
-
-            response = self._token_auth(device['device_token'])
-            if device['device_enabled']:
-                # First Login
-                self.assertEqual(response.status_code, 200)
-                # Then Logout
-                response = self._token_auth_logout(device['device_token'])
-                self.assertEqual(response.status_code, 403)
-            else:
-                self.assertEqual(response.status_code, 401)
-
+        for device in devices:
+            if device['device_token']:
+                if device['device_enabled']:
+                    response = self._get_with_device_token_auth(self.test_client, token=device['device_token'])
+                    self.assertEqual(403, response.status_code)
+                else:
+                    response = self._get_with_device_token_auth(self.test_client, token=device['device_token'])
+                    self.assertEqual(401, response.status_code)

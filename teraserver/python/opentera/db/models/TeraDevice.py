@@ -31,14 +31,16 @@ class TeraDevice(db.Model, BaseModel):
 
     # device_sites = db.relationship("TeraDeviceSite")
     # device_projects = db.relationship('TeraDeviceProject', cascade='delete')
-    device_projects = db.relationship("TeraProject", secondary="t_devices_projects", back_populates="project_devices")
+    device_projects = db.relationship("TeraProject", secondary="t_devices_projects",
+                                      back_populates="project_devices", lazy='joined')
     # device_session_types = db.relationship("TeraSessionTypeDeviceType")
     device_participants = db.relationship("TeraParticipant",  secondary="t_devices_participants",
-                                          back_populates="participant_devices", passive_deletes=True)
+                                          back_populates="participant_devices", passive_deletes=True, lazy='joined')
     device_sessions = db.relationship("TeraSession", secondary="t_sessions_devices", back_populates="session_devices",
-                                      passive_deletes=True)
-    device_subtype = db.relationship('TeraDeviceSubType')
-    device_assets = db.relationship('TeraAsset', passive_deletes=True, back_populates='asset_device')
+                                      passive_deletes=True, lazy='select')
+    device_type = db.relationship('TeraDeviceType', lazy='joined')
+    device_subtype = db.relationship('TeraDeviceSubType', lazy='joined')
+    device_assets = db.relationship('TeraAsset', passive_deletes=True, back_populates='asset_device', lazy='select')
 
     authenticated = False
 
@@ -53,7 +55,7 @@ class TeraDevice(db.Model, BaseModel):
             ignore_fields = []
 
         ignore_fields += ['device_projects', 'device_participants', 'device_sessions', 'device_certificate',
-                          'device_subtype', 'authenticated', 'device_assets']
+                          'device_type', 'device_subtype', 'authenticated', 'device_assets']
 
         if minimal:
             ignore_fields += ['device_onlineable', 'device_config', 'device_notes',
@@ -125,9 +127,6 @@ class TeraDevice(db.Model, BaseModel):
 
             # Only validating UUID since other fields can change in database after token is generated.
             if data['device_uuid'] == device.device_uuid:
-
-                # Update last online
-                device.update_last_online()
                 device.authenticated = True
                 return device
             else:
@@ -148,23 +147,23 @@ class TeraDevice(db.Model, BaseModel):
     def get_device_by_id(device_id):
         return TeraDevice.query.filter_by(id_device=device_id).first()
 
-    @staticmethod
-    # Available device = device not assigned to any participant
-    def get_available_devices(ignore_disabled=True):
-        if ignore_disabled:
-            return TeraDevice.query.outerjoin(TeraDevice.device_participants)\
-                .filter(TeraDevice.device_participants == None).all()
-        else:
-            return TeraDevice.query.filter_by(device_enabled=True).outerjoin(TeraDevice.device_participants).\
-                filter(TeraDevice.device_participants == None).all()
-
-    @staticmethod
-    # Unavailable device = device assigned to at least one participant
-    def get_unavailable_devices(ignore_disabled=True):
-        if ignore_disabled:
-            return TeraDevice.query.join(TeraDevice.device_participants).all()
-        else:
-            return TeraDevice.query.filter_by(device_enabled=True).join(TeraDevice.device_participants).all()
+    # @staticmethod
+    # # Available device = device not assigned to any participant
+    # def get_available_devices(ignore_disabled=True):
+    #     if ignore_disabled:
+    #         return TeraDevice.query.outerjoin(TeraDevice.device_participants)\
+    #             .filter(TeraDevice.device_participants is None).all()
+    #     else:
+    #         return TeraDevice.query.filter_by(device_enabled=True).outerjoin(TeraDevice.device_participants).\
+    #             filter(TeraDevice.device_participants is None).all()
+    #
+    # @staticmethod
+    # # Unavailable device = device assigned to at least one participant
+    # def get_unavailable_devices(ignore_disabled=True):
+    #     if ignore_disabled:
+    #         return TeraDevice.query.join(TeraDevice.device_participants).all()
+    #     else:
+    #         return TeraDevice.query.filter_by(device_enabled=True).join(TeraDevice.device_participants).all()
 
     @staticmethod
     def create_defaults(test=False):

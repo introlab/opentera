@@ -1,4 +1,3 @@
-import os
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
 from opentera.db.Base import db
@@ -7,12 +6,6 @@ from opentera.db.models.TeraService import TeraService
 
 
 class TeraServiceTest(BaseModelsTest):
-
-    filename = os.path.join(os.path.dirname(__file__), 'TeraServiceTest.db')
-
-    SQLITE = {
-        'filename': filename
-    }
 
     def test_nullable_args(self):
         new_service = TeraService()
@@ -243,7 +236,7 @@ class TeraServiceTest(BaseModelsTest):
         self.assertEqual(json_data['service_endpoint_device'], service.service_endpoint_device)
         self.assertEqual(json_data['service_endpoint_user'], service.service_endpoint_user)
         self.assertEqual(json_data['service_enabled'], service.service_enabled)
-        self.assertFalse('service_system' in json_data)
+        self.assertEqual(json_data['service_system'], service.service_system)
         self.assertEqual(json_data['service_editable_config'], service.service_editable_config)
         self.assertEqual(json_data['service_enabled'], service.service_enabled)
         if minimal:

@@ -1,22 +1,11 @@
-import unittest
-from modules.DatabaseModule.DBManager import DBManager
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from opentera.db.Base import db
-from opentera.config.ConfigManager import ConfigManager
 import uuid
-import os
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
 class TeraParticipantTest(BaseModelsTest):
-
-    filename = os.path.join(os.path.dirname(__file__), 'TeraParticipantTest.db')
-
-    SQLITE = {
-        'filename': filename
-    }
-
 
     def test_token(self):
         return

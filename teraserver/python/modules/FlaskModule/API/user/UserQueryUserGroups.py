@@ -33,6 +33,7 @@ class UserQueryUserGroups(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @staticmethod
     def get_projects_roles_json(user_access, user_group_id: int):

@@ -58,13 +58,17 @@ function initSystem(){
         setTitle(true, 2, local_name);
     }
 
+    // Initial local status
+    localContact.status = {'microMuted': false, 'videoMuted': false, 'speakerMuted': false, 'sharing2ndSource': false};
+
     // Initialize video and audio sources
     fillDefaultSourceList().then(initSystemDone).catch(err => {
         showStatusMsg(translator.translateForKey("status.cant-continue", currentLang))
     })
 
     // Reset forms
-    if ($('#chronosForm')[0] !== undefined) $('#chronosForm')[0].reset();
+    if ($('#chronosForm')[0] !== undefined)
+        $('#chronosForm')[0].reset();
 }
 
 function initSystemDone(){

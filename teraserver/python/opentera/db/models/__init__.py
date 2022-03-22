@@ -1,33 +1,36 @@
 from .TeraAsset import TeraAsset
 from .TeraDevice import TeraDevice
-# from .TeraDeviceData import TeraDeviceData
 from .TeraDeviceParticipant import TeraDeviceParticipant
 from .TeraDeviceProject import TeraDeviceProject
 from .TeraDeviceSubType import TeraDeviceSubType
+from .TeraDeviceType import TeraDeviceType
 from .TeraParticipant import TeraParticipant
 from .TeraParticipantGroup import TeraParticipantGroup
 from .TeraProject import TeraProject
 from .TeraServerSettings import TeraServerSettings
 from .TeraService import TeraService
-from .TeraServiceProject import TeraServiceProject
 from .TeraServiceAccess import TeraServiceAccess
-from .TeraServiceRole import TeraServiceRole
 from .TeraServiceConfig import TeraServiceConfig
 from .TeraServiceConfigSpecific import TeraServiceConfigSpecific
+from .TeraServiceProject import TeraServiceProject
+from .TeraServiceRole import TeraServiceRole
+from .TeraServiceSite import TeraServiceSite
 from .TeraSession import TeraSession
+from .TeraSessionDevices import TeraSessionDevices
 from .TeraSessionEvent import TeraSessionEvent
 from .TeraSessionParticipants import TeraSessionParticipants
-from .TeraSessionUsers import TeraSessionUsers
-from .TeraSessionDevices import TeraSessionDevices
 from .TeraSessionType import TeraSessionType
+from .TeraSessionTypeSite import TeraSessionTypeSite
 from .TeraSessionTypeProject import TeraSessionTypeProject
+from .TeraSessionUsers import TeraSessionUsers
 from .TeraSite import TeraSite
 from .TeraTest import TeraTest
 from .TeraTestType import TeraTestType
 from .TeraUser import TeraUser
 from .TeraUserGroup import TeraUserGroup
 from .TeraUserUserGroup import TeraUserUserGroup
-
+from .TeraUserPreference import TeraUserPreference
+from .TeraUserUserGroup import TeraUserUserGroup
 
 """
     A map containing the event name and class, useful for event filtering. 
@@ -40,6 +43,7 @@ EventNameClassMap = {
     TeraParticipantGroup.get_model_name(): TeraParticipantGroup,
     TeraProject.get_model_name(): TeraProject,
     TeraSession.get_model_name(): TeraSession,
+    TeraSessionType.get_model_name(): TeraSessionType,
     TeraSite.get_model_name(): TeraSite,
     TeraUser.get_model_name(): TeraUser,
     TeraUserGroup.get_model_name(): TeraUserGroup
@@ -48,7 +52,6 @@ EventNameClassMap = {
 # All exported symbols
 __all__ = ['TeraAsset',
            'TeraDevice',
-           # 'TeraDeviceData',
            'TeraDeviceParticipant',
            'TeraDeviceProject',
            'TeraDeviceSubType',
@@ -62,14 +65,15 @@ __all__ = ['TeraAsset',
            'TeraServiceConfig',
            'TeraServiceConfigSpecific',
            'TeraServiceProject',
-           # 'TeraServiceSite',
            'TeraServiceRole',
+           'TeraServiceSite',
            'TeraSession',
            'TeraSessionDevices',
            'TeraSessionEvent',
            'TeraSessionParticipants',
            'TeraSessionType',
            'TeraSessionTypeProject',
+           'TeraSessionTypeSite',
            'TeraSessionUsers',
            'TeraSite',
            'TeraTest',

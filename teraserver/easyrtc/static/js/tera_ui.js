@@ -2,7 +2,6 @@ let localTimerHandles = [0, 0];
 let remoteTimerHandles = [0, 0, 0, 0];
 
 let localScreenSharing = false;
-let localSecondSource = false;
 
 let primaryView = {peerid: 0, streamName: 'default'};
 
@@ -77,7 +76,7 @@ function showButtons(local, show, index){
             if (iconActive === true){
                 screenIcon.show();
             }else{
-                (show === true && (!localSecondSource && local === true)) ? screenIcon.show() : screenIcon.hide();
+                (show === true && (!localContact.status.sharing2ndSource && local === true)) ? screenIcon.show() : screenIcon.hide();
             }
         }
 
@@ -328,7 +327,7 @@ function enlargeView(local, index){
 }
 
 function btnShareScreenClicked(){
-    if (localSecondSource === true){
+    if (localContact.status.sharing2ndSource === true){
         console.warn("Trying to share screen while already having a second video source");
         return;
     }
@@ -382,15 +381,15 @@ function btnShow2ndLocalVideoClicked(){
         return;
     }
 
-    localSecondSource = ! localSecondSource;
+    localContact.status.sharing2ndSource = ! localContact.status.sharing2ndSource;
 
-    share2ndStream(true, localSecondSource);
+    share2ndStream(true, localContact.status.sharing2ndSource);
 
-    updateButtonIconState(localSecondSource, true, 1, "Show2ndVideo");
+    updateButtonIconState(localContact.status.sharing2ndSource, true, 1, "Show2ndVideo");
 
     // Show / Hide screen sharing button
     let btn = getButtonIcon(true, 1, "ShareScreen");
-    (localSecondSource) ? btn.hide() : btn.show();
+    (localContact.status.sharing2ndSource) ? btn.hide() : btn.show();
 }
 
 function btnShow2ndRemoteVideoClicked(index){
@@ -616,6 +615,10 @@ function refreshRemoteStatusIcons(peerid){
 
         if (status.video !== undefined) {
             updateStatusIconState(status.video, false, index + 1, "Video");
+        }
+
+        if (status.sharing2ndSource !== undefined){
+            updateButtonIconState(status.sharing2ndSource, false, index+1, "Show2ndVideo");
         }
     }
 }

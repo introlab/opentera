@@ -45,6 +45,12 @@ class TeraServiceClient:
         backend_response = get(url=self.__backend_url + path, headers=request_headers, verify=False)
         return backend_response
 
+    def get_service_infos(self) -> dict:
+        response = self.do_get_request_to_backend('/api/service/services?uuid_service=' + self.__service_uuid)
+        if response.status_code == 200:
+            return response.json()[0]
+        return {}
+
     def __repr__(self):
         return '<TeraServiceClient - UUID: ' + self.__service_uuid \
                + ', Token: ' + self.__service_token + '>'

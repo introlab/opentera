@@ -21,8 +21,10 @@ class WebRTCModule(BaseModule):
     def setup_rpc_interface(self):
         pass
 
-    def create_webrtc_session(self, room_name, owner_uuid, users: list, participants: list, devices: list,
-                              parameters: dict):
+    def create_webrtc_session(self, session_info):
+
+        room_name = session_info['session_key']
+        owner_uuid = session_info['session_creator_uuid']
         # make sure we kill sessions already started with this owner_uuid or room name
         self.terminate_webrtc_session_with_owner_uuid(owner_uuid)
         self.terminate_webrtc_session_with_room_name(room_name)
@@ -46,18 +48,15 @@ class WebRTCModule(BaseModule):
                           + str(self.config.webrtc_config['external_port']) \
                           + '/webrtc/' + str(port) + '/devices?key=' + key
 
-            if self.launch_node(port=port, key=key, owner=owner_uuid,
-                                users=users, participants=participants, devices=devices, parameters=parameters):
+            if self.launch_node(port=port, key=key, owner=owner_uuid, session_info=session_info):
                 # Return url
                 return True, {'url_users': url_users,
                               'url_participants': url_participants,
                               'url_devices': url_devices,
                               'key': key,
                               'port': port,
-                              'owner': owner_uuid,
-                              'users': users,
-                              'participants': participants,
-                              'devices': devices}
+                              'owner': owner_uuid
+                              }
             else:
                 return False, {'error': 'Process not launched.'}
         else:
@@ -146,7 +145,7 @@ class WebRTCModule(BaseModule):
         self.used_ports.append(port)
         return port
 
-    def launch_node(self, port, key, owner, users, participants, devices, parameters):
+    def launch_node(self, port, key, owner, session_info):
         executable_args = [self.config.webrtc_config['executable'],
                            self.config.webrtc_config['script'],
                            '--port=' + str(port),
@@ -163,9 +162,7 @@ class WebRTCModule(BaseModule):
                                      'port': port,
                                      'key': key,
                                      'owner': owner,
-                                     'users': users,
-                                     'participants': participants,
-                                     'devices': devices})
+                                     'session_info': session_info})
 
             self.logger.log_info(self.module_name, 'launch_node', executable_args, 'pid', str(process.pid))
 

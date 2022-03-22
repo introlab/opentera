@@ -74,7 +74,8 @@ function updateContact(contact)
 {
     //Contact should be a JSON object
     console.log("Update contact : " + contact);
-    localContact = JSON.parse(contact);
+    let receivedContact = JSON.parse(contact);
+    localContact = {...localContact, ...receivedContact}; // Merge values
     //localContact.peerid = local_peerid;
 
     localPTZCapabilities.uuid = localContact.uuid;

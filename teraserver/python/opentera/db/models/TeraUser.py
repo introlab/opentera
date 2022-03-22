@@ -39,7 +39,7 @@ class TeraUser(db.Model, BaseModel):
     # user_sites_access = db.relationship('TeraSiteAccess', cascade="all,delete")
     # user_projects_access = db.relationship("TeraProjectAccess", cascade="all,delete")
     user_user_groups = db.relationship("TeraUserGroup", secondary="t_users_users_groups",
-                                       back_populates="user_group_users")
+                                       back_populates="user_group_users", lazy='joined')
     user_sessions = db.relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users",
                                     passive_deletes=True)
 

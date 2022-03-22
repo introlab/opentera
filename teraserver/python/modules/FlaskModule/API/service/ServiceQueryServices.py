@@ -16,9 +16,10 @@ get_parser.add_argument('with_base_url', type=inputs.boolean, help='Also include
 
 class ServiceQueryServices(Resource):
 
-    def __init__(self, _api, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self, _api)
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @LoginModule.service_token_or_certificate_required
     @api.expect(get_parser)
@@ -34,7 +35,7 @@ class ServiceQueryServices(Resource):
         services = []
         # Can only query service with a key, id or uuid
         if not args['service_key'] and not args['id_service'] and not args['uuid_service']:
-            return gettext('Missing service key, id or uuid', 400)
+            return gettext('Missing service key, id or uuid'), 400
 
         if args['id_service']:
             services = [TeraService.get_service_by_id(args['id_service'])]

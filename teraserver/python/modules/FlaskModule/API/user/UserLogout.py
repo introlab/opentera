@@ -9,7 +9,7 @@ class UserLogout(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
-        self.parser = reqparse.RequestParser()
+        self.test = kwargs.get('test', False)
 
     @api.doc(description='Logout from the server')
     def get(self):

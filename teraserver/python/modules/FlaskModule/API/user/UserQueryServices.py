@@ -16,12 +16,14 @@ from flask_babel import gettext
 get_parser = api.parser()
 get_parser.add_argument('id_service', type=int, help='ID of the service to query')
 get_parser.add_argument('id_project', type=int, help='ID of the project to query services from')
+get_parser.add_argument('id_site', type=int, help='ID of the site to query services from')
 get_parser.add_argument('id', type=int, help='Alias for "id_service"')
-get_parser.add_argument('uuid', type=str, help='Service UUID to query')
-get_parser.add_argument('key', type=str, help='Service Key to query')
+get_parser.add_argument('service_uuid', type=str, help='Service UUID to query')
+get_parser.add_argument('uuid', type=str, help='Alias for "service_uuid"')
+get_parser.add_argument('service_key', type=str, help='Service Key to query')
+get_parser.add_argument('key', type=str, help='Alias for "service_key"')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_config', type=inputs.boolean, help='Only return services with editable configuration')
-get_parser.add_argument('with_projects', type=inputs.boolean, help='Return services with service projects')
 
 
 # post_parser = reqparse.RequestParser()
@@ -39,6 +41,7 @@ class UserQueryServices(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
@@ -57,37 +60,42 @@ class UserQueryServices(Resource):
         if args['id']:
             args['id_service'] = args['id']
 
+        if args['key']:
+            args['service_key'] = args['key']
+
+        if args['uuid']:
+            args['service_uuid'] = args['uuid']
+
         if args['id_service']:
             if args['id_service'] in user_access.get_accessible_services_ids():
                 services = [TeraService.get_service_by_id(args['id_service'])]
-        elif args['uuid']:
+        elif args['service_uuid']:
             # If we have a service uuid, ensure that service is accessible
-            service = TeraService.get_service_by_uuid(args['uuid'])
+            service = TeraService.get_service_by_uuid(args['service_uuid'])
             if service and service.id_service in user_access.get_accessible_services_ids():
                 services = [service]
-        elif args['key']:
-            service = TeraService.get_service_by_key(args['key'])
+        elif args['service_key']:
+            service = TeraService.get_service_by_key(args['service_key'])
             if service and service.id_service in user_access.get_accessible_services_ids():
                 services = [service]
         elif args['id_project']:
-            services = user_access.query_services_for_project(args['id_project'])
+            services = user_access.query_services_for_project(project_id=args['id_project'])
+        elif args['id_site']:
+            services = user_access.query_services_for_site(site_id=args['id_site'])
         else:
             # No arguments - return all acceessible services
-            services = user_access.get_accessible_services(include_system_services=args['with_config'])
+            services = user_access.get_accessible_services()
 
         try:
             services_list = []
 
             for service in services:
+                if service.service_key == 'OpenTeraServer':
+                    continue  # Never return OpenTeraServer service with that API
                 if args['with_config']:
                     if not service.service_editable_config:
                         continue
-                if args['with_projects']:
-                    # Get all current association for service
-                    current_projects = TeraServiceProject.get_projects_for_service(id_service=service.id_service)
-                    service_projects = []
-                    for project in current_projects:
-                        service_projects.append(project.to_json())
+
                 service_json = service.to_json(minimal=args['list'])
                 services_list.append(service_json)
 
@@ -132,19 +140,24 @@ class UserQueryServices(Resource):
             return gettext('Forbidden'), 403
 
         # Manage service roles
+        has_service_roles = False
         service_roles = []
         if 'roles' in json_service:
             service_roles = json_service.pop('roles')
+            has_service_roles = True
 
         # Do the update!
         import jsonschema
         if json_service['id_service'] > 0:
             # Already existing
             try:
-                if 'service_system' in json_service:
-                    service = TeraService.get_service_by_id(json_service['id_service'])
-                    if service.service_system != json_service['service_system']:
-                        return gettext('Can\'t change system services from that API'), 403
+                service = TeraService.get_service_by_id(json_service['id_service'])
+                if service.service_key == 'OpenTeraServer':
+                    return gettext('OpenTera service can\'t be updated using this API'), 403
+                # if 'service_system' in json_service:
+                #     service = TeraService.get_service_by_id(json_service['id_service'])
+                #     if service.service_system != json_service['service_system']:
+                #         return gettext('Can\'t change system services from that API'), 403
                 TeraService.update(json_service['id_service'], json_service)
             except exc.SQLAlchemyError as e:
                 import sys
@@ -176,7 +189,7 @@ class UserQueryServices(Resource):
         update_service = TeraService.get_service_by_id(json_service['id_service'])
 
         # Service roles
-        if len(service_roles) > 0:
+        if has_service_roles:
             # Check if there's some roles for the updated service that we need to delete
             roles_ids = [role['id_service_role'] for role in service_roles]
             id_roles_to_delete = set([role.id_service_role for role in update_service.service_roles]) \

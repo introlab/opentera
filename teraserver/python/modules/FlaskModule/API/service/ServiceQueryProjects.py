@@ -14,9 +14,10 @@ get_parser.add_argument('id_project', type=int, help='ID of the project to query
 
 class ServiceQueryProjects(Resource):
 
-    def __init__(self, _api, flaskModule=None):
-        self.module = flaskModule
-        Resource.__init__(self, _api)
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @LoginModule.service_token_or_certificate_required
     @api.expect(get_parser)

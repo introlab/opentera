@@ -44,10 +44,10 @@ class BaseWebRTCService(ServiceOpenTera):
     @defer.inlineCallbacks
     def register_to_events(self):
         # Need to register to events produced by UserManagerModule
-        ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+        yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
             ModuleNames.USER_MANAGER_MODULE_NAME), self.user_manager_event_received)
 
-        # print(ret1)
+        super().register_to_events()
 
     def send_join_message(self, session_info, join_msg: str = gettext('Join me!'), target_users: list = None,
                           target_participants: list = None, target_devices: list = None):
@@ -84,8 +84,14 @@ class BaseWebRTCService(ServiceOpenTera):
             join_message.session_devices.extend([device_uuid])
         join_message.join_msg = join_msg
         if not parameters:
-            parameters = ''
+            parameters = {}
+
+        # Conversion to str
+        if type(parameters) is dict:
+            parameters = json.dumps(parameters)
+
         join_message.session_parameters = parameters
+
         join_message.service_uuid = self.service_uuid
 
         # Send invitations (as events) for users, participants and devices
@@ -401,14 +407,14 @@ class BaseWebRTCService(ServiceOpenTera):
             elif 'session_creator_service_uuid' in session_info:
                 creator_uuid = session_info['session_creator_service_uuid']
 
+            session_info['session_creator_uuid'] = creator_uuid
+
             # New WebRTC process with send events on this pattern
             self.subscribe_pattern_with_callback('webrtc.' + session_info['session_key'],
                                                  self.nodejs_webrtc_message_callback)
 
             # Start WebRTC process
-            retval, process_info = self.webRTCModule.create_webrtc_session(
-                session_info['session_key'], creator_uuid, users, participants, devices,
-                session_info['session_parameters'])
+            retval, process_info = self.webRTCModule.create_webrtc_session(session_info)
 
             if not retval or not process_info:
                 self.unsubscribe_pattern_with_callback('webrtc.' + session_info['session_key'],

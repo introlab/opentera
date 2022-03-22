@@ -52,7 +52,7 @@ class DBManager:
         self.upgrade_db()
 
     def open_local(self, db_infos, echo=False):
-        self.db_uri = 'sqlite:///%(filename)s' % db_infos
+        self.db_uri = 'sqlite://'
 
         flask_app.config.update({
             'SQLALCHEMY_DATABASE_URI': self.db_uri,

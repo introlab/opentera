@@ -36,6 +36,7 @@ class UserQueryUserStats(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @user_multi_auth.login_required
     @api.expect(get_parser)
@@ -79,7 +80,9 @@ class UserQueryUserStats(Resource):
                                                                   args['with_participants'])
 
         if args['id_session']:
-            if not args['id_session'] in user_access.get_accessible_sessions_ids():
+            # if not args['id_session'] in user_access.get_accessible_sessions_ids():
+            #     return gettext('Forbidden'), 403
+            if not user_access.query_session(session_id=args['id_session']):
                 return gettext('Forbidden'), 403
             return UserQueryUserStats.get_session_stats(user_access, args['id_session'])
 
@@ -129,7 +132,11 @@ class UserQueryUserStats(Resource):
     @staticmethod
     def get_site_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool, with_warnings: bool) \
             -> dict:
-        from opentera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+        from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
+        from opentera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraDeviceSite import TeraDeviceSite
+
         site_projects = user_access.query_projects_for_site(item_id)
         site_users = user_access.query_users_for_site(site_id=item_id)
         site_users_enabled = user_access.query_users_for_site(site_id=item_id, enabled_only=True)
@@ -137,16 +144,18 @@ class UserQueryUserStats(Resource):
         participants_total = 0
         participants_enabled = 0
         sessions_total = 0
-        devices = []
+        # devices = []
         for project in site_projects:
-            site_groups_total += len(project.project_participants_groups)
-            participants_total += len(project.project_participants)
-            participants_enabled += len([part for part in project.project_participants if part.participant_enabled])
-            devices.extend([device.id_device for device in project.project_devices])
+            site_groups_total += TeraParticipantGroup.count_with_filters({'id_project': project.id_project})
+            participants_total += TeraParticipant.count_with_filters({'id_project': project.id_project})
+            participants_enabled += TeraParticipant.count_with_filters({'id_project': project.id_project,
+                                                                        'participant_enabled': True})
+            # devices.extend([device.id_device for device in project.project_devices])
             for part in project.project_participants:
-                sessions_total += len(TeraSession.get_sessions_for_participant(part.id_participant))
+                sessions_total += TeraSessionParticipants.get_session_count_for_participant(
+                    id_participant=part.id_participant)
 
-        devices = set(devices)  # Remove duplicates
+        # devices = set(devices)  # Remove duplicates
         stats = {'users_total_count': len(site_users),
                  'users_enabled_count': len(site_users_enabled),
                  'projects_count': len(site_projects),
@@ -154,7 +163,7 @@ class UserQueryUserStats(Resource):
                  'participants_total_count': participants_total,
                  'participants_enabled_count': participants_enabled,
                  'sessions_total_count': sessions_total,
-                 'devices_total_count': len(devices)
+                 'devices_total_count': TeraDeviceSite.count_with_filters({'id_site': item_id})
                  }
         # Add participants information?
         participants = []
@@ -234,7 +243,7 @@ class UserQueryUserStats(Resource):
 
     @staticmethod
     def get_project_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool) -> dict:
-        from opentera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
         from opentera.db.models.TeraProject import TeraProject
         project_users = user_access.query_users_for_project(project_id=item_id)
         project_users_enabled = user_access.query_users_for_project(project_id=item_id, enabled_only=True)
@@ -244,7 +253,8 @@ class UserQueryUserStats(Resource):
         participants_enabled = len([part for part in project.project_participants if part.participant_enabled])
         sessions_total = 0
         for part in project.project_participants:
-            sessions_total += len(TeraSession.get_sessions_for_participant(part.id_participant))
+            sessions_total += TeraSessionParticipants.get_session_count_for_participant(
+                    id_participant=part.id_participant)
 
         stats = {'users_total_count': len(project_users),
                  'users_enabled_count': len(project_users_enabled),
@@ -265,7 +275,7 @@ class UserQueryUserStats(Resource):
     @staticmethod
     def get_participant_group_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool) -> dict:
         # from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
-        from opentera.db.models.TeraSession import TeraSession
+        from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
         # group = TeraParticipantGroup.get_participant_group_by_id(item_id)
         participants = user_access.query_participants_for_group(item_id)
         participants_total = len(participants)
@@ -273,7 +283,9 @@ class UserQueryUserStats(Resource):
         participants_enabled = len([part for part in participants if part.participant_enabled])
         sessions_total = 0
         for part in participants:
-            sessions_total += len(TeraSession.get_sessions_for_participant(part.id_participant))
+            sessions_total += TeraSessionParticipants.get_session_count_for_participant(
+                    id_participant=part.id_participant)
+            # len(TeraSession.get_sessions_for_participant(part.id_participant))
 
         stats = {'participants_total_count': participants_total,
                  'participants_enabled_count': participants_enabled,
@@ -305,13 +317,18 @@ class UserQueryUserStats(Resource):
     def get_participant_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:
         from opentera.db.models.TeraParticipant import TeraParticipant
         from opentera.db.models.TeraSession import TeraSessionStatus
+        from opentera.db.models.TeraAsset import TeraAsset
         participant = TeraParticipant.get_participant_by_id(item_id)
         sessions_total_time = sum([ses.session_duration for ses in participant.participant_sessions])
-        sessions_mean_time = sessions_total_time / len(participant.participant_sessions)
-        sessions_assets_total = sum([len(ses.session_assets) for ses in participant.participant_sessions])
-        users_involved = set()
-        for ses in participant.participant_sessions:
-            users_involved = users_involved.union(set([user for user in ses.session_users]))
+        if len(participant.participant_sessions) > 0:
+            sessions_mean_time = sessions_total_time / len(participant.participant_sessions)
+        else:
+            sessions_mean_time = 0
+        sessions_assets_total = len(TeraAsset.get_assets_for_participant(item_id))
+        # sum([len(ses.session_assets) for ses in participant.participant_sessions])
+        # users_involved = set()
+        # for ses in participant.participant_sessions:
+        #     users_involved = users_involved.union(set([user for user in ses.session_users]))
 
         stats = {'sessions_total_count': len(participant.participant_sessions),
                  'sessions_total_time': sessions_total_time,
@@ -326,7 +343,7 @@ class UserQueryUserStats(Resource):
                                                   if ses.session_status == TeraSessionStatus.STATUS_CANCELLED.value]),
                  'sessions_terminated_count': len([ses.id_session for ses in participant.participant_sessions
                                                   if ses.session_status == TeraSessionStatus.STATUS_TERMINATED.value]),
-                 'users_total_count': len(users_involved),
+                 # 'users_total_count': len(users_involved),
                  'assets_total_count': sessions_assets_total,
                  'tests_total_count': 0}
         return stats
