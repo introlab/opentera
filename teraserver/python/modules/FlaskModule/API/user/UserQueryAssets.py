@@ -98,6 +98,9 @@ class UserQueryAssets(Resource):
         else:
             return gettext('Missing argument'), 400
 
+        if not assets:
+            return []
+
         assets_list = []
         access_token = None
         servername = self.module.config.server_config['hostname']

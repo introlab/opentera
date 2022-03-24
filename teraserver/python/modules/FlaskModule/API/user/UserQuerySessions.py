@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSession import TeraSession
@@ -49,7 +49,6 @@ class UserQuerySessions(Resource):
                         400: 'No parameters specified at least one id must be used',
                         500: 'Database error'})
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         parser = get_parser
@@ -119,7 +118,6 @@ class UserQuerySessions(Resource):
         # parser = post_parser
         from opentera.db.models.TeraDevice import TeraDevice
 
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:
@@ -232,7 +230,6 @@ class UserQuerySessions(Resource):
     def delete(self):
         parser = delete_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = parser.parse_args()
