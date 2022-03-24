@@ -36,5 +36,6 @@ OpenTera is based or uses the following Open Source technologies :
 * Cynthia Vilanova
 
 # Acknowledgements
-This project is supported by [IntRoLab - Intelligent / Interactive / Integrated / Interdisciplinary Robot Lab](https://introlab.3it.usherbrooke.ca/), Sherbrooke, Québec, Canada.
+This project is supported by [IntRoLab - Intelligent / Interactive / Integrated / Interdisciplinary Robot Lab](https://introlab.3it.usherbrooke.ca/), Sherbrooke, Québec, Canada,
+by [Regroupement INTER](https://www.regroupementinter.com) and by the [Centre de recherche sur le vieillissement de Sherbrooke](https://www.cdrv.ca), Sherbrooke, Québec, Canada.
 

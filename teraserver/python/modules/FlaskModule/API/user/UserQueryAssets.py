@@ -97,6 +97,9 @@ class UserQueryAssets(Resource):
             assets = user_access.query_assets_associated_to_service(args['service_uuid'])
         else:
             return gettext('Missing argument'), 400
+          
+        if not assets:
+            return []
 
         assets_list = []
         access_token = None
@@ -123,6 +126,7 @@ class UserQueryAssets(Resource):
             #                                           expiration=1800)
             # if args['with_only_token']:
             #     return {'access_token': access_token}
+
 
         for asset in assets:
             if args['with_only_token']:

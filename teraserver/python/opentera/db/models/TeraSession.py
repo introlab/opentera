@@ -58,8 +58,7 @@ class TeraSession(db.Model, BaseModel):
                               'session_creator_participant', 'session_creator_service', 'session_session_type',
                               'session_events', 'session_users', 'session_devices', 'session_assets'])
         if minimal:
-            ignore_fields.extend(['session_comments', 'session_duration', 'session_start_datetime',
-                                  'session_parameters'])
+            ignore_fields.extend(['session_comments', 'session_parameters'])
 
         rval = super().to_json(ignore_fields=ignore_fields)
 
@@ -92,20 +91,19 @@ class TeraSession(db.Model, BaseModel):
                                         'device_uuid': device.device_uuid,
                                         'device_name': device.device_name}
                                        for device in self.session_devices]
-
-            # Append user name
-            if self.session_creator_user:
-                rval['session_creator_user'] = self.session_creator_user.get_fullname()
-                rval['session_creator_user_uuid'] = self.session_creator_user.user_uuid
-            if self.session_creator_device:
-                rval['session_creator_device'] = self.session_creator_device.device_name
-                rval['session_creator_device_uuid'] = self.session_creator_device.device_uuid
-            if self.session_creator_participant:
-                rval['session_creator_participant'] = self.session_creator_participant.participant_name
-                rval['session_creator_participant_uuid'] = self.session_creator_participant.participant_uuid
-            if self.session_creator_service:
-                rval['session_creator_service'] = self.session_creator_service.service_name
-                rval['session_creator_service_uuid'] = self.session_creator_service.service_uuid
+        # Append creator name
+        if self.session_creator_user:
+            rval['session_creator_user'] = self.session_creator_user.get_fullname()
+            rval['session_creator_user_uuid'] = self.session_creator_user.user_uuid
+        if self.session_creator_device:
+            rval['session_creator_device'] = self.session_creator_device.device_name
+            rval['session_creator_device_uuid'] = self.session_creator_device.device_uuid
+        if self.session_creator_participant:
+            rval['session_creator_participant'] = self.session_creator_participant.participant_name
+            rval['session_creator_participant_uuid'] = self.session_creator_participant.participant_uuid
+        if self.session_creator_service:
+            rval['session_creator_service'] = self.session_creator_service.service_name
+            rval['session_creator_service_uuid'] = self.session_creator_service.service_uuid
 
         # Append session stats
         from opentera.db.models.TeraAsset import TeraAsset

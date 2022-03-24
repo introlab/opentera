@@ -37,3 +37,4 @@ python-slugify==5.0.2
 websocket-client==1.2.1
 pytest==6.2.5
 jsonschema==4.2.1
+Jinja2==3.0.3

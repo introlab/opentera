@@ -1,9 +1,6 @@
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse, inputs
-from sqlalchemy import exc
-from modules.LoginModule.LoginModule import user_multi_auth
+from flask_restx import Resource, inputs
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipant import TeraParticipant
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager, DBManagerTeraUserAccess
@@ -47,7 +44,6 @@ class UserQueryUserStats(Resource):
     def get(self):
         parser = get_parser
 
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         args = parser.parse_args()
 
         user_access = DBManager.userAccess(current_user)
@@ -136,10 +132,10 @@ class UserQueryUserStats(Resource):
         from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
         from opentera.db.models.TeraParticipant import TeraParticipant
         from opentera.db.models.TeraDeviceSite import TeraDeviceSite
-
         site_projects = user_access.query_projects_for_site(item_id)
         site_users = user_access.query_users_for_site(site_id=item_id)
-        site_users_enabled = user_access.query_users_for_site(site_id=item_id, enabled_only=True)
+        site_users_enabled = [user for user in site_users if user.user_enabled]
+        # site_users_enabled = user_access.query_users_for_site(site_id=item_id, enabled_only=True)
         site_groups_total = 0
         participants_total = 0
         participants_enabled = 0
@@ -150,7 +146,7 @@ class UserQueryUserStats(Resource):
             participants_total += TeraParticipant.count_with_filters({'id_project': project.id_project})
             participants_enabled += TeraParticipant.count_with_filters({'id_project': project.id_project,
                                                                         'participant_enabled': True})
-            # devices.extend([device.id_device for device in project.project_devices])
+
             for part in project.project_participants:
                 sessions_total += TeraSessionParticipants.get_session_count_for_participant(
                     id_participant=part.id_participant)
@@ -226,7 +222,7 @@ class UserQueryUserStats(Resource):
                                               'months': diff_month})
                 else:
                     updated_date = datetime.datetime.fromtimestamp(user.version_id/1000)
-                    diff_month = UserQueryUserStats.diff_month(today,updated_date)
+                    diff_month = UserQueryUserStats.diff_month(today, updated_date)
                     if diff_month >= 1:
                         warning_neverlogged_users.append({'id_user': user.id_user,
                                                           'user_fullname': user.get_fullname(),

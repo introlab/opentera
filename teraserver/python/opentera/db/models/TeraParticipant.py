@@ -4,7 +4,6 @@ from opentera.db.models.TeraServerSettings import TeraServerSettings
 
 import uuid
 import jwt
-import time
 import datetime
 from passlib.hash import bcrypt
 
@@ -81,7 +80,6 @@ class TeraParticipant(db.Model, BaseModel):
         return jwt.encode(payload, token_key, algorithm='HS256')
 
     def create_token(self):
-        import random
         # Creating token with user info
         payload = {
             'iss': 'TeraServer',

@@ -548,9 +548,6 @@ class DBManagerTeraUserAccess:
         proj_ids = self.get_accessible_projects_ids()
         projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids))
 
-        if site_id:
-            projects = projects.filter(TeraProject.id_site == site_id)
-
         return projects.all()
 
     def query_projects_for_session_type(self, session_type_id: int, include_other_projects: bool = False):
@@ -759,9 +756,7 @@ class DBManagerTeraUserAccess:
         return device_parts
 
     def query_session(self, session_id: int):
-        from opentera.db.models.TeraParticipant import TeraParticipant
         from opentera.db.models.TeraSession import TeraSession
-        from opentera.db.models.TeraSessionUsers import TeraSessionUsers
 
         # session = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users)\
         #     .filter(and_(TeraSession.id_session == session_id),
@@ -1173,27 +1168,43 @@ class DBManagerTeraUserAccess:
 
     def query_asset(self, asset_id: int = None, asset_uuid: str = None):
         from opentera.db.models.TeraAsset import TeraAsset
-        from sqlalchemy import or_
+        # from sqlalchemy import or_
 
         if not asset_id and not asset_uuid:
             return None
 
+
+        if asset_id:
+            asset: TeraAsset = TeraAsset.get_asset_by_id(asset_id)
+        elif asset_uuid:
+            asset: TeraAsset = TeraAsset.get_asset_by_uuid(asset_uuid)
+        else:
+            return None
+
+        asset_session = self.query_session(asset.id_session)
+        if not asset_session:
+            # No access to asset session
+            return None
+
+        if asset.asset_service_uuid not in [service.service_uuid for service in self.get_accessible_services()]:
+            return None
         # If a user has access to a session, it should have access to its assets
-        session_ids = self.get_accessible_sessions_ids()
+        # session_ids = self.get_accessible_sessions_ids()
         # device_ids = self.get_accessible_devices_ids()
         # participant_ids = self.get_accessible_participants_ids()
         # user_ids = self.get_accessible_users_ids()
-        service_ids = self.get_accessible_services_ids()
-
-        query = TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids))\
-            .filter(or_(TeraAsset.id_service.in_(service_ids), TeraAsset.id_service == None))
-
-        if asset_id:
-            query = query.filter(TeraAsset.id_asset == asset_id)
-        elif asset_uuid:
-            query = query.filter(TeraAsset.asset_uuid == asset_uuid)
-
-        return query.all()
+        # service_ids = self.get_accessible_services_ids()
+        #
+        # query = TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids))\
+        #     .filter(or_(TeraAsset.id_service.in_(service_ids), TeraAsset.id_service == None))
+        #
+        # if asset_id:
+        #     query = query.filter(TeraAsset.id_asset == asset_id)
+        # elif asset_uuid:
+        #     query = query.filter(TeraAsset.asset_uuid == asset_uuid)
+        #
+        # return query.all()
+        return [asset]
 
     #     .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None)) \
     #     .filter(or_(TeraAsset.id_participant.in_(participant_ids), TeraAsset.id_participant == None)) \

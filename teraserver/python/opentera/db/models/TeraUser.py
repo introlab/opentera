@@ -1,7 +1,6 @@
 from opentera.db.Base import db, BaseModel
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
-from flask_sqlalchemy import event
 
 from passlib.hash import bcrypt
 import uuid
