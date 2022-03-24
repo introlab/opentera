@@ -131,6 +131,7 @@ class UserQueryUserStats(Resource):
         from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
         from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
         from opentera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraDeviceSite import TeraDeviceSite
         site_projects = user_access.query_projects_for_site(item_id)
         site_users = user_access.query_users_for_site(site_id=item_id)
         site_users_enabled = [user for user in site_users if user.user_enabled]
