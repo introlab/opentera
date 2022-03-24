@@ -35,11 +35,10 @@ class TeraSession(db.Model, BaseModel):
     session_parameters = db.Column(db.String, nullable=True)
 
     session_participants = db.relationship("TeraParticipant", secondary="t_sessions_participants",
-                                           back_populates="participant_sessions", lazy='joined')
-    session_users = db.relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions",
-                                    lazy='joined')
+                                           back_populates="participant_sessions")
+    session_users = db.relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions")
     session_devices = db.relationship("TeraDevice", secondary="t_sessions_devices",
-                                      back_populates="device_sessions", lazy='joined')
+                                      back_populates="device_sessions")
 
     session_creator_user = db.relationship('TeraUser')
     session_creator_device = db.relationship('TeraDevice')

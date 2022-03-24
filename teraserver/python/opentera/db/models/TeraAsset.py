@@ -35,12 +35,12 @@ class TeraAsset(db.Model, BaseModel):
     asset_type = db.Column(db.String, nullable=False)  # MIME Type
     asset_datetime = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
 
-    asset_session = db.relationship("TeraSession", back_populates='session_assets', lazy='joined')
-    asset_device = db.relationship("TeraDevice", back_populates='device_assets', lazy='joined')
-    asset_user = db.relationship("TeraUser", lazy='joined')
-    asset_participant = db.relationship("TeraParticipant", lazy='joined')
-    asset_service = db.relationship("TeraService", foreign_keys="TeraAsset.id_service", lazy='joined')
-    asset_service_owner = db.relationship("TeraService", foreign_keys="TeraAsset.asset_service_uuid", lazy='joined')
+    asset_session = db.relationship("TeraSession", back_populates='session_assets')
+    asset_device = db.relationship("TeraDevice", back_populates='device_assets')
+    asset_user = db.relationship("TeraUser")
+    asset_participant = db.relationship("TeraParticipant")
+    asset_service = db.relationship("TeraService", foreign_keys="TeraAsset.id_service")
+    asset_service_owner = db.relationship("TeraService", foreign_keys="TeraAsset.asset_service_uuid")
 
     def from_json(self, json, ignore_fields=None):
         if ignore_fields is None:

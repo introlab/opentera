@@ -39,13 +39,13 @@ class TeraParticipant(db.Model, BaseModel):
     id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
 
     participant_devices = db.relationship("TeraDevice", secondary="t_devices_participants",
-                                          back_populates="device_participants", viewonly=True, lazy='joined')
+                                          back_populates="device_participants", viewonly=True)
 
     participant_sessions = db.relationship("TeraSession", secondary="t_sessions_participants",
                                            back_populates="session_participants", passive_deletes=True)
 
     participant_participant_group = db.relationship("TeraParticipantGroup",
-                                                    back_populates='participant_group_participants', lazy='joined')
+                                                    back_populates='participant_group_participants')
 
     participant_project = db.relationship("TeraProject", back_populates='project_participants', lazy='joined')
 
