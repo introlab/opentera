@@ -1,4 +1,5 @@
 from sqlalchemy import true
+from typing import List
 
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraUserGroup import TeraUserGroup
@@ -1171,6 +1172,7 @@ class DBManagerTeraUserAccess:
 
         if not asset_id and not asset_uuid:
             return None
+
 
         if asset_id:
             asset: TeraAsset = TeraAsset.get_asset_by_id(asset_id)

@@ -131,7 +131,6 @@ class UserQueryUserStats(Resource):
         from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
         from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
         from opentera.db.models.TeraParticipant import TeraParticipant
-
         site_projects = user_access.query_projects_for_site(item_id)
         site_users = user_access.query_users_for_site(site_id=item_id)
         site_users_enabled = [user for user in site_users if user.user_enabled]
@@ -159,7 +158,7 @@ class UserQueryUserStats(Resource):
                  'participants_total_count': participants_total,
                  'participants_enabled_count': participants_enabled,
                  'sessions_total_count': sessions_total,
-                 'devices_total_count': 0 # TeraDeviceSite.count_with_filters({'id_site': item_id})
+                 'devices_total_count': TeraDeviceSite.count_with_filters({'id_site': item_id})
                  }
         # Add participants information?
         participants = []
