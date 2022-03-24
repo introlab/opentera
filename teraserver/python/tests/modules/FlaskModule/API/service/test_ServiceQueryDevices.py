@@ -3,6 +3,8 @@ from typing import List
 from BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraDeviceSubType import TeraDeviceSubType
+from opentera.db.models.TeraDeviceType import TeraDeviceType
 
 
 class ServiceQueryDevicesTest(BaseServiceAPITest):
@@ -71,7 +73,8 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
             self.assertFalse('device_subtype' in response.json)
             self.assertFalse('device_assets' in response.json)
             device_json = device.to_json()
-            device_json['device_type'] = device.device_type.to_json(minimal=True)
+            device_json['device_type'] = TeraDeviceType.get_device_type_by_id(device.id_device_type).\
+                to_json(minimal=True)
             self.assertEqual(device_json, response.json)
 
     def test_get_endpoint_with_token_auth_with_device_uuid_and_device_subtype(self):
@@ -88,28 +91,10 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
             self.assertFalse('device_assets' in response.json)
 
             device_json = device.to_json()
-            if device.device_subtype is not None:
-                device_json['device_subtype'] = device.device_subtype.to_json(minimal=True)
-            else:
-                device_json['device_subtype'] = None
-            self.assertEqual(device_json, response.json)
 
-    def test_get_endpoint_with_token_auth_with_device_uuid_and_device_subtype(self):
-        # Get all devices from DB
-        devices: List[TeraDevice] = TeraDevice.query.all()
-        for device in devices:
-            device_uuid: str = device.device_uuid
-            params = {'device_uuid': device_uuid, 'with_device_subtype': True}
-            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
-                                                         params=params, endpoint=self.test_endpoint)
-            self.assertEqual(200, response.status_code)
-            self.assertFalse('device_type' in response.json)
-            self.assertTrue('device_subtype' in response.json)
-            self.assertFalse('device_assets' in response.json)
-
-            device_json = device.to_json()
-            if device.device_subtype is not None:
-                device_json['device_subtype'] = device.device_subtype.to_json(minimal=True)
+            if device.id_device_subtype is not None:
+                device_subtype = TeraDeviceSubType.get_device_subtype_by_id(device.id_device_subtype)
+                device_json['device_subtype'] = device_subtype.to_json(minimal=True)
             else:
                 device_json['device_subtype'] = None
             self.assertEqual(device_json, response.json)

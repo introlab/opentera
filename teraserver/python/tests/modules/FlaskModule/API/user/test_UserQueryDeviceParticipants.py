@@ -4,6 +4,7 @@ from BaseUserAPITest import BaseUserAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 from opentera.db.models.TeraDeviceType import TeraDeviceType
@@ -65,22 +66,24 @@ class UserQueryDeviceParticipantsTest(BaseUserAPITest):
                 self.assertTrue(response.json[index]['id_participant'] in participant_ids)
 
     def test_get_endpoint_with_http_auth_admin_and_id_participant(self):
-        participants: List[TeraParticipant] = TeraParticipant.query.all()
+        device_participants: List[TeraDeviceParticipant] = TeraDeviceParticipant.query.all()
 
-        for participant in participants:
+        for device_participant in device_participants:
             params = {
-                'id_participant': participant.id_participant,
+                'id_participant': device_participant.id_participant,
                 'list': True
             }
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
             # self.session.add(participant)  # Required for lazy loading
-            self.assertEqual(len(participant.participant_devices), len(response.json))
+            real_device_participants = TeraDeviceParticipant.query_devices_for_participant(
+                device_participant.id_participant)
+            self.assertEqual(len(real_device_participants), len(response.json))
 
             # Assuming same order here
             for index in range(len(response.json)):
-                self.assertEqual(participant.participant_devices[index].id_device,
+                self.assertEqual(real_device_participants[index].id_device,
                                  response.json[index]['id_device'])
 
     def test_get_endpoint_with_http_auth_admin_and_id_site(self):

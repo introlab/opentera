@@ -8,8 +8,8 @@ class TeraDeviceProject(db.Model, BaseModel):
     id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
     id_project = db.Column(db.Integer, db.ForeignKey("t_projects.id_project", ondelete='cascade'), nullable=False)
 
-    device_project_project = db.relationship("TeraProject", viewonly=True, lazy='joined')
-    device_project_device = db.relationship("TeraDevice", viewonly=True, lazy='joined')
+    device_project_project = db.relationship("TeraProject", viewonly=True)
+    device_project_device = db.relationship("TeraDevice", viewonly=True)
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['device_project_project', 'device_project_device'])
