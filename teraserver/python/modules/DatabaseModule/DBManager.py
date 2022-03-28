@@ -1,6 +1,6 @@
 from flask_sqlalchemy import event
 from sqlalchemy.engine import Engine
-from sqlalchemy.schema import MetaData
+from sqlalchemy.engine.reflection import Inspector
 from sqlite3 import Connection as SQLite3Connection
 
 from twisted.internet import task, reactor
@@ -40,6 +40,7 @@ from opentera.db.models.TeraUserPreference import TeraUserPreference
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraServiceConfig import TeraServiceConfig
+from opentera.db.models.TeraTestType import TeraTestType
 
 from opentera.config.ConfigManager import ConfigManager
 from modules.FlaskModule.FlaskModule import flask_app
@@ -252,6 +253,10 @@ class DBManager (BaseModule):
             print('No service config - creating defaults')
             TeraServiceConfig.create_defaults(test)
 
+        if TeraTestType.get_count() == 0:
+            print('No test types - creating defaults')
+            TeraTestType.create_defaults(test)
+
     def setup_events(self):
         # TODO Add events that need to be sent through redis
         # TODO Useful to specify event name, always get_model_name() ?
@@ -275,10 +280,9 @@ class DBManager (BaseModule):
 
         # Init tables
         # db.drop_all()
-        metadata_obj = MetaData()
-        metadata_obj.reflect(bind=db.engine)
+        inspector = Inspector.from_engine(db.engine)
+        tables = inspector.get_table_names()
         # tables = db.engine.table_names()
-        tables = metadata_obj.tables
         if not tables:
             # Create all tables
             db.create_all()
@@ -312,10 +316,9 @@ class DBManager (BaseModule):
         db.app = flask_app
 
         # Init tables
-        metadata_obj = MetaData()
-        metadata_obj.reflect(bind=db.engine)
+        inspector = Inspector.from_engine(db.engine)
+        tables = inspector.get_table_names()
         # tables = db.engine.table_names()
-        tables = metadata_obj.tables
         if not tables:
             # Create all tables
             db.create_all()
