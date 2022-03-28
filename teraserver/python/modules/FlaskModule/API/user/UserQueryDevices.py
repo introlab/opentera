@@ -4,6 +4,8 @@ from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraSite import TeraSite
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
 from modules.DatabaseModule.DBManager import DBManager, TeraDeviceProject
@@ -233,7 +235,6 @@ class UserQueryDevices(Resource):
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
                         500: 'Internal error occured when saving device'})
     def post(self):
-        from opentera.db.models.TeraProject import TeraProject
         # parser = post_parser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
@@ -261,9 +262,21 @@ class UserQueryDevices(Resource):
                     return gettext('No site admin access for at a least one project in the list'), 403
             update_device_projects = True
 
+        device_sites_ids = []
+        update_device_sites = False
+        if 'device_sites' in json_device:
+            device_sites = json_device.pop('device_sites')
+            # Check if the current user is site admin in all of those sites
+            device_sites_ids = [site['id_site'] for site in device_sites]
+
+            for site_id in device_sites_ids:
+                if user_access.get_site_role(site_id) != 'admin':
+                    return gettext('No site admin access for at a least one site in the list'), 403
+            update_device_sites = True
+
         # New devices can only be added by super admins or by site admins
         if json_device['id_device'] == 0:
-            if not current_user.user_superadmin and not update_device_projects:
+            if not current_user.user_superadmin and not update_device_projects and not update_device_sites:
                 return gettext('Forbidden'), 403
         else:
             # Check if current user can modify the posted device
@@ -317,6 +330,27 @@ class UserQueryDevices(Resource):
                 return gettext('Database error'), 500
 
         update_device = TeraDevice.get_device_by_id(json_device['id_device'])
+
+        # Update device sites, if needed
+        if update_device_sites:
+            if new_device:
+                # New device - directly update the list
+                update_device.device_sites = [TeraSite.get_site_by_id(site_id) for site_id in device_sites_ids]
+                update_device.commit()
+            else:
+                # Updated device - first, we add sites not already there
+                update_device_current_sites = [site.id_site for site in update_device.device_sites]
+                sites_to_add = set(device_sites_ids).difference(update_device_current_sites)
+                update_device.device_sites.extend([TeraSite.get_site_by_id(site_id) for site_id in sites_to_add])
+
+                # Then, we delete sites that the current user has access, but are not present in the posted list,
+                # without touching sites already there
+                current_user_sites = user_access.get_accessible_sites_ids(admin_only=True)
+                update_device_current_sites.extend(list(sites_to_add))
+                missing_sites = set(current_user_sites).difference(device_sites_ids)
+                for site_id in missing_sites:
+                    update_device.device_sites.remove(TeraSite.get_site_by_id(site_id))
+                update_device.commit()
 
         # Update device projects, if needed
         if update_device_projects:
