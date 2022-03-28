@@ -1,5 +1,6 @@
 from flask_sqlalchemy import event
 from sqlalchemy.engine import Engine
+from sqlalchemy.schema import MetaData
 from sqlite3 import Connection as SQLite3Connection
 
 from twisted.internet import task, reactor
@@ -274,7 +275,10 @@ class DBManager (BaseModule):
 
         # Init tables
         # db.drop_all()
-        tables = db.engine.table_names()
+        metadata_obj = MetaData()
+        metadata_obj.reflect(bind=db.engine)
+        # tables = db.engine.table_names()
+        tables = metadata_obj.tables
         if not tables:
             # Create all tables
             db.create_all()
@@ -308,7 +312,10 @@ class DBManager (BaseModule):
         db.app = flask_app
 
         # Init tables
-        tables = db.engine.table_names()
+        metadata_obj = MetaData()
+        metadata_obj.reflect(bind=db.engine)
+        # tables = db.engine.table_names()
+        tables = metadata_obj.tables
         if not tables:
             # Create all tables
             db.create_all()
