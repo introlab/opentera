@@ -68,7 +68,7 @@ class TeraTestType(db.Model, BaseModel):
 
     @staticmethod
     def get_test_type_by_id(test_type_id: int):
-        return TeraTestType.query.filter_by(test_type_id=test_type_id).first()
+        return TeraTestType.query.filter_by(id_test_type=test_type_id).first()
 
     @staticmethod
     def get_test_types_for_service(id_service: int):

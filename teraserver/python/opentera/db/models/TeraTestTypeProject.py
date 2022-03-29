@@ -43,7 +43,7 @@ class TeraTestTypeProject(db.Model, BaseModel):
             db.session.add(ttp)
 
             ttp = TeraTestTypeProject()
-            ttp.id_session_type = post_test.id_session_type
+            ttp.id_test_type = post_test.id_test_type
             ttp.id_project = project.id_project
             db.session.add(ttp)
 
