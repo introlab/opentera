@@ -15,6 +15,9 @@ class TeraTestTypeProject(db.Model, BaseModel):
     test_type_project_project = db.relationship("TeraProject", viewonly=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
+        if ignore_fields is None:
+            ignore_fields = []
+
         ignore_fields.extend(['test_type_project_test_type', 'test_type_project_project'])
 
         if minimal:
@@ -104,7 +107,7 @@ class TeraTestTypeProject(db.Model, BaseModel):
         from opentera.db.models.TeraProject import TeraProject
         project = TeraProject.get_project_by_id(project_id=ttp.id_project)
         tt_site = TeraTestTypeSite.get_test_type_site_for_test_type_and_site(site_id=project.id_site,
-                                                                             test_type_id=ttp.id_session_type)
+                                                                             test_type_id=ttp.id_test_type)
         if not tt_site:
             raise IntegrityError(params='Test type not associated to project site',
                                  orig='TeraTestTypeProject.insert', statement='insert')

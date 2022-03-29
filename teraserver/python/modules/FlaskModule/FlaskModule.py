@@ -168,6 +168,8 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserRefreshToken import UserRefreshToken
         from modules.FlaskModule.API.user.UserQueryVersions import UserQueryVersions
         from modules.FlaskModule.API.user.UserQueryTestTypeSites import UserQueryTestTypeSites
+        from modules.FlaskModule.API.user.UserQueryTestTypeProjects import UserQueryTestTypeProjects
+
         # Resources
         user_api_ns.add_resource(UserQueryAssets,               '/assets', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDevices,              '/devices', resource_class_kwargs=kwargs)
@@ -204,6 +206,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQuerySites,                '/sites', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySiteAccess,           '/siteaccess', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUserStats,            '/stats', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryTestTypeProjects,     '/testtypes/projects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryTestTypeSites,        '/testtypes/sites', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUsers,                '/users', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryOnlineUsers,          '/users/online', resource_class_kwargs=kwargs)

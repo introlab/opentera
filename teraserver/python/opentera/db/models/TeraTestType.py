@@ -58,7 +58,7 @@ class TeraTestType(db.Model, BaseModel):
             test = TeraTestType()
             test.test_type_name = 'General survey'
             test.test_type_description = 'General satisfaction survey'
-            test.id_service = TeraService.get_service_by_key('BureauActif').id_service
+            test.id_service = TeraService.get_service_by_key('FileTransferService').id_service
             test.test_type_uuid = str(uuid.uuid4())
             test.test_type_has_web_format = True
             test.test_type_has_web_editor = True
