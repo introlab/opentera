@@ -24,7 +24,7 @@ from .TeraSessionTypeSite import TeraSessionTypeSite
 from .TeraSessionTypeProject import TeraSessionTypeProject
 from .TeraSessionUsers import TeraSessionUsers
 from .TeraSite import TeraSite
-from .TeraTest import TeraTest
+# from .TeraTest import TeraTest
 from .TeraTestType import TeraTestType
 from .TeraUser import TeraUser
 from .TeraUserGroup import TeraUserGroup
@@ -76,8 +76,10 @@ __all__ = ['TeraAsset',
            'TeraSessionTypeSite',
            'TeraSessionUsers',
            'TeraSite',
-           'TeraTest',
+           # 'TeraTest',
            'TeraTestType',
+           'TeraTestTypeSite',
+           'TeraTestTypeProject',
            'TeraUser',
            'TeraUserGroup',
            'TeraUserPreference',

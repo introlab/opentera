@@ -40,8 +40,12 @@ def upgrade():
                     sa.Column('id_test_type', sa.Integer, sa.Sequence('id_test_type_sequence'),
                               primary_key=True, autoincrement=True),
                     sa.Column('id_service', sa.Integer, sa.ForeignKey('t_services.id_service'), nullable=False),
+                    sa.Column('test_type_uuid', sa.String(36), nullable=False, unique=True),
                     sa.Column('test_type_name', sa.String, nullable=False, unique=False),
-                    sa.Column('test_type_description', sa.String, nullable=True)
+                    sa.Column('test_type_description', sa.String, nullable=True),
+                    sa.Column('test_type_has_json_format', sa.Boolean, nullable=False, default=False),
+                    sa.Column('test_type_has_web_format', sa.Boolean, nullable=False, default=False),
+                    sa.Column('test_type_has_web_editor', sa.Boolean, nullable=False, default=False)
                     )
     op.execute(CreateSequence(sa.Sequence('id_test_type_sequence')))
 
