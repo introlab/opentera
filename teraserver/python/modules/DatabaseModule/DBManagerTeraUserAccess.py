@@ -564,6 +564,14 @@ class DBManagerTeraUserAccess:
                                                                                                in_(proj_ids)).first()
         return session_type
 
+    def query_test_type(self, test_type_id: int):
+        site_ids = self.get_accessible_sites_ids()
+        proj_ids = self.get_accessible_projects_ids()
+        service_ids = self.get_accessible_services_ids()
+        test_type = TeraTestType.query.filter_by(id_test_type=test_type_id).filter(TeraSite.id_site.in_(site_ids))\
+            .filter(TeraTestType.id_service.in_(service_ids)).filter(TeraProject.id_project.in_(proj_ids)).first()
+        return test_type
+
     def query_projects_for_site(self, site_id: int):
         proj_ids = self.get_accessible_projects_ids()
         projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids))

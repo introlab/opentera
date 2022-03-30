@@ -5,7 +5,7 @@ import uuid
 class TeraTestType(db.Model, BaseModel):
     __tablename__ = 't_tests_types'
     id_test_type = db.Column(db.Integer, db.Sequence('id_test_type_sequence'), primary_key=True, autoincrement=True)
-    id_service = db.Column(db.Integer, db.ForeignKey("t_services.id_service"), nullable=False)
+    id_service = db.Column(db.Integer, db.ForeignKey("t_services.id_service", ondelete='cascade'), nullable=False)
     test_type_uuid = db.Column(db.String(36), nullable=False, unique=True)
     test_type_name = db.Column(db.String, nullable=False, unique=False)
     test_type_description = db.Column(db.String, nullable=True)
@@ -16,12 +16,18 @@ class TeraTestType(db.Model, BaseModel):
     # Test type service provides a web based editor?
     test_type_has_web_editor = db.Column(db.Boolean, nullable=False, default=False)
 
-    test_type_service = db.relationship("TeraService", cascade='delete')
+    test_type_test_type_projects = db.relationship("TeraTestTypeProject", viewonly=True)
+    test_type_test_type_sites = db.relationship("TeraTestTypeSite", viewonly=True)
+
+    test_type_service = db.relationship("TeraService")
+    test_type_projects = db.relationship("TeraProject", secondary="t_tests_types_projects")
+    test_type_sites = db.relationship("TeraSite", secondary="t_tests_types_sites")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['test_type_service'])
+        ignore_fields.extend(['test_type_service', 'test_type_sites', 'test_type_projects',
+                              'test_type_test_type_projects', 'test_type_test_type_sites'])
 
         if minimal:
             ignore_fields.extend(['test_type_description'])
@@ -29,8 +35,8 @@ class TeraTestType(db.Model, BaseModel):
 
         if not minimal:
             # Also includes service key and uuid
-            rval['test_type_service_key'] = self.session_type_service.service_key
-            rval['test_type_service_uuid'] = self.session_type_service.service_uuid
+            rval['test_type_service_key'] = self.test_type_service.service_key
+            rval['test_type_service_uuid'] = self.test_type_service.service_uuid
         return rval
 
     @staticmethod

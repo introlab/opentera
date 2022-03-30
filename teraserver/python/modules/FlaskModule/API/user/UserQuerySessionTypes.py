@@ -1,11 +1,9 @@
-from flask import jsonify, session, request
+from flask import session, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSessionType import TeraSessionType
-from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
-from opentera.db.models.TeraServiceProject import TeraServiceProject
 from opentera.db.models.TeraServiceSite import TeraServiceSite
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError, IntegrityError
@@ -330,8 +328,6 @@ class UserQuerySessionTypes(Resource):
 
         # Check if there's some sessions that are using that session type. If so, we must not delete!
         # Now done at database level
-        # if len(TeraSession.get_sessions_for_type(id_todel)) > 0:
-        #     return gettext('Impossible de supprimer - des seances de ce type existent.'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
