@@ -80,6 +80,24 @@ class TeraTestType(db.Model, BaseModel):
     def get_test_types_for_service(id_service: int):
         return TeraTestType.query.filter_by(id_service=id_service).all()
 
+    @staticmethod
+    def get_access_token(test_type_uuids: list, token_key: str, requester_uuid: str, can_edit: bool, expiration=3600):
+        import time
+        import jwt
+
+        # Creating token
+        now = time.time()
+        payload = {
+            'iat': int(now),
+            'exp': int(now) + expiration,
+            'iss': 'TeraServer',
+            'test_type_uuids': test_type_uuids,
+            'can_edit': can_edit,
+            'requester_uuid': requester_uuid
+        }
+
+        return jwt.encode(payload, token_key, algorithm='HS256')
+
     @classmethod
     def insert(cls, test_type):
         # Generate UUID
