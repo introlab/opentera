@@ -28,7 +28,7 @@ class TeraTest(db.Model, BaseModel):
     test_status = db.Column(db.Integer, nullable=False, default=0)
     test_summary = db.Column(db.String, nullable=True)  # This contains a json formatted summary for results display
 
-    test_session = db.relationship("TeraSession", back_populates='test_assets')
+    test_session = db.relationship("TeraSession", back_populates='session_tests')
     test_device = db.relationship("TeraDevice")
     test_user = db.relationship("TeraUser")
     test_participant = db.relationship("TeraParticipant")
@@ -95,6 +95,7 @@ class TeraTest(db.Model, BaseModel):
                 new_test.test_name = "Test #" + str(i)
                 new_test.test_session = session2
                 new_test.test_uuid = str(uuid.uuid4())
+                new_test.test_datetime = session2.session_start_datetime
                 if i == 0:
                     new_test.id_test_type = pretesttype.id_test_type
                     new_test.id_participant = TeraParticipant.get_participant_by_name('Participant #1').id_participant
@@ -106,6 +107,7 @@ class TeraTest(db.Model, BaseModel):
                     new_test.id_device = TeraDevice.get_device_by_id(1).id_device
                 if i == 3:
                     new_test.test_session = session3
+                    new_test.test_datetime = session3.session_start_datetime
                     new_test.id_test_type = pretesttype.id_test_type
                     new_test.id_participant = TeraParticipant.get_participant_by_name('Participant #1').id_participant
                 db.session.add(new_test)
@@ -121,7 +123,7 @@ class TeraTest(db.Model, BaseModel):
         return TeraTest.query.filter_by(test_uuid=test_uuid).first()
 
     @staticmethod
-    def gettests_for_device(device_id: int):
+    def get_tests_for_device(device_id: int):
         return TeraTest.query.filter_by(id_device=device_id).all()
 
     @staticmethod
@@ -156,6 +158,24 @@ class TeraTest(db.Model, BaseModel):
         }
 
         return jwt.encode(payload, token_key, algorithm='HS256')
+
+    def get_service_url(self, server_url: str, server_port: int) -> dict:
+        urls = {'test_answers_url': None,
+                'test_answers_web_url': None,
+                }
+
+        if not self.test_test_type.test_type_service.service_enabled:
+            return urls  # Service disabled = no Urls!
+
+        service_endpoint = self.test_test_type.test_type_service.service_clientendpoint
+        base_url = 'https://' + server_url + ':' + str(server_port) + service_endpoint
+
+        urls['test_answers_url'] = base_url + '/api/tests/answers'
+
+        if self.test_test_type.test_type_has_web_format:
+            urls['test_answers_web_url'] = base_url + '/api/tests/answers/web'
+
+        return urls
 
     @classmethod
     def insert(cls, test):

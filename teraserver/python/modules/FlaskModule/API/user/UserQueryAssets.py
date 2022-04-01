@@ -127,7 +127,6 @@ class UserQueryAssets(Resource):
             # if args['with_only_token']:
             #     return {'access_token': access_token}
 
-
         for asset in assets:
             if args['with_only_token']:
                 asset_json = {'asset_uuid': asset.asset_uuid}

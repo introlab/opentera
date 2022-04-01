@@ -98,6 +98,28 @@ class TeraTestType(db.Model, BaseModel):
 
         return jwt.encode(payload, token_key, algorithm='HS256')
 
+    def get_service_urls(self, server_url: str, server_port: int) -> dict:
+        urls = {'test_type_json_url': None,
+                'test_type_web_url': None,
+                'test_type_web_editor_url': None}
+
+        if not self.test_type_service.service_enabled:
+            return urls  # Service disabled = no Urls!
+
+        service_endpoint = self.test_type_service.service_clientendpoint
+        base_url = 'https://' + server_url + ':' + str(server_port) + service_endpoint
+
+        if self.test_type_has_json_format:
+            urls['test_type_json_url'] = base_url + '/api/testtypes/form'
+
+        if self.test_type_has_web_format:
+            urls['test_type_web_url'] = base_url + '/api/testtypes/web'
+
+        if self.test_type_has_web_editor:
+            urls['test_type_web_editor_url'] = base_url + '/api/testtypes/web/edit'
+
+        return urls
+
     @classmethod
     def insert(cls, test_type):
         # Generate UUID

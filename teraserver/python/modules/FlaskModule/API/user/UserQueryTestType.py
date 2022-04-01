@@ -2,9 +2,7 @@ from flask import session, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraTestType import TeraTestType
-from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraServiceSite import TeraServiceSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
 from modules.DatabaseModule.DBManager import DBManager
@@ -12,12 +10,17 @@ from sqlalchemy.exc import InvalidRequestError, IntegrityError
 from sqlalchemy import exc
 from flask_babel import gettext
 
+from opentera.redis.RedisVars import RedisVars
+
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_test_type', type=int, help='ID of the test type to query')
 get_parser.add_argument('id_project', type=int, help='ID of the project to get test types for')
 get_parser.add_argument('id_site', type=int, help='ID of the site to get test types for')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include test types urls')
+get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
+                                                                     'Will ignore with_urls if specified.')
 
 # post_parser = reqparse.RequestParser()
 # post_parser.add_argument('session_type', type=str, location='json', help='Session type to create / update',
@@ -64,13 +67,41 @@ class UserQueryTestTypes(Resource):
 
         try:
             test_types_list = []
+            servername = self.module.config.server_config['hostname']
+            port = self.module.config.server_config['port']
+            if 'X_EXTERNALSERVER' in request.headers:
+                servername = request.headers['X_EXTERNALSERVER']
+
+            if 'X_EXTERNALPORT' in request.headers:
+                port = request.headers['X_EXTERNALPORT']
+
             for tt in test_types:
-                if args['list'] is None:
-                    tt_json = tt.to_json()
-                    test_types_list.append(tt_json)
+                if args['with_only_token']:
+                    tt_json = {'test_type_uuid': tt.test_type_uuid}
                 else:
-                    tt_json = tt.to_json(minimal=True)
-                    test_types_list.append(tt_json)
+                    tt_json = tt.to_json(minimal=args['list'])
+
+                if args['with_urls'] or args['with_only_token']:
+                    # Access token
+                    token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
+                    projects_ids = [proj.id_project for proj in
+                                    TeraTestTypeProject.get_projects_for_test_type(tt.id_test_type)]
+                    admin_projects_ids = user_access.get_accessible_projects_ids(admin_only=True)
+
+                    # Is project admin in at least one of the related project? If so, can edit the test type
+                    is_project_admin = len(set(projects_ids).difference(admin_projects_ids)) != len(projects_ids)
+
+                    access_token = TeraTestType.get_access_token(test_type_uuids=tt.test_type_uuid,
+                                                                 token_key=token_key,
+                                                                 requester_uuid=current_user.user_uuid,
+                                                                 can_edit=is_project_admin,
+                                                                 expiration=1800)
+                    tt_json['access_token'] = access_token
+
+                if args['with_urls']:
+                    tt_json.update(tt.get_service_urls(server_url=servername, server_port=port))
+
+                test_types_list.append(tt_json)
 
             return test_types_list
 

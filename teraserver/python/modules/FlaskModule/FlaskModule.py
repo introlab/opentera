@@ -170,6 +170,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQueryTestTypeSites import UserQueryTestTypeSites
         from modules.FlaskModule.API.user.UserQueryTestTypeProjects import UserQueryTestTypeProjects
         from modules.FlaskModule.API.user.UserQueryTestType import UserQueryTestTypes
+        from modules.FlaskModule.API.user.UserQueryTests import UserQueryTests
 
         # Resources
         user_api_ns.add_resource(UserQueryAssets,               '/assets', resource_class_kwargs=kwargs)
@@ -207,6 +208,7 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQuerySites,                '/sites', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySiteAccess,           '/siteaccess', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUserStats,            '/stats', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryTests,                '/tests', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryTestTypes,            '/testtypes', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryTestTypeProjects,     '/testtypes/projects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryTestTypeSites,        '/testtypes/sites', resource_class_kwargs=kwargs)

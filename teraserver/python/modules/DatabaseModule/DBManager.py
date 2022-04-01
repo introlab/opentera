@@ -43,6 +43,7 @@ from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
+from opentera.db.models.TeraTest import TeraTest
 
 from opentera.config.ConfigManager import ConfigManager
 from modules.FlaskModule.FlaskModule import flask_app
@@ -260,6 +261,10 @@ class DBManager (BaseModule):
             TeraTestType.create_defaults(test)
             TeraTestTypeSite.create_defaults(test)
             TeraTestTypeProject.create_defaults(test)
+
+        if TeraTest.get_count() == 0:
+            print('No test - creating defaults')
+            TeraTest.create_defaults(test)
 
     def setup_events(self):
         # TODO Add events that need to be sent through redis

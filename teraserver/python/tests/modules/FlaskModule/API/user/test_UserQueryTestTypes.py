@@ -224,6 +224,34 @@ class UserQueryTestTypesTest(BaseUserAPITest):
                                                     endpoint='/api/user/services/projects', client=self.test_client)
         self.assertEqual(response.status_code, 200, msg='Back to default state!')
 
+    def test_query_with_urls(self):
+        response = self._get_with_user_http_auth(username='admin', password='admin', client=self.test_client,
+                                                 params={'with_urls': True})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json
+        self.assertEqual(len(json_data), 3)
+
+        for data_item in json_data:
+            self._checkJson(data_item)
+            self.assertTrue(data_item.__contains__('test_type_json_url'))
+            self.assertTrue(data_item.__contains__('test_type_web_url'))
+            self.assertTrue(data_item.__contains__('test_type_web_editor_url'))
+            self.assertTrue(data_item.__contains__('access_token'))
+
+    def test_query_access_token_only(self):
+        response = self._get_with_user_http_auth(username='admin', password='admin', client=self.test_client,
+                                                 params={'with_only_token': True})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json
+        self.assertEqual(len(json_data), 3)
+
+        for data_item in json_data:
+            self.assertEqual(len(data_item), 2)
+            self.assertTrue(data_item.__contains__('test_type_uuid'))
+            self.assertTrue(data_item.__contains__('access_token'))
+
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
         self.assertTrue(json_data.__contains__('id_test_type'))

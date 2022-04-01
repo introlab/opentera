@@ -1291,7 +1291,6 @@ class DBManagerTeraUserAccess:
         if not asset_id and not asset_uuid:
             return None
 
-
         if asset_id:
             asset: TeraAsset = TeraAsset.get_asset_by_id(asset_id)
         elif asset_uuid:
@@ -1306,24 +1305,28 @@ class DBManagerTeraUserAccess:
 
         if asset.asset_service_uuid not in [service.service_uuid for service in self.get_accessible_services()]:
             return None
-        # If a user has access to a session, it should have access to its assets
-        # session_ids = self.get_accessible_sessions_ids()
-        # device_ids = self.get_accessible_devices_ids()
-        # participant_ids = self.get_accessible_participants_ids()
-        # user_ids = self.get_accessible_users_ids()
-        # service_ids = self.get_accessible_services_ids()
-        #
-        # query = TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids))\
-        #     .filter(or_(TeraAsset.id_service.in_(service_ids), TeraAsset.id_service == None))
-        #
-        # if asset_id:
-        #     query = query.filter(TeraAsset.id_asset == asset_id)
-        # elif asset_uuid:
-        #     query = query.filter(TeraAsset.asset_uuid == asset_uuid)
-        #
-        # return query.all()
+
         return [asset]
 
-    #     .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None)) \
-    #     .filter(or_(TeraAsset.id_participant.in_(participant_ids), TeraAsset.id_participant == None)) \
-    #     .filter(or_(TeraAsset.id_user.in_(user_ids), TeraAsset.id_user == None)) \
+    def query_test(self, test_id: int = None, test_uuid: str = None):
+        from opentera.db.models.TeraTest import TeraTest
+
+        if not test_id and not test_uuid:
+            return None
+
+        if test_id:
+            test: TeraTest = TeraTest.get_test_by_id(test_id)
+        elif test_uuid:
+            asset: TeraTest = TeraTest.get_test_by_uuid(test_uuid)
+        else:
+            return None
+
+        test_session = self.query_session(test.id_session)
+        if not test_session:
+            # No access to asset session
+            return None
+
+        if test.test_test_type.id_service not in [service.id_service for service in self.get_accessible_services()]:
+            return None
+
+        return test
