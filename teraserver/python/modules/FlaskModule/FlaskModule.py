@@ -289,10 +289,12 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceSessionManager import ServiceSessionManager
         from modules.FlaskModule.API.service.ServiceQuerySessionTypes import ServiceQuerySessionTypes
         from modules.FlaskModule.API.service.ServiceQueryDevices import ServiceQueryDevices
+        from modules.FlaskModule.API.service.ServiceQueryTestTypes import ServiceQueryTestTypes
+        from modules.FlaskModule.API.service.ServiceQueryTests import ServiceQueryTests
 
-        service_api_ns.add_resource(ServiceQueryUsers, '/users', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryUsers,          '/users', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
-        service_api_ns.add_resource(ServiceQueryDevices, '/devices', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryDevices,        '/devices', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryAssets,         '/assets', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySessions,       '/sessions', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySessionEvents,  '/sessions/events', resource_class_kwargs=kwargs)
@@ -302,6 +304,8 @@ class FlaskModule(BaseModule):
         service_api_ns.add_resource(ServiceQuerySites,          '/sites', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceSessionManager,      '/sessions/manager', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySessionTypes,   '/sessiontypes', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryTestTypes,      '/testtypes', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryTests,          '/tests', resource_class_kwargs=kwargs)
 
         # Add namespace
         api.add_namespace(service_api_ns)

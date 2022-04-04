@@ -110,15 +110,6 @@ class ServiceQueryAssets(Resource):
             services_infos = {service.service_uuid: service.service_clientendpoint
                               for service in TeraService.query.filter(TeraService.service_enabled == True).all()}
 
-            # Access token
-            # from opentera.redis.RedisVars import RedisVars
-            # token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
-            # access_token = TeraAsset.get_access_token(asset_uuids=[asset.asset_uuid for asset in assets],
-            #                                           token_key=token_key, requester_uuid=current_service.service_uuid,
-            #                                           expiration=1800)
-            # if args['with_only_token']:
-            #     return {'access_token': access_token}
-
         for asset in assets:
             if args['with_only_token']:
                 asset_json = {'asset_uuid': asset.asset_uuid}

@@ -27,12 +27,6 @@ class ServiceQuerySessionTypesTest(BaseServiceAPITest):
         response = self.test_client.get(self.test_endpoint)
         self.assertEqual(401, response.status_code)
 
-    def test_get_endpoint_with_token_auth_and_invalid_params(self):
-        params = {'unused1': True, 'unused2': True}
-        response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
-                                                     params=params, endpoint=self.test_endpoint)
-        self.assertEqual(400, response.status_code)
-
     def test_get_endpoint_with_token_auth_no_params(self):
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=None, endpoint=self.test_endpoint)

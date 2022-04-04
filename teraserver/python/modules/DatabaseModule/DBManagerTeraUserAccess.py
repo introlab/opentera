@@ -1317,7 +1317,7 @@ class DBManagerTeraUserAccess:
         if test_id:
             test: TeraTest = TeraTest.get_test_by_id(test_id)
         elif test_uuid:
-            asset: TeraTest = TeraTest.get_test_by_uuid(test_uuid)
+            test: TeraTest = TeraTest.get_test_by_uuid(test_uuid)
         else:
             return None
 
