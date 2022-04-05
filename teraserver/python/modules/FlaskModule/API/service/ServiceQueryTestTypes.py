@@ -57,7 +57,7 @@ class ServiceQueryTestTypes(Resource):
                 test_types = [TeraTestType.get_test_type_by_id(args['id_test_type'])]
         elif args['test_type_key']:
             test_type = TeraTestType.get_test_type_by_key(args['test_type_key'])
-            if test_type.id_test_type in service_access.get_accessible_tests_types_ids():
+            if test_type and test_type.id_test_type in service_access.get_accessible_tests_types_ids():
                 test_types = [test_type]
         else:
             test_types = service_access.get_accessible_tests_types()
