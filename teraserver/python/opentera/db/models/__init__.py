@@ -24,7 +24,7 @@ from .TeraSessionTypeSite import TeraSessionTypeSite
 from .TeraSessionTypeProject import TeraSessionTypeProject
 from .TeraSessionUsers import TeraSessionUsers
 from .TeraSite import TeraSite
-# from .TeraTest import TeraTest
+from .TeraTest import TeraTest
 from .TeraTestType import TeraTestType
 from .TeraUser import TeraUser
 from .TeraUserGroup import TeraUserGroup
@@ -46,7 +46,9 @@ EventNameClassMap = {
     TeraSessionType.get_model_name(): TeraSessionType,
     TeraSite.get_model_name(): TeraSite,
     TeraUser.get_model_name(): TeraUser,
-    TeraUserGroup.get_model_name(): TeraUserGroup
+    TeraUserGroup.get_model_name(): TeraUserGroup,
+    TeraTestType.get_model_name(): TeraTestType,
+    TeraTest.get_model_name(): TeraTest
 }
 
 # All exported symbols
@@ -76,7 +78,7 @@ __all__ = ['TeraAsset',
            'TeraSessionTypeSite',
            'TeraSessionUsers',
            'TeraSite',
-           # 'TeraTest',
+           'TeraTest',
            'TeraTestType',
            'TeraTestTypeSite',
            'TeraTestTypeProject',

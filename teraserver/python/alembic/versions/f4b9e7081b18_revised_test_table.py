@@ -48,6 +48,8 @@ def upgrade():
                     )
     op.execute(CreateSequence(sa.Sequence('id_test_sequence')))
 
+    op.add_column(table_name='t_tests_types', column=sa.Column('test_type_key', sa.String, nullable=True, unique=True))
+
 
 def downgrade():
     pass

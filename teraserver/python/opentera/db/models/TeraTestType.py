@@ -9,6 +9,7 @@ class TeraTestType(db.Model, BaseModel):
     test_type_uuid = db.Column(db.String(36), nullable=False, unique=True)
     test_type_name = db.Column(db.String, nullable=False, unique=False)
     test_type_description = db.Column(db.String, nullable=True)
+    test_type_key = db.Column(db.String, nullable=True, unique=True)
     # Test type service provides TeraForm style json format?
     test_type_has_json_format = db.Column(db.Boolean, nullable=False, default=False)
     # Test type service provides a generated HTML form?
@@ -49,6 +50,7 @@ class TeraTestType(db.Model, BaseModel):
             test.test_type_description = 'Evaluation shown before a session'
             test.id_service = TeraService.get_service_by_key('VideoRehabService').id_service
             test.test_type_uuid = str(uuid.uuid4())
+            test.test_type_key = 'PRE'
             test.test_type_has_json_format = True
             db.session.add(test)
 
@@ -75,6 +77,10 @@ class TeraTestType(db.Model, BaseModel):
     @staticmethod
     def get_test_type_by_id(test_type_id: int):
         return TeraTestType.query.filter_by(id_test_type=test_type_id).first()
+
+    @staticmethod
+    def get_test_type_by_key(tt_key: int):
+        return TeraTestType.query.filter_by(test_type_key=tt_key).first()
 
     @staticmethod
     def get_test_types_for_service(id_service: int):

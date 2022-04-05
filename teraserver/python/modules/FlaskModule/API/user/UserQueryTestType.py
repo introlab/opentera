@@ -15,6 +15,7 @@ from opentera.redis.RedisVars import RedisVars
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_test_type', type=int, help='ID of the test type to query')
+get_parser.add_argument('test_type_key', type=str, help='Key of the test type to query')
 get_parser.add_argument('id_project', type=int, help='ID of the project to get test types for')
 get_parser.add_argument('id_site', type=int, help='ID of the site to get test types for')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
@@ -54,6 +55,9 @@ class UserQueryTestTypes(Resource):
 
         if args['id_test_type']:
             test_types = [user_access.query_test_type(args['id_test_type'])]
+        elif args['test_type_key']:
+            test_type = TeraTestType.get_test_type_by_key(args['test_type_key'])
+            test_types = [user_access.query_test_type(test_type.id_test_type)]  # Call to filter access if needed
         elif args['id_project']:
             test_types_projects = user_access.query_test_types_for_project(args['id_project'])
             test_types = [ttp.test_type_project_test_type for ttp in test_types_projects]

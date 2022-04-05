@@ -252,12 +252,25 @@ class UserQueryTestTypesTest(BaseUserAPITest):
             self.assertTrue(data_item.__contains__('test_type_uuid'))
             self.assertTrue(data_item.__contains__('access_token'))
 
+    def test_query_test_type_by_key(self):
+        response = self._get_with_user_http_auth(username='admin', password='admin', client=self.test_client,
+                                                 params={'test_type_key': 'PRE'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        json_data = response.json
+        self.assertEqual(len(json_data), 1)
+
+        for data_item in json_data:
+            self._checkJson(data_item)
+            self.assertEqual(data_item['test_type_key'], 'PRE')
+
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
         self.assertTrue(json_data.__contains__('id_test_type'))
         self.assertTrue(json_data.__contains__('id_service'))
         self.assertTrue(json_data.__contains__('test_type_uuid'))
         self.assertTrue(json_data.__contains__('test_type_name'))
+        self.assertTrue(json_data.__contains__('test_type_key'))
         self.assertTrue(json_data.__contains__('test_type_has_json_format'))
         self.assertTrue(json_data.__contains__('test_type_has_web_format'))
         self.assertTrue(json_data.__contains__('test_type_has_web_editor'))

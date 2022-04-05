@@ -97,3 +97,30 @@ class ServiceQueryTestTypesTest(BaseServiceAPITest):
         for test_type in accessible_types:
             json_value = test_type.to_json()
             self.assertTrue(json_value in response.json)
+
+    def test_get_endpoint_with_token_auth_for_id(self):
+        response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                     params={'id_test_type': 1}, endpoint=self.test_endpoint)
+        self.assertEqual(200, response.status_code)
+
+        service: TeraService = TeraService.get_service_by_uuid(self.service_uuid)
+        from modules.DatabaseModule.DBManager import DBManager
+        service_access = DBManager.serviceAccess(service)
+        accessible_types = service_access.get_accessible_tests_types_ids()
+        self.assertEqual(1, len(response.json))
+        self.assertTrue(response.json[0]['id_test_type'] in accessible_types)
+        self.assertEqual(response.json[0]['id_test_type'], 1)
+
+    def test_get_endpoint_with_token_auth_for_key(self):
+        response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                     params={'test_type_key': 'PRE'}, endpoint=self.test_endpoint)
+        self.assertEqual(200, response.status_code)
+
+        test_types: List[TeraTestType] = [TeraTestType.get_test_type_by_key('PRE')]
+        service: TeraService = TeraService.get_service_by_uuid(self.service_uuid)
+        from modules.DatabaseModule.DBManager import DBManager
+        service_access = DBManager.serviceAccess(service)
+        accessible_types = service_access.get_accessible_tests_types_ids()
+        self.assertEqual(1, len(response.json))
+        self.assertTrue(response.json[0]['id_test_type'] in accessible_types)
+        self.assertEqual(response.json[0]['id_test_type'], test_types[0].id_test_type)
