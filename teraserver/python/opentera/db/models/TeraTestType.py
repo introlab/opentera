@@ -83,6 +83,10 @@ class TeraTestType(db.Model, BaseModel):
         return TeraTestType.query.filter_by(test_type_key=tt_key).first()
 
     @staticmethod
+    def get_test_type_by_uuid(tt_uuid: int):
+        return TeraTestType.query.filter_by(test_type_uuid=tt_uuid).first()
+
+    @staticmethod
     def get_test_types_for_service(id_service: int):
         return TeraTestType.query.filter_by(id_service=id_service).all()
 

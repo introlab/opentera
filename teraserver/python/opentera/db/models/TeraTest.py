@@ -1,6 +1,7 @@
 from opentera.db.Base import db, BaseModel
 from enum import Enum
 import uuid
+import json
 
 
 class TeraTestStatus(Enum):
@@ -182,4 +183,18 @@ class TeraTest(db.Model, BaseModel):
         # Generate UUID
         test.test_uuid = str(uuid.uuid4())
 
+        # Check if summary is in json
+        if isinstance(test.test_summary, dict):
+            test.test_summary = json.dumps(test.test_summary)
+
         super().insert(test)
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+
+        # Check if summary is in json
+        if 'test_summary' in values:
+            if isinstance(values['test_summary'], dict):
+                values['test_summary'] = json.dumps(values['test_summary'])
+
+        super().update(update_id=update_id, values=values)

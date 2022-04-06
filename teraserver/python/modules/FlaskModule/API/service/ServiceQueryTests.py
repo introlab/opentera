@@ -5,9 +5,11 @@ from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from opentera.db.models.TeraTest import TeraTest
 from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraTestType import TeraTestType
 from opentera.redis.RedisVars import RedisVars
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy import exc
+from datetime import datetime
 
 
 # Parser definition(s)
@@ -137,11 +139,32 @@ class ServiceQueryTests(Resource):
             if 'id_session' not in test_info:
                 return gettext('Unknown session'), 400
 
-            if 'id_test_type' not in test_info:
+            if 'id_test_type' not in test_info and 'test_type_uuid' not in test_info:
                 return gettext('Missing id_test_type field'), 400
 
-        if 'test_name' not in test_info and not test_info['test_name']:
-            return gettext('Invalid test name'), 400
+            if 'test_type_uuid' in test_info:
+                test_type = TeraTestType.get_test_type_by_uuid(test_info['test_type_uuid'])
+                if not test_type:
+                    return gettext('Invalid test type'), 400
+                test_info.pop('test_type_uuid')
+                test_info['id_test_type'] = test_type.id_test_type
+            else:
+                test_type = TeraTestType.get_test_type_by_id(test_info['id_test_type'])
+
+            if 'test_datetime' not in test_info:
+                test_info['test_datetime'] = datetime.now()
+
+            if 'test_name' not in test_info:
+                test_date = test_info['test_datetime']
+                if not isinstance(test_date, datetime):
+                    test_date = datetime.fromisoformat(test_info['test_datetime'])
+                if test_type.test_type_key:
+                    test_name = test_type.test_type_key
+                else:
+                    test_name = test_type.test_name
+                test_name += ' [' + str(test_date.year) + '.' + \
+                             str(TeraTest.count_with_filters({'id_session': test_info['id_session']})) + ']'
+                test_info['test_name'] = test_name
 
         # Check if the service can create/update that test
         if test_info['id_test'] != 0 and 'id_session' not in test_info:
