@@ -1321,6 +1321,9 @@ class DBManagerTeraUserAccess:
         else:
             return None
 
+        if not test:
+            return None
+
         test_session = self.query_session(test.id_session)
         if not test_session:
             # No access to asset session

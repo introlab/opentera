@@ -305,7 +305,7 @@ class UserQueryUserStats(Resource):
                  'devices_total_count': len(ses.session_devices),
                  'assets_total_count': len(ses.session_assets),
                  'events_total_count': len(ses.session_events),
-                 'tests_total_count': 0
+                 'tests_total_count': len(ses.session_tests)
                  }
         return stats
 

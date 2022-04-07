@@ -36,14 +36,14 @@ class TeraTest(db.Model, BaseModel):
     test_service = db.relationship("TeraService")
     test_test_type = db.relationship('TeraTestType')
 
-    def from_json(self, json, ignore_fields=None):
+    def from_json(self, json_data, ignore_fields=None):
         if ignore_fields is None:
             ignore_fields = []
 
         ignore_fields.extend(['test_session', 'test_device', 'test_user', 'test_participant', 'test_service',
                               'test_test_type'])
 
-        super().from_json(json, ignore_fields)
+        super().from_json(json_data, ignore_fields)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -55,6 +55,7 @@ class TeraTest(db.Model, BaseModel):
         test_json = super().to_json(ignore_fields=ignore_fields)
         if not minimal:
             test_json['test_session_name'] = self.test_session.session_name
+            test_json['test_test_type_name'] = self.test_test_type.test_type_name
             if self.id_device:
                 test_json['test_device'] = self.test_device.device_name
             if self.id_user:

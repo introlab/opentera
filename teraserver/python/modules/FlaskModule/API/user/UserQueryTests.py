@@ -4,7 +4,7 @@ from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraTest import TeraTest
-from opentera.db.models.TeraService import TeraService
+from sqlalchemy import exc
 
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.redis.RedisVars import RedisVars
@@ -24,6 +24,9 @@ get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only inclu
                                                                      'Will ignore with_urls if specified.')
 get_parser.add_argument('full', type=inputs.boolean, help='Also include names of sessions, users, services, ... in the '
                                                           'reply')
+
+delete_parser = api.parser()
+delete_parser.add_argument('id', type=int, help='Test type ID to delete', required=True)
 
 
 class UserQueryTests(Resource):
@@ -116,8 +119,30 @@ class UserQueryTests(Resource):
                        'Test service)'), 501
 
     @user_multi_auth.login_required
-    @api.doc(description='Delete test.',
-             responses={501: 'Unable to delete test from here'})
+    @api.expect(delete_parser)
+    @api.doc(description='Delete a specific test',
+             responses={200: 'Success',
+                        403: 'Logged user can\'t delete test',
+                        500: 'Database error.'})
     def delete(self):
-        return gettext('Test deletion must be done directly into a service (such as '
-                       'Test service)'), 501
+        user_access = DBManager.userAccess(current_user)
+
+        args = delete_parser.parse_args(strict=True)
+        id_todel = args['id']
+
+        # Check if current user can delete
+        if not user_access.query_test(id_todel):
+            return gettext('Forbidden'), 403
+
+        # If we are here, we are allowed to delete. Do so.
+        try:
+            TeraTest.delete(id_todel=id_todel)
+        except exc.SQLAlchemyError as e:
+            import sys
+            print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryTests.__name__,
+                                         'delete', 500, 'Database error', e)
+            return gettext('Database error'), 500
+
+        return '', 200

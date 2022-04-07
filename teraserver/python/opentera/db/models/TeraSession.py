@@ -107,7 +107,9 @@ class TeraSession(db.Model, BaseModel):
 
         # Append session stats
         from opentera.db.models.TeraAsset import TeraAsset
+        from opentera.db.models.TeraTest import TeraTest
         rval['session_assets_count'] = TeraAsset.get_count({'id_session': self.id_session})
+        rval['session_tests_count'] = TeraTest.get_count({'id_session': self.id_session})
         # rval['session_has_device_data'] = len(TeraDeviceData.get_data_for_session(self.id_session)) > 0
         return rval
 
