@@ -6,6 +6,7 @@ from modules.FlaskModule.FlaskModule import service_api_ns as api
 from opentera.db.models.TeraTest import TeraTest
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraSession import TeraSession
 from opentera.redis.RedisVars import RedisVars
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy import exc
@@ -136,8 +137,18 @@ class ServiceQueryTests(Resource):
             return gettext('Missing id_test field'), 400
 
         if test_info['id_test'] == 0:
-            if 'id_session' not in test_info:
+            if 'id_session' not in test_info and 'session_uuid' not in test_info:
                 return gettext('Unknown session'), 400
+
+            if 'session_uuid' in test_info and 'id_session' not in test_info:
+                # Get session id
+                target_session = TeraSession.get_session_by_uuid(test_info['session_uuid'])
+                if not target_session:
+                    return gettext('Unknown session'), 400
+                test_info['id_session'] = target_session.id_session
+
+            if 'session_uuid' in test_info:
+                del test_info['session_uuid']
 
             if 'id_test_type' not in test_info and 'test_type_uuid' not in test_info:
                 return gettext('Missing id_test_type field'), 400
@@ -163,7 +174,8 @@ class ServiceQueryTests(Resource):
                 else:
                     test_name = test_type.test_name
                 test_name += ' #' + \
-                             str(TeraTest.count_with_filters({'id_session': test_info['id_session']}))
+                             str(TeraTest.count_with_filters({'id_session': test_info['id_session'],
+                                                              'id_test_type': test_info['id_test_type']})+1)
                 test_info['test_name'] = test_name
 
         # Check if the service can create/update that test
