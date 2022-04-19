@@ -134,11 +134,9 @@ class ServiceSessionManager(Resource):
                 json_session_manager['id_session'] = 0
 
         if json_session_manager['id_session'] != 0:
-            if json_session_manager['id_session'] not in service_access.get_accessible_sessions_ids():
-                return gettext('Service doesn\'t have access to that session'), 403
-            current_session = TeraSession.get_session_by_id(json_session_manager['id_session'])
+            current_session = service_access.query_session(json_session_manager['id_session'])
             if not current_session:
-                return gettext('Invalid session'), 400
+                return gettext('Service doesn\'t have access to that session'), 403
 
             if 'id_service' not in json_session_manager:
                 # Check if there's a service for that session, and, if so, adds its id.
