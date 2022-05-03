@@ -155,6 +155,17 @@ class DBManagerTeraServiceAccess:
     def get_accessible_sessions_types_ids(self):
         return [st.id_session_type for st in self.get_accessible_sessions_types()]
 
+    def get_accessible_tests_types(self):
+        from opentera.db.models.TeraTestType import TeraTestType
+
+        query = TeraTestType.query.filter(TeraTestType.id_service == self.service.id_service)\
+            .order_by(TeraTestType.test_type_name.asc())
+
+        return query.all()
+
+    def get_accessible_tests_types_ids(self):
+        return [tt.id_test_type for tt in self.get_accessible_tests_types()]
+
     def get_site_role(self, site_id: int, uuid_user: str):
         user = self.get_user_with_uuid(uuid_user)
         sites_roles = user.get_sites_roles()
@@ -205,3 +216,42 @@ class DBManagerTeraServiceAccess:
         return TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids)).filter(TeraAsset.id_asset == asset_id)\
             .all()
         # .filter(or_(TeraAsset.id_service.in_(service_ids), TeraAsset.id_service == None)) \
+
+    def query_test(self, test_id: int = None, test_uuid: str = None):
+        from opentera.db.models.TeraTest import TeraTest
+
+        if not test_id and not test_uuid:
+            return None
+
+        test = None
+        if test_id:
+            test = TeraTest.get_test_by_id(test_id)
+        elif test_uuid:
+            test = TeraTest.get_test_by_uuid(test_uuid)
+
+        if not test:
+            return None
+
+        test_session = self.query_session(test.id_session)
+        if not test_session:
+            # No access to asset session
+            return None
+
+        return test
+
+    def query_session(self, session_id: int):
+        from opentera.db.models.TeraSession import TeraSession
+
+        session = TeraSession.get_session_by_id(session_id)
+
+        if session:
+            # Check if we are the creator of that session
+            if session.id_creator_service == self.service.id_service:
+                return session
+
+            # Check if we have access to the project of that session
+            accessible_projects = self.get_accessible_projects_ids()
+            if session.get_associated_project_id() in accessible_projects:
+                return session
+
+        return None

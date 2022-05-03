@@ -48,6 +48,7 @@ class TeraSession(db.Model, BaseModel):
     session_session_type = db.relationship('TeraSessionType', back_populates='session_type_sessions', lazy='joined')
     session_events = db.relationship('TeraSessionEvent', cascade="delete", back_populates='session_event_session')
     session_assets = db.relationship('TeraAsset', cascade='delete', back_populates='asset_session')
+    session_tests = db.relationship('TeraTest', cascade='delete', back_populates='test_session')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -55,7 +56,7 @@ class TeraSession(db.Model, BaseModel):
 
         ignore_fields.extend(['session_participants', 'session_creator_user', 'session_creator_device',
                               'session_creator_participant', 'session_creator_service', 'session_session_type',
-                              'session_events', 'session_users', 'session_devices', 'session_assets'])
+                              'session_events', 'session_users', 'session_devices', 'session_assets', 'session_tests'])
         if minimal:
             ignore_fields.extend(['session_comments', 'session_parameters'])
 
@@ -106,7 +107,9 @@ class TeraSession(db.Model, BaseModel):
 
         # Append session stats
         from opentera.db.models.TeraAsset import TeraAsset
+        from opentera.db.models.TeraTest import TeraTest
         rval['session_assets_count'] = TeraAsset.get_count({'id_session': self.id_session})
+        rval['session_tests_count'] = TeraTest.get_count({'id_session': self.id_session})
         # rval['session_has_device_data'] = len(TeraDeviceData.get_data_for_session(self.id_session)) > 0
         return rval
 

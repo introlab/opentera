@@ -196,8 +196,7 @@ class ServiceQuerySessions(Resource):
                 session_name = TeraSessionType.get_session_type_by_id(json_session['id_session_type']).session_type_name
                 session_date = json_session['session_start_datetime']
                 if not isinstance(session_date, datetime):
-                    import dateutil.parser as parser
-                    session_date = parser.parse(json_session['session_start_datetime'])
+                    session_date = datetime.fromisoformat(json_session['session_start_datetime'])
                 # session_name += ' [' + session_date.strftime('%d-%m-%Y %H:%M') + ']'
                 session_name += ' [' + str(session_date.year) + '.' + str(TeraSession.get_count()) + ']'
                 json_session['session_name'] = session_name

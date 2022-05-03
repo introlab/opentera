@@ -167,19 +167,13 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQueryUserUserGroups import UserQueryUserUserGroups
         from modules.FlaskModule.API.user.UserRefreshToken import UserRefreshToken
         from modules.FlaskModule.API.user.UserQueryVersions import UserQueryVersions
+        from modules.FlaskModule.API.user.UserQueryTestTypeSites import UserQueryTestTypeSites
+        from modules.FlaskModule.API.user.UserQueryTestTypeProjects import UserQueryTestTypeProjects
+        from modules.FlaskModule.API.user.UserQueryTestType import UserQueryTestTypes
+        from modules.FlaskModule.API.user.UserQueryTests import UserQueryTests
+
         # Resources
-        user_api_ns.add_resource(UserLogin,                     '/login', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserLogout,                    '/logout', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQuerySites,                '/sites', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryUsers,                '/users', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryOnlineUsers,          '/users/online', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryUserGroups,           '/usergroups', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryUserUserGroups,       '/users/usergroups', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryUserPreferences,      '/users/preferences', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryForms,                '/forms', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryProjects,             '/projects', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryParticipants,         '/participants', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryOnlineParticipants,   '/participants/online', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryAssets,               '/assets', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDevices,              '/devices', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryOnlineDevices,        '/devices/online', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceSites,          '/devicesites', resource_class_kwargs=kwargs)
@@ -188,26 +182,41 @@ class FlaskModule(BaseModule):
         user_api_ns.add_resource(UserQueryDeviceProjects,       '/devices/projects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceParticipants,   '/deviceparticipants', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryDeviceParticipants,   '/devices/participants', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQuerySiteAccess,           '/siteaccess', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryProjectAccess,        '/projectaccess', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryDeviceTypes,          '/devicetypes', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryDeviceSubTypes,       '/devicesubtypes', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryForms,                '/forms', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryParticipantGroup,     '/groups', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserLogin,                     '/login', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserLogout,                    '/logout', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryParticipants,         '/participants', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryOnlineParticipants,   '/participants/online', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryProjectAccess,        '/projectaccess', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryProjects,             '/projects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserRefreshToken,              '/refresh_token', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessions,             '/sessions', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserSessionManager,            '/sessions/manager', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessionTypes,         '/sessiontypes', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQuerySessionTypeProjects, '/sessiontypeprojects', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQuerySessionTypeProjects, '/sessiontypes/projects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQuerySessionTypeProjects,  '/sessiontypeprojects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQuerySessionTypeProjects,  '/sessiontypes/projects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessionTypeSites,     '/sessiontypes/sites', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQuerySessionEvents,        '/sessions/events', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryDeviceTypes,          '/devicetypes', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryDeviceSubTypes,       '/devicesubtypes', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserQueryAssets,               '/assets', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServices,             '/services', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServiceProjects,      '/services/projects', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServiceSites,         '/services/sites', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServiceAccess,        '/services/access', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryServiceConfig,        '/services/configs', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQuerySites,                '/sites', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQuerySiteAccess,           '/siteaccess', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryUserStats,            '/stats', resource_class_kwargs=kwargs)
-        user_api_ns.add_resource(UserRefreshToken,              '/refresh_token', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryTests,                '/tests', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryTestTypes,            '/testtypes', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryTestTypeProjects,     '/testtypes/projects', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryTestTypeSites,        '/testtypes/sites', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryUsers,                '/users', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryOnlineUsers,          '/users/online', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryUserGroups,           '/usergroups', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryUserUserGroups,       '/users/usergroups', resource_class_kwargs=kwargs)
+        user_api_ns.add_resource(UserQueryUserPreferences,      '/users/preferences', resource_class_kwargs=kwargs)
         user_api_ns.add_resource(UserQueryVersions,             '/versions', resource_class_kwargs=kwargs)
         api.add_namespace(user_api_ns)
 
@@ -280,10 +289,12 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceSessionManager import ServiceSessionManager
         from modules.FlaskModule.API.service.ServiceQuerySessionTypes import ServiceQuerySessionTypes
         from modules.FlaskModule.API.service.ServiceQueryDevices import ServiceQueryDevices
+        from modules.FlaskModule.API.service.ServiceQueryTestTypes import ServiceQueryTestTypes
+        from modules.FlaskModule.API.service.ServiceQueryTests import ServiceQueryTests
 
-        service_api_ns.add_resource(ServiceQueryUsers, '/users', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryUsers,          '/users', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
-        service_api_ns.add_resource(ServiceQueryDevices, '/devices', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryDevices,        '/devices', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryAssets,         '/assets', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySessions,       '/sessions', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySessionEvents,  '/sessions/events', resource_class_kwargs=kwargs)
@@ -293,6 +304,8 @@ class FlaskModule(BaseModule):
         service_api_ns.add_resource(ServiceQuerySites,          '/sites', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceSessionManager,      '/sessions/manager', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQuerySessionTypes,   '/sessiontypes', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryTestTypes,      '/testtypes', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryTests,          '/tests', resource_class_kwargs=kwargs)
 
         # Add namespace
         api.add_namespace(service_api_ns)

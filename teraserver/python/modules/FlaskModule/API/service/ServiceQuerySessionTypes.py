@@ -3,9 +3,15 @@ from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
+from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+from opentera.db.models.TeraParticipant import TeraParticipant
 
 # Parser definition(s)
 get_parser = api.parser()
+get_parser.add_argument('id_site', type=int, help='ID of the site to query session types for')
+get_parser.add_argument('id_project', type=int, help='ID of the project to query session types for')
+get_parser.add_argument('id_participant', type=int, help='ID of the participant to query types for')
 
 
 class ServiceQuerySessionTypes(Resource):
@@ -24,8 +30,24 @@ class ServiceQuerySessionTypes(Resource):
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
         parser = get_parser
-        args = parser.parse_args(strict=True)
-
+        args = parser.parse_args()
         service_access = DBManager.serviceAccess(current_service)
 
-        return [st.to_json() for st in service_access.get_accessible_sessions_types()]
+        session_types = []
+        if args['id_site']:
+            if args['id_site'] in service_access.get_accessibles_sites_ids():
+                session_types = [st.session_type_site_session_type for st in
+                                 TeraSessionTypeSite.get_sessions_types_for_site(args['id_site'])]
+        elif args['id_project']:
+            if args['id_project'] in service_access.get_accessible_projects_ids():
+                session_types = [st.session_type_project_session_type for st in
+                                 TeraSessionTypeProject.get_sessions_types_for_project(args['id_project'])]
+        elif args['id_participant']:
+            if args['id_participant'] in service_access.get_accessible_participants_ids():
+                part_info = TeraParticipant.get_participant_by_id(args['id_participant'])
+                session_types = [st.session_type_project_session_type for st in
+                                 TeraSessionTypeProject.get_sessions_types_for_project(part_info.id_project)]
+        else:
+            session_types = service_access.get_accessible_sessions_types()
+
+        return [st.to_json() for st in session_types]

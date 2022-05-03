@@ -7,7 +7,7 @@ class TeraSite(db.Model, BaseModel):
     id_site = db.Column(db.Integer, db.Sequence('id_site_sequence'), primary_key=True, autoincrement=True)
     site_name = db.Column(db.String, nullable=False, unique=True)
 
-    # site_devices = db.relationship("TeraDeviceSite")
+    site_devices = db.relationship("TeraDevice", secondary="t_devices_sites", back_populates="device_sites")
     site_projects = db.relationship("TeraProject", cascade="delete", passive_deletes=True,
                                     back_populates='project_site', lazy='joined')
 
@@ -15,7 +15,7 @@ class TeraSite(db.Model, BaseModel):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend(['site_projects'])
+        ignore_fields.extend(['site_projects', 'site_devices'])
 
         return super().to_json(ignore_fields=ignore_fields)
 

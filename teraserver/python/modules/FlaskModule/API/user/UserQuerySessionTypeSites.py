@@ -1,8 +1,7 @@
-from flask import session, request
+from flask import request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite

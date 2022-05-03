@@ -372,7 +372,7 @@ class UserQuerySessionTypeSitesTest(BaseAPITest):
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
-        self.assertTrue(json_data.__contains__('id_session_type'))
+        self.assertTrue(json_data.__contains__('id_session_type_site'))
         self.assertTrue(json_data.__contains__('id_session_type'))
         self.assertTrue(json_data.__contains__('id_site'))
 

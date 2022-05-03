@@ -46,7 +46,9 @@ EventNameClassMap = {
     TeraSessionType.get_model_name(): TeraSessionType,
     TeraSite.get_model_name(): TeraSite,
     TeraUser.get_model_name(): TeraUser,
-    TeraUserGroup.get_model_name(): TeraUserGroup
+    TeraUserGroup.get_model_name(): TeraUserGroup,
+    TeraTestType.get_model_name(): TeraTestType,
+    TeraTest.get_model_name(): TeraTest
 }
 
 # All exported symbols
@@ -78,6 +80,8 @@ __all__ = ['TeraAsset',
            'TeraSite',
            'TeraTest',
            'TeraTestType',
+           'TeraTestTypeSite',
+           'TeraTestTypeProject',
            'TeraUser',
            'TeraUserGroup',
            'TeraUserPreference',

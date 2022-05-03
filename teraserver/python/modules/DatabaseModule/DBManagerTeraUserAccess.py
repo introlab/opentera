@@ -16,6 +16,9 @@ from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
+from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
 
 from sqlalchemy import or_, and_, not_
 
@@ -277,7 +280,6 @@ class DBManagerTeraUserAccess:
         # # return TeraSessionType.query.filter(TeraProject.id_project.in_(project_id_list)).all()
         # return TeraSessionType.query.join(TeraSessionTypeProject) \
         #     .filter(TeraSessionTypeProject.id_project.in_(project_id_list)).all()
-        from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
         if self.user.user_superadmin:
             return TeraSessionType.query.all()
 
@@ -293,6 +295,24 @@ class DBManagerTeraUserAccess:
             st_ids.append(st.id_session_type)
 
         return st_ids
+
+    def get_accessible_test_types(self, admin_only=False):
+        if self.user.user_superadmin:
+            return TeraTestType.query.all()
+
+        site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
+        services_ids = self.get_accessible_services_ids()
+        query = TeraTestType.query.join(TeraTestTypeSite)\
+            .filter(TeraTestTypeSite.id_site.in_(site_id_list)).filter(TeraTestType.id_service.in_(services_ids))
+        return query.all()
+
+    def get_accessible_test_types_ids(self, admin_only=False):
+        tt_ids = []
+
+        for tt in self.get_accessible_test_types(admin_only=admin_only):
+            tt_ids.append(tt.id_test_type)
+
+        return tt_ids
 
     def get_accessible_sessions(self, admin_only=False):
         from opentera.db.models.TeraSession import TeraSession
@@ -544,6 +564,14 @@ class DBManagerTeraUserAccess:
                                                                                                in_(proj_ids)).first()
         return session_type
 
+    def query_test_type(self, test_type_id: int):
+        site_ids = self.get_accessible_sites_ids()
+        proj_ids = self.get_accessible_projects_ids()
+        service_ids = self.get_accessible_services_ids()
+        test_type = TeraTestType.query.filter_by(id_test_type=test_type_id).filter(TeraSite.id_site.in_(site_ids))\
+            .filter(TeraTestType.id_service.in_(service_ids)).filter(TeraProject.id_project.in_(proj_ids)).first()
+        return test_type
+
     def query_projects_for_site(self, site_id: int):
         proj_ids = self.get_accessible_projects_ids()
         projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids))
@@ -568,6 +596,24 @@ class DBManagerTeraUserAccess:
 
         # Sort by project id
         return sorted(st_projects, key=lambda sp: sp.session_type_project_project.project_name)
+
+    def query_projects_for_test_type(self, test_type_id: int, include_other_projects: bool = False):
+        proj_ids = self.get_accessible_projects_ids()
+        tt_projects = TeraTestTypeProject.query.filter(TeraTestTypeProject.id_test_type == test_type_id)\
+            .filter(TeraTestTypeProject.id_project.in_(proj_ids)).all()
+
+        if include_other_projects:
+            # We must add the missing projects
+            missing_proj_ids = set(proj_ids).difference([tp.id_project for tp in tt_projects])
+            for missing_proj_id in missing_proj_ids:
+                tt_project = TeraTestTypeProject()
+                tt_project.id_project = missing_proj_id
+                tt_project.id_test_type = None
+                tt_project.test_type_project_project = TeraProject.get_project_by_id(missing_proj_id)
+                tt_projects.append(tt_project)
+
+        # Sort by project id
+        return sorted(tt_projects, key=lambda tp: tp.test_type_project_project.project_name)
 
     def query_all_participants_for_site(self, site_id: int):
         part_ids = self.get_accessible_participants_ids()
@@ -829,6 +875,31 @@ class DBManagerTeraUserAccess:
         # Sort by name
         return sorted(session_types, key=lambda s: s.session_type_project_session_type.session_type_name)
 
+    def query_test_types_for_project(self, project_id: int, include_other_test_types: bool = False):
+        test_types_ids = self.get_accessible_test_types_ids()
+        service_ids = self.get_accessible_services_ids()
+
+        test_types = TeraTestTypeProject.query.filter(TeraTestTypeProject.id_test_type.in_(test_types_ids)) \
+            .filter_by(id_project=project_id).join(TeraTestType).filter(TeraTestType.id_service.in_(service_ids)).all()
+
+        if include_other_test_types:
+            # We must add the missing test types in the list
+            project = TeraProject.get_project_by_id(project_id)
+            site_tts = TeraTestType.query.filter(TeraTestType.id_service.in_(service_ids)).join(TeraTestTypeSite).\
+                filter(TeraTestTypeSite.id_site == project.id_site)
+            site_tt_ids = [tt.id_test_type for tt in site_tts]
+            tt_ids = [tt.id_test_type for tt in test_types]
+            missing_tt_ids = set(site_tt_ids).difference(tt_ids)
+            for missing_tt_id in missing_tt_ids:
+                tt_proj = TeraTestTypeProject()
+                tt_proj.id_test_type = missing_tt_id
+                tt_proj.id_project = None
+                tt_proj.test_type_project_test_type = TeraTestType.get_test_type_by_id(missing_tt_id)
+                test_types.append(tt_proj)
+
+        # Sort by name
+        return sorted(test_types, key=lambda s: s.test_type_project_test_type.test_type_name)
+
     def query_assets_associated_to_service(self, uuid_service: str):
         from opentera.db.models.TeraAsset import TeraAsset
         from sqlalchemy import or_
@@ -914,6 +985,53 @@ class DBManagerTeraUserAccess:
 
         # Sort by site name
         return sorted(st_sites, key=lambda s: s.session_type_site_site.site_name)
+
+    def query_test_types_sites_for_site(self, site_id: int, include_other_test_types=False):
+        service_ids = self.get_accessible_services_ids()
+        tt_sites = TeraTestTypeSite.query.filter_by(id_site=site_id).join(TeraTestType)\
+            .filter(TeraTestType.id_service.in_(service_ids)).all()
+
+        if include_other_test_types:
+            # We must add the missing test types in the list, even if we don't have access to them
+            if self.user.user_superadmin:
+                other_tts = TeraTestType.query_with_filters()
+            else:
+                sites_ids = self.get_accessible_sites_ids()
+                other_tts = TeraTestType.query.join(TeraTestTypeSite)\
+                    .filter(TeraTestTypeSite.id_site.in_(sites_ids)).filter(TeraTestType.id_service.in_(service_ids))\
+                    .all()
+            tt_ids = [tt.id_test_type for tt in other_tts]
+            missing_tt_ids = set(tt_ids).difference([tt.id_test_type for tt in tt_sites])
+            for missing_tt_id in missing_tt_ids:
+                tt_site = TeraTestTypeSite()
+                tt_site.id_site = None
+                tt_site.id_test_type = missing_tt_id
+                tt_site.test_type_site_test_type = TeraTestType.get_test_type_by_id(missing_tt_id)
+                tt_sites.append(tt_site)
+
+        # Sort by name
+        return sorted(tt_sites, key=lambda s: s.test_type_site_test_type.test_type_name)
+
+    def query_test_types_sites_for_session_type(self, test_type_id: int, include_other_sites=False):
+        site_ids = self.get_accessible_sites_ids()
+        service_ids = self.get_accessible_services_ids()
+
+        query = TeraTestTypeSite.query.filter(TeraTestTypeSite.id_site.in_(site_ids)) \
+            .filter_by(id_test_type=test_type_id).join(TeraTestType).filter(TeraTestType.id_service.in_(service_ids))
+
+        tt_sites = query.all()
+        if include_other_sites:
+            # We must add the missing sites in the list
+            missing_sites_ids = set(site_ids).difference([s.id_site for s in tt_sites])
+            for missing_site_id in missing_sites_ids:
+                tt_site = TeraTestTypeSite()
+                tt_site.id_site = missing_site_id
+                tt_site.id_test_type = None
+                tt_site.test_type_site_site = TeraSite.get_site_by_id(missing_site_id)
+                tt_sites.append(tt_site)
+
+        # Sort by site name
+        return sorted(tt_sites, key=lambda s: s.test_type_site_site.site_name)
 
     def query_services_projects_for_project(self, project_id: int, include_other_services=False):
         from opentera.db.models.TeraServiceProject import TeraServiceProject
@@ -1173,7 +1291,6 @@ class DBManagerTeraUserAccess:
         if not asset_id and not asset_uuid:
             return None
 
-
         if asset_id:
             asset: TeraAsset = TeraAsset.get_asset_by_id(asset_id)
         elif asset_uuid:
@@ -1188,24 +1305,31 @@ class DBManagerTeraUserAccess:
 
         if asset.asset_service_uuid not in [service.service_uuid for service in self.get_accessible_services()]:
             return None
-        # If a user has access to a session, it should have access to its assets
-        # session_ids = self.get_accessible_sessions_ids()
-        # device_ids = self.get_accessible_devices_ids()
-        # participant_ids = self.get_accessible_participants_ids()
-        # user_ids = self.get_accessible_users_ids()
-        # service_ids = self.get_accessible_services_ids()
-        #
-        # query = TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids))\
-        #     .filter(or_(TeraAsset.id_service.in_(service_ids), TeraAsset.id_service == None))
-        #
-        # if asset_id:
-        #     query = query.filter(TeraAsset.id_asset == asset_id)
-        # elif asset_uuid:
-        #     query = query.filter(TeraAsset.asset_uuid == asset_uuid)
-        #
-        # return query.all()
+
         return [asset]
 
-    #     .filter(or_(TeraAsset.id_device.in_(device_ids), TeraAsset.id_device == None)) \
-    #     .filter(or_(TeraAsset.id_participant.in_(participant_ids), TeraAsset.id_participant == None)) \
-    #     .filter(or_(TeraAsset.id_user.in_(user_ids), TeraAsset.id_user == None)) \
+    def query_test(self, test_id: int = None, test_uuid: str = None):
+        from opentera.db.models.TeraTest import TeraTest
+
+        if not test_id and not test_uuid:
+            return None
+
+        if test_id:
+            test: TeraTest = TeraTest.get_test_by_id(test_id)
+        elif test_uuid:
+            test: TeraTest = TeraTest.get_test_by_uuid(test_uuid)
+        else:
+            return None
+
+        if not test:
+            return None
+
+        test_session = self.query_session(test.id_session)
+        if not test_session:
+            # No access to asset session
+            return None
+
+        if test.test_test_type.id_service not in [service.id_service for service in self.get_accessible_services()]:
+            return None
+
+        return test

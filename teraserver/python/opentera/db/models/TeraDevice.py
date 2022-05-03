@@ -29,7 +29,7 @@ class TeraDevice(db.Model, BaseModel):
     device_notes = db.Column(db.String, nullable=True)
     device_lastonline = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
 
-    # device_sites = db.relationship("TeraDeviceSite")
+    device_sites = db.relationship("TeraSite", secondary='t_devices_sites', back_populates='site_devices')
     # device_projects = db.relationship('TeraDeviceProject', cascade='delete')
     device_projects = db.relationship("TeraProject", secondary="t_devices_projects",
                                       back_populates="project_devices", lazy='joined')
@@ -55,7 +55,7 @@ class TeraDevice(db.Model, BaseModel):
             ignore_fields = []
 
         ignore_fields += ['device_projects', 'device_participants', 'device_sessions', 'device_certificate',
-                          'device_type', 'device_subtype', 'authenticated', 'device_assets']
+                          'device_type', 'device_subtype', 'authenticated', 'device_assets', 'device_sites']
 
         if minimal:
             ignore_fields += ['device_onlineable', 'device_config', 'device_notes',

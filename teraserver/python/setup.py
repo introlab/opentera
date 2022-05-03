@@ -9,7 +9,7 @@ with open("env/requirements.txt", "r", encoding="utf-8") as f:
 
 setuptools.setup(
     name="opentera",
-    version="1.1.1",
+    version="1.1.2",
     author="Dominic Létourneau, Simon Brière",
     author_email="dominic.letourneau@usherbrooke.ca, simon.briere@usherbrooke.ca",
     description="OpenTera base package",
@@ -23,5 +23,5 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.7',
 )

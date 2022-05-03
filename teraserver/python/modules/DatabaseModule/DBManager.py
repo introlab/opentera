@@ -1,5 +1,6 @@
 from flask_sqlalchemy import event
 from sqlalchemy.engine import Engine
+from sqlalchemy.engine.reflection import Inspector
 from sqlite3 import Connection as SQLite3Connection
 
 from twisted.internet import task, reactor
@@ -39,6 +40,10 @@ from opentera.db.models.TeraUserPreference import TeraUserPreference
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraServiceConfig import TeraServiceConfig
+from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
+from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
+from opentera.db.models.TeraTest import TeraTest
 
 from opentera.config.ConfigManager import ConfigManager
 from modules.FlaskModule.FlaskModule import flask_app
@@ -188,10 +193,6 @@ class DBManager (BaseModule):
             print('No device types - creating defaults')
             TeraDeviceType.create_defaults(test)
 
-        if TeraDeviceSubType.get_count() == 0:
-            print("No device sub types - creating defaults")
-            TeraDeviceSubType.create_defaults(test)
-
         if TeraServiceProject.get_count() == 0:
             print('No service - project association - creating defaults')
             TeraServiceProject.create_defaults(test)
@@ -224,6 +225,7 @@ class DBManager (BaseModule):
             TeraDeviceProject.create_defaults(test)
             TeraDeviceParticipant.create_defaults(test)
             TeraServiceAccess.create_defaults(test)
+            TeraDeviceSubType.create_defaults(test)
 
         if TeraDeviceSite.get_count() == 0:
             print('No device-site association - creating defaults')
@@ -251,6 +253,16 @@ class DBManager (BaseModule):
             print('No service config - creating defaults')
             TeraServiceConfig.create_defaults(test)
 
+        if TeraTestType.get_count() == 0:
+            print('No test types - creating defaults')
+            TeraTestType.create_defaults(test)
+            TeraTestTypeSite.create_defaults(test)
+            TeraTestTypeProject.create_defaults(test)
+
+        if TeraTest.get_count() == 0:
+            print('No test - creating defaults')
+            TeraTest.create_defaults(test)
+
     def setup_events(self):
         # TODO Add events that need to be sent through redis
         # TODO Useful to specify event name, always get_model_name() ?
@@ -274,7 +286,9 @@ class DBManager (BaseModule):
 
         # Init tables
         # db.drop_all()
-        tables = db.engine.table_names()
+        inspector = Inspector.from_engine(db.engine)
+        tables = inspector.get_table_names()
+        # tables = db.engine.table_names()
         if not tables:
             # Create all tables
             db.create_all()
@@ -308,7 +322,9 @@ class DBManager (BaseModule):
         db.app = flask_app
 
         # Init tables
-        tables = db.engine.table_names()
+        inspector = Inspector.from_engine(db.engine)
+        tables = inspector.get_table_names()
+        # tables = db.engine.table_names()
         if not tables:
             # Create all tables
             db.create_all()

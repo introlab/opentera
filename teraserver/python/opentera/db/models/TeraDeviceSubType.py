@@ -27,19 +27,20 @@ class TeraDeviceSubType(db.Model, BaseModel):
 
     @staticmethod
     def create_defaults(test=False):
-        from opentera.db.models.TeraDeviceType import TeraDeviceType
-        bureau = TeraDeviceType.get_device_type_by_key('bureau_actif')
-        subtype = TeraDeviceSubType()
-        subtype.device_subtype_type = bureau
-        subtype.device_subtype_name = 'Bureau modèle #1'
-        db.session.add(subtype)
+        if test:
+            from opentera.db.models.TeraDeviceType import TeraDeviceType
+            bureau = TeraDeviceType.get_device_type_by_key('bureau_actif')
+            subtype = TeraDeviceSubType()
+            subtype.device_subtype_type = bureau
+            subtype.device_subtype_name = 'Bureau modèle #1'
+            db.session.add(subtype)
 
-        subtype = TeraDeviceSubType()
-        subtype.device_subtype_type = bureau
-        subtype.device_subtype_name = 'Bureau modèle #2'
-        db.session.add(subtype)
+            subtype = TeraDeviceSubType()
+            subtype.device_subtype_type = bureau
+            subtype.device_subtype_name = 'Bureau modèle #2'
+            db.session.add(subtype)
 
-        db.session.commit()
+            db.session.commit()
 
     @staticmethod
     def get_devices_subtypes():

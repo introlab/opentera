@@ -3,17 +3,17 @@ from modules.FlaskModule.FlaskModule import flask_app
 from datetime import datetime
 
 
-class ServiceQueryAssetsTest(BaseServiceAPITest):
-    test_endpoint = '/api/service/assets'
+class ServiceQueryTestsTest(BaseServiceAPITest):
+    test_endpoint = '/api/service/tests'
 
     def setUp(self):
         super().setUp()
         from modules.FlaskModule.FlaskModule import service_api_ns
         from BaseServiceAPITest import FakeFlaskModule
         # Setup minimal API
-        from modules.FlaskModule.API.service.ServiceQueryAssets import ServiceQueryAssets
+        from modules.FlaskModule.API.service.ServiceQueryTests import ServiceQueryTests
         kwargs = {'flaskModule': FakeFlaskModule(config=BaseServiceAPITest.getConfig())}
-        service_api_ns.add_resource(ServiceQueryAssets, '/assets', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryTests, '/tests', resource_class_kwargs=kwargs)
 
         # Create test client
         self.test_client = flask_app.test_client()
@@ -52,33 +52,31 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
-        self.assertTrue(json_data.__contains__('id_asset'))
+        self.assertTrue(json_data.__contains__('id_test'))
         self.assertTrue(json_data.__contains__('id_session'))
         self.assertTrue(json_data.__contains__('id_device'))
         self.assertTrue(json_data.__contains__('id_participant'))
         self.assertTrue(json_data.__contains__('id_user'))
         self.assertTrue(json_data.__contains__('id_service'))
-        self.assertTrue(json_data.__contains__('asset_name'))
-        self.assertTrue(json_data.__contains__('asset_uuid'))
-        self.assertTrue(json_data.__contains__('asset_service_uuid'))
-        self.assertTrue(json_data.__contains__('asset_type'))
-        self.assertTrue(json_data.__contains__('asset_datetime'))
+        self.assertTrue(json_data.__contains__('test_name'))
+        self.assertTrue(json_data.__contains__('test_uuid'))
+        self.assertTrue(json_data.__contains__('test_datetime'))
         if not minimal:
-            self.assertTrue(json_data.__contains__('asset_infos_url'))
-            self.assertTrue(json_data.__contains__('asset_url'))
+            self.assertTrue(json_data.__contains__('test_answers_url'))
+            self.assertTrue(json_data.__contains__('test_answers_web_url'))
             self.assertTrue(json_data.__contains__('access_token'))
 
-    def test_get_endpoint_query_assets_by_service_uuid(self):
-        params = {'service_uuid': '00000000-0000-0000-0000-000000000001', 'with_urls': True}
+    def test_get_endpoint_query_tests_by_service_uuid(self):
+        params = {'service_uuid': self.service_uuid, 'with_urls': True}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(len(response.json), 4)
+        self.assertEqual(len(response.json), 0)
 
         for data_item in response.json:
             self._checkJson(json_data=data_item)
 
-    def test_get_endpoint_query_device_assets(self):
+    def test_get_endpoint_query_device_tests(self):
         params = {'id_device': 1, 'with_urls': True}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
@@ -88,13 +86,13 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
         for data_item in response.json:
             self._checkJson(json_data=data_item)
 
-    def test_get_endpoint_query_device_assets_no_access(self):
+    def test_get_endpoint_query_device_tests_no_access(self):
         params = {'id_device': 4, 'with_urls': True}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
         self.assertEqual(response.status_code, 403)
 
-    def test_get_endpoint_query_session_assets(self):
+    def test_get_endpoint_query_session_tests(self):
         params = {'id_session': 2}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
@@ -104,46 +102,46 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
         for data_item in response.json:
             self._checkJson(json_data=data_item, minimal=True)
 
-    def test_get_endpoint_query_session_assets_no_access(self):
+    def test_get_endpoint_query_session_tests_no_access(self):
         params = {'id_session': 100}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
         self.assertEqual(response.status_code, 403)
 
-    def test_get_endpoint_query_participant_assets(self):
+    def test_get_endpoint_query_participant_tests(self):
         params = {'id_participant': 1, 'with_urls': True}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(len(response.json), 4)
+        self.assertTrue(len(response.json), 3)
 
         for data_item in response.json:
             self._checkJson(json_data=data_item)
 
-    def test_get_endpoint_query_participant_assets_no_access(self):
+    def test_get_endpoint_query_participant_tests_no_access(self):
         params = {'id_participant': 4, 'with_urls': True}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
         self.assertEqual(response.status_code, 403)
 
-    def test_get_endpoint_query_user_assets(self):
-        params = {'id_user': 1, 'with_urls': True}
+    def test_get_endpoint_query_user_tests(self):
+        params = {'id_user': 2, 'with_urls': True}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json), 4)
+        self.assertEqual(len(response.json), 1)
 
         for data_item in response.json:
             self._checkJson(json_data=data_item)
 
-    def test_get_endpoint_query_user_assets_no_access(self):
+    def test_get_endpoint_query_user_tests_no_access(self):
         params = {'id_user': 6, 'with_urls': True}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
         self.assertEqual(response.status_code, 403)
 
-    def test_get_endpoint_query_asset(self):
-        params = {'id_asset': 1, 'with_urls': True}
+    def test_get_endpoint_query_tests(self):
+        params = {'id_test': 1, 'with_urls': True}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
         self.assertEqual(response.status_code, 200)
@@ -152,111 +150,55 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
         for data_item in response.json:
             self._checkJson(json_data=data_item)
 
-    def test_get_endpoint_query_asset_no_access(self):
-        params = {'id_asset': 5, 'with_urls': True}
+    def test_get_endpoint_query_test_no_access(self):
+        params = {'id_test': 5, 'with_urls': True}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json), 0)
 
-
-    def test_get_endpoint_query_assets_created_by_service(self):
-        params = {'id_creator_service': 1, 'with_urls': True}
-        response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
-                                                     params=params, endpoint=self.test_endpoint)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(len(response.json), 1)
-
-        for data_item in response.json:
-            self._checkJson(json_data=data_item)
-
-    def test_get_endpoint_query_assets_created_by_user(self):
-        params = {'id_creator_user': 1, 'with_urls': True}
-        response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
-                                                     params=params, endpoint=self.test_endpoint)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(len(response.json), 1)
-
-        for data_item in response.json:
-            self._checkJson(json_data=data_item)
-
-    def test_get_endpoint_query_assets_created_by_user_no_access(self):
-        params = {'id_creator_user': 6, 'with_urls': True}
-        response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
-                                                     params=params, endpoint=self.test_endpoint)
-        self.assertEqual(response.status_code, 403)
-
-    def test_get_endpoint_query_assets_created_by_participant(self):
-        params = {'id_creator_participant': 1, 'with_urls': True}
-        response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
-                                                     params=params, endpoint=self.test_endpoint)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(len(response.json), 1)
-
-        for data_item in response.json:
-            self._checkJson(json_data=data_item)
-
-    def test_get_endpoint_query_assets_created_by_participant_no_access(self):
-        params = {'id_creator_participant': 4, 'with_urls': True}
-        response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
-                                                     params=params, endpoint=self.test_endpoint)
-        self.assertEqual(response.status_code, 403)
-
-    def test_get_endpoint_query_assets_created_by_device(self):
-        params = {'id_creator_device': 1, 'with_urls': True}
-        response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
-                                                     params=params, endpoint=self.test_endpoint)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(len(response.json), 1)
-
-        for data_item in response.json:
-            self._checkJson(json_data=data_item)
-
-    def test_get_endpoint_query_assets_created_by_device_no_access(self):
-        params = {'id_creator_device': 4, 'with_urls': True}
-        response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
-                                                     params=params, endpoint=self.test_endpoint)
-        self.assertEqual(response.status_code, 403)
-
     def test_post_endpoint_with_update_and_delete(self):
         # New with minimal infos
         json_data = {
-            'asset': {
-                'asset_name': 'Test Asset',
-                'asset_datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')            }
+            'test': {
+                'test_name': 'Test Test',
+                'test_datetime': datetime.now().isoformat()}
         }
 
         response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                       json=json_data, endpoint=self.test_endpoint)
 
-        self.assertEqual(400, response.status_code, msg="Missing id_asset")
+        self.assertEqual(400, response.status_code, msg="Missing id_test")
 
-        json_data['asset']['id_asset'] = 0
+        json_data['test']['id_test'] = 0
         response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                       json=json_data, endpoint=self.test_endpoint)
-        self.assertEqual(400, response.status_code, msg="Missing asset type")
+        self.assertEqual(400, response.status_code, msg="Missing test type")
 
-        json_data['asset']['asset_type'] = 'application/octet-stream'
-
+        json_data['test']['id_test_type'] = 1
         response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                       json=json_data, endpoint=self.test_endpoint)
         self.assertEqual(400, response.status_code, msg="Missing id_session")
 
-        json_data['asset']['id_session'] = 2
+        json_data['test']['id_session'] = 1
+        # response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
+        #                                               json=json_data, endpoint=self.test_endpoint)
+        # self.assertEqual(403, response.status_code, msg="Test type not accessible to this service")
+
+        # json_data['test']['id_test_type'] = 1
         response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                       json=json_data, endpoint=self.test_endpoint)
         self.assertEqual(200, response.status_code, msg="Post new")  # All ok now!
 
         json_data = response.json[0]
         self._checkJson(json_data, minimal=True)
-        current_id = json_data['id_asset']
-        current_uuid = json_data['asset_uuid']
+        current_id = json_data['id_test']
+        current_uuid = json_data['test_uuid']
 
         json_data = {
-            'asset': {
-                'id_asset': current_id,
-                'asset_service_uuid': '0000000000000',  # Bad service uuid - should be replaced in post reply
-                'asset_name': 'Test Asset 2'
+            'test': {
+                'id_test': current_id,
+                'test_name': 'Test Test 2'
             }
         }
 
@@ -265,8 +207,7 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
         self.assertEqual(200, response.status_code, msg="Post update")
         json_data = response.json[0]
         self._checkJson(json_data, minimal=True)
-        self.assertEqual(json_data['asset_name'], 'Test Asset 2')
-        self.assertEqual(json_data['asset_service_uuid'], self.service_uuid)
+        self.assertEqual(json_data['test_name'], 'Test Test 2')
 
         # Delete
         response = self._delete_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -279,13 +220,13 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                                                         params={'uuid': current_uuid}, endpoint=self.test_endpoint)
         self.assertEqual(400, response.status_code, msg="Wrong delete")
 
-    def test_get_endpoint_query_session_assets_as_admin_token_only(self):
+    def test_get_endpoint_query_session_tests_as_admin_token_only(self):
         params = {'id_session': 2, 'with_urls': True, 'with_only_token': True}
         response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                      params=params, endpoint=self.test_endpoint)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json), 3)
         for data_item in response.json:
-            self.assertFalse(data_item.__contains__("asset_name"))
-            self.assertTrue(data_item.__contains__("asset_uuid"))
+            self.assertFalse(data_item.__contains__("test_name"))
+            self.assertTrue(data_item.__contains__("test_uuid"))
             self.assertTrue(data_item.__contains__("access_token"))
