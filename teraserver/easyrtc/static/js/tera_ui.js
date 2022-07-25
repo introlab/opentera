@@ -1,5 +1,5 @@
 let localTimerHandles = [0, 0];
-let remoteTimerHandles = [0, 0, 0, 0];
+let remoteTimerHandles = [];
 
 let localScreenSharing = false;
 
@@ -7,6 +7,23 @@ let primaryView = {peerid: 0, streamName: 'default'};
 
 function initUI(){
     $('#configDialog').on('hidden.bs.modal', configDialogClosed);
+    for(let i=0; i<maxRemoteSourceNum; i++){
+        remoteTimerHandles.push(0);
+    }
+}
+
+function initVideoAreas(){
+    $.get(
+        'includes/video_user_remote_view.html',
+        {},
+        function (data) {
+            for (let i=1; i<=maxRemoteSourceNum; i++){
+                let divdata = data.replaceAll('{##view_id##}', i.toString());
+                $('#remoteRows').append(divdata);
+            }
+            initialUserLayout();
+        }
+    );
 }
 
 function resetInactiveTimer(local, index){
@@ -332,7 +349,7 @@ function btnShareScreenClicked(){
         return;
     }
 
-    if (remoteStreams.length >= 4){
+    if (remoteStreams.length >= maxRemoteSourceNum){
         showError("btnShareScreenClicked", translator.translateForKey("errors.screenshare-no-slot", currentLang), true, false);
         return;
     }

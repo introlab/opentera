@@ -1,6 +1,7 @@
 let isWeb = true;
 let translator = null;
 let currentLang = 'fr';
+const maxRemoteSourceNum = 8;
 
 function preInitSystem(){
     console.log("Pre-initializing system...");

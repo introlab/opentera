@@ -362,7 +362,7 @@ function localVideoStreamSuccess(stream){
             if (stream.streamName === "default"){
                 local_index = 0;
                 console.log("Connecting to session...");
-                easyrtc.connect("TeraPlus", signalingLoginSuccess, signalingLoginFailure);
+                easyrtc.connect("OpenTera", signalingLoginSuccess, signalingLoginFailure);
 
             }else{
                 // Other stream - must add to call
@@ -515,7 +515,7 @@ function newStreamStarted(callerid, stream, streamname) {
 
     // Find first empty slot
     if (slot === undefined){
-        if (remoteStreams.length+1 > 4) {
+        if (remoteStreams.length+1 > maxRemoteSourceNum) {
             showError("newStreamStarted", translator.translateForKey("errors.stream-no-slot", currentLang), true);
             return;
         }
