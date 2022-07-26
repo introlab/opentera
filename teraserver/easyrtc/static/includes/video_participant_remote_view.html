@@ -1,0 +1,25 @@
+<div class="col-sm-12 col-xl videoView" id="remoteView{##view_id##}"
+     onmousemove="resetInactiveTimer(false, {##view_id##});showButtons(false, true, {##view_id##});"
+     onmouseleave="stopInactiveTimer(false, {##view_id##});showButtons(false, false, {##view_id##}); return false;"
+     oncontextmenu="resetInactiveTimer(false, {##view_id##});showButtons(false, true, {##view_id##});">
+    <span class="badge badge-primary d-lg-inline d-none" id="remoteViewTitle{##view_id##}">Participant #{##view_id##}</span>
+    <!--span class="badge badge-danger text-white-50" id="remoteViewRec1" style="display:none;">REC</span>-->
+
+    <!-- Video controls -->
+    <div id="remoteVideoControls{##view_id##}" class="overlay-top-right" style="">
+        <input id="remoteBtnSwapVideo{##view_id##}" type="image" alt="image" src="images/swap.png" class="image-icon" onclick="enlargeView(false,{##view_id##});event.stopPropagation();" style="display: none;"/>
+    </div>
+
+    <!-- Micro, video, sensors, ... controls -->
+    <div id="remoteLockedViewControls{##view_id##}" class="overlay-bottom-center" >
+        <input id="remoteMicStatus{##view_id##}" type="image" alt="image" src="images/mic.png" class="image-icon" style="display: none;"/>
+        <input id="remoteVideoStatus{##view_id##}" type="image" alt="image" src="images/video.png" class="image-icon" style="display: none;"/>
+        <input id="remoteSpeakerStatus{##view_id##}" type="image" alt="image" src="images/speaker.png" class="image-icon" style="display: none;"/>
+    </div>
+
+    <!-- Video ! -->
+    <video id="remoteVideo{##view_id##}" playsinline
+           oncontextmenu="return false;"
+           onclick=""
+           onwheel="" class="" style=""></video>
+</div>

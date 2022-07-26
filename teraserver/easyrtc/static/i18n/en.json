@@ -81,6 +81,8 @@
 		"presets": "Positions",
 		"preset-1": "Position 1",
 		"preset-2": "Position 2",
-		"preset-3": "Position 3"
+		"preset-3": "Position 3",
+		"screenof": "Screen -",
+		"cameraof": "Camera -"
 	}
 }

@@ -12,20 +12,6 @@ function initUI(){
     }
 }
 
-function initVideoAreas(){
-    $.get(
-        'includes/video_user_remote_view.html',
-        {},
-        function (data) {
-            for (let i=1; i<=maxRemoteSourceNum; i++){
-                let divdata = data.replaceAll('{##view_id##}', i.toString());
-                $('#remoteRows').append(divdata);
-            }
-            initialUserLayout();
-        }
-    );
-}
-
 function resetInactiveTimer(local, index){
     stopInactiveTimer(local, index);
 
@@ -540,12 +526,22 @@ function updateLocalConfig(new_config){
     }
 }
 
-function setTitle(local, index, title){
+function setTitle(local, index, title, user=false){
     let view_prefix = ((local === true) ? 'local' : 'remote');
     let label = $('#' + view_prefix + 'ViewTitle' + index);
     if (title === undefined) title = "Participant #" + index;
     if (label.length){
         label[0].innerText = title;
+    }
+    if (local === false){
+        // console.log('setTitle - ' + title + ', isUser = ' + user);
+        if (user){
+            removeClassByPrefix(label[0], 'badge-primary');
+            label.addClass('badge-warning');
+        }else {
+            removeClassByPrefix(label[0], 'badge-warning');
+            label.addClass('badge-primary');
+        }
     }
 }
 

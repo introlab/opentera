@@ -367,6 +367,8 @@ function localVideoStreamSuccess(stream){
             }else{
                 // Other stream - must add to call
                 console.log("Adding stream to session...");
+                sendPrimaryView(local_peerid, stream.streamName);
+                setPrimaryViewIcon(local_peerid, stream.streamName);
                 local_index = 1; // Secondary stream in the call
                 for (let i=0; i<remoteStreams.length; i++){
                     easyrtc.addStreamToCall(remoteStreams[i].peerid, stream.streamName, function (/*caller, streamName*/) {
@@ -531,11 +533,15 @@ function newStreamStarted(callerid, stream, streamname) {
     let contact_index = getContactIndexForPeerId(callerid);
     if (contact_index !== undefined){
         let title =  remoteContacts[contact_index].name;
+        // console.log('Found remote contact - ' + title + ' for slot ' + slot);
         if (title === undefined) title = "Participant #" + (contact_index+1);
         if (streamname === 'ScreenShare') {
-            title = "Écran de " + title;
+            title = translator.translateForKey('ui.screenof') + " " + title;
         }
-        setTitle(false, slot, title);
+        if (streamname === '2ndStream'){
+            title = translator.translateForKey('ui.cameraof') + " " + title;
+        }
+        setTitle(false, slot, title, remoteContacts[contact_index].status.isUser);
     }
 
     // Enable-disable status controls
@@ -610,6 +616,12 @@ function newStreamStarted(callerid, stream, streamname) {
     if (primaryView.peerid === callerid){
         // Select current primary view
         setPrimaryView(primaryView.peerid, primaryView.streamName);
+    }
+    // Update large view if required to show the last user connected
+    if (isParticipant && primaryView.peerid === 0 && contact_index !== undefined
+        && remoteContacts[contact_index].status.isUser){
+        //setPrimaryView(msgData.peerid, "default");
+        setLargeView(getVideoViewId(false, slot));
     }
 
     // Recorder
@@ -719,8 +731,10 @@ function streamDisconnected(callerid, mediaStream, streamName){
         if (contact_index !== undefined) {
             let title = remoteContacts[contact_index].name;
             if (remoteStreams[i].streamname === 'ScreenShare')
-                title = "Écran de " + title;
-            setTitle(false, i + 1, title);
+                title = translator.translateForKey('ui.screenof') + " " + title;
+            if (remoteStreams[i].streamname === '2ndStream')
+                title = translator.translateForKey('ui.cameraof') + " " + title;
+            setTitle(false, i + 1, title, remoteContacts[contact_index].status.isUser);
         }
     }
 
@@ -841,8 +855,9 @@ function dataReception(sendercid, msgType, msgData, targeting) {
         }
         // Update title
         let stream_index = getStreamIndexForPeerId(sendercid, 'default');
+        console.log('Found stream index: ' + stream_index);
         if (stream_index !== undefined) {
-            setTitle(false, stream_index+1, msgData.name);
+            setTitle(false, stream_index+1, msgData.name, msgData.status.isUser);
         }
     }
 
@@ -975,6 +990,8 @@ function dataReception(sendercid, msgType, msgData, targeting) {
                 //setPrimaryView(msgData.peerid, "default");
                 setLargeView(getVideoViewId(false, index+1));
             }
+
+            setTitle(false, index+1, remoteContacts[contact_index].name, msgData.isUser);
         }
 
     }

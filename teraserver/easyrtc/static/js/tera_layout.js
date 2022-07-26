@@ -7,6 +7,20 @@ let currentLayoutId = layouts.GRID;
 let currentLargeViewId = "";
 let isParticipant = false;
 
+function initVideoAreas(){
+    $.get(
+        'includes/video_user_remote_view.html',
+        {},
+        function (data) {
+            for (let i=1; i<=maxRemoteSourceNum; i++){
+                let divdata = data.replaceAll('{##view_id##}', i.toString());
+                $('#remoteRows').append(divdata);
+            }
+            initialUserLayout();
+        }
+    );
+}
+
 function initialUserLayout(){
     updateUserRemoteViewsLayout(0);
     updateUserLocalViewLayout(1, 0);
@@ -87,13 +101,13 @@ function updateUserRemoteViewsLayout(remote_num){
         }
     }
 
-    if (currentLayoutId === layouts.LARGEVIEW && remote_num % 2 === 0){
+    if (currentLayoutId === layouts.LARGEVIEW && remote_num % 2 === 0 && !currentLargeViewId.startsWith('local')){
         let last_view = $("#remoteView" + remote_num);
         if (currentLargeViewId === 'remoteView' + remote_num){
             if (remote_num-1 > 0) {
-                last_view = $("#remoteView" + remote_num - 1);
+                last_view = $("#remoteView" + (remote_num - 1));
             }else{
-                last_view = $("#remoteView" + remote_num + 1);
+                last_view = $("#remoteView" + (remote_num + 1));
             }
         }
         if (!last_view[0].classList.contains('col')){
@@ -115,6 +129,9 @@ function updateUserLocalViewLayout(local_num, remote_num){
     }
 
     switch(local_num){
+        case 0:
+            selfViewRow2.hide();
+            break;
         case 1:
             selfViewRow2.hide();
             break;
@@ -122,7 +139,7 @@ function updateUserLocalViewLayout(local_num, remote_num){
             selfViewRow2.show();
             break;
         default:
-            console.error('Unknown local view number, don\'t know how to set the layout!');
+            console.error('Unknown local view number - ' + local_num + ', don\'t know how to set the layout!');
     }
 }
 
