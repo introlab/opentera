@@ -7,7 +7,7 @@ function initVideoAreas(){
         {},
         function (data) {
             for (let i=1; i<=maxRemoteSourceNum; i++){
-                let divdata = data.replaceAll('{##view_id##}', i.toString());
+                let divdata = data.replace(/{##view_id##}/g, i.toString());
                 $('#remoteRows').append(divdata);
             }
             initialUserLayout();

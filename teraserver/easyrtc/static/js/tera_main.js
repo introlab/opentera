@@ -60,7 +60,8 @@ function initSystem(){
     }
 
     // Initial local status
-    localContact.status = {'microMuted': false, 'videoMuted': false, 'speakerMuted': false, 'sharing2ndSource': false};
+    localContact.status = {'microMuted': false, 'videoMuted': false, 'speakerMuted': false, 'sharing2ndSource': false,
+                           'sharingScreen': false};
 
     // Initialize video and audio sources
     fillDefaultSourceList().then(initSystemDone).catch(err => {

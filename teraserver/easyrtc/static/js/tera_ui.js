@@ -1,8 +1,6 @@
 let localTimerHandles = [0, 0];
 let remoteTimerHandles = [];
 
-let localScreenSharing = false;
-
 let primaryView = {peerid: 0, streamName: 'default'};
 
 function initUI(){
@@ -76,10 +74,18 @@ function showButtons(local, show, index){
 
         if (screenIcon.length){
             let iconActive = isButtonActive(local, index, "ShareScreen");
-            if (iconActive === true){
-                screenIcon.show();
+            if (local === true){
+                if (iconActive === true){
+                    screenIcon.show();
+                }else{
+                    (show === true && (!localContact.status.sharing2ndSource /*&& local === true*/)) ? screenIcon.show() : screenIcon.hide();
+                }
             }else{
-                (show === true && (!localContact.status.sharing2ndSource && local === true)) ? screenIcon.show() : screenIcon.hide();
+                if (iconActive === true){
+                    screenIcon.show();
+                }else{
+                    (show === true && remoteStreams[index-1].streamname === 'default') ? screenIcon.show() : screenIcon.hide();
+                }
             }
         }
 
@@ -93,7 +99,8 @@ function showButtons(local, show, index){
                     if (iconActive === true) {
                         secondSourceIcon.show();
                     } else {
-                        (show === true && !localScreenSharing) ? secondSourceIcon.show() : secondSourceIcon.hide();
+                        (show === true && !localContact.status.sharingScreen) ?
+                            secondSourceIcon.show() : secondSourceIcon.hide();
                     }
                 }
             }else{
@@ -161,8 +168,9 @@ function showButtons(local, show, index){
                     let contact_index = getContactIndexForPeerId(remoteStreams[index-1].peerid);
                     if (contact_index !== undefined){
                         if (remoteContacts[contact_index].status &&
-                            remoteContacts[contact_index].status.videoSrcLength > 1){
-                            (show === true) ? videoSwapIcon.show() : videoSwapIcon.hide();
+                            remoteContacts[contact_index].status.videoSrcLength > 1 &&
+                            remoteStreams[index-1].streamname === 'default'){
+                                (show === true) ? videoSwapIcon.show() : videoSwapIcon.hide();
                         }else{
                             videoSwapIcon.hide();
                         }
@@ -288,7 +296,7 @@ function updateButtonIconState(status, local, index, prefix){
                 if (local){
                     if (localTimerHandles[index-1] !== 0) must_show = true;
                 }else{
-                    if (remoteTimerHandles[index-1] !== 0) must_show = true;
+                    /*if (remoteTimerHandles[index-1] !== 0)*/ must_show = true;
                 }
                 (!must_show) ? icon.hide() : icon.show();
             }else{
@@ -340,24 +348,24 @@ function btnShareScreenClicked(){
         return;
     }
 
-    localScreenSharing = !localScreenSharing;
+    localContact.status.sharingScreen = !localContact.status.sharingScreen;
 
     // Do the screen sharing
-    shareScreen(true, localScreenSharing).then(function (){
+    shareScreen(true, localContact.status.sharingScreen).then(function (){
 
-        updateButtonIconState(localScreenSharing, true, 1, "ShareScreen");
+        updateButtonIconState(localContact.status.sharingScreen, true, 1, "ShareScreen");
 
         // Show / Hide share screen button
         let btn = getButtonIcon(true, 1, "ShareScreen");
-        if (localScreenSharing)
+        if (localContact.status.sharingScreen)
             btn.show();
 
         // Show / Hide second source button
         btn = getButtonIcon(true, 1, "Show2ndVideo");
-        (localScreenSharing) ? btn.hide() : btn.show();
+        (localContact.status.sharingScreen) ? btn.hide() : btn.show();
 
         // Show / hide mic-video-speaker icons
-        showStatusControls(true, 2, !localScreenSharing);
+        showStatusControls(true, 2, !localContact.status.sharingScreen);
 
         // Force views on new screen share
         if (!isParticipant){
@@ -368,13 +376,19 @@ function btnShareScreenClicked(){
 
     }).catch(function (){
         // Revert state
-        localScreenSharing = !localScreenSharing;
+        localContact.status.sharingScreen = !localContact.status.sharingScreen;
     });
 
 }
 
+function btnRemoteShareScreenClicked(index){
+    let status = !isButtonActive(false, index, "ShareScreen");
+    sendShareScreen(remoteContacts[index-1].peerid, status);
+    updateButtonIconState(status, false, 1, "ShareScreen");
+}
+
 function btnShow2ndLocalVideoClicked(){
-    if (localScreenSharing === true){
+    if (localContact.status.sharingScreen === true){
         console.warn("Trying to add second source while already having a screen sharing source");
         return;
     }
@@ -632,6 +646,10 @@ function refreshRemoteStatusIcons(peerid){
 
         if (status.sharing2ndSource !== undefined){
             updateButtonIconState(status.sharing2ndSource, false, index+1, "Show2ndVideo");
+        }
+
+        if (status.sharingScreen !== undefined){
+            updateButtonIconState(status.sharingScreen, false, index+1, "ShareScreen");
         }
     }
 }
