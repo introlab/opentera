@@ -83,5 +83,9 @@
     <video id="remoteVideo{##view_id##}" playsinline
            oncontextmenu="return false;"
            onclick="managePTZClickEvent(event, false, {##view_id##});"
+           onmousedown="manageMouseEvent(event, false, {##view_id##}, 'MouseDownEvent');"
+           onmouseup="manageMouseEvent(event, false, {##view_id##}, 'MouseUpEvent');"
+           onmousemove="manageMouseEvent(event, false, {##view_id##}, 'MouseMoveEvent');"
+           <!-- onkeydown="manageKeyEvent(event, false, {##view_id##}, 'KeyDownEvent');" -->
            onwheel="managePTZMouseWheel(event, false, {##view_id##});" class=""></video>
 </div>

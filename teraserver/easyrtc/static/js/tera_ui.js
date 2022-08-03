@@ -33,7 +33,7 @@ function showButtons(local, show, index){
     let view_prefix = ((local === true) ? 'local' : 'remote');
     let ptzControls = $("#" + view_prefix + "PtzControls" + index);
     let srcControls = $("#" + view_prefix + "SourcesControls" + index);
-    let statusControls = $("#" + view_prefix + "ViewControls" + index)
+    let statusControls = $("#" + view_prefix + "ViewControls" + index);
     let videoControls = $("#" + view_prefix + "VideoControls" + index);
     let viewCameras = $("#" + view_prefix + "ViewCameras" + index);
 

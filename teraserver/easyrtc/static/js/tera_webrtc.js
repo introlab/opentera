@@ -424,7 +424,8 @@ function forwardData(data)
 
 function broadcastlocalCapabilities(){
     if (easyrtc.webSocketConnected){
-        easyrtc.sendDataWS({"targetRoom":"default"}, 'updateCapabilities', localCapabilities, function(ackMesg) {
+        easyrtc.sendDataWS({"targetRoom":"default"}, 'updateCapabilities', localCapabilities,
+            function(ackMesg) {
             //console.error("ackMsg:",ackMesg);
             if( ackMesg.msgType === 'error' ) {
                 console.error(ackMesg.msgData.errorText);
@@ -574,24 +575,6 @@ function newStreamStarted(callerid, stream, streamname) {
     if (streamname === "default"){
         // Send self contact card
         sendContactInfo(callerid);
-
-        // Update video
-        //var videoId = getVideoId(0);
-        /*var videoId = getVideoId(slot);
-        var video = document.getElementById(videoId);
-
-        // Send status update to all
-        var micEnabled = "false";
-        //if (video.micEnabled || video.micEnabled==undefined)
-        if (isMicActive(0,0))
-            micEnabled="true";
-        var mic2Enabled = "false";
-        if (isMicActive(0,1))
-            mic2Enabled="true";
-
-        var spkEnabled = "false";
-        if (video.volume=="1")
-            spkEnabled = "true";*/
 
         // Sends PTZ capabilities
         broadcastlocalPTZCapabilities();
@@ -876,6 +859,40 @@ function dataReception(sendercid, msgType, msgData, targeting) {
             }else
                 console.error("Not connected to client.");
         }
+
+    }
+
+    if (msgType === "MouseDownEvent"){
+        if (localCapabilities.screenControl === true && msgData.streamname.endsWith('ScreenShare')){
+            // Remote control
+            if (teraConnected) {
+                SharedObject.mouseDownEvent(localContact.uuid, msgData.x, msgData.y, msgData.w, msgData.h);
+            }else{
+                console.error("Not connected to client");
+            }
+        }
+    }
+
+    if (msgType === "MouseUpEvent"){
+        if (localCapabilities.screenControl === true && msgData.streamname.endsWith('ScreenShare')){
+            // Remote control
+            if (teraConnected) {
+                SharedObject.mouseUpEvent(localContact.uuid, msgData.x, msgData.y, msgData.w, msgData.h);
+            }else{
+                console.error("Not connected to client");
+            }
+        }
+    }
+
+    if (msgType === "MouseMoveEvent"){
+        if (localCapabilities.screenControl === true && msgData.streamname.endsWith('ScreenShare')){
+            // Remote control
+            if (teraConnected) {
+                SharedObject.mouseMoveEvent(localContact.uuid, msgData.x, msgData.y, msgData.w, msgData.h);
+            }else{
+                console.error("Not connected to client");
+            }
+        }
     }
 
     if (msgType === "ZoomRequest"){
@@ -957,7 +974,7 @@ function dataReception(sendercid, msgType, msgData, targeting) {
     }
 
     if (msgType === "updateCapabilities"){
-        setCapabilities(sendercid, msgData.video2);
+        setCapabilities(sendercid, msgData.video2, msgData.screenControl);
     }
 
     if (msgType === "setPrimaryView"){
@@ -1117,7 +1134,7 @@ function signalingLoginSuccess(peerid,  roomOwner) {
     broadcastlocalPTZCapabilities();
 
     // Sends other capabilities
-    broadcastlocalCapabilities();
+    // broadcastlocalCapabilities();
 
     clearStatusMsg();
     stopSounds();

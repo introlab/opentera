@@ -1,7 +1,7 @@
 // Audio - video sources management
 var videoSources = [];
 var audioSources = [];
-var localCapabilities = {'video2':false};
+let localCapabilities = {'video2':false, 'screenControl': false};
 
 // Control flags
 var deviceEnumCompleted = false;
@@ -200,23 +200,23 @@ function selectDefaultSources(){
 }
 
 
-function setCapabilities(peerid, video2){
+function setCapabilities(peerid, video2, screenControl){
 
-    console.log("Setting Capabilities: " + peerid + " = " + video2);
-    let cap = {'video2':video2};
+    console.log("Setting Capabilities: " + peerid + ", video2 = " + video2 + ", control = " + screenControl);
+    let cap = {'video2':video2, 'screenControl': screenControl};
 
     if (peerid === local_peerid){
         console.log(" -- Local ID - settings values.");
-        localCapabilities.video2 = video2;
-    }else{
+        localCapabilities = cap;
+    }else {
         console.log(" -- Remote ID received: " + peerid + ", I am " + local_peerid);
         // Find and update capabilities in remoteContacts
+        console.log(remoteContacts);
         let index = getContactIndexForPeerId(peerid);
-        if (index){
+        if (index !== undefined) {
             remoteContacts[index].capabilities = cap;
         }
     }
-
 }
 
 function getActiveStreams(){
