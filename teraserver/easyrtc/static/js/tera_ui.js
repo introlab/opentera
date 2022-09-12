@@ -78,13 +78,14 @@ function showButtons(local, show, index){
                 if (iconActive === true){
                     screenIcon.show();
                 }else{
-                    (show === true && (!localContact.status.sharing2ndSource /*&& local === true*/)) ? screenIcon.show() : screenIcon.hide();
+                    (show === true && (!localContact.status.sharing2ndSource && localCapabilities.screenSharing/*&& local === true*/)) ? screenIcon.show() : screenIcon.hide();
                 }
             }else{
                 if (iconActive === true){
                     screenIcon.show();
                 }else{
-                    (show === true && remoteStreams[index-1].streamname === 'default') ? screenIcon.show() : screenIcon.hide();
+                    (show === true && remoteStreams[index-1].streamname === 'default'
+                        && remoteContacts[index-1].capabilities.screenSharing) ? screenIcon.show() : screenIcon.hide();
                 }
             }
         }
@@ -384,7 +385,7 @@ function btnShareScreenClicked(){
 function btnRemoteShareScreenClicked(index){
     let status = !isButtonActive(false, index, "ShareScreen");
     sendShareScreen(remoteContacts[index-1].peerid, status);
-    updateButtonIconState(status, false, 1, "ShareScreen");
+    // updateButtonIconState(status, false, index, "ShareScreen");
 }
 
 function btnShow2ndLocalVideoClicked(){

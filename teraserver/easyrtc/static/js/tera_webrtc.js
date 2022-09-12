@@ -974,7 +974,7 @@ function dataReception(sendercid, msgType, msgData, targeting) {
     }
 
     if (msgType === "updateCapabilities"){
-        setCapabilities(sendercid, msgData.video2, msgData.screenControl);
+        setCapabilities(sendercid, msgData.video2, msgData.screenControl, msgData.screenSharing);
     }
 
     if (msgType === "setPrimaryView"){

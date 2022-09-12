@@ -65,7 +65,7 @@ function setupSharedObjectCallbacks(channel){
         ptz = JSON.parse(settings.ptz);
         setPTZCapabilities(localContact.uuid, ptz.zoom, ptz.presets, ptz.settings, ptz.camera);
         if (settings.screenControl !== undefined){
-            setCapabilities("0", localCapabilities.video2, settings.screenControl);
+            setCapabilities("0", localCapabilities.video2, settings.screenControl, true);
         }
 
         // Connect to signaling server now that we got all the settings
