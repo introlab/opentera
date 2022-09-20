@@ -12,6 +12,7 @@ from opentera.modules.BaseModule import ModuleNames
 
 # Parser definition(s)
 get_parser = api.parser()
+get_parser.add_argument('id', type=int, help='ID of the user to query')
 get_parser.add_argument('id_user', type=int, help='ID of the user to query')
 get_parser.add_argument('id_user_group', type=int, help='ID of the user group to get all users from')
 get_parser.add_argument('id_project', type=int, help='ID of the project to get all users that has access to it')
@@ -62,6 +63,9 @@ class UserQueryUsers(Resource):
 
         if args['uuid']:
             args['user_uuid'] = args['uuid']
+
+        if args['id']:
+            args['id_user'] = args['id']
 
         # If we have a user_uuid, query for that user if accessible
         if args['user_uuid']:
