@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: [3.10.7]
 
     steps:
     - uses: actions/checkout@v2
@@ -42,8 +42,8 @@ jobs:
     - name: Build dist package with setuptools
       working-directory: teraserver/python
       run: | 
-        ./env/python-3.8/bin/python3 -m pip install --upgrade setuptools wheel twine
-        ./env/python-3.8/bin/python3 setup.py sdist bdist_wheel
+        ./env/python-3.10/bin/python3 -m pip install --upgrade setuptools wheel twine
+        ./env/python-3.10/bin/python3 setup.py sdist bdist_wheel
         du -h dist
         
     - name: Run Tests
@@ -56,7 +56,7 @@ jobs:
     - name: Upload package to PyPi
       working-directory: teraserver/python
       run: | 
-        ./env/python-3.8/bin/python3 -m twine upload dist/*
+        ./env/python-3.10/bin/python3 -m twine upload dist/*
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}

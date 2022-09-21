@@ -126,23 +126,23 @@ class TeraTest(db.Model, BaseModel):
 
     @staticmethod
     def get_tests_for_device(device_id: int):
-        return TeraTest.query.filter_by(id_device=device_id).all()
+        return TeraTest.query.filter_by(id_device=device_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
 
     @staticmethod
     def get_tests_for_user(user_id: int):
-        return TeraTest.query.filter_by(id_user=user_id).all()
+        return TeraTest.query.filter_by(id_user=user_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
 
     @staticmethod
     def get_tests_for_session(session_id: int):
-        return TeraTest.query.filter_by(id_session=session_id).all()
+        return TeraTest.query.filter_by(id_session=session_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
 
     @staticmethod
     def get_tests_for_participant(part_id: int):
-        return TeraTest.query.filter_by(id_participant=part_id).all()
+        return TeraTest.query.filter_by(id_participant=part_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
 
     @staticmethod
     def get_tests_for_service(service_id: int):
-        return TeraTest.query.filter_by(id_service=service_id).all()
+        return TeraTest.query.filter_by(id_service=service_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
 
     @staticmethod
     def get_access_token(test_uuids: list, token_key: str, requester_uuid: str, expiration=3600):

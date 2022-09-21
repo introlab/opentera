@@ -14,6 +14,7 @@
     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="js/socket.io.js"></script>
     <script src="easyrtc/easyrtc.js"></script>
+    <script src="js/bowser/bowser.js"></script>
 
     <script src="js/tera_layout_participants.js"></script>
     <script src="js/tera_main.js"></script>
@@ -36,7 +37,10 @@
             console.log('Page loaded. Ready to start!');
             preInitSystem();
             initTranslator();
-            initialUserLayout();
+            $(document).ready(function(){
+                initVideoAreas();
+            });
+            //initialUserLayout();
             initUI();
             initSystem();
         }
@@ -131,7 +135,7 @@
                      onmouseleave="stopInactiveTimer(true, 1);showButtons(true, false, 1); return false;"
                      oncontextmenu="resetInactiveTimer(true, 1);showButtons(true, true, 1);">
 
-                    <span class="badge badge-info" id="localViewTitle1">Vue locale #1</span>
+                    <span class="badge badge-info d-lg-inline d-none" id="localViewTitle1">Vue locale #1</span>
                     <!-- Video controls -->
                     <div id="localVideoControls1" class="overlay-top-right" style="">
                         <input id="localBtnSwapVideo1" type="image" alt="image" src="images/swap.png" class="image-icon" onclick="enlargeView(true,1);event.stopPropagation();" style="display: none;"/>
@@ -205,7 +209,7 @@
                      onmousemove="resetInactiveTimer(true, 2);showButtons(true, true, 2);"
                      onmouseleave="stopInactiveTimer(true, 2);showButtons(true, false, 2); return false;"
                      oncontextmenu="resetInactiveTimer(true, 2);showButtons(true, true, 2);">
-                    <span class="badge badge-info" id="localViewTitle2">Vue locale #2</span>
+                    <span class="badge badge-info d-lg-inline d-none" id="localViewTitle2">Vue locale #2</span>
 
                     <!-- Video controls -->
                     <div id="localVideoControls2" class="overlay-top-right" style="">
@@ -235,107 +239,8 @@
             </div>
         </div>
         <div class="col-2 h-100" id="remoteViews">
-            <div class="row h-100" id="remoteRows1" style="flex-flow: column;">
-                <div class="col videoView" id="remoteView1"
-                     onmousemove="resetInactiveTimer(false, 1);showButtons(false, true, 1);"
-                     onmouseleave="stopInactiveTimer(false, 1);showButtons(false, false, 1); return false;"
-                     oncontextmenu="resetInactiveTimer(false, 1);showButtons(false, true, 1);">
-                    <span class="badge badge-primary" id="remoteViewTitle1">Participant #1</span>
-                    <!--span class="badge badge-danger text-white-50" id="remoteViewRec1" style="display:none;">REC</span>-->
-
-                    <!-- Video controls -->
-                    <div id="remoteVideoControls1" class="overlay-top-right" style="">
-                        <input id="remoteBtnSwapVideo1" type="image" alt="image" src="images/swap.png" class="image-icon" onclick="enlargeView(false,1);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Micro, video, sensors, ... controls -->
-                    <div id="remoteLockedViewControls1" class="overlay-bottom-center" >
-                        <input id="remoteMicStatus1" type="image" alt="image" src="images/mic.png" class="image-icon" style="display: none;"/>
-                        <input id="remoteVideoStatus1" type="image" alt="image" src="images/video.png" class="image-icon" style="display: none;"/>
-                        <input id="remoteSpeakerStatus1" type="image" alt="image" src="images/speaker.png" class="image-icon" style="display: none;"/>
-                    </div>
-
-                    <!-- Video ! -->
-                    <video id="remoteVideo1" playsinline
-                           oncontextmenu="return false;"
-                           onclick=""
-                           onwheel="" class=""></video>
-                </div>
-                <div class="col videoView" id="remoteView2"
-                     onmousemove="resetInactiveTimer(false, 2);showButtons(false, true, 2);"
-                     onmouseleave="stopInactiveTimer(false, 2);showButtons(false, false, 2); return false;"
-                     oncontextmenu="resetInactiveTimer(false, 2);showButtons(false, true, 2);">
-                    <span class="badge badge-primary" id="remoteViewTitle2">Participant #2</span>
-                    <!--<span class="badge badge-danger text-white-50" id="remoteViewRec2" style="display:none;">REC</span>-->
-
-                    <!-- Video controls -->
-                    <div id="remoteVideoControls2" class="overlay-top-right" style="">
-                        <input id="remoteBtnSwapVideo2" type="image" alt="image" src="images/swap.png" class="image-icon" onclick="enlargeView(false,2);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Micro, video, sensors, ... controls -->
-                    <div id="remoteLockedViewControls2" class="overlay-bottom-center" >
-                        <input id="remoteMicStatus2" type="image" alt="image" src="images/mic.png" class="image-icon" style="display: none;"/>
-                        <input id="remoteVideoStatus2" type="image" alt="image" src="images/video.png" class="image-icon" style="display: none;"/>
-                        <input id="remoteSpeakerStatus2" type="image" alt="image" src="images/speaker.png" class="image-icon" style="display: none;"/>
-                    </div>
-
-                    <!-- Video ! -->
-                    <video id="remoteVideo2" playsinline
-                           oncontextmenu="return false;"
-                           onclick=""
-                           onwheel="" class=""></video>
-                </div>
-                <div class="col videoView" id="remoteView3"
-                     onmousemove="resetInactiveTimer(false, 3);showButtons(false, true, 3);"
-                     onmouseleave="stopInactiveTimer(false, 3);showButtons(false, false, 3); return false;"
-                     oncontextmenu="resetInactiveTimer(false, 3);showButtons(false, true, 3);">
-                    <span class="badge badge-primary" id="remoteViewTitle3">Participant #3</span>
-                    <!--<span class="badge badge-danger text-white-50" id="remoteViewRec3" style="display:none;">REC</span>-->
-
-                    <!-- Video controls -->
-                    <div id="remoteVideoControls3" class="overlay-top-right" style="">
-                        <input id="remoteBtnSwapVideo3" type="image" alt="image" src="images/swap.png" class="image-icon" onclick="enlargeView(false,3);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Micro, video, sensors, ... controls -->
-                    <div id="remoteLockedViewControls3" class="overlay-bottom-center" >
-                        <input id="remoteMicStatus3" type="image" alt="image" src="images/mic.png" class="image-icon" style="display: none;"/>
-                        <input id="remoteVideoStatus3" type="image" alt="image" src="images/video.png" class="image-icon" style="display: none;"/>
-                        <input id="remoteSpeakerStatus3" type="image" alt="image" src="images/speaker.png" class="image-icon" style="display: none;"/>
-                    </div>
-
-                    <!-- Video ! -->
-                    <video id="remoteVideo3" playsinline
-                           oncontextmenu="return false;"
-                           onclick=""
-                           onwheel="" class=""></video>
-                </div>
-                <div class="col videoView" id="remoteView4"
-                     onmousemove="resetInactiveTimer(false, 4);showButtons(false, true, 4);"
-                     onmouseleave="stopInactiveTimer(false, 4);showButtons(false, false, 4); return false;"
-                     oncontextmenu="resetInactiveTimer(false, 4);showButtons(false, true, 4);">
-                    <span class="badge badge-primary" id="remoteViewTitle4">Participant #4</span>
-                    <!--<span class="badge badge-danger text-white-50" id="remoteViewRec4" style="display:none;">REC</span>-->
-
-                    <!-- Video controls -->
-                    <div id="remoteVideoControls4" class="overlay-top-right" style="">
-                        <input id="remoteBtnSwapVideo4" type="image" alt="image" src="images/swap.png" class="image-icon" onclick="enlargeView(false,4);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Micro, video, sensors, ... controls -->
-                    <div id="remoteLockedViewControls4" class="overlay-bottom-center" >
-                        <input id="remoteMicStatus4" type="image" alt="image" src="images/mic.png" class="image-icon" style="display: none;"/>
-                        <input id="remoteVideoStatus4" type="image" alt="image" src="images/video.png" class="image-icon" style="display: none;"/>
-                        <input id="remoteSpeakerStatus4" type="image" alt="image" src="images/speaker.png" class="image-icon" style="display: none;"/>
-                    </div>
-
-                    <!-- Video ! -->
-                    <video id="remoteVideo4" playsinline
-                           oncontextmenu="return false;"
-                           onclick=""
-                           onwheel="" class=""></video>
-                </div>
+            <div class="row h-100" id="remoteRows" style="">
+                <!-- This area will be populated with remote videos tags on page load -->
             </div>
         </div>
     </div>

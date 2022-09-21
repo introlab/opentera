@@ -46,6 +46,10 @@ You are welcome to participate in this effort. Leave us comments or report [Issu
 * Marc-Antoine Maheux
 * Cynthia Vilanova
 
+## Publication(s)
+
+* Panchea, A.M., Létourneau, D., Brière, S. et al., [OpenTera: A microservice architecture solution for rapid prototyping of robotic solutions to COVID-19 challenges in care facilities](https://rdcu.be/cHzmf),  Health Technol. 12, 583–596 (2022)
+
 ## Videos
 
 ### OpenTera Telehealth Platform

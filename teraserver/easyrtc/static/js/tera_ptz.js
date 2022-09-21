@@ -157,8 +157,9 @@ function managePTZClickEvent(event, local, index){
     const bar_height = (video.clientHeight - real_video_height) / 2;
 
     //alert("x=" + (event.clientX - offsets.left) + " y=" + (event.clientY - offsets.top) + " w=" + video.clientWidth + " h=" + video.clientHeight);
-    if (local === true){
-        if (teraConnected){
+    let request;
+    if (local === true) {
+        if (teraConnected) {
             if (isCurrentCameraPTZ()) {
                 let x = (event.clientX - bar_width);
                 let y = (event.clientY - bar_height);
@@ -168,16 +169,22 @@ function managePTZClickEvent(event, local, index){
                 SharedObject.imageClicked(localContact.uuid, x, y, real_video_width, real_video_height);
             }
         }
-    }else{
+    } else {
         // Send message to the other client
-        console.log("PTZ request to :", remoteStreams[index-1].peerid);
+        console.log("PTZ request to :", remoteStreams[index - 1].peerid);
         //send contact information to other users
         //request = {"x":event.clientX - offsets.left, "y": event.clientY - offsets.top, "w":video.clientWidth, "h": video.clientHeight};
-        request = {"x": event.clientX - bar_width - offsets.left, "y": event.clientY - bar_height, "w": real_video_width, "h": real_video_height};
-        if (easyrtc.webSocketConnected){
-            easyrtc.sendDataWS( remoteStreams[index-1].peerid, 'PTZRequest', request, function(ackMesg) {
+        request = {
+            "x": event.clientX - bar_width - offsets.left,
+            "y": event.clientY - bar_height,
+            "w": real_video_width,
+            "h": real_video_height,
+            "streamname": remoteStreams[index - 1].streamname
+        };
+        if (easyrtc.webSocketConnected) {
+            easyrtc.sendDataWS(remoteStreams[index - 1].peerid, 'PTZRequest', request, function (ackMesg) {
                 //console.error("ackMsg:",ackMesg);
-                if( ackMesg.msgType === 'error' ) {
+                if (ackMesg.msgType === 'error') {
                     console.error(ackMesg.msgData.errorText);
                 }
             });

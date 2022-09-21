@@ -36,6 +36,7 @@ function connect() {
     easyrtc.setStreamAcceptor(newStreamStarted);
     easyrtc.setOnStreamClosed(streamDisconnected);
     easyrtc.setPeerListener(dataReception);
+    // easyrtc.debugPrinter =function (message){console.log('EASYRTC - ' + message);}
 
     //Post-connect Event listeners
     //easyrtc.setOnHangup(streamDisconnected);
@@ -362,11 +363,13 @@ function localVideoStreamSuccess(stream){
             if (stream.streamName === "default"){
                 local_index = 0;
                 console.log("Connecting to session...");
-                easyrtc.connect("TeraPlus", signalingLoginSuccess, signalingLoginFailure);
+                easyrtc.connect("OpenTera", signalingLoginSuccess, signalingLoginFailure);
 
             }else{
                 // Other stream - must add to call
                 console.log("Adding stream to session...");
+                sendPrimaryView(local_peerid, stream.streamName);
+                setPrimaryViewIcon(local_peerid, stream.streamName);
                 local_index = 1; // Secondary stream in the call
                 for (let i=0; i<remoteStreams.length; i++){
                     easyrtc.addStreamToCall(remoteStreams[i].peerid, stream.streamName, function (/*caller, streamName*/) {
@@ -421,7 +424,8 @@ function forwardData(data)
 
 function broadcastlocalCapabilities(){
     if (easyrtc.webSocketConnected){
-        easyrtc.sendDataWS({"targetRoom":"default"}, 'updateCapabilities', localCapabilities, function(ackMesg) {
+        easyrtc.sendDataWS({"targetRoom":"default"}, 'updateCapabilities', localCapabilities,
+            function(ackMesg) {
             //console.error("ackMsg:",ackMesg);
             if( ackMesg.msgType === 'error' ) {
                 console.error(ackMesg.msgData.errorText);
@@ -477,7 +481,7 @@ function sendContactInfo(peerid_target){
 }
 
 function updateRoomUsers(roomName, occupants, isPrimary) {
-    //console.log("updateRoomUsers: " + JSON.stringify(occupants));
+    console.log("updateRoomUsers: " + JSON.stringify(occupants));
     for(let peerid in occupants) {
         if (peerid !== local_peerid){
             if (needToCallOtherUsers) {
@@ -515,7 +519,7 @@ function newStreamStarted(callerid, stream, streamname) {
 
     // Find first empty slot
     if (slot === undefined){
-        if (remoteStreams.length+1 > 4) {
+        if (remoteStreams.length+1 > maxRemoteSourceNum) {
             showError("newStreamStarted", translator.translateForKey("errors.stream-no-slot", currentLang), true);
             return;
         }
@@ -531,16 +535,20 @@ function newStreamStarted(callerid, stream, streamname) {
     let contact_index = getContactIndexForPeerId(callerid);
     if (contact_index !== undefined){
         let title =  remoteContacts[contact_index].name;
+        // console.log('Found remote contact - ' + title + ' for slot ' + slot);
         if (title === undefined) title = "Participant #" + (contact_index+1);
-        if (streamname === 'ScreenShare') {
-            title = "Écran de " + title;
+        if (streamname.endsWith('ScreenShare')) {
+            title = translator.translateForKey('ui.screenof') + " " + title;
         }
-        setTitle(false, slot, title);
+        if (streamname.endsWith('2ndStream')){
+            title = translator.translateForKey('ui.cameraof') + " " + title;
+        }
+        setTitle(false, slot, title, remoteContacts[contact_index].status.isUser);
     }
 
     // Enable-disable status controls
     if (streamname !== "default"){
-        if (streamname === "ScreenShare"){
+        if (streamname.endsWith("ScreenShare")){
             // Screen sharing = no controls
             showStatusControls(false, slot, false);
         }
@@ -568,24 +576,6 @@ function newStreamStarted(callerid, stream, streamname) {
         // Send self contact card
         sendContactInfo(callerid);
 
-        // Update video
-        //var videoId = getVideoId(0);
-        /*var videoId = getVideoId(slot);
-        var video = document.getElementById(videoId);
-
-        // Send status update to all
-        var micEnabled = "false";
-        //if (video.micEnabled || video.micEnabled==undefined)
-        if (isMicActive(0,0))
-            micEnabled="true";
-        var mic2Enabled = "false";
-        if (isMicActive(0,1))
-            mic2Enabled="true";
-
-        var spkEnabled = "false";
-        if (video.volume=="1")
-            spkEnabled = "true";*/
-
         // Sends PTZ capabilities
         broadcastlocalPTZCapabilities();
 
@@ -610,6 +600,12 @@ function newStreamStarted(callerid, stream, streamname) {
     if (primaryView.peerid === callerid){
         // Select current primary view
         setPrimaryView(primaryView.peerid, primaryView.streamName);
+    }
+    // Update large view if required to show the last user connected
+    if (isParticipant && primaryView.peerid === 0 && contact_index !== undefined
+        && remoteContacts[contact_index].status.isUser){
+        //setPrimaryView(msgData.peerid, "default");
+        setLargeView(getVideoViewId(false, slot));
     }
 
     // Recorder
@@ -718,9 +714,11 @@ function streamDisconnected(callerid, mediaStream, streamName){
         let contact_index = getContactIndexForPeerId(remoteStreams[i].peerid);
         if (contact_index !== undefined) {
             let title = remoteContacts[contact_index].name;
-            if (remoteStreams[i].streamname === 'ScreenShare')
-                title = "Écran de " + title;
-            setTitle(false, i + 1, title);
+            if (remoteStreams[i].streamname.endsWith('ScreenShare'))
+                title = translator.translateForKey('ui.screenof') + " " + title;
+            if (remoteStreams[i].streamname.endsWith('2ndStream'))
+                title = translator.translateForKey('ui.cameraof') + " " + title;
+            setTitle(false, i + 1, title, remoteContacts[contact_index].status.isUser);
         }
     }
 
@@ -813,7 +811,8 @@ function sendStatus(target_peerid){
         "isUser": !isParticipant,
         "videoSrcLength": videoSources.length,
         "secondSource": currentConfig.currentVideoSource2Index > -1,
-        "sharing2ndSource": localContact.status.sharing2ndSource
+        "sharing2ndSource": localContact.status.sharing2ndSource,
+        "sharingScreen": localContact.status.sharingScreen
     };
 
     if (easyrtc.webSocketConnected){
@@ -841,8 +840,9 @@ function dataReception(sendercid, msgType, msgData, targeting) {
         }
         // Update title
         let stream_index = getStreamIndexForPeerId(sendercid, 'default');
+        console.log('Found stream index: ' + stream_index);
         if (stream_index !== undefined) {
-            setTitle(false, stream_index+1, msgData.name);
+            setTitle(false, stream_index+1, msgData.name, msgData.status.isUser);
         }
     }
 
@@ -858,6 +858,40 @@ function dataReception(sendercid, msgType, msgData, targeting) {
                 SharedObject.imageClicked(localContact.uuid, msgData.x, msgData.y, msgData.w, msgData.h);
             }else
                 console.error("Not connected to client.");
+        }
+
+    }
+
+    if (msgType === "MouseDownEvent"){
+        if (localCapabilities.screenControl === true && msgData.streamname.endsWith('ScreenShare')){
+            // Remote control
+            if (teraConnected) {
+                SharedObject.mouseDownEvent(localContact.uuid, msgData.x, msgData.y, msgData.w, msgData.h);
+            }else{
+                console.error("Not connected to client");
+            }
+        }
+    }
+
+    if (msgType === "MouseUpEvent"){
+        if (localCapabilities.screenControl === true && msgData.streamname.endsWith('ScreenShare')){
+            // Remote control
+            if (teraConnected) {
+                SharedObject.mouseUpEvent(localContact.uuid, msgData.x, msgData.y, msgData.w, msgData.h);
+            }else{
+                console.error("Not connected to client");
+            }
+        }
+    }
+
+    if (msgType === "MouseMoveEvent"){
+        if (localCapabilities.screenControl === true && msgData.streamname.endsWith('ScreenShare')){
+            // Remote control
+            if (teraConnected) {
+                SharedObject.mouseMoveEvent(localContact.uuid, msgData.x, msgData.y, msgData.w, msgData.h);
+            }else{
+                console.error("Not connected to client");
+            }
         }
     }
 
@@ -940,7 +974,7 @@ function dataReception(sendercid, msgType, msgData, targeting) {
     }
 
     if (msgType === "updateCapabilities"){
-        setCapabilities(sendercid, msgData.video2);
+        setCapabilities(sendercid, msgData.video2, msgData.screenControl, msgData.screenSharing);
     }
 
     if (msgType === "setPrimaryView"){
@@ -975,6 +1009,8 @@ function dataReception(sendercid, msgType, msgData, targeting) {
                 //setPrimaryView(msgData.peerid, "default");
                 setLargeView(getVideoViewId(false, index+1));
             }
+
+            setTitle(false, index+1, remoteContacts[contact_index].name, msgData.isUser);
         }
 
     }
@@ -1068,6 +1104,15 @@ function dataReception(sendercid, msgType, msgData, targeting) {
             // Message sent directly to us
             localContact.status.sharing2ndSource = !msgData;
             btnShow2ndLocalVideoClicked();
+            broadcastStatus();
+        }
+    }
+    if (msgType === "shareScreen"){
+        if (targeting.targetEasyrtcid === local_peerid){
+            // Message sent directly to us
+            localContact.status.sharingScreen = !msgData;
+            btnShareScreenClicked();
+            broadcastStatus();
         }
     }
 }
@@ -1089,7 +1134,7 @@ function signalingLoginSuccess(peerid,  roomOwner) {
     broadcastlocalPTZCapabilities();
 
     // Sends other capabilities
-    broadcastlocalCapabilities();
+    // broadcastlocalCapabilities();
 
     clearStatusMsg();
     stopSounds();
@@ -1105,26 +1150,28 @@ function signalingLoginFailure(errorCode, message) {
 }
 
 async function shareScreen(local, start){
+    let streamName = localContact.peerid + '_' +'ScreenShare';
     if (start === true){
         // Start screen sharing
         let screenStream = undefined;
         try {
             screenStream = await navigator.mediaDevices.getDisplayMedia({video: true});
-            easyrtc.register3rdPartyLocalMediaStream(screenStream, 'ScreenShare');
+            easyrtc.register3rdPartyLocalMediaStream(screenStream, streamName);
 
             console.log("Starting screen sharing...");
 
             // Then to add to existing connections
-            for (let i=0; i<remoteStreams.length; i++){
-                console.log("Starting screen sharing with " + remoteStreams[i].peerid);
-                easyrtc.addStreamToCall(remoteStreams[i].peerid, 'ScreenShare', function (caller, streamName) {
+            for (let i=0; i<remoteContacts.length; i++){
+                console.log("Starting screen sharing with " + remoteContacts[i].peerid);
+                easyrtc.addStreamToCall(remoteContacts[i].peerid, streamName, function (caller, streamName) {
                     console.log("Started screen sharing with " + caller + " - " + streamName);
+                    easyrtc.renegotiate(remoteContacts[i].peerid);
                 });
             }
             easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], screenStream);
-            localStreams.push({"peerid": local_peerid, "streamname": "ScreenShare", "stream":screenStream});
-            sendPrimaryView(local_peerid, "ScreenShare");
-            setPrimaryViewIcon(local_peerid, "ScreenShare");
+            localStreams.push({"peerid": local_peerid, "streamname": streamName, "stream":screenStream});
+            sendPrimaryView(local_peerid, streamName);
+            setPrimaryViewIcon(local_peerid, streamName);
 
         } catch(err) {
             showError("shareScreen", translator.translateForKey("errors.no-sharescreen-access", currentLang)
@@ -1135,8 +1182,8 @@ async function shareScreen(local, start){
 
     }else{
         // Stop screen sharing
-        for (let i=0; i<remoteStreams.length; i++) {
-            easyrtc.removeStreamFromCall(remoteStreams[i].peerid, "ScreenShare");
+        for (let i=0; i<remoteContacts.length; i++) {
+            easyrtc.removeStreamFromCall(remoteContacts[i].peerid, streamName);
         }
         console.log("Stopping screen sharing...");
         //easyrtc.closeLocalMediaStream("ScreenShare");
@@ -1312,6 +1359,17 @@ function sendShareSecondSource(peerid_target, status){
     console.log("Sending request to share second source " + status + " to: ", peerid_target);
     if (easyrtc.webSocketConnected){
         easyrtc.sendDataWS(peerid_target, 'shareSecondSource', status,function(ackMesg) {
+            if( ackMesg.msgType === 'error' ) {
+                console.error(ackMesg.msgData.errorText);
+            }
+        });
+    }
+}
+
+function sendShareScreen(peerid_target, status){
+    console.log("Sending request to share screen " + status + " to: ", peerid_target);
+    if (easyrtc.webSocketConnected){
+        easyrtc.sendDataWS(peerid_target, 'shareScreen', status,function(ackMesg) {
             if( ackMesg.msgType === 'error' ) {
                 console.error(ackMesg.msgData.errorText);
             }

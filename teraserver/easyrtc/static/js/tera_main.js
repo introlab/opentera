@@ -1,6 +1,8 @@
 let isWeb = true;
 let translator = null;
 let currentLang = 'fr';
+const maxRemoteSourceNum = 8;
+let browser = null;
 
 function preInitSystem(){
     console.log("Pre-initializing system...");
@@ -59,7 +61,12 @@ function initSystem(){
     }
 
     // Initial local status
-    localContact.status = {'microMuted': false, 'videoMuted': false, 'speakerMuted': false, 'sharing2ndSource': false};
+    localContact.status = {'microMuted': false, 'videoMuted': false, 'speakerMuted': false, 'sharing2ndSource': false,
+                           'sharingScreen': false};
+
+    // Initial capabilities
+    browser = bowser.getParser(window.navigator.userAgent);
+    localCapabilities.screenSharing = browser.getPlatformType() === 'desktop'; // Screen sharing only on desktop
 
     // Initialize video and audio sources
     fillDefaultSourceList().then(initSystemDone).catch(err => {

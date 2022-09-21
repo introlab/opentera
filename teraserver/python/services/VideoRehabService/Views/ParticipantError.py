@@ -9,7 +9,7 @@ class ParticipantError(MethodView):
     def __init__(self, *args, **kwargs):
         self.flaskModule = kwargs.get('flaskModule', None)
 
-    @ServiceAccessManager.token_required(allow_static_tokens=True, allow_dynamic_tokens=False)
+    # @ServiceAccessManager.token_required(allow_static_tokens=True, allow_dynamic_tokens=False)
     def get(self):
         backend_hostname = self.flaskModule.config.backend_config['hostname']
         backend_port = self.flaskModule.config.backend_config['port']
@@ -34,4 +34,7 @@ class ParticipantError(MethodView):
                                    participant_token=current_participant_client.participant_token,
                                    error_msg=error_msg)
         else:
-            return 'Unauthorized', 403
+            return render_template('participant_error.html', backend_hostname=backend_hostname,
+                                   backend_port=backend_port,
+                                   participant_token='',
+                                   error_msg=error_msg)

@@ -1,6 +1,20 @@
 let currentLargeViewId = "";
 let isParticipant = true;
 
+function initVideoAreas(){
+    $.get(
+        'includes/video_participant_remote_view.html',
+        {},
+        function (data) {
+            for (let i=1; i<=maxRemoteSourceNum; i++){
+                let divdata = data.replace(/{##view_id##}/g, i.toString());
+                $('#remoteRows').append(divdata);
+            }
+            initialUserLayout();
+        }
+    );
+}
+
 function initialUserLayout(){
     updateUserRemoteViewsLayout(0);
     updateUserLocalViewLayout(1, 0);
@@ -8,12 +22,6 @@ function initialUserLayout(){
 }
 
 function updateUserRemoteViewsLayout(remote_num){
-    // TODO: Improve.
-
-    let remoteView1 = $("#remoteView1");
-    let remoteView2 = $("#remoteView2");
-    let remoteView3 = $("#remoteView3");
-    let remoteView4 = $("#remoteView4");
     let remoteViews = $("#remoteViews");
     let largeView = $("#largeView");
     let localViews = $("#localViews");
@@ -47,36 +55,43 @@ function updateUserRemoteViewsLayout(remote_num){
 
     }
 
-    switch(remote_num){
-        case 1:
-            remoteView1.show();
-            remoteView2.hide();
-            remoteView3.hide();
-            remoteView4.hide();
-            //setLargeView('remoteView1');
-            break;
-        case 2:
-            remoteView1.show();
-            remoteView2.show();
-            remoteView3.hide();
-            remoteView4.hide();
-            break;
-        case 3:
-            remoteView1.show();
-            remoteView2.show();
-            remoteView3.show();
-            remoteView4.hide();
-            break;
-        case 4:
-            remoteView1.show();
-            remoteView3.show();
-            remoteView2.show();
-            remoteView4.show();
-            break;
-        default:
-            console.error('Too many views, don\'t know how to set the layout!');
-            break;
+    let col_count = 1;
+    if (remote_num > 4){
+        col_count = 2;
     }
+    let base_width = 12 / col_count;
+
+    // Hide unused views
+    for (let i=remote_num+1; i<=maxRemoteSourceNum; i++){
+        $("#remoteView" + i).hide();
+    }
+
+    // Show used views
+    for (let i=1; i<=remote_num; i++){
+        let current_view = $("#remoteView" + i);
+        current_view.show();
+        if (currentLargeViewId !== 'remoteView' + i) {
+            //setColWidth(current_view, base_width);
+            removeClassByPrefix(current_view[0], 'col');
+            current_view.addClass('col-xl-' + base_width + ' col-sm-12')
+        }
+    }
+
+    // If odd numbered views, stretch the last one
+    // if (remote_num % 2 === 0){
+    //     let last_view = $("#remoteView" + remote_num);
+    //     if (currentLargeViewId === 'remoteView' + remote_num){
+    //         if (remote_num-1 > 0) {
+    //             last_view = $("#remoteView" + (remote_num - 1));
+    //         }else{
+    //             last_view = $("#remoteView" + (remote_num + 1));
+    //         }
+    //     }
+    //     if (!last_view[0].classList.contains('col')){
+    //         setColWidth(last_view, Math.ceil(12 / (col_count - 1)));
+    //     }
+    // }
+
 }
 
 function updateUserLocalViewLayout(local_num, remote_num){
@@ -113,20 +128,24 @@ function setLargeView(view_id, updateui=true){
     // Remove current view
     let largeView = $("#largeView");
 
-    if (currentLargeViewId !== ""){
+    if (currentLargeViewId !== "" && currentLargeViewId !== undefined){
         let view_index = Number(currentLargeViewId.substr(-1));
+        let currentLargeView = $('#' + currentLargeViewId);
         if (currentLargeViewId.startsWith("local")){
             setColWidth(largeView.children('div'),12);
             // Insert at the right place
             let prev_el = $('#localView' + view_index + 'Row');
-            prev_el.append($('#' + currentLargeViewId));
+            prev_el.append(currentLargeView);
         }else{
+            removeClassByPrefix(currentLargeView[0], 'col');
             setColWidth(largeView.children('div'),0);
+            currentLargeView.addClass('col-sm-12 col');
+
             if (view_index === 1){
-                $('#' + currentLargeViewId).insertBefore($('#remoteView2'));
+                currentLargeView.insertBefore($('#remoteView2'));
             }else {
                 let prev_el = $('#remoteView' + (view_index-1));
-                $('#' + currentLargeViewId).insertAfter(prev_el);
+                currentLargeView.insertAfter(prev_el);
             }
         }
     }
@@ -171,4 +190,25 @@ function removeClassByPrefix(el, prefix) {
             el.classList.remove(el.classList[i]);
         }
     }
+}
+
+function testLayout(local_num, remote_num){
+    remoteStreams=[]
+    for (let i=1; i<=remote_num; i++) {
+        $('#remoteVideo' + i)[0].srcObject = $('#localVideo1')[0].srcObject;
+        $('#remoteVideo' + i)[0].muted = true;
+        $('#remoteVideo' + i)[0].play();
+        remoteStreams.push($('#remoteVideo' + i)[0].srcObject)
+    }
+    if (localStreams.length < local_num){
+        $('#localVideo2')[0].srcObject = $('#localVideo1')[0].srcObject;
+        $('#localVideo2')[0].muted = true;
+        $('#localVideo2')[0].play();
+        localStreams.push($('#localVideo2')[0].srcObject)
+    }else{
+        localStreams.pop();
+    }
+
+    updateUserRemoteViewsLayout(remote_num);
+    updateUserLocalViewLayout(local_num, remote_num);
 }

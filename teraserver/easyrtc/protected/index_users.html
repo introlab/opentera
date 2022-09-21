@@ -15,6 +15,7 @@
     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="js/socket.io.js"></script>
     <script src="easyrtc/easyrtc.js"></script>
+    <script src="js/bowser/bowser.js"></script>
 
     <script src="js/tera_layout.js"></script>
     <script src="js/tera_main.js"></script>
@@ -25,6 +26,7 @@
     <script src="js/tera_ptz.js"></script>
     <script src="js/tera_medias.js"></script>
     <script src="js/tera_tools.js"></script>
+    <script src="js/tera_screen_control.js"></script>
 
     <!-- Streams recorders -->
     <script src="js/recordrtc/RecordRTC.js"></script>
@@ -43,9 +45,11 @@
     <script>
         preInitSystem();
         initTranslator();
+        $(document).ready(function(){
+            initVideoAreas();
+        });
 		window.onload = function() {
             console.log('Page loaded. Ready to start!');
-            initialUserLayout();
             initUI();
             initSystem();
         }
@@ -347,9 +351,8 @@
                 </div>
             </div>
             <!-- Tools and controls -->
-
             <div class="row mt-1" id="toolsViewRow" style="min-height:45px; background: #2f2f40;">
-                <div class="btn-toolbar ml-auto mr-auto">
+                <div class="btn-toolbar ml-auto mr-auto" style="justify-content: center;">
                     <div class="dropup mr-2">
                         <button class="btn btn-warning dropdown-toggle" type="button" id="controlsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.controls">
                             Contrôles
@@ -384,337 +387,10 @@
 
             </div>
         </div>
-        <div class="col h-100" id="largeView" style="display: none">
-
-        </div>
+        <div class="col h-100" id="largeView" style="display: none"></div>
         <div class="col-9 h-100" id="remoteViews">
-            <div class="row h-100" id="remoteRows1">
-                <div class="col-6 videoView" id="remoteView1"
-                     onmousemove="resetInactiveTimer(false, 1);showButtons(false, true, 1);"
-                     onmouseleave="stopInactiveTimer(false, 1);showButtons(false, false, 1); return false;"
-                     oncontextmenu="resetInactiveTimer(false, 1);showButtons(false, true, 1);">
-                    <span class="badge badge-primary" id="remoteViewTitle1">Participant #1</span>
-                    <!--<span class="badge badge-danger text-white-50" id="remoteViewRec1" style="display:none;">REC</span>-->
-
-                    <!-- Video controls -->
-                    <div id="remoteVideoControls1" class="overlay-top-right" style="">
-                        <input id="remoteBtnStar1" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(false, 1);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteBtnSwapVideo1" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(false,1);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Text display -->
-                    <div id="remoteDisplay1" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="remoteText1" onclick="stopChrono(false, 1);">Temps restant: xx:xx</label>
-                    </div>
-
-                    <!-- Micro, video, sensors, ... controls -->
-                    <div id="remoteViewControls1" class="overlay-bottom-center" >
-                        <input id="remoteConfig1" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(false, 1);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteMicStatus1" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(false,1);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteVideoStatus1" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(false,1);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteSpeakerStatus1" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(false,1);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Video source controls -->
-                    <div id="remoteViewCameras1" class="overlay-bottom-left">
-                        <input id="remoteVideoSwap1" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(false, 1); event.stopPropagation();" style="display:none;"/>
-                        <input id="remoteBtnShow2ndVideo1" class="image-icon" type="image" alt="image" src="images/show2ndvideo.png" onclick="btnShow2ndRemoteVideoClicked(1);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- PTZ controls -->
-                    <div id="remotePtzControls1" class="overlay-top-center" oncontextmenu="" onclick="" onwheel="" style="display: none;">
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="remoteZoomButtons1" src="images/zoom_custom.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.zoom" style="display:none;"/>
-                            <div class="dropdown-menu bg-secondary" aria-labelledby="remoteZoomButtons1" >
-                                <div class="dropdown-item text-light" onclick="zoomMax(false, 1);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomMax1" type="image" alt="image" src="images/Zoom-max.png" />
-                                    <label data-i18n="ui.zoom-max">Max</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomIn(false, 1);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomIn1" type="image" alt="image" src="images/Zoom-in1.png"/>
-                                    <label data-i18n="ui.zoom-in">In</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomOut(false, 1);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomOut1" type="image" alt="image" src="images/Zoom-out1.png"/>
-                                    <label data-i18n="ui.zoom-out">Out</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomMin(false, 1);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomMin1" type="image" alt="image" src="images/Zoom-min.png"/>
-                                    <label data-i18n="ui.zoom-min">Min</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="remotePresetButtons1" src="images/presets.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.presets" style="display:none;"/>
-                            <div class="dropdown-menu bg-secondary" aria-labelledby="remotePresetButtons1">
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 1, 1);">
-                                    <label data-i18n="ui.preset-1">Position 1</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 1, 2);">
-                                    <label data-i18n="ui.preset-2">Position 2</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 1, 3);">
-                                    <label data-i18n="ui.preset-3">Position 3</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light image-icon" id="remoteSettingsButton1" type="image" alt="image" src="images/settings.png" onclick="camSettings(false, 1);event.stopPropagation();" style="display: none;"/>
-                        </div>
-                    </div>
-
-                    <!-- Sources controls -->
-                    <div id="remoteSourcesControls1" class="overlay-bottom-right">
-                        <div style="padding-left:20px;padding-top:20px;background-color:rgba(0,0,0,0);">
-                            <!--<input id="remoteBtnShareScreen1" type="image" alt="image" src="images/sharescreen.png" height=32 onclick="event.stopPropagation();" style="display: none;"/>-->
-                        </div>
-                    </div>
-
-                    <!-- Video ! -->
-                    <video id="remoteVideo1" playsinline
-                           oncontextmenu="return false;"
-                           onclick="managePTZClickEvent(event, false, 1);"
-                           onwheel="managePTZMouseWheel(event, false, 1);" class=""></video>
-                </div>
-                <div class="col-6 videoView" id="remoteView2"
-                     onmousemove="resetInactiveTimer(false, 2);showButtons(false, true, 2);"
-                     onmouseleave="stopInactiveTimer(false, 2);showButtons(false, false, 2); return false;"
-                     oncontextmenu="resetInactiveTimer(false, 2);showButtons(false, true, 2);">
-                    <span class="badge badge-primary" id="remoteViewTitle2">Participant #2</span>
-                    <!--<span class="badge badge-danger text-white-50" id="remoteViewRec2" style="display:none;">REC</span>-->
-
-                    <!-- Video controls -->
-                    <div id="remoteVideoControls2" class="overlay-top-right" style="">
-                        <input id="remoteBtnStar2" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(false, 2);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteBtnSwapVideo2" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(false,2);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Text display -->
-                    <div id="remoteDisplay2" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="remoteText2" onclick="stopChrono(false, 2);">Temps restant: xx:xx</label>
-                    </div>
-
-                    <!-- Micro, video, sensors, ... controls -->
-                    <div id="remoteViewControls2" class="overlay-bottom-center" >
-                        <input id="remoteConfig2" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(false, 2);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteMicStatus2" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(false,2);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteVideoStatus2" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(false,2);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteSpeakerStatus2" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(false,2);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Video source controls -->
-                    <div id="remoteViewCameras2" class="overlay-bottom-left">
-                        <input id="remoteVideoSwap2" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(false, 2); event.stopPropagation();" style="display:none;"/>
-                        <input id="remoteBtnShow2ndVideo2" class="image-icon" type="image" alt="image" src="images/show2ndvideo.png" onclick="btnShow2ndRemoteVideoClicked(2);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- PTZ controls -->
-                    <div id="remotePtzControls2" class="overlay-top-center" oncontextmenu="" onclick="" onwheel="" style="display: none;">
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="remoteZoomButtons2" src="images/zoom_custom.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.zoom" style="display:none;"/>
-                            <div class="dropdown-menu bg-secondary" aria-labelledby="remoteZoomButtons2" >
-                                <div class="dropdown-item text-light" onclick="zoomMax(false, 2);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomMax2" type="image" alt="image" src="images/Zoom-max.png" />
-                                    <label data-i18n="ui.zoom-max">Max</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomIn(false, 2);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomIn2" type="image" alt="image" src="images/Zoom-in1.png"/>
-                                    <label data-i18n="ui.zoom-in">In</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomOut(false, 2);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomOut2" type="image" alt="image" src="images/Zoom-out1.png"/>
-                                    <label data-i18n="ui.zoom-out">Out</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomMin(false, 2);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomMin2" type="image" alt="image" src="images/Zoom-min.png"/>
-                                    <label data-i18n="ui.zoom-min">Min</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="remotePresetButtons2" src="images/presets.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.presets" style="display:none;"/>
-                            <div class="dropdown-menu bg-secondary" aria-labelledby="remotePresetButtons2">
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 2, 1);">
-                                    <label data-i18n="ui.preset-1">Position 1</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 2, 2);">
-                                    <label data-i18n="ui.preset-2">Position 2</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 2, 3);">
-                                    <label data-i18n="ui.preset-3">Position 3</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light image-icon" id="remoteSettingsButton2" type="image" alt="image" src="images/settings.png" onclick="camSettings(false, 1);event.stopPropagation();" style="display: none;"/>
-                        </div>
-                    </div>
-                    <!-- Video ! -->
-                    <video id="remoteVideo2" playsinline
-                           oncontextmenu="return false;"
-                           onclick="managePTZClickEvent(event, false, 2);"
-                           onwheel="managePTZMouseWheel(event, false, 2);" class=""></video>
-                </div>
-                <div class="col-6 videoView" id="remoteView3"
-                     onmousemove="resetInactiveTimer(false, 3);showButtons(false, true, 3);"
-                     onmouseleave="stopInactiveTimer(false, 3);showButtons(false, false, 3); return false;"
-                     oncontextmenu="resetInactiveTimer(false, 3);showButtons(false, true, 3);">
-                    <span class="badge badge-primary" id="remoteViewTitle3">Participant #3</span>
-                    <!--<span class="badge badge-danger text-white-50" id="remoteViewRec3" style="display:none;">REC</span>-->
-
-                    <!-- Video controls -->
-                    <div id="remoteVideoControls3" class="overlay-top-right" style="">
-                        <input id="remoteBtnStar3" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(false, 3);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteBtnSwapVideo3" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(false,3);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Text display -->
-                    <div id="remoteDisplay3" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="remoteText3" onclick="stopChrono(false, 3);">Temps restant: xx:xx</label>
-                    </div>
-
-                    <!-- Micro, video, sensors, ... controls -->
-                    <div id="remoteViewControls3" class="overlay-bottom-center" >
-                        <input id="remoteConfig3" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(false, 3);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteMicStatus3" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(false,3);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteVideoStatus3" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(false,3);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteSpeakerStatus3" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(false,3);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Video source controls -->
-                    <div id="remoteViewCameras3" class="overlay-bottom-left">
-                        <input id="remoteVideoSwap3" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(false, 3); event.stopPropagation();" style="display:none;"/>
-                        <input id="remoteBtnShow2ndVideo3" class="image-icon" type="image" alt="image" src="images/show2ndvideo.png" onclick="btnShow2ndRemoteVideoClicked(3);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- PTZ controls -->
-                    <div id="remotePtzControls3" class="overlay-top-center" oncontextmenu="" onclick="" onwheel="" style="display: none;">
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="remoteZoomButtons3" src="images/zoom_custom.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.zoom" style="display:none;"/>
-                            <div class="dropdown-menu bg-secondary" aria-labelledby="remoteZoomButtons3" >
-                                <div class="dropdown-item text-light" onclick="zoomMax(false, 3);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomMax3" type="image" alt="image" src="images/Zoom-max.png" />
-                                    <label data-i18n="ui.zoom-max">Max</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomIn(false, 3);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomIn3" type="image" alt="image" src="images/Zoom-in1.png"/>
-                                    <label data-i18n="ui.zoom-in">In</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomOut(false, 3);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomOut3" type="image" alt="image" src="images/Zoom-out1.png"/>
-                                    <label data-i18n="ui.zoom-out">Out</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomMin(false, 3);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomMin3" type="image" alt="image" src="images/Zoom-min.png"/>
-                                    <label data-i18n="ui.zoom-min">Min</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="remotePresetButtons3" src="images/presets.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.presets" style="display:none;"/>
-                            <div class="dropdown-menu bg-secondary" aria-labelledby="remotePresetButtons3">
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 3, 1);">
-                                    <label data-i18n="ui.preset-1">Position 1</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 3, 2);">
-                                    <label data-i18n="ui.preset-2">Position 2</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 3, 3);">
-                                    <label data-i18n="ui.preset-3">Position 3</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light image-icon" id="remoteSettingsButton3" type="image" alt="image" src="images/settings.png" onclick="camSettings(false, 1);event.stopPropagation();" style="display: none;"/>
-                        </div>
-                    </div>
-
-                    <!-- Video ! -->
-                    <video id="remoteVideo3" playsinline
-                           oncontextmenu="return false;"
-                           onclick="managePTZClickEvent(event, false, 3);"
-                           onwheel="managePTZMouseWheel(event, false, 3);" class=""></video>
-                </div>
-                <div class="col-6 videoView" id="remoteView4"
-                     onmousemove="resetInactiveTimer(false, 4);showButtons(false, true, 4);"
-                     onmouseleave="stopInactiveTimer(false, 4);showButtons(false, false, 4); return false;"
-                     oncontextmenu="resetInactiveTimer(true, 4);showButtons(false, true, 4);">
-                    <span class="badge badge-primary" id="remoteViewTitle4">Participant #4</span>
-                    <!--<span class="badge badge-danger text-white-50" id="remoteViewRec4" style="display:none;">REC</span>-->
-
-                    <!-- Video controls -->
-                    <div id="remoteVideoControls4" class="overlay-top-right" style="">
-                        <input id="remoteBtnStar4" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(false, 4);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteBtnSwapVideo4" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(false,4);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Text display -->
-                    <div id="remoteDisplay4" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="remoteText4" onclick="stopChrono(false, 4);">Temps restant: xx:xx</label>
-                    </div>
-
-                    <!-- Micro, video, sensors, ... controls -->
-                    <div id="remoteViewControls4" class="overlay-bottom-center" >
-                        <input id="remoteConfig4" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(false, 4);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteMicStatus4" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(false,4);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteVideoStatus4" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(false,4);event.stopPropagation();" style="display: none;"/>
-                        <input id="remoteSpeakerStatus4" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(false,4);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- Video sources controls -->
-                    <div id="remoteViewCameras4" class="overlay-bottom-left">
-                        <input id="remoteVideoSwap4" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(false, 4); event.stopPropagation();" style="display:none;"/>
-                        <input id="remoteBtnShow2ndVideo4" class="image-icon" type="image" alt="image" src="images/show2ndvideo.png" onclick="btnShow2ndRemoteVideoClicked(4);event.stopPropagation();" style="display: none;"/>
-                    </div>
-
-                    <!-- PTZ controls -->
-                    <div id="remotePtzControls4" class="overlay-top-center" oncontextmenu="" onclick="" onwheel="" style="display: none;">
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="remoteZoomButtons4" src="images/zoom_custom.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.zoom" style="display:none;"/>
-                            <div class="dropdown-menu bg-secondary" aria-labelledby="remoteZoomButtons4" >
-                                <div class="dropdown-item text-light" onclick="zoomMax(false, 4);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomMax4" type="image" alt="image" src="images/Zoom-max.png" />
-                                    <label data-i18n="ui.zoom-max">Max</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomIn(false, 4);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomIn4" type="image" alt="image" src="images/Zoom-in1.png"/>
-                                    <label data-i18n="ui.zoom-in">In</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomOut(false, 4);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomOut4" type="image" alt="image" src="images/Zoom-out1.png"/>
-                                    <label data-i18n="ui.zoom-out">Out</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="zoomMin(false, 4);">
-                                    <input class="tool-icon" id="btnRemotePTZZoomMin4" type="image" alt="image" src="images/Zoom-min.png"/>
-                                    <label data-i18n="ui.zoom-min">Min</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light dropdown-toggle image-icon" type="image" id="remotePresetButtons4" src="images/presets.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.presets" style="display:none;"/>
-                            <div class="dropdown-menu bg-secondary" aria-labelledby="remotePresetButtons4">
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 4, 1);">
-                                    <label data-i18n="ui.preset-1">Position 1</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 4, 2);">
-                                    <label data-i18n="ui.preset-2">Position 2</label>
-                                </div>
-                                <div class="dropdown-item text-light" onclick="gotoPreset(event, false, 4, 3);">
-                                    <label data-i18n="ui.preset-3">Position 3</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <input class="btn bg-secondary text-light image-icon" id="remoteSettingsButton4" type="image" alt="image" src="images/settings.png" onclick="camSettings(false, 1);event.stopPropagation();" style="display: none;"/>
-                        </div>
-                    </div>
-
-                    <!-- Video ! -->
-                    <video id="remoteVideo4" playsinline
-                           oncontextmenu="return false;"
-                           onclick="managePTZClickEvent(event, false, 4);"
-                           onwheel="managePTZMouseWheel(event, false, 4);" class=""></video>
-                </div>
+            <div class="row h-100" id="remoteRows">
+                <!-- This area will be populated with remote videos tags on page load -->
             </div>
         </div>
     </div>

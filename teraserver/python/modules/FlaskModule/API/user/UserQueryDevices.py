@@ -15,6 +15,7 @@ from opentera.modules.BaseModule import ModuleNames
 
 # Parser definition(s)
 get_parser = api.parser()
+get_parser.add_argument('id', type=int, help='ID of the device to query')
 get_parser.add_argument('id_device', type=int, help='ID of the device to query')
 get_parser.add_argument('device_uuid', type=str, help='Device uuid of the device to query')
 get_parser.add_argument('uuid', type=str, help='Alias for "device_uuid"')
@@ -79,6 +80,9 @@ class UserQueryDevices(Resource):
         parser = get_parser
 
         args = parser.parse_args()
+
+        if args['id']:
+            args['id_device'] = args['id']
 
         # has_available = args.pop('available')
         has_projects = args.pop('projects')
