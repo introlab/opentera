@@ -84,6 +84,7 @@ class LoggingService(ServiceOpenTera):
                 ret = tera_event.ParseFromString(message)
 
             log_event = messages.LogEvent()
+            login_event = messages.LoginEvent()
 
             # Look for UserEvent, ParticipantEvent, DeviceEvent
             for any_msg in tera_event.events:
@@ -93,6 +94,9 @@ class LoggingService(ServiceOpenTera):
                         Globals.db_man.store_log_event(log_event)
                     else:
                         print(log_event)
+                if any_msg.Unpack(login_event):
+                    if login_event.level <= self.loglevel:
+                        Globals.db_man.store_login_event(login_event)
 
         except DecodeError as d:
             print('LoggingService - DecodeError ', pattern, channel, message, d)
@@ -170,7 +174,7 @@ if __name__ == '__main__':
     try:
         Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
     except OperationalError as e:
-        print("Unable to connect to database - please check settings in config file!",e)
+        print("Unable to connect to database - please check settings in config file!", e)
         quit()
 
     with flask_app.app_context():

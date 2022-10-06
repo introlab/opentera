@@ -5,10 +5,13 @@ from sqlalchemy.engine.reflection import Inspector
 # Must include all Database objects here to be properly initialized and created if needed
 # All at once to make sure all files are registered.
 from services.LoggingService.libloggingservice.db.models.LogEntry import LogEntry
+from services.LoggingService.libloggingservice.db.models.LoginEntry import LoginEntry
 
 from services.LoggingService.ConfigManager import ConfigManager
 from services.LoggingService.FlaskModule import flask_app
-from opentera.messages.python.LogEvent_pb2 import LogEvent
+from opentera.messages.python import LogEvent
+from opentera.messages.python import LoginEvent
+
 import datetime
 
 # Alembic
@@ -61,7 +64,7 @@ class DBManager:
         # tables = db.engine.table_names()
         if not tables:
             # Create all tables
-            db.create_all()
+            # db.create_all()
             # New database - stamp with current revision version
             self.stamp_db()
         else:
@@ -89,7 +92,7 @@ class DBManager:
         # tables = db.engine.table_names()
         if not tables:
             # Create all tables
-            db.create_all()
+            # db.create_all()
             # New database - stamp with current revision version
             self.stamp_db()
         else:
@@ -151,5 +154,25 @@ class DBManager:
         entry.sender = event.sender
         entry.timestamp = datetime.datetime.fromtimestamp(event.timestamp)
         entry.message = event.message
+        db.session.add(entry)
+        db.session.commit()
+
+    def store_login_event(self, event: LoginEvent):
+        entry = LoginEntry()
+        entry.login_timestamp = event.log_header.timestamp
+        entry.login_log_level = event.log_header.level
+        entry.login_sender = event.log_header.sender
+        entry.login_user_uuid = event.user_uuid
+        entry.login_participant_uuid = event.participant_uuid
+        entry.login_device_uuid = event.device_uuid
+        entry.login_service_uuid = event.service_uuid
+        entry.login_status = event.login_status
+        entry.login_type = event.login_type
+        entry.login_client_ip = event.client_ip
+        entry.login_server_endpoint = event.server_endpoint
+        entry.login_client_name = event.client_name
+        entry.login_client_version = event.client_version
+        entry.login_os_name = event.os_name
+        entry.login_os_version = event.os_version
         db.session.add(entry)
         db.session.commit()

@@ -26,7 +26,7 @@ class ServiceLauncherModule(BaseModule):
         for service in services:
             if service.service_system:
                 # print(service)
-                if service.service_key != 'OpenTeraServer':
+                if service.service_key != 'OpenTeraServer' and service.service_key != 'LoggingService':
                     self.launch_service(service)
             elif service.service_enabled and not self.launch_system_service_only:
                 # or service.service_key == 'FileTransferService'):
