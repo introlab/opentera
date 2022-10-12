@@ -32,7 +32,7 @@ class DBManager:
     def __init__(self):
         self.db_uri = None
 
-    def create_defaults(self, config: ConfigManager):
+    def create_defaults(self, config: ConfigManager, test: bool = False):
         if LogEntry.get_count() == 0:
             entry = LogEntry()
             entry.log_level = LogEvent.LogLevel.LOGLEVEL_INFO
@@ -41,6 +41,9 @@ class DBManager:
             entry.message = 'Database initialized.'
             db.session.add(entry)
             db.session.commit()
+
+        if test:
+            pass
 
     def open(self, db_infos, echo=False):
         self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
@@ -71,8 +74,12 @@ class DBManager:
             # Apply any database upgrade, if needed
             self.upgrade_db()
 
-    def open_local(self, db_infos, echo=False):
-        self.db_uri = 'sqlite:///%(filename)s' % db_infos
+    def open_local(self, db_infos, echo=False, ram=False):
+
+        if ram:
+            self.db_uri = 'sqlite://'
+        else:
+            self.db_uri = 'sqlite:///%(filename)s' % db_infos
 
         flask_app.config.update({
             'SQLALCHEMY_DATABASE_URI': self.db_uri,
