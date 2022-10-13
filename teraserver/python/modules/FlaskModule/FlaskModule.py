@@ -291,6 +291,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQueryDevices import ServiceQueryDevices
         from modules.FlaskModule.API.service.ServiceQueryTestTypes import ServiceQueryTestTypes
         from modules.FlaskModule.API.service.ServiceQueryTests import ServiceQueryTests
+        from modules.FlaskModule.API.service.ServiceQueryAccess import ServiceQueryAccess
 
         service_api_ns.add_resource(ServiceQueryUsers,          '/users', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
@@ -306,6 +307,7 @@ class FlaskModule(BaseModule):
         service_api_ns.add_resource(ServiceQuerySessionTypes,   '/sessiontypes', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryTestTypes,      '/testtypes', resource_class_kwargs=kwargs)
         service_api_ns.add_resource(ServiceQueryTests,          '/tests', resource_class_kwargs=kwargs)
+        service_api_ns.add_resource(ServiceQueryAccess,         '/access', resource_class_kwargs=kwargs)
 
         # Add namespace
         api.add_namespace(service_api_ns)
