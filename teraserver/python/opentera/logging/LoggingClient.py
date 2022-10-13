@@ -98,13 +98,13 @@ class LoggingClient:
     def send_login_event(self, sender: str, level: int, login_type: int, login_status: int,
                          client_name: str, client_version: str, client_ip: str, os_name: str, os_version: str,
                          user_uuid: str = '', participant_uuid: str = '', device_uuid: str = '', service_uuid: str = '',
-                         server_endpoint: str = ''):
+                         server_endpoint: str = '', message: str = ''):
         # Create and fill event info
         login_event = messages.LoginEvent()
         login_event.log_header.level = level
         login_event.log_header.timestamp = datetime.datetime.now().timestamp()
         login_event.log_header.sender = str(sender)
-        login_event.log_header.message = str()
+        login_event.log_header.message = message
         login_event.login_type = login_type
         login_event.login_status = login_status
         login_event.client_name = client_name

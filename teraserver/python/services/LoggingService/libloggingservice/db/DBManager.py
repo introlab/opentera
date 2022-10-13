@@ -181,5 +181,6 @@ class DBManager:
         entry.login_client_version = event.client_version
         entry.login_os_name = event.os_name
         entry.login_os_version = event.os_version
+        entry.login_message = event.log_header.message
         db.session.add(entry)
         db.session.commit()

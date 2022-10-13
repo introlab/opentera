@@ -226,7 +226,7 @@ if __name__ == '__main__':
 
     # LOGIN MANAGER, must be initialized after Flask
     #################################################
-    login_module = LoginModule(config_man)
+    Globals.login_module = LoginModule(config_man)
 
     # Twisted will run flask, must be initialized after Flask
     #########################################################
