@@ -81,19 +81,71 @@ class ServiceQueryAccess(Resource):
 
         # Copy query flags
         result = dict()
-        result['admin'] = args['admin']
 
+        # Request access from user_uuid perspective
         if from_user_uuid:
+            result['admin'] = args['admin']
             user_access = DBManagerTeraUserAccess(TeraUser.get_user_by_uuid(from_user_uuid))
             result['from_user_uuid'] = from_user_uuid
 
+            if args['with_users_uuids']:
+                result['users_uuids'] = user_access.get_accessible_users_uuids(admin_only=args['admin'])
+
+            if args['with_projects_ids']:
+                result['projects_ids'] = user_access.get_accessible_projects_ids(admin_only=args['admin'])
+
+            if args['with_participants_uuids']:
+                result['participants_uuids'] = user_access.get_accessible_participants_uuids(admin_only=args['admin'])
+
+            if args['with_devices_uuids']:
+                result['devices_uuids'] = user_access.get_accessible_devices_uuids(admin_only=args['admin'])
+
+            if args['with_sites_ids']:
+                result['sites_ids'] = user_access.get_accessible_sites_ids(admin_only=args['admin'])
+
+        # Request access from participant perspective
         if from_participant_uuid:
-            participant_access = DBManagerTeraParticipantAccess(
-                TeraParticipant.get_participant_by_uuid(from_participant_uuid))
+            result['admin'] = False
+            # TODO Unused for now
+            # participant_access = DBManagerTeraParticipantAccess(
+            #     TeraParticipant.get_participant_by_uuid(from_participant_uuid))
             result['from_participant_uuid'] = from_participant_uuid
 
+            if args['with_users_uuids']:
+                result['users_uuids'] = []
+
+            if args['with_projects_ids']:
+                result['projects_ids'] = []
+
+            if args['with_participants_uuids']:
+                result['participants_uuids'] = [from_participant_uuid]
+
+            if args['with_devices_uuids']:
+                result['devices_uuids'] = []
+
+            if args['with_sites_ids']:
+                result['sites_ids'] = []
+
+        # Request access from device perspective
         if from_device_uuid:
-            device_access = DBManagerTeraDeviceAccess(TeraDevice.get_device_by_uuid(from_device_uuid))
+            result['admin'] = False
+            # TODO unused for now
+            # device_access = DBManagerTeraDeviceAccess(TeraDevice.get_device_by_uuid(from_device_uuid))
             result['from_device_uuid'] = from_device_uuid
+
+            if args['with_users_uuids']:
+                result['users_uuids'] = []
+
+            if args['with_projects_ids']:
+                result['projects_ids'] = []
+
+            if args['with_participants_uuids']:
+                result['participants_uuids'] = []
+
+            if args['with_devices_uuids']:
+                result['devices_uuids'] = [from_device_uuid]
+
+            if args['with_sites_ids']:
+                result['sites_ids'] = []
 
         return result
