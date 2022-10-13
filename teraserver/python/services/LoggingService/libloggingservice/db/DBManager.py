@@ -166,7 +166,7 @@ class DBManager:
 
     def store_login_event(self, event: LoginEvent):
         entry = LoginEntry()
-        entry.login_timestamp = event.log_header.timestamp
+        entry.login_timestamp = datetime.datetime.fromtimestamp(event.log_header.timestamp)
         entry.login_log_level = event.log_header.level
         entry.login_sender = event.log_header.sender
         entry.login_user_uuid = event.user_uuid

@@ -1,4 +1,3 @@
-
 from flask_login import LoginManager, login_user
 
 from modules.FlaskModule.FlaskModule import flask_app
@@ -23,6 +22,7 @@ from functools import wraps
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
 
 from twisted.internet import task
+from ua_parser import user_agent_parser
 
 # Current participant identity, stacked
 current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant', None))
@@ -92,7 +92,6 @@ class DisabledTokenStorage:
 
 
 class LoginModule(BaseModule):
-
     # This client is required for static functions
     redis_client = None
 
@@ -301,7 +300,6 @@ class LoginModule(BaseModule):
         logged_participant = TeraParticipant.verify_password(username=username, password=password,
                                                              participant=tentative_participant)
         if logged_participant:
-
             _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_username(username)
 
             # print('participant_verify_password, found participant: ', current_participant)
@@ -412,6 +410,61 @@ class LoginModule(BaseModule):
         return []
 
     @staticmethod
+    def parse_request_for_login_infos(http_request: request) -> dict:
+        infos = {'client_name': '',
+                 'client_version': '',
+                 'os_name': '',
+                 'os_version': '',
+                 'server_endpoint': http_request.endpoint,
+                 'client_ip': http_request.remote_addr
+                 }
+
+        if 'USER_AGENT' in http_request.headers:
+            user_agent = user_agent_parser.Parse(http_request.headers['USER_AGENT'])
+            infos['client_name'] = user_agent['user_agent']['family']
+            if user_agent['user_agent']['major']:
+                infos['client_version'] = user_agent['user_agent']['major']
+            else:
+                infos['client_version'] = 'x'
+            infos['client_version'] += '.'
+            if user_agent['user_agent']['minor']:
+                infos['client_version'] += user_agent['user_agent']['minor']
+            else:
+                infos['client_version'] += '0'
+            infos['client_version'] += '.'
+            if user_agent['user_agent']['patch']:
+                infos['client_version'] += user_agent['user_agent']['patch']
+            else:
+                infos['client_version'] += '0'
+
+            infos['os_name'] = user_agent['os']['family']
+
+            if user_agent['os']['major']:
+                infos['os_version'] = user_agent['os']['major']
+            else:
+                infos['os_version'] = 'x'
+            infos['os_version'] += '.'
+            if user_agent['os']['minor']:
+                infos['os_version'] += user_agent['os']['minor']
+            else:
+                infos['os_version'] += '0'
+            infos['os_version'] += '.'
+            if user_agent['os']['patch']:
+                infos['os_version'] += user_agent['os']['patch']
+            else:
+                infos['os_version'] += '0'
+
+        if 'X-Client-Name' in http_request.headers:
+            infos['client_name'] = http_request.headers['X-Client-Name']
+        if 'X-Client_Version' in http_request.headers:
+            infos['client_version'] = http_request.headers['X-Client-Version']
+
+        if 'X-Script-Name' in http_request.headers:
+            infos['server_endpoint'] = http_request.headers['X-Script-Name']
+
+        return infos
+
+    @staticmethod
     def auth_error(status):
         return gettext("Unauthorized"), status
 
@@ -421,6 +474,7 @@ class LoginModule(BaseModule):
         Use this decorator if UUID is stored in a client certificate or token in url params.
         Acceptable for devices and participants.
         """
+
         @wraps(f)
         def decorated(*args, **kwargs):
 
@@ -486,6 +540,7 @@ class LoginModule(BaseModule):
         Use this decorator if UUID is stored in a client certificate or token in url params.
         Acceptable for services
         """
+
         @wraps(f)
         def decorated(*args, **kwargs):
             import jwt
@@ -551,6 +606,7 @@ class LoginModule(BaseModule):
         return decorated
 
 
+
 # if __name__ == '__main__':
 #     storage = DisabledTokenStorage()
 #     import uuid
@@ -579,4 +635,3 @@ class LoginModule(BaseModule):
 #
 #     storage.remove_expired_tokens(key)
 #     print(storage)
-

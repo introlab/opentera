@@ -95,7 +95,7 @@ class LoggingService(ServiceOpenTera):
                     else:
                         print(log_event)
                 if any_msg.Unpack(login_event):
-                    if login_event.level <= self.loglevel:
+                    if login_event.log_header.level <= self.loglevel:
                         Globals.db_man.store_login_event(login_event)
 
         except DecodeError as d:

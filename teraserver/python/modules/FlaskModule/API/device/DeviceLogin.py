@@ -65,6 +65,10 @@ class DeviceLogin(Resource):
         for st in session_types:
             response['session_types_info'].append(st.to_json(minimal=True))
 
+        # Get login informations for log
+        login_infos = LoginModule.parse_request_for_login_infos(request)
+        # TODO: Log login informations
+
         # TODO Handle sessions
         if current_device.device_onlineable:
             if not self.test:

@@ -1,7 +1,7 @@
 from flask import session, request
 from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import user_http_auth
+from modules.LoginModule.LoginModule import user_http_auth, LoginModule
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
@@ -51,6 +51,10 @@ class UserLogin(Resource):
         # Get token for user
         from opentera.db.models.TeraUser import TeraUser
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
+
+        # Get login informations for log
+        login_infos = LoginModule.parse_request_for_login_infos(request)
+        # TODO: Log login informations
 
         # Verify if user already logged in
         rpc = RedisRPCClient(self.module.config.redis_config)

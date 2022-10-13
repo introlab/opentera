@@ -1,12 +1,12 @@
 from flask import session, request
 from flask_restx import Resource, fields, inputs
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
+from modules.LoginModule.LoginModule import participant_multi_auth, current_participant, LoginModule
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from opentera.redis.RedisVars import RedisVars
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
-
+import opentera.messages.python as messages
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -55,6 +55,13 @@ class ParticipantLogin(Resource):
             if 'X_EXTERNALPORT' in request.headers:
                 port = request.headers['X_EXTERNALPORT']
 
+            # Get login informations for log
+            login_infos = LoginModule.parse_request_for_login_infos(request)
+            if current_participant.fullAccess:
+                login_type = messages.LoginEvent.LOGIN_TYPE_TOKEN
+            else:
+                login_type = messages.LoginEvent.LOGIN_TYPE_PASSWORD
+
             # Verify if participant already logged in
             rpc = RedisRPCClient(self.module.config.redis_config)
             online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
@@ -65,11 +72,23 @@ class ParticipantLogin(Resource):
                 self.module.redisSet(session['_id'], session['_user_id'], ex=60)
             elif args['with_websocket']:
                 # Online and websocket required
-                self.module.logger.log_warning(self.module.module_name,
-                                               ParticipantLogin.__name__,
-                                               'get', 403,
-                                               'Participant already logged in',
-                                               current_participant.to_json(minimal=True))
+                # self.module.logger.log_warning(self.module.module_name,
+                #                                ParticipantLogin.__name__,
+                #                                'get', 403,
+                #                                'Participant already logged in',
+                #                                current_participant.to_json(minimal=True))
+                self.module.logger.send_login_event(sender=self.module.module_name,
+                                                    level=messages.LogEvent.LOGLEVEL_INFO,
+                                                    login_type=login_type,
+                                                    login_status=
+                                                    messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_ALREADY_LOGGED_IN,
+                                                    client_name=login_infos['client_name'],
+                                                    client_version=login_infos['client_version'],
+                                                    client_ip=login_infos['client_ip'],
+                                                    os_name=login_infos['os_name'],
+                                                    os_version=login_infos['os_version'],
+                                                    participant_uuid=current_participant.participant_uuid,
+                                                    server_endpoint=login_infos['server_endpoint'])
                 return gettext('Participant already logged in.'), 403
 
             current_participant.update_last_online()
@@ -88,11 +107,21 @@ class ParticipantLogin(Resource):
             else:
                 reply['base_token'] = current_participant.participant_token
 
+            self.module.logger.send_login_event(sender=self.module.module_name,
+                                                level=messages.LogEvent.LOGLEVEL_INFO,
+                                                login_type=login_type,
+                                                login_status=
+                                                messages.LoginEvent.LOGIN_STATUS_SUCCESS,
+                                                client_name=login_infos['client_name'],
+                                                client_version=login_infos['client_version'],
+                                                client_ip=login_infos['client_ip'],
+                                                os_name=login_infos['os_name'],
+                                                os_version=login_infos['os_version'],
+                                                participant_uuid=current_participant.participant_uuid,
+                                                server_endpoint=login_infos['server_endpoint'])
             return reply
         else:
             self.module.logger.log_error(self.module.module_name,
                                          ParticipantLogin.__name__,
                                          'get', 501, 'Missing current_participant')
             return gettext('Missing current_participant'), 501
-
-
