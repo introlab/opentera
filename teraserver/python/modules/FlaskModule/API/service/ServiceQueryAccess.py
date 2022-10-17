@@ -85,7 +85,11 @@ class ServiceQueryAccess(Resource):
         # Request access from user_uuid perspective
         if from_user_uuid:
             result['admin'] = args['admin']
-            user_access = DBManagerTeraUserAccess(TeraUser.get_user_by_uuid(from_user_uuid))
+            user = TeraUser.get_user_by_uuid(from_user_uuid)
+            if user is None:
+                return gettext('Invalid user uuid'), 400
+
+            user_access = DBManagerTeraUserAccess(user)
             result['from_user_uuid'] = from_user_uuid
 
             if args['with_users_uuids']:
@@ -105,46 +109,68 @@ class ServiceQueryAccess(Resource):
 
         # Request access from participant perspective
         if from_participant_uuid:
-            result['admin'] = False
+            if args['admin']:
+                return gettext('Participant cannot be admin'), 400
+
+            participant = TeraParticipant.get_participant_by_uuid(from_participant_uuid)
+            if participant is None:
+                return gettext('Invalid participant uuid'), 400
+
             # TODO Unused for now
-            # participant_access = DBManagerTeraParticipantAccess(
-            #     TeraParticipant.get_participant_by_uuid(from_participant_uuid))
+            participant_access = DBManagerTeraParticipantAccess(participant)
             result['from_participant_uuid'] = from_participant_uuid
 
+            # TODO should return users that have sessions with this participant
             if args['with_users_uuids']:
                 result['users_uuids'] = []
 
+            # TODO should return only the project containing the participant_uuid
             if args['with_projects_ids']:
                 result['projects_ids'] = []
 
+            # TODO should return participants of the same group
             if args['with_participants_uuids']:
                 result['participants_uuids'] = [from_participant_uuid]
 
+            # TODO should return devices associated to this participant
             if args['with_devices_uuids']:
                 result['devices_uuids'] = []
 
+            # TODO should return the site of the current participant's project
             if args['with_sites_ids']:
                 result['sites_ids'] = []
 
         # Request access from device perspective
         if from_device_uuid:
-            result['admin'] = False
+            if args['admin']:
+                return gettext('Device cannot be admin'), 400
+
+            device = TeraDevice.get_device_by_uuid(from_device_uuid)
+            if device is None:
+                return gettext('Invalid device uuid'), 400
+
             # TODO unused for now
-            # device_access = DBManagerTeraDeviceAccess(TeraDevice.get_device_by_uuid(from_device_uuid))
+            device_access = DBManagerTeraDeviceAccess(device)
             result['from_device_uuid'] = from_device_uuid
 
+            # TODO should return users that have sessions with this device
             if args['with_users_uuids']:
                 result['users_uuids'] = []
 
+            # TODO should return projects where device is associated
             if args['with_projects_ids']:
                 result['projects_ids'] = []
 
+            # TODO should return participants associated with this device
             if args['with_participants_uuids']:
-                result['participants_uuids'] = []
+                result['participants_uuids'] = [participant.participant_uuid
+                                                for participant in device_access.get_accessible_participants()]
 
+            # TODO devices of the same project ? sessions with devices ?
             if args['with_devices_uuids']:
                 result['devices_uuids'] = [from_device_uuid]
 
+            # TODO return sites where device is associated
             if args['with_sites_ids']:
                 result['sites_ids'] = []
 
