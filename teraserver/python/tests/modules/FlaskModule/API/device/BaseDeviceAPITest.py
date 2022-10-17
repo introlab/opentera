@@ -66,11 +66,12 @@ class BaseDeviceAPITest(unittest.TestCase):
     def setUp(self):
         # Setup required keys
         self.setup_redis_keys()
-        self.session = db.create_scoped_session()
+        # self.session = db.create_scoped_session()
 
     def tearDown(self):
         # Make sure pending queries are rolled backed.
-        self.session.remove()
+        # self.session.remove()
+        pass
 
     def setup_redis_keys(self):
         # Initialize keys (create only if not found)
