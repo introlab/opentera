@@ -30,6 +30,11 @@ class DeviceQueryDevicesTest(BaseDeviceAPITest):
             response = self.test_client.get(self.test_endpoint)
             self.assertEqual(401, response.status_code)
 
+    def test_get_endpoint_invalid_token_auth(self):
+        with flask_app.app_context():
+            response = self._get_with_device_token_auth(self.test_client, token='Invalid token')
+            self.assertEqual(401, response.status_code)
+
     def test_get_endpoint_from_all_devices(self):
         with flask_app.app_context():
             for device in TeraDevice.query.all():
@@ -55,3 +60,51 @@ class DeviceQueryDevicesTest(BaseDeviceAPITest):
                                  'device_infos', 'device_token']
                 for field in ignore_fields:
                     self.assertFalse(field in response.json['device_info'])
+
+    def test_post_endpoint_from_all_devices_without_id_device(self):
+        with flask_app.app_context():
+            for device in TeraDevice.query.all():
+                schema = {
+                    'device':  {
+                        # 'id_device': 32,
+                        'device_config': 'Config string'
+                        }
+                }
+                result = self._post_with_device_token_auth(self.test_client, token=device.device_token, json=schema)
+                if not device.device_enabled:
+                    self.assertEqual(result.status_code, 401)
+                    continue
+
+                self.assertEqual(result.status_code, 200)
+                self.assertEqual(schema['device']['device_config'], result.json[0]['device_config'])
+                # TODO why return an array
+                self.assertEqual(device.id_device, result.json[0]['id_device'])
+
+    def test_post_endpoint_from_all_devices_with_wrong_id_device(self):
+        with flask_app.app_context():
+            for device in TeraDevice.query.all():
+                schema = {
+                    'device': {
+                        'id_device': 9999999999,
+                        'device_config': 'Config string'
+                    }
+                }
+                result = self._post_with_device_token_auth(self.test_client, token=device.device_token, json=schema)
+                if not device.device_enabled:
+                    self.assertEqual(result.status_code, 401)
+                    continue
+
+                # Should not be able to change another device id
+                self.assertEqual(result.status_code, 403)
+
+    def test_post_endpoint_from_all_devices_with_empty_schema(self):
+        with flask_app.app_context():
+            for device in TeraDevice.query.all():
+                schema = {
+                }
+                result = self._post_with_device_token_auth(self.test_client, token=device.device_token, json=schema)
+                if not device.device_enabled:
+                    self.assertEqual(result.status_code, 401)
+                    continue
+
+                self.assertEqual(result.status_code, 400)

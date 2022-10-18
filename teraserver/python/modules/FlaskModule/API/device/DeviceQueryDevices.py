@@ -68,6 +68,10 @@ class DeviceQueryDevices(Resource):
                         500: 'Internal error occured when saving device'})
     def post(self):
         current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
+
+        if 'device' not in request.json:
+            return gettext('Missing device schema'), 400
+
         json_device = request.json['device']
 
         # Validate if we have an id
