@@ -1,69 +1,46 @@
-import unittest
-import os
-from requests import get
-import json
+from BaseDeviceAPITest import BaseDeviceAPITest
+from modules.FlaskModule.FlaskModule import flask_app
+from opentera.db.models.TeraDevice import TeraDevice
 
 
-class DeviceQueryParticipantsTest(unittest.TestCase):
-
-    host = '127.0.0.1'
-    port = 40075
-    device_login_endpoint = '/api/device/login'
-    device_logout_endpoint = '/api/device/logout'
-    device_query_participants_endpoint = '/api/device/participants'
-    user_device_endpoint = '/api/user/devices'
-    all_devices = None
+class DeviceQueryParticipantsTest(BaseDeviceAPITest):
+    test_endpoint = '/api/device/participants'
 
     def setUp(self):
-        # Use admin account to get device information (and tokens)
-        response = self._http_auth_devices('admin', 'admin')
-        self.assertEqual(response.status_code, 200)
-        self.all_devices = json.loads(response.text)
-        self.assertGreater(len(self.all_devices), 0)
+        super().setUp()
+        from modules.FlaskModule.FlaskModule import device_api_ns
+        from BaseDeviceAPITest import FakeFlaskModule
+        # Setup minimal API
+        from modules.FlaskModule.API.device.DeviceQueryParticipants import DeviceQueryParticipants
+        kwargs = {
+            'flaskModule': FakeFlaskModule(config=BaseDeviceAPITest.getConfig()),
+            'test': True
+        }
+        device_api_ns.add_resource(DeviceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
+
+        # Create test client
+        self.test_client = flask_app.test_client()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
-    def _make_url(self, hostname, port, endpoint):
-        return 'https://' + hostname + ':' + str(port) + endpoint
+    def test_get_endpoint_with_invalid_token(self):
+        with flask_app.app_context():
+            response = self._get_with_device_token_auth(self.test_client, token='Invalid')
+            self.assertEqual(response.status_code, 401)
 
-    def _http_auth_devices(self, username, password):
-        url = self._make_url(self.host, self.port, self.user_device_endpoint)
-        return get(url=url, verify=False, auth=(username, password))
+    def test_get_endpoint_with_valid_token(self):
+        with flask_app.app_context():
+            for device in TeraDevice.query.all():
+                response = self._get_with_device_token_auth(self.test_client, token=device.device_token)
 
-    def _token_auth(self, token):
-        url = self._make_url(self.host, self.port, self.device_login_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
+                if not device.device_enabled:
+                    self.assertEqual(response.status_code, 401)
+                    continue
 
-    def _token_auth_logout(self, token):
-        url = self._make_url(self.host, self.port, self.device_logout_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
+                if not device.device_onlineable:
+                    self.assertEqual(response.status_code, 403)
+                    continue
 
-    def _token_auth_query_participants(self, token):
-        url = self._make_url(self.host, self.port, self.device_query_participants_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
-
-    def test_query_participants_get_with_valid_token(self):
-        for device in self.all_devices:
-            response = self._token_auth_query_participants(device['device_token'])
-
-            if not device['device_enabled']:
-                # Should always return unauthorized for disabled devices
-                self.assertEqual(401, response.status_code)
-            else:
-                if device['device_onlineable']:
-                    self.assertEqual(200, response.status_code)
-                    participants = response.json()
-                    self.assertTrue('participants_info' in participants)
-                else:
-                    # Should return forbidden (not onlinable but enabled = forbidden)
-                    self.assertEqual(403, response.status_code)
-
-    def test_query_participants_get_with_invalid_token(self):
-        for device in self.all_devices:
-            response = self._token_auth_query_participants(device['device_token'] + str('invalid'))
-            # Should return unauthorized
-            self.assertEqual(401, response.status_code)
+                self.assertEqual(response.status_code, 200)
+                self.assertTrue('participants_info' in response.json)

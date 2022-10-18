@@ -7,7 +7,6 @@ class DeviceQueryDevicesTest(BaseDeviceAPITest):
     test_endpoint = '/api/device/devices'
 
     def setUp(self):
-
         super().setUp()
         from modules.FlaskModule.FlaskModule import device_api_ns
         from BaseDeviceAPITest import FakeFlaskModule

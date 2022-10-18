@@ -1,96 +1,122 @@
-import unittest
-import os
-from requests import get
-import json
+from BaseDeviceAPITest import BaseDeviceAPITest
+from modules.FlaskModule.FlaskModule import flask_app
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraSessionEvent import TeraSessionEvent
+from datetime import datetime
 
 
-class DeviceQuerySessionEventsTest(unittest.TestCase):
-
-    host = '127.0.0.1'
-    port = 40075
-    device_login_endpoint = '/api/device/login'
-    device_logout_endpoint = '/api/device/logout'
-    device_query_session_endpoint = '/api/device/sessions'
-    device_query_session_events_endpoint = '/api/device/sessions/events'
-    user_device_endpoint = '/api/user/devices'
-    all_devices = None
+class DeviceQuerySessionEventsTest(BaseDeviceAPITest):
+    test_endpoint = '/api/device/sessionevents'
 
     def setUp(self):
-        # Use admin account to get device information (and tokens)
-        response = self._http_auth_devices('admin', 'admin')
-        self.assertEqual(response.status_code, 200)
-        self.all_devices = json.loads(response.text)
-        self.assertGreater(len(self.all_devices), 0)
+        super().setUp()
+        from modules.FlaskModule.FlaskModule import device_api_ns
+        from BaseDeviceAPITest import FakeFlaskModule
+        # Setup minimal API
+        from modules.FlaskModule.API.device.DeviceQuerySessionEvents import DeviceQuerySessionEvents
+        kwargs = {
+            'flaskModule': FakeFlaskModule(config=BaseDeviceAPITest.getConfig()),
+            'test': True
+        }
+        device_api_ns.add_resource(DeviceQuerySessionEvents, '/sessionevents', resource_class_kwargs=kwargs)
 
-        # Populate sessions for all devices
-        for device in self.all_devices:
-            response_sessions = self._token_auth_query_sessions(device['device_token'])
-            if device['device_enabled']:
-                # Should be forbidden
-                self.assertEqual(response_sessions.status_code, 403)
-            else:
-                self.assertEqual(response_sessions.status_code, 401)
+        # Create test client
+        self.test_client = flask_app.test_client()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
-    def _make_url(self, hostname, port, endpoint):
-        return 'https://' + hostname + ':' + str(port) + endpoint
+    def test_get_endpoint_with_invalid_token(self):
+        with flask_app.app_context():
+            response = self._get_with_device_token_auth(self.test_client, token='Invalid')
+            self.assertEqual(response.status_code, 401)
 
-    def _http_auth_devices(self, username, password):
-        url = self._make_url(self.host, self.port, self.user_device_endpoint)
-        return get(url=url, verify=False, auth=(username, password))
+    def test_get_endpoint_with_valid_token(self):
+        with flask_app.app_context():
+            for device in TeraDevice.query.all():
+                response = self._get_with_device_token_auth(self.test_client, token=device.device_token)
 
-    def _token_auth(self, token):
-        url = self._make_url(self.host, self.port, self.device_login_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
+                if not device.device_enabled:
+                    self.assertEqual(response.status_code, 401)
+                else:
+                    self.assertEqual(response.status_code, 403)
 
-    def _token_auth_logout(self, token):
-        url = self._make_url(self.host, self.port, self.device_logout_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
+    def test_post_endpoint_with_empty_schema(self):
+        with flask_app.app_context():
+            for device in TeraDevice.query.all():
+                schema = {}
+                response = self._post_with_device_token_auth(self.test_client, token=device.device_token, json={})
+                if not device.device_enabled:
+                    self.assertEqual(response.status_code, 401)
+                else:
+                    self.assertEqual(response.status_code, 400)
 
-    def _token_auth_query_sessions(self, token):
-        url = self._make_url(self.host, self.port, self.device_query_session_endpoint) + '?list=true'
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
+    def test_post_endpoint_with_empty_session_event(self):
+        with flask_app.app_context():
+            for device in TeraDevice.query.all():
+                schema = {'session_event': {}}
+                response = self._post_with_device_token_auth(self.test_client, token=device.device_token, json=schema)
+                if not device.device_enabled:
+                    self.assertEqual(response.status_code, 401)
+                else:
+                    self.assertEqual(response.status_code, 400)
 
-    def _token_auth_query_session_events(self, token, id_session=None):
-        url = self._make_url(self.host, self.port, self.device_query_session_events_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        if id_session:
-            url = url + '?id_session=' + str(id_session)
+    def test_post_endpoint_with_invalid_session_id_and_id_session_event(self):
+        with flask_app.app_context():
+            for device in TeraDevice.query.all():
+                schema = {'session_event': {'id_session': -1, 'id_session_event': -1}}
+                response = self._post_with_device_token_auth(self.test_client, token=device.device_token, json=schema)
+                if not device.device_enabled:
+                    self.assertEqual(response.status_code, 401)
+                else:
+                    self.assertEqual(response.status_code, 403)
 
-        return get(url=url, verify=False, headers=request_headers)
+    def test_post_endpoint_with_valid_session_id_and_new_session_event(self):
+        with flask_app.app_context():
+            for device in TeraDevice.query.all():
+                for session in device.device_sessions:
+                    schema = {'session_event': {'id_session': session.id_session,
+                                                'id_session_event': -1,
+                                                'id_session_event_type':
+                                                    TeraSessionEvent.SessionEventTypes.DEVICE_EVENT.value,
+                                                'session_event_datetime': str(datetime.now()),
+                                                'session_event_text': 'session_event_text',
 
-    def test_query_session_events_get_without_session_id(self):
-        for device in self.all_devices:
-            response = self._token_auth_query_session_events(device['device_token'])
-            if device['device_enabled']:
-                # Should be forbidden
-                self.assertEqual(response.status_code, 403)
-            else:
-                self.assertEqual(response.status_code, 401)
+                                                'session_event_context': 'session_event_context'
+                                                }
+                              }
 
-    def test_query_session_events_get_wrong_session_id(self):
-        for device in self.all_devices:
-            response = self._token_auth_query_session_events(device['device_token'], -1)
-            if device['device_enabled']:
-                # Should be forbidden
-                self.assertEqual(response.status_code, 403)
-            else:
-                self.assertEqual(response.status_code, 401)
+                    response = self._post_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                 json=schema)
+                    if not device.device_enabled:
+                        self.assertEqual(response.status_code, 401)
+                        continue
 
-    def test_query_session_event_get_invalid_args(self):
-        for device in self.all_devices:
-            # Custom request
-            url = self._make_url(self.host, self.port, self.device_query_session_events_endpoint) + '?invalid=True'
-            request_headers = {'Authorization': 'OpenTera ' + device['device_token']}
-            response = self._token_auth_query_session_events(device['device_token'], -1)
-            if device['device_enabled']:
-                # Should be forbidden
-                self.assertEqual(response.status_code, 403)
-            else:
-                self.assertEqual(response.status_code, 401)
+                    # Test if the device owns the session, otherwise cannot add events
+                    if session.id_creator_device == device.id_device:
+                        self.assertEqual(response.status_code, 200)
+                    else:
+                        self.assertEqual(response.status_code, 403)
 
+    def test_post_endpoint_with_valid_session_id_and_update_session_event(self):
+        with flask_app.app_context():
+            for device in TeraDevice.query.all():
+                for session in device.device_sessions:
+                    for event in session.session_events:
+                        schema = {'session_event': event.to_json(minimal=False)}
+
+                        # Update time
+                        schema['session_event']['session_event_datetime'] = str(datetime.now())
+
+                        response = self._post_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                     json=schema)
+                        if not device.device_enabled:
+                            self.assertEqual(response.status_code, 401)
+                            continue
+
+                        # Test if the device owns the session, otherwise cannot add events
+                        if session.id_creator_device == device.id_device:
+                            self.assertEqual(response.status_code, 200)
+                        else:
+                            self.assertEqual(response.status_code, 403)
