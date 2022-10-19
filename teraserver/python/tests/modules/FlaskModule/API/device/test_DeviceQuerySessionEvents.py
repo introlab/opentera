@@ -45,7 +45,6 @@ class DeviceQuerySessionEventsTest(BaseDeviceAPITest):
     def test_post_endpoint_with_empty_schema(self):
         with flask_app.app_context():
             for device in TeraDevice.query.all():
-                schema = {}
                 response = self._post_with_device_token_auth(self.test_client, token=device.device_token, json={})
                 if not device.device_enabled:
                     self.assertEqual(response.status_code, 401)

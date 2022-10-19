@@ -127,7 +127,7 @@ class BaseDeviceAPITest(unittest.TestCase):
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
     def _delete_with_device_token_auth(self, client: FlaskClient, token: str = '',
-                                       params: dict = {}, endpoint: str = ''):
+                                       params: dict = {}, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
