@@ -1,9 +1,7 @@
 import unittest
 from opentera.db.Base import db
-from opentera.db.models.TeraDevice import TeraDevice
 from modules.DatabaseModule.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule
-from modules.UserManagerModule.UserManagerModule import UserManagerModule
 from opentera.config.ConfigManager import ConfigManager
 from opentera.modules.BaseModule import BaseModule, ModuleNames
 from flask.testing import FlaskClient
@@ -12,12 +10,7 @@ from opentera.db.models.TeraServerSettings import TeraServerSettings
 from flask_session import Session
 from modules.FlaskModule.FlaskModule import flask_app
 import redis
-from twisted.internet import reactor
-from threading import Thread
-from datetime import datetime
-from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name
-import opentera.messages.python as messages
-import time
+from requests.auth import _basic_auth_str
 
 
 class FakeFlaskModule(BaseModule):
@@ -39,7 +32,7 @@ class FakeFlaskModule(BaseModule):
         self.session = Session(flask_app)
 
 
-class BaseDeviceAPITest(unittest.TestCase):
+class BaseParticipantAPITest(unittest.TestCase):
     test_endpoint: str = ''
     user_token_key = TeraServerSettings.generate_token_key(32)
     participant_token_key = TeraServerSettings.generate_token_key(32)
@@ -47,8 +40,7 @@ class BaseDeviceAPITest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls._config = BaseDeviceAPITest.getConfig()
-
+        cls._config = BaseParticipantAPITest.getConfig()
         cls._db_man: DBManager = DBManager(cls._config)
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)
@@ -58,9 +50,6 @@ class BaseDeviceAPITest(unittest.TestCase):
 
         # This is needed for Logins and tokens
         cls._login_module = LoginModule(cls._config)
-
-        # This is needed for User management
-        cls._user_manager_module = UserManagerModule(cls._config)
 
     @classmethod
     def tearDownClass(cls):
@@ -75,15 +64,25 @@ class BaseDeviceAPITest(unittest.TestCase):
         config.create_defaults()
         return config
 
+    @classmethod
+    def reset_database(cls):
+        # db.close()
+        # Create all tables
+        config = cls.getConfig()
+        manager = DBManager(config)
+        manager.open_local({}, echo=False, ram=True)
+
+        # Creating default users / tests. Time-consuming, only once per test file.
+        manager.create_defaults(config, test=True)
+
     def setUp(self):
         # Setup required keys
         self.setup_redis_keys()
-        # self.session = db.create_scoped_session()
+        self.session = db.create_scoped_session()
 
     def tearDown(self):
-        # Make sure pending queries are rolled backed.
-        # self.session.remove()
-        pass
+        # Make sure pending queries are rollbacked.
+        self.session.remove()
 
     def setup_redis_keys(self):
         # Initialize keys (create only if not found)
@@ -121,49 +120,7 @@ class BaseDeviceAPITest(unittest.TestCase):
                                          TeraServerSettings.get_server_setting_value(
                                              TeraServerSettings.ServerParticipantTokenKey))
 
-    def _simulate_device_online(self, device: TeraDevice):
-        self.assertTrue(device.device_enabled)
-        self.assertTrue(device.device_onlineable)
-        tera_message = messages.TeraModuleMessage()
-        tera_message.head.version = 1
-        tera_message.head.time = datetime.now().timestamp()
-        tera_message.head.seq = 0
-        tera_message.head.source = 'device' + device.device_uuid
-        tera_message.head.dest = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
-
-        device_connected = messages.DeviceEvent()
-        device_connected.device_uuid = str(device.device_uuid)
-        device_connected.device_name = device.device_name
-        device_connected.type = messages.DeviceEvent.DEVICE_CONNECTED
-        # Need to use Any container
-        any_message = messages.Any()
-        any_message.Pack(device_connected)
-        tera_message.data.extend([any_message])
-        # Send device connected message
-        self._user_manager_module.handle_device_connected(tera_message.head, device_connected)
-
-    def _simulate_device_offline(self, device: TeraDevice):
-        self.assertTrue(device.device_enabled)
-        self.assertTrue(device.device_onlineable)
-        tera_message = messages.TeraModuleMessage()
-        tera_message.head.version = 1
-        tera_message.head.time = datetime.now().timestamp()
-        tera_message.head.seq = 0
-        tera_message.head.source = 'device' + device.device_uuid
-        tera_message.head.dest = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
-
-        device_disconnected = messages.DeviceEvent()
-        device_disconnected.device_uuid = str(device.device_uuid)
-        device_disconnected.device_name = device.device_name
-        device_disconnected.type = messages.DeviceEvent.DEVICE_DISCONNECTED
-        # Need to use Any container
-        any_message = messages.Any()
-        any_message.Pack(device_disconnected)
-        tera_message.data.extend([any_message])
-        # Send device connected message
-        self._user_manager_module.handle_device_disconnected(tera_message.head, device_disconnected)
-
-    def _get_with_device_token_auth(self, client: FlaskClient, token: str = '', params={}, endpoint=None):
+    def _get_with_participant_token_auth(self, client: FlaskClient, token: str = '', params=None, endpoint=None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -171,8 +128,18 @@ class BaseDeviceAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.get(endpoint, headers=headers, query_string=params)
 
-    def _post_with_device_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
-                                     params: dict = {}, endpoint: str = None):
+    def _get_with_participant_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
+                                        params=None, endpoint=None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+
+        headers = {'Authorization': _basic_auth_str(username, password)}
+        return client.get(endpoint, headers=headers, query_string=params)
+
+    def _post_with_participant_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
+                                          params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -180,23 +147,29 @@ class BaseDeviceAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
-    def _post_data_no_auth(self, client: FlaskClient, json: dict = None, params: dict = {}, headers: dict = {},
-                           data: bytes = None, endpoint: str = None):
-
+    def _post_with_participant_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
+                                         json: dict = {}, params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
-        if data is not None:
-            headers = {'Content-Type': 'application/octet-stream', 'Content-Transfer-Encoding': 'Base64'}
+        headers = {'Authorization': _basic_auth_str(username, password)}
+        return client.post(endpoint, headers=headers, query_string=params, json=json)
 
-        return client.post(endpoint, headers=headers, query_string=params, json=json, data=data)
-
-    def _delete_with_device_token_auth(self, client: FlaskClient, token: str = '',
-                                       params: dict = {}, endpoint: str = None):
+    def _delete_with_participant_token_auth(self, client: FlaskClient, token: str = '',
+                                            params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
         headers = {'Authorization': 'OpenTera ' + token}
+        return client.delete(endpoint, headers=headers, query_string=params)
+
+    def _delete_with_participant_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
+                                           params: dict = None, endpoint: str = None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        headers = {'Authorization': _basic_auth_str(username, password)}
         return client.delete(endpoint, headers=headers, query_string=params)
