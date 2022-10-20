@@ -135,6 +135,10 @@ class TeraDevice(db.Model, BaseModel):
         return None
 
     @staticmethod
+    def get_device_by_certificate(certificate):
+        return TeraDevice.query.filter_by(device_certificate=certificate).first()
+
+    @staticmethod
     def get_device_by_uuid(dev_uuid):
         device = TeraDevice.query.filter_by(device_uuid=dev_uuid).first()
         return device

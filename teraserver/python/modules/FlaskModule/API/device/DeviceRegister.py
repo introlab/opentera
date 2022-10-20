@@ -38,13 +38,20 @@ class DeviceRegister(Resource):
 
         self.ca_info = dict()
 
-        # Load CA private key
-        self.ca_info['private_key'] = load_private_pem_key(self.module.config.server_config['ssl_path'] + '/'
-                                                           + self.module.config.server_config['ca_private_key'])
+        if not self.test:
+            # Load CA private key
+            self.ca_info['private_key'] = load_private_pem_key(self.module.config.server_config['ssl_path'] + '/'
+                                                               + self.module.config.server_config['ca_private_key'])
 
-        # Load CA certificate
-        self.ca_info['certificate'] = load_pem_certificate(self.module.config.server_config['ssl_path'] + '/'
-                                                           + self.module.config.server_config['ca_certificate'])
+            # Load CA certificate
+            self.ca_info['certificate'] = load_pem_certificate(self.module.config.server_config['ssl_path'] + '/'
+                                                               + self.module.config.server_config['ca_certificate'])
+        else:
+            # Generate temporary CA certificate and key for tests
+            from opentera.crypto.crypto_utils import generate_ca_certificate
+            info = generate_ca_certificate()
+            self.ca_info['private_key'] = info['private_key']
+            self.ca_info['certificate'] = info['certificate']
 
     def create_device(self, name, device_json=None):
         # Create TeraDevice
@@ -66,8 +73,6 @@ class DeviceRegister(Resource):
         return device
 
     def post(self):
-        print(request)
-
         # We should receive a certificate signing request (base64) in an octet-stream
         if request.content_type == 'application/octet-stream':
             # try:

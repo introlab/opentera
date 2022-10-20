@@ -180,6 +180,18 @@ class BaseDeviceAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
+    def _post_data_no_auth(self, client: FlaskClient, json: dict = None, params: dict = {}, headers: dict = {},
+                                data: bytes = None, endpoint: str = None):
+
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        if data is not None:
+            headers = {'Content-Type': 'application/octet-stream', 'Content-Transfer-Encoding': 'Base64'}
+
+        return client.post(endpoint, headers=headers, query_string=params, json=json, data=data)
+
     def _delete_with_device_token_auth(self, client: FlaskClient, token: str = '',
                                        params: dict = {}, endpoint: str = None):
         if params is None:
