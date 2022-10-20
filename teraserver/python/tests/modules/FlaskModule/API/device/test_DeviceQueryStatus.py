@@ -19,7 +19,8 @@ class DeviceQueryStatusTest(BaseDeviceAPITest):
         from modules.FlaskModule.API.device.DeviceQueryStatus import DeviceQueryStatus
         kwargs = {
             'flaskModule': FakeFlaskModule(config=BaseDeviceAPITest.getConfig()),
-            'test': True
+            'test': True,
+            'user_manager_module': self._user_manager_module
         }
         device_api_ns.add_resource(DeviceQueryStatus, '/status', resource_class_kwargs=kwargs)
 

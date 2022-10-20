@@ -17,6 +17,7 @@ from threading import Thread
 from datetime import datetime
 from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name
 import opentera.messages.python as messages
+import time
 
 
 class FakeFlaskModule(BaseModule):
@@ -47,6 +48,7 @@ class BaseDeviceAPITest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._config = BaseDeviceAPITest.getConfig()
+
         cls._db_man: DBManager = DBManager(cls._config)
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)
@@ -60,18 +62,10 @@ class BaseDeviceAPITest(unittest.TestCase):
         # This is needed for User management
         cls._user_manager_module = UserManagerModule(cls._config)
 
-        cls._reactor_thread = Thread(target=reactor.run, args=(False,))
-        cls._reactor_thread.start()
-
     @classmethod
     def tearDownClass(cls):
         cls._config = None
         cls._db_man = None
-        # Stop reactor
-        if cls._reactor_thread:
-            reactor.callFromThread(lambda: reactor.stop())
-            cls._reactor_thread.join()
-
         LoginModule.redis_client = None
         db.session.remove()
 
@@ -146,7 +140,7 @@ class BaseDeviceAPITest(unittest.TestCase):
         any_message.Pack(device_connected)
         tera_message.data.extend([any_message])
         # Send device connected message
-        LoginModule.redis_client.publish(tera_message.head.dest, tera_message.SerializeToString())
+        self._user_manager_module.handle_device_connected(tera_message.head, device_connected)
 
     def _simulate_device_offline(self, device: TeraDevice):
         self.assertTrue(device.device_enabled)
@@ -167,7 +161,7 @@ class BaseDeviceAPITest(unittest.TestCase):
         any_message.Pack(device_disconnected)
         tera_message.data.extend([any_message])
         # Send device connected message
-        LoginModule.redis_client.publish(tera_message.head.dest, tera_message.SerializeToString())
+        self._user_manager_module.handle_device_disconnected(tera_message.head, device_disconnected)
 
     def _get_with_device_token_auth(self, client: FlaskClient, token: str = '', params={}, endpoint=None):
         if params is None:
