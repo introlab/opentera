@@ -1,7 +1,9 @@
 import unittest
 from opentera.db.Base import db
+from opentera.db.models.TeraDevice import TeraDevice
 from modules.DatabaseModule.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule
+from modules.UserManagerModule.UserManagerModule import UserManagerModule
 from opentera.config.ConfigManager import ConfigManager
 from opentera.modules.BaseModule import BaseModule, ModuleNames
 from flask.testing import FlaskClient
@@ -10,6 +12,11 @@ from opentera.db.models.TeraServerSettings import TeraServerSettings
 from flask_session import Session
 from modules.FlaskModule.FlaskModule import flask_app
 import redis
+from twisted.internet import reactor
+from threading import Thread
+from datetime import datetime
+from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name
+import opentera.messages.python as messages
 
 
 class FakeFlaskModule(BaseModule):
@@ -50,10 +57,21 @@ class BaseDeviceAPITest(unittest.TestCase):
         # This is needed for Logins and tokens
         cls._login_module = LoginModule(cls._config)
 
+        # This is needed for User management
+        cls._user_manager_module = UserManagerModule(cls._config)
+
+        cls._reactor_thread = Thread(target=reactor.run, args=(False,))
+        cls._reactor_thread.start()
+
     @classmethod
     def tearDownClass(cls):
         cls._config = None
         cls._db_man = None
+        # Stop reactor
+        if cls._reactor_thread:
+            reactor.callFromThread(lambda: reactor.stop())
+            cls._reactor_thread.join()
+
         LoginModule.redis_client = None
         db.session.remove()
 
@@ -108,6 +126,48 @@ class BaseDeviceAPITest(unittest.TestCase):
             LoginModule.redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey,
                                          TeraServerSettings.get_server_setting_value(
                                              TeraServerSettings.ServerParticipantTokenKey))
+
+    def _simulate_device_online(self, device: TeraDevice):
+        self.assertTrue(device.device_enabled)
+        self.assertTrue(device.device_onlineable)
+        tera_message = messages.TeraModuleMessage()
+        tera_message.head.version = 1
+        tera_message.head.time = datetime.now().timestamp()
+        tera_message.head.seq = 0
+        tera_message.head.source = 'device' + device.device_uuid
+        tera_message.head.dest = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
+
+        device_connected = messages.DeviceEvent()
+        device_connected.device_uuid = str(device.device_uuid)
+        device_connected.device_name = device.device_name
+        device_connected.type = messages.DeviceEvent.DEVICE_CONNECTED
+        # Need to use Any container
+        any_message = messages.Any()
+        any_message.Pack(device_connected)
+        tera_message.data.extend([any_message])
+        # Send device connected message
+        LoginModule.redis_client.publish(tera_message.head.dest, tera_message.SerializeToString())
+
+    def _simulate_device_offline(self, device: TeraDevice):
+        self.assertTrue(device.device_enabled)
+        self.assertTrue(device.device_onlineable)
+        tera_message = messages.TeraModuleMessage()
+        tera_message.head.version = 1
+        tera_message.head.time = datetime.now().timestamp()
+        tera_message.head.seq = 0
+        tera_message.head.source = 'device' + device.device_uuid
+        tera_message.head.dest = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
+
+        device_disconnected = messages.DeviceEvent()
+        device_disconnected.device_uuid = str(device.device_uuid)
+        device_disconnected.device_name = device.device_name
+        device_disconnected.type = messages.DeviceEvent.DEVICE_DISCONNECTED
+        # Need to use Any container
+        any_message = messages.Any()
+        any_message.Pack(device_disconnected)
+        tera_message.data.extend([any_message])
+        # Send device connected message
+        LoginModule.redis_client.publish(tera_message.head.dest, tera_message.SerializeToString())
 
     def _get_with_device_token_auth(self, client: FlaskClient, token: str = '', params={}, endpoint=None):
         if params is None:
