@@ -64,7 +64,10 @@ class ParticipantLogin(Resource):
 
             # Verify if participant already logged in
             rpc = RedisRPCClient(self.module.config.redis_config)
-            online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
+            if not self.test:
+                online_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_participants')
+            else:
+                online_participants = []
             websocket_url = None
             if current_participant.participant_uuid not in online_participants:
                 websocket_url = "wss://" + servername + ":" + str(port) + "/wss/participant?id=" + session['_id']
