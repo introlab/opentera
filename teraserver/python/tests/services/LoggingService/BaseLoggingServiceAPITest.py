@@ -11,6 +11,8 @@ import redis
 import uuid
 import random
 from string import digits, ascii_lowercase, ascii_uppercase
+import services.LoggingService.Globals as Globals
+# from FakeLoggingService import FakeLoggingService
 
 
 def infinite_jti_sequence():
@@ -63,12 +65,14 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
                                         password=cls._config.redis_config['password'],
                                         db=cls._config.redis_config['db'])
 
-        cls._db_man: DBManager = DBManager()
+        cls._db_man: DBManager = DBManager(test=True)
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)
 
         # Creating default users / tests. Time-consuming, only once per test file.
         cls._db_man.create_defaults(cls._config, test=True)
+
+        # Globals.service = FakeLoggingService()
 
     @classmethod
     def tearDownClass(cls):

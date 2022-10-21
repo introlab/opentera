@@ -7,6 +7,8 @@ config_man = ConfigManager()
 # Database manager
 db_man = DBManager()
 
+service = None
+
 # Redis client & keys
 redis_client = None
 api_user_token_key = None

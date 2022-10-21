@@ -22,3 +22,7 @@ class LoginEntry(db.Model, BaseModel):
     login_os_version = db.Column(db.String, nullable=True)
     login_message = db.Column(db.String, nullable=True)
 
+    def to_json(self, ignore_fields=None, minimal=False):
+        if ignore_fields is None:
+            ignore_fields = []
+        return super().to_json(ignore_fields=ignore_fields)

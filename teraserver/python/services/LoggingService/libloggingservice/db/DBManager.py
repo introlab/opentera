@@ -32,8 +32,9 @@ class DBManager:
         'type': ''
     }"""
 
-    def __init__(self):
+    def __init__(self, test: bool = False):
         self.db_uri = None
+        self.test = test
 
     def create_defaults(self, config: ConfigManager, test: bool = False):
         with flask_app.app_context():
@@ -63,7 +64,6 @@ class DBManager:
         db.app = flask_app
 
         # Init tables
-        # db.drop_all()
         db.create_all()
 
         inspector = Inspector.from_engine(db.engine)
@@ -94,8 +94,6 @@ class DBManager:
         # Create db engine
         db.init_app(flask_app)
         db.app = flask_app
-
-        # db.drop_all()
         db.create_all()
 
         inspector = Inspector.from_engine(db.engine)
