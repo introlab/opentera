@@ -2,18 +2,15 @@ import unittest
 from services.LoggingService.libloggingservice.db.Base import db
 from services.LoggingService.libloggingservice.db.DBManager import DBManager
 from services.LoggingService.ConfigManager import ConfigManager
-
-
-from opentera.modules.BaseModule import BaseModule, ModuleNames
+from opentera.modules.BaseModule import BaseModule
 from flask.testing import FlaskClient
 from opentera.redis.RedisVars import RedisVars
-from opentera.db.models.TeraService import TeraService
-from opentera.db.models.TeraServerSettings import TeraServerSettings
 from flask_session import Session
-
 from services.LoggingService.FlaskModule import flask_app
 import redis
 import uuid
+import random
+from string import digits, ascii_lowercase, ascii_uppercase
 
 
 def infinite_jti_sequence():
@@ -52,9 +49,10 @@ class FakeFlaskModule(BaseModule):
 class BaseLoggingServiceAPITest(unittest.TestCase):
 
     test_endpoint = ''
-    user_token_key = TeraServerSettings.generate_token_key(32)
-    participant_token_key = TeraServerSettings.generate_token_key(32)
-    service_token_key = TeraServerSettings.generate_token_key(32)
+    user_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for i in range(36))
+    participant_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for i in range(36))
+    service_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for i in range(36))
+    device_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for i in range(36))
 
     @classmethod
     def setUpClass(cls):
@@ -116,20 +114,15 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
 
         # Device (dynamic)
         if not self._redis_client.exists(RedisVars.RedisVar_DeviceTokenAPIKey):
-            self._redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey, TeraServerSettings.get_server_setting_value(
-                                             TeraServerSettings.ServerDeviceTokenKey))
+            self._redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey, self.device_token_key)
 
         # Device (static)
         if not self._redis_client.exists(RedisVars.RedisVar_DeviceStaticTokenAPIKey):
-            self._redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey,
-                                   TeraServerSettings.get_server_setting_value(
-                                             TeraServerSettings.ServerDeviceTokenKey))
+            self._redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey, self.device_token_key)
 
         # Participant (static)
         if not self._redis_client.exists(RedisVars.RedisVar_ParticipantStaticTokenAPIKey):
-            self._redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey,
-                                   TeraServerSettings.get_server_setting_value(
-                                             TeraServerSettings.ServerParticipantTokenKey))
+            self._redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey, self.participant_token_key)
 
     def setup_service_access_manager(self):
         # Initialize service from redis, posing as LoggingService
