@@ -13,7 +13,7 @@ from flask_session import Session
 
 from services.LoggingService.FlaskModule import flask_app
 import redis
-
+import uuid
 
 class FakeFlaskModule(BaseModule):
     def __init__(self,  config: ConfigManager):
@@ -21,7 +21,7 @@ class FakeFlaskModule(BaseModule):
 
         flask_app.debug = False
         flask_app.test = True
-        flask_app.secret_key = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerUUID)
+        flask_app.secret_key = str(uuid.uuid4())  # Normally service UUID
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
                                    % self.config.redis_config)
@@ -33,26 +33,32 @@ class FakeFlaskModule(BaseModule):
         # Create session
         self.session = Session(flask_app)
 
+        # Setup Fake Service API
+        # from modules.FlaskModule.FlaskModule import service_api_ns
+
 
 class BaseLoggingServiceAPITest(unittest.TestCase):
 
     test_endpoint = ''
-    service_token = None
-    service_uuid = None
-    service_key = None
+    user_token_key = TeraServerSettings.generate_token_key(32)
+    participant_token_key = TeraServerSettings.generate_token_key(32)
+    service_token_key = TeraServerSettings.generate_token_key(32)
 
     @classmethod
     def setUpClass(cls):
         cls._config = BaseLoggingServiceAPITest.getConfig()
+        cls._redis_client = redis.Redis(host=cls._config.redis_config['hostname'],
+                                        port=cls._config.redis_config['port'],
+                                        username=cls._config.redis_config['username'],
+                                        password=cls._config.redis_config['password'],
+                                        db=cls._config.redis_config['db'])
+
         cls._db_man: DBManager = DBManager()
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)
 
         # Creating default users / tests. Time-consuming, only once per test file.
         cls._db_man.create_defaults(cls._config, test=True)
-
-        # This is needed for Logins and tokens
-        # cls._login_module = LoginModule(cls._config)
 
     @classmethod
     def tearDownClass(cls):
@@ -68,29 +74,69 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         return config
 
     def setUp(self):
-        self.setup_service_token()
+        self.setup_redis_keys()
+        self.setup_service_access_manager()
 
     def tearDown(self):
         # Make sure pending queries are rollbacked.
         db.session.rollback()
 
-    def setup_service_token(self):
-        # Initialize service from redis, posing as LoggingService
-        service: TeraService = TeraService.get_service_by_key('LoggingService')
+    def setup_redis_keys(self):
+        # Initialize keys (create only if not found)
+        # Service (dynamic)
+        if not self._redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
+            self._redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_token_key)
+        else:
+            self.service_token_key = self._redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
 
-        self.assertIsNotNone(service)
-        # self.assertIsNotNone(LoginModule.redis_client)
-        #
-        # if not LoginModule.redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
-        #     self.service_key = 'BaseServiceAPITest'
-        #     LoginModule.redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_key)
-        # else:
-        #     self.service_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
-        #
-        # self.assertIsNotNone(self.service_key)
-        # self.service_token = service.get_token(self.service_key)
-        # self.service_uuid = service.service_uuid
-        # self.id_service = service.id_service
+        # User (dynamic)
+        if not self._redis_client.exists(RedisVars.RedisVar_UserTokenAPIKey):
+            self._redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, self.user_token_key)
+        else:
+            self.user_token_key = self._redis_client.get(RedisVars.RedisVar_UserTokenAPIKey).decode('utf-8')
+
+        # Participant (dynamic)
+        if not self._redis_client.exists(RedisVars.RedisVar_ParticipantTokenAPIKey):
+            self._redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, self.participant_token_key)
+        else:
+            self.participant_token_key = self._redis_client.get(
+                RedisVars.RedisVar_ParticipantTokenAPIKey).decode('utf-8')
+
+        # Device (dynamic)
+        if not self._redis_client.exists(RedisVars.RedisVar_DeviceTokenAPIKey):
+            self._redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey, TeraServerSettings.get_server_setting_value(
+                                             TeraServerSettings.ServerDeviceTokenKey))
+
+        # Device (static)
+        if not self._redis_client.exists(RedisVars.RedisVar_DeviceStaticTokenAPIKey):
+            self._redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey,
+                                   TeraServerSettings.get_server_setting_value(
+                                             TeraServerSettings.ServerDeviceTokenKey))
+
+        # Participant (static)
+        if not self._redis_client.exists(RedisVars.RedisVar_ParticipantStaticTokenAPIKey):
+            self._redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey,
+                                   TeraServerSettings.get_server_setting_value(
+                                             TeraServerSettings.ServerParticipantTokenKey))
+
+    def setup_service_access_manager(self):
+        # Initialize service from redis, posing as LoggingService
+        from opentera.services.ServiceAccessManager import ServiceAccessManager
+        # Update Service Access information
+        ServiceAccessManager.api_user_token_key = \
+            self._redis_client.get(RedisVars.RedisVar_UserTokenAPIKey)
+        ServiceAccessManager.api_participant_token_key = \
+            self._redis_client.get(RedisVars.RedisVar_ParticipantTokenAPIKey)
+        ServiceAccessManager.api_participant_static_token_key = \
+            self._redis_client.get(RedisVars.RedisVar_ParticipantStaticTokenAPIKey)
+        ServiceAccessManager.api_device_token_key = \
+            self._redis_client.get(RedisVars.RedisVar_DeviceTokenAPIKey)
+        ServiceAccessManager.api_device_static_token_key = \
+            self._redis_client.get(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
+        ServiceAccessManager.api_service_token_key = \
+            self._redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey)
+
+        ServiceAccessManager.config_man = self._config
 
     def _get_with_service_token_auth(self, client: FlaskClient, token, params={}, endpoint=None):
         if params is None:

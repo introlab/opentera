@@ -3,7 +3,7 @@ from services.LoggingService.FlaskModule import flask_app
 
 
 class LoggingServiceDBManagerTest(BaseLoggingServiceAPITest):
-    test_endpoint = '/api/'
+    test_endpoint = '/api/log_entries'
 
     def setUp(self):
         super().setUp()
@@ -21,5 +21,5 @@ class LoggingServiceDBManagerTest(BaseLoggingServiceAPITest):
         super().tearDown()
 
     def test_working(self):
-        pass
+        print('testing...')
 

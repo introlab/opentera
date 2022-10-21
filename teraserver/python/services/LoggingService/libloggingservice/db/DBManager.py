@@ -1,6 +1,9 @@
 # Using same base as TeraServer
 from services.LoggingService.libloggingservice.db.Base import db
+from flask_sqlalchemy import event
+from sqlalchemy.engine import Engine
 from sqlalchemy.engine.reflection import Inspector
+from sqlite3 import Connection as SQLite3Connection
 
 # Must include all Database objects here to be properly initialized and created if needed
 # All at once to make sure all files are registered.
@@ -33,17 +36,18 @@ class DBManager:
         self.db_uri = None
 
     def create_defaults(self, config: ConfigManager, test: bool = False):
-        if LogEntry.get_count() == 0:
-            entry = LogEntry()
-            entry.log_level = LogEvent.LogLevel.LOGLEVEL_INFO
-            entry.sender = 'service.LoggingService'
-            entry.timestamp = datetime.datetime.now()
-            entry.message = 'Database initialized.'
-            db.session.add(entry)
-            db.session.commit()
+        with flask_app.app_context():
+            if LogEntry.get_count() == 0:
+                entry = LogEntry()
+                entry.log_level = LogEvent.LogLevel.LOGLEVEL_INFO
+                entry.sender = 'service.LoggingService'
+                entry.timestamp = datetime.datetime.now()
+                entry.message = 'Database initialized.'
+                db.session.add(entry)
+                db.session.commit()
 
-        if test:
-            pass
+            if test:
+                pass
 
     def open(self, db_infos, echo=False):
         self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
@@ -184,3 +188,12 @@ class DBManager:
         entry.login_message = event.log_header.message
         db.session.add(entry)
         db.session.commit()
+
+
+# Fix foreign_keys on sqlite
+@event.listens_for(Engine, "connect")
+def _set_sqlite_pragma(dbapi_connection, connection_record):
+    if isinstance(dbapi_connection, SQLite3Connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON;")
+        cursor.close()
