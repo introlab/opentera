@@ -11,7 +11,8 @@ class LoggingServiceDBManagerTest(BaseLoggingServiceAPITest):
         from BaseLoggingServiceAPITest import FakeFlaskModule
         # Setup minimal API
         from services.LoggingService.API.QueryLogEntries import QueryLogEntries
-        kwargs = {'flaskModule': FakeFlaskModule(config=BaseLoggingServiceAPITest.getConfig())}
+        kwargs = {'flaskModule': FakeFlaskModule(config=BaseLoggingServiceAPITest.getConfig()),
+                  'test': True}
         logging_api_ns.add_resource(QueryLogEntries, '/log_entries', resource_class_kwargs=kwargs)
 
         # Create test client
