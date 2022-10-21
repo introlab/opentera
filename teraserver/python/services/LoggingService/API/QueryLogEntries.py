@@ -13,7 +13,7 @@ class QueryLogEntries(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
-        self.parser = reqparse.RequestParser()
+        self.test = kwargs.get('test', False)
 
     @api.expect(get_parser)
     @api.doc(description='To be documented '
@@ -22,7 +22,7 @@ class QueryLogEntries(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
-    @ServiceAccessManager.token_required
+    @ServiceAccessManager.token_required(allow_dynamic_tokens=True, allow_static_tokens=False)
     def get(self):
 
         # TODO Only allow superadmins to query logs?

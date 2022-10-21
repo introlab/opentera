@@ -15,6 +15,18 @@ from services.LoggingService.FlaskModule import flask_app
 import redis
 import uuid
 
+
+def infinite_jti_sequence():
+    num = 0
+    while True:
+        yield num
+        num += 1
+
+
+# Initialize generator, call next(user_jti_generator) to get next sequence number
+user_jti_generator = infinite_jti_sequence()
+
+
 class FakeFlaskModule(BaseModule):
     def __init__(self,  config: ConfigManager):
         BaseModule.__init__(self, config.service_config['name'] + '.FlaskModule-test', config)
@@ -138,12 +150,40 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
 
         ServiceAccessManager.config_man = self._config
 
-    def _get_with_service_token_auth(self, client: FlaskClient, token, params={}, endpoint=None):
+    def _generate_fake_user_token(self, name='FakeUser', superadmin=False, expiration=3600):
+
+        import time
+        import jwt
+        import random
+        import uuid
+
+        # Creating token with user info
+        now = time.time()
+        token_key = self._redis_client.get(RedisVars.RedisVar_UserTokenAPIKey)
+
+        payload = {
+            'iat': int(now),
+            'exp': int(now) + expiration,
+            'iss': 'TeraServer',
+            'jti': next(user_jti_generator),
+            'user_uuid': str(uuid.uuid4()),
+            'id_user': 1,
+            'user_fullname': name,
+            'user_superadmin': superadmin
+        }
+
+        return jwt.encode(payload, token_key, algorithm='HS256')
+
+    def _get_with_service_token_auth(self, client: FlaskClient, token=None, params=None, endpoint=None):
         if params is None:
             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
-        headers = {'Authorization': 'OpenTera ' + token}
+        if token is not None:
+            headers = {'Authorization': 'OpenTera ' + token}
+        else:
+            headers = {}
+
         return client.get(endpoint, headers=headers, query_string=params)
 
     def _post_with_service_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
