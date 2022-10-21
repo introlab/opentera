@@ -2,7 +2,7 @@ from BaseLoggingServiceAPITest import BaseLoggingServiceAPITest
 from services.LoggingService.FlaskModule import flask_app
 
 
-class LoggingServiceDBManagerTest(BaseLoggingServiceAPITest):
+class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
     test_endpoint = '/api/logging/log_entries'
 
     def setUp(self):
