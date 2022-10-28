@@ -287,7 +287,7 @@ class DBManager (BaseModule):
         BaseModel.set_db(self.db)
 
         # Init tables
-        inspector = Inspector.from_engine(db.engine)
+        inspector = Inspector.from_engine(self.db.engine)
         tables = inspector.get_table_names()
         # tables = db.engine.table_names()
         if not tables:
