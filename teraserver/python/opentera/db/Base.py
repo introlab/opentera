@@ -139,7 +139,7 @@ class BaseMixin(object):
     @classmethod
     def update(cls, update_id: int, values: dict):
         values = cls.clean_values(values)
-        update_obj = cls.db().session.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
+        update_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
         update_obj.from_json(values)
         cls.commit()
 
@@ -158,7 +158,7 @@ class BaseMixin(object):
 
     @classmethod
     def delete(cls, id_todel):
-        delete_obj = cls.db().session.query.filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
+        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
         if delete_obj:
             cls.db().session.delete(delete_obj)
             cls.commit()
@@ -168,14 +168,14 @@ class BaseMixin(object):
         if filters is None:
             filters = dict()
 
-        return cls.db().session.query.filter_by(**filters).all()
+        return cls.db().session.query(cls).filter_by(**filters).all()
 
     @classmethod
     def count_with_filters(cls, filters=None):
         if filters is None:
             filters = dict()
 
-        return cls.db().session.query.filter_by(**filters).count()
+        return cls.db().session.query(cls).filter_by(**filters).count()
 
     @classmethod
     def get_json_schema(cls) -> dict:
