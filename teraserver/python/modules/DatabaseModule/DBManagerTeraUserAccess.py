@@ -37,7 +37,7 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_users(self, admin_only=False):
         if self.user.user_superadmin:
-            users = TeraUser.query.order_by(TeraUser.user_firstname.asc()).all()
+            users = TeraUser.query().order_by(TeraUser.user_firstname.asc()).all()
         else:
             projects = self.get_accessible_projects(admin_only=admin_only)
             users = []
@@ -60,7 +60,7 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_users_groups(self, admin_only=False, by_sites=False):
         users_groups = []
-        all_users_groups = TeraUserGroup.query.order_by(TeraUserGroup.user_group_name.asc()).all()
+        all_users_groups = TeraUserGroup.query().order_by(TeraUserGroup.user_group_name.asc()).all()
         if self.user.user_superadmin:
             users_groups = all_users_groups
         else:
@@ -123,7 +123,7 @@ class DBManagerTeraUserAccess:
         project_list = []
         if self.user.user_superadmin:
             # Is superadmin - admin on all projects
-            project_list = TeraProject.query.all()
+            project_list = TeraProject.query().all()
         else:
             # Build project list
             project_roles = self.user.get_projects_roles()
@@ -143,12 +143,12 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_devices(self, admin_only=False):
         if self.user.user_superadmin:
-            return TeraDevice.query.all()
+            return TeraDevice.query().all()
 
         # proj_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
-        # query = TeraDevice.query.join(TeraDeviceProject).filter(TeraDeviceProject.id_project.in_(proj_id_list))
+        # query = TeraDevice.query().join(TeraDeviceProject).filter(TeraDeviceProject.id_project.in_(proj_id_list))
         site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
-        query = TeraDevice.query.join(TeraDeviceSite).filter(TeraDeviceSite.id_site.in_(site_id_list))
+        query = TeraDevice.query().join(TeraDeviceSite).filter(TeraDeviceSite.id_site.in_(site_id_list))
         return query.all()
 
     def get_accessible_devices_uuids(self, admin_only=False):
@@ -168,12 +168,12 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_devices_types(self, admin_only=False):
         # if self.user.user_superadmin:
-        #     return TeraDeviceType.query.all()
+        #     return TeraDeviceType.query().all()
         return TeraDeviceType.get_devices_types()
 
         # from opentera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
         # session_types_id_list = self.get_accessible_session_types_ids(admin_only=admin_only)
-        # return TeraDeviceType.query.join(TeraSessionTypeDeviceType).join(TeraSessionType).\
+        # return TeraDeviceType.query().join(TeraSessionTypeDeviceType).join(TeraSessionType).\
         #     filter(TeraSessionType.id_session_type.in_(session_types_id_list)).all()
 
     def get_accessible_devices_types_ids(self, admin_only=False):
@@ -215,12 +215,12 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_participants(self, admin_only=False):
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
-        # groups = TeraParticipantGroup.query.filter(TeraParticipantGroup.id_project.in_(project_id_list)).all()
+        # groups = TeraParticipantGroup.query().filter(TeraParticipantGroup.id_project.in_(project_id_list)).all()
         participant_list = []
         # for group in groups:
-        #     participant_list.extend(TeraParticipant.query.
+        #     participant_list.extend(TeraParticipant.query().
         #                             filter_by(id_participant_group=group.id_participant_group).all())
-        participant_list.extend(TeraParticipant.query.filter(TeraParticipant.id_project.in_(project_id_list)))
+        participant_list.extend(TeraParticipant.query().filter(TeraParticipant.id_project.in_(project_id_list)))
 
         return participant_list
 
@@ -241,7 +241,7 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_groups(self, admin_only=False):
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
-        return TeraParticipantGroup.query.filter(TeraParticipantGroup.id_project.in_(project_id_list)).all()
+        return TeraParticipantGroup.query().filter(TeraParticipantGroup.id_project.in_(project_id_list)).all()
 
     def get_accessible_groups_ids(self, admin_only=False):
         groups = []
@@ -253,7 +253,7 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_sites(self, admin_only=False):
         if self.user.user_superadmin:
-            site_list = TeraSite.query.order_by(TeraSite.site_name.asc()).all()
+            site_list = TeraSite.query().order_by(TeraSite.site_name.asc()).all()
         else:
             site_list = []
             site_roles = self.user.get_sites_roles()
@@ -274,17 +274,17 @@ class DBManagerTeraUserAccess:
     def get_accessible_session_types(self, admin_only=False):
         # from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
         # if self.user.user_superadmin:
-        #     return TeraSessionType.query.all()
+        #     return TeraSessionType.query().all()
         #
         # project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
-        # # return TeraSessionType.query.filter(TeraProject.id_project.in_(project_id_list)).all()
-        # return TeraSessionType.query.join(TeraSessionTypeProject) \
+        # # return TeraSessionType.query().filter(TeraProject.id_project.in_(project_id_list)).all()
+        # return TeraSessionType.query().join(TeraSessionTypeProject) \
         #     .filter(TeraSessionTypeProject.id_project.in_(project_id_list)).all()
         if self.user.user_superadmin:
-            return TeraSessionType.query.all()
+            return TeraSessionType.query().all()
 
         site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
-        query = TeraSessionType.query.join(TeraSessionTypeSite)\
+        query = TeraSessionType.query().join(TeraSessionTypeSite)\
             .filter(TeraSessionTypeSite.id_site.in_(site_id_list))
         return query.all()
 
@@ -298,11 +298,11 @@ class DBManagerTeraUserAccess:
 
     def get_accessible_test_types(self, admin_only=False):
         if self.user.user_superadmin:
-            return TeraTestType.query.all()
+            return TeraTestType.query().all()
 
         site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
         services_ids = self.get_accessible_services_ids()
-        query = TeraTestType.query.join(TeraTestTypeSite)\
+        query = TeraTestType.query().join(TeraTestTypeSite)\
             .filter(TeraTestTypeSite.id_site.in_(site_id_list)).filter(TeraTestType.id_service.in_(services_ids))
         return query.all()
 
@@ -326,32 +326,32 @@ class DBManagerTeraUserAccess:
         device_ids = self.get_accessible_devices_ids(admin_only=admin_only)
         service_ids = self.get_accessible_services_ids(admin_only=admin_only)
         # # THIS JOIN TAKES A LONG TIME TO PROCESS... IMPROVE!
-        # # sessions = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users). \
+        # # sessions = TeraSession.query().join(TeraSession.session_participants).join(TeraSession.session_users). \
         # #     filter(or_(TeraSessionParticipants.id_participant.in_(part_ids),
         # #                TeraSessionUsers.id_user == self.user.id_user,
         # #                TeraSession.id_creator_user == self.user.id_user)).all()
-        # sessions = TeraSession.query.join(TeraSession.session_participants). \
+        # sessions = TeraSession.query().join(TeraSession.session_participants). \
         #     filter(TeraSessionParticipants.id_participant.in_(part_ids)).all()
-        sessions = TeraSession.query.filter(or_(TeraSession.id_creator_user.in_(user_ids),
+        sessions = TeraSession.query().filter(or_(TeraSession.id_creator_user.in_(user_ids),
                                             TeraSession.id_creator_device.in_(device_ids),
                                             TeraSession.id_creator_participant.in_(part_ids),
                                             TeraSession.id_creator_service.in_(service_ids))).all()
 
         # Also check for sessions which we were part
         sessions_ids = [session.id_session for session in sessions]
-        other_sessions = TeraSessionUsers.query.filter_by(id_user=self.user.id_user).\
+        other_sessions = TeraSessionUsers.query().filter_by(id_user=self.user.id_user).\
             filter(not_(TeraSessionUsers.id_session.in_(sessions_ids)))
         sessions.extend(other_sessions)
 
         # ... and sessions which participants we have access to were part
         sessions_ids = [session.id_session for session in sessions]
-        other_sessions = TeraSessionParticipants.query.filter(TeraSessionParticipants.id_participant.in_(part_ids)). \
+        other_sessions = TeraSessionParticipants.query().filter(TeraSessionParticipants.id_participant.in_(part_ids)). \
             filter(not_(TeraSessionParticipants.id_session.in_(sessions_ids)))
         sessions.extend(other_sessions)
 
         # ... and sessions which devices we have access to were part!
         sessions_ids = [session.id_session for session in sessions]
-        other_sessions = TeraSessionDevices.query.filter(TeraSessionDevices.id_device.in_(device_ids)). \
+        other_sessions = TeraSessionDevices.query().filter(TeraSessionDevices.id_device.in_(device_ids)). \
             filter(not_(TeraSessionDevices.id_session.in_(sessions_ids)))
         sessions.extend(other_sessions)
 
@@ -374,12 +374,12 @@ class DBManagerTeraUserAccess:
 
         if self.user.user_superadmin:
             if self.user.user_superadmin:
-                return TeraService.query.all()
+                return TeraService.query().all()
 
         # Accessible services are those from projects and sites where the user is admin
         accessible_projects_ids = self.get_accessible_projects_ids()
         admin_sites_ids = self.get_accessible_sites_ids(admin_only=True)
-        query = TeraService.query.outerjoin(TeraServiceProject).outerjoin(TeraServiceSite).filter(or_(
+        query = TeraService.query().outerjoin(TeraServiceProject).outerjoin(TeraServiceSite).filter(or_(
             TeraServiceProject.id_project.in_(accessible_projects_ids),
             TeraServiceSite.id_site.in_(admin_sites_ids)
         ))
@@ -420,9 +420,9 @@ class DBManagerTeraUserAccess:
     def query_devices_for_site(self, site_id: int, device_type_id: int, enabled: bool = False):
         devices = []
         if site_id in self.get_accessible_sites_ids():
-            query = TeraDevice.query.join(TeraDeviceSite).filter(TeraDeviceSite.id_site == site_id).\
+            query = TeraDevice.query().join(TeraDeviceSite).filter(TeraDeviceSite.id_site == site_id).\
                 order_by(TeraDevice.device_name.asc())
-        #     query = TeraDevice.query.join(TeraDeviceProject).join(TeraProject) \
+        #     query = TeraDevice.query().join(TeraDeviceProject).join(TeraProject) \
         #         .filter(TeraProject.id_site == site_id) \
         #         .order_by(TeraDevice.device_name.asc())
             if device_type_id:
@@ -436,7 +436,7 @@ class DBManagerTeraUserAccess:
         devices = []
         projects_ids = self.get_accessible_projects_ids()
         if project_id in projects_ids:
-            query = TeraDevice.query.join(TeraDeviceProject).filter_by(id_project=project_id) \
+            query = TeraDevice.query().join(TeraDeviceProject).filter_by(id_project=project_id) \
                 .order_by(TeraDevice.device_name.asc())
             if device_type_id:
                 query = query.filter(TeraDevice.id_device_type == device_type_id)
@@ -450,7 +450,7 @@ class DBManagerTeraUserAccess:
         from opentera.db.models.TeraProject import TeraProject
         devices_ids = self.get_accessible_devices_ids()
 
-        device_projects = TeraDeviceProject.query.filter(TeraDeviceProject.id_device.in_(devices_ids)) \
+        device_projects = TeraDeviceProject.query().filter(TeraDeviceProject.id_device.in_(devices_ids)) \
             .filter_by(id_project=project_id).all()
 
         if include_other_devices:
@@ -480,7 +480,7 @@ class DBManagerTeraUserAccess:
                 other_devices = TeraDevice.query_with_filters()
             else:
                 sites_ids = self.get_accessible_sites_ids()
-                other_devices = TeraDevice.query.join(TeraDeviceSite).filter(TeraDeviceSite.id_site.in_(sites_ids)) \
+                other_devices = TeraDevice.query().join(TeraDeviceSite).filter(TeraDeviceSite.id_site.in_(sites_ids)) \
                     .all()
             device_ids = [device.id_device for device in other_devices]
             missing_devices_ids = set(device_ids).difference([ds.id_device for ds in device_sites])
@@ -497,7 +497,7 @@ class DBManagerTeraUserAccess:
     def query_devices_sites_for_device(self, device_id: int, include_other_sites=False):
         site_ids = self.get_accessible_sites_ids()
 
-        query = TeraDeviceSite.query.filter(TeraDeviceSite.id_site.in_(site_ids)) \
+        query = TeraDeviceSite.query().filter(TeraDeviceSite.id_site.in_(site_ids)) \
             .filter_by(id_device=device_id)
 
         device_sites = query.all()
@@ -517,7 +517,7 @@ class DBManagerTeraUserAccess:
     def query_devices_projects_for_device(self, device_id: int, site_id: int = None, include_other_projects=False):
         projects_ids = self.get_accessible_projects_ids()
 
-        query = TeraDeviceProject.query.filter(TeraDeviceProject.id_project.in_(projects_ids)) \
+        query = TeraDeviceProject.query().filter(TeraDeviceProject.id_project.in_(projects_ids)) \
             .filter_by(id_device=device_id)
 
         if site_id:
@@ -539,14 +539,14 @@ class DBManagerTeraUserAccess:
 
     def query_devices_by_type(self, id_type_device: int):
         accessibles_devices = self.get_accessible_devices_ids()
-        devices = TeraDevice.query.filter_by(id_device_type=id_type_device).filter(TeraDevice
+        devices = TeraDevice.query().filter_by(id_device_type=id_type_device).filter(TeraDevice
                                                                                 .id_device.in_(accessibles_devices)) \
             .order_by(TeraDevice.device_name.asc()).all()
         return devices
 
     def query_devices_by_subtype(self, id_device_subtype: int):
         accessibles_devices = self.get_accessible_devices_ids()
-        devices = TeraDevice.query.filter_by(id_device_subtype=id_device_subtype).filter(
+        devices = TeraDevice.query().filter_by(id_device_subtype=id_device_subtype).filter(
             TeraDevice.id_device.in_(accessibles_devices)).order_by(TeraDevice.device_name.asc()).all()
         return devices
 
@@ -560,7 +560,7 @@ class DBManagerTeraUserAccess:
 
     def query_session_type_by_id(self, session_type_id: int):
         proj_ids = self.get_accessible_projects_ids()
-        session_type = TeraSessionType.query.filter_by(id_session_type=session_type_id).filter(TeraProject.id_project.
+        session_type = TeraSessionType.query().filter_by(id_session_type=session_type_id).filter(TeraProject.id_project.
                                                                                                in_(proj_ids)).first()
         return session_type
 
@@ -568,20 +568,20 @@ class DBManagerTeraUserAccess:
         site_ids = self.get_accessible_sites_ids()
         proj_ids = self.get_accessible_projects_ids()
         service_ids = self.get_accessible_services_ids()
-        test_type = TeraTestType.query.filter_by(id_test_type=test_type_id).filter(TeraSite.id_site.in_(site_ids))\
+        test_type = TeraTestType.query().filter_by(id_test_type=test_type_id).filter(TeraSite.id_site.in_(site_ids))\
             .filter(TeraTestType.id_service.in_(service_ids)).filter(TeraProject.id_project.in_(proj_ids)).first()
         return test_type
 
     def query_projects_for_site(self, site_id: int):
         proj_ids = self.get_accessible_projects_ids()
-        projects = TeraProject.query.filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids))
+        projects = TeraProject.query().filter_by(id_site=site_id).filter(TeraProject.id_project.in_(proj_ids))
 
         return projects.all()
 
     def query_projects_for_session_type(self, session_type_id: int, include_other_projects: bool = False):
         from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
         proj_ids = self.get_accessible_projects_ids()
-        st_projects = TeraSessionTypeProject.query.filter(TeraSessionTypeProject.id_session_type == session_type_id)\
+        st_projects = TeraSessionTypeProject.query().filter(TeraSessionTypeProject.id_session_type == session_type_id)\
             .filter(TeraSessionTypeProject.id_project.in_(proj_ids)).all()
 
         if include_other_projects:
@@ -599,7 +599,7 @@ class DBManagerTeraUserAccess:
 
     def query_projects_for_test_type(self, test_type_id: int, include_other_projects: bool = False):
         proj_ids = self.get_accessible_projects_ids()
-        tt_projects = TeraTestTypeProject.query.filter(TeraTestTypeProject.id_test_type == test_type_id)\
+        tt_projects = TeraTestTypeProject.query().filter(TeraTestTypeProject.id_test_type == test_type_id)\
             .filter(TeraTestTypeProject.id_project.in_(proj_ids)).all()
 
         if include_other_projects:
@@ -617,14 +617,14 @@ class DBManagerTeraUserAccess:
 
     def query_all_participants_for_site(self, site_id: int):
         part_ids = self.get_accessible_participants_ids()
-        participants = TeraParticipant.query.join(TeraProject) \
+        participants = TeraParticipant.query().join(TeraProject) \
             .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids)) \
             .order_by(TeraParticipant.participant_name.asc()).all()
         return participants
 
     def query_enabled_participants_for_site(self, site_id: int):
         part_ids = self.get_accessible_participants_ids()
-        participants = TeraParticipant.query.join(TeraProject) \
+        participants = TeraParticipant.query().join(TeraProject) \
             .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids)) \
             .filter(TeraParticipant.participant_enabled == true()) \
             .order_by(TeraParticipant.participant_name.asc()).all()
@@ -632,14 +632,14 @@ class DBManagerTeraUserAccess:
 
     def query_all_participants_for_project(self, project_id: int):
         part_ids = self.get_accessible_participants_ids()
-        participants = TeraParticipant.query.filter(TeraParticipant.id_project == project_id,
+        participants = TeraParticipant.query().filter(TeraParticipant.id_project == project_id,
                                                     TeraParticipant.id_participant.in_(part_ids)) \
             .order_by(TeraParticipant.participant_name.asc()).all()
         return participants
 
     def query_enabled_participants_for_project(self, project_id: int):
         part_ids = self.get_accessible_participants_ids()
-        participants = TeraParticipant.query.filter(TeraParticipant.id_project == project_id,
+        participants = TeraParticipant.query().filter(TeraParticipant.id_project == project_id,
                                                     TeraParticipant.id_participant.in_(part_ids)) \
             .filter(TeraParticipant.participant_enabled == true()) \
             .order_by(TeraParticipant.participant_name.asc()).all()
@@ -647,7 +647,7 @@ class DBManagerTeraUserAccess:
 
     def query_participants_for_group(self, group_id: int):
         part_ids = self.get_accessible_participants_ids()
-        participants = TeraParticipant.query.filter(TeraParticipant.id_participant_group == group_id,
+        participants = TeraParticipant.query().filter(TeraParticipant.id_participant_group == group_id,
                                                     TeraParticipant.id_participant.in_(part_ids)) \
             .order_by(TeraParticipant.participant_name.asc()).all()
         return participants
@@ -772,7 +772,7 @@ class DBManagerTeraUserAccess:
 
     def query_participants_for_device(self, device_id: int):
         from opentera.db.models.TeraParticipant import TeraParticipant
-        parts = TeraParticipant.query.join(TeraParticipant.participant_devices).filter_by(id_device=device_id) \
+        parts = TeraParticipant.query().join(TeraParticipant.participant_devices).filter_by(id_device=device_id) \
             .filter(TeraDevice.id_device.in_(self.get_accessible_devices_ids()),
                     TeraParticipant.id_participant.in_(self.get_accessible_participants_ids())).all()
         return parts
@@ -785,26 +785,26 @@ class DBManagerTeraUserAccess:
             for device_site in device_sites:
                 if device_site.device_site_device.id_device not in device_ids:
                     device_ids.append(device_site.device_site_device.id_device)
-                device_parts = TeraDeviceParticipant.query.join(TeraDeviceParticipant.device_participant_device) \
+                device_parts = TeraDeviceParticipant.query().join(TeraDeviceParticipant.device_participant_device) \
                     .join(TeraParticipant).join(TeraParticipant.participant_project).join(TeraProject.project_site) \
                     .filter_by(id_site=site_id).filter(TeraDevice.id_device.in_(device_ids)).all()
         return device_parts
 
     def query_device_participants_by_type(self, id_device_type: int, participant_id: int):
-        device_parts = TeraDeviceParticipant.query.join(TeraDevice) \
+        device_parts = TeraDeviceParticipant.query().join(TeraDevice) \
             .filter(TeraDevice.id_device_type == id_device_type, TeraDeviceParticipant.id_participant == participant_id) \
             .order_by(TeraDeviceParticipant.id_device_participant.asc()).all()
         return device_parts
 
     def query_device_participants_for_device(self, device_id: int):
-        device_parts = TeraDeviceParticipant.query.filter_by(id_device=device_id).\
+        device_parts = TeraDeviceParticipant.query().filter_by(id_device=device_id).\
             filter(TeraDeviceParticipant.id_participant.in_(self.get_accessible_participants_ids())).all()
         return device_parts
 
     def query_session(self, session_id: int):
         from opentera.db.models.TeraSession import TeraSession
 
-        # session = TeraSession.query.join(TeraSession.session_participants).join(TeraSession.session_users)\
+        # session = TeraSession.query().join(TeraSession.session_participants).join(TeraSession.session_users)\
         #     .filter(and_(TeraSession.id_session == session_id),
         #             or_(TeraParticipant.id_participant.in_(self.get_accessible_participants_ids()),
         #                 TeraSessionUsers.id_user == self.user.id_user,
@@ -840,7 +840,7 @@ class DBManagerTeraUserAccess:
     #     from opentera.db.models.TeraSessionTypeDeviceType import TeraSessionTypeDeviceType
     #     session_types_ids = self.get_accessible_session_types_ids()
     #
-    #     session_types = TeraSessionTypeDeviceType.query.filter(TeraSessionTypeDeviceType.id_session_type.
+    #     session_types = TeraSessionTypeDeviceType.query().filter(TeraSessionTypeDeviceType.id_session_type.
     #                                                            in_(session_types_ids))\
     #         .filter_by(id_device_type=device_type_id).all()
     #     return session_types
@@ -851,7 +851,7 @@ class DBManagerTeraUserAccess:
         session_types_ids = self.get_accessible_session_types_ids()
         service_ids = self.get_accessible_services_ids()
 
-        session_types = TeraSessionTypeProject.query.filter(TeraSessionTypeProject.id_session_type.
+        session_types = TeraSessionTypeProject.query().filter(TeraSessionTypeProject.id_session_type.
                                                             in_(session_types_ids)) \
             .filter_by(id_project=project_id).join(TeraSessionType).filter(or_(
                 TeraSessionType.session_type_category != TeraSessionType.SessionCategoryEnum.SERVICE.value, and_(
@@ -879,13 +879,13 @@ class DBManagerTeraUserAccess:
         test_types_ids = self.get_accessible_test_types_ids()
         service_ids = self.get_accessible_services_ids()
 
-        test_types = TeraTestTypeProject.query.filter(TeraTestTypeProject.id_test_type.in_(test_types_ids)) \
+        test_types = TeraTestTypeProject.query().filter(TeraTestTypeProject.id_test_type.in_(test_types_ids)) \
             .filter_by(id_project=project_id).join(TeraTestType).filter(TeraTestType.id_service.in_(service_ids)).all()
 
         if include_other_test_types:
             # We must add the missing test types in the list
             project = TeraProject.get_project_by_id(project_id)
-            site_tts = TeraTestType.query.filter(TeraTestType.id_service.in_(service_ids)).join(TeraTestTypeSite).\
+            site_tts = TeraTestType.query().filter(TeraTestType.id_service.in_(service_ids)).join(TeraTestTypeSite).\
                 filter(TeraTestTypeSite.id_site == project.id_site)
             site_tt_ids = [tt.id_test_type for tt in site_tts]
             tt_ids = [tt.id_test_type for tt in test_types]
@@ -911,7 +911,7 @@ class DBManagerTeraUserAccess:
         # user_ids = self.get_accessible_users_ids()
         service_ids = self.get_accessible_services_ids()
 
-        return TeraAsset.query.filter(TeraAsset.id_session.in_(session_ids))\
+        return TeraAsset.query().filter(TeraAsset.id_session.in_(session_ids))\
             .filter(TeraAsset.asset_service_uuid == uuid_service) \
             .filter(or_(TeraAsset.id_service.in_(service_ids), TeraAsset.id_service == None)) \
             .all()
@@ -923,7 +923,7 @@ class DBManagerTeraUserAccess:
         from opentera.db.models.TeraServiceProject import TeraServiceProject
         projects_ids = self.get_accessible_projects_ids()
 
-        query = TeraServiceProject.query.filter(TeraServiceProject.id_project.in_(projects_ids)) \
+        query = TeraServiceProject.query().filter(TeraServiceProject.id_project.in_(projects_ids)) \
             .filter_by(id_service=service_id)
 
         if site_id:
@@ -952,7 +952,7 @@ class DBManagerTeraUserAccess:
                 other_sts = TeraSessionType.query_with_filters()
             else:
                 sites_ids = self.get_accessible_sites_ids()
-                other_sts = TeraSessionType.query.join(TeraSessionTypeSite)\
+                other_sts = TeraSessionType.query().join(TeraSessionTypeSite)\
                     .filter(TeraSessionTypeSite.id_site.in_(sites_ids)).all()
             st_ids = [st.id_session_type for st in other_sts]
             missing_st_ids = set(st_ids).difference([st.id_session_type for st in st_sites])
@@ -969,7 +969,7 @@ class DBManagerTeraUserAccess:
     def query_session_types_sites_for_session_type(self, session_type_id: int, include_other_sites=False):
         site_ids = self.get_accessible_sites_ids()
 
-        query = TeraSessionTypeSite.query.filter(TeraSessionTypeSite.id_site.in_(site_ids)) \
+        query = TeraSessionTypeSite.query().filter(TeraSessionTypeSite.id_site.in_(site_ids)) \
             .filter_by(id_session_type=session_type_id)
 
         st_sites = query.all()
@@ -988,7 +988,7 @@ class DBManagerTeraUserAccess:
 
     def query_test_types_sites_for_site(self, site_id: int, include_other_test_types=False):
         service_ids = self.get_accessible_services_ids()
-        tt_sites = TeraTestTypeSite.query.filter_by(id_site=site_id).join(TeraTestType)\
+        tt_sites = TeraTestTypeSite.query().filter_by(id_site=site_id).join(TeraTestType)\
             .filter(TeraTestType.id_service.in_(service_ids)).all()
 
         if include_other_test_types:
@@ -997,7 +997,7 @@ class DBManagerTeraUserAccess:
                 other_tts = TeraTestType.query_with_filters()
             else:
                 sites_ids = self.get_accessible_sites_ids()
-                other_tts = TeraTestType.query.join(TeraTestTypeSite)\
+                other_tts = TeraTestType.query().join(TeraTestTypeSite)\
                     .filter(TeraTestTypeSite.id_site.in_(sites_ids)).filter(TeraTestType.id_service.in_(service_ids))\
                     .all()
             tt_ids = [tt.id_test_type for tt in other_tts]
@@ -1016,7 +1016,7 @@ class DBManagerTeraUserAccess:
         site_ids = self.get_accessible_sites_ids()
         service_ids = self.get_accessible_services_ids()
 
-        query = TeraTestTypeSite.query.filter(TeraTestTypeSite.id_site.in_(site_ids)) \
+        query = TeraTestTypeSite.query().filter(TeraTestTypeSite.id_site.in_(site_ids)) \
             .filter_by(id_test_type=test_type_id).join(TeraTestType).filter(TeraTestType.id_service.in_(service_ids))
 
         tt_sites = query.all()
@@ -1040,7 +1040,7 @@ class DBManagerTeraUserAccess:
         from opentera.db.models.TeraProject import TeraProject
         services_ids = self.get_accessible_services_ids()
 
-        service_projects = TeraServiceProject.query.filter(TeraServiceProject.id_service.in_(services_ids)) \
+        service_projects = TeraServiceProject.query().filter(TeraServiceProject.id_service.in_(services_ids)) \
             .filter_by(id_project=project_id).all()
 
         if include_other_services:
@@ -1071,7 +1071,7 @@ class DBManagerTeraUserAccess:
         from opentera.db.models.TeraServiceSite import TeraServiceSite
         site_ids = self.get_accessible_sites_ids()
 
-        query = TeraServiceSite.query.filter(TeraServiceSite.id_site.in_(site_ids)) \
+        query = TeraServiceSite.query().filter(TeraServiceSite.id_site.in_(site_ids)) \
             .filter_by(id_service=service_id)
 
         service_sites = query.all()
@@ -1095,7 +1095,7 @@ class DBManagerTeraUserAccess:
         from opentera.db.models.TeraService import TeraService
         services_ids = self.get_accessible_services_ids()
 
-        service_sites = TeraServiceSite.query.filter(TeraServiceSite.id_service.in_(services_ids)) \
+        service_sites = TeraServiceSite.query().filter(TeraServiceSite.id_service.in_(services_ids)) \
             .filter_by(id_site=site_id).filter(TeraServiceSite.id_service != Globals.opentera_service_id).all()
 
         if include_other_services:
@@ -1105,7 +1105,7 @@ class DBManagerTeraUserAccess:
                                   if service.service_key != 'OpenTeraServer']
             else:
                 sites_ids = self.get_accessible_sites_ids()
-                other_services = TeraService.query.join(TeraServiceSite).filter(TeraServiceSite.id_site.in_(sites_ids))\
+                other_services = TeraService.query().join(TeraServiceSite).filter(TeraServiceSite.id_site.in_(sites_ids))\
                     .filter(TeraService.service_key != 'OpenTeraServer').all()
             services_ids = [service.id_service for service in other_services]
             missing_services_ids = set(services_ids).difference([ss.id_service for ss in service_sites])
@@ -1127,7 +1127,7 @@ class DBManagerTeraUserAccess:
     def query_users_usergroups_for_usergroup(self, user_group_id: int, enabled_only: bool = False,
                                              include_other_users: bool = False):
         accessible_users_ids = self.get_accessible_users_ids()
-        query = TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).filter(TeraUserUserGroup.id_user
+        query = TeraUserUserGroup.query().filter_by(id_user_group=user_group_id).filter(TeraUserUserGroup.id_user
                                                                                       .in_(accessible_users_ids)) \
             .join(TeraUser).order_by(TeraUser.user_firstname.asc())
         if enabled_only:
@@ -1158,7 +1158,7 @@ class DBManagerTeraUserAccess:
 
     def query_users_usergroups_for_user(self, user_id: int, include_other_user_groups: bool = False):
         accessible_user_groups_ids = self.get_accessible_users_groups_ids()
-        query = TeraUserUserGroup.query.filter_by(id_user=user_id).filter(TeraUserUserGroup.id_user_group
+        query = TeraUserUserGroup.query().filter_by(id_user=user_id).filter(TeraUserUserGroup.id_user_group
                                                                           .in_(accessible_user_groups_ids))
 
         users_user_groups = query.all()
@@ -1237,15 +1237,15 @@ class DBManagerTeraUserAccess:
                 services_configs = TeraServiceConfig.get_service_config_for_service(service_id=service_id)
         else:
             if user_id:
-                services_configs = TeraServiceConfig.query.filter_by(id_user=user_id). \
+                services_configs = TeraServiceConfig.query().filter_by(id_user=user_id). \
                     join(TeraServiceConfig.service_config_service).filter_by(service_editable_config=True).all()
 
             elif device_id:
-                services_configs = TeraServiceConfig.query.filter_by(id_device=device_id). \
+                services_configs = TeraServiceConfig.query().filter_by(id_device=device_id). \
                     join(TeraServiceConfig.service_config_service).filter_by(service_editable_config=True).all()
 
             elif participant_id:
-                services_configs = TeraServiceConfig.query.filter_by(id_participant=participant_id). \
+                services_configs = TeraServiceConfig.query().filter_by(id_participant=participant_id). \
                     join(TeraServiceConfig.service_config_service).filter_by(service_editable_config=True).all()
 
         if include_services_without_config:

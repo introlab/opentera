@@ -5,19 +5,19 @@ from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 class TeraAssetTest(BaseModelsTest):
 
     def test_defaults(self):
-        for asset in TeraAsset.query.all():
+        for asset in TeraAsset.query().all():
             self.assertGreater(len(asset.asset_name), 0)
             self.assertIsNotNone(asset.asset_session)
             self.assertIsNotNone(asset.asset_service_uuid)
             self.assertIsNotNone(asset.asset_uuid)
 
     def test_to_json(self):
-        for asset in TeraAsset.query.all():
+        for asset in TeraAsset.query().all():
             json = asset.to_json()
             self.assertGreater(len(json), 0)
 
     def test_from_json(self):
-        for asset in TeraAsset.query.all():
+        for asset in TeraAsset.query().all():
             json = asset.to_json()
             new_asset = TeraAsset()
             new_asset.from_json(json)

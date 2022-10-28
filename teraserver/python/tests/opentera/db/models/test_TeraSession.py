@@ -7,7 +7,7 @@ from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 class TeraSessionTest(BaseModelsTest):
 
     def test_session_defaults(self):
-        for session in TeraSession.query.all():
+        for session in TeraSession.query().all():
             my_list = [session.id_creator_device, session.id_creator_participant,
                        session.id_creator_service, session.id_creator_user]
             # Only one not None

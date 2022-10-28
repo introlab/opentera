@@ -131,7 +131,7 @@ class TeraService(BaseModel):
         new_service.service_enabled = True
         new_service.service_system = True
         new_service.service_editable_config = True
-        TeraService.insert(new_service)
+        TeraService.db().session.add(new_service)
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
@@ -143,7 +143,7 @@ class TeraService(BaseModel):
         new_service.service_clientendpoint = '/log'
         new_service.service_enabled = True
         new_service.service_system = True
-        TeraService.insert(new_service)
+        TeraService.db().session.add(new_service)
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
@@ -155,7 +155,7 @@ class TeraService(BaseModel):
         new_service.service_clientendpoint = '/file'
         new_service.service_enabled = True
         new_service.service_system = True
-        TeraService.insert(new_service)
+        TeraService.db().session.add(new_service)
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
@@ -166,7 +166,7 @@ class TeraService(BaseModel):
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/bureau'
         new_service.service_enabled = True
-        TeraService.insert(new_service)
+        TeraService.db().session.add(new_service)
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
@@ -182,7 +182,7 @@ class TeraService(BaseModel):
         # new_service.service_endpoint_device = '/device'
         new_service.service_enabled = True
         new_service.service_editable_config = True
-        TeraService.insert(new_service)
+        TeraService.db().session.add(new_service)
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
@@ -193,7 +193,8 @@ class TeraService(BaseModel):
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/robot'
         new_service.service_enabled = True
-        TeraService.insert(new_service)
+        TeraService.db().session.add(new_service)
+        TeraService.db().session.commit()
 
     @classmethod
     def insert(cls, service):

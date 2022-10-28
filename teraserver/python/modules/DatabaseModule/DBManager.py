@@ -79,6 +79,10 @@ class DBManager (BaseModule):
         # Database cleanup task set to run at next midnight
         self.cleanup_database_task = self.start_cleanup_task()
 
+    @staticmethod
+    def app_context():
+        return flask_app.app_context()
+
     def start_cleanup_task(self) -> task:
         # Compute time till next midnight
         current_datetime = datetime.datetime.now()

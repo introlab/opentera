@@ -3,7 +3,6 @@ from opentera.db.models.TeraUserPreference import TeraUserPreference
 from opentera.db.models.TeraUser import TeraUser
 import json
 from sqlalchemy import exc
-from opentera.db.Base import db
 
 
 class TeraUserPreferenceTest(BaseModelsTest):
@@ -27,7 +26,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
         self.assertTrue('auto_save' in json_user_preferences)
 
     def test_default_user_preference_for_openteraplus_multiple(self):
-        preferences: list[TeraUserPreference] = TeraUserPreference.query.filter_by(user_preference_app_tag='openteraplus').all()
+        preferences: list[TeraUserPreference] = TeraUserPreference.query().filter_by(user_preference_app_tag='openteraplus').all()
         self.assertEqual(2, len(preferences))
         self.assertNotEqual(preferences[0].id_user, preferences[1].id_user)
         for preference in preferences:
@@ -55,22 +54,22 @@ class TeraUserPreferenceTest(BaseModelsTest):
         preference: TeraUserPreference = TeraUserPreference()
         preference.user_preference_app_tag = 'myapp'
         preference.user_preference_preference = json.dumps({'my_super_key': 'my_super_value'})
-        db.session.add(preference)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
+        self.db.session.add(preference)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_user_preference_null_app_tag(self):
         preference: TeraUserPreference = TeraUserPreference()
         preference.id_user = 1  # admin
         preference.user_preference_preference = json.dumps({'my_super_key': 'my_super_value'})
-        db.session.add(preference)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
+        self.db.session.add(preference)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_user_preference_null_preference(self):
         preference: TeraUserPreference = TeraUserPreference()
         preference.id_user = 1  # admin
         preference.user_preference_app_tag = 'myapp'
-        db.session.add(preference)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
+        self.db.session.add(preference)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_to_json(self):
         preference: TeraUserPreference = TeraUserPreference()

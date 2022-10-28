@@ -1,6 +1,6 @@
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
-from opentera.db.Base import db
+
 
 from opentera.db.models.TeraService import TeraService
 
@@ -18,38 +18,38 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_enabled = True
         new_service.service_system = True
         new_service.service_editable_config = True
-        db.session.add(new_service)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(new_service)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
 
         new_service.service_uuid = 'Uuid'
         new_service.service_name = None
-        db.session.add(new_service)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(new_service)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
 
         new_service.service_name = 'Name'
         new_service.service_hostname = None
-        db.session.add(new_service)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(new_service)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
 
         new_service.service_hostname = 'Hostname'
         new_service.service_port = None
-        db.session.add(new_service)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(new_service)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
 
         new_service.service_port = 1
         new_service.service_endpoint = None
-        db.session.add(new_service)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(new_service)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
 
         new_service.service_endpoint = 'Endpoint'
         new_service.service_clientendpoint = None
-        db.session.add(new_service)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
+        self.db.session.add(new_service)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_nullable_bool1(self):
         #testing bool service_enabled
@@ -64,8 +64,8 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_editable_config = True
 
         new_service.service_enabled = None
-        db.session.add(new_service)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
+        self.db.session.add(new_service)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_nullable_bool2(self):
         # testing bool service_system
@@ -80,8 +80,8 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_editable_config = True
 
         new_service.service_system = None
-        db.session.add(new_service)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
+        self.db.session.add(new_service)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_nullable_bool3(self):
         # testing bool service_editable_config
@@ -96,8 +96,8 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_enabled = False
 
         new_service.service_editable_config = None
-        db.session.add(new_service)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
+        self.db.session.add(new_service)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_unique_args_uuid(self):
         new_service = TeraService()
@@ -125,9 +125,9 @@ class TeraServiceTest(BaseModelsTest):
 
         new_service.service_uuid = 'uuid'
         same_service.service_uuid = 'uuid'
-        db.session.add(new_service)
-        db.session.add(same_service)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
+        self.db.session.add(new_service)
+        self.db.session.add(same_service)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_unique_args_service_key(self):
         new_service = TeraService()
@@ -155,9 +155,9 @@ class TeraServiceTest(BaseModelsTest):
 
         new_service.service_key = 'key'
         same_service.service_key = 'key'
-        db.session.add(new_service)
-        db.session.add(same_service)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
+        self.db.session.add(new_service)
+        self.db.session.add(same_service)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_service_port_integer(self):
         new_service = TeraService()
@@ -171,8 +171,8 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_enabled = 'not a bool'
         new_service.service_system = True
         new_service.service_editable_config = True
-        db.session.add(new_service)
-        self.assertRaises(exc.StatementError, db.session.commit)
+        self.db.session.add(new_service)
+        self.assertRaises(exc.StatementError, self.db.session.commit)
 
     def test_service_system_integer(self):
         new_service = TeraService()
@@ -186,8 +186,8 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_enabled = False
         new_service.service_system = 'not a bool'
         new_service.service_editable_config = True
-        db.session.add(new_service)
-        self.assertRaises(exc.StatementError, db.session.commit)
+        self.db.session.add(new_service)
+        self.assertRaises(exc.StatementError, self.db.session.commit)
 
     def test_service_editable_config_integer(self):
         new_service = TeraService()
@@ -201,8 +201,8 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_enabled = False
         new_service.service_system = False
         new_service.service_editable_config = 15
-        db.session.add(new_service)
-        self.assertRaises(exc.StatementError, db.session.commit)
+        self.db.session.add(new_service)
+        self.assertRaises(exc.StatementError, self.db.session.commit)
 
     def test_service_to_json(self):
         new_service = TeraService()
@@ -269,8 +269,8 @@ class TeraServiceTest(BaseModelsTest):
         new_service.service_enabled = True
         new_service.service_system = True
         new_service.service_editable_config = True
-        db.session.add(new_service)
-        db.session.commit()
+        self.db.session.add(new_service)
+        self.db.session.commit()
         key_none = TeraService.get_service_by_key(key='Not a real key')
         key_present = TeraService.get_service_by_key(key='Key')
         uuid_none = TeraService.get_service_by_uuid(p_uuid='Not a real uuid')
@@ -328,9 +328,9 @@ class TeraServiceTest(BaseModelsTest):
 #     new_service.service_enabled = True
 #     new_service.service_system = True
 #     new_service.service_editable_config = True
-#     db.session.add(new_service)
-#     db.session.commit()
-#     self.assertRaises(exc.IntegrityError, db.session.commit)
+#     self.db.session.add(new_service)
+#     self.db.session.commit()
+#     self.assertRaises(exc.IntegrityError, self.db.session.commit)
 #
 # SQLite uses what it calls a dynamic typing system, which ultimately means that you can store text
 # in integer fields - in Oracle, SQL Server and all the other big hitters in the database world,
@@ -351,6 +351,6 @@ class TeraServiceTest(BaseModelsTest):
 #     new_service.service_enabled = True
 #     new_service.service_system = True
 #     new_service.service_editable_config = True
-#     db.session.add(new_service)
-#     db.session.commit()
+#     self.db.session.add(new_service)
+#     self.db.session.commit()
 #     breakpoint()
