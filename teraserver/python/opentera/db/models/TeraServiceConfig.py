@@ -1,25 +1,27 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 from datetime import datetime
 import json
 import jsonschema
 
 
-class TeraServiceConfig(db.Model, BaseModel):
+class TeraServiceConfig(BaseModel):
     __tablename__ = 't_services_configs'
-    id_service_config = db.Column(db.Integer, db.Sequence('id_service_config_sequence'), primary_key=True,
+    id_service_config = Column(Integer, Sequence('id_service_config_sequence'), primary_key=True,
                                   autoincrement=True)
-    id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
-    id_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user', ondelete='cascade'), nullable=True)
-    id_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant', ondelete='cascade'),
+    id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
+    id_user = Column(Integer, ForeignKey('t_users.id_user', ondelete='cascade'), nullable=True)
+    id_participant = Column(Integer, ForeignKey('t_participants.id_participant', ondelete='cascade'),
                                nullable=True)
-    id_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device', ondelete='cascade'), nullable=True)
-    service_config_config = db.Column(db.String, nullable=False, default='{}')
+    id_device = Column(Integer, ForeignKey('t_devices.id_device', ondelete='cascade'), nullable=True)
+    service_config_config = Column(String, nullable=False, default='{}')
 
-    service_config_service = db.relationship("TeraService")
-    service_config_user = db.relationship("TeraUser")
-    service_config_participant = db.relationship('TeraParticipant')
-    service_config_device = db.relationship('TeraDevice')
-    service_config_specifics = db.relationship('TeraServiceConfigSpecific', cascade='delete')
+    service_config_service = relationship("TeraService")
+    service_config_user = relationship("TeraUser")
+    service_config_participant = relationship('TeraParticipant')
+    service_config_device = relationship('TeraDevice')
+    service_config_specifics = relationship('TeraServiceConfigSpecific', cascade='delete')
 
     def to_json(self, ignore_fields=None, minimal=False, specific_id=None):
         if ignore_fields is None:
@@ -72,23 +74,23 @@ class TeraServiceConfig(db.Model, BaseModel):
 
     @staticmethod
     def get_service_config_by_id(s_id: int):
-        return TeraServiceConfig.query.filter_by(id_service_config=s_id).first()
+        return TeraServiceConfig.query().filter_by(id_service_config=s_id).first()
 
     @staticmethod
     def get_service_config_for_service(service_id: int):
-        return TeraServiceConfig.query.filter_by(id_service=service_id).all()
+        return TeraServiceConfig.query().filter_by(id_service=service_id).all()
 
     @staticmethod
     def get_service_config_for_service_for_user(service_id: int, user_id: int):
-        return TeraServiceConfig.query.filter_by(id_service=service_id, id_user=user_id).first()
+        return TeraServiceConfig.query().filter_by(id_service=service_id, id_user=user_id).first()
 
     @staticmethod
     def get_service_config_for_service_for_participant(service_id: int, participant_id: int):
-        return TeraServiceConfig.query.filter_by(id_service=service_id, id_participant=participant_id).first()
+        return TeraServiceConfig.query().filter_by(id_service=service_id, id_participant=participant_id).first()
 
     @staticmethod
     def get_service_config_for_service_for_device(service_id: int, device_id: int):
-        return TeraServiceConfig.query.filter_by(id_service=service_id, id_device=device_id).first()
+        return TeraServiceConfig.query().filter_by(id_service=service_id, id_device=device_id).first()
 
     def has_specific_config_for_specific_id(self, specific_id: int) -> bool:
         for specific in self.service_config_specifics:
@@ -190,34 +192,34 @@ class TeraServiceConfig(db.Model, BaseModel):
             new_config.id_user = TeraUser.get_user_by_id(1).id_user
             new_config.id_service = TeraService.get_openteraserver_service().id_service
             new_config.service_config_config = '{"notification_sounds": true}'
-            db.session.add(new_config)
+            TeraServiceConfig.db().session.add(new_config)
 
             new_config = TeraServiceConfig()
             new_config.id_participant = TeraParticipant.get_participant_by_name('Participant #1').id_participant
             new_config.id_service = TeraService.get_service_by_key('VideoRehabService').id_service
             new_config.service_config_config = '{"default_muted": false, "view_local": true}'
-            db.session.add(new_config)
-            db.session.commit()
+            TeraServiceConfig.db().session.add(new_config)
+            TeraServiceConfig.db().session.commit()
 
             new_specific_config = TeraServiceConfigSpecific()
             new_specific_config.id_service_config = new_config.id_service_config
             new_specific_config.service_config_specific_id = 'pc-001'
             new_specific_config.service_config_specific_config = '{"default_muted": true}'
-            db.session.add(new_specific_config)
+            TeraServiceConfig.db().session.add(new_specific_config)
 
             new_specific_config = TeraServiceConfigSpecific()
             new_specific_config.id_service_config = new_config.id_service_config
             new_specific_config.service_config_specific_id = 'pc-002'
             new_specific_config.service_config_specific_config = '{"default_muted": true, "view_local": false}'
-            db.session.add(new_specific_config)
+            TeraServiceConfig.db().session.add(new_specific_config)
 
             new_config = TeraServiceConfig()
             new_config.id_device = TeraDevice.get_device_by_name('Apple Watch #W05P1').id_device
             new_config.id_service = TeraService.get_service_by_key('VideoRehabService').id_service
             new_config.service_config_config = '{"delete_from_device": true}'
-            db.session.add(new_config)
+            TeraServiceConfig.db().session.add(new_config)
 
-            db.session.commit()
+            TeraServiceConfig.db().session.commit()
 
     @classmethod
     def update(cls, update_id: int, values: dict):

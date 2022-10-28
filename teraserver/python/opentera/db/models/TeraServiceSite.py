@@ -1,15 +1,17 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraServiceSite(db.Model, BaseModel):
+class TeraServiceSite(BaseModel):
     __tablename__ = 't_services_sites'
-    id_service_site = db.Column(db.Integer, db.Sequence('id_service_site_sequence'), primary_key=True,
+    id_service_site = Column(Integer, Sequence('id_service_site_sequence'), primary_key=True,
                                 autoincrement=True)
-    id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
-    id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
+    id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
+    id_site = Column(Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
 
-    service_site_service = db.relationship("TeraService", viewonly=True)
-    service_site_site = db.relationship("TeraSite", viewonly=True)
+    service_site_service = relationship("TeraService", viewonly=True)
+    service_site_site = relationship("TeraSite", viewonly=True)
 
     def __init__(self):
         pass
@@ -27,19 +29,19 @@ class TeraServiceSite(db.Model, BaseModel):
 
     @staticmethod
     def get_services_for_site(id_site: int):
-        return TeraServiceSite.query.filter_by(id_site=id_site).all()
+        return TeraServiceSite.query().filter_by(id_site=id_site).all()
 
     @staticmethod
     def get_sites_for_service(id_service: int):
-        return TeraServiceSite.query.filter_by(id_service=id_service).all()
+        return TeraServiceSite.query().filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_service_site_by_id(service_site_id: int):
-        return TeraServiceSite.query.filter_by(id_service_site=service_site_id).first()
+        return TeraServiceSite.query().filter_by(id_service_site=service_site_id).first()
 
     @staticmethod
     def get_service_site_for_service_site(site_id: int, service_id: int):
-        return TeraServiceSite.query.filter_by(id_site=site_id, id_service=service_id).first()
+        return TeraServiceSite.query().filter_by(id_site=site_id, id_service=service_id).first()
 
     @staticmethod
     def create_defaults(test=False):
@@ -57,24 +59,24 @@ class TeraServiceSite(db.Model, BaseModel):
             service_site = TeraServiceSite()
             service_site.id_site = site1.id_site
             service_site.id_service = service_rehab.id_service
-            db.session.add(service_site)
+            TeraServiceSite.db().session.add(service_site)
 
             service_site = TeraServiceSite()
             service_site.id_site = site1.id_site
             service_site.id_service = service_filetransfer.id_service
-            db.session.add(service_site)
+            TeraServiceSite.db().session.add(service_site)
 
             service_site = TeraServiceSite()
             service_site.id_site = site1.id_site
             service_site.id_service = service_logging.id_service
-            db.session.add(service_site)
+            TeraServiceSite.db().session.add(service_site)
 
             service_site = TeraServiceSite()
             service_site.id_site = site2.id_site
             service_site.id_service = service_filetransfer.id_service
-            db.session.add(service_site)
+            TeraServiceSite.db().session.add(service_site)
 
-            db.session.commit()
+            TeraServiceSite.db().session.commit()
         else:
             # Automatically associate services that are in a project to that site
             from opentera.db.models.TeraServiceProject import TeraServiceProject
@@ -87,12 +89,12 @@ class TeraServiceSite(db.Model, BaseModel):
                     service_site = TeraServiceSite()
                     service_site.id_site = project_site_id
                     service_site.id_service = sp.service_project_service.id_service
-                    db.session.add(service_site)
-                    db.session.commit()
+                    TeraServiceSite.db().session.add(service_site)
+                    TeraServiceSite.db().session.commit()
 
     @staticmethod
     def delete_with_ids(service_id: int, site_id: int):
-        delete_obj = TeraServiceSite.query.filter_by(id_service=service_id, id_site=site_id).first()
+        delete_obj = TeraServiceSite.query().filter_by(id_service=service_id, id_site=site_id).first()
         if delete_obj:
             TeraServiceSite.delete(delete_obj.id_service_site)
 
@@ -100,7 +102,7 @@ class TeraServiceSite(db.Model, BaseModel):
     def delete(cls, id_todel):
         from opentera.db.models.TeraServiceProject import TeraServiceProject
         # Delete all association with projects for that site
-        delete_obj = TeraServiceSite.query.filter_by(id_service_site=id_todel).first()
+        delete_obj = TeraServiceSite.query().filter_by(id_service_site=id_todel).first()
 
         if delete_obj:
             projects = TeraServiceProject.get_projects_for_service(delete_obj.id_service)

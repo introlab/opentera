@@ -3,21 +3,43 @@ import datetime
 # import uuid
 import time
 import sqlalchemy.sql.sqltypes
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, BaseQuery
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger
 
-db = SQLAlchemy()
+# db = SQLAlchemy()
 
 
-class BaseModel:
-
-    version_id = db.Column(db.BigInteger, nullable=False, default=time.time()*1000)
+class BaseMixin(object):
+    version_id = Column(BigInteger, nullable=False, default=int(time.time()*1000))
 
     # Using timestamp as version tracker - multiplying by 1000 to keep ms part without using floats (which seems to
     # cause problems with the mapper)
     __mapper_args__ = {
         'version_id_col': version_id,
-        'version_id_generator': lambda version: int(time.time()*1000)  # uuid.uuid4().hex
+        'version_id_generator': lambda version: int(time.time()*1000)
     }
+
+    # This needs to be initialized by app
+    __db__: SQLAlchemy = None
+
+    @classmethod
+    def set_db(cls, db: SQLAlchemy):
+        cls.__db__ = db
+
+    @classmethod
+    def create_all(cls):
+        if cls.__db__ and cls.__db__.engine:
+            cls.__db__.create_all()
+            cls.metadata.create_all(cls.__db__.engine)
+
+    @classmethod
+    def db(cls) -> SQLAlchemy:
+        return cls.__db__
+
+    @classmethod
+    def query(cls) -> BaseQuery:
+        return cls.db().session.query(cls)
 
     def to_json(self, ignore_fields=None):
         if ignore_fields is None:
@@ -98,7 +120,7 @@ class BaseModel:
 
     @classmethod
     def get_count(cls, filters: dict = None) -> int:
-        query = db.session.query(cls)
+        query = cls.db().session.query(cls)
         if filters:
             query = query.filter_by(**filters)
         return query.count()
@@ -117,13 +139,13 @@ class BaseModel:
     @classmethod
     def update(cls, update_id: int, values: dict):
         values = cls.clean_values(values)
-        update_obj = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
+        update_obj = cls.db().session.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
         update_obj.from_json(values)
         cls.commit()
 
     @classmethod
     def commit(cls):
-        db.session.commit()
+        cls.db().session.commit()
 
     @classmethod
     def insert(cls, db_object):
@@ -131,14 +153,14 @@ class BaseModel:
         setattr(db_object, cls.get_primary_key_name(), None)
 
         # Add to database session and commit
-        db.session.add(db_object)
+        cls.db().session.add(db_object)
         cls.commit()
 
     @classmethod
     def delete(cls, id_todel):
-        delete_obj = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
+        delete_obj = cls.db().session.query.filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
         if delete_obj:
-            db.session.delete(delete_obj)
+            cls.db().session.delete(delete_obj)
             cls.commit()
 
     @classmethod
@@ -146,27 +168,14 @@ class BaseModel:
         if filters is None:
             filters = dict()
 
-        return cls.query.filter_by(**filters).all()
-
-        # query = cls.query
-        #
-        # # Direct elements from that model
-        # for filter_item in filters:
-        #     if filter_item in dir(cls) and filter_item is not None:
-        #         # Filter item is a direct property
-        #         query = query.filter_by(**filter_item)
-        #     else:
-        #         # Check for joined models
-        #         pass
-        #
-        # return query.all()
+        return cls.db().session.query.filter_by(**filters).all()
 
     @classmethod
     def count_with_filters(cls, filters=None):
         if filters is None:
             filters = dict()
 
-        return cls.query.filter_by(**filters).count()
+        return cls.db().session.query.filter_by(**filters).count()
 
     @classmethod
     def get_json_schema(cls) -> dict:
@@ -229,3 +238,7 @@ class BaseModel:
                         missing_fields.append(name)
 
         return missing_fields
+
+
+# Declarative base, inherit from Base for all models
+BaseModel = declarative_base(cls=BaseMixin)

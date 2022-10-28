@@ -1,8 +1,9 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
 import uuid
 # from enum import Enum, unique
 from sqlalchemy import or_
-
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 # @unique
 # class AssetType(Enum):
@@ -16,31 +17,30 @@ from sqlalchemy import or_
 #         return self.name, self.value
 
 
-class TeraAsset(db.Model, BaseModel):
+class TeraAsset(BaseModel):
     __tablename__ = 't_assets'
-    id_asset = db.Column(db.Integer, db.Sequence('id_asset_sequence'), primary_key=True, autoincrement=True)
-    id_session = db.Column(db.Integer, db.ForeignKey("t_sessions.id_session", ondelete='cascade'), nullable=False)
+    id_asset = Column(Integer, Sequence('id_asset_sequence'), primary_key=True, autoincrement=True)
+    id_session = Column(Integer, ForeignKey("t_sessions.id_session", ondelete='cascade'), nullable=False)
     # Creator of that asset - multiple could be used to indicate, for example, an asset created by a device for a
     # specific participant in a session
-    id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device"), nullable=True)
-    id_participant = db.Column(db.Integer, db.ForeignKey("t_participants.id_participant"), nullable=True)
-    id_user = db.Column(db.Integer, db.ForeignKey("t_users.id_user"), nullable=True)
-    id_service = db.Column(db.Integer, db.ForeignKey("t_services.id_service"), nullable=True)
+    id_device = Column(Integer, ForeignKey("t_devices.id_device"), nullable=True)
+    id_participant = Column(Integer, ForeignKey("t_participants.id_participant"), nullable=True)
+    id_user = Column(Integer, ForeignKey("t_users.id_user"), nullable=True)
+    id_service = Column(Integer, ForeignKey("t_services.id_service"), nullable=True)
     # Put a description of the asset here
-    asset_name = db.Column(db.String, nullable=False)
+    asset_name = Column(String, nullable=False)
 
-    asset_uuid = db.Column(db.String(36), nullable=False, unique=True)
-    asset_service_uuid = db.Column(db.String(36), db.ForeignKey("t_services.service_uuid", ondelete='cascade'),
-                                   nullable=False)
-    asset_type = db.Column(db.String, nullable=False)  # MIME Type
-    asset_datetime = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+    asset_uuid = Column(String(36), nullable=False, unique=True)
+    asset_service_uuid = Column(String(36), ForeignKey("t_services.service_uuid", ondelete='cascade'), nullable=False)
+    asset_type = Column(String, nullable=False)  # MIME Type
+    asset_datetime = Column(TIMESTAMP(timezone=True), nullable=True)
 
-    asset_session = db.relationship("TeraSession", back_populates='session_assets')
-    asset_device = db.relationship("TeraDevice", back_populates='device_assets')
-    asset_user = db.relationship("TeraUser")
-    asset_participant = db.relationship("TeraParticipant")
-    asset_service = db.relationship("TeraService", foreign_keys="TeraAsset.id_service")
-    asset_service_owner = db.relationship("TeraService", foreign_keys="TeraAsset.asset_service_uuid")
+    asset_session = relationship("TeraSession", back_populates='session_assets')
+    asset_device = relationship("TeraDevice", back_populates='device_assets')
+    asset_user = relationship("TeraUser")
+    asset_participant = relationship("TeraParticipant")
+    asset_service = relationship("TeraService", foreign_keys="TeraAsset.id_service")
+    asset_service_owner = relationship("TeraService", foreign_keys="TeraAsset.asset_service_uuid")
 
     def from_json(self, json, ignore_fields=None):
         if ignore_fields is None:
@@ -105,7 +105,7 @@ class TeraAsset(db.Model, BaseModel):
                     new_asset.id_participant = TeraParticipant.get_participant_by_name('Participant #1').id_participant
                 if i == 1:
                     new_asset.id_user = TeraUser.get_user_by_id(1).id_user
-                db.session.add(new_asset)
+                TeraAsset.insert(new_asset)
 
             asset_device = TeraDevice.get_device_by_name('Apple Watch #W05P1')
             new_asset = TeraAsset()
@@ -116,60 +116,57 @@ class TeraAsset(db.Model, BaseModel):
             new_asset.asset_service_uuid = '00000000-0000-0000-0000-000000000001'
             new_asset.asset_type = 'video/mpeg'
             new_asset.id_service = 1
-            db.session.add(new_asset)
-
-            db.session.commit()
+            TeraAsset.insert(new_asset)
 
     @staticmethod
     def get_asset_by_id(asset_id: int):
-        return TeraAsset.query.filter_by(id_asset=asset_id).first()
+        return TeraAsset.query().filter_by(id_asset=asset_id).first()
 
     @staticmethod
     def get_asset_by_uuid(asset_uuid: str):
-        return TeraAsset.query.filter_by(asset_uuid=asset_uuid).first()
+        return TeraAsset.query().filter_by(asset_uuid=asset_uuid).first()
 
     @staticmethod
     def get_assets_for_device(device_id: int):
-        # return TeraAsset.query.filter_by(id_device=device_id).all()
         from opentera.db.models.TeraSession import TeraSession
-        return TeraAsset.query.join(TeraSession).filter(or_(TeraSession.session_devices.any(
+        return TeraAsset.query().join(TeraSession).filter(or_(TeraSession.session_devices.any(
             id_device=device_id), TeraAsset.id_device == device_id)).all()
 
     @staticmethod
     def get_assets_for_user(user_id: int):
         from opentera.db.models.TeraSession import TeraSession
-        return TeraAsset.query.join(TeraSession).filter(or_(TeraSession.session_users.any(
+        return TeraAsset.query().join(TeraSession).filter(or_(TeraSession.session_users.any(
             id_user=user_id), TeraAsset.id_user == user_id)).all()
 
     @staticmethod
     def get_assets_for_session(session_id: int):
-        return TeraAsset.query.filter_by(id_session=session_id).all()
+        return TeraAsset.query().filter_by(id_session=session_id).all()
 
     @staticmethod
     def get_assets_for_participant(part_id: int):
         from opentera.db.models.TeraSession import TeraSession
-        return TeraAsset.query.join(TeraSession).filter(or_(TeraSession.session_participants.any(
+        return TeraAsset.query().join(TeraSession).filter(or_(TeraSession.session_participants.any(
             id_participant=part_id), TeraAsset.id_participant == part_id)).all()
 
     @staticmethod
     def get_assets_owned_by_service(service_uuid: str):
-        return TeraAsset.query.filter_by(asset_service_uuid=service_uuid).all()
+        return TeraAsset.query().filter_by(asset_service_uuid=service_uuid).all()
 
     @staticmethod
     def get_assets_created_by_service(service_id: int):
-        return TeraAsset.query.filter_by(id_service=service_id).all()
+        return TeraAsset.query().filter_by(id_service=service_id).all()
 
     @staticmethod
     def get_assets_created_by_user(user_id: int):
-        return TeraAsset.query.filter_by(id_user=user_id).all()
+        return TeraAsset.query().filter_by(id_user=user_id).all()
 
     @staticmethod
     def get_assets_created_by_participant(participant_id: int):
-        return TeraAsset.query.filter_by(id_participant=participant_id).all()
+        return TeraAsset.query().filter_by(id_participant=participant_id).all()
 
     @staticmethod
     def get_assets_created_by_device(device_id: int):
-        return TeraAsset.query.filter_by(id_device=device_id).all()
+        return TeraAsset.query().filter_by(id_device=device_id).all()
 
     @staticmethod
     def get_access_token(asset_uuids: list, token_key: str, requester_uuid: str, expiration=3600):

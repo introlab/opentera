@@ -1,4 +1,6 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
 
@@ -20,26 +22,26 @@ def infinite_jti_sequence():
 user_jti_generator = infinite_jti_sequence()
 
 
-class TeraUser(db.Model, BaseModel):
+class TeraUser(BaseModel):
     __tablename__ = 't_users'
-    id_user = db.Column(db.Integer, db.Sequence('id_user_sequence'), primary_key=True, autoincrement=True)
-    user_username = db.Column(db.String(50), nullable=False, unique=True)
-    user_uuid = db.Column(db.String(36), nullable=False, unique=True)
-    user_email = db.Column(db.String, nullable=True)
-    user_firstname = db.Column(db.String, nullable=False)
-    user_lastname = db.Column(db.String, nullable=False)
-    user_password = db.Column(db.String, nullable=False)
-    user_enabled = db.Column(db.Boolean, nullable=False)
-    user_profile = db.Column(db.String, nullable=False)  # Used to store "extra" informations, if needed.
-    user_notes = db.Column(db.String, nullable=True)
-    user_lastonline = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
-    user_superadmin = db.Column(db.Boolean, nullable=False, default=False)
+    id_user = Column(Integer, Sequence('id_user_sequence'), primary_key=True, autoincrement=True)
+    user_username = Column(String(50), nullable=False, unique=True)
+    user_uuid = Column(String(36), nullable=False, unique=True)
+    user_email = Column(String, nullable=True)
+    user_firstname = Column(String, nullable=False)
+    user_lastname = Column(String, nullable=False)
+    user_password = Column(String, nullable=False)
+    user_enabled = Column(Boolean, nullable=False)
+    user_profile = Column(String, nullable=False)  # Used to store "extra" informations, if needed.
+    user_notes = Column(String, nullable=True)
+    user_lastonline = Column(TIMESTAMP(timezone=True), nullable=True)
+    user_superadmin = Column(Boolean, nullable=False, default=False)
 
-    # user_sites_access = db.relationship('TeraSiteAccess', cascade="all,delete")
-    # user_projects_access = db.relationship("TeraProjectAccess", cascade="all,delete")
-    user_user_groups = db.relationship("TeraUserGroup", secondary="t_users_users_groups",
+    # user_sites_access = relationship('TeraSiteAccess', cascade="all,delete")
+    # user_projects_access = relationship("TeraProjectAccess", cascade="all,delete")
+    user_user_groups = relationship("TeraUserGroup", secondary="t_users_users_groups",
                                        back_populates="user_group_users", lazy='joined')
-    user_sessions = db.relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users",
+    user_sessions = relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users",
                                     passive_deletes=True)
 
     authenticated = False
@@ -104,7 +106,7 @@ class TeraUser(db.Model, BaseModel):
 
     def update_last_online(self):
         self.user_lastonline = datetime.datetime.now()
-        db.session.commit()
+        TeraUser.db().session.commit()
 
     def __str__(self):
         return '<TeraUser ' + str(self.user_username) + ', ' + str(self.user_email) + ' >'
@@ -117,7 +119,7 @@ class TeraUser(db.Model, BaseModel):
 
         if self.user_superadmin:
             # Super admin - admin role in all sites
-            sites = TeraSite.query.all()
+            sites = TeraSite.query().all()
             for site in sites:
                 sites_roles[site] = {'site_role': 'admin', 'inherited': True}
             return sites_roles
@@ -141,7 +143,7 @@ class TeraUser(db.Model, BaseModel):
 
         if self.user_superadmin:
             # Super admin - admin role in all projects
-            projects = TeraProject.query.all()
+            projects = TeraProject.query().all()
             for project in projects:
                 projects_roles[project] = {'project_role': 'admin', 'inherited': True}
             return projects_roles
@@ -187,21 +189,21 @@ class TeraUser(db.Model, BaseModel):
 
     @staticmethod
     def get_user_by_username(username):
-        return TeraUser.query.filter_by(user_username=username).first()
+        return TeraUser.query().filter_by(user_username=username).first()
 
     @staticmethod
     def get_user_by_uuid(u_uuid):
-        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
+        user = TeraUser.query().filter_by(user_uuid=u_uuid).first()
         return user
 
     @staticmethod
     def get_user_by_id(id_user):
-        user = TeraUser.query.filter_by(id_user=id_user).first()
+        user = TeraUser.query().filter_by(id_user=id_user).first()
         return user
 
     @staticmethod
     def get_superadmins():
-        return TeraUser.query.filter_by(user_superadmin=True).all()
+        return TeraUser.query().filter_by(user_superadmin=True).all()
 
     @classmethod
     def update(cls, id_user: int, values: dict):
@@ -255,7 +257,7 @@ class TeraUser(db.Model, BaseModel):
         admin.user_superadmin = True
         admin.user_username = "admin"
         admin.user_uuid = str(uuid.uuid4())
-        db.session.add(admin)
+        TeraUser.db().session.add(admin)
 
         if test:
             # Site admin
@@ -269,7 +271,7 @@ class TeraUser(db.Model, BaseModel):
             admin.user_username = "siteadmin"
             admin.user_uuid = str(uuid.uuid4())
             # admin.user_user_group = TeraUserGroup.get_user_group_by_group_name("Admins - Default Site")
-            db.session.add(admin)
+            TeraUser.db().session.add(admin)
 
             # Site User
             user = TeraUser()
@@ -282,7 +284,7 @@ class TeraUser(db.Model, BaseModel):
             user.user_username = "user"
             user.user_uuid = str(uuid.uuid4())
             # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Project 1")
-            db.session.add(user)
+            TeraUser.db().session.add(user)
 
             # Site User
             user = TeraUser()
@@ -295,7 +297,7 @@ class TeraUser(db.Model, BaseModel):
             user.user_username = "user2"
             user.user_uuid = str(uuid.uuid4())
             # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
-            db.session.add(user)
+            TeraUser.db().session.add(user)
 
             # Project admin
             user = TeraUser()
@@ -308,7 +310,7 @@ class TeraUser(db.Model, BaseModel):
             user.user_username = "user3"
             user.user_uuid = str(uuid.uuid4())
             # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
-            db.session.add(user)
+            TeraUser.db().session.add(user)
 
             # No access user!
             user = TeraUser()
@@ -321,6 +323,6 @@ class TeraUser(db.Model, BaseModel):
             user.user_username = "user4"
             user.user_uuid = str(uuid.uuid4())
             # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
-            db.session.add(user)
+            TeraUser.db().session.add(user)
 
-        db.session.commit()
+        TeraUser.db().session.commit()

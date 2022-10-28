@@ -1,9 +1,11 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 from enum import Enum, unique
 from flask_babel import gettext
 
 
-class TeraSessionType(db.Model, BaseModel):
+class TeraSessionType(BaseModel):
     @unique
     class SessionCategoryEnum(Enum):
         SERVICE = 1
@@ -15,25 +17,25 @@ class TeraSessionType(db.Model, BaseModel):
             return self.name, self.value
 
     __tablename__ = 't_sessions_types'
-    id_session_type = db.Column(db.Integer, db.Sequence('id_session_type_sequence'), primary_key=True,
+    id_session_type = Column(Integer, Sequence('id_session_type_sequence'), primary_key=True,
                                 autoincrement=True)
-    id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=True)
-    session_type_name = db.Column(db.String, nullable=False, unique=False)
-    session_type_online = db.Column(db.Boolean, nullable=False)
-    session_type_config = db.Column(db.String, nullable=True)
-    session_type_color = db.Column(db.String(7), nullable=False)
-    session_type_category = db.Column(db.Integer, nullable=False)
+    id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=True)
+    session_type_name = Column(String, nullable=False, unique=False)
+    session_type_online = Column(Boolean, nullable=False)
+    session_type_config = Column(String, nullable=True)
+    session_type_color = Column(String(7), nullable=False)
+    session_type_category = Column(Integer, nullable=False)
 
-    session_type_session_type_projects = db.relationship("TeraSessionTypeProject", viewonly=True)
-    session_type_session_type_sites = db.relationship("TeraSessionTypeSite", viewonly=True)
+    session_type_session_type_projects = relationship("TeraSessionTypeProject", viewonly=True)
+    session_type_session_type_sites = relationship("TeraSessionTypeSite", viewonly=True)
 
-    session_type_projects = db.relationship("TeraProject", secondary="t_sessions_types_projects",
+    session_type_projects = relationship("TeraProject", secondary="t_sessions_types_projects",
                                             back_populates="project_session_types")
-    session_type_sites = db.relationship("TeraSite", secondary="t_sessions_types_sites")
+    session_type_sites = relationship("TeraSite", secondary="t_sessions_types_sites")
 
-    session_type_service = db.relationship("TeraService")
+    session_type_service = relationship("TeraService")
 
-    session_type_sessions = db.relationship("TeraSession", passive_deletes=True, back_populates='session_session_type')
+    session_type_sessions = relationship("TeraSession", passive_deletes=True, back_populates='session_session_type')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -81,7 +83,7 @@ class TeraSessionType(db.Model, BaseModel):
         # video_session.session_type_projects = [type_project]
         # video_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
         #     int(TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value))]
-        db.session.add(video_session)
+        TeraSessionType.db().session.add(video_session)
 
         sensor_session = TeraSessionType()
         sensor_session.session_type_name = "Données Capteur"
@@ -92,7 +94,7 @@ class TeraSessionType(db.Model, BaseModel):
         # sensor_session.session_type_projects = [type_project]
         # sensor_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
         #     int(TeraDeviceType.DeviceTypeEnum.SENSOR.value))]
-        db.session.add(sensor_session)
+        TeraSessionType.db().session.add(sensor_session)
 
         vsensor_session = TeraSessionType()
         vsensor_session.session_type_name = "Collecte données"
@@ -104,7 +106,7 @@ class TeraSessionType(db.Model, BaseModel):
         # vsensor_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
         #     int(TeraDeviceType.DeviceTypeEnum.SENSOR.value)), TeraDeviceType.get_device_type(
         #     int(TeraDeviceType.DeviceTypeEnum.VIDEOCONFERENCE.value))]
-        db.session.add(vsensor_session)
+        TeraSessionType.db().session.add(vsensor_session)
 
         robot_session = TeraSessionType()
         robot_session.session_type_name = "Exercices individuels"
@@ -115,7 +117,7 @@ class TeraSessionType(db.Model, BaseModel):
         robot_session.session_type_category = TeraSessionType.SessionCategoryEnum.PROTOCOL.value
         # robot_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
         #     int(TeraDeviceType.DeviceTypeEnum.ROBOT.value))]
-        db.session.add(robot_session)
+        TeraSessionType.db().session.add(robot_session)
 
         bureau_session = TeraSessionType()
         bureau_session.session_type_name = "FileTransfer"
@@ -126,17 +128,17 @@ class TeraSessionType(db.Model, BaseModel):
         # robot_session.session_type_uses_devices_types = [TeraDeviceType.get_device_type(
         #     int(TeraDeviceType.DeviceTypeEnum.ROBOT.value))]
         bureau_session.id_service = TeraService.get_service_by_key('FileTransferService').id_service
-        db.session.add(bureau_session)
+        TeraSessionType.db().session.add(bureau_session)
 
-        db.session.commit()
+        TeraSessionType.db().session.commit()
 
     @staticmethod
     def get_session_type_by_id(ses_type_id: int):
-        return TeraSessionType.query.filter_by(id_session_type=ses_type_id).first()
+        return TeraSessionType.query().filter_by(id_session_type=ses_type_id).first()
 
     @staticmethod
     def get_session_types_for_service(id_service: int):
-        return TeraSessionType.query.filter_by(id_service=id_service).all()
+        return TeraSessionType.query().filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_category_name(category: SessionCategoryEnum):

@@ -1,28 +1,30 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 import uuid
 
 
-class TeraTestType(db.Model, BaseModel):
+class TeraTestType(BaseModel):
     __tablename__ = 't_tests_types'
-    id_test_type = db.Column(db.Integer, db.Sequence('id_test_type_sequence'), primary_key=True, autoincrement=True)
-    id_service = db.Column(db.Integer, db.ForeignKey("t_services.id_service", ondelete='cascade'), nullable=False)
-    test_type_uuid = db.Column(db.String(36), nullable=False, unique=True)
-    test_type_name = db.Column(db.String, nullable=False, unique=False)
-    test_type_description = db.Column(db.String, nullable=True)
-    test_type_key = db.Column(db.String, nullable=True, unique=True)
+    id_test_type = Column(Integer, Sequence('id_test_type_sequence'), primary_key=True, autoincrement=True)
+    id_service = Column(Integer, ForeignKey("t_services.id_service", ondelete='cascade'), nullable=False)
+    test_type_uuid = Column(String(36), nullable=False, unique=True)
+    test_type_name = Column(String, nullable=False, unique=False)
+    test_type_description = Column(String, nullable=True)
+    test_type_key = Column(String, nullable=True, unique=True)
     # Test type service provides TeraForm style json format?
-    test_type_has_json_format = db.Column(db.Boolean, nullable=False, default=False)
+    test_type_has_json_format = Column(Boolean, nullable=False, default=False)
     # Test type service provides a generated HTML form?
-    test_type_has_web_format = db.Column(db.Boolean, nullable=False, default=False)
+    test_type_has_web_format = Column(Boolean, nullable=False, default=False)
     # Test type service provides a web based editor?
-    test_type_has_web_editor = db.Column(db.Boolean, nullable=False, default=False)
+    test_type_has_web_editor = Column(Boolean, nullable=False, default=False)
 
-    test_type_test_type_projects = db.relationship("TeraTestTypeProject", viewonly=True)
-    test_type_test_type_sites = db.relationship("TeraTestTypeSite", viewonly=True)
+    test_type_test_type_projects = relationship("TeraTestTypeProject", viewonly=True)
+    test_type_test_type_sites = relationship("TeraTestTypeSite", viewonly=True)
 
-    test_type_service = db.relationship("TeraService")
-    test_type_projects = db.relationship("TeraProject", secondary="t_tests_types_projects")
-    test_type_sites = db.relationship("TeraSite", secondary="t_tests_types_sites")
+    test_type_service = relationship("TeraService")
+    test_type_projects = relationship("TeraProject", secondary="t_tests_types_projects")
+    test_type_sites = relationship("TeraSite", secondary="t_tests_types_sites")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -52,7 +54,7 @@ class TeraTestType(db.Model, BaseModel):
             test.test_type_uuid = str(uuid.uuid4())
             test.test_type_key = 'PRE'
             test.test_type_has_json_format = True
-            db.session.add(test)
+            TeraTestType.db().session.add(test)
 
             test = TeraTestType()
             test.test_type_name = 'Post-session evaluation'
@@ -61,7 +63,7 @@ class TeraTestType(db.Model, BaseModel):
             test.test_type_uuid = str(uuid.uuid4())
             test.test_type_has_json_format = True
             test.test_type_has_web_format = True
-            db.session.add(test)
+            TeraTestType.db().session.add(test)
 
             test = TeraTestType()
             test.test_type_name = 'General survey'
@@ -70,25 +72,25 @@ class TeraTestType(db.Model, BaseModel):
             test.test_type_uuid = str(uuid.uuid4())
             test.test_type_has_web_format = True
             test.test_type_has_web_editor = True
-            db.session.add(test)
+            TeraTestType.db().session.add(test)
 
-            db.session.commit()
+            TeraTestType.db().session.commit()
 
     @staticmethod
     def get_test_type_by_id(test_type_id: int):
-        return TeraTestType.query.filter_by(id_test_type=test_type_id).first()
+        return TeraTestType.query().filter_by(id_test_type=test_type_id).first()
 
     @staticmethod
     def get_test_type_by_key(tt_key: int):
-        return TeraTestType.query.filter_by(test_type_key=tt_key).first()
+        return TeraTestType.query().filter_by(test_type_key=tt_key).first()
 
     @staticmethod
     def get_test_type_by_uuid(tt_uuid: int):
-        return TeraTestType.query.filter_by(test_type_uuid=tt_uuid).first()
+        return TeraTestType.query().filter_by(test_type_uuid=tt_uuid).first()
 
     @staticmethod
     def get_test_types_for_service(id_service: int):
-        return TeraTestType.query.filter_by(id_service=id_service).all()
+        return TeraTestType.query().filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_access_token(test_type_uuids: list, token_key: str, requester_uuid: str, can_edit: bool, expiration=3600):

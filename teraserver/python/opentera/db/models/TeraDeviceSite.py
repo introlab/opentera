@@ -1,14 +1,16 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraDeviceSite(db.Model, BaseModel):
+class TeraDeviceSite(BaseModel):
     __tablename__ = 't_devices_sites'
-    id_device_site = db.Column(db.Integer, db.Sequence('id_device_site_sequence'), primary_key=True, autoincrement=True)
-    id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
-    id_site = db.Column(db.Integer, db.ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=False)
+    id_device_site = Column(Integer, Sequence('id_device_site_sequence'), primary_key=True, autoincrement=True)
+    id_device = Column(Integer, ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
+    id_site = Column(Integer, ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=False)
 
-    device_site_site = db.relationship("TeraSite", viewonly=True)
-    device_site_device = db.relationship("TeraDevice", viewonly=True)
+    device_site_site = relationship("TeraSite", viewonly=True)
+    device_site_device = relationship("TeraDevice", viewonly=True)
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['device_site_site', 'device_site_device'])
@@ -36,19 +38,19 @@ class TeraDeviceSite(db.Model, BaseModel):
             dev_site = TeraDeviceSite()
             dev_site.id_device = device1.id_device
             dev_site.id_site = default_site.id_site
-            db.session.add(dev_site)
+            TeraDeviceSite.db().session.add(dev_site)
 
             dev_site = TeraDeviceSite()
             dev_site.id_device = device2.id_device
             dev_site.id_site = default_site.id_site
-            db.session.add(dev_site)
+            TeraDeviceSite.db().session.add(dev_site)
 
             dev_site = TeraDeviceSite()
             dev_site.id_device = device1.id_device
             dev_site.id_site = secret_site.id_site
-            db.session.add(dev_site)
+            TeraDeviceSite.db().session.add(dev_site)
 
-            db.session.commit()
+            TeraDeviceSite.db().session.commit()
         else:
             # Automatically associate devices that are in a project to that site
             from opentera.db.models.TeraDeviceProject import TeraDeviceProject
@@ -61,28 +63,28 @@ class TeraDeviceSite(db.Model, BaseModel):
                     device_site = TeraDeviceSite()
                     device_site.id_site = project_site_id
                     device_site.id_device = dp.device_project_device.id_device
-                    db.session.add(device_site)
-                    db.session.commit()
+                    TeraDeviceSite.db().session.add(device_site)
+                    TeraDeviceSite.db().session.commit()
 
     @staticmethod
     def get_device_site_by_id(device_site_id: int):
-        return TeraDeviceSite.query.filter_by(id_device_site=device_site_id).first()
+        return TeraDeviceSite.query().filter_by(id_device_site=device_site_id).first()
 
     @staticmethod
     def get_device_site_id_for_device_and_site(device_id: int, site_id: int):
-        return TeraDeviceSite.query.filter_by(id_site=site_id, id_device=device_id).first()
+        return TeraDeviceSite.query().filter_by(id_site=site_id, id_device=device_id).first()
 
     @staticmethod
     def get_devices_for_site(site_id: int):
-        return TeraDeviceSite.query.filter_by(id_site=site_id).all()
+        return TeraDeviceSite.query().filter_by(id_site=site_id).all()
 
     @staticmethod
     def get_sites_for_device(device_id: int):
-        return TeraDeviceSite.query.filter_by(id_device=device_id).all()
+        return TeraDeviceSite.query().filter_by(id_device=device_id).all()
 
     @staticmethod
     def delete_with_ids(device_id: int, site_id: int):
-        delete_obj: TeraDeviceSite = TeraDeviceSite.query.filter_by(id_device=device_id, id_site=site_id).first()
+        delete_obj: TeraDeviceSite = TeraDeviceSite.query().filter_by(id_device=device_id, id_site=site_id).first()
         if delete_obj:
             TeraDeviceSite.delete(delete_obj.id_device_site)
 
@@ -90,7 +92,7 @@ class TeraDeviceSite(db.Model, BaseModel):
     def delete(cls, id_todel):
         from opentera.db.models.TeraDeviceProject import TeraDeviceProject
         # Delete all association with projects for that site
-        delete_obj = TeraDeviceSite.query.filter_by(id_device_site=id_todel).first()
+        delete_obj = TeraDeviceSite.query().filter_by(id_device_site=id_todel).first()
 
         if delete_obj:
             projects = TeraDeviceProject.get_projects_for_device(delete_obj.id_device)

@@ -1,16 +1,18 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraSessionTypeSite(db.Model, BaseModel):
+class TeraSessionTypeSite(BaseModel):
     __tablename__ = 't_sessions_types_sites'
-    id_session_type_site = db.Column(db.Integer, db.Sequence('id_session_type_site_sequence'), primary_key=True,
+    id_session_type_site = Column(Integer, Sequence('id_session_type_site_sequence'), primary_key=True,
                                      autoincrement=True)
-    id_session_type = db.Column('id_session_type', db.Integer, db.ForeignKey('t_sessions_types.id_session_type',
+    id_session_type = Column('id_session_type', Integer, ForeignKey('t_sessions_types.id_session_type',
                                                                              ondelete='cascade'), nullable=False)
-    id_site = db.Column('id_site', db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
+    id_site = Column('id_site', Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
 
-    session_type_site_session_type = db.relationship("TeraSessionType", viewonly=True)
-    session_type_site_site = db.relationship("TeraSite", viewonly=True)
+    session_type_site_session_type = relationship("TeraSessionType", viewonly=True)
+    session_type_site_site = relationship("TeraSite", viewonly=True)
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['session_type_site_session_type', 'session_type_site_site'])
@@ -40,34 +42,34 @@ class TeraSessionTypeSite(db.Model, BaseModel):
             sts = TeraSessionTypeSite()
             sts.id_session_type = video_session.id_session_type
             sts.id_site = default_site.id_site
-            db.session.add(sts)
+            TeraSessionTypeSite.db().session.add(sts)
 
             sts = TeraSessionTypeSite()
             sts.id_session_type = sensor_session.id_session_type
             sts.id_site = default_site.id_site
-            db.session.add(sts)
+            TeraSessionTypeSite.db().session.add(sts)
 
             sts = TeraSessionTypeSite()
             sts.id_session_type = data_session.id_session_type
             sts.id_site = default_site.id_site
-            db.session.add(sts)
+            TeraSessionTypeSite.db().session.add(sts)
 
             sts = TeraSessionTypeSite()
             sts.id_session_type = exerc_session.id_session_type
             sts.id_site = default_site.id_site
-            db.session.add(sts)
+            TeraSessionTypeSite.db().session.add(sts)
 
             sts = TeraSessionTypeSite()
             sts.id_session_type = bureau_session.id_session_type
             sts.id_site = default_site.id_site
-            db.session.add(sts)
+            TeraSessionTypeSite.db().session.add(sts)
 
             sts = TeraSessionTypeSite()
             sts.id_session_type = exerc_session.id_session_type
             sts.id_site = secret_site.id_site
-            db.session.add(sts)
+            TeraSessionTypeSite.db().session.add(sts)
 
-            db.session.commit()
+            TeraSessionTypeSite.db().session.commit()
         else:
             # Automatically associate session types that are in a project to that site
             from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
@@ -80,29 +82,29 @@ class TeraSessionTypeSite(db.Model, BaseModel):
                     st_site = TeraSessionTypeSite()
                     st_site.id_site = project_site_id
                     st_site.id_session_type = stp.id_session_type
-                    db.session.add(st_site)
-                    db.session.commit()
+                    TeraSessionTypeSite.db().session.add(st_site)
+                    TeraSessionTypeSite.db().session.commit()
 
     @staticmethod
     def get_session_type_site_by_id(sts_id: int):
-        return TeraSessionTypeSite.query.filter_by(id_session_type_site=sts_id).first()
+        return TeraSessionTypeSite.query().filter_by(id_session_type_site=sts_id).first()
 
     @staticmethod
     def get_sites_for_session_type(session_type_id: int):
-        return TeraSessionTypeSite.query.filter_by(id_session_type=session_type_id).all()
+        return TeraSessionTypeSite.query().filter_by(id_session_type=session_type_id).all()
 
     @staticmethod
     def get_sessions_types_for_site(site_id: int):
-        return TeraSessionTypeSite.query.filter_by(id_site=site_id).all()
+        return TeraSessionTypeSite.query().filter_by(id_site=site_id).all()
 
     @staticmethod
     def get_session_type_site_for_session_type_and_site(site_id: int, session_type_id: int):
-        return TeraSessionTypeSite.query.filter_by(id_site=site_id, id_session_type=session_type_id).first()
+        return TeraSessionTypeSite.query().filter_by(id_site=site_id, id_session_type=session_type_id).first()
 
     @staticmethod
     def get_session_type_site_for_site_and_service(site_id: int, service_id: int):
         from opentera.db.models.TeraSessionType import TeraSessionType
-        return TeraSessionTypeSite.query.join(TeraSessionType). \
+        return TeraSessionTypeSite.query().join(TeraSessionType). \
             filter(TeraSessionType.id_service == service_id). \
             filter(TeraSessionTypeSite.id_site == site_id).all()
 
@@ -124,7 +126,7 @@ class TeraSessionTypeSite(db.Model, BaseModel):
 
     @staticmethod
     def delete_with_ids(session_type_id: int, site_id: int):
-        delete_obj: TeraSessionTypeSite = TeraSessionTypeSite.query.filter_by(id_session_type=session_type_id,
+        delete_obj: TeraSessionTypeSite = TeraSessionTypeSite.query().filter_by(id_session_type=session_type_id,
                                                                               id_site=site_id).first()
         if delete_obj:
             TeraSessionTypeSite.delete(delete_obj.id_session_type_site)
@@ -133,7 +135,7 @@ class TeraSessionTypeSite(db.Model, BaseModel):
     def delete(cls, id_todel):
         from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
         # Delete all association with projects for that site
-        delete_obj = TeraSessionTypeSite.query.filter_by(id_session_type_site=id_todel).first()
+        delete_obj = TeraSessionTypeSite.query().filter_by(id_session_type_site=id_todel).first()
 
         if delete_obj:
             projects = TeraSessionTypeProject.get_projects_for_session_type(delete_obj.id_session_type)
