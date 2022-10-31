@@ -1,5 +1,4 @@
 import unittest
-from services.LoggingService.libloggingservice.db.Base import db
 from services.LoggingService.libloggingservice.db.DBManager import DBManager
 from services.LoggingService.ConfigManager import ConfigManager
 from opentera.modules.BaseModule import BaseModule
@@ -12,7 +11,7 @@ import uuid
 import random
 from string import digits, ascii_lowercase, ascii_uppercase
 import services.LoggingService.Globals as Globals
-# from FakeLoggingService import FakeLoggingService
+from FakeLoggingService import FakeLoggingService
 
 
 def infinite_jti_sequence():
@@ -72,14 +71,15 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         # Creating default users / tests. Time-consuming, only once per test file.
         cls._db_man.create_defaults(cls._config, test=True)
 
-        # Globals.service = FakeLoggingService()
+        # Instance of Fake service API
+        Globals.service = FakeLoggingService()
 
     @classmethod
     def tearDownClass(cls):
         cls._config = None
-        cls._db_man = None
         # LoginModule.redis_client = None
-        db.session.remove()
+        cls._db_man.db.session.remove()
+        cls._db_man = None
 
     @classmethod
     def getConfig(cls) -> ConfigManager:
@@ -93,7 +93,7 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
 
     def tearDown(self):
         # Make sure pending queries are rollbacked.
-        db.session.rollback()
+        self._db_man.db.session.rollback()
 
     def setup_redis_keys(self):
         # Initialize keys (create only if not found)

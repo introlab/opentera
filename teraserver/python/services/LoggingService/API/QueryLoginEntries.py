@@ -3,6 +3,7 @@ from sqlalchemy.exc import InvalidRequestError
 from services.LoggingService.FlaskModule import logging_api_ns as api
 from opentera.services.ServiceAccessManager import ServiceAccessManager, current_user_client
 from services.LoggingService.libloggingservice.db.models.LoginEntry import LoginEntry
+from services.LoggingService.Globals import service
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -26,6 +27,20 @@ class QueryLoginEntries(Resource):
 
         # TODO Only allow superadmins to query logs?
         if current_user_client and current_user_client.user_superadmin:
+
+            # Request access from server
+            params = {
+                'from_user_uuid': current_user_client.user_uuid,
+                'with_user_uuids': True,
+                'with_projets_ids': True,
+                'with_participants_uuids': True,
+                'with_device_uuids': True,
+                'with_sites_ids': True,
+                'admin': False
+            }
+
+            response = service.get_from_opentera('/api/service/access', params)
+
             try:
                 all_entries = LoginEntry.query.all()
                 results = []
