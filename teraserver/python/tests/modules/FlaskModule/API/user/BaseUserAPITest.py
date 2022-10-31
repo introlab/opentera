@@ -1,5 +1,5 @@
 import unittest
-from opentera.db.Base import db
+from opentera.db.Base import BaseModel
 from modules.DatabaseModule.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule
 from opentera.config.ConfigManager import ConfigManager
@@ -44,6 +44,7 @@ class BaseUserAPITest(unittest.TestCase):
         cls._db_man: DBManager = DBManager(cls._config)
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)
+        BaseModel.set_db(cls._db_man.db)
 
         # Creating default users / tests. Time-consuming, only once per test file.
         cls._db_man.create_defaults(cls._config, test=True)
@@ -54,9 +55,9 @@ class BaseUserAPITest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls._config = None
+        cls._db_man.db.session.remove()
         cls._db_man = None
         LoginModule.redis_client = None
-        db.session.remove()
 
     @classmethod
     def getConfig(cls) -> ConfigManager:
@@ -78,7 +79,7 @@ class BaseUserAPITest(unittest.TestCase):
     def setUp(self):
         # Setup required keys
         self.setup_redis_keys()
-        self.session = db.create_scoped_session()
+        self.session = self._db_man.db.create_scoped_session()
 
     def tearDown(self):
         # Make sure pending queries are rollbacked.

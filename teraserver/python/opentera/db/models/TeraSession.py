@@ -249,15 +249,15 @@ class TeraSession(BaseModel):
     def _set_query_parameters(query, status: int = None, limit: int = None, offset: int = None,
                               start_date: datetime.date = None, end_date: datetime.date = None):
         if status is not None:
-            query = query().filter(TeraSession.session_status == status)
+            query = query.filter(TeraSession.session_status == status)
         if start_date:
-            query = query().filter(TeraSession.db().func.date(TeraSession.session_start_datetime) >= start_date)
+            query = query.filter(TeraSession.db().func.date(TeraSession.session_start_datetime) >= start_date)
         if end_date:
-            query = query().filter(TeraSession.db().func.date(TeraSession.session_start_datetime) <= end_date)
+            query = query.filter(TeraSession.db().func.date(TeraSession.session_start_datetime) <= end_date)
         if limit:
-            query = query().limit(limit)
+            query = query.limit(limit)
         if offset:
-            query = query().offset(offset)
+            query = query.offset(offset)
 
         return query
 
@@ -269,45 +269,45 @@ class TeraSession(BaseModel):
         query = TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
                                                                                 part_id)
 
-        query = query().order_by(TeraSession.session_start_datetime.desc())
+        query = query.order_by(TeraSession.session_start_datetime.desc())
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
 
         if filters:
-            query = query().filter_by(**filters)
+            query = query.filter_by(**filters)
 
-        return query().all()
+        return query.all()
 
     @staticmethod
     def get_sessions_for_user(user_id: int, status: int = None, limit: int = None, offset: int = None,
                               start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None):
         from opentera.db.models.TeraUser import TeraUser
         query = TeraSession.query.join(TeraSession.session_users).filter(TeraUser.id_user == user_id)
-        query = query().order_by(TeraSession.session_start_datetime.desc())
+        query = query.order_by(TeraSession.session_start_datetime.desc())
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
 
         if filters:
-            query = query().filter_by(**filters)
+            query = query.filter_by(**filters)
 
-        return query().all()
+        return query.all()
 
     @staticmethod
     def get_sessions_for_device(device_id: int, status: int = None, limit: int = None, offset: int = None,
                                 start_date: datetime.date = None, end_date: datetime.date = None, filters:dict = None):
         from opentera.db.models.TeraDevice import TeraDevice
         query = TeraSession.query.join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
-        query = query().order_by(TeraSession.session_start_datetime.desc())
+        query = query.order_by(TeraSession.session_start_datetime.desc())
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
 
         if filters:
-            query = query().filter_by(**filters)
+            query = query.filter_by(**filters)
 
-        return query().all()
+        return query.all()
 
     @staticmethod
     def get_sessions_for_type(session_type_id: int):

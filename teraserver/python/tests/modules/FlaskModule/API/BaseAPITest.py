@@ -1,11 +1,6 @@
 import unittest
 from requests import get, post, delete
 
-from opentera.db.Base import db
-from modules.DatabaseModule.DBManager import DBManager
-from opentera.config.ConfigManager import ConfigManager
-from opentera.modules.BaseModule import BaseModule, ModuleNames
-
 
 class BaseAPITest(unittest.TestCase):
     host = '127.0.0.1'

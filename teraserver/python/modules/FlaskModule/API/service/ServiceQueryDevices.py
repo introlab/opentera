@@ -6,7 +6,7 @@ from modules.FlaskModule.FlaskModule import service_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraDeviceType import TeraDeviceType
 from opentera.db.models.TeraDeviceSubType import TeraDeviceSubType
-from modules.DatabaseModule.DBManager import db
+
 import uuid
 from datetime import datetime
 

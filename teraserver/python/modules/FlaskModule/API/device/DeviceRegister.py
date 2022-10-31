@@ -11,7 +11,6 @@ from cryptography.x509.oid import NameOID
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 
-from opentera.db.Base import db
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraDeviceType import TeraDeviceType
 from opentera.db.models.TeraSessionType import TeraSessionType
