@@ -1,6 +1,7 @@
 from BaseLoggingServiceAPITest import BaseLoggingServiceAPITest
 from services.LoggingService.FlaskModule import flask_app
 from services.LoggingService.libloggingservice.db.models.LoginEntry import LoginEntry
+
 from datetime import datetime
 import uuid
 
@@ -59,11 +60,16 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 self._db_man.db.session.add(entry)
                 self._db_man.db.session.commit()
 
-            token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
-            response = self._get_with_service_token_auth(self.test_client, token=token)
-            self.assertEqual(response.status_code, 200)
+            from services.LoggingService.Globals import service
+            users_uuids = service.get_users_uuids()
 
-            entries = LoginEntry.query.all()
-            self.assertEqual(len(response.json), len(entries))
+            for user_uuid in users_uuids:
+                token = self._generate_fake_user_token(name='FakeUser', user_uuid=user_uuid,
+                                                       superadmin=True, expiration=3600)
+                response = self._get_with_service_token_auth(self.test_client, token=token)
+                self.assertEqual(response.status_code, 200)
+
+                entries = LoginEntry.query.all()
+                self.assertEqual(len(response.json), len(entries))
 
 

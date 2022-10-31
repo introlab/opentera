@@ -147,7 +147,8 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
 
         ServiceAccessManager.config_man = self._config
 
-    def _generate_fake_user_token(self, name='FakeUser', superadmin=False, expiration=3600):
+    def _generate_fake_user_token(self, name='FakeUser', user_uuid=str(uuid.uuid4()),
+                                  superadmin=False, expiration=3600):
 
         import time
         import jwt
@@ -163,7 +164,7 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
             'exp': int(now) + expiration,
             'iss': 'TeraServer',
             'jti': next(user_jti_generator),
-            'user_uuid': str(uuid.uuid4()),
+            'user_uuid': user_uuid,
             'id_user': 1,
             'user_fullname': name,
             'user_superadmin': superadmin

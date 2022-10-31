@@ -135,6 +135,11 @@ class FakeLoggingService:
         self.redis.set(RedisVars.RedisVar_ServiceTokenAPIKey, ServiceAccessManager.api_service_token_key)
         ServiceAccessManager.config_man = self.config
 
+    def get_users_uuids(self):
+        with flask_app.app_context():
+            from opentera.db.models.TeraUser import TeraUser
+            return [user.user_uuid for user in TeraUser.query.all() if user.user_enabled]
+
     def post_to_opentera(self, api_url: str, json_data: dict) -> Response:
         # Synchronous call to OpenTera fake backend
         request_headers = {'Authorization': 'OpenTera ' + self.service_token}
