@@ -1,5 +1,6 @@
 # Using same base as TeraServer
-from services.FileTransferService.libfiletransferservice.db.Base import db
+from opentera.db.Base import BaseModel
+from flask_sqlalchemy import SQLAlchemy
 
 # Must include all Database objects here to be properly initialized and created if needed
 # All at once to make sure all files are registered.
@@ -26,6 +27,7 @@ class DBManager:
     }"""
 
     def __init__(self):
+        self.db = SQLAlchemy()
         self.db_uri = None
 
     def create_defaults(self, config: ConfigManager):
@@ -41,12 +43,12 @@ class DBManager:
         })
 
         # Create db engine
-        db.init_app(flask_app)
-        db.app = flask_app
+        self.db.init_app(flask_app)
+        self.db.app = flask_app
+        BaseModel.set_db(self.db)
 
         # Init tables
-        # db.drop_all()
-        db.create_all()
+        BaseModel.create_all()
 
         # Apply any database upgrade, if needed
         self.upgrade_db()
@@ -61,11 +63,12 @@ class DBManager:
         })
 
         # Create db engine
-        db.init_app(flask_app)
-        db.app = flask_app
+        self.db.init_app(flask_app)
+        self.db.app = flask_app
+        BaseModel.set_db(self.db)
 
-        db.drop_all()
-        db.create_all()
+        # Init tables
+        BaseModel.create_all()
 
         # Apply any database upgrade, if needed
         self.upgrade_db()
@@ -78,3 +81,11 @@ class DBManager:
         # TODO ALEMBIC UPGRADES
         pass
 
+
+if __name__ == '__main__':
+    config = ConfigManager()
+    config.create_defaults()
+    manager = DBManager()
+    manager.open_local({}, echo=True)
+    manager.create_defaults(config)
+    print('test')
