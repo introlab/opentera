@@ -54,5 +54,4 @@ class ConfigManager(ServiceConfigManager, FileTransferConfig, DBConfig):
         self.db_config['username'] = ''
         self.db_config['password'] = ''
 
-        # Default logging configuration
-        self.logging_config['level'] = 'trace'
+        self.filetransfer_config['files_directory'] = '.'
