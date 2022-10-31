@@ -1,18 +1,20 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
 
-class TeraTestTypeProject(db.Model, BaseModel):
+class TeraTestTypeProject(BaseModel):
     __tablename__ = 't_tests_types_projects'
-    id_test_type_project = db.Column(db.Integer, db.Sequence('id_test_type_project_sequence'), primary_key=True,
+    id_test_type_project = Column(Integer, Sequence('id_test_type_project_sequence'), primary_key=True,
                                      autoincrement=True)
-    id_test_type = db.Column('id_test_type', db.Integer, db.ForeignKey('t_tests_types.id_test_type',
+    id_test_type = Column('id_test_type', Integer, ForeignKey('t_tests_types.id_test_type',
                                                                        ondelete='cascade'), nullable=False)
-    id_project = db.Column('id_project', db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'),
+    id_project = Column('id_project', Integer, ForeignKey('t_projects.id_project', ondelete='cascade'),
                            nullable=False)
 
-    test_type_project_test_type = db.relationship("TeraTestType", viewonly=True)
-    test_type_project_project = db.relationship("TeraProject", viewonly=True)
+    test_type_project_test_type = relationship("TeraTestType", viewonly=True)
+    test_type_project_project = relationship("TeraProject", viewonly=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -43,19 +45,19 @@ class TeraTestTypeProject(db.Model, BaseModel):
             ttp = TeraTestTypeProject()
             ttp.id_test_type = pre_test.id_test_type
             ttp.id_project = project.id_project
-            db.session.add(ttp)
+            TeraTestTypeProject.db().session.add(ttp)
 
             ttp = TeraTestTypeProject()
             ttp.id_test_type = post_test.id_test_type
             ttp.id_project = project.id_project
-            db.session.add(ttp)
+            TeraTestTypeProject.db().session.add(ttp)
 
             ttp = TeraTestTypeProject()
             ttp.id_test_type = general_test.id_test_type
             ttp.id_project = secret_project.id_project
-            db.session.add(ttp)
+            TeraTestTypeProject.db().session.add(ttp)
 
-            db.session.commit()
+            TeraTestTypeProject.db().session.commit()
 
     @staticmethod
     def get_test_type_project_by_id(stp_id: int):

@@ -1,14 +1,16 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 from flask_sqlalchemy import event
 
 
-class TeraSite(db.Model, BaseModel):
+class TeraSite(BaseModel):
     __tablename__ = 't_sites'
-    id_site = db.Column(db.Integer, db.Sequence('id_site_sequence'), primary_key=True, autoincrement=True)
-    site_name = db.Column(db.String, nullable=False, unique=True)
+    id_site = Column(Integer, Sequence('id_site_sequence'), primary_key=True, autoincrement=True)
+    site_name = Column(String, nullable=False, unique=True)
 
-    site_devices = db.relationship("TeraDevice", secondary="t_devices_sites", back_populates="device_sites")
-    site_projects = db.relationship("TeraProject", cascade="delete", passive_deletes=True,
+    site_devices = relationship("TeraDevice", secondary="t_devices_sites", back_populates="device_sites")
+    site_projects = relationship("TeraProject", cascade="delete", passive_deletes=True,
                                     back_populates='project_site', lazy='joined')
 
     def to_json(self, ignore_fields=None, minimal=False):
@@ -75,15 +77,14 @@ class TeraSite(db.Model, BaseModel):
         access_role.id_service = opentera_service_id
         access_role.id_site = site.id_site
         access_role.service_role_name = 'admin'
-        db.session.add(access_role)
+        TeraServiceRole.insert(access_role)
 
         access_role = TeraServiceRole()
         access_role.id_service = opentera_service_id
         access_role.id_site = site.id_site
         access_role.service_role_name = 'user'
-        db.session.add(access_role)
+        TeraServiceRole.insert(access_role)
 
-        db.session.commit()
 
 #
 # @event.listens_for(TeraSite, 'after_insert')

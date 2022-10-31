@@ -1,16 +1,18 @@
-from opentera.db.Base import db, BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
+from opentera.db.Base import BaseModel
 from opentera.db.models.TeraProject import TeraProject
 
 
-class TeraParticipantGroup(db.Model, BaseModel):
+class TeraParticipantGroup(BaseModel):
     __tablename__ = 't_participants_groups'
-    id_participant_group = db.Column(db.Integer, db.Sequence('id_participantgroup_sequence'), primary_key=True,
+    id_participant_group = Column(Integer, Sequence('id_participantgroup_sequence'), primary_key=True,
                                      autoincrement=True)
-    id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
-    participant_group_name = db.Column(db.String, nullable=False, unique=False)
+    id_project = Column(Integer, ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
+    participant_group_name = Column(String, nullable=False, unique=False)
 
-    participant_group_project = db.relationship('TeraProject', back_populates='project_participants_groups')
-    participant_group_participants = db.relationship("TeraParticipant", back_populates='participant_participant_group',
+    participant_group_project = relationship('TeraProject', back_populates='project_participants_groups')
+    participant_group_participants = relationship("TeraParticipant", back_populates='participant_participant_group',
                                                      passive_deletes=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
@@ -52,13 +54,13 @@ class TeraParticipantGroup(db.Model, BaseModel):
             base_pgroup = TeraParticipantGroup()
             base_pgroup.participant_group_name = 'Default Participant Group A'
             base_pgroup.id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
-            db.session.add(base_pgroup)
+            TeraParticipantGroup.db().session.add(base_pgroup)
 
             base_pgroup2 = TeraParticipantGroup()
             base_pgroup2.participant_group_name = 'Default Participant Group B'
             base_pgroup2.id_project = TeraProject.get_project_by_projectname('Default Project #2').id_project
-            db.session.add(base_pgroup2)
-            db.session.commit()
+            TeraParticipantGroup.db().session.add(base_pgroup2)
+            TeraParticipantGroup.db().session.commit()
 
     @classmethod
     def delete(cls, id_todel):

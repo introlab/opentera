@@ -1,12 +1,14 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraDeviceType(db.Model, BaseModel):
+class TeraDeviceType(BaseModel):
 
     __tablename__ = 't_devices_types'
-    id_device_type = db.Column(db.Integer, db.Sequence('id_device_type_sequence'), primary_key=True, autoincrement=True)
-    device_type_name = db.Column(db.String, nullable=False)
-    device_type_key = db.Column(db.String, nullable=False, unique=True)
+    id_device_type = Column(Integer, Sequence('id_device_type_sequence'), primary_key=True, autoincrement=True)
+    device_type_name = Column(String, nullable=False)
+    device_type_key = Column(String, nullable=False, unique=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -25,22 +27,22 @@ class TeraDeviceType(db.Model, BaseModel):
         VIDEOCONFERENCE = TeraDeviceType()
         VIDEOCONFERENCE.device_type_name = 'Vidéoconférence'
         VIDEOCONFERENCE.device_type_key = 'videoconference'
-        db.session.add(VIDEOCONFERENCE)
+        TeraDeviceType.db().session.add(VIDEOCONFERENCE)
 
         CAPTEUR = TeraDeviceType()
         CAPTEUR.device_type_name = 'Capteur'
         CAPTEUR.device_type_key = 'capteur'
-        db.session.add(CAPTEUR)
+        TeraDeviceType.db().session.add(CAPTEUR)
 
         ROBOT = TeraDeviceType()
         ROBOT.device_type_name = 'Robot'
         ROBOT.device_type_key = 'robot'
-        db.session.add(ROBOT)
+        TeraDeviceType.db().session.add(ROBOT)
 
         BUREAU_ACTIF = TeraDeviceType()
         BUREAU_ACTIF.device_type_name = 'Bureau Actif'
         BUREAU_ACTIF.device_type_key = 'bureau_actif'
-        db.session.add(BUREAU_ACTIF)
+        TeraDeviceType.db().session.add(BUREAU_ACTIF)
 
     @staticmethod
     def get_devices_types():
@@ -64,5 +66,5 @@ class TeraDeviceType(db.Model, BaseModel):
 
     @staticmethod
     def commit():
-        db.session.commit()
+        TeraDeviceType.db().session.commit()
 

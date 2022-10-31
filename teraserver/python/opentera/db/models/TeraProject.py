@@ -1,18 +1,20 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraProject(db.Model, BaseModel):
+class TeraProject(BaseModel):
     __tablename__ = 't_projects'
-    id_project = db.Column(db.Integer, db.Sequence('id_project_sequence'), primary_key=True, autoincrement=True)
-    id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
-    project_name = db.Column(db.String, nullable=False, unique=False)
+    id_project = Column(Integer, Sequence('id_project_sequence'), primary_key=True, autoincrement=True)
+    id_site = Column(Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
+    project_name = Column(String, nullable=False, unique=False)
 
-    project_site = db.relationship("TeraSite", back_populates='site_projects')
-    project_participants = db.relationship("TeraParticipant", back_populates='participant_project',
+    project_site = relationship("TeraSite", back_populates='site_projects')
+    project_participants = relationship("TeraParticipant", back_populates='participant_project',
                                            passive_deletes=True)
-    project_participants_groups = db.relationship("TeraParticipantGroup", passive_deletes=True)
-    project_devices = db.relationship("TeraDevice", secondary="t_devices_projects", back_populates="device_projects")
-    project_session_types = db.relationship("TeraSessionType", secondary="t_sessions_types_projects",
+    project_participants_groups = relationship("TeraParticipantGroup", passive_deletes=True)
+    project_devices = relationship("TeraDevice", secondary="t_devices_projects", back_populates="device_projects")
+    project_session_types = relationship("TeraSessionType", secondary="t_sessions_types_projects",
                                             back_populates="session_type_projects")
 
     def to_json(self, ignore_fields=None, minimal=False):
@@ -141,12 +143,12 @@ class TeraProject(db.Model, BaseModel):
         access_role.id_service = opentera_service_id
         access_role.id_project = project.id_project
         access_role.service_role_name = 'admin'
-        db.session.add(access_role)
+        TeraProject.db().session.add(access_role)
 
         access_role = TeraServiceRole()
         access_role.id_service = opentera_service_id
         access_role.id_project = project.id_project
         access_role.service_role_name = 'user'
-        db.session.add(access_role)
+        TeraProject.db().session.add(access_role)
 
-        db.session.commit()
+        TeraProject.db().session.commit()

@@ -1,15 +1,17 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraUserPreference(db.Model, BaseModel):
+class TeraUserPreference(BaseModel):
     __tablename__ = 't_users_preferences'
-    id_user_preference = db.Column(db.Integer, db.Sequence('id_userpreference_sequence'), primary_key=True,
+    id_user_preference = Column(Integer, Sequence('id_userpreference_sequence'), primary_key=True,
                                    autoincrement=True)
-    id_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user', ondelete='cascade'), nullable=False)
-    user_preference_app_tag = db.Column(db.String, nullable=False)
-    user_preference_preference = db.Column(db.String, nullable=False)
+    id_user = Column(Integer, ForeignKey('t_users.id_user', ondelete='cascade'), nullable=False)
+    user_preference_app_tag = Column(String, nullable=False)
+    user_preference_preference = Column(String, nullable=False)
 
-    user_preference_user = db.relationship("TeraUser")
+    user_preference_user = relationship("TeraUser")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -49,19 +51,19 @@ class TeraUserPreference(db.Model, BaseModel):
             new_pref.id_user = super_admin.id_user
             new_pref.user_preference_app_tag = 'openteraplus'
             new_pref.user_preference_preference = '{"language": "fr", "notification_sounds": true}'
-            db.session.add(new_pref)
+            TeraUserPreference.db().session.add(new_pref)
 
             new_pref = TeraUserPreference()
             new_pref.id_user = site_admin.id_user
             new_pref.user_preference_app_tag = 'openteraplus'
             new_pref.user_preference_preference = '{"language": "en", "notification_sounds": false}'
-            db.session.add(new_pref)
+            TeraUserPreference.db().session.add(new_pref)
 
             new_pref = TeraUserPreference()
             new_pref.id_user = super_admin.id_user
             new_pref.user_preference_app_tag = 'anotherapp'
             new_pref.user_preference_preference = '{"gui_style": 1, "auto_save": false}'
-            db.session.add(new_pref)
+            TeraUserPreference.db().session.add(new_pref)
 
     @staticmethod
     def insert_or_update_or_delete_user_preference(user_id: int, app_tag: str, prefs: str):
@@ -85,7 +87,7 @@ class TeraUserPreference(db.Model, BaseModel):
         if existing_pref:
             # Update or delete
             if prefs is None or prefs == '':
-                db.session.delete(existing_pref)
+                TeraUserPreference.db().session.delete(existing_pref)
             else:
                 # Updage pref
                 existing_pref.user_preference_preference = prefs
@@ -95,5 +97,5 @@ class TeraUserPreference(db.Model, BaseModel):
             new_user_pref.id_user = user_id
             new_user_pref.user_preference_app_tag = app_tag
             new_user_pref.user_preference_preference = prefs
-            db.session.add(new_user_pref)
-        db.session.commit()
+            TeraUserPreference.db().session.add(new_user_pref)
+        TeraUserPreference.db().session.commit()

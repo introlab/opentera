@@ -1,16 +1,18 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraDeviceSubType(db.Model, BaseModel):
+class TeraDeviceSubType(BaseModel):
 
     __tablename__ = 't_devices_subtypes'
-    id_device_subtype = db.Column(db.Integer, db.Sequence('id_device_subtype_sequence'), primary_key=True,
+    id_device_subtype = Column(Integer, Sequence('id_device_subtype_sequence'), primary_key=True,
                                   autoincrement=True)
-    id_device_type = db.Column(db.Integer, db.ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
+    id_device_type = Column(Integer, ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
                                nullable=False)
-    device_subtype_name = db.Column(db.String, nullable=False)
+    device_subtype_name = Column(String, nullable=False)
 
-    device_subtype_type = db.relationship("TeraDeviceType")
+    device_subtype_type = relationship("TeraDeviceType")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -33,14 +35,14 @@ class TeraDeviceSubType(db.Model, BaseModel):
             subtype = TeraDeviceSubType()
             subtype.device_subtype_type = bureau
             subtype.device_subtype_name = 'Bureau modèle #1'
-            db.session.add(subtype)
+            TeraDeviceSubType.db().session.add(subtype)
 
             subtype = TeraDeviceSubType()
             subtype.device_subtype_type = bureau
             subtype.device_subtype_name = 'Bureau modèle #2'
-            db.session.add(subtype)
+            TeraDeviceSubType.db().session.add(subtype)
 
-            db.session.commit()
+            TeraDeviceSubType.db().session.commit()
 
     @staticmethod
     def get_devices_subtypes():

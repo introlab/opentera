@@ -1,4 +1,6 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 from enum import Enum
 import random
@@ -15,40 +17,40 @@ class TeraSessionStatus(Enum):
     STATUS_TERMINATED = 4
 
 
-class TeraSession(db.Model, BaseModel):
+class TeraSession(BaseModel):
     __tablename__ = 't_sessions'
-    id_session = db.Column(db.Integer, db.Sequence('id_session_sequence'), primary_key=True, autoincrement=True)
-    session_uuid = db.Column(db.String(36), nullable=False, unique=True)
+    id_session = Column(Integer, Sequence('id_session_sequence'), primary_key=True, autoincrement=True)
+    session_uuid = Column(String(36), nullable=False, unique=True)
 
-    id_session_type = db.Column(db.Integer, db.ForeignKey('t_sessions_types.id_session_type'), nullable=False)
-    id_creator_user = db.Column(db.Integer, db.ForeignKey('t_users.id_user'), nullable=True)
-    id_creator_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device'), nullable=True)
-    id_creator_participant = db.Column(db.Integer, db.ForeignKey('t_participants.id_participant'), nullable=True)
-    id_creator_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='set null'),
+    id_session_type = Column(Integer, ForeignKey('t_sessions_types.id_session_type'), nullable=False)
+    id_creator_user = Column(Integer, ForeignKey('t_users.id_user'), nullable=True)
+    id_creator_device = Column(Integer, ForeignKey('t_devices.id_device'), nullable=True)
+    id_creator_participant = Column(Integer, ForeignKey('t_participants.id_participant'), nullable=True)
+    id_creator_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='set null'),
                                    nullable=True)
 
-    session_name = db.Column(db.String, nullable=False)
-    session_start_datetime = db.Column(db.TIMESTAMP(timezone=True), nullable=False)
-    session_duration = db.Column(db.Integer, nullable=False, default=0)
-    session_status = db.Column(db.Integer, nullable=False)
-    session_comments = db.Column(db.String, nullable=True)
-    session_parameters = db.Column(db.String, nullable=True)
+    session_name = Column(String, nullable=False)
+    session_start_datetime = Column(TIMESTAMP(timezone=True), nullable=False)
+    session_duration = Column(Integer, nullable=False, default=0)
+    session_status = Column(Integer, nullable=False)
+    session_comments = Column(String, nullable=True)
+    session_parameters = Column(String, nullable=True)
 
-    session_participants = db.relationship("TeraParticipant", secondary="t_sessions_participants",
+    session_participants = relationship("TeraParticipant", secondary="t_sessions_participants",
                                            back_populates="participant_sessions")
-    session_users = db.relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions")
-    session_devices = db.relationship("TeraDevice", secondary="t_sessions_devices",
+    session_users = relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions")
+    session_devices = relationship("TeraDevice", secondary="t_sessions_devices",
                                       back_populates="device_sessions")
 
-    session_creator_user = db.relationship('TeraUser')
-    session_creator_device = db.relationship('TeraDevice')
-    session_creator_participant = db.relationship('TeraParticipant')
-    session_creator_service = db.relationship('TeraService')
+    session_creator_user = relationship('TeraUser')
+    session_creator_device = relationship('TeraDevice')
+    session_creator_participant = relationship('TeraParticipant')
+    session_creator_service = relationship('TeraService')
 
-    session_session_type = db.relationship('TeraSessionType', back_populates='session_type_sessions', lazy='joined')
-    session_events = db.relationship('TeraSessionEvent', cascade="delete", back_populates='session_event_session')
-    session_assets = db.relationship('TeraAsset', cascade='delete', back_populates='asset_session')
-    session_tests = db.relationship('TeraTest', cascade='delete', back_populates='test_session')
+    session_session_type = relationship('TeraSessionType', back_populates='session_type_sessions', lazy='joined')
+    session_events = relationship('TeraSessionEvent', cascade="delete", back_populates='session_event_session')
+    session_assets = relationship('TeraAsset', cascade='delete', back_populates='asset_session')
+    session_tests = relationship('TeraTest', cascade='delete', back_populates='test_session')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -167,7 +169,7 @@ class TeraSession(db.Model, BaseModel):
                 if i == 3:
                     base_session.session_devices = [session_device]
                 base_session.session_uuid = str(uuid.uuid4())
-                db.session.add(base_session)
+                TeraSession.db().session.add(base_session)
 
             # Create device sessions
             for i in range(8):
@@ -187,7 +189,7 @@ class TeraSession(db.Model, BaseModel):
                     base_session.session_participants = [session_part, session_part2]
                 base_session.session_devices = [base_session.session_creator_device]
                 base_session.session_uuid = str(uuid.uuid4())
-                db.session.add(base_session)
+                TeraSession.db().session.add(base_session)
 
             # Create participant sessions
             for i in range(8):
@@ -203,7 +205,7 @@ class TeraSession(db.Model, BaseModel):
                 base_session.session_status = ses_status
                 base_session.session_participants = [base_session.session_creator_participant]
                 base_session.session_uuid = str(uuid.uuid4())
-                db.session.add(base_session)
+                TeraSession.db().session.add(base_session)
 
             # Create service sessions
             for i in range(4):
@@ -223,9 +225,9 @@ class TeraSession(db.Model, BaseModel):
                     base_session.session_participants = [session_part, session_part2]
                     base_session.session_users = [session_user3]
                 base_session.session_uuid = str(uuid.uuid4())
-                db.session.add(base_session)
+                TeraSession.db().session.add(base_session)
 
-            db.session.commit()
+            TeraSession.db().session.commit()
 
     @staticmethod
     def get_session_by_id(ses_id: int):
@@ -249,9 +251,9 @@ class TeraSession(db.Model, BaseModel):
         if status is not None:
             query = query.filter(TeraSession.session_status == status)
         if start_date:
-            query = query.filter(db.func.date(TeraSession.session_start_datetime) >= start_date)
+            query = query.filter(TeraSession.db().func.date(TeraSession.session_start_datetime) >= start_date)
         if end_date:
-            query = query.filter(db.func.date(TeraSession.session_start_datetime) <= end_date)
+            query = query.filter(TeraSession.db().func.date(TeraSession.session_start_datetime) <= end_date)
         if limit:
             query = query.limit(limit)
         if offset:
@@ -368,7 +370,7 @@ class TeraSession(db.Model, BaseModel):
                                  TeraSession.session_start_datetime <= datetime.now()).\
             update({'session_status': TeraSessionStatus.STATUS_CANCELLED.value})
 
-        db.session.commit()
+        TeraSession.db().session.commit()
 
     @staticmethod
     def terminate_past_inprogress_sessions():
@@ -377,7 +379,7 @@ class TeraSession(db.Model, BaseModel):
                                  TeraSession.session_start_datetime <= datetime.now()). \
             update({'session_status': TeraSessionStatus.STATUS_TERMINATED.value})
 
-        db.session.commit()
+        TeraSession.db().session.commit()
 
     # THIS SHOULD NOT BE USED ANYMORE, AS DELETES CAN'T OCCUR IF THERE'S STILL ASSOCIATED SESSIONS
     # @staticmethod

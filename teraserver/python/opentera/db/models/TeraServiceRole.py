@@ -1,20 +1,22 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraServiceRole(db.Model, BaseModel):
+class TeraServiceRole(BaseModel):
     __tablename__ = 't_services_roles'
-    id_service_role = db.Column(db.Integer, db.Sequence('id_service_role_sequence'), primary_key=True,
+    id_service_role = Column(Integer, Sequence('id_service_role_sequence'), primary_key=True,
                                 autoincrement=True)
-    id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
+    id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
     # Specific project role for a project, used mostly with OpenTera service for project access
-    id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=True)
+    id_project = Column(Integer, ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=True)
     # Specific site role for a site, used mostly with OpenTera service for site access
-    id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=True)
-    service_role_name = db.Column(db.String(100), nullable=False)
+    id_site = Column(Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=True)
+    service_role_name = Column(String(100), nullable=False)
 
-    service_role_service = db.relationship("TeraService", viewonly=True)
-    service_role_project = db.relationship('TeraProject', viewonly=True)
-    service_role_site = db.relationship('TeraSite', viewonly=True)
+    service_role_service = relationship("TeraService", viewonly=True)
+    service_role_project = relationship('TeraProject', viewonly=True)
+    service_role_site = relationship('TeraSite', viewonly=True)
 
     def __init__(self):
         pass
@@ -83,13 +85,13 @@ class TeraServiceRole(db.Model, BaseModel):
                 new_role = TeraServiceRole()
                 new_role.id_service = service.id_service
                 new_role.service_role_name = 'admin'
-                db.session.add(new_role)
+                TeraServiceRole.db().session.add(new_role)
 
                 new_role = TeraServiceRole()
                 new_role.id_service = service.id_service
                 new_role.service_role_name = 'user'
-                db.session.add(new_role)
+                TeraServiceRole.db().session.add(new_role)
             else:
                 pass  # TODO: do what we did in Project and Site Access
 
-        db.session.commit()
+        TeraServiceRole.db().session.commit()

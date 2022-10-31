@@ -1,15 +1,17 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraDeviceProject(db.Model, BaseModel):
+class TeraDeviceProject(BaseModel):
     __tablename__ = 't_devices_projects'
-    id_device_project = db.Column(db.Integer, db.Sequence('id_device_project_sequence'), primary_key=True,
+    id_device_project = Column(Integer, Sequence('id_device_project_sequence'), primary_key=True,
                                   autoincrement=True)
-    id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
-    id_project = db.Column(db.Integer, db.ForeignKey("t_projects.id_project", ondelete='cascade'), nullable=False)
+    id_device = Column(Integer, ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
+    id_project = Column(Integer, ForeignKey("t_projects.id_project", ondelete='cascade'), nullable=False)
 
-    device_project_project = db.relationship("TeraProject", viewonly=True)
-    device_project_device = db.relationship("TeraDevice", viewonly=True)
+    device_project_project = relationship("TeraProject", viewonly=True)
+    device_project_device = relationship("TeraDevice", viewonly=True)
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['device_project_project', 'device_project_device'])
@@ -36,19 +38,19 @@ class TeraDeviceProject(db.Model, BaseModel):
             dev_proj = TeraDeviceProject()
             dev_proj.id_device = device1.id_device
             dev_proj.id_project = project1.id_project
-            db.session.add(dev_proj)
+            TeraDeviceProject.db().session.add(dev_proj)
 
             dev_proj = TeraDeviceProject()
             dev_proj.id_device = device2.id_device
             dev_proj.id_project = project1.id_project
-            db.session.add(dev_proj)
+            TeraDeviceProject.db().session.add(dev_proj)
 
             dev_proj = TeraDeviceProject()
             dev_proj.id_device = device1.id_device
             dev_proj.id_project = project3.id_project
-            db.session.add(dev_proj)
+            TeraDeviceProject.db().session.add(dev_proj)
 
-            db.session.commit()
+            TeraDeviceProject.db().session.commit()
 
     @staticmethod
     def get_device_project_by_id(device_project_id: int):

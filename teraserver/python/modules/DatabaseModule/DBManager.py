@@ -1,12 +1,10 @@
-from flask_sqlalchemy import event
+from flask_sqlalchemy import event, SQLAlchemy
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.reflection import Inspector
 from sqlite3 import Connection as SQLite3Connection
 
 from twisted.internet import task, reactor
 import datetime
-
-from opentera.db.Base import db
 import opentera.messages.python as messages
 
 # Must include all Database objects here to be properly initialized and created if needed
@@ -44,6 +42,7 @@ from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
 from opentera.db.models.TeraTest import TeraTest
+from opentera.db.Base import BaseModel
 
 from opentera.config.ConfigManager import ConfigManager
 from modules.FlaskModule.FlaskModule import flask_app
@@ -73,10 +72,16 @@ class DBManager (BaseModule):
 
         BaseModule.__init__(self, ModuleNames.DATABASE_MODULE_NAME.value, config)
 
+        self.db = SQLAlchemy()
+
         self.db_uri = None
 
         # Database cleanup task set to run at next midnight
         self.cleanup_database_task = self.start_cleanup_task()
+
+    @staticmethod
+    def app_context():
+        return flask_app.app_context()
 
     def start_cleanup_task(self) -> task:
         # Compute time till next midnight
@@ -109,7 +114,7 @@ class DBManager (BaseModule):
                 # Specific topic for each class
                 self.publish(event_message.header.topic, event_message.SerializeToString())
 
-        # Send the event before we delete so we can trace it...
+        # Send the event before we delete, so we can trace it...
         @event.listens_for(cls, 'after_delete')
         def base_model_deleted(mapper, connection, target):
             # print(mapper, connection, target, event_name)
@@ -281,17 +286,17 @@ class DBManager (BaseModule):
         })
 
         # Create db engine
-        db.init_app(flask_app)
-        db.app = flask_app
+        self.db.init_app(flask_app)
+        self.db.app = flask_app
+        BaseModel.set_db(self.db)
 
         # Init tables
-        # db.drop_all()
-        inspector = Inspector.from_engine(db.engine)
+        inspector = Inspector.from_engine(self.db.engine)
         tables = inspector.get_table_names()
         # tables = db.engine.table_names()
         if not tables:
             # Create all tables
-            db.create_all()
+            BaseModel.create_all()
             # New database - stamp with current revision version
             self.stamp_db()
         else:
@@ -318,16 +323,17 @@ class DBManager (BaseModule):
         })
 
         # Create db engine
-        db.init_app(flask_app)
-        db.app = flask_app
+        self.db.init_app(flask_app)
+        self.db.app = flask_app
+        BaseModel.set_db(self.db)
 
         # Init tables
-        inspector = Inspector.from_engine(db.engine)
+        inspector = Inspector.from_engine(self.db.engine)
         tables = inspector.get_table_names()
-        # tables = db.engine.table_names()
+
         if not tables:
             # Create all tables
-            db.create_all()
+            BaseModel.create_all()
             # New database - stamp with current revision version
             self.stamp_db()
         else:
@@ -484,3 +490,17 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
 #     # Publish
 #     db_man.publish(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
 #                    tera_message.SerializeToString())
+
+
+if __name__ == '__main__':
+    with flask_app.app_context():
+        config = ConfigManager()
+        config.create_defaults()
+        manager = DBManager(config)
+        print(manager)
+        manager.open_local(dict(), echo=True, ram=True)
+        user = TeraUser()
+        user.query.all()
+        test = TeraUser.query.all()
+        manager.create_defaults(config, test=True)
+

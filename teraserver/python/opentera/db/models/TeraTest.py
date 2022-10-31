@@ -1,4 +1,6 @@
-from opentera.db.Base import db, BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
+from opentera.db.Base import BaseModel
 from enum import Enum
 import uuid
 import json
@@ -10,31 +12,31 @@ class TeraTestStatus(Enum):
     TEST_COMPLETED = 2
 
 
-class TeraTest(db.Model, BaseModel):
+class TeraTest(BaseModel):
     __tablename__ = 't_tests'
-    id_test = db.Column(db.Integer, db.Sequence('id_test_sequence'), primary_key=True, autoincrement=True)
-    id_test_type = db.Column(db.Integer, db.ForeignKey('t_tests_types.id_test_type'), nullable=False)
-    id_session = db.Column(db.Integer, db.ForeignKey('t_sessions.id_session', ondelete='cascade'), nullable=False)
+    id_test = Column(Integer, Sequence('id_test_sequence'), primary_key=True, autoincrement=True)
+    id_test_type = Column(Integer, ForeignKey('t_tests_types.id_test_type'), nullable=False)
+    id_session = Column(Integer, ForeignKey('t_sessions.id_session', ondelete='cascade'), nullable=False)
 
     # Item to which that test is associated. At least one of it should be selected, but multiple can also be specified
     # Of course, that item needs to be in the associated session for data integrity
-    id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device"), nullable=True)
-    id_participant = db.Column(db.Integer, db.ForeignKey("t_participants.id_participant"), nullable=True)
-    id_user = db.Column(db.Integer, db.ForeignKey("t_users.id_user"), nullable=True)
-    id_service = db.Column(db.Integer, db.ForeignKey("t_services.id_service"), nullable=True)
+    id_device = Column(Integer, ForeignKey("t_devices.id_device"), nullable=True)
+    id_participant = Column(Integer, ForeignKey("t_participants.id_participant"), nullable=True)
+    id_user = Column(Integer, ForeignKey("t_users.id_user"), nullable=True)
+    id_service = Column(Integer, ForeignKey("t_services.id_service"), nullable=True)
 
-    test_uuid = db.Column(db.String(36), nullable=False, unique=True)
-    test_name = db.Column(db.String, nullable=False)
-    test_datetime = db.Column(db.TIMESTAMP(timezone=True), nullable=False)
-    test_status = db.Column(db.Integer, nullable=False, default=0)
-    test_summary = db.Column(db.String, nullable=True)  # This contains a json formatted summary for results display
+    test_uuid = Column(String(36), nullable=False, unique=True)
+    test_name = Column(String, nullable=False)
+    test_datetime = Column(TIMESTAMP(timezone=True), nullable=False)
+    test_status = Column(Integer, nullable=False, default=0)
+    test_summary = Column(String, nullable=True)  # This contains a json formatted summary for results display
 
-    test_session = db.relationship("TeraSession", back_populates='session_tests')
-    test_device = db.relationship("TeraDevice")
-    test_user = db.relationship("TeraUser")
-    test_participant = db.relationship("TeraParticipant")
-    test_service = db.relationship("TeraService")
-    test_test_type = db.relationship('TeraTestType')
+    test_session = relationship("TeraSession", back_populates='session_tests')
+    test_device = relationship("TeraDevice")
+    test_user = relationship("TeraUser")
+    test_participant = relationship("TeraParticipant")
+    test_service = relationship("TeraService")
+    test_test_type = relationship('TeraTestType')
 
     def from_json(self, json_data, ignore_fields=None):
         if ignore_fields is None:
@@ -112,9 +114,9 @@ class TeraTest(db.Model, BaseModel):
                     new_test.test_datetime = session3.session_start_datetime
                     new_test.id_test_type = pretesttype.id_test_type
                     new_test.id_participant = TeraParticipant.get_participant_by_name('Participant #1').id_participant
-                db.session.add(new_test)
+                TeraTest.db().session.add(new_test)
 
-            db.session.commit()
+            TeraTest.db().session.commit()
 
     @staticmethod
     def get_test_by_id(test_id: int):

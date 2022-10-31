@@ -1,6 +1,6 @@
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
-from opentera.db.Base import db
+
 
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 
@@ -9,28 +9,28 @@ class TeraServerSettingsTest(BaseModelsTest):
 
     def test_nullable_args(self):
         new_settings = TeraServerSettings()
-        db.session.add(new_settings)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(new_settings)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
         new_settings.server_settings_name = 'test_nullable_args'
-        db.session.add(new_settings)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(new_settings)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
         new_settings.server_settings_name = None
         new_settings.server_settings_value = 'Key'
-        db.session.add(new_settings)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(new_settings)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
 
     def test_unique_args(self):
         new_settings = TeraServerSettings()
         same_settings = TeraServerSettings()
         new_settings.server_settings_name = 'test_unique_args'
         same_settings.server_settings_name = 'test_unique_args'
-        db.session.add(new_settings)
-        db.session.add(same_settings)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(new_settings)
+        self.db.session.add(same_settings)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
 
     def test_constants_check(self):
         for settings in TeraServerSettings.query.all():

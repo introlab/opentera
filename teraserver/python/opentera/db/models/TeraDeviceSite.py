@@ -1,14 +1,16 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraDeviceSite(db.Model, BaseModel):
+class TeraDeviceSite(BaseModel):
     __tablename__ = 't_devices_sites'
-    id_device_site = db.Column(db.Integer, db.Sequence('id_device_site_sequence'), primary_key=True, autoincrement=True)
-    id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
-    id_site = db.Column(db.Integer, db.ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=False)
+    id_device_site = Column(Integer, Sequence('id_device_site_sequence'), primary_key=True, autoincrement=True)
+    id_device = Column(Integer, ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
+    id_site = Column(Integer, ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=False)
 
-    device_site_site = db.relationship("TeraSite", viewonly=True)
-    device_site_device = db.relationship("TeraDevice", viewonly=True)
+    device_site_site = relationship("TeraSite", viewonly=True)
+    device_site_device = relationship("TeraDevice", viewonly=True)
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['device_site_site', 'device_site_device'])
@@ -36,19 +38,19 @@ class TeraDeviceSite(db.Model, BaseModel):
             dev_site = TeraDeviceSite()
             dev_site.id_device = device1.id_device
             dev_site.id_site = default_site.id_site
-            db.session.add(dev_site)
+            TeraDeviceSite.db().session.add(dev_site)
 
             dev_site = TeraDeviceSite()
             dev_site.id_device = device2.id_device
             dev_site.id_site = default_site.id_site
-            db.session.add(dev_site)
+            TeraDeviceSite.db().session.add(dev_site)
 
             dev_site = TeraDeviceSite()
             dev_site.id_device = device1.id_device
             dev_site.id_site = secret_site.id_site
-            db.session.add(dev_site)
+            TeraDeviceSite.db().session.add(dev_site)
 
-            db.session.commit()
+            TeraDeviceSite.db().session.commit()
         else:
             # Automatically associate devices that are in a project to that site
             from opentera.db.models.TeraDeviceProject import TeraDeviceProject
@@ -61,8 +63,8 @@ class TeraDeviceSite(db.Model, BaseModel):
                     device_site = TeraDeviceSite()
                     device_site.id_site = project_site_id
                     device_site.id_device = dp.device_project_device.id_device
-                    db.session.add(device_site)
-                    db.session.commit()
+                    TeraDeviceSite.db().session.add(device_site)
+                    TeraDeviceSite.db().session.commit()
 
     @staticmethod
     def get_device_site_by_id(device_site_id: int):

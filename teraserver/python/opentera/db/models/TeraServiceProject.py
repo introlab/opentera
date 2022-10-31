@@ -1,16 +1,18 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
 
-class TeraServiceProject(db.Model, BaseModel):
+class TeraServiceProject(BaseModel):
     __tablename__ = 't_services_projects'
-    id_service_project = db.Column(db.Integer, db.Sequence('id_service_project_sequence'), primary_key=True,
+    id_service_project = Column(Integer, Sequence('id_service_project_sequence'), primary_key=True,
                                    autoincrement=True)
-    id_service = db.Column(db.Integer, db.ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
-    id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
+    id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
+    id_project = Column(Integer, ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
 
-    service_project_service = db.relationship("TeraService", viewonly=True)
-    service_project_project = db.relationship("TeraProject", viewonly=True)
+    service_project_service = relationship("TeraService", viewonly=True)
+    service_project_project = relationship("TeraProject", viewonly=True)
 
     def __init__(self):
         pass
@@ -57,24 +59,24 @@ class TeraServiceProject(db.Model, BaseModel):
             service_project = TeraServiceProject()
             service_project.id_project = project1.id_project
             service_project.id_service = servicefile.id_service
-            db.session.add(service_project)
+            TeraServiceProject.db().session.add(service_project)
 
             service_project = TeraServiceProject()
             service_project.id_project = project1.id_project
             service_project.id_service = servicevideorehab.id_service
-            db.session.add(service_project)
+            TeraServiceProject.db().session.add(service_project)
 
             service_project = TeraServiceProject()
             service_project.id_project = project2.id_project
             service_project.id_service = servicefile.id_service
-            db.session.add(service_project)
+            TeraServiceProject.db().session.add(service_project)
 
             service_project = TeraServiceProject()
             service_project.id_project = 3
             service_project.id_service = servicefile.id_service
-            db.session.add(service_project)
+            TeraServiceProject.db().session.add(service_project)
 
-            db.session.commit()
+            TeraServiceProject.db().session.commit()
 
     @classmethod
     def insert(cls, stp):

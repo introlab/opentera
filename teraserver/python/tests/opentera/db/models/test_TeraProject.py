@@ -1,6 +1,6 @@
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
-from opentera.db.Base import db
+
 
 from opentera.db.models.TeraProject import TeraProject
 
@@ -11,14 +11,14 @@ class TeraProjectTest(BaseModelsTest):
         new_project = TeraProject()
         new_project.id_site = 1
         new_project.project_name = None
-        db.session.add(new_project)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
-        db.session.rollback()
+        self.db.session.add(new_project)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
+        self.db.session.rollback()
         new_project = TeraProject()
         new_project.id_site = None
         new_project.project_name = 'test_nullable_args'
-        db.session.add(new_project)
-        self.assertRaises(exc.IntegrityError, db.session.commit)
+        self.db.session.add(new_project)
+        self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_unique_args(self):
         pass
@@ -27,8 +27,8 @@ class TeraProjectTest(BaseModelsTest):
         new_project = TeraProject()
         new_project.id_site = 1
         new_project.project_name = 'test_to_json'
-        db.session.add(new_project)
-        db.session.commit()
+        self.db.session.add(new_project)
+        self.db.session.commit()
         new_project_json = new_project.to_json()
         new_project_json_minimal = new_project.to_json(minimal=True)
         self._check_json(new_project, project_test=new_project_json)
@@ -45,8 +45,8 @@ class TeraProjectTest(BaseModelsTest):
         new_project = TeraProject()
         new_project.id_site = 1
         new_project.project_name = 'test_to_json_create_event'
-        db.session.add(new_project)
-        db.session.commit()
+        self.db.session.add(new_project)
+        self.db.session.commit()
         new_project_json = new_project.to_json_create_event()
         self._check_json(new_project, project_test=new_project_json, minimal=True)
 
@@ -54,8 +54,8 @@ class TeraProjectTest(BaseModelsTest):
         new_project = TeraProject()
         new_project.id_site = 1
         new_project.project_name = 'test_to_json_update_event'
-        db.session.add(new_project)
-        db.session.commit()
+        self.db.session.add(new_project)
+        self.db.session.commit()
         new_project_json = new_project.to_json_update_event()
         self._check_json(new_project, project_test=new_project_json, minimal=True)
 
@@ -63,8 +63,8 @@ class TeraProjectTest(BaseModelsTest):
         new_project = TeraProject()
         new_project.id_site = 1
         new_project.project_name = 'test_to_json_delete_event'
-        db.session.add(new_project)
-        db.session.commit()
+        self.db.session.add(new_project)
+        self.db.session.commit()
         new_project_json = new_project.to_json_delete_event()
         self.assertGreaterEqual(new_project_json['id_project'], 1)
 
@@ -72,8 +72,8 @@ class TeraProjectTest(BaseModelsTest):
         new_project = TeraProject()
         new_project.id_site = 1
         new_project.project_name = 'test_get_users_ids_in_project'
-        db.session.add(new_project)
-        db.session.commit()
+        self.db.session.add(new_project)
+        self.db.session.commit()
         users_ids = new_project.get_users_ids_in_project()
         self.assertIsNotNone(users_ids)
 
@@ -81,8 +81,8 @@ class TeraProjectTest(BaseModelsTest):
         new_project = TeraProject()
         new_project.id_site = 1
         new_project.project_name = 'test_get_users_ids_in_project'
-        db.session.add(new_project)
-        db.session.commit()
+        self.db.session.add(new_project)
+        self.db.session.commit()
         users = new_project.get_users_in_project()
         self.assertIsNotNone(users)
 
@@ -90,8 +90,8 @@ class TeraProjectTest(BaseModelsTest):
         new_project = TeraProject()
         new_project.id_site = 1
         new_project.project_name = 'test_get_project_by_projectname'
-        db.session.add(new_project)
-        db.session.commit()
+        self.db.session.add(new_project)
+        self.db.session.commit()
         same_project = new_project.get_project_by_projectname(projectname=new_project.project_name)
         self.assertEqual(same_project, new_project)
 
@@ -99,8 +99,8 @@ class TeraProjectTest(BaseModelsTest):
         new_project = TeraProject()
         new_project.id_site = 1
         new_project.project_name = 'test_get_project_by_id'
-        db.session.add(new_project)
-        db.session.commit()
+        self.db.session.add(new_project)
+        self.db.session.commit()
         same_project = new_project.get_project_by_id(project_id=new_project.id_project)
         self.assertEqual(same_project, new_project)
 

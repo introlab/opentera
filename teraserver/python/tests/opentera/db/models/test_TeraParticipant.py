@@ -1,6 +1,5 @@
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
-from opentera.db.Base import db
 import uuid
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
@@ -22,10 +21,10 @@ class TeraParticipantTest(BaseModelsTest):
         token = participant.create_token()
 
         self.assertNotEqual(token, "")
-        db.session.add(participantGroup)
-        db.session.add(participant)
+        self.db.session.add(participantGroup)
+        self.db.session.add(participant)
 
-        db.session.commit()
+        self.db.session.commit()
 
         # Load participant from invalid token
         loadedParticipant = TeraParticipant.get_participant_by_token('rien')

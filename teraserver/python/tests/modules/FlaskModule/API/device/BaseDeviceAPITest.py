@@ -1,5 +1,5 @@
 import unittest
-from opentera.db.Base import db
+from opentera.db.Base import BaseModel
 from opentera.db.models.TeraDevice import TeraDevice
 from modules.DatabaseModule.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule
@@ -52,6 +52,7 @@ class BaseDeviceAPITest(unittest.TestCase):
         cls._db_man: DBManager = DBManager(cls._config)
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)
+        BaseModel.set_db(cls._db_man.db)
 
         # Creating default users / tests. Time-consuming, only once per test file.
         cls._db_man.create_defaults(cls._config, test=True)
@@ -65,9 +66,9 @@ class BaseDeviceAPITest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls._config = None
+        cls._db_man.db.session.remove()
         cls._db_man = None
         LoginModule.redis_client = None
-        db.session.remove()
 
     @classmethod
     def getConfig(cls) -> ConfigManager:

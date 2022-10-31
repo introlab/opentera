@@ -1,23 +1,25 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 
 
-class TeraServiceAccess(db.Model, BaseModel):
+class TeraServiceAccess(BaseModel):
     __tablename__ = 't_services_access'
-    id_service_access = db.Column(db.Integer, db.Sequence('id_service_project_role_sequence'), primary_key=True,
+    id_service_access = Column(Integer, Sequence('id_service_project_role_sequence'), primary_key=True,
                                   autoincrement=True)
-    id_user_group = db.Column(db.Integer, db.ForeignKey('t_users_groups.id_user_group', ondelete='cascade'),
+    id_user_group = Column(Integer, ForeignKey('t_users_groups.id_user_group', ondelete='cascade'),
                               nullable=True)
-    id_device = db.Column(db.Integer, db.ForeignKey('t_devices.id_device', ondelete='cascade'), nullable=True)
-    id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group',
+    id_device = Column(Integer, ForeignKey('t_devices.id_device', ondelete='cascade'), nullable=True)
+    id_participant_group = Column(Integer, ForeignKey('t_participants_groups.id_participant_group',
                                                                ondelete='cascade'), nullable=True)
-    id_service_role = db.Column(db.Integer, db.ForeignKey('t_services_roles.id_service_role', ondelete='cascade'),
+    id_service_role = Column(Integer, ForeignKey('t_services_roles.id_service_role', ondelete='cascade'),
                                 nullable=False)
 
-    service_access_role = db.relationship("TeraServiceRole")
-    service_access_user_group = db.relationship("TeraUserGroup", back_populates='user_group_services_access')
-    service_access_device = db.relationship("TeraDevice")
-    service_access_participant_group = db.relationship("TeraParticipantGroup")
+    service_access_role = relationship("TeraServiceRole")
+    service_access_user_group = relationship("TeraUserGroup", back_populates='user_group_services_access')
+    service_access_device = relationship("TeraDevice")
+    service_access_participant_group = relationship("TeraParticipantGroup")
 
     def __init__(self):
         pass
@@ -97,7 +99,7 @@ class TeraServiceAccess(db.Model, BaseModel):
             # Update it
             access.id_service_role = id_service_role
 
-            db.session.commit()
+            TeraServiceAccess.db().session.commit()
         return access
 
     @staticmethod
@@ -118,7 +120,7 @@ class TeraServiceAccess(db.Model, BaseModel):
             # Update it
             access.id_service_role = id_service_role
 
-            db.session.commit()
+            TeraServiceAccess.db().session.commit()
         return access
 
     @staticmethod
@@ -191,21 +193,21 @@ class TeraServiceAccess(db.Model, BaseModel):
             service_role = TeraServiceAccess()
             service_role.id_user_group = user_group1.id_user_group
             service_role.id_service_role = service_bureau_admin.id_service_role
-            db.session.add(service_role)
+            TeraServiceAccess.db().session.add(service_role)
 
             service_role = TeraServiceAccess()
             service_role.id_user_group = user_group2.id_user_group
             service_role.id_service_role = service_logging_admin.id_service_role
-            db.session.add(service_role)
+            TeraServiceAccess.db().session.add(service_role)
 
             service_role = TeraServiceAccess()
             service_role.id_device = device.id_device
             service_role.id_service_role = service_bureau_user.id_service_role
-            db.session.add(service_role)
+            TeraServiceAccess.db().session.add(service_role)
 
             service_role = TeraServiceAccess()
             service_role.id_participant_group = group.id_participant_group
             service_role.id_service_role = service_logging_user.id_service_role
-            db.session.add(service_role)
+            TeraServiceAccess.db().session.add(service_role)
 
-            db.session.commit()
+            TeraServiceAccess.db().session.commit()

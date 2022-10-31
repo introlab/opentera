@@ -1,18 +1,20 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
 
-class TeraSessionTypeProject(db.Model, BaseModel):
+class TeraSessionTypeProject(BaseModel):
     __tablename__ = 't_sessions_types_projects'
-    id_session_type_project = db.Column(db.Integer, db.Sequence('id_session_type_project_sequence'), primary_key=True,
+    id_session_type_project = Column(Integer, Sequence('id_session_type_project_sequence'), primary_key=True,
                                         autoincrement=True)
-    id_session_type = db.Column('id_session_type', db.Integer, db.ForeignKey('t_sessions_types.id_session_type',
+    id_session_type = Column('id_session_type', Integer, ForeignKey('t_sessions_types.id_session_type',
                                                                              ondelete='cascade'), nullable=False)
-    id_project = db.Column('id_project', db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'),
+    id_project = Column('id_project', Integer, ForeignKey('t_projects.id_project', ondelete='cascade'),
                            nullable=False)
 
-    session_type_project_session_type = db.relationship("TeraSessionType", viewonly=True)
-    session_type_project_project = db.relationship("TeraProject", viewonly=True)
+    session_type_project_session_type = relationship("TeraSessionType", viewonly=True)
+    session_type_project_project = relationship("TeraProject", viewonly=True)
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['session_type_project_session_type', 'session_type_project_project'])
@@ -41,29 +43,29 @@ class TeraSessionTypeProject(db.Model, BaseModel):
             stp = TeraSessionTypeProject()
             stp.id_session_type = video_session.id_session_type
             stp.id_project = project.id_project
-            db.session.add(stp)
+            TeraSessionTypeProject.db().session.add(stp)
 
             stp = TeraSessionTypeProject()
             stp.id_session_type = sensor_session.id_session_type
             stp.id_project = project.id_project
-            db.session.add(stp)
+            TeraSessionTypeProject.db().session.add(stp)
 
             stp = TeraSessionTypeProject()
             stp.id_session_type = data_session.id_session_type
             stp.id_project = project.id_project
-            db.session.add(stp)
+            TeraSessionTypeProject.db().session.add(stp)
 
             stp = TeraSessionTypeProject()
             stp.id_session_type = exerc_session.id_session_type
             stp.id_project = project.id_project
-            db.session.add(stp)
+            TeraSessionTypeProject.db().session.add(stp)
 
             stp = TeraSessionTypeProject()
             stp.id_session_type = bureau_session.id_session_type
             stp.id_project = project.id_project
-            db.session.add(stp)
+            TeraSessionTypeProject.db().session.add(stp)
 
-            db.session.commit()
+            TeraSessionTypeProject.db().session.commit()
 
     @staticmethod
     def get_session_type_project_by_id(stp_id: int):

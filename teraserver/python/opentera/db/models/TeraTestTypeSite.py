@@ -1,16 +1,18 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraTestTypeSite(db.Model, BaseModel):
+class TeraTestTypeSite(BaseModel):
     __tablename__ = 't_tests_types_sites'
-    id_test_type_site = db.Column(db.Integer, db.Sequence('id_test_type_site_sequence'), primary_key=True,
+    id_test_type_site = Column(Integer, Sequence('id_test_type_site_sequence'), primary_key=True,
                                   autoincrement=True)
-    id_test_type = db.Column('id_test_type', db.Integer, db.ForeignKey('t_tests_types.id_test_type',
+    id_test_type = Column('id_test_type', Integer, ForeignKey('t_tests_types.id_test_type',
                                                                        ondelete='cascade'), nullable=False)
-    id_site = db.Column('id_site', db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
+    id_site = Column('id_site', Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
 
-    test_type_site_test_type = db.relationship("TeraTestType", viewonly=True)
-    test_type_site_site = db.relationship("TeraSite", viewonly=True)
+    test_type_site_test_type = relationship("TeraTestType", viewonly=True)
+    test_type_site_site = relationship("TeraSite", viewonly=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -40,24 +42,24 @@ class TeraTestTypeSite(db.Model, BaseModel):
             tts = TeraTestTypeSite()
             tts.id_test_type = pre_test.id_test_type
             tts.id_site = default_site.id_site
-            db.session.add(tts)
+            TeraTestTypeSite.db().session.add(tts)
 
             tts = TeraTestTypeSite()
             tts.id_test_type = post_test.id_test_type
             tts.id_site = default_site.id_site
-            db.session.add(tts)
+            TeraTestTypeSite.db().session.add(tts)
 
             tts = TeraTestTypeSite()
             tts.id_test_type = pre_test.id_test_type
             tts.id_site = secret_site.id_site
-            db.session.add(tts)
+            TeraTestTypeSite.db().session.add(tts)
 
             tts = TeraTestTypeSite()
             tts.id_test_type = general_test.id_test_type
             tts.id_site = secret_site.id_site
-            db.session.add(tts)
+            TeraTestTypeSite.db().session.add(tts)
 
-            db.session.commit()
+            TeraTestTypeSite.db().session.commit()
 
     @staticmethod
     def get_test_type_site_by_id(tts_id: int):

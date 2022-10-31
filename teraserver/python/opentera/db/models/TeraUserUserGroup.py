@@ -1,16 +1,18 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraUserUserGroup(db.Model, BaseModel):
+class TeraUserUserGroup(BaseModel):
     __tablename__ = 't_users_users_groups'
-    id_user_user_group = db.Column(db.Integer, db.Sequence('id_user_user_group_sequence'), primary_key=True,
+    id_user_user_group = Column(Integer, Sequence('id_user_user_group_sequence'), primary_key=True,
                                    autoincrement=True)
-    id_user = db.Column(db.Integer, db.ForeignKey("t_users.id_user", ondelete='cascade'), nullable=False)
-    id_user_group = db.Column(db.Integer, db.ForeignKey("t_users_groups.id_user_group"),
+    id_user = Column(Integer, ForeignKey("t_users.id_user", ondelete='cascade'), nullable=False)
+    id_user_group = Column(Integer, ForeignKey("t_users_groups.id_user_group"),
                               nullable=False)
 
-    user_user_group_user = db.relationship("TeraUser", viewonly=True)
-    user_user_group_user_group = db.relationship("TeraUserGroup", viewonly=True)  # Fun variable name!
+    user_user_group_user = relationship("TeraUser", viewonly=True)
+    user_user_group_user_group = relationship("TeraUserGroup", viewonly=True)  # Fun variable name!
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['user_user_group_user', 'user_user_group_user_group'])
@@ -39,29 +41,29 @@ class TeraUserUserGroup(db.Model, BaseModel):
             user_ug = TeraUserUserGroup()
             user_ug.id_user = user1.id_user
             user_ug.id_user_group = group3.id_user_group
-            db.session.add(user_ug)
+            TeraUserUserGroup.db().session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
             user_ug.id_user = user2.id_user
             user_ug.id_user_group = group1.id_user_group
-            db.session.add(user_ug)
+            TeraUserUserGroup.db().session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
             user_ug.id_user = user3.id_user
             user_ug.id_user_group = group4.id_user_group
-            db.session.add(user_ug)
+            TeraUserUserGroup.db().session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
             user_ug.id_user = user3.id_user
             user_ug.id_user_group = group3.id_user_group
-            db.session.add(user_ug)
+            TeraUserUserGroup.db().session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
             user_ug.id_user = user4.id_user
             user_ug.id_user_group = group2.id_user_group
-            db.session.add(user_ug)
+            TeraUserUserGroup.db().session.add(user_ug)
 
-            db.session.commit()
+            TeraUserUserGroup.db().session.commit()
 
     @staticmethod
     def get_user_user_group_by_id(user_user_group_id: int):
@@ -85,7 +87,7 @@ class TeraUserUserGroup(db.Model, BaseModel):
         new_uug.id_user_group = id_user_group
         new_uug.id_user = id_user
 
-        db.session.add(new_uug)
-        db.session.commit()
+        TeraUserUserGroup.db().session.add(new_uug)
+        TeraUserUserGroup.db().session.commit()
 
         return new_uug

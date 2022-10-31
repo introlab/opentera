@@ -1,14 +1,16 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraUserGroup(db.Model, BaseModel):
+class TeraUserGroup(BaseModel):
     __tablename__ = 't_users_groups'
-    id_user_group = db.Column(db.Integer, db.Sequence('id_usergroup_sequence'), primary_key=True, autoincrement=True)
-    user_group_name = db.Column(db.String, nullable=False, unique=False)
+    id_user_group = Column(Integer, Sequence('id_usergroup_sequence'), primary_key=True, autoincrement=True)
+    user_group_name = Column(String, nullable=False, unique=False)
 
-    user_group_services_access = db.relationship('TeraServiceAccess', cascade="all,delete",
+    user_group_services_access = relationship('TeraServiceAccess', cascade="all,delete",
                                                  back_populates='service_access_user_group')
-    user_group_users = db.relationship("TeraUser", secondary="t_users_users_groups", back_populates="user_user_groups",
+    user_group_users = relationship("TeraUser", secondary="t_users_users_groups", back_populates="user_user_groups",
                                        passive_deletes=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
@@ -88,25 +90,25 @@ class TeraUserGroup(db.Model, BaseModel):
 
             ugroup = TeraUserGroup()
             ugroup.user_group_name = "Users - Projects 1 & 2"
-            db.session.add(ugroup)
+            TeraUserGroup.db().session.add(ugroup)
 
             ugroup = TeraUserGroup()
             ugroup.user_group_name = "Admins - Project 1"
-            db.session.add(ugroup)
+            TeraUserGroup.db().session.add(ugroup)
 
             ugroup = TeraUserGroup()
             ugroup.user_group_name = "Admins - Default Site"
-            db.session.add(ugroup)
+            TeraUserGroup.db().session.add(ugroup)
 
             ugroup = TeraUserGroup()
             ugroup.user_group_name = "Users - Project 1"
-            db.session.add(ugroup)
+            TeraUserGroup.db().session.add(ugroup)
 
             ugroup = TeraUserGroup()
             ugroup.user_group_name = "No access!"
-            db.session.add(ugroup)
+            TeraUserGroup.db().session.add(ugroup)
 
-            db.session.commit()
+            TeraUserGroup.db().session.commit()
 
             id_user_group = TeraUserGroup.get_user_group_by_group_name('Users - Projects 1 & 2').id_user_group
             access = TeraServiceAccess()
@@ -115,7 +117,7 @@ class TeraUserGroup(db.Model, BaseModel):
             user_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
                                                                               project_id=id_project, rolename='user')
             access.id_service_role = user_role.id_service_role
-            db.session.add(access)
+            TeraUserGroup.db().session.add(access)
 
             access = TeraServiceAccess()
             access.id_user_group = id_user_group
@@ -123,7 +125,7 @@ class TeraUserGroup(db.Model, BaseModel):
             user_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
                                                                               project_id=id_project, rolename='user')
             access.id_service_role = user_role.id_service_role
-            db.session.add(access)
+            TeraUserGroup.db().session.add(access)
 
             admin_access = TeraServiceAccess()
             admin_role = TeraServiceRole.get_specific_service_role_for_site(service_id=opentera_service_id,
@@ -132,7 +134,7 @@ class TeraUserGroup(db.Model, BaseModel):
                                                                             rolename='admin')
             admin_access.id_service_role = admin_role.id_service_role
             admin_access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Admins - Default Site').id_user_group
-            db.session.add(admin_access)
+            TeraUserGroup.db().session.add(admin_access)
 
             access = TeraServiceAccess()
             access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Admins - Project 1').id_user_group
@@ -140,14 +142,14 @@ class TeraUserGroup(db.Model, BaseModel):
             admin_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
                                                                                project_id=id_project, rolename='admin')
             access.id_service_role = admin_role.id_service_role
-            db.session.add(access)
+            TeraUserGroup.db().session.add(access)
 
             access = TeraServiceAccess()
             access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Users - Project 1').id_user_group
             user_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
                                                                               project_id=id_project, rolename='user')
             access.id_service_role = user_role.id_service_role
-            db.session.add(access)
+            TeraUserGroup.db().session.add(access)
 
-            db.session.commit()
+            TeraUserGroup.db().session.commit()
 
