@@ -1,6 +1,6 @@
 # Using same base as TeraServer
-from services.LoggingService.libloggingservice.db.Base import db
-from flask_sqlalchemy import event
+from opentera.db.Base import BaseModel
+from flask_sqlalchemy import event, SQLAlchemy
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.reflection import Inspector
 from sqlite3 import Connection as SQLite3Connection
@@ -34,6 +34,7 @@ class DBManager:
 
     def __init__(self, test: bool = False):
         self.db_uri = None
+        self.db = SQLAlchemy()
         self.test = test
 
     def create_defaults(self, config: ConfigManager, test: bool = False):
@@ -44,8 +45,8 @@ class DBManager:
                 entry.sender = 'service.LoggingService'
                 entry.timestamp = datetime.datetime.now()
                 entry.message = 'Database initialized.'
-                db.session.add(entry)
-                db.session.commit()
+                self.db.session.add(entry)
+                self.db.session.commit()
 
             if test:
                 pass
@@ -60,18 +61,17 @@ class DBManager:
         })
 
         # Create db engine
-        db.init_app(flask_app)
-        db.app = flask_app
+        self.db.init_app(flask_app)
+        self.db.app = flask_app
+        BaseModel.set_db(self.db)
 
         # Init tables
-        db.create_all()
+        BaseModel.create_all()
 
-        inspector = Inspector.from_engine(db.engine)
+        inspector = Inspector.from_engine(self.db.engine)
         tables = inspector.get_table_names()
-        # tables = db.engine.table_names()
+
         if not tables:
-            # Create all tables
-            # db.create_all()
             # New database - stamp with current revision version
             self.stamp_db()
         else:
@@ -92,16 +92,15 @@ class DBManager:
         })
 
         # Create db engine
-        db.init_app(flask_app)
-        db.app = flask_app
-        db.create_all()
+        self.db.init_app(flask_app)
+        self.db.app = flask_app
+        BaseModel.set_db(self.db)
+        BaseModel.create_all()
 
-        inspector = Inspector.from_engine(db.engine)
+        inspector = Inspector.from_engine(self.db.engine)
         tables = inspector.get_table_names()
-        # tables = db.engine.table_names()
+
         if not tables:
-            # Create all tables
-            # db.create_all()
             # New database - stamp with current revision version
             self.stamp_db()
         else:
@@ -164,8 +163,8 @@ class DBManager:
             entry.sender = event.sender
             entry.timestamp = datetime.datetime.fromtimestamp(event.timestamp)
             entry.message = event.message
-            db.session.add(entry)
-            db.session.commit()
+            self.db.session.add(entry)
+            self.db.session.commit()
 
     def store_login_event(self, event: LoginEvent):
         with flask_app.app_context():
@@ -186,8 +185,8 @@ class DBManager:
             entry.login_os_name = event.os_name
             entry.login_os_version = event.os_version
             entry.login_message = event.log_header.message
-            db.session.add(entry)
-            db.session.commit()
+            self.db.session.add(entry)
+            self.db.session.commit()
 
 
 # Fix foreign_keys on sqlite
@@ -197,3 +196,13 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
+
+
+if __name__ == '__main__':
+    config = ConfigManager()
+    config.create_defaults()
+    manager = DBManager(config)
+    manager.open_local({}, echo=True, ram=True)
+    manager.create_defaults(config, test=True)
+    print('test')
+

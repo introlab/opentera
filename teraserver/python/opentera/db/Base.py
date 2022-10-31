@@ -8,8 +8,6 @@ from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger
 
-# db = SQLAlchemy()
-
 
 class _QueryProperty:
     def __get__(self, obj: Model | None, cls: t.Type[Model]) -> BaseQuery:
