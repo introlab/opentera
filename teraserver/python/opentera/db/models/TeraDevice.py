@@ -116,7 +116,7 @@ class TeraDevice(BaseModel):
 
     @staticmethod
     def get_device_by_token(token):
-        device = TeraDevice.query().filter_by(device_token=token).first()
+        device = TeraDevice.query.filter_by(device_token=token).first()
 
         if device:
             # Validate token, key loaded from DB
@@ -135,38 +135,38 @@ class TeraDevice(BaseModel):
 
     @staticmethod
     def get_device_by_certificate(certificate):
-        return TeraDevice.query().filter_by(device_certificate=certificate).first()
+        return TeraDevice.query.filter_by(device_certificate=certificate).first()
 
     @staticmethod
     def get_device_by_uuid(dev_uuid):
-        device = TeraDevice.query().filter_by(device_uuid=dev_uuid).first()
+        device = TeraDevice.query.filter_by(device_uuid=dev_uuid).first()
         return device
 
     @staticmethod
     def get_device_by_name(name):
-        return TeraDevice.query().filter_by(device_name=name).first()
+        return TeraDevice.query.filter_by(device_name=name).first()
 
     @staticmethod
     def get_device_by_id(device_id):
-        return TeraDevice.query().filter_by(id_device=device_id).first()
+        return TeraDevice.query.filter_by(id_device=device_id).first()
 
     # @staticmethod
     # # Available device = device not assigned to any participant
     # def get_available_devices(ignore_disabled=True):
     #     if ignore_disabled:
-    #         return TeraDevice.query().outerjoin(TeraDevice.device_participants)\
+    #         return TeraDevice.query.outerjoin(TeraDevice.device_participants)\
     #             .filter(TeraDevice.device_participants is None).all()
     #     else:
-    #         return TeraDevice.query().filter_by(device_enabled=True).outerjoin(TeraDevice.device_participants).\
+    #         return TeraDevice.query.filter_by(device_enabled=True).outerjoin(TeraDevice.device_participants).\
     #             filter(TeraDevice.device_participants is None).all()
     #
     # @staticmethod
     # # Unavailable device = device assigned to at least one participant
     # def get_unavailable_devices(ignore_disabled=True):
     #     if ignore_disabled:
-    #         return TeraDevice.query().join(TeraDevice.device_participants).all()
+    #         return TeraDevice.query.join(TeraDevice.device_participants).all()
     #     else:
-    #         return TeraDevice.query().filter_by(device_enabled=True).join(TeraDevice.device_participants).all()
+    #         return TeraDevice.query.filter_by(device_enabled=True).join(TeraDevice.device_participants).all()
 
     @staticmethod
     def create_defaults(test=False):

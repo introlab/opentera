@@ -32,11 +32,11 @@ class TeraServiceConfigSpecific(BaseModel):
 
     @staticmethod
     def get_service_config_specific_by_id(s_id: int):
-        return TeraServiceConfigSpecific.query().filter_by(id_service_config_specific=s_id).first()
+        return TeraServiceConfigSpecific.query.filter_by(id_service_config_specific=s_id).first()
 
     @staticmethod
     def get_service_config_specifics_for_service_config(service_config_id: int):
-        return TeraServiceConfigSpecific.query().filter_by(id_service_config=service_config_id).all()
+        return TeraServiceConfigSpecific.query.filter_by(id_service_config=service_config_id).all()
 
     def get_last_update_datetime(self) -> datetime:
         return datetime.fromtimestamp(self.version_id/1000)

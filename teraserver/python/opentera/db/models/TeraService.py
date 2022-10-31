@@ -87,7 +87,7 @@ class TeraService(BaseModel):
 
     @staticmethod
     def get_service_by_key(key: str):
-        service = TeraService.query().filter_by(service_key=key).first()
+        service = TeraService.query.filter_by(service_key=key).first()
 
         if service:
             return service
@@ -96,7 +96,7 @@ class TeraService(BaseModel):
 
     @staticmethod
     def get_service_by_uuid(p_uuid: str):
-        service = TeraService.query().filter_by(service_uuid=p_uuid).first()
+        service = TeraService.query.filter_by(service_uuid=p_uuid).first()
 
         if service:
             return service
@@ -105,11 +105,11 @@ class TeraService(BaseModel):
 
     @staticmethod
     def get_service_by_name(name: str):
-        return TeraService.query().filter_by(service_name=name).first()
+        return TeraService.query.filter_by(service_name=name).first()
 
     @staticmethod
     def get_service_by_id(s_id: int):
-        return TeraService.query().filter_by(id_service=s_id).first()
+        return TeraService.query.filter_by(id_service=s_id).first()
 
     @staticmethod
     def get_openteraserver_service():

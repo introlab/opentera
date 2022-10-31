@@ -38,15 +38,15 @@ class TeraParticipantGroup(BaseModel):
 
     @staticmethod
     def get_participant_group_by_group_name(name: str):
-        return TeraParticipantGroup.query().filter_by(participant_group_name=name).first()
+        return TeraParticipantGroup.query.filter_by(participant_group_name=name).first()
 
     @staticmethod
     def get_participant_group_by_id(group_id: int):
-        return TeraParticipantGroup.query().filter_by(id_participant_group=group_id).first()
+        return TeraParticipantGroup.query.filter_by(id_participant_group=group_id).first()
 
     @staticmethod
     def get_participant_group_for_project(project_id: int):
-        return TeraParticipantGroup.query().filter_by(id_project=project_id).all()
+        return TeraParticipantGroup.query.filter_by(id_project=project_id).all()
 
     @staticmethod
     def create_defaults(test=False):

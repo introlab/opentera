@@ -2,12 +2,18 @@ import inspect
 import datetime
 # import uuid
 import time
+import typing as t
 import sqlalchemy.sql.sqltypes
-from flask_sqlalchemy import SQLAlchemy, BaseQuery
-from sqlalchemy.ext.declarative import declarative_base
+from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger
 
 # db = SQLAlchemy()
+
+
+class _QueryProperty:
+    def __get__(self, obj: Model | None, cls: t.Type[Model]) -> BaseQuery:
+        return cls.db().session.query(cls)
 
 
 class BaseMixin(object):
@@ -33,13 +39,11 @@ class BaseMixin(object):
             cls.__db__.create_all()
             cls.metadata.create_all(cls.__db__.engine)
 
+    query = _QueryProperty()
+
     @classmethod
     def db(cls) -> SQLAlchemy:
         return cls.__db__
-
-    @classmethod
-    def query(cls) -> BaseQuery:
-        return cls.db().session.query(cls)
 
     def to_json(self, ignore_fields=None):
         if ignore_fields is None:

@@ -54,23 +54,23 @@ class TeraDeviceProject(BaseModel):
 
     @staticmethod
     def get_device_project_by_id(device_project_id: int):
-        return TeraDeviceProject.query().filter_by(id_device_project=device_project_id).first()
+        return TeraDeviceProject.query.filter_by(id_device_project=device_project_id).first()
 
     @staticmethod
     def get_device_project_id_for_device_and_project(device_id: int, project_id: int):
-        return TeraDeviceProject.query().filter_by(id_project=project_id, id_device=device_id).first()
+        return TeraDeviceProject.query.filter_by(id_project=project_id, id_device=device_id).first()
 
     @staticmethod
     def get_devices_for_project(project_id: int):
-        return TeraDeviceProject.query().filter_by(id_project=project_id).all()
+        return TeraDeviceProject.query.filter_by(id_project=project_id).all()
 
     @staticmethod
     def get_projects_for_device(device_id: int):
-        return TeraDeviceProject.query().filter_by(id_device=device_id).all()
+        return TeraDeviceProject.query.filter_by(id_device=device_id).all()
 
     @staticmethod
     def delete_with_ids(device_id: int, project_id: int):
-        delete_obj = TeraDeviceProject.query().filter_by(id_device=device_id, id_project=project_id).first()
+        delete_obj = TeraDeviceProject.query.filter_by(id_device=device_id, id_project=project_id).first()
         if delete_obj:
             TeraDeviceProject.delete(delete_obj.id_device_project)
 
@@ -78,7 +78,7 @@ class TeraDeviceProject(BaseModel):
     def delete(cls, id_todel):
         from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 
-        delete_obj: TeraDeviceProject = TeraDeviceProject.query().filter_by(id_device_project=id_todel).first()
+        delete_obj: TeraDeviceProject = TeraDeviceProject.query.filter_by(id_device_project=id_todel).first()
 
         if delete_obj:
             # Delete participants association with that device
@@ -97,13 +97,13 @@ class TeraDeviceProject(BaseModel):
     # @staticmethod
     # def query_sites_for_device(device_id: int) -> list:
     #     from opentera.db.models.TeraProject import TeraProject
-    #     return TeraDeviceProject.query().filter_by(id_device=device_id).join(TeraDeviceProject.device_project_project)\
+    #     return TeraDeviceProject.query.filter_by(id_device=device_id).join(TeraDeviceProject.device_project_project)\
     #         .join(TeraProject.project_site).all()
-    #     # TeraSite.query().join(TeraSite.site_projects).join(TeraDeviceProject.device_project_project)\
+    #     # TeraSite.query.join(TeraSite.site_projects).join(TeraDeviceProject.device_project_project)\
     #     # .filter(id_device=device_id).all()
 
     # @staticmethod
     # def query_devices_for_site(site_id: int) -> list:
     #     from opentera.db.models.TeraDevice import TeraDevice
-    #     return TeraDeviceProject.query().join(TeraDeviceProject.device_project_project).filter_by(id_site=site_id).all()
-    #     # return TeraDevice.query().join(TeraDevice.device_projects).filter_by(id_site=site_id).all()
+    #     return TeraDeviceProject.query.join(TeraDeviceProject.device_project_project).filter_by(id_site=site_id).all()
+    #     # return TeraDevice.query.join(TeraDevice.device_projects).filter_by(id_site=site_id).all()

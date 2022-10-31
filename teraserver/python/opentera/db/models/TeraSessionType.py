@@ -134,11 +134,11 @@ class TeraSessionType(BaseModel):
 
     @staticmethod
     def get_session_type_by_id(ses_type_id: int):
-        return TeraSessionType.query().filter_by(id_session_type=ses_type_id).first()
+        return TeraSessionType.query.filter_by(id_session_type=ses_type_id).first()
 
     @staticmethod
     def get_session_types_for_service(id_service: int):
-        return TeraSessionType.query().filter_by(id_service=id_service).all()
+        return TeraSessionType.query.filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_category_name(category: SessionCategoryEnum):

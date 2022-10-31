@@ -78,19 +78,19 @@ class TeraTestType(BaseModel):
 
     @staticmethod
     def get_test_type_by_id(test_type_id: int):
-        return TeraTestType.query().filter_by(id_test_type=test_type_id).first()
+        return TeraTestType.query.filter_by(id_test_type=test_type_id).first()
 
     @staticmethod
     def get_test_type_by_key(tt_key: int):
-        return TeraTestType.query().filter_by(test_type_key=tt_key).first()
+        return TeraTestType.query.filter_by(test_type_key=tt_key).first()
 
     @staticmethod
     def get_test_type_by_uuid(tt_uuid: int):
-        return TeraTestType.query().filter_by(test_type_uuid=tt_uuid).first()
+        return TeraTestType.query.filter_by(test_type_uuid=tt_uuid).first()
 
     @staticmethod
     def get_test_types_for_service(id_service: int):
-        return TeraTestType.query().filter_by(id_service=id_service).all()
+        return TeraTestType.query.filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_access_token(test_type_uuids: list, token_key: str, requester_uuid: str, can_edit: bool, expiration=3600):

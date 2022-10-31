@@ -80,7 +80,7 @@ class TeraSessionEvent(BaseModel):
 
     @staticmethod
     def get_session_event_by_id(event_id: int):
-        return TeraSessionEvent.query().filter_by(id_session_event=event_id).first()
+        return TeraSessionEvent.query.filter_by(id_session_event=event_id).first()
 
     @staticmethod
     def get_events_for_session(id_session: int):

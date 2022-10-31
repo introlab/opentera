@@ -63,24 +63,24 @@ class TeraTestTypeSite(BaseModel):
 
     @staticmethod
     def get_test_type_site_by_id(tts_id: int):
-        return TeraTestTypeSite.query().filter_by(id_test_type_site=tts_id).first()
+        return TeraTestTypeSite.query.filter_by(id_test_type_site=tts_id).first()
 
     @staticmethod
     def get_sites_for_test_type(test_type_id: int):
-        return TeraTestTypeSite.query().filter_by(id_test_type=test_type_id).all()
+        return TeraTestTypeSite.query.filter_by(id_test_type=test_type_id).all()
 
     @staticmethod
     def get_tests_types_for_site(site_id: int):
-        return TeraTestTypeSite.query().filter_by(id_site=site_id).all()
+        return TeraTestTypeSite.query.filter_by(id_site=site_id).all()
 
     @staticmethod
     def get_test_type_site_for_test_type_and_site(site_id: int, test_type_id: int):
-        return TeraTestTypeSite.query().filter_by(id_site=site_id, id_test_type=test_type_id).first()
+        return TeraTestTypeSite.query.filter_by(id_site=site_id, id_test_type=test_type_id).first()
 
     @staticmethod
     def get_test_type_site_for_site_and_service(site_id: int, service_id: int):
         from opentera.db.models.TeraTestType import TeraTestType
-        return TeraTestTypeSite.query().join(TeraTestType). \
+        return TeraTestTypeSite.query.join(TeraTestType). \
             filter(TeraTestType.id_service == service_id). \
             filter(TeraTestTypeSite.id_site == site_id).all()
 
@@ -98,7 +98,7 @@ class TeraTestTypeSite(BaseModel):
 
     @staticmethod
     def delete_with_ids(test_type_id: int, site_id: int):
-        delete_obj: TeraTestTypeSite = TeraTestTypeSite.query().filter_by(id_test_type=test_type_id,
+        delete_obj: TeraTestTypeSite = TeraTestTypeSite.query.filter_by(id_test_type=test_type_id,
                                                                         id_site=site_id).first()
         if delete_obj:
             TeraTestTypeSite.delete(delete_obj.id_test_type_site)
@@ -107,7 +107,7 @@ class TeraTestTypeSite(BaseModel):
     def delete(cls, id_todel):
         from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
         # Delete all association with projects for that site
-        delete_obj = TeraTestTypeSite.query().filter_by(id_test_type_site=id_todel).first()
+        delete_obj = TeraTestTypeSite.query.filter_by(id_test_type_site=id_todel).first()
 
         if delete_obj:
             projects = TeraTestTypeProject.get_projects_for_test_type(delete_obj.id_test_type)

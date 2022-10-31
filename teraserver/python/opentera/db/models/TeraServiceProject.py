@@ -30,19 +30,19 @@ class TeraServiceProject(BaseModel):
 
     @staticmethod
     def get_services_for_project(id_project: int):
-        return TeraServiceProject.query().filter_by(id_project=id_project).all()
+        return TeraServiceProject.query.filter_by(id_project=id_project).all()
 
     @staticmethod
     def get_projects_for_service(id_service: int):
-        return TeraServiceProject.query().filter_by(id_service=id_service).all()
+        return TeraServiceProject.query.filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_service_project_by_id(service_project_id: int):
-        return TeraServiceProject.query().filter_by(id_service_project=service_project_id).first()
+        return TeraServiceProject.query.filter_by(id_service_project=service_project_id).first()
 
     @staticmethod
     def get_service_project_for_service_project(project_id: int, service_id: int):
-        return TeraServiceProject.query().filter_by(id_project=project_id, id_service=service_id).first()
+        return TeraServiceProject.query.filter_by(id_project=project_id, id_service=service_id).first()
 
     @staticmethod
     def create_defaults(test=False):
@@ -94,7 +94,7 @@ class TeraServiceProject(BaseModel):
     @classmethod
     def update(cls, update_id: int, values: dict):
         values = cls.clean_values(values)
-        stp = cls.query().filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
+        stp = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
         stp.from_json(values)
         # Check if that site of that project has the site associated to it
         from opentera.db.models.TeraServiceSite import TeraServiceSite
@@ -107,7 +107,7 @@ class TeraServiceProject(BaseModel):
 
     @staticmethod
     def delete_with_ids(service_id: int, project_id: int):
-        delete_obj = TeraServiceProject.query().filter_by(id_service=service_id, id_project=project_id).first()
+        delete_obj = TeraServiceProject.query.filter_by(id_service=service_id, id_project=project_id).first()
         if delete_obj:
             TeraServiceProject.delete(delete_obj.id_service_project)
 
@@ -115,7 +115,7 @@ class TeraServiceProject(BaseModel):
     def delete(cls, id_todel):
         from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
         # Delete all session type association to that project
-        delete_obj: TeraServiceProject = TeraServiceProject.query().filter_by(id_service_project=id_todel).first()
+        delete_obj: TeraServiceProject = TeraServiceProject.query.filter_by(id_service_project=id_todel).first()
 
         if delete_obj:
             session_types = TeraSessionTypeProject.get_session_type_project_for_project_and_service(

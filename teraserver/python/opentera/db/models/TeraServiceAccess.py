@@ -75,7 +75,7 @@ class TeraServiceAccess(BaseModel):
 
     @staticmethod
     def get_service_access_by_id(service_access_id: int):
-        return TeraServiceAccess.query().filter_by(id_service_access=service_access_id).first()
+        return TeraServiceAccess.query.filter_by(id_service_access=service_access_id).first()
 
     @staticmethod
     def update_service_access_for_user_group_for_site(id_service: int, id_user_group: int, id_service_role: int,
@@ -125,28 +125,28 @@ class TeraServiceAccess(BaseModel):
 
     @staticmethod
     def get_service_access_for_user_group(id_service: int, id_user_group: int):
-        return TeraServiceAccess.query().filter_by(id_user_group=id_user_group).join(TeraServiceRole)\
+        return TeraServiceAccess.query.filter_by(id_user_group=id_user_group).join(TeraServiceRole)\
             .filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_service_access_for_project(id_service: int, id_project: int):
-        return TeraServiceAccess.query().join(TeraServiceRole).filter_by(id_service=id_service,
+        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
                                                                        id_project=id_project).all()
 
     @staticmethod
     def get_service_access_for_site(id_service: int, id_site: int):
-        return TeraServiceAccess.query().join(TeraServiceRole).filter_by(id_service=id_service,
+        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
                                                                        id_site=id_site).all()
 
     @staticmethod
     def get_service_access_for_user_group_for_site(id_service: int, id_user_group: int, id_site: int):
-        return TeraServiceAccess.query().join(TeraServiceRole).filter_by(id_service=id_service,
+        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
                                                                        id_site=id_site).filter(
             TeraServiceAccess.id_user_group == id_user_group).first()
 
     @staticmethod
     def get_service_access_for_user_group_for_project(id_service: int, id_user_group: int, id_project: int):
-        return TeraServiceAccess.query().join(TeraServiceRole).filter_by(id_service=id_service,
+        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
                                                                        id_project=id_project).filter(
             TeraServiceAccess.id_user_group == id_user_group).first()
 

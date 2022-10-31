@@ -40,18 +40,18 @@ from .TeraUserUserGroup import TeraUserUserGroup
     Insert only useful events here.
 """
 EventNameClassMap = {
-    TeraAsset.get_model_name(): TeraAsset,
-    TeraDevice.get_model_name(): TeraDevice,
-    TeraParticipant.get_model_name(): TeraParticipant,
-    TeraParticipantGroup.get_model_name(): TeraParticipantGroup,
-    TeraProject.get_model_name(): TeraProject,
-    TeraSession.get_model_name(): TeraSession,
-    TeraSessionType.get_model_name(): TeraSessionType,
-    TeraSite.get_model_name(): TeraSite,
-    TeraUser.get_model_name(): TeraUser,
-    TeraUserGroup.get_model_name(): TeraUserGroup,
-    TeraTestType.get_model_name(): TeraTestType,
-    TeraTest.get_model_name(): TeraTest
+    # TeraAsset.get_model_name(): TeraAsset,
+    # TeraDevice.get_model_name(): TeraDevice,
+    # TeraParticipant.get_model_name(): TeraParticipant,
+    # TeraParticipantGroup.get_model_name(): TeraParticipantGroup,
+    # TeraProject.get_model_name(): TeraProject,
+    # TeraSession.get_model_name(): TeraSession,
+    # TeraSessionType.get_model_name(): TeraSessionType,
+    # TeraSite.get_model_name(): TeraSite,
+    # TeraUser.get_model_name(): TeraUser,
+    # TeraUserGroup.get_model_name(): TeraUserGroup,
+    # TeraTestType.get_model_name(): TeraTestType,
+    # TeraTest.get_model_name(): TeraTest
 }
 
 # All exported symbols

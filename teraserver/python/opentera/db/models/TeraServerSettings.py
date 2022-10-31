@@ -50,7 +50,7 @@ class TeraServerSettings(BaseModel):
 
     @staticmethod
     def get_server_setting(setting_name: string):
-        return TeraServerSettings.query().filter_by(
+        return TeraServerSettings.query.filter_by(
             server_settings_name=setting_name).first()
 
     @staticmethod

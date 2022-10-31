@@ -25,19 +25,19 @@ class TeraUserPreference(BaseModel):
 
     @staticmethod
     def get_user_preferences_for_app(app_tag: str):
-        return TeraUserPreference.query().filter_by(user_preference_app_tag=app_tag).first()
+        return TeraUserPreference.query.filter_by(user_preference_app_tag=app_tag).first()
 
     @staticmethod
     def get_user_preference_by_id(user_pref_id: int):
-        return TeraUserPreference.query().filter_by(id_user_prefrence=user_pref_id).first()
+        return TeraUserPreference.query.filter_by(id_user_prefrence=user_pref_id).first()
 
     @staticmethod
     def get_user_preferences_for_user(user_id: int):
-        return TeraUserPreference.query().filter_by(id_user=user_id).all()
+        return TeraUserPreference.query.filter_by(id_user=user_id).all()
 
     @staticmethod
     def get_user_preferences_for_user_and_app(user_id: int, app_tag: str):
-        return TeraUserPreference.query().filter_by(id_user=user_id, user_preference_app_tag=app_tag).first()
+        return TeraUserPreference.query.filter_by(id_user=user_id, user_preference_app_tag=app_tag).first()
 
     @staticmethod
     def create_defaults(test=False):

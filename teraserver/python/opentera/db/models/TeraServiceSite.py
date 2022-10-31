@@ -29,19 +29,19 @@ class TeraServiceSite(BaseModel):
 
     @staticmethod
     def get_services_for_site(id_site: int):
-        return TeraServiceSite.query().filter_by(id_site=id_site).all()
+        return TeraServiceSite.query.filter_by(id_site=id_site).all()
 
     @staticmethod
     def get_sites_for_service(id_service: int):
-        return TeraServiceSite.query().filter_by(id_service=id_service).all()
+        return TeraServiceSite.query.filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_service_site_by_id(service_site_id: int):
-        return TeraServiceSite.query().filter_by(id_service_site=service_site_id).first()
+        return TeraServiceSite.query.filter_by(id_service_site=service_site_id).first()
 
     @staticmethod
     def get_service_site_for_service_site(site_id: int, service_id: int):
-        return TeraServiceSite.query().filter_by(id_site=site_id, id_service=service_id).first()
+        return TeraServiceSite.query.filter_by(id_site=site_id, id_service=service_id).first()
 
     @staticmethod
     def create_defaults(test=False):
@@ -94,7 +94,7 @@ class TeraServiceSite(BaseModel):
 
     @staticmethod
     def delete_with_ids(service_id: int, site_id: int):
-        delete_obj = TeraServiceSite.query().filter_by(id_service=service_id, id_site=site_id).first()
+        delete_obj = TeraServiceSite.query.filter_by(id_service=service_id, id_site=site_id).first()
         if delete_obj:
             TeraServiceSite.delete(delete_obj.id_service_site)
 
@@ -102,7 +102,7 @@ class TeraServiceSite(BaseModel):
     def delete(cls, id_todel):
         from opentera.db.models.TeraServiceProject import TeraServiceProject
         # Delete all association with projects for that site
-        delete_obj = TeraServiceSite.query().filter_by(id_service_site=id_todel).first()
+        delete_obj = TeraServiceSite.query.filter_by(id_service_site=id_todel).first()
 
         if delete_obj:
             projects = TeraServiceProject.get_projects_for_service(delete_obj.id_service)

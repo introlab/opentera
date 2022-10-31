@@ -119,7 +119,7 @@ class TeraUser(BaseModel):
 
         if self.user_superadmin:
             # Super admin - admin role in all sites
-            sites = TeraSite.query().all()
+            sites = TeraSite.query.all()
             for site in sites:
                 sites_roles[site] = {'site_role': 'admin', 'inherited': True}
             return sites_roles
@@ -143,7 +143,7 @@ class TeraUser(BaseModel):
 
         if self.user_superadmin:
             # Super admin - admin role in all projects
-            projects = TeraProject.query().all()
+            projects = TeraProject.query.all()
             for project in projects:
                 projects_roles[project] = {'project_role': 'admin', 'inherited': True}
             return projects_roles
@@ -189,21 +189,21 @@ class TeraUser(BaseModel):
 
     @staticmethod
     def get_user_by_username(username):
-        return TeraUser.query().filter_by(user_username=username).first()
+        return TeraUser.query.filter_by(user_username=username).first()
 
     @staticmethod
     def get_user_by_uuid(u_uuid):
-        user = TeraUser.query().filter_by(user_uuid=u_uuid).first()
+        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
         return user
 
     @staticmethod
     def get_user_by_id(id_user):
-        user = TeraUser.query().filter_by(id_user=id_user).first()
+        user = TeraUser.query.filter_by(id_user=id_user).first()
         return user
 
     @staticmethod
     def get_superadmins():
-        return TeraUser.query().filter_by(user_superadmin=True).all()
+        return TeraUser.query.filter_by(user_superadmin=True).all()
 
     @classmethod
     def update(cls, id_user: int, values: dict):

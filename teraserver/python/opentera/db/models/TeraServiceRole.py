@@ -52,35 +52,35 @@ class TeraServiceRole(BaseModel):
 
     @staticmethod
     def get_service_roles(service_id: int):
-        return TeraServiceRole.query().filter_by(id_service=service_id).all()
+        return TeraServiceRole.query.filter_by(id_service=service_id).all()
 
     @staticmethod
     def get_service_roles_for_site(service_id: int, site_id: int):
-        return TeraServiceRole.query().filter_by(id_service=service_id, id_site=site_id).all()
+        return TeraServiceRole.query.filter_by(id_service=service_id, id_site=site_id).all()
 
     @staticmethod
     def get_specific_service_role_for_site(service_id: int, site_id: int, rolename: str):
-        return TeraServiceRole.query().filter_by(id_service=service_id, id_site=site_id, service_role_name=rolename)\
+        return TeraServiceRole.query.filter_by(id_service=service_id, id_site=site_id, service_role_name=rolename)\
             .first()
 
     @staticmethod
     def get_service_roles_for_project(service_id: int, project_id: int):
-        return TeraServiceRole.query().filter_by(id_service=service_id, id_project=project_id).all()
+        return TeraServiceRole.query.filter_by(id_service=service_id, id_project=project_id).all()
 
     @staticmethod
     def get_specific_service_role_for_project(service_id: int, project_id: int, rolename: str):
-        return TeraServiceRole.query().filter_by(id_service=service_id, id_project=project_id,
+        return TeraServiceRole.query.filter_by(id_service=service_id, id_project=project_id,
                                                service_role_name=rolename).first()
 
     @staticmethod
     def get_service_role_by_id(role_id: int):
-        return TeraServiceRole.query().filter_by(id_service_role=role_id).first()
+        return TeraServiceRole.query.filter_by(id_service_role=role_id).first()
 
     @staticmethod
     def create_defaults(test=False):
         from opentera.db.models.TeraService import TeraService
 
-        for service in TeraService.query().all():
+        for service in TeraService.query.all():
             if service.service_key != 'OpenTeraServer':  # Don't add global roles for TeraServer
                 new_role = TeraServiceRole()
                 new_role.id_service = service.id_service

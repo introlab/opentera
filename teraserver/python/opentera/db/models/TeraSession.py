@@ -231,11 +231,11 @@ class TeraSession(BaseModel):
 
     @staticmethod
     def get_session_by_id(ses_id: int):
-        return TeraSession.query().filter_by(id_session=ses_id).first()
+        return TeraSession.query.filter_by(id_session=ses_id).first()
 
     @staticmethod
     def get_session_by_uuid(s_uuid):
-        session = TeraSession.query().filter_by(session_uuid=s_uuid).first()
+        session = TeraSession.query.filter_by(session_uuid=s_uuid).first()
         if session:
             return session
 
@@ -243,7 +243,7 @@ class TeraSession(BaseModel):
 
     @staticmethod
     def get_session_by_name(name: str):
-        return TeraSession.query().filter_by(session_name=name).first()
+        return TeraSession.query.filter_by(session_name=name).first()
 
     @staticmethod
     def _set_query_parameters(query, status: int = None, limit: int = None, offset: int = None,
@@ -266,7 +266,7 @@ class TeraSession(BaseModel):
                                      start_date: datetime.date = None, end_date: datetime.date = None,
                                      filters: dict = None):
         from opentera.db.models.TeraParticipant import TeraParticipant
-        query = TeraSession.query().join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
+        query = TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
                                                                                 part_id)
 
         query = query().order_by(TeraSession.session_start_datetime.desc())
@@ -283,7 +283,7 @@ class TeraSession(BaseModel):
     def get_sessions_for_user(user_id: int, status: int = None, limit: int = None, offset: int = None,
                               start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None):
         from opentera.db.models.TeraUser import TeraUser
-        query = TeraSession.query().join(TeraSession.session_users).filter(TeraUser.id_user == user_id)
+        query = TeraSession.query.join(TeraSession.session_users).filter(TeraUser.id_user == user_id)
         query = query().order_by(TeraSession.session_start_datetime.desc())
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
@@ -298,7 +298,7 @@ class TeraSession(BaseModel):
     def get_sessions_for_device(device_id: int, status: int = None, limit: int = None, offset: int = None,
                                 start_date: datetime.date = None, end_date: datetime.date = None, filters:dict = None):
         from opentera.db.models.TeraDevice import TeraDevice
-        query = TeraSession.query().join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
+        query = TeraSession.query.join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
         query = query().order_by(TeraSession.session_start_datetime.desc())
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
@@ -311,7 +311,7 @@ class TeraSession(BaseModel):
 
     @staticmethod
     def get_sessions_for_type(session_type_id: int):
-        return TeraSession.query().filter_by(id_session_type=session_type_id).all()
+        return TeraSession.query.filter_by(id_session_type=session_type_id).all()
 
     @staticmethod
     def is_user_in_session(session_uuid: str, user_uuid: str) -> bool:
@@ -366,7 +366,7 @@ class TeraSession(BaseModel):
     @staticmethod
     def cancel_past_not_started_sessions():
         # Set sessions in the "NOT STARTED" state in the past to the "CANCELLED" state
-        TeraSession.query().filter(TeraSession.session_status == TeraSessionStatus.STATUS_NOTSTARTED.value,
+        TeraSession.query.filter(TeraSession.session_status == TeraSessionStatus.STATUS_NOTSTARTED.value,
                                  TeraSession.session_start_datetime <= datetime.now()).\
             update({'session_status': TeraSessionStatus.STATUS_CANCELLED.value})
 
@@ -375,7 +375,7 @@ class TeraSession(BaseModel):
     @staticmethod
     def terminate_past_inprogress_sessions():
         # Set sessions "IN PROGRESS" which are in the past to the "TERMINATED" state
-        TeraSession.query().filter(TeraSession.session_status == TeraSessionStatus.STATUS_INPROGRESS.value,
+        TeraSession.query.filter(TeraSession.session_status == TeraSessionStatus.STATUS_INPROGRESS.value,
                                  TeraSession.session_start_datetime <= datetime.now()). \
             update({'session_status': TeraSessionStatus.STATUS_TERMINATED.value})
 
@@ -385,10 +385,10 @@ class TeraSession(BaseModel):
     # @staticmethod
     # def delete_orphaned_sessions(commit_changes=True):
     #     from opentera.db.models.TeraDeviceData import TeraDeviceData
-    #     orphans_parts = TeraSession.query().outerjoin(TeraSession.session_participants).filter(
+    #     orphans_parts = TeraSession.query.outerjoin(TeraSession.session_participants).filter(
     #         TeraSession.session_participants == None).all()
     #
-    #     orphans_users = TeraSession.query().outerjoin(TeraSession.session_users).filter(
+    #     orphans_users = TeraSession.query.outerjoin(TeraSession.session_users).filter(
     #         TeraSession.session_users == None).all()
     #
     #     orphans = list(set(orphans_parts + orphans_users))  # Keep unique sessions only!

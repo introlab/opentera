@@ -186,7 +186,7 @@ class TeraParticipant(BaseModel):
 
     @staticmethod
     def get_participant_by_token(token):
-        participant = TeraParticipant.query().filter_by(participant_token=token).first()
+        participant = TeraParticipant.query.filter_by(participant_token=token).first()
 
         if participant and participant.participant_enabled and participant.participant_token_enabled:
             # Validate token
@@ -203,7 +203,7 @@ class TeraParticipant(BaseModel):
 
     @staticmethod
     def get_participant_by_uuid(p_uuid):
-        participant = TeraParticipant.query().filter_by(participant_uuid=p_uuid).first()
+        participant = TeraParticipant.query.filter_by(participant_uuid=p_uuid).first()
 
         if participant:
             return participant
@@ -212,19 +212,19 @@ class TeraParticipant(BaseModel):
 
     @staticmethod
     def get_participant_by_username(username):
-        return TeraParticipant.query().filter_by(participant_username=username).first()
+        return TeraParticipant.query.filter_by(participant_username=username).first()
 
     @staticmethod
     def get_participant_by_email(email: str):
-        return TeraParticipant.query().filter_by(participant_email=email).first()
+        return TeraParticipant.query.filter_by(participant_email=email).first()
 
     @staticmethod
     def get_participant_by_name(name):
-        return TeraParticipant.query().filter_by(participant_name=name).first()
+        return TeraParticipant.query.filter_by(participant_name=name).first()
 
     @staticmethod
     def get_participant_by_id(part_id: int):
-        return TeraParticipant.query().filter_by(id_participant=part_id).first()
+        return TeraParticipant.query.filter_by(id_participant=part_id).first()
 
     @staticmethod
     def is_participant_username_available(username: str) -> bool:
@@ -232,7 +232,7 @@ class TeraParticipant(BaseModel):
         if username is None or username == '':
             return True
 
-        return TeraParticipant.query().filter_by(participant_username=username).first() is None
+        return TeraParticipant.query.filter_by(participant_username=username).first() is None
 
     @staticmethod
     def create_defaults(test=False):

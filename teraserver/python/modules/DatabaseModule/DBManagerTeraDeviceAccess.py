@@ -23,7 +23,7 @@ class DBManagerTeraDeviceAccess:
 
     def query_existing_session(self, session_name: str, session_type_id: int, session_date: datetime,
                                participant_uuids: list):
-        sessions = TeraSession.query().filter(TeraSession.id_creator_device == self.device.id_device).\
+        sessions = TeraSession.query.filter(TeraSession.id_creator_device == self.device.id_device).\
             filter(TeraSession.session_name == session_name).filter(TeraSession.id_session_type == session_type_id).\
             filter(func.date(TeraSession.session_start_datetime) == session_date.date()).\
             order_by(TeraSession.id_session.asc()).all()
@@ -36,7 +36,7 @@ class DBManagerTeraDeviceAccess:
         return None
 
     def get_accessible_sessions(self):
-        query = TeraSession.query().filter(TeraSession.id_creator_device == self.device.id_device)
+        query = TeraSession.query.filter(TeraSession.id_creator_device == self.device.id_device)
         return query.all()
 
     def get_accessible_sessions_ids(self):
@@ -63,7 +63,7 @@ class DBManagerTeraDeviceAccess:
         # for part in participants:
         #     project_list.append(part.id_project)
 
-        session_types = TeraSessionType.query().join(TeraSessionType.session_type_projects)\
+        session_types = TeraSessionType.query.join(TeraSessionType.session_type_projects)\
             .filter(TeraProject.id_project.in_(project_list)).all()
 
         return session_types
@@ -76,7 +76,7 @@ class DBManagerTeraDeviceAccess:
 
     def get_accessible_assets(self, id_asset: int = None, uuid_asset: str = None):
         from opentera.db.models.TeraAsset import TeraAsset
-        query = TeraAsset.query().filter(TeraAsset.id_device == self.device.id_device)
+        query = TeraAsset.query.filter(TeraAsset.id_device == self.device.id_device)
         if id_asset:
             query = query.filter(TeraAsset.id_asset == id_asset)
         elif uuid_asset:
@@ -90,7 +90,7 @@ class DBManagerTeraDeviceAccess:
 
         accessible_projects_ids = [proj.id_project for proj in self.device.device_projects]
 
-        query = TeraService.query().join(TeraServiceProject).filter(
+        query = TeraService.query.join(TeraServiceProject).filter(
             TeraServiceProject.id_project.in_(accessible_projects_ids)).group_by(TeraService.id_service)
 
         return query.all()

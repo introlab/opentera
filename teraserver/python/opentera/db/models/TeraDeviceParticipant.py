@@ -54,16 +54,16 @@ class TeraDeviceParticipant(BaseModel):
 
     @staticmethod
     def get_device_participant_by_id(device_participant_id: int):
-        return TeraDeviceParticipant.query().filter_by(id_device_participant=device_participant_id).first()
+        return TeraDeviceParticipant.query.filter_by(id_device_participant=device_participant_id).first()
 
     @staticmethod
     def query_devices_for_participant(participant_id: int):
-        return TeraDeviceParticipant.query().filter_by(id_participant=participant_id).all()
+        return TeraDeviceParticipant.query.filter_by(id_participant=participant_id).all()
 
     @staticmethod
     def query_participants_for_device(device_id: int):
-        return TeraDeviceParticipant.query().filter_by(id_device=device_id).all()
+        return TeraDeviceParticipant.query.filter_by(id_device=device_id).all()
 
     @staticmethod
     def query_device_participant_for_participant_device(device_id: int, participant_id: int):
-        return TeraDeviceParticipant.query().filter_by(id_device=device_id, id_participant=participant_id).first()
+        return TeraDeviceParticipant.query.filter_by(id_device=device_id, id_participant=participant_id).first()

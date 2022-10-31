@@ -26,7 +26,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
         self.assertTrue('auto_save' in json_user_preferences)
 
     def test_default_user_preference_for_openteraplus_multiple(self):
-        preferences: list[TeraUserPreference] = TeraUserPreference.query().filter_by(user_preference_app_tag='openteraplus').all()
+        preferences: list[TeraUserPreference] = TeraUserPreference.query.filter_by(user_preference_app_tag='openteraplus').all()
         self.assertEqual(2, len(preferences))
         self.assertNotEqual(preferences[0].id_user, preferences[1].id_user)
         for preference in preferences:

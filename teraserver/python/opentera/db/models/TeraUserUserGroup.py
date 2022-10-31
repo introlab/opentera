@@ -67,19 +67,19 @@ class TeraUserUserGroup(BaseModel):
 
     @staticmethod
     def get_user_user_group_by_id(user_user_group_id: int):
-        return TeraUserUserGroup.query().filter_by(id_user_user_group=user_user_group_id).first()
+        return TeraUserUserGroup.query.filter_by(id_user_user_group=user_user_group_id).first()
 
     @staticmethod
     def query_users_for_user_group(user_group_id: int):
-        return TeraUserUserGroup.query().filter_by(id_user_group=user_group_id).all()
+        return TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).all()
 
     @staticmethod
     def query_users_groups_for_user(user_id: int):
-        return TeraUserUserGroup.query().filter_by(id_user=user_id).all()
+        return TeraUserUserGroup.query.filter_by(id_user=user_id).all()
 
     @staticmethod
     def query_user_user_group_for_user_user_group(user_id: int, user_group_id: int):
-        return TeraUserUserGroup.query().filter_by(id_user=user_id, id_user_group=user_group_id).first()
+        return TeraUserUserGroup.query.filter_by(id_user=user_id, id_user_group=user_group_id).first()
 
     @staticmethod
     def insert_user_user_group(id_user_group: int, id_user: int):

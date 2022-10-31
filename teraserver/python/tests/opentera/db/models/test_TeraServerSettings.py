@@ -33,7 +33,7 @@ class TeraServerSettingsTest(BaseModelsTest):
         self.db.session.rollback()
 
     def test_constants_check(self):
-        for settings in TeraServerSettings.query().all():
+        for settings in TeraServerSettings.query.all():
             self.assertGreater(settings.id_server_settings, 0)
             self.assertIsNotNone(settings.server_settings_name)
             self.assertIsNotNone(settings.server_settings_value)

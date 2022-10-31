@@ -499,5 +499,8 @@ if __name__ == '__main__':
         manager = DBManager(config)
         print(manager)
         manager.open_local(dict(), echo=True, ram=True)
+        user = TeraUser()
+        user.query.all()
+        test = TeraUser.query.all()
         manager.create_defaults(config, test=True)
 

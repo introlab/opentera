@@ -61,30 +61,30 @@ class TeraTestTypeProject(BaseModel):
 
     @staticmethod
     def get_test_type_project_by_id(stp_id: int):
-        return TeraTestTypeProject.query().filter_by(id_test_type_project=stp_id).first()
+        return TeraTestTypeProject.query.filter_by(id_test_type_project=stp_id).first()
 
     @staticmethod
     def get_projects_for_test_type(test_type_id: int):
-        return TeraTestTypeProject.query().filter_by(id_test_type=test_type_id).all()
+        return TeraTestTypeProject.query.filter_by(id_test_type=test_type_id).all()
 
     @staticmethod
     def get_tests_types_for_project(project_id: int):
-        return TeraTestTypeProject.query().filter_by(id_project=project_id).all()
+        return TeraTestTypeProject.query.filter_by(id_project=project_id).all()
 
     @staticmethod
     def get_test_type_project_for_test_type_project(project_id: int, test_type_id: int):
-        return TeraTestTypeProject.query().filter_by(id_project=project_id, id_test_type=test_type_id).first()
+        return TeraTestTypeProject.query.filter_by(id_project=project_id, id_test_type=test_type_id).first()
 
     @staticmethod
     def get_test_type_project_for_project_and_service(project_id: int, service_id: int):
         from opentera.db.models.TeraTestType import TeraTestType
-        return TeraTestTypeProject.query().join(TeraTestType).\
+        return TeraTestTypeProject.query.join(TeraTestType).\
             filter(TeraTestType.id_service == service_id).\
             filter(TeraTestTypeProject.id_project == project_id).all()
 
     @staticmethod
     def delete_with_ids(test_type_id: int, project_id: int):
-        delete_obj: TeraTestTypeProject = TeraTestTypeProject.query().filter_by(id_test_type=test_type_id,
+        delete_obj: TeraTestTypeProject = TeraTestTypeProject.query.filter_by(id_test_type=test_type_id,
                                                                               id_project=project_id).first()
         if delete_obj:
             TeraTestTypeProject.delete(delete_obj.id_test_type_project)
@@ -119,7 +119,7 @@ class TeraTestTypeProject(BaseModel):
     @classmethod
     def update(cls, update_id: int, values: dict):
         values = cls.clean_values(values)
-        ttp = cls.query().filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
+        ttp = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
         ttp.from_json(values)
         # Check if that site of that project has the site associated to the test type
         from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
