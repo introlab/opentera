@@ -1,4 +1,6 @@
-from modules.FlaskModule.FlaskModule import flask_app
+# from modules.FlaskModule.FlaskModule import flask_app
+from services.LoggingService.FlaskModule import flask_app
+from services.LoggingService.FlaskModule import api
 from requests import get, post, Response, delete
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.config.ConfigManager import ConfigManager
@@ -10,29 +12,32 @@ import uuid
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 
 
+service_api_namespace = api.namespace('service', description='Fake TeraServer service API')
+
+
 class FakeFlaskModule(BaseModule):
     def __init__(self,  config: ConfigManager):
         BaseModule.__init__(self, 'FlaskModule-test', config)
-        flask_app.debug = True
-        flask_app.test = True
-        flask_app.secret_key = str(uuid.uuid4())  # Normally service UUID
-        flask_app.config.update({'SESSION_TYPE': 'redis'})
-        redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
-                                   % self.config.redis_config)
-
-        flask_app.config.update({'SESSION_REDIS': redis_url})
-        flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
-        flask_app.config.update({'SESSION_COOKIE_SECURE': True})
-        flask_app.config.update({'SQLALCHEMY_TRACK_MODIFICATIONS': True})
-
-        # Create session
-        self.session = Session(flask_app)
+        # flask_app.debug = True
+        # flask_app.test = True
+        # flask_app.secret_key = str(uuid.uuid4())  # Normally service UUID
+        # flask_app.config.update({'SESSION_TYPE': 'redis'})
+        # redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
+        #                            % self.config.redis_config)
+        #
+        # flask_app.config.update({'SESSION_REDIS': redis_url})
+        # flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
+        # flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        # flask_app.config.update({'SQLALCHEMY_TRACK_MODIFICATIONS': True})
+        #
+        # # Create session
+        # self.session = Session(flask_app)
         self.setup_fake_service_api()
 
     def setup_fake_service_api(self):
         with flask_app.app_context():
             # Setup Fake Service API
-            from modules.FlaskModule.FlaskModule import service_api_ns
+            # from modules.FlaskModule.FlaskModule import service_api_ns
             # Default arguments
             kwargs = {'flaskModule': self,
                       'test': True}
@@ -55,21 +60,21 @@ class FakeFlaskModule(BaseModule):
             from modules.FlaskModule.API.service.ServiceQueryTests import ServiceQueryTests
             from modules.FlaskModule.API.service.ServiceQueryAccess import ServiceQueryAccess
 
-            service_api_ns.add_resource(ServiceQueryUsers, '/users', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQueryDevices, '/devices', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQueryAssets, '/assets', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQuerySessionEvents, '/sessions/events', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQuerySiteProjectAccessRoles, '/users/access', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQueryServices, '/services', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQueryProjects, '/projects', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQuerySites, '/sites', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceSessionManager, '/sessions/manager', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQuerySessionTypes, '/sessiontypes', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQueryTestTypes, '/testtypes', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQueryTests, '/tests', resource_class_kwargs=kwargs)
-            service_api_ns.add_resource(ServiceQueryAccess, '/access', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQueryUsers, '/users', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQueryDevices, '/devices', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQueryAssets, '/assets', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQuerySessionEvents, '/sessions/events', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQuerySiteProjectAccessRoles, '/users/access', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQueryServices, '/services', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQueryProjects, '/projects', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQuerySites, '/sites', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceSessionManager, '/sessions/manager', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQuerySessionTypes, '/sessiontypes', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQueryTestTypes, '/testtypes', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQueryTests, '/tests', resource_class_kwargs=kwargs)
+            service_api_namespace.add_resource(ServiceQueryAccess, '/access', resource_class_kwargs=kwargs)
 
             # Add namespace
             # api.add_namespace(service_api_ns)
@@ -82,7 +87,7 @@ class FakeLoggingService:
     """
     service_token = str()
 
-    def __init__(self):
+    def __init__(self, db):
         self.config = ConfigManager()
         self.config.create_defaults()
         self.redis = redis.Redis(host=self.config.redis_config['hostname'],
@@ -92,9 +97,10 @@ class FakeLoggingService:
                                  db=self.config.redis_config['db'])
         from modules.LoginModule.LoginModule import LoginModule
         self.login_module = LoginModule(self.config)
-        # self.flask_module = FakeFlaskModule(self.config)
         self.db_manager = DBManager(self.config)
-        self.db_manager.open_local({}, echo=False, ram=True)
+        # Cheating on db (reusing already opened from test)
+        self.db_manager.db = db
+        # self.db_manager.open_local({}, echo=False, ram=True)
         with flask_app.app_context():
             self.db_manager.create_defaults(self.config, test=True)
         self.flask_module = FakeFlaskModule(self.config)
@@ -141,19 +147,22 @@ class FakeLoggingService:
             return [user.user_uuid for user in TeraUser.query.all() if user.user_enabled]
 
     def post_to_opentera(self, api_url: str, json_data: dict) -> Response:
-        # Synchronous call to OpenTera fake backend
-        request_headers = {'Authorization': 'OpenTera ' + self.service_token}
-        return self.test_client.post(api_url, headers=request_headers, json=json_data)
+        with flask_app.app_context():
+            # Synchronous call to OpenTera fake backend
+            request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+            return self.test_client.post(api_url, headers=request_headers, json=json_data)
 
     def get_from_opentera(self, api_url: str, params: dict) -> Response:
-        # Synchronous call to OpenTera fake backend
-        request_headers = {'Authorization': 'OpenTera ' + self.service_token}
-        return self.test_client.get(api_url, headers=request_headers, query_string=params)
+        with flask_app.app_context():
+            # Synchronous call to OpenTera fake backend
+            request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+            return self.test_client.get(api_url, headers=request_headers, query_string=params)
 
     def delete_from_opentera(self, api_url: str, params: dict) -> Response:
-        # Synchronous call to OpenTera fake backend
-        request_headers = {'Authorization': 'OpenTera ' + self.service_token}
-        return self.test_client.delete(api_url, headers=request_headers, query_string=params)
+        with flask_app.app_context():
+            # Synchronous call to OpenTera fake backend
+            request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+            return self.test_client.delete(api_url, headers=request_headers, query_string=params)
 
 
 if __name__ == '__main__':

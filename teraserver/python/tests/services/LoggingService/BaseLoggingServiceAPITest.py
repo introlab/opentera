@@ -72,7 +72,7 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         cls._db_man.create_defaults(cls._config, test=True)
 
         # Instance of Fake service API
-        Globals.service = FakeLoggingService()
+        Globals.service = FakeLoggingService(cls._db_man.db)
 
     @classmethod
     def tearDownClass(cls):
