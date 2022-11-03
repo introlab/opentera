@@ -47,11 +47,12 @@ class DBManager:
         self.db.app = flask_app
         BaseModel.set_db(self.db)
 
-        # Init tables
-        BaseModel.create_all()
+        with flask_app.app_context():
+            # Init tables
+            BaseModel.create_all()
 
-        # Apply any database upgrade, if needed
-        self.upgrade_db()
+            # Apply any database upgrade, if needed
+            self.upgrade_db()
 
     def open_local(self, db_infos, echo=False):
         self.db_uri = 'sqlite://'
@@ -67,11 +68,12 @@ class DBManager:
         self.db.app = flask_app
         BaseModel.set_db(self.db)
 
-        # Init tables
-        BaseModel.create_all()
+        with flask_app.app_context():
+            # Init tables
+            BaseModel.create_all()
 
-        # Apply any database upgrade, if needed
-        self.upgrade_db()
+            # Apply any database upgrade, if needed
+            self.upgrade_db()
 
     def upgrade_db(self):
         # TODO ALEMBIC UPGRADES...

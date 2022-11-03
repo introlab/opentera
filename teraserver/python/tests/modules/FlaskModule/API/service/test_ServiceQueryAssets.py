@@ -8,56 +8,47 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
 
     def setUp(self):
         super().setUp()
-        from modules.FlaskModule.FlaskModule import service_api_ns
-        from BaseServiceAPITest import FakeFlaskModule
-        # Setup minimal API
-        from modules.FlaskModule.API.service.ServiceQueryAssets import ServiceQueryAssets
-        kwargs = {'flaskModule': FakeFlaskModule(config=BaseServiceAPITest.getConfig())}
-        service_api_ns.add_resource(ServiceQueryAssets, '/assets', resource_class_kwargs=kwargs)
-
-        # Create test client
-        self.test_client = flask_app.test_client()
 
     def tearDown(self):
         super().tearDown()
 
     def test_get_endpoint_no_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self.test_client.get(self.test_endpoint)
             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_with_token_auth_no_params(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=None, endpoint=self.test_endpoint)
             self.assertEqual(400, response.status_code)
 
     def test_post_endpoint_no_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self.test_client.post(self.test_endpoint)
             self.assertEqual(401, response.status_code)
 
     def test_delete_endpoint_no_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'uuid': 0}
             response = self.test_client.delete(self.test_endpoint, query_string=params)
             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_query_no_params(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=None, endpoint=self.test_endpoint)
             self.assertEqual(400, response.status_code)
 
     def test_get_endpoint_query_bad_params(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_invalid': 1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 400)
 
     def _checkJson(self, json_data, minimal=False):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             self.assertGreater(len(json_data), 0)
             self.assertTrue(json_data.__contains__('id_asset'))
             self.assertTrue(json_data.__contains__('id_session'))
@@ -76,7 +67,7 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                 self.assertTrue(json_data.__contains__('access_token'))
 
     def test_get_endpoint_query_assets_by_service_uuid(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'service_uuid': '00000000-0000-0000-0000-000000000001', 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -87,7 +78,7 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item)
 
     def test_get_endpoint_query_device_assets(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_device': 1, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -98,14 +89,14 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item)
 
     def test_get_endpoint_query_device_assets_no_access(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_device': 4, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_query_session_assets(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_session': 2}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -116,14 +107,14 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item, minimal=True)
 
     def test_get_endpoint_query_session_assets_no_access(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_session': 100}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_query_participant_assets(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_participant': 1, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -134,14 +125,14 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item)
 
     def test_get_endpoint_query_participant_assets_no_access(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_participant': 4, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_query_user_assets(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_user': 1, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -152,14 +143,14 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item)
 
     def test_get_endpoint_query_user_assets_no_access(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_user': 6, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_query_asset(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_asset': 1, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -170,7 +161,7 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item)
 
     def test_get_endpoint_query_asset_no_access(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_asset': 5, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -178,7 +169,7 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
             self.assertEqual(len(response.json), 0)
 
     def test_get_endpoint_query_assets_created_by_service(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_creator_service': 1, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -189,7 +180,7 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item)
 
     def test_get_endpoint_query_assets_created_by_user(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_creator_user': 1, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -200,14 +191,14 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item)
 
     def test_get_endpoint_query_assets_created_by_user_no_access(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_creator_user': 6, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_query_assets_created_by_participant(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_creator_participant': 1, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -218,14 +209,14 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item)
 
     def test_get_endpoint_query_assets_created_by_participant_no_access(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_creator_participant': 4, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_query_assets_created_by_device(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_creator_device': 1, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -236,14 +227,14 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item)
 
     def test_get_endpoint_query_assets_created_by_device_no_access(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_creator_device': 4, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 403)
 
     def test_post_endpoint_with_update_and_delete(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # New with minimal infos
             json_data = {
                 'asset': {
@@ -305,7 +296,7 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
             self.assertEqual(400, response.status_code, msg="Wrong delete")
 
     def test_get_endpoint_query_session_assets_as_admin_token_only(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_session': 2, 'with_urls': True, 'with_only_token': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
