@@ -5,6 +5,10 @@ from modules.LoginModule.LoginModule import user_http_auth, LoginModule
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
+from opentera.utils.UserAgentParser import UserAgentParser
+
+import opentera.messages.python as messages
+
 
 # model = api.model('Login', {
 #     'websocket_url': fields.String,
@@ -53,8 +57,7 @@ class UserLogin(Resource):
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
 
         # Get login informations for log
-        login_infos = LoginModule.parse_request_for_login_infos(request)
-        # TODO: Log login informations
+        login_infos = UserAgentParser.parse_request_for_login_infos(request)
 
         # Verify if user already logged in
         rpc = RedisRPCClient(self.module.config.redis_config)
@@ -65,10 +68,19 @@ class UserLogin(Resource):
             self.module.redisSet(session['_id'], session['_user_id'], ex=60)
         elif args['with_websocket']:
             # User is online and a websocket is required
-            self.module.logger.log_warning(self.module.module_name,
-                                           UserLogin.__name__,
-                                           'get', 403,
-                                           'User already logged in', current_user.to_json(minimal=True))
+            self.module.logger.send_login_event(sender=self.module.module_name,
+                                                level=messages.LogEvent.LOGLEVEL_ERROR,
+                                                login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
+                                                login_status=
+                                                messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_ALREADY_LOGGED_IN,
+                                                client_name=login_infos['client_name'],
+                                                client_version=login_infos['client_version'],
+                                                client_ip=login_infos['client_ip'],
+                                                os_name=login_infos['os_name'],
+                                                os_version=login_infos['os_version'],
+                                                user_uuid=current_user.user_uuid,
+                                                server_endpoint=login_infos['server_endpoint'])
+
             return gettext('User already logged in.'), 403
 
         current_user.update_last_online()
@@ -109,12 +121,20 @@ class UserLogin(Resource):
                         if len(stored_client_version_parts) and len(client_version_parts):
                             if stored_client_version_parts[0] != client_version_parts[0]:
                                 # return 426 = upgrade required
-                                self.module.logger.log_warning(self.module.module_name,
-                                                               UserLogin.__name__,
-                                                               'get', 426,
-                                                               'Client major version too old, not accepting login',
-                                                               stored_client_version_parts[0],
-                                                               client_version_parts[0])
+                                self.module.logger.send_login_event(sender=self.module.module_name,
+                                                                    level=messages.LogEvent.LOGLEVEL_ERROR,
+                                                                    login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
+                                                                    login_status=
+                                                                    messages.LoginEvent.LOGIN_STATUS_UNKNOWN,
+                                                                    client_name=login_infos['client_name'],
+                                                                    client_version=login_infos['client_version'],
+                                                                    client_ip=login_infos['client_ip'],
+                                                                    os_name=login_infos['os_name'],
+                                                                    os_version=login_infos['os_version'],
+                                                                    user_uuid=current_user.user_uuid,
+                                                                    server_endpoint=login_infos['server_endpoint'],
+                                                                    message=gettext('Client version mismatch'))
+
                                 return gettext('Client major version too old, not accepting login'), 426
                 else:
                     return gettext('Invalid client name :') + client_name, 403
@@ -123,5 +143,17 @@ class UserLogin(Resource):
                                              UserLogin.__name__,
                                              'get', 500, 'Invalid client version handler', str(e))
                 return gettext('Invalid client version handler') + str(e), 500
+
+        self.module.logger.send_login_event(sender=self.module.module_name,
+                                            level=messages.LogEvent.LOGLEVEL_INFO,
+                                            login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
+                                            login_status=messages.LoginEvent.LOGIN_STATUS_SUCCESS,
+                                            client_name=login_infos['client_name'],
+                                            client_version=login_infos['client_version'],
+                                            client_ip=login_infos['client_ip'],
+                                            os_name=login_infos['os_name'],
+                                            os_version=login_infos['os_version'],
+                                            user_uuid=current_user.user_uuid,
+                                            server_endpoint=login_infos['server_endpoint'])
 
         return reply

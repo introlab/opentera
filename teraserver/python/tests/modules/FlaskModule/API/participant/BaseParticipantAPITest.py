@@ -11,6 +11,7 @@ from flask_session import Session
 from modules.FlaskModule.FlaskModule import flask_app
 import redis
 from requests.auth import _basic_auth_str
+import modules.Globals as Globals
 
 
 class FakeFlaskModule(BaseModule):
@@ -51,6 +52,7 @@ class BaseParticipantAPITest(unittest.TestCase):
 
         # This is needed for Logins and tokens
         cls._login_module = LoginModule(cls._config)
+        Globals.login_module = cls._login_module  # TODO: Create a fake logger so we don't actually log?
 
     @classmethod
     def tearDownClass(cls):

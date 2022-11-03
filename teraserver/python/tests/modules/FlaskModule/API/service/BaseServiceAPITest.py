@@ -15,6 +15,7 @@ import redis
 import uuid
 from flask import Flask
 from flask_babel import Babel
+import modules.Globals as Globals
 
 
 class FakeFlaskModule(BaseModule):
@@ -57,13 +58,13 @@ class BaseServiceAPITest(unittest.TestCase):
         cls._config = BaseServiceAPITest.getConfig()
         # This is needed for Logins and tokens
         cls._login_module = LoginModule(cls._config, cls._flask_app)
+        Globals.login_module = cls._login_module  # TODO: Create a fake logger so we don't actually log?
         cls._db_man: DBManager = DBManager(cls._config, cls._flask_app)
 
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)
 
         with cls._flask_app.app_context():
-
             cls._flask_module = FakeFlaskModule(cls._config, cls._flask_app)
             # Creating default users / tests. Time-consuming, only once per test file.
             cls._db_man.create_defaults(cls._config, test=True)
