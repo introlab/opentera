@@ -17,6 +17,7 @@ from threading import Thread
 from datetime import datetime
 from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name
 import opentera.messages.python as messages
+import modules.Globals as Globals
 import time
 
 
@@ -59,6 +60,7 @@ class BaseDeviceAPITest(unittest.TestCase):
 
         # This is needed for Logins and tokens
         cls._login_module = LoginModule(cls._config)
+        Globals.login_module = cls._login_module    # TODO: Create a fake logger so we don't actually log?
 
         # This is needed for User management
         cls._user_manager_module = UserManagerModule(cls._config)

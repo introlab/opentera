@@ -24,8 +24,9 @@ from functools import wraps
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
 
 from twisted.internet import task
-from ua_parser import user_agent_parser
 
+import modules.Globals as Globals
+from opentera.utils.UserAgentParser import UserAgentParser
 # Current participant identity, stacked
 current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant', None))
 
@@ -201,9 +202,9 @@ class LoginModule(BaseModule):
         tentative_user = TeraUser.get_user_by_username(username)
         if not tentative_user:
             # self.logger.log_warning(self.module_name, 'Invalid username', username)
-            login_infos = LoginModule.parse_request_for_login_infos(request)
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
             self.logger.send_login_event(sender='LoginModule.user_verify_password',
-                                         level=messages.LogEvent.LOGLEVEL_WARNING,
+                                         level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
                                          login_status=
                                          messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_WRONG_USERNAME,
@@ -225,9 +226,9 @@ class LoginModule(BaseModule):
             current_attempts = int(current_attempts)
 
         if current_attempts >= 5:
-            login_infos = LoginModule.parse_request_for_login_infos(request)
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
             self.logger.send_login_event(sender='LoginModule.user_verify_password',
-                                         level=messages.LogEvent.LOGLEVEL_WARNING,
+                                         level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
                                          login_status=
                                          messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_MAX_ATTEMPTS_REACHED,
@@ -261,13 +262,13 @@ class LoginModule(BaseModule):
         self.redisSet(attempts_key, current_attempts, 120)
 
         # self.logger.log_warning(self.module_name, 'Invalid password for user', username)
-        login_infos = LoginModule.parse_request_for_login_infos(request)
+        login_infos = UserAgentParser.parse_request_for_login_infos(request)
         if not tentative_user.is_active():
             login_status = messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_DISABLED_ACCOUNT
         else:
             login_status = messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_WRONG_PASSWORD
         self.logger.send_login_event(sender='LoginModule.user_verify_password',
-                                     level=messages.LogEvent.LOGLEVEL_WARNING,
+                                     level=messages.LogEvent.LOGLEVEL_ERROR,
                                      login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
                                      login_status=login_status,
                                      client_name=login_infos['client_name'],
@@ -293,9 +294,9 @@ class LoginModule(BaseModule):
         """
         # Disabled tokens should never be used
         if LoginModule.is_user_token_disabled(token_value):
-            login_infos = LoginModule.parse_request_for_login_infos(request)
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
             self.logger.send_login_event(sender='LoginModule.user_verify_token',
-                                         level=messages.LogEvent.LOGLEVEL_WARNING,
+                                         level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
                                          login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_DISABLED_ACCOUNT,
                                          client_name=login_infos['client_name'],
@@ -314,9 +315,9 @@ class LoginModule(BaseModule):
         except jwt.exceptions.PyJWTError as e:
             # print(e)
             # self.logger.log_error(self.module_name, 'User Token exception occurred')
-            login_infos = LoginModule.parse_request_for_login_infos(request)
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
             self.logger.send_login_event(sender='LoginModule.user_verify_token',
-                                         level=messages.LogEvent.LOGLEVEL_WARNING,
+                                         level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
                                          login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
                                          client_name=login_infos['client_name'],
@@ -335,9 +336,9 @@ class LoginModule(BaseModule):
             # Expiration date in the past?
             if expiration_date < datetime.datetime.now():
                 # self.logger.log_warning(self.module_name, 'Token expired for user', token_dict['user_uuid'])
-                login_infos = LoginModule.parse_request_for_login_infos(request)
+                login_infos = UserAgentParser.parse_request_for_login_infos(request)
                 self.logger.send_login_event(sender='LoginModule.user_verify_token',
-                                             level=messages.LogEvent.LOGLEVEL_WARNING,
+                                             level=messages.LogEvent.LOGLEVEL_ERROR,
                                              login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
                                              login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_EXPIRED_TOKEN,
                                              client_name=login_infos['client_name'],
@@ -356,7 +357,7 @@ class LoginModule(BaseModule):
                 login_user(current_user, remember=True)
                 return True
 
-            login_infos = LoginModule.parse_request_for_login_infos(request)
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
             self.logger.send_login_event(sender='LoginModule.user_verify_token',
                                          level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
@@ -376,9 +377,9 @@ class LoginModule(BaseModule):
 
         tentative_participant = TeraParticipant.get_participant_by_username(username)
         if not tentative_participant:
-            login_infos = LoginModule.parse_request_for_login_infos(request)
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
             self.logger.send_login_event(sender='LoginModule.participant_verify_password',
-                                         level=messages.LogEvent.LOGLEVEL_WARNING,
+                                         level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
                                          login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_WRONG_USERNAME,
                                          client_name=login_infos['client_name'],
@@ -400,9 +401,9 @@ class LoginModule(BaseModule):
             current_attempts = int(current_attempts)
 
         if current_attempts >= 5:
-            login_infos = LoginModule.parse_request_for_login_infos(request)
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
             self.logger.send_login_event(sender='LoginModule.participant_verify_password',
-                                         level=messages.LogEvent.LOGLEVEL_WARNING,
+                                         level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
                                          login_status=
                                          messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_MAX_ATTEMPTS_REACHED,
@@ -440,9 +441,9 @@ class LoginModule(BaseModule):
         self.redisSet(attempts_key, current_attempts, 120)
 
         # self.logger.log_warning(self.module_name, 'Invalid password for participant', username)
-        login_infos = LoginModule.parse_request_for_login_infos(request)
+        login_infos = UserAgentParser.parse_request_for_login_infos(request)
         self.logger.send_login_event(sender='LoginModule.participant_verify_password',
-                                     level=messages.LogEvent.LOGLEVEL_WARNING,
+                                     level=messages.LogEvent.LOGLEVEL_ERROR,
                                      login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
                                      login_status=
                                      messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_WRONG_PASSWORD,
@@ -482,9 +483,9 @@ class LoginModule(BaseModule):
 
         # Disabled tokens should never be used
         if LoginModule.is_participant_token_disabled(token_value):
-            login_infos = LoginModule.parse_request_for_login_infos(request)
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
             self.logger.send_login_event(sender='LoginModule.participant_verify_token',
-                                         level=messages.LogEvent.LOGLEVEL_WARNING,
+                                         level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
                                          login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_DISABLED_ACCOUNT,
                                          client_name=login_infos['client_name'],
@@ -506,9 +507,9 @@ class LoginModule(BaseModule):
         except jwt.exceptions.PyJWTError as e:
             #print(e)
             # self.logger.log_error(self.module_name, 'Participant Token exception occurred')
-            login_infos = LoginModule.parse_request_for_login_infos(request)
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
             self.logger.send_login_event(sender='LoginModule.participant_verify_token',
-                                         level=messages.LogEvent.LOGLEVEL_WARNING,
+                                         level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
                                          login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
                                          client_name=login_infos['client_name'],
@@ -529,9 +530,9 @@ class LoginModule(BaseModule):
             if expiration_date < datetime.datetime.now():
                 # self.logger.log_warning(self.module_name, 'Token expired for participant',
                 #                         token_dict['participant_uuid'])
-                login_infos = LoginModule.parse_request_for_login_infos(request)
+                login_infos = UserAgentParser.parse_request_for_login_infos(request)
                 self.logger.send_login_event(sender='LoginModule.participant_verify_token',
-                                             level=messages.LogEvent.LOGLEVEL_WARNING,
+                                             level=messages.LogEvent.LOGLEVEL_ERROR,
                                              login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
                                              login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_EXPIRED_TOKEN,
                                              client_name=login_infos['client_name'],
@@ -553,7 +554,7 @@ class LoginModule(BaseModule):
             login_user(current_participant, remember=True)
             return True
 
-        login_infos = LoginModule.parse_request_for_login_infos(request)
+        login_infos = UserAgentParser.parse_request_for_login_infos(request)
         self.logger.send_login_event(sender='LoginModule.participant_verify_token',
                                      level=messages.LogEvent.LOGLEVEL_ERROR,
                                      login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
@@ -590,68 +591,6 @@ class LoginModule(BaseModule):
         return []
 
     @staticmethod
-    def parse_request_for_login_infos(http_request: request) -> dict:
-        infos = {'client_name': '',
-                 'client_version': '',
-                 'os_name': '',
-                 'os_version': '',
-                 'server_endpoint': http_request.endpoint,
-                 'client_ip': http_request.remote_addr
-                 }
-
-        if 'USER_AGENT' in http_request.headers:
-            user_agent = user_agent_parser.Parse(http_request.headers['USER_AGENT'])
-            infos['client_name'] = ''
-            if user_agent['device']['brand']:
-                infos['client_name'] = user_agent['device']['brand'] + ' - '
-            if user_agent['device']['family']:
-                infos['client_name'] += user_agent['device']['family'] + ' - '
-
-            infos['client_name'] += user_agent['user_agent']['family']
-
-            if user_agent['user_agent']['major']:
-                infos['client_version'] = user_agent['user_agent']['major']
-            else:
-                infos['client_version'] = 'x'
-            infos['client_version'] += '.'
-            if user_agent['user_agent']['minor']:
-                infos['client_version'] += user_agent['user_agent']['minor']
-            else:
-                infos['client_version'] += 'x'
-            infos['client_version'] += '.'
-            if user_agent['user_agent']['patch']:
-                infos['client_version'] += user_agent['user_agent']['patch']
-            else:
-                infos['client_version'] += 'x'
-
-            infos['os_name'] = user_agent['os']['family']
-
-            if user_agent['os']['major']:
-                infos['os_version'] = user_agent['os']['major']
-            else:
-                infos['os_version'] = 'x'
-            infos['os_version'] += '.'
-            if user_agent['os']['minor']:
-                infos['os_version'] += user_agent['os']['minor']
-            else:
-                infos['os_version'] += 'x'
-            infos['os_version'] += '.'
-            if user_agent['os']['patch']:
-                infos['os_version'] += user_agent['os']['patch']
-            else:
-                infos['os_version'] += 'x'
-
-        if 'X-Client-Name' in http_request.headers:
-            infos['client_name'] = http_request.headers['X-Client-Name']
-        if 'X-Client_Version' in http_request.headers:
-            infos['client_version'] = http_request.headers['X-Client-Version']
-
-        if 'X-Script-Name' in http_request.headers:
-            infos['server_endpoint'] = http_request.headers['X-Script-Name']
-
-        return infos
-
-    @staticmethod
     def auth_error(status):
         return gettext("Unauthorized"), status
 
@@ -664,8 +603,6 @@ class LoginModule(BaseModule):
 
         @wraps(f)
         def decorated(*args, **kwargs):
-            # TODO: Use Globals.login_module.logger to log
-
             # Since certificates are more secure than tokens, we will test for them first
 
             # Headers are modified in TwistedModule to add certificate information if available.
@@ -681,6 +618,15 @@ class LoginModule(BaseModule):
                         login_user(current_device, remember=True)
                         return f(*args, **kwargs)
                     else:
+                        login_infos = UserAgentParser.parse_request_for_login_infos(request)
+                        Globals.login_module.logger.send_login_event(
+                            sender='LoginModule.device_token_or_certificate_required',
+                            level=messages.LogEvent.LOGLEVEL_ERROR,
+                            login_type=messages.LoginEvent.LOGIN_TYPE_CERTIFICATE,
+                            login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_DISABLED_ACCOUNT,
+                            client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                            client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                            os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'])
                         return gettext('Disabled device'), 401
 
             # Then verify tokens...
@@ -705,6 +651,15 @@ class LoginModule(BaseModule):
                             login_user(current_device, remember=True)
                             return f(*args, **kwargs)
                         else:
+                            login_infos = UserAgentParser.parse_request_for_login_infos(request)
+                            Globals.login_module.logger.send_login_event(
+                                sender='LoginModule.device_token_or_certificate_required',
+                                level=messages.LogEvent.LOGLEVEL_ERROR,
+                                login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
+                                login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_DISABLED_ACCOUNT,
+                                client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                                client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                                os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'])
                             return gettext('Disabled device'), 401
 
             # Parse args
@@ -724,6 +679,19 @@ class LoginModule(BaseModule):
                     return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
+            if request.headers.__contains__('X-Device-Uuid'):
+                login_type = messages.LoginEvent.LOGIN_TYPE_CERTIFICATE
+            else:
+                login_type = messages.LoginEvent.LOGIN_TYPE_TOKEN
+            Globals.login_module.logger.send_login_event(
+                sender='LoginModule.device_token_or_certificate_required',
+                level=messages.LogEvent.LOGLEVEL_ERROR,
+                login_type=login_type,
+                login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
+                client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'])
             return gettext('Unauthorized'), 401
 
         return decorated
@@ -747,6 +715,12 @@ class LoginModule(BaseModule):
 
             # Then verify tokens...
             service_uuid = None
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
+            if request.headers.__contains__('X-Service-Uuid'):
+                login_type = messages.LoginEvent.LOGIN_TYPE_CERTIFICATE
+            else:
+                login_type = messages.LoginEvent.LOGIN_TYPE_TOKEN
+
             # Verify token in auth headers (priority over token in params)
             if 'Authorization' in request.headers:
                 try:
@@ -754,6 +728,15 @@ class LoginModule(BaseModule):
                     scheme, token = request.headers['Authorization'].split(None, 1)
                 except ValueError:
                     # malformed Authorization header
+                    Globals.login_module.logger.send_login_event(
+                        sender='LoginModule.service_token_or_certificate_required',
+                        level=messages.LogEvent.LOGLEVEL_ERROR,
+                        login_type=login_type,
+                        login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
+                        client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                        client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                        os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
+                        service_uuid=service_uuid)
                     return gettext('Invalid Token'), 401
 
                 # Verify scheme and token
@@ -767,6 +750,15 @@ class LoginModule(BaseModule):
                         if 'service_uuid' in token_dict:
                             service_uuid = token_dict['service_uuid']
                     except jwt.exceptions.PyJWTError as e:
+                        Globals.login_module.logger.send_login_event(
+                            sender='LoginModule.service_token_or_certificate_required',
+                            level=messages.LogEvent.LOGLEVEL_ERROR,
+                            login_type=login_type,
+                            login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
+                            client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                            client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                            os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
+                            service_uuid=service_uuid)
                         return gettext('Unauthorized'), 401
 
             # Parse args
@@ -785,6 +777,15 @@ class LoginModule(BaseModule):
                         if 'service_uuid' in token_dict:
                             service_uuid = token_dict['service_uuid']
                     except jwt.exceptions.PyJWTError as e:
+                        Globals.login_module.logger.send_login_event(
+                            sender='LoginModule.service_token_or_certificate_required',
+                            level=messages.LogEvent.LOGLEVEL_ERROR,
+                            login_type=login_type,
+                            login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
+                            client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                            client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                            os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
+                            service_uuid=service_uuid)
                         return gettext('Unauthorized'), 401
 
             if service_uuid:
@@ -795,37 +796,15 @@ class LoginModule(BaseModule):
                     return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.
+            Globals.login_module.logger.send_login_event(
+                sender='LoginModule.service_token_or_certificate_required',
+                level=messages.LogEvent.LOGLEVEL_ERROR,
+                login_type=login_type,
+                login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
+                client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
+                service_uuid=service_uuid)
             return gettext('Unauthorized'), 401
 
         return decorated
-
-
-
-# if __name__ == '__main__':
-#     storage = DisabledTokenStorage()
-#     import uuid
-#
-#     def create_user():
-#         new_user = TeraUser()
-#         new_user.user_enabled = True
-#         new_user.user_firstname = "No Access"
-#         new_user.user_lastname = "User!"
-#         new_user.user_profile = ""
-#         new_user.user_password = TeraUser.encrypt_password("user4")
-#         new_user.user_superadmin = False
-#         new_user.user_username = "test_user"
-#         new_user.user_uuid = str(uuid.uuid4())
-#         return new_user
-#
-#     key = 'testkey'
-#     user = create_user()
-#     token1 = user.get_token(key, expiration=1)
-#     token2 = user.get_token(key, expiration=3600)
-#
-#     storage.push_disabled_token(token1)
-#     storage.push_disabled_token(token2)
-#     disabled = storage.is_disabled_token(token1)
-#     disabled = storage.is_disabled_token(token2)
-#
-#     storage.remove_expired_tokens(key)
-#     print(storage)

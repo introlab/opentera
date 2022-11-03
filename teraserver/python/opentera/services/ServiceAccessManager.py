@@ -11,6 +11,8 @@ from opentera.services.TeraUserClient import TeraUserClient
 from opentera.services.TeraDeviceClient import TeraDeviceClient
 from opentera.services.TeraParticipantClient import TeraParticipantClient
 from opentera.services.TeraServiceClient import TeraServiceClient
+from opentera.utils.UserAgentParser import UserAgentParser
+import opentera.messages.python as messages
 
 # Current client identity, stacked
 current_user_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_user_client', None))
@@ -39,7 +41,7 @@ class ServiceAccessManager:
     api_device_static_token_key = None
     api_service_token_key = None
     token_cookie_name = 'OpenTera'
-    config_man = None
+    service = None
 
     @staticmethod
     def token_required(allow_dynamic_tokens=True, allow_static_tokens=False):
@@ -47,6 +49,8 @@ class ServiceAccessManager:
             def decorated(*args, **kwargs):
                 # We support 3 authentication scheme: token in url, cookie and authorization header
                 token = None
+                login_infos = UserAgentParser.parse_request_for_login_infos(request)
+
                 ######################
                 # AUTHORIZATION HEADER
                 if 'Authorization' in request.headers:
@@ -55,6 +59,15 @@ class ServiceAccessManager:
                         scheme, atoken = request.headers['Authorization'].split(None, 1)
                     except ValueError:
                         # malformed Authorization header
+                        ServiceAccessManager.service.logger.send_login_event(
+                            sender='ServiceAccessManager.token_required',
+                            level=messages.LogEvent.LOGLEVEL_ERROR,
+                            login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
+                            login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
+                            client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                            client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                            os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
+                            service_uuid=ServiceAccessManager.service.service_uuid)
                         return 'Forbidden', 403
 
                     # Verify scheme and token
@@ -96,6 +109,15 @@ class ServiceAccessManager:
                                                                    allow_static_tokens=allow_static_tokens):
                     return f(*args, **kwargs)
 
+                ServiceAccessManager.service.logger.send_login_event(
+                    sender='ServiceAccessManager.token_required',
+                    level=messages.LogEvent.LOGLEVEL_ERROR,
+                    login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
+                    login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
+                    client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                    client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                    os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
+                    service_uuid=ServiceAccessManager.service.service_uuid)
                 return 'Forbidden', 403
 
             return decorated
@@ -107,6 +129,7 @@ class ServiceAccessManager:
         def decorated(*args, **kwargs):
             # We support token auth. only.
             token = None
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
             ######################
             # AUTHORIZATION HEADER
             if 'Authorization' in request.headers:
@@ -115,6 +138,15 @@ class ServiceAccessManager:
                     scheme, atoken = request.headers['Authorization'].split(None, 1)
                 except ValueError:
                     # malformed Authorization header
+                    ServiceAccessManager.service.logger.send_login_event(
+                        sender='ServiceAccessManager.service_token_required',
+                        level=messages.LogEvent.LOGLEVEL_ERROR,
+                        login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
+                        login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
+                        client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                        client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                        os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
+                        service_uuid=ServiceAccessManager.service.service_uuid)
                     return 'Forbidden', 403
 
                 # Verify scheme and token
@@ -125,6 +157,15 @@ class ServiceAccessManager:
             if ServiceAccessManager.validate_service_token(token=token):
                 return f(*args, **kwargs)
 
+            ServiceAccessManager.service.logger.send_login_event(
+                sender='ServiceAccessManager.service_token_required',
+                level=messages.LogEvent.LOGLEVEL_ERROR,
+                login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
+                login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
+                client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
+                service_uuid=ServiceAccessManager.service.service_uuid)
             return 'Forbidden', 403
 
         return decorated
@@ -135,6 +176,7 @@ class ServiceAccessManager:
             def decorated(*args, **kwargs):
                 # We support 3 authentication scheme: token in url, cookie and authorization header
                 token = None
+                login_infos = UserAgentParser.parse_request_for_login_infos(request)
                 ######################
                 # AUTHORIZATION HEADER
                 if 'Authorization' in request.headers:
@@ -143,6 +185,15 @@ class ServiceAccessManager:
                         scheme, atoken = request.headers['Authorization'].split(None, 1)
                     except ValueError:
                         # malformed Authorization header
+                        ServiceAccessManager.service.logger.send_login_event(
+                            sender='ServiceAccessManager.service_or_others_token_required',
+                            level=messages.LogEvent.LOGLEVEL_ERROR,
+                            login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
+                            login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
+                            client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                            client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                            os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
+                            service_uuid=ServiceAccessManager.service.service_uuid)
                         return 'Forbidden', 403
 
                     # Verify scheme and token
@@ -189,6 +240,15 @@ class ServiceAccessManager:
                                                                    allow_static_tokens=allow_static_tokens):
                     return f(*args, **kwargs)
 
+                ServiceAccessManager.service.logger.send_login_event(
+                    sender='ServiceAccessManager.service_or_others_token_required',
+                    level=messages.LogEvent.LOGLEVEL_ERROR,
+                    login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
+                    login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
+                    client_name=login_infos['client_name'], client_version=login_infos['client_version'],
+                    client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
+                    os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
+                    service_uuid=ServiceAccessManager.service.service_uuid)
                 return 'Forbidden', 403
 
             return decorated
@@ -205,7 +265,7 @@ class ServiceAccessManager:
         else:
             # User token
             _request_ctx_stack.top.current_user_client = \
-                TeraUserClient(token_dict, token, ServiceAccessManager.config_man)
+                TeraUserClient(token_dict, token, ServiceAccessManager.service.config_man)
             _request_ctx_stack.top.current_login_type = LoginType.USER_LOGIN
             return True
 
@@ -220,7 +280,7 @@ class ServiceAccessManager:
             else:
                 # Device token
                 _request_ctx_stack.top.current_device_client = \
-                    TeraDeviceClient(token_dict, token, ServiceAccessManager.config_man)
+                    TeraDeviceClient(token_dict, token, ServiceAccessManager.service.config_man)
                 _request_ctx_stack.top.current_login_type = LoginType.DEVICE_LOGIN
                 return True
 
@@ -233,7 +293,7 @@ class ServiceAccessManager:
             else:
                 # Device token
                 _request_ctx_stack.top.current_device_client = \
-                    TeraDeviceClient(token_dict, token, ServiceAccessManager.config_man)
+                    TeraDeviceClient(token_dict, token, ServiceAccessManager.service.config_man)
                 _request_ctx_stack.top.current_login_type = LoginType.DEVICE_LOGIN
                 return True
 
@@ -250,7 +310,7 @@ class ServiceAccessManager:
             else:
                 # Participant token
                 _request_ctx_stack.top.current_participant_client = \
-                    TeraParticipantClient(token_dict, token, ServiceAccessManager.config_man)
+                    TeraParticipantClient(token_dict, token, ServiceAccessManager.service.config_man)
                 _request_ctx_stack.top.current_login_type = LoginType.PARTICIPANT_LOGIN
                 return True
 
@@ -264,7 +324,7 @@ class ServiceAccessManager:
             else:
                 # Participant token
                 _request_ctx_stack.top.current_participant_client = \
-                    TeraParticipantClient(token_dict, token, ServiceAccessManager.config_man)
+                    TeraParticipantClient(token_dict, token, ServiceAccessManager.service.config_man)
                 _request_ctx_stack.top.current_login_type = LoginType.PARTICIPANT_LOGIN
                 return True
 
@@ -280,7 +340,7 @@ class ServiceAccessManager:
         else:
             # Service token
             _request_ctx_stack.top.current_service_client = \
-                TeraServiceClient(token_dict, token, ServiceAccessManager.config_man)
+                TeraServiceClient(token_dict, token, ServiceAccessManager.service.config_man)
             _request_ctx_stack.top.current_login_type = LoginType.SERVICE_LOGIN
             return True
 

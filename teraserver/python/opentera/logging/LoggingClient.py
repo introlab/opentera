@@ -112,10 +112,10 @@ class LoggingClient:
         login_event.client_ip = client_ip
         login_event.os_name = os_name
         login_event.os_version = os_version
-        login_event.user_uuid = user_uuid
-        login_event.participant_uuid = participant_uuid
-        login_event.device_uuid = device_uuid
-        login_event.service_uuid = service_uuid
+        login_event.user_uuid = '' if user_uuid is None else user_uuid
+        login_event.participant_uuid = '' if participant_uuid is None else participant_uuid
+        login_event.device_uuid = '' if device_uuid is None else device_uuid
+        login_event.service_uuid = '' if service_uuid is None else service_uuid
         login_event.server_endpoint = server_endpoint
         # Send it
         try:

@@ -6,7 +6,9 @@ from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
+from opentera.utils.UserAgentParser import UserAgentParser
 from flask_babel import gettext
+import opentera.messages.python as messages
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -66,8 +68,11 @@ class DeviceLogin(Resource):
             response['session_types_info'].append(st.to_json(minimal=True))
 
         # Get login informations for log
-        login_infos = LoginModule.parse_request_for_login_infos(request)
-        # TODO: Log login informations
+        login_infos = UserAgentParser.parse_request_for_login_infos(request)
+        if request.headers.__contains__('X-Device-Uuid'):
+            login_type = messages.LoginEvent.LOGIN_TYPE_CERTIFICATE
+        else:
+            login_type = messages.LoginEvent.LOGIN_TYPE_TOKEN
 
         # TODO Handle sessions
         if current_device.device_onlineable:
@@ -80,10 +85,18 @@ class DeviceLogin(Resource):
                     return gettext('Unable to get online devices.'), 403
 
                 if current_device.device_uuid in online_devices:
-                    self.module.logger.log_warning(self.module.module_name,
-                                                   DeviceLogin.__name__,
-                                                   'get', 403,
-                                                   'Device already logged in', current_device.to_json(minimal=True))
+                    self.module.logger.send_login_event(sender=self.module.module_name,
+                                                        level=messages.LogEvent.LOGLEVEL_ERROR,
+                                                        login_type=login_type,
+                                                        login_status=
+                                                        messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_ALREADY_LOGGED_IN,
+                                                        client_name=login_infos['client_name'],
+                                                        client_version=login_infos['client_version'],
+                                                        client_ip=login_infos['client_ip'],
+                                                        os_name=login_infos['os_name'],
+                                                        os_version=login_infos['os_version'],
+                                                        device_uuid=current_device.device_uuid,
+                                                        server_endpoint=login_infos['server_endpoint'])
 
                     return gettext('Device already logged in.'), 403
 
@@ -93,5 +106,16 @@ class DeviceLogin(Resource):
             # Add websocket URL
             response['websocket_url'] = "wss://" + server_name + ":" + str(port) + "/wss/device?id=" + session['_id']
 
+        self.module.logger.send_login_event(sender=self.module.module_name,
+                                            level=messages.LogEvent.LOGLEVEL_INFO,
+                                            login_type=login_type,
+                                            login_status=messages.LoginEvent.LOGIN_STATUS_SUCCESS,
+                                            client_name=login_infos['client_name'],
+                                            client_version=login_infos['client_version'],
+                                            client_ip=login_infos['client_ip'],
+                                            os_name=login_infos['os_name'],
+                                            os_version=login_infos['os_version'],
+                                            device_uuid=current_device.device_uuid,
+                                            server_endpoint=login_infos['server_endpoint'])
         # Return reply as json object
         return response

@@ -6,6 +6,7 @@ from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from opentera.redis.RedisVars import RedisVars
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
+from opentera.utils.UserAgentParser import UserAgentParser
 import opentera.messages.python as messages
 
 # Parser definition(s)
@@ -56,7 +57,7 @@ class ParticipantLogin(Resource):
                 port = request.headers['X_EXTERNALPORT']
 
             # Get login informations for log
-            login_infos = LoginModule.parse_request_for_login_infos(request)
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
             if current_participant.fullAccess:
                 login_type = messages.LoginEvent.LOGIN_TYPE_TOKEN
             else:
@@ -81,7 +82,7 @@ class ParticipantLogin(Resource):
                 #                                'Participant already logged in',
                 #                                current_participant.to_json(minimal=True))
                 self.module.logger.send_login_event(sender=self.module.module_name,
-                                                    level=messages.LogEvent.LOGLEVEL_INFO,
+                                                    level=messages.LogEvent.LOGLEVEL_ERROR,
                                                     login_type=login_type,
                                                     login_status=
                                                     messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_ALREADY_LOGGED_IN,
@@ -113,8 +114,7 @@ class ParticipantLogin(Resource):
             self.module.logger.send_login_event(sender=self.module.module_name,
                                                 level=messages.LogEvent.LOGLEVEL_INFO,
                                                 login_type=login_type,
-                                                login_status=
-                                                messages.LoginEvent.LOGIN_STATUS_SUCCESS,
+                                                login_status=messages.LoginEvent.LOGIN_STATUS_SUCCESS,
                                                 client_name=login_infos['client_name'],
                                                 client_version=login_infos['client_version'],
                                                 client_ip=login_infos['client_ip'],

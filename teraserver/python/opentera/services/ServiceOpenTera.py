@@ -29,6 +29,7 @@ class ServiceOpenTera(RedisClient):
 
         # Store config
         self.config = config_man.service_config
+        self.config_man = config_man
 
         # Take values from config_man
         # Values are checked when config is loaded...
@@ -52,7 +53,7 @@ class ServiceOpenTera(RedisClient):
             self.redisGet(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
         ServiceAccessManager.api_service_token_key = \
             self.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
-        ServiceAccessManager.config_man = config_man
+        ServiceAccessManager.service = self
 
     def redisConnectionMade(self):
         print('*** ServiceOpenTera.redisConnectionMade for', self.config['name'])
