@@ -28,7 +28,7 @@ class FakeFlaskModule(BaseModule):
         self.api = CustomAPI(self.flask_app, version='0.1', title='OpenTeraServer FakeAPI',
                              description='TeraServer API Documentation', prefix='/api')
 
-        self.namespace = self.api.namespace('participant', description='API for service calls')
+        self.namespace = self.api.namespace('participant', description='API for participant calls')
 
         self.flask_app.debug = False
         self.flask_app.testing = True

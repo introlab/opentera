@@ -1,15 +1,11 @@
 import unittest
-from opentera.db.Base import BaseModel
 from modules.DatabaseModule.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule
 from opentera.config.ConfigManager import ConfigManager
 from opentera.modules.BaseModule import BaseModule, ModuleNames
 from flask.testing import FlaskClient
 from opentera.redis.RedisVars import RedisVars
-from opentera.redis.RedisClient import RedisClient
 from opentera.db.models.TeraService import TeraService
-from opentera.db.models.TeraServerSettings import TeraServerSettings
-from flask_session import Session
 from modules.FlaskModule.FlaskModule import FlaskModule, CustomAPI
 import redis
 import uuid
@@ -30,7 +26,6 @@ class FakeFlaskModule(BaseModule):
 
         self.flask_app.debug = False
         self.flask_app.testing = True
-        # flask_app.secret_key = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerUUID)
         self.flask_app.secret_key = str(uuid.uuid4())
         self.flask_app.config.update({'SESSION_TYPE': 'redis'})
         redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
