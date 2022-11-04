@@ -42,7 +42,10 @@ class FakeFlaskModule(BaseModule):
         self.flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         self.flask_app.config.update({'SESSION_COOKIE_SECURE': True})
 
-        additional_args = {'test': True, 'user_manager_module': user_manager_module}
+        additional_args = {'test': True,
+                           'user_manager_module': user_manager_module,
+                           'flaskModule': self}
+
         FlaskModule.init_device_api(self, self.namespace, additional_args)
 
 
