@@ -4,7 +4,7 @@ from services.LoggingService.FlaskModule import logging_api_ns as api
 from opentera.services.ServiceAccessManager import ServiceAccessManager, current_user_client, \
     current_participant_client, current_device_client
 from services.LoggingService.libloggingservice.db.models.LoginEntry import LoginEntry
-from services.LoggingService.Globals import service
+import services.LoggingService.Globals as Globals
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -38,7 +38,7 @@ class QueryLoginEntries(Resource):
             'admin': False
         }
 
-        response = service.get_from_opentera('/api/service/access', params)
+        response = Globals.service.get_from_opentera('/api/service/access', params)
         if response.status_code == 200:
             # Response should include ourselves (user, participant or device)
             users_uuids = response.json['users_uuids']

@@ -24,6 +24,9 @@ class LoggingConfig:
 
 # Build configuration from base classes
 class ConfigManager(ServiceConfigManager, LoggingConfig, DBConfig):
+    # Only useful for tests
+    server_config = {}
+
     def to_dict(self):
         return {
             'Service': self.service_config,
@@ -43,6 +46,7 @@ class ConfigManager(ServiceConfigManager, LoggingConfig, DBConfig):
         self.service_config['hostname'] = '127.0.0.1'
         self.service_config['port'] = 4041
         self.service_config['debug_mode'] = True
+        self.service_config['ServiceUUID'] = 'invalid'
 
         # Default backend configuration
         self.backend_config['hostname'] = '127.0.0.1'
@@ -65,4 +69,9 @@ class ConfigManager(ServiceConfigManager, LoggingConfig, DBConfig):
 
         # Default logging configuration
         self.logging_config['level'] = 'trace'
+
+        # For tests
+        self.server_config['hostname'] = self.backend_config['hostname']
+        self.server_config['port'] = self.backend_config['port']
+
 
