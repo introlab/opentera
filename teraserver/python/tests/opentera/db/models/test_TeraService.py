@@ -310,7 +310,7 @@ class TeraServiceTest(BaseModelsTest):
             new_service = TeraService()
             # new_service.service_uuid = str(uuid.uuid4())
             new_service.service_name = 'Name'
-            new_service.service_key = 'Key'
+            new_service.service_key = 'Key-Insert'
             new_service.service_hostname = 'Hostname'
             new_service.service_port = 1
             new_service.service_endpoint = "Endpoint"

@@ -5,4 +5,5 @@ from modules.FlaskModule.FlaskModule import flask_app
 class TeraServiceProjectRoleTest(BaseModelsTest):
 
     def test_defaults(self):
-        pass
+        with flask_app.app_context():
+            pass
