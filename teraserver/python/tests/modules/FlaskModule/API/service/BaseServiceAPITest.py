@@ -29,7 +29,7 @@ class FakeFlaskModule(BaseModule):
         self.namespace = self.api.namespace('service', description='API for service calls')
 
         self.flask_app.debug = False
-        self.flask_app.test = True
+        self.flask_app.testing = True
         # flask_app.secret_key = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerUUID)
         self.flask_app.secret_key = str(uuid.uuid4())
         self.flask_app.config.update({'SESSION_TYPE': 'redis'})

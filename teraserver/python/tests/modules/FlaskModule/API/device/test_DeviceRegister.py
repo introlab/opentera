@@ -1,9 +1,9 @@
 from BaseDeviceAPITest import BaseDeviceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraDeviceType import TeraDeviceType
 import opentera.crypto.crypto_utils as crypto
 from cryptography.hazmat.primitives import hashes, serialization
+import time
 
 
 class DeviceRegisterTest(BaseDeviceAPITest):
@@ -12,30 +12,24 @@ class DeviceRegisterTest(BaseDeviceAPITest):
 
     def setUp(self):
         super().setUp()
-        from modules.FlaskModule.FlaskModule import device_api_ns
-        from BaseDeviceAPITest import FakeFlaskModule
-        # Setup minimal API
-        from modules.FlaskModule.API.device.DeviceRegister import DeviceRegister
-        kwargs = {
-            'flaskModule': FakeFlaskModule(config=BaseDeviceAPITest.getConfig()),
-            'test': True,
-            'user_manager_module': self._user_manager_module
-        }
-        device_api_ns.add_resource(DeviceRegister, '/register', resource_class_kwargs=kwargs)
-
-        # Create test client
-        self.test_client = flask_app.test_client()
+        self.sleep_time = 0
 
     def tearDown(self):
         super().tearDown()
 
     def test_post_endpoint_device_register_empty_json(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
+            # This is required since the server will throttle device creations
+            time.sleep(self.sleep_time)
+
             response = self._post_data_no_auth(self.test_client, json={})
             self.assertEqual(response.status_code, 400)
 
     def test_post_endpoint_device_register_json_incomplete_post(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
+            # This is required since the server will throttle device creations
+            time.sleep(self.sleep_time)
+
             device_info = {'device_info': {'device_name': 'Device Name'}}
             response = self._post_data_no_auth(self.test_client, json=device_info)
             self.assertEqual(response.status_code, 400)
@@ -45,13 +39,19 @@ class DeviceRegisterTest(BaseDeviceAPITest):
             self.assertEqual(response.status_code, 400)
 
     def test_post_endpoint_device_register_invalid_id_device_type(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
+            # This is required since the server will throttle device creations
+            time.sleep(self.sleep_time)
+
             device_info = {'device_info': {'device_name': 'Device Name', 'id_device_type': 0}}
             response = self._post_data_no_auth(self.test_client, json=device_info)
             self.assertEqual(response.status_code, 500)
 
     def test_post_endpoint_device_register_json_ok(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
+            # This is required since the server will throttle device creations
+            time.sleep(self.sleep_time)
+
             device_info = {'device_info': {'device_name': 'Device Name', 'id_device_type': 1}}
             response = self._post_data_no_auth(self.test_client, json=device_info)
             self.assertEqual(response.status_code, 200)
@@ -68,10 +68,9 @@ class DeviceRegisterTest(BaseDeviceAPITest):
             self.assertIsNone(TeraDevice.get_device_by_token(response.json['token']))
 
     def test_post_endpoint_with_device_register_with_certificate_csr(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # This is required since the server will throttle device creations
-            import time
-            time.sleep(1)
+            time.sleep(self.sleep_time)
 
             # This will generate private key and signing request for the CA
             client_info = crypto.create_certificate_signing_request('Test Device with Certificate')
