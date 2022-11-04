@@ -1,5 +1,4 @@
 from BaseUserAPITest import BaseUserAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 
 
 class UserQueryParticipantsTest(BaseUserAPITest):

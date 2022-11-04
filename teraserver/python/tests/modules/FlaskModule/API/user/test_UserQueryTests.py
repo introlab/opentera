@@ -1,5 +1,4 @@
 from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 
 
 class UserQueryTestsTest(BaseUserAPITest):

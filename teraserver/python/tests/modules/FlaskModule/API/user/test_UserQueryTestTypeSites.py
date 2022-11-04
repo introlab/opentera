@@ -1,5 +1,6 @@
 from BaseUserAPITest import BaseUserAPITest
 
+
 class UserQuerySessionTypeSitesTest(BaseUserAPITest):
     test_endpoint = '/api/user/testtypes/sites'
 

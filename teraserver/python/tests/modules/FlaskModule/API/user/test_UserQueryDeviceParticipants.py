@@ -186,7 +186,6 @@ class UserQueryDeviceParticipantsTest(BaseUserAPITest):
                     else:
                         self.assertEqual(403, response.status_code)
 
-
     def test_post_endpoint_with_http_auth_site_admin_id_device_is_allowed_for_site(self):
         with self._flask_app.app_context():
             user: TeraUser = TeraUser.get_user_by_username('siteadmin')
