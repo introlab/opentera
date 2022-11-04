@@ -149,7 +149,7 @@ class BaseDeviceAPITest(unittest.TestCase):
         tera_message.head.version = 1
         tera_message.head.time = datetime.now().timestamp()
         tera_message.head.seq = 0
-        tera_message.head.source = 'device' + device.device_uuid
+        tera_message.head.source = 'device.' + device.device_uuid
         tera_message.head.dest = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
 
         device_connected = messages.DeviceEvent()
@@ -170,7 +170,7 @@ class BaseDeviceAPITest(unittest.TestCase):
         tera_message.head.version = 1
         tera_message.head.time = datetime.now().timestamp()
         tera_message.head.seq = 0
-        tera_message.head.source = 'device' + device.device_uuid
+        tera_message.head.source = 'device.' + device.device_uuid
         tera_message.head.dest = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
 
         device_disconnected = messages.DeviceEvent()

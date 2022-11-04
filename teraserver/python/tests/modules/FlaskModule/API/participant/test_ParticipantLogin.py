@@ -1,5 +1,4 @@
 from BaseParticipantAPITest import BaseParticipantAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraParticipant import TeraParticipant
 
 

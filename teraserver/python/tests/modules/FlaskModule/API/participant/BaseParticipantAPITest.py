@@ -14,6 +14,10 @@ import redis
 import uuid
 from flask_babel import Babel
 from flask import Flask
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name
+import opentera.messages.python as messages
+from datetime import datetime
 
 
 class FakeFlaskModule(BaseModule):
@@ -113,38 +117,81 @@ class BaseParticipantAPITest(unittest.TestCase):
     def setup_redis_keys(self):
         # Initialize keys (create only if not found)
         # Service (dynamic)
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_token_key)
-        else:
-            self.service_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
+        with self._flask_app.app_context():
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_token_key)
+            else:
+                self.service_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
 
-        # User (dynamic)
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_UserTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, self.user_token_key)
-        else:
-            self.user_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_UserTokenAPIKey).decode('utf-8')
+            # User (dynamic)
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_UserTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, self.user_token_key)
+            else:
+                self.user_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_UserTokenAPIKey).decode('utf-8')
 
-        # Participant (dynamic)
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_ParticipantTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, self.participant_token_key)
-        else:
-            self.participant_token_key = LoginModule.redis_client.get(
-                RedisVars.RedisVar_ParticipantTokenAPIKey).decode('utf-8')
+            # Participant (dynamic)
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_ParticipantTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, self.participant_token_key)
+            else:
+                self.participant_token_key = LoginModule.redis_client.get(
+                    RedisVars.RedisVar_ParticipantTokenAPIKey).decode('utf-8')
 
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_DeviceTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey,
-                                         TeraServerSettings.get_server_setting_value(
-                                             TeraServerSettings.ServerDeviceTokenKey))
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_DeviceTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey,
+                                             TeraServerSettings.get_server_setting_value(
+                                                 TeraServerSettings.ServerDeviceTokenKey))
 
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_DeviceStaticTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey,
-                                         TeraServerSettings.get_server_setting_value(
-                                             TeraServerSettings.ServerDeviceTokenKey))
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_DeviceStaticTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey,
+                                             TeraServerSettings.get_server_setting_value(
+                                                 TeraServerSettings.ServerDeviceTokenKey))
 
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_ParticipantStaticTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey,
-                                         TeraServerSettings.get_server_setting_value(
-                                             TeraServerSettings.ServerParticipantTokenKey))
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_ParticipantStaticTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey,
+                                             TeraServerSettings.get_server_setting_value(
+                                                 TeraServerSettings.ServerParticipantTokenKey))
+
+    def _simulate_participant_online(self, participant: TeraParticipant):
+        self.assertTrue(participant.participant_enabled)
+        self.assertTrue(participant.participant_login_enabled)
+        tera_message = messages.TeraModuleMessage()
+        tera_message.head.version = 1
+        tera_message.head.time = datetime.now().timestamp()
+        tera_message.head.seq = 0
+        tera_message.head.source = 'participant.' + participant.participant_uuid
+        tera_message.head.dest = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
+
+        participant_connected = messages.ParticipantEvent()
+        participant_connected.participant_uuid = str(participant.participant_uuid)
+        participant_connected.participant_name = participant.participant_name
+        participant_connected.type = messages.ParticipantEvent.PARTICIPANT_CONNECTED
+        # Need to use Any container
+        any_message = messages.Any()
+        any_message.Pack(participant_connected)
+        tera_message.data.extend([any_message])
+        # Send participant connected message
+        self._user_manager_module.handle_participant_connected(tera_message.head, participant_connected)
+
+    def _simulate_participant_offline(self, participant: TeraParticipant):
+        self.assertTrue(participant.participant_enabled)
+        self.assertTrue(participant.participant_login_enabled)
+        tera_message = messages.TeraModuleMessage()
+        tera_message.head.version = 1
+        tera_message.head.time = datetime.now().timestamp()
+        tera_message.head.seq = 0
+        tera_message.head.source = 'participant.' + participant.participant_uuid
+        tera_message.head.dest = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
+
+        participant_connected = messages.ParticipantEvent()
+        participant_connected.participant_uuid = str(participant.participant_uuid)
+        participant_connected.participant_name = participant.participant_name
+        participant_connected.type = messages.ParticipantEvent.PARTICIPANT_DISCONNECTED
+        # Need to use Any container
+        any_message = messages.Any()
+        any_message.Pack(participant_connected)
+        tera_message.data.extend([any_message])
+        # Send participant disconnected message
+        self._user_manager_module.handle_participant_connected(tera_message.head, participant_connected)
 
     def _get_with_participant_token_auth(self, client: FlaskClient, token: str = '', params=None, endpoint=None):
         if params is None:
