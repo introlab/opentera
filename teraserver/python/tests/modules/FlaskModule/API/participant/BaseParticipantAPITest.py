@@ -93,17 +93,6 @@ class BaseParticipantAPITest(unittest.TestCase):
         config.create_defaults()
         return config
 
-    @classmethod
-    def reset_database(cls):
-        # db.close()
-        # Create all tables
-        config = cls.getConfig()
-        manager = DBManager(config, cls._flask_app)
-        manager.open_local({}, echo=False, ram=True)
-        with cls._flask_app.app_context():
-            # Creating default users / tests. Time-consuming, only once per test file.
-            manager.create_defaults(config, test=True)
-
     def setUp(self):
         self.test_client = self._flask_module.flask_app.test_client()
         # Setup required keys

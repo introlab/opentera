@@ -23,8 +23,7 @@ class ParticipantLogoutTest(BaseParticipantAPITest):
 
             self.assertEqual(login_response.status_code, 200)
             self.assertEqual(login_response.headers['Content-Type'], 'application/json')
-            json_data = login_response.json()
-            self.assertGreater(len(json_data), 0)
+            self.assertGreater(len(login_response.json), 0)
 
             logout_response = self._get_with_participant_http_auth(
                 self.test_client, username, password, params={}, endpoint=self.test_endpoint)
