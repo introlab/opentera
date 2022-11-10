@@ -12,26 +12,17 @@ class ServiceQuerySitesTest(BaseServiceAPITest):
 
     def setUp(self):
         super().setUp()
-        from modules.FlaskModule.FlaskModule import service_api_ns
-        from BaseServiceAPITest import FakeFlaskModule
-        # Setup minimal API
-        from modules.FlaskModule.API.service.ServiceQuerySites import ServiceQuerySites
-        kwargs = {'flaskModule': FakeFlaskModule(config=BaseServiceAPITest.getConfig())}
-        service_api_ns.add_resource(ServiceQuerySites, '/sites', resource_class_kwargs=kwargs)
-
-        # Create test client
-        self.test_client = flask_app.test_client()
 
     def tearDown(self):
         super().tearDown()
 
     def test_get_endpoint_no_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self.test_client.get(self.test_endpoint)
             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_with_token_auth_no_params(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=None, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code)
@@ -46,14 +37,14 @@ class ServiceQuerySitesTest(BaseServiceAPITest):
                     self.assertEqual(site.to_json(minimal=True), site_json)
 
     def test_get_endpoint_with_token_auth_and_invalid_params(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'invalid_param': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(400, response.status_code)
 
     def test_get_endpoint_with_token_auth_and_id_site(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             sites: List[TeraSite] = TeraSite.query.all()
             for site in sites:
                 service: TeraService = TeraService.get_service_by_uuid(self.service_uuid)
@@ -75,7 +66,7 @@ class ServiceQuerySitesTest(BaseServiceAPITest):
                     self.assertEqual(403, response.status_code)
 
     def test_get_endpoint_with_token_auth_and_id_site(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             users: List[TeraUser] = TeraUser.query.all()
             for user in users:
                 service: TeraService = TeraService.get_service_by_uuid(self.service_uuid)

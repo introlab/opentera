@@ -40,13 +40,13 @@ class ServiceQueryAccess(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @LoginModule.service_token_or_certificate_required
     @api.expect(get_parser)
     @api.doc(description='Return access information.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged service doesn\'t have permission to access the requested data'})
+    @LoginModule.service_token_or_certificate_required
     def get(self):
 
         service_access = DBManager.serviceAccess(current_service)

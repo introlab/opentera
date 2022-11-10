@@ -1,6 +1,7 @@
 # Using same base as TeraServer
 from opentera.db.Base import BaseModel
-from flask_sqlalchemy import event, SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.reflection import Inspector
 from sqlite3 import Connection as SQLite3Connection
@@ -65,18 +66,19 @@ class DBManager:
         self.db.app = flask_app
         BaseModel.set_db(self.db)
 
-        # Init tables
-        BaseModel.create_all()
+        with flask_app.app_context():
+            # Init tables
+            BaseModel.create_all()
 
-        inspector = Inspector.from_engine(self.db.engine)
-        tables = inspector.get_table_names()
+            inspector = Inspector.from_engine(self.db.engine)
+            tables = inspector.get_table_names()
 
-        if not tables:
-            # New database - stamp with current revision version
-            self.stamp_db()
-        else:
-            # Apply any database upgrade, if needed
-            self.upgrade_db()
+            if not tables:
+                # New database - stamp with current revision version
+                self.stamp_db()
+            else:
+                # Apply any database upgrade, if needed
+                self.upgrade_db()
 
     def open_local(self, db_infos, echo=False, ram=False):
 
@@ -95,17 +97,19 @@ class DBManager:
         self.db.init_app(flask_app)
         self.db.app = flask_app
         BaseModel.set_db(self.db)
-        BaseModel.create_all()
 
-        inspector = Inspector.from_engine(self.db.engine)
-        tables = inspector.get_table_names()
+        with flask_app.app_context():
+            BaseModel.create_all()
 
-        if not tables:
-            # New database - stamp with current revision version
-            self.stamp_db()
-        else:
-            # Apply any database upgrade, if needed
-            self.upgrade_db()
+            inspector = Inspector.from_engine(self.db.engine)
+            tables = inspector.get_table_names()
+
+            if not tables:
+                # New database - stamp with current revision version
+                self.stamp_db()
+            else:
+                # Apply any database upgrade, if needed
+                self.upgrade_db()
 
     def init_alembic(self):
         import sys

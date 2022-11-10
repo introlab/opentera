@@ -102,8 +102,8 @@ class LoginModule(BaseModule):
     __user_disabled_token_storage = DisabledTokenStorage()
     __participant_disabled_token_storage = DisabledTokenStorage()
 
-    def __init__(self, config: ConfigManager):
-
+    def __init__(self, config: ConfigManager, app=flask_app):
+        self.app = app
         # Update Global Redis Client
         LoginModule.redis_client = redis.Redis(host=config.redis_config['hostname'],
                                                port=config.redis_config['port'],
@@ -147,11 +147,11 @@ class LoginModule(BaseModule):
         pass
 
     def setup_login_manager(self):
-        self.login_manager.init_app(flask_app)
+        self.login_manager.init_app(self.app)
         self.login_manager.session_protection = "strong"
 
         # Cookie based configuration
-        flask_app.config.update({'REMEMBER_COOKIE_NAME': 'OpenTera',
+        self.app.config.update({'REMEMBER_COOKIE_NAME': 'OpenTera',
                                  'REMEMBER_COOKIE_DURATION': 14,
                                  'REMEMBER_COOKIE_SECURE': True,
                                  'USE_PERMANENT_SESSION': True,

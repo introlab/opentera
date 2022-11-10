@@ -1,15 +1,18 @@
-# from modules.FlaskModule.FlaskModule import flask_app
 from services.LoggingService.FlaskModule import flask_app
 from services.LoggingService.FlaskModule import api
 from requests import get, post, Response, delete
 from modules.DatabaseModule.DBManager import DBManager
-from opentera.config.ConfigManager import ConfigManager
+# from opentera.config.ConfigManager import ConfigManager
+from services.LoggingService.ConfigManager import ConfigManager
 from opentera.modules.BaseModule import BaseModule
+from opentera.services.ServiceOpenTera import ServiceOpenTera
+
 import redis
 from opentera.redis.RedisVars import RedisVars
 from flask_session import Session
 import uuid
 from opentera.services.ServiceAccessManager import ServiceAccessManager
+from modules.FlaskModule.FlaskModule import FlaskModule
 
 
 service_api_namespace = api.namespace('service', description='Fake TeraServer service API')
@@ -17,9 +20,9 @@ service_api_namespace = api.namespace('service', description='Fake TeraServer se
 
 class FakeFlaskModule(BaseModule):
     def __init__(self,  config: ConfigManager):
-        BaseModule.__init__(self, 'FlaskModule-test', config)
+        BaseModule.__init__(self, 'FakeFlaskModule', config)
         # flask_app.debug = True
-        # flask_app.test = True
+        # flask_app.testing = True
         # flask_app.secret_key = str(uuid.uuid4())  # Normally service UUID
         # flask_app.config.update({'SESSION_TYPE': 'redis'})
         # redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
@@ -30,80 +33,42 @@ class FakeFlaskModule(BaseModule):
         # flask_app.config.update({'SESSION_COOKIE_SECURE': True})
         # flask_app.config.update({'SQLALCHEMY_TRACK_MODIFICATIONS': True})
         #
-        # # Create session
-        # self.session = Session(flask_app)
         self.setup_fake_service_api()
 
     def setup_fake_service_api(self):
         with flask_app.app_context():
             # Setup Fake Service API
-            # from modules.FlaskModule.FlaskModule import service_api_ns
-            # Default arguments
             kwargs = {'flaskModule': self,
                       'test': True}
 
-            # Services
-            from modules.FlaskModule.API.service.ServiceQueryParticipants import ServiceQueryParticipants
-            from modules.FlaskModule.API.service.ServiceQueryAssets import ServiceQueryAssets
-            from modules.FlaskModule.API.service.ServiceQuerySessions import ServiceQuerySessions
-            from modules.FlaskModule.API.service.ServiceQuerySessionEvents import ServiceQuerySessionEvents
-            from modules.FlaskModule.API.service.ServiceQuerySiteProjectAccessRoles import \
-                ServiceQuerySiteProjectAccessRoles
-            from modules.FlaskModule.API.service.ServiceQueryUsers import ServiceQueryUsers
-            from modules.FlaskModule.API.service.ServiceQueryServices import ServiceQueryServices
-            from modules.FlaskModule.API.service.ServiceQueryProjects import ServiceQueryProjects
-            from modules.FlaskModule.API.service.ServiceQuerySites import ServiceQuerySites
-            from modules.FlaskModule.API.service.ServiceSessionManager import ServiceSessionManager
-            from modules.FlaskModule.API.service.ServiceQuerySessionTypes import ServiceQuerySessionTypes
-            from modules.FlaskModule.API.service.ServiceQueryDevices import ServiceQueryDevices
-            from modules.FlaskModule.API.service.ServiceQueryTestTypes import ServiceQueryTestTypes
-            from modules.FlaskModule.API.service.ServiceQueryTests import ServiceQueryTests
-            from modules.FlaskModule.API.service.ServiceQueryAccess import ServiceQueryAccess
-
-            service_api_namespace.add_resource(ServiceQueryUsers, '/users', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQueryDevices, '/devices', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQueryAssets, '/assets', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQuerySessionEvents, '/sessions/events', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQuerySiteProjectAccessRoles, '/users/access', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQueryServices, '/services', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQueryProjects, '/projects', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQuerySites, '/sites', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceSessionManager, '/sessions/manager', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQuerySessionTypes, '/sessiontypes', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQueryTestTypes, '/testtypes', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQueryTests, '/tests', resource_class_kwargs=kwargs)
-            service_api_namespace.add_resource(ServiceQueryAccess, '/access', resource_class_kwargs=kwargs)
-
-            # Add namespace
-            # api.add_namespace(service_api_ns)
+            FlaskModule.init_service_api(self, service_api_namespace, kwargs)
 
 
-class FakeLoggingService:
+class FakeLoggingService(ServiceOpenTera):
     """
         The only thing we want here is a way to simulate communication with the base server.
         We will simulate the service API with the database.
     """
     service_token = str()
 
-    def __init__(self, db):
-        self.config = ConfigManager()
-        self.config.create_defaults()
-        self.redis = redis.Redis(host=self.config.redis_config['hostname'],
-                                 port=self.config.redis_config['port'],
-                                 username=self.config.redis_config['username'],
-                                 password=self.config.redis_config['password'],
-                                 db=self.config.redis_config['db'])
+    def __init__(self, db=None):
+        self.service_config = ConfigManager()
+        self.service_config.create_defaults()
+
+        ServiceOpenTera.__init__(self, self.service_config, {})
+
         from modules.LoginModule.LoginModule import LoginModule
-        self.login_module = LoginModule(self.config)
-        self.db_manager = DBManager(self.config)
+        self.login_module = LoginModule(self.service_config)
+        self.db_manager = DBManager(self.service_config, flask_app)
         # Cheating on db (reusing already opened from test)
-        self.db_manager.db = db
-        # self.db_manager.open_local({}, echo=False, ram=True)
+        if db is not None:
+            self.db_manager.db = db
+        else:
+            self.db_manager.open_local({}, echo=False, ram=True)
+
         with flask_app.app_context():
-            self.db_manager.create_defaults(self.config, test=True)
-        self.flask_module = FakeFlaskModule(self.config)
+            self.db_manager.create_defaults(self.service_config, test=True)
+        self.flask_module = FakeFlaskModule(self.service_config)
         self.test_client = flask_app.test_client()
 
         # Update redis vars and basic token

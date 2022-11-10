@@ -71,7 +71,7 @@ session_manager_schema = api.schema_model('session_manage', {
                 'action': {
                     'type': 'string'  # 'start', 'stop', 'invite', 'remove', 'invite_reply'
                 },
-                'parameters': {  # For invite_reply, parameter must contains 'reply_code' and 'reply_msg'. 'reply_code'
+                'parameters': {  # For invite_reply, parameter must contain 'reply_code' and 'reply_msg'. 'reply_code'
                                  # can either be a direct int value from JoinSessionReplyEvent or a string with one of
                                  # those value: 'accept', 'reject', 'busy', 'timeout'
                     'type': 'object'

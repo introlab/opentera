@@ -1,7 +1,6 @@
 from opentera.db.Base import BaseModel
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
-from flask_sqlalchemy import event
 
 
 class TeraSite(BaseModel):
@@ -84,23 +83,3 @@ class TeraSite(BaseModel):
         access_role.id_site = site.id_site
         access_role.service_role_name = 'user'
         TeraServiceRole.insert(access_role)
-
-
-#
-# @event.listens_for(TeraSite, 'after_insert')
-# def site_inserted(mapper, connection, target):
-#     # By default, creates user and admin roles after a site has been added
-#     from opentera.db.models.TeraServiceRole import TeraServiceRole
-#     from opentera.db.models.TeraService import TeraService
-#
-#     access_role = TeraServiceRole()
-#     access_role.id_service = Globals.opentera_service_id
-#     access_role.id_site = target.id_site
-#     access_role.service_role_name = 'admin'
-#     db.session.add(access_role)
-#
-#     access_role = TeraServiceRole()
-#     access_role.id_service = Globals.opentera_service_id
-#     access_role.id_site = target.id_site
-#     access_role.service_role_name = 'user'
-#     db.session.add(access_role)

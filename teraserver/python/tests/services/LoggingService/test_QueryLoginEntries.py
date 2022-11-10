@@ -11,16 +11,6 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
 
     def setUp(self):
         super().setUp()
-        from services.LoggingService.FlaskModule import logging_api_ns
-        from BaseLoggingServiceAPITest import FakeFlaskModule
-        # Setup minimal API
-        from services.LoggingService.API.QueryLoginEntries import QueryLoginEntries
-        kwargs = {'flaskModule': FakeFlaskModule(config=BaseLoggingServiceAPITest.getConfig()),
-                  'test': True}
-        logging_api_ns.add_resource(QueryLoginEntries, '/login_entries', resource_class_kwargs=kwargs)
-
-        # Create test client
-        self.test_client = flask_app.test_client()
 
     def tearDown(self):
         super().tearDown()
@@ -30,7 +20,7 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
             response = self._get_with_service_token_auth(self.test_client, token="invalid")
             self.assertEqual(response.status_code, 403)
 
-    def test_get_endpoint_with_valid_token_but_not_admin(self):
+    def test_get_endpoint_with_invalid_token_but_not_admin(self):
         with flask_app.app_context():
             token = self._generate_fake_user_token(name='FakeUser', superadmin=False, expiration=3600)
             response = self._get_with_service_token_auth(self.test_client, token=token)

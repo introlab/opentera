@@ -10,32 +10,23 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
 
     def setUp(self):
         super().setUp()
-        from modules.FlaskModule.FlaskModule import service_api_ns
-        from BaseServiceAPITest import FakeFlaskModule
-        # Setup minimal API
-        from modules.FlaskModule.API.service.ServiceQueryParticipants import ServiceQueryParticipants
-        kwargs = {'flaskModule': FakeFlaskModule(config=BaseServiceAPITest.getConfig())}
-        service_api_ns.add_resource(ServiceQueryParticipants, '/participants', resource_class_kwargs=kwargs)
-
-        # Create test client
-        self.test_client = flask_app.test_client()
 
     def tearDown(self):
         super().tearDown()
 
     def test_get_endpoint_no_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self.test_client.get(self.test_endpoint)
             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_with_token_auth_no_params(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=None, endpoint=self.test_endpoint)
             self.assertEqual(400, response.status_code)
 
     def test_get_endpoint_with_token_auth_with_wrong_params(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Get all participants from DB
             participants: List[TeraParticipant] = TeraParticipant.query.all()
             for participant in participants:
@@ -45,7 +36,7 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
                 self.assertEqual(400, response.status_code)
 
     def test_get_endpoint_with_token_auth_with_participant_uuid(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Get all participants from DB
             participants: List[TeraParticipant] = TeraParticipant.query.all()
             for participant in participants:
@@ -57,18 +48,18 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
                 self.assertEqual(participant_json, response.json)
 
     def test_post_endpoint_without_token_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self.test_client.post(self.test_endpoint, json={})
             self.assertEqual(400, response.status_code)
 
     def test_post_endpoint_with_token_auth_empty_json(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token, json={},
                                                           endpoint=self.test_endpoint)
             self.assertEqual(400, response.status_code)
 
     def test_post_endpoint_with_token_auth_create_participant(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             participant_schema = {
                 'participant': {
                     'id_participant': 0,
@@ -87,7 +78,7 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
             self.assertEqual(response.json, participant.to_json(minimal=False))
 
     def test_post_endpoint_with_token_auth_update_participant(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             participant_schema = {
                 'participant': {
                     'id_participant': 0,

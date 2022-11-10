@@ -1,5 +1,4 @@
 import unittest
-from opentera.db.Base import BaseModel
 from modules.DatabaseModule.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule
 from opentera.config.ConfigManager import ConfigManager
@@ -7,30 +6,46 @@ from opentera.modules.BaseModule import BaseModule, ModuleNames
 from flask.testing import FlaskClient
 from opentera.redis.RedisVars import RedisVars
 from opentera.db.models.TeraServerSettings import TeraServerSettings
-from flask_session import Session
-from modules.FlaskModule.FlaskModule import flask_app
-import modules.Globals as Globals
-import redis
+from modules.UserManagerModule.UserManagerModule import UserManagerModule
 from requests.auth import _basic_auth_str
+import modules.Globals as Globals
+from modules.FlaskModule.FlaskModule import FlaskModule, CustomAPI
+import redis
+import uuid
+from flask_babel import Babel
+from flask import Flask
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name
+import opentera.messages.python as messages
+from datetime import datetime
 
 
 class FakeFlaskModule(BaseModule):
-    def __init__(self,  config: ConfigManager):
+    def __init__(self, config: ConfigManager, flask_app=None, user_manager_module=None):
         BaseModule.__init__(self, ModuleNames.FLASK_MODULE_NAME.value, config)
+        self.flask_app = flask_app
+        self.babel = Babel(self.flask_app)
+        self.api = CustomAPI(self.flask_app, version='0.1', title='OpenTeraServer FakeAPI',
+                             description='TeraServer API Documentation', prefix='/api')
 
-        flask_app.debug = False
-        flask_app.testing = True
-        flask_app.secret_key = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerUUID)
-        flask_app.config.update({'SESSION_TYPE': 'redis'})
+        self.namespace = self.api.namespace('user', description='API for user calls')
+
+        self.flask_app.debug = False
+        self.flask_app.testing = True
+        self.flask_app.secret_key = str(uuid.uuid4())
+        self.flask_app.config.update({'SESSION_TYPE': 'redis'})
         redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
                                    % self.config.redis_config)
 
-        flask_app.config.update({'SESSION_REDIS': redis_url})
-        flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
-        flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        self.flask_app.config.update({'SESSION_REDIS': redis_url})
+        self.flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
+        self.flask_app.config.update({'SESSION_COOKIE_SECURE': True})
 
-        # Create session
-        self.session = Session(flask_app)
+        additional_args = {'test': True,
+                           'user_manager_module': user_manager_module,
+                           'flaskModule': self}
+
+        FlaskModule.init_user_api(self, self.namespace, additional_args)
 
 
 class BaseUserAPITest(unittest.TestCase):
@@ -41,25 +56,36 @@ class BaseUserAPITest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        from modules.FlaskModule.FlaskModule import flask_app
+        flask_app.testing = True
+
+        # Create Fake API
+        cls._flask_app = Flask('FakeFlaskApp')
         cls._config = BaseUserAPITest.getConfig()
-        cls._db_man: DBManager = DBManager(cls._config)
+        # This is needed for Logins and tokens
+        cls._login_module = LoginModule(cls._config, cls._flask_app)
+
+        # This is needed for User management
+        cls._user_manager_module = UserManagerModule(cls._config)
+
+        Globals.login_module = cls._login_module  # TODO: Create a fake logger so we don't actually log?
+        cls._db_man: DBManager = DBManager(cls._config, cls._flask_app)
+
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)
-        BaseModel.set_db(cls._db_man.db)
 
-        # Creating default users / tests. Time-consuming, only once per test file.
-        cls._db_man.create_defaults(cls._config, test=True)
-
-        # This is needed for Logins and tokens
-        cls._login_module = LoginModule(cls._config)
-        Globals.login_module = cls._login_module  # TODO: Create a fake logger so we don't actually log?
+        with cls._flask_app.app_context():
+            cls._flask_module = FakeFlaskModule(cls._config, cls._flask_app, cls._user_manager_module)
+            # Creating default users / tests. Time-consuming, only once per test file.
+            cls._db_man.create_defaults(cls._config, test=True)
 
     @classmethod
     def tearDownClass(cls):
-        cls._config = None
-        cls._db_man.db.session.remove()
-        cls._db_man = None
-        LoginModule.redis_client = None
+        with cls._flask_app.app_context():
+            cls._config = None
+            cls._db_man.db.session.remove()
+            cls._db_man = None
+            LoginModule.redis_client = None
 
     @classmethod
     def getConfig(cls) -> ConfigManager:
@@ -67,61 +93,52 @@ class BaseUserAPITest(unittest.TestCase):
         config.create_defaults()
         return config
 
-    @classmethod
-    def reset_database(cls):
-        # db.close()
-        # Create all tables
-        config = cls.getConfig()
-        manager = DBManager(config)
-        manager.open_local({}, echo=False, ram=True)
-
-        # Creating default users / tests. Time-consuming, only once per test file.
-        manager.create_defaults(config, test=True)
-
     def setUp(self):
+        self.test_client = self._flask_module.flask_app.test_client()
         # Setup required keys
         self.setup_redis_keys()
-        self.session = self._db_man.db.create_scoped_session()
 
     def tearDown(self):
-        # Make sure pending queries are rollbacked.
-        self.session.remove()
+        with self._flask_app.app_context():
+            # Make sure pending queries are rollbacked.
+            self._db_man.db.session.rollback()
 
     def setup_redis_keys(self):
         # Initialize keys (create only if not found)
         # Service (dynamic)
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_token_key)
-        else:
-            self.service_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
+        with self._flask_app.app_context():
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_token_key)
+            else:
+                self.service_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
 
-        # User (dynamic)
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_UserTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, self.user_token_key)
-        else:
-            self.user_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_UserTokenAPIKey).decode('utf-8')
+            # User (dynamic)
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_UserTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, self.user_token_key)
+            else:
+                self.user_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_UserTokenAPIKey).decode('utf-8')
 
-        # Participant (dynamic)
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_ParticipantTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, self.participant_token_key)
-        else:
-            self.participant_token_key = LoginModule.redis_client.get(
-                RedisVars.RedisVar_ParticipantTokenAPIKey).decode('utf-8')
+            # Participant (dynamic)
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_ParticipantTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, self.participant_token_key)
+            else:
+                self.participant_token_key = LoginModule.redis_client.get(
+                    RedisVars.RedisVar_ParticipantTokenAPIKey).decode('utf-8')
 
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_DeviceTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey,
-                                         TeraServerSettings.get_server_setting_value(
-                                             TeraServerSettings.ServerDeviceTokenKey))
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_DeviceTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey,
+                                             TeraServerSettings.get_server_setting_value(
+                                                 TeraServerSettings.ServerDeviceTokenKey))
 
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_DeviceStaticTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey,
-                                         TeraServerSettings.get_server_setting_value(
-                                             TeraServerSettings.ServerDeviceTokenKey))
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_DeviceStaticTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey,
+                                             TeraServerSettings.get_server_setting_value(
+                                                 TeraServerSettings.ServerDeviceTokenKey))
 
-        if not LoginModule.redis_client.exists(RedisVars.RedisVar_ParticipantStaticTokenAPIKey):
-            LoginModule.redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey,
-                                         TeraServerSettings.get_server_setting_value(
-                                             TeraServerSettings.ServerParticipantTokenKey))
+            if not LoginModule.redis_client.exists(RedisVars.RedisVar_ParticipantStaticTokenAPIKey):
+                LoginModule.redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey,
+                                             TeraServerSettings.get_server_setting_value(
+                                                 TeraServerSettings.ServerParticipantTokenKey))
 
     def _get_with_user_token_auth(self, client: FlaskClient, token: str = '', params=None, endpoint=None):
         if params is None:

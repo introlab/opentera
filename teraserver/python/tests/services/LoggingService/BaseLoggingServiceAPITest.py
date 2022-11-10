@@ -12,6 +12,7 @@ import random
 from string import digits, ascii_lowercase, ascii_uppercase
 import services.LoggingService.Globals as Globals
 from FakeLoggingService import FakeLoggingService
+from services.LoggingService.FlaskModule import FlaskModule, logging_api_ns
 
 
 def infinite_jti_sequence():
@@ -30,7 +31,7 @@ class FakeFlaskModule(BaseModule):
         BaseModule.__init__(self, config.service_config['name'] + '.FlaskModule-test', config)
 
         flask_app.debug = False
-        flask_app.test = True
+        flask_app.testing = True
         flask_app.secret_key = str(uuid.uuid4())  # Normally service UUID
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
@@ -40,11 +41,9 @@ class FakeFlaskModule(BaseModule):
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
 
-        # Create session
-        self.session = Session(flask_app)
+        additional_args = {'test': True, 'flaskModule': self}
 
-        # Setup Fake Service API
-        # from modules.FlaskModule.FlaskModule import service_api_ns
+        FlaskModule.init_api(self, logging_api_ns, additional_args)
 
 
 class BaseLoggingServiceAPITest(unittest.TestCase):
@@ -67,19 +66,23 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         cls._db_man: DBManager = DBManager(test=True)
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)
+        # Will create test api
+        cls._flask_module = FakeFlaskModule(cls._config)
 
-        # Creating default users / tests. Time-consuming, only once per test file.
-        cls._db_man.create_defaults(cls._config, test=True)
+        with flask_app.app_context():
+            # Creating default users / tests. Time-consuming, only once per test file.
+            cls._db_man.create_defaults(cls._config, test=True)
 
-        # Instance of Fake service API
-        Globals.service = FakeLoggingService(cls._db_man.db)
+            # Instance of Fake service API
+            Globals.service = FakeLoggingService(cls._db_man.db)
 
     @classmethod
     def tearDownClass(cls):
-        cls._config = None
-        # LoginModule.redis_client = None
-        cls._db_man.db.session.remove()
-        cls._db_man = None
+        with flask_app.app_context():
+            cls._config = None
+            # LoginModule.redis_client = None
+            cls._db_man.db.session.remove()
+            cls._db_man = None
 
     @classmethod
     def getConfig(cls) -> ConfigManager:
@@ -88,14 +91,17 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         return config
 
     def setUp(self):
-        self.setup_redis_keys()
-        self.setup_service_access_manager()
+        self.test_client = flask_app.test_client()
+        with flask_app.app_context():
+            self._setup_redis_keys()
+            self._setup_service_access_manager()
 
     def tearDown(self):
-        # Make sure pending queries are rollbacked.
-        self._db_man.db.session.rollback()
+        with flask_app.app_context():
+            # Make sure pending queries are rollbacked.
+            self._db_man.db.session.rollback()
 
-    def setup_redis_keys(self):
+    def _setup_redis_keys(self):
         # Initialize keys (create only if not found)
         # Service (dynamic)
         if not self._redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
@@ -128,7 +134,7 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         if not self._redis_client.exists(RedisVars.RedisVar_ParticipantStaticTokenAPIKey):
             self._redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey, self.participant_token_key)
 
-    def setup_service_access_manager(self):
+    def _setup_service_access_manager(self):
         # Initialize service from redis, posing as LoggingService
         from opentera.services.ServiceAccessManager import ServiceAccessManager
         # Update Service Access information

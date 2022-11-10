@@ -8,43 +8,34 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
 
     def setUp(self):
         super().setUp()
-        from modules.FlaskModule.FlaskModule import service_api_ns
-        from BaseServiceAPITest import FakeFlaskModule
-        # Setup minimal API
-        from modules.FlaskModule.API.service.ServiceQuerySessions import ServiceQuerySessions
-        kwargs = {'flaskModule': FakeFlaskModule(config=BaseServiceAPITest.getConfig())}
-        service_api_ns.add_resource(ServiceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
-
-        # Create test client
-        self.test_client = flask_app.test_client()
 
     def tearDown(self):
         super().tearDown()
 
     def test_get_endpoint_with_no_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self.test_client.get(self.test_endpoint)
             self.assertEqual(401, response.status_code)
 
     def test_post_endpoint_with_no_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self.test_client.post(self.test_endpoint)
             self.assertEqual(401, response.status_code)
 
     def test_delete_endpoint_no_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_session': 0}
             response = self.test_client.delete(self.test_endpoint, query_string=params)
             self.assertEqual(405, response.status_code)  # Not implemented
 
     def test_get_endpoint_query_no_params(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=None, endpoint=self.test_endpoint)
             self.assertEqual(400, response.status_code)
 
     def test_get_endpoint_query_list(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_session': 1, 'list': 1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -57,7 +48,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item, minimal=True)
 
     def test_get_endpoint_query_specific(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_session': 1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -70,14 +61,14 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item)
 
     def test_get_endpoint_query_specific_but_invalid(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_session': -1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(403, response.status_code)
 
     def test_get_endpoint_query_for_participant(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_participant': 1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -92,7 +83,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self.assertEqual(1, participant_count)
 
     def test_get_endpoint_query_for_participant_with_list(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_participant': 1, 'list': 1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -102,7 +93,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item, minimal=True)
 
     def test_get_endpoint_query_for_participant_with_limit(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_participant': 1, 'limit': 2}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -111,7 +102,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(2, len(response.json))
 
     def test_get_endpoint_query_for_participant_with_limit_and_offset(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_participant': 1, 'limit': 2, 'offset': 27}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -121,7 +112,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(1, len(response.json))
 
     def test_get_endpoint_query_for_participant_with_status(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_participant': 1, 'status': 0}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -133,7 +124,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self.assertEqual(0, data_item['session_status'])
 
     def test_get_endpoint_query_for_participant_with_limit_and_offset_and_status_and_list(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_participant': 1, 'list': 1, 'limit': 2, 'offset': 11, 'status': 0}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -145,7 +136,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self.assertEqual(0, data_item['session_status'])
 
     def test_get_endpoint_query_for_participant_with_start_date_and_end_date(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             start_date = (datetime.now() - timedelta(days=6)).date().strftime("%Y-%m-%d")
             end_date = (datetime.now() - timedelta(days=4)).date().strftime("%Y-%m-%d")
             params = {'id_participant': 1, 'start_date': start_date, 'end_date': end_date}
@@ -156,7 +147,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(6, len(response.json))
 
     def test_get_endpoint_query_for_participant_with_start_date(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             start_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
             params = {'id_participant': 1, 'start_date': start_date}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -166,7 +157,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(12, len(response.json))
 
     def test_get_endpoint_query_for_participant_with_end_date(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             end_date = (datetime.now() - timedelta(days=5)).date().strftime("%Y-%m-%d")
             params = {'id_participant': 1, 'end_date': end_date}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -176,28 +167,28 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(9, len(response.json))
 
     def test_get_endpoint_query_for_not_accessible_user(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_user': 6}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(403, response.status_code)
 
     def test_get_endpoint_query_for_not_accessible_participant(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_participant': 4}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(403, response.status_code)
 
     def test_get_endpoint_query_for_not_accessible_device(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_device': 3}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(403, response.status_code)
 
     def test_get_endpoint_query_for_user(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_user': 3}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -212,7 +203,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self.assertEqual(1, user_count)
 
     def test_get_endpoint_query_for_user_with_list(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_user': 3, 'list': 1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -222,7 +213,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item, minimal=True)
 
     def test_get_endpoint_query_for_user_with_limit(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_user': 3, 'limit': 2}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -231,7 +222,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(2, len(response.json))
 
     def test_get_endpoint_query_for_user_with_limit_and_offset(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_user': 3, 'limit': 2, 'offset': 4}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -240,7 +231,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(1, len(response.json))
 
     def test_get_endpoint_query_for_user_with_status(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_user': 3, 'status': 2}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -252,7 +243,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self.assertEqual(2, data_item['session_status'])
 
     def test_get_endpoint_query_for_user_with_limit_and_offset_and_status_and_list(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_user': 3, 'list': 1, 'limit': 2, 'offset': 1, 'status': 2}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -265,7 +256,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self.assertEqual(2, data_item['session_status'])
 
     def test_get_endpoint_query_for_user_with_start_date_and_end_date(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             start_date = (datetime.now() - timedelta(days=6)).date().strftime("%Y-%m-%d")
             end_date = (datetime.now() - timedelta(days=4)).date().strftime("%Y-%m-%d")
 
@@ -277,7 +268,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(2, len(response.json))
 
     def test_get_endpoint_query_for_user_with_start_date(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             start_date = (datetime.now() - timedelta(days=6)).date().strftime("%Y-%m-%d")
 
             params = {'id_user': 3, 'start_date': start_date}
@@ -288,7 +279,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(3, len(response.json))
 
     def test_get_endpoint_query_for_user_with_end_date(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             end_date = (datetime.now() - timedelta(days=4)).date().strftime("%Y-%m-%d")
 
             params = {'id_user': 3, 'end_date': end_date}
@@ -299,7 +290,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(4, len(response.json))
 
     def test_get_endpoint_query_for_device(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_device': 2}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -313,7 +304,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self.assertEqual(1, device_count)
 
     def test_get_endpoint_query_for_device_with_list(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_device': 2, 'list': 1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -323,7 +314,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self._checkJson(json_data=data_item, minimal=True)
 
     def test_get_endpoint_query_for_device_with_limit(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_device': 1, 'limit': 2}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -332,7 +323,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(2, len(response.json))
 
     def test_get_endpoint_query_for_device_with_limit_and_offset(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_device': 1, 'limit': 2, 'offset': 7}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -341,7 +332,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(1, len(response.json))
 
     def test_get_endpoint_query_for_device_with_status(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_device': 1, 'status': 0}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -353,7 +344,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self.assertEqual(0, data_item['session_status'])
 
     def test_get_endpoint_query_for_device_with_limit_and_offset_and_status_and_list(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             params = {'id_device': 1, 'list': 1, 'limit': 2, 'offset': 2, 'status': 0}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
@@ -365,7 +356,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self.assertEqual(0, data_item['session_status'])
 
     def test_get_endpoint_query_for_device_with_limit_and_list_and_start_date_and_end_date(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             start_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
             end_date = (datetime.now() - timedelta(days=1)).date().strftime("%Y-%m-%d")
             params = {'id_device': 1, 'list': 1, 'limit': 1, 'start_date': start_date, 'end_date': end_date}
@@ -379,7 +370,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                 self.assertEqual(0, data_item['session_status'])
 
     def test_get_endpoint_query_for_device_with_start_date_and_end_date(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             start_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
             end_date = (datetime.now() - timedelta(days=1)).date().strftime("%Y-%m-%d")
             params = {'id_device': 1, 'start_date': start_date, 'end_date': end_date}
@@ -390,7 +381,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(2, len(response.json))
 
     def test_get_endpoint_query_for_device_with_start_date(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             start_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
             params = {'id_device': 1, 'start_date': start_date}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -400,7 +391,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(3, len(response.json))
 
     def test_get_endpoint_query_for_device_with_end_date(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             end_date = (datetime.now() - timedelta(days=3)).date().strftime("%Y-%m-%d")
             params = {'id_device': 1, 'end_date': end_date}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -410,7 +401,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             self.assertEqual(5, len(response.json))
 
     def test_post_and_delete_endpoint(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # New with minimal infos
             json_data = {
                 'session': {

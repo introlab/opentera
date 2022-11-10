@@ -1,5 +1,4 @@
 from BaseDeviceAPITest import BaseDeviceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSession import TeraSession
 from modules.DatabaseModule.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
@@ -12,29 +11,17 @@ class DeviceQuerySessionsTest(BaseDeviceAPITest):
 
     def setUp(self):
         super().setUp()
-        from modules.FlaskModule.FlaskModule import device_api_ns
-        from BaseDeviceAPITest import FakeFlaskModule
-        # Setup minimal API
-        from modules.FlaskModule.API.device.DeviceQuerySessions import DeviceQuerySessions
-        kwargs = {
-            'flaskModule': FakeFlaskModule(config=BaseDeviceAPITest.getConfig()),
-            'test': True
-        }
-        device_api_ns.add_resource(DeviceQuerySessions, '/sessions', resource_class_kwargs=kwargs)
-
-        # Create test client
-        self.test_client = flask_app.test_client()
 
     def tearDown(self):
         super().tearDown()
 
     def test_get_endpoint_with_invalid_token(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self._get_with_device_token_auth(self.test_client, token='Invalid')
             self.assertEqual(response.status_code, 401)
 
     def test_get_endpoint_with_valid_token(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 # Devices should not be able to query sessions
                 response = self._get_with_device_token_auth(self.test_client, token=device.device_token)
@@ -44,7 +31,7 @@ class DeviceQuerySessionsTest(BaseDeviceAPITest):
                     self.assertEqual(response.status_code, 403)
 
     def test_post_endpoint_with_valid_token_but_empty_schema(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 response = self._post_with_device_token_auth(self.test_client, token=device.device_token, json={})
 
@@ -54,7 +41,7 @@ class DeviceQuerySessionsTest(BaseDeviceAPITest):
                     self.assertEqual(response.status_code, 400)
 
     def test_post_endpoint_with_valid_token_but_invalid_session(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 # Get all participant ids
                 participants_uuids = [participant.participant_uuid for participant in device.device_participants]
@@ -69,7 +56,7 @@ class DeviceQuerySessionsTest(BaseDeviceAPITest):
                     self.assertEqual(response.status_code, 400)
 
     def test_post_endpoint_with_valid_token_valid_participants_valid_session_type_and_new_session(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 # Get all participant ids
                 participants_uuids = [participant.participant_uuid for participant in device.device_participants]
@@ -101,7 +88,7 @@ class DeviceQuerySessionsTest(BaseDeviceAPITest):
                     self.assertEqual(response.json['id_creator_device'], device.id_device)
 
     def test_post_endpoint_with_valid_token_invalid_participants_valid_session_type_and_new_session(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 # Generate invalid participants
                 participants_uuids = [str(uuid.uuid4()), str(uuid.uuid4()), str(uuid.uuid4())]
@@ -130,7 +117,7 @@ class DeviceQuerySessionsTest(BaseDeviceAPITest):
                     self.assertEqual(response.status_code, 400)
 
     def test_post_endpoint_with_valid_token_valid_participants_invalid_session_type_and_new_session(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 # Get all participant ids
                 participants_uuids = [participant.participant_uuid for participant in device.device_participants]
@@ -159,7 +146,7 @@ class DeviceQuerySessionsTest(BaseDeviceAPITest):
                     self.assertEqual(response.status_code, 403)
 
     def test_post_endpoint_with_valid_token_valid_participants_valid_session_type_and_update_session(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 access = DBManagerTeraDeviceAccess(device)
 
@@ -194,7 +181,7 @@ class DeviceQuerySessionsTest(BaseDeviceAPITest):
                     self.assertEqual(response.json['id_creator_device'], device.id_device)
 
     def test_delete_endpoint_with_valid_session_id(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 access = DBManagerTeraDeviceAccess(device)
 

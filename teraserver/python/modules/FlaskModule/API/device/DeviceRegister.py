@@ -19,7 +19,7 @@ import uuid
 from modules.FlaskModule.FlaskModule import flask_app
 from sqlalchemy.exc import SQLAlchemyError
 
-limiter = Limiter(flask_app, key_func=get_remote_address)
+limiter = Limiter(flask_app, key_func=get_remote_address, storage_uri="memory://")
 
 
 class DeviceRegister(Resource):
@@ -28,7 +28,8 @@ class DeviceRegister(Resource):
     Will return the certificate with newly created device UUID, but disabled.
     Administrators will need to put the device in a site and enable it before use.
     """
-    decorators = [limiter.limit("10/minute", error_message='Rate Limited')]
+    decorators = [limiter.limit("1/second", error_message='Rate Limited',
+                                exempt_when=lambda: flask_app.testing is True)]
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)

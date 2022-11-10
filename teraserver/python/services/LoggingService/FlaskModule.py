@@ -1,6 +1,6 @@
 # Flask
 from flask import Flask, request, g, url_for
-from flask_restx import Api
+from flask_restx import Api, Namespace
 from flask_babel import Babel
 
 # OpenTera
@@ -176,7 +176,7 @@ class FlaskModule(BaseModule):
         # self.session = Session(flask_app)
 
         # Init API
-        self.init_api()
+        FlaskModule.init_api(self, logging_api_ns)
 
         # Init Views
         self.init_views()
@@ -223,9 +223,11 @@ class FlaskModule(BaseModule):
         print('LoggingService.FlaskModule - Received message ', pattern, channel, message)
         pass
 
-    def init_api(self):
+    @staticmethod
+    def init_api(module: object, namespace: Namespace, additional_args: dict = dict()):
         # Default arguments
-        kwargs = {'flaskModule': self}
+        kwargs = {'flaskModule': module}
+        kwargs |= additional_args
 
         from services.LoggingService.API.QueryLogEntries import QueryLogEntries
         logging_api_ns.add_resource(QueryLogEntries, '/log_entries', resource_class_kwargs=kwargs)

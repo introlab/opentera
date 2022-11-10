@@ -1,5 +1,4 @@
 from BaseDeviceAPITest import BaseDeviceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraDevice import TeraDevice
 
 
@@ -8,34 +7,22 @@ class DeviceQueryDevicesTest(BaseDeviceAPITest):
 
     def setUp(self):
         super().setUp()
-        from modules.FlaskModule.FlaskModule import device_api_ns
-        from BaseDeviceAPITest import FakeFlaskModule
-        # Setup minimal API
-        from modules.FlaskModule.API.device.DeviceQueryDevices import DeviceQueryDevices
-        kwargs = {
-            'flaskModule': FakeFlaskModule(config=BaseDeviceAPITest.getConfig()),
-            'test': True
-        }
-        device_api_ns.add_resource(DeviceQueryDevices, '/devices', resource_class_kwargs=kwargs)
-
-        # Create test client
-        self.test_client = flask_app.test_client()
 
     def tearDown(self):
         super().tearDown()
 
     def test_get_endpoint_no_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self.test_client.get(self.test_endpoint)
             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_invalid_token_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self._get_with_device_token_auth(self.test_client, token='Invalid token')
             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_from_all_devices(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 response = self._get_with_device_token_auth(self.test_client, token=device.device_token)
                 if not device.device_enabled:
@@ -61,7 +48,7 @@ class DeviceQueryDevicesTest(BaseDeviceAPITest):
                     self.assertFalse(field in response.json['device_info'])
 
     def test_post_endpoint_from_all_devices_without_id_device(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 schema = {
                     'device':  {
@@ -80,7 +67,7 @@ class DeviceQueryDevicesTest(BaseDeviceAPITest):
                 self.assertEqual(device.id_device, result.json[0]['id_device'])
 
     def test_post_endpoint_from_all_devices_with_wrong_id_device(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 schema = {
                     'device': {
@@ -97,7 +84,7 @@ class DeviceQueryDevicesTest(BaseDeviceAPITest):
                 self.assertEqual(result.status_code, 403)
 
     def test_post_endpoint_from_all_devices_with_empty_schema(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for device in TeraDevice.query.all():
                 schema = {
                 }

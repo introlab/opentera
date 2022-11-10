@@ -1,5 +1,4 @@
 from BaseParticipantAPITest import BaseParticipantAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraParticipant import TeraParticipant
 
 
@@ -8,29 +7,17 @@ class ParticipantLoginTest(BaseParticipantAPITest):
 
     def setUp(self):
         super().setUp()
-        from modules.FlaskModule.FlaskModule import participant_api_ns
-        from BaseParticipantAPITest import FakeFlaskModule
-        # Setup minimal API
-        from modules.FlaskModule.API.participant.ParticipantLogin import ParticipantLogin
-        kwargs = {
-            'flaskModule': FakeFlaskModule(config=BaseParticipantAPITest.getConfig()),
-            'test': True
-        }
-        participant_api_ns.add_resource(ParticipantLogin, '/login', resource_class_kwargs=kwargs)
-
-        # Create test client
-        self.test_client = flask_app.test_client()
 
     def tearDown(self):
         super().tearDown()
 
     def test_get_endpoint_no_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self.test_client.get(self.test_endpoint)
             self.assertEqual(response.status_code, 401)
 
     def test_get_endpoint_login_valid_participant_http_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Using default participant information
             response = self._get_with_participant_http_auth(self.test_client, 'participant1', 'opentera')
 
@@ -49,13 +36,13 @@ class ParticipantLoginTest(BaseParticipantAPITest):
             self.assertGreater(len(response.json['base_token']), 0)
 
     def test_get_endpoint_login_invalid_participant_httpauth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Using default participant information
             response = self._get_with_participant_http_auth(self.test_client, 'invalid', 'invalid')
             self.assertEqual(response.status_code, 401)
 
     def test_get_endpoint_login_valid_token_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for participant in TeraParticipant.query.all():
                 if participant.participant_token is None:
                     continue
@@ -77,7 +64,7 @@ class ParticipantLoginTest(BaseParticipantAPITest):
 
     def test_get_endpoint_login_base_token_auth(self):
         # Get the token from http auth
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Using default participant information
             response = self._get_with_participant_http_auth(self.test_client, 'participant1', 'opentera')
 

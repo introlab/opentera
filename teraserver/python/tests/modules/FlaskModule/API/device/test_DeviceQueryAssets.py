@@ -1,7 +1,5 @@
 from typing import List
-
 from BaseDeviceAPITest import BaseDeviceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraAsset import TeraAsset
 
@@ -11,34 +9,22 @@ class DeviceQueryAssetsTest(BaseDeviceAPITest):
 
     def setUp(self):
         super().setUp()
-        from modules.FlaskModule.FlaskModule import device_api_ns
-        from BaseDeviceAPITest import FakeFlaskModule
-        # Setup minimal API
-        from modules.FlaskModule.API.device.DeviceQueryAssets import DeviceQueryAssets
-        kwargs = {
-            'flaskModule': FakeFlaskModule(config=BaseDeviceAPITest.getConfig()),
-            'test': True
-        }
-        device_api_ns.add_resource(DeviceQueryAssets, '/assets', resource_class_kwargs=kwargs)
-
-        # Create test client
-        self.test_client = flask_app.test_client()
 
     def tearDown(self):
         super().tearDown()
 
     def test_get_endpoint_no_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self.test_client.get(self.test_endpoint)
             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_invalid_token_auth(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             response = self._get_with_device_token_auth(self.test_client, token='invalid')
             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_with_token_auth_no_param(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             devices: List[TeraDevice] = TeraDevice.query.all()
             for device in devices:
                 if device.device_token:
@@ -54,7 +40,7 @@ class DeviceQueryAssetsTest(BaseDeviceAPITest):
                         self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_with_token_auth_with_urls(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             devices: List[TeraDevice] = TeraDevice.query.all()
             params = {
                 'with_urls': True
@@ -75,7 +61,7 @@ class DeviceQueryAssetsTest(BaseDeviceAPITest):
                         self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_with_token_auth_with_asset_uuid(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             devices: List[TeraDevice] = TeraDevice.query.all()
 
             for device in devices:
@@ -102,7 +88,7 @@ class DeviceQueryAssetsTest(BaseDeviceAPITest):
                             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_with_token_auth_with_asset_id(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             devices: List[TeraDevice] = TeraDevice.query.all()
 
             for device in devices:
@@ -129,7 +115,7 @@ class DeviceQueryAssetsTest(BaseDeviceAPITest):
                             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_with_token_auth_with_forbidden_id_asset(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             devices: List[TeraDevice] = TeraDevice.query.all()
 
             for device in devices:
@@ -154,7 +140,7 @@ class DeviceQueryAssetsTest(BaseDeviceAPITest):
                             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_with_token_auth_with_forbidden_uuid_asset(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             devices: List[TeraDevice] = TeraDevice.query.all()
 
             for device in devices:
@@ -179,7 +165,7 @@ class DeviceQueryAssetsTest(BaseDeviceAPITest):
                             self.assertEqual(401, response.status_code)
 
     def test_get_endpoint_with_token_auth_with_token_only(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             devices: List[TeraDevice] = TeraDevice.query.all()
 
             for device in devices:
