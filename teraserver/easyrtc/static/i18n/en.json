@@ -11,7 +11,8 @@
 		"video2": "Extra Video Source",
 		"audio2": "Extra Audio Source",
 		"mirror": "Mirror Image",
-		"none": "None"
+		"none": "None",
+		"screenaudio": "Share screen audio"
 	},
 	"chronosDialog": {
 		"title": "Timers",

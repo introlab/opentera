@@ -465,6 +465,10 @@ function setConfigDialogValues(peer_id, audios, videos, config){
     let mirrorCheck = $('#mirrorCheck')[0];
     mirrorCheck.checked = config['video1Mirror'];
 
+    // Audio for screen sharing
+    let screenAudio = $('#screenAudioCheck')[0];
+    screenAudio.checked = config['screenAudio'];
+
     // Fill lists
     audios.forEach(audio => {
         let name = audio.label;
@@ -493,13 +497,15 @@ function configDialogClosed(){
     let videoSelect2 = $('#videoSelect2')[0];
     let audioSelect2 = $('#audioSelect2')[0];
     let mirrorCheck = $('#mirrorCheck')[0];
+    let screenAudio = $('#screenAudioCheck')[0];
 
     let new_config = {
         'currentVideoSourceIndex': videoSelect.selectedIndex,
         'currentAudioSourceIndex': audioSelect.selectedIndex,
         'video1Mirror': mirrorCheck.checked,
         'currentVideoSource2Index': videoSelect2.selectedIndex-1,
-        'currentAudioSource2Index': audioSelect2.selectedIndex-1
+        'currentAudioSource2Index': audioSelect2.selectedIndex-1,
+        'screenAudio': screenAudio.checked
     };
 
     if (peer_id === local_peerid){
@@ -530,6 +536,11 @@ function updateLocalConfig(new_config){
             if (SharedObject.setLocalMirror !== undefined)
                 SharedObject.setLocalMirror(currentConfig['video1Mirror']);
         }
+    }
+
+    if (new_config['screenAudio'] !== currentConfig['screenAudio']){
+        // Mirror changed
+        currentConfig['screenAudio'] = new_config['screenAudio'];
     }
 
     if (new_config['currentVideoSource2Index'] !== currentConfig['currentVideoSource2Index'] ||
@@ -819,7 +830,8 @@ function showConfigDialog(peer_id, audios, videos, config){
     if (peer_id !== local_peerid){
         peer_name = remoteContacts[getContactIndexForPeerId(peer_id)].name;
     }
-    $('#configDialogLongTitle')[0].innerHTML = translator.translateForKey("configDialog.title", currentLang) + " - " + peer_name;
+    $('#configDialogLongTitle')[0].innerHTML = translator.translateForKey("configDialog.title", currentLang)
+        + " - " + peer_name;
     $('#configDialog').modal('show');
 }
 
