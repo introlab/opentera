@@ -1155,10 +1155,11 @@ async function shareScreen(local, start){
         // Start screen sharing
         let screenStream = undefined;
         try {
-            screenStream = await navigator.mediaDevices.getDisplayMedia({video: true});
+            screenStream = await navigator.mediaDevices.getDisplayMedia({video: true,
+                audio: currentConfig.screenAudio});
             easyrtc.register3rdPartyLocalMediaStream(screenStream, streamName);
 
-            console.log("Starting screen sharing...");
+            console.log("Starting screen sharing - with audio: " + currentConfig.screenAudio);
 
             // Then to add to existing connections
             for (let i=0; i<remoteContacts.length; i++){

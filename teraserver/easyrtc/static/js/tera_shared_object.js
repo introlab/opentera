@@ -6,7 +6,8 @@ var currentConfig = {'currentVideoSourceIndex': -1,
                      'currentAudioSourceIndex': -1,
                      'currentVideoSource2Index': -1,
                      'currentAudioSource2Index': -1,
-                     'video1Mirror': true};
+                     'video1Mirror': true,
+                     'screenAudio': false};
 
 function connectSharedObject() {
     let baseUrl = "ws://localhost:12345";
