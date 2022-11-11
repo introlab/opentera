@@ -55,8 +55,6 @@ class FakeLoggingService(ServiceOpenTera):
         self.service_config = ConfigManager()
         self.service_config.create_defaults()
 
-        ServiceOpenTera.__init__(self, self.service_config, {})
-
         from modules.LoginModule.LoginModule import LoginModule
         self.login_module = LoginModule(self.service_config)
         self.db_manager = DBManager(self.service_config, flask_app)
@@ -67,13 +65,26 @@ class FakeLoggingService(ServiceOpenTera):
             self.db_manager.open_local({}, echo=False, ram=True)
 
         with flask_app.app_context():
+            # Update redis vars and basic token
             self.db_manager.create_defaults(self.service_config, test=True)
+
+            from opentera.db.models.TeraService import TeraService
+            logging_service: TeraService = TeraService.get_service_by_key('LoggingService')
+
+            # Use LoggingService UUID
+            if logging_service:
+                self.service_config.service_config['ServiceUUID'] = logging_service.service_uuid
+
+        # Will need redis from here
+        ServiceOpenTera.__init__(self, self.service_config, {})
+
+        # Setup modules
         self.flask_module = FakeFlaskModule(self.service_config)
         self.test_client = flask_app.test_client()
 
-        # Update redis vars and basic token
-        self.setup_service_access_manager()
-        self.service_token = self.generate_service_token()
+        with flask_app.app_context():
+            self.setup_service_access_manager()
+            self.service_token = self.generate_service_token()
 
     def generate_service_token(self) -> str:
         with flask_app.app_context():
@@ -87,19 +98,30 @@ class FakeLoggingService(ServiceOpenTera):
                 return ''
 
     def setup_service_access_manager(self):
+        from opentera.db.models.TeraServerSettings import TeraServerSettings
+
         # Initialize service from redis, posing as LoggingService
         # Update Service Access information
         ServiceAccessManager.api_user_token_key = 'test'
         self.redis.set(RedisVars.RedisVar_UserTokenAPIKey,
                        ServiceAccessManager.api_user_token_key)
-        ServiceAccessManager.api_participant_token_key = 'test'
+
+        # Participant token key from DB
+        ServiceAccessManager.api_participant_token_key = TeraServerSettings.get_server_setting_value(
+            TeraServerSettings.ServerParticipantTokenKey)
         self.redis.set(RedisVars.RedisVar_ParticipantTokenAPIKey,
                        ServiceAccessManager.api_participant_token_key)
+
         ServiceAccessManager.api_participant_static_token_key = 'test'
         self.redis.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey,
                        ServiceAccessManager.api_participant_static_token_key)
-        ServiceAccessManager.api_device_token_key = 'test'
+
+        # Device Token Key from DB
+        ServiceAccessManager.api_device_token_key = TeraServerSettings.get_server_setting_value(
+            TeraServerSettings.ServerDeviceTokenKey)
+
         self.redis.set(RedisVars.RedisVar_DeviceTokenAPIKey, ServiceAccessManager.api_device_token_key)
+
         ServiceAccessManager.api_device_static_token_key = 'test'
         self.redis.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey, ServiceAccessManager.api_device_static_token_key)
         ServiceAccessManager.api_service_token_key = 'test'
