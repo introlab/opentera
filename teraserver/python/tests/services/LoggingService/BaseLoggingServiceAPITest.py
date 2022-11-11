@@ -28,7 +28,7 @@ user_jti_generator = infinite_jti_sequence()
 
 class FakeFlaskModule(BaseModule):
     def __init__(self,  config: ConfigManager):
-        BaseModule.__init__(self, config.service_config['name'] + '.FlaskModule-test', config)
+        BaseModule.__init__(self, config.service_config['name'] + '.FakeFlaskModule', config)
 
         flask_app.debug = False
         flask_app.testing = True
@@ -68,6 +68,8 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         cls._db_man.open_local({}, echo=False, ram=True)
         # Will create test api
         cls._flask_module = FakeFlaskModule(cls._config)
+        # Needed before creating instance of service
+        cls._setup_redis_keys()
 
         with flask_app.app_context():
             # Creating default users / tests. Time-consuming, only once per test file.
@@ -92,66 +94,45 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
 
     def setUp(self):
         self.test_client = flask_app.test_client()
-        with flask_app.app_context():
-            self._setup_redis_keys()
-            self._setup_service_access_manager()
 
     def tearDown(self):
         with flask_app.app_context():
             # Make sure pending queries are rollbacked.
             self._db_man.db.session.rollback()
 
-    def _setup_redis_keys(self):
+    @classmethod
+    def _setup_redis_keys(cls):
         # Initialize keys (create only if not found)
         # Service (dynamic)
-        if not self._redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
-            self._redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_token_key)
+        if not cls._redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
+            cls._redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, cls.service_token_key)
         else:
-            self.service_token_key = self._redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
+            cls.service_token_key = cls._redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
 
         # User (dynamic)
-        if not self._redis_client.exists(RedisVars.RedisVar_UserTokenAPIKey):
-            self._redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, self.user_token_key)
+        if not cls._redis_client.exists(RedisVars.RedisVar_UserTokenAPIKey):
+            cls._redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, cls.user_token_key)
         else:
-            self.user_token_key = self._redis_client.get(RedisVars.RedisVar_UserTokenAPIKey).decode('utf-8')
+            cls.user_token_key = cls._redis_client.get(RedisVars.RedisVar_UserTokenAPIKey).decode('utf-8')
 
         # Participant (dynamic)
-        if not self._redis_client.exists(RedisVars.RedisVar_ParticipantTokenAPIKey):
-            self._redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, self.participant_token_key)
+        if not cls._redis_client.exists(RedisVars.RedisVar_ParticipantTokenAPIKey):
+            cls._redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, cls.participant_token_key)
         else:
-            self.participant_token_key = self._redis_client.get(
+            cls.participant_token_key = cls._redis_client.get(
                 RedisVars.RedisVar_ParticipantTokenAPIKey).decode('utf-8')
 
         # Device (dynamic)
-        if not self._redis_client.exists(RedisVars.RedisVar_DeviceTokenAPIKey):
-            self._redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey, self.device_token_key)
+        if not cls._redis_client.exists(RedisVars.RedisVar_DeviceTokenAPIKey):
+            cls._redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey, cls.device_token_key)
 
         # Device (static)
-        if not self._redis_client.exists(RedisVars.RedisVar_DeviceStaticTokenAPIKey):
-            self._redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey, self.device_token_key)
+        if not cls._redis_client.exists(RedisVars.RedisVar_DeviceStaticTokenAPIKey):
+            cls._redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey, cls.device_token_key)
 
         # Participant (static)
-        if not self._redis_client.exists(RedisVars.RedisVar_ParticipantStaticTokenAPIKey):
-            self._redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey, self.participant_token_key)
-
-    def _setup_service_access_manager(self):
-        # Initialize service from redis, posing as LoggingService
-        from opentera.services.ServiceAccessManager import ServiceAccessManager
-        # Update Service Access information
-        ServiceAccessManager.api_user_token_key = \
-            self._redis_client.get(RedisVars.RedisVar_UserTokenAPIKey)
-        ServiceAccessManager.api_participant_token_key = \
-            self._redis_client.get(RedisVars.RedisVar_ParticipantTokenAPIKey)
-        ServiceAccessManager.api_participant_static_token_key = \
-            self._redis_client.get(RedisVars.RedisVar_ParticipantStaticTokenAPIKey)
-        ServiceAccessManager.api_device_token_key = \
-            self._redis_client.get(RedisVars.RedisVar_DeviceTokenAPIKey)
-        ServiceAccessManager.api_device_static_token_key = \
-            self._redis_client.get(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
-        ServiceAccessManager.api_service_token_key = \
-            self._redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey)
-
-        ServiceAccessManager.config_man = self._config
+        if not cls._redis_client.exists(RedisVars.RedisVar_ParticipantStaticTokenAPIKey):
+            cls._redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey, cls.participant_token_key)
 
     def _generate_fake_user_token(self, name='FakeUser', user_uuid=str(uuid.uuid4()),
                                   superadmin=False, expiration=3600):
