@@ -26,3 +26,7 @@ class LoginEntry(BaseModel):
         if ignore_fields is None:
             ignore_fields = []
         return super().to_json(ignore_fields=ignore_fields)
+
+    @staticmethod
+    def get_login_entry_by_id(id_login_event):
+        return LoginEntry.query.filter_by(id_login_event=id_login_event).first()

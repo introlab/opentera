@@ -16,4 +16,6 @@ class LogEntry(BaseModel):
             ignore_fields = []
         return super().to_json(ignore_fields=ignore_fields)
 
-
+    @staticmethod
+    def get_log_entry_by_id(id_log_entry):
+        return LogEntry.query.filter_by(id_log_entry=id_log_entry).first()

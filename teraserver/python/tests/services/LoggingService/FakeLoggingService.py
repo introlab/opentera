@@ -1,16 +1,11 @@
 from services.LoggingService.FlaskModule import flask_app
 from services.LoggingService.FlaskModule import api
-from requests import get, post, Response, delete
+from requests import Response
 from modules.DatabaseModule.DBManager import DBManager
-# from opentera.config.ConfigManager import ConfigManager
 from services.LoggingService.ConfigManager import ConfigManager
 from opentera.modules.BaseModule import BaseModule
 from opentera.services.ServiceOpenTera import ServiceOpenTera
-
-import redis
 from opentera.redis.RedisVars import RedisVars
-from flask_session import Session
-import uuid
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 from modules.FlaskModule.FlaskModule import FlaskModule
 
@@ -21,18 +16,8 @@ service_api_namespace = api.namespace('service', description='Fake TeraServer se
 class FakeFlaskModule(BaseModule):
     def __init__(self,  config: ConfigManager):
         BaseModule.__init__(self, 'FakeFlaskModule', config)
-        # flask_app.debug = True
-        # flask_app.testing = True
-        # flask_app.secret_key = str(uuid.uuid4())  # Normally service UUID
-        # flask_app.config.update({'SESSION_TYPE': 'redis'})
-        # redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
-        #                            % self.config.redis_config)
-        #
-        # flask_app.config.update({'SESSION_REDIS': redis_url})
-        # flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
-        # flask_app.config.update({'SESSION_COOKIE_SECURE': True})
-        # flask_app.config.update({'SQLALCHEMY_TRACK_MODIFICATIONS': True})
-        #
+        # Flask app is already configured before in BaseLoggingServiceAPITest.
+        # We just need to add the service API.
         self.setup_fake_service_api()
 
     def setup_fake_service_api(self):
@@ -41,6 +26,7 @@ class FakeFlaskModule(BaseModule):
             kwargs = {'flaskModule': self,
                       'test': True}
 
+            # The trick is to initialize main server api to thew newly created namespace
             FlaskModule.init_service_api(self, service_api_namespace, kwargs)
 
 

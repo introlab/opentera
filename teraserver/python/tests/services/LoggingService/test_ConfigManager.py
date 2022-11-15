@@ -14,5 +14,3 @@ class LoggingServiceDBManagerTest(unittest.TestCase):
         config = ConfigManager()
         config.create_defaults()
         self.assertTrue(config.validate_config(config.to_dict()))
-
-
