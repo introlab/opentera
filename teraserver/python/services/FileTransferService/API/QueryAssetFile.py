@@ -51,7 +51,7 @@ class QueryAssetFile(Resource):
         src_dir = flask_app.config['UPLOAD_FOLDER']
 
         filename = asset.asset_original_filename
-        return send_file(src_dir + '/' + str(asset.asset_uuid), as_attachment=True, attachment_filename=filename)
+        return send_file(src_dir + '/' + str(asset.asset_uuid), as_attachment=True, download_name=filename)
 
     @api.doc(description='Upload a new file asset to the service',
              responses={200: 'Success - Return informations about file assets',
