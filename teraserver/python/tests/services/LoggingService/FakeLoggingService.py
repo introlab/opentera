@@ -1,5 +1,4 @@
-from services.LoggingService.FlaskModule import flask_app
-from services.LoggingService.FlaskModule import api
+from services.LoggingService.FlaskModule import CustomAPI, authorizations
 from requests import Response
 from modules.DatabaseModule.DBManager import DBManager
 from services.LoggingService.ConfigManager import ConfigManager
@@ -7,27 +6,55 @@ from opentera.modules.BaseModule import BaseModule
 from opentera.services.ServiceOpenTera import ServiceOpenTera
 from opentera.redis.RedisVars import RedisVars
 from opentera.services.ServiceAccessManager import ServiceAccessManager
-from modules.FlaskModule.FlaskModule import FlaskModule
-
-
-service_api_namespace = api.namespace('service', description='Fake TeraServer service API')
+from flask import Flask
+from flask_babel import Babel
+import redis
+import uuid
 
 
 class FakeFlaskModule(BaseModule):
-    def __init__(self,  config: ConfigManager):
+    def __init__(self,  config: ConfigManager, flask_app):
         BaseModule.__init__(self, 'FakeFlaskModule', config)
-        # Flask app is already configured before in BaseLoggingServiceAPITest.
-        # We just need to add the service API.
-        self.setup_fake_service_api()
 
-    def setup_fake_service_api(self):
+        self.flask_app = flask_app
+        self.api = CustomAPI(self.flask_app, version='1.0.0', title='LoggingService API',
+                             description='FakeLoggingService API Documentation', doc='/doc', prefix='/api',
+                             authorizations=authorizations)
+
+        self.babel = Babel(self.flask_app)
+
+        flask_app.debug = False
+        flask_app.testing = True
+        flask_app.secret_key = str(uuid.uuid4())  # Normally service UUID
+        flask_app.config.update({'SESSION_TYPE': 'redis'})
+        redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
+                                   % self.config.redis_config)
+
+        flask_app.config.update({'SESSION_REDIS': redis_url})
+        flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
+        flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        self.logging_api_namespace = self.api.namespace('logging', description='LoggingService API')
+        self.service_api_namespace = self.api.namespace('service', description='Fake TeraServer service API')
+        self.setup_fake_logging_api(flask_app)
+        self.setup_fake_service_api(flask_app)
+
+    def setup_fake_logging_api(self, flask_app):
+        from services.LoggingService.FlaskModule import FlaskModule
+        with flask_app.app_context():
+            # Setup Fake Service API
+            kwargs = {'flaskModule': self,
+                      'test': True}
+            FlaskModule.init_api(self, self.logging_api_namespace, kwargs)
+
+    def setup_fake_service_api(self, flask_app):
+        from modules.FlaskModule.FlaskModule import FlaskModule
         with flask_app.app_context():
             # Setup Fake Service API
             kwargs = {'flaskModule': self,
                       'test': True}
 
             # The trick is to initialize main server api to thew newly created namespace
-            FlaskModule.init_service_api(self, service_api_namespace, kwargs)
+            FlaskModule.init_service_api(self, self.service_api_namespace, kwargs)
 
 
 class FakeLoggingService(ServiceOpenTera):
@@ -38,19 +65,20 @@ class FakeLoggingService(ServiceOpenTera):
     service_token = str()
 
     def __init__(self, db=None):
+        self.flask_app = Flask('FakeLoggingService')
         self.service_config = ConfigManager()
         self.service_config.create_defaults()
 
         from modules.LoginModule.LoginModule import LoginModule
         self.login_module = LoginModule(self.service_config)
-        self.db_manager = DBManager(self.service_config, flask_app)
+        self.db_manager = DBManager(self.service_config, self.flask_app)
         # Cheating on db (reusing already opened from test)
         if db is not None:
             self.db_manager.db = db
         else:
             self.db_manager.open_local({}, echo=False, ram=True)
 
-        with flask_app.app_context():
+        with self.flask_app.app_context():
             # Update redis vars and basic token
             self.db_manager.create_defaults(self.service_config, test=True)
 
@@ -65,15 +93,15 @@ class FakeLoggingService(ServiceOpenTera):
         ServiceOpenTera.__init__(self, self.service_config, {})
 
         # Setup modules
-        self.flask_module = FakeFlaskModule(self.service_config)
-        self.test_client = flask_app.test_client()
+        self.flask_module = FakeFlaskModule(self.service_config, self.flask_app)
+        self.test_client = self.flask_app.test_client()
 
-        with flask_app.app_context():
+        with self.flask_app.app_context():
             self.setup_service_access_manager()
             self.service_token = self.generate_service_token()
 
     def generate_service_token(self) -> str:
-        with flask_app.app_context():
+        with self.flask_app.app_context():
             # Use redis key to generate token
             # Fake service uuid
             from opentera.db.models.TeraService import TeraService
@@ -115,24 +143,24 @@ class FakeLoggingService(ServiceOpenTera):
         ServiceAccessManager.config_man = self.config
 
     def get_users_uuids(self):
-        with flask_app.app_context():
+        with self.flask_app.app_context():
             from opentera.db.models.TeraUser import TeraUser
             return [user.user_uuid for user in TeraUser.query.all() if user.user_enabled]
 
     def post_to_opentera(self, api_url: str, json_data: dict) -> Response:
-        with flask_app.app_context():
+        with self.flask_app.app_context():
             # Synchronous call to OpenTera fake backend
             request_headers = {'Authorization': 'OpenTera ' + self.service_token}
             return self.test_client.post(api_url, headers=request_headers, json=json_data)
 
     def get_from_opentera(self, api_url: str, params: dict) -> Response:
-        with flask_app.app_context():
+        with self.flask_app.app_context():
             # Synchronous call to OpenTera fake backend
             request_headers = {'Authorization': 'OpenTera ' + self.service_token}
             return self.test_client.get(api_url, headers=request_headers, query_string=params)
 
     def delete_from_opentera(self, api_url: str, params: dict) -> Response:
-        with flask_app.app_context():
+        with self.flask_app.app_context():
             # Synchronous call to OpenTera fake backend
             request_headers = {'Authorization': 'OpenTera ' + self.service_token}
             return self.test_client.delete(api_url, headers=request_headers, query_string=params)
@@ -141,7 +169,7 @@ class FakeLoggingService(ServiceOpenTera):
 if __name__ == '__main__':
     from opentera.db.models.TeraParticipant import TeraParticipant
     service = FakeLoggingService()
-    with flask_app.app_context():
+    with service.flask_app.app_context():
         participant = TeraParticipant.get_participant_by_id(1)
         response = service.get_from_opentera('/api/service/participants',
                                              {'participant_uuid': participant.participant_uuid})

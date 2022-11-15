@@ -28,5 +28,21 @@ class LoginEntry(BaseModel):
         return super().to_json(ignore_fields=ignore_fields)
 
     @staticmethod
-    def get_login_entry_by_id(id_login_event):
+    def get_login_entry_by_id(id_login_event: int):
         return LoginEntry.query.filter_by(id_login_event=id_login_event).first()
+
+    @staticmethod
+    def get_login_entries_by_user_uuid(user_uuid: str):
+        return LoginEntry.query.filter_by(login_user_uuid=user_uuid).all()
+
+    @staticmethod
+    def get_login_entries_by_participant_uuid(participant_uuid: str):
+        return LoginEntry.query.filter_by(login_participant_uuid=participant_uuid).all()
+
+    @staticmethod
+    def get_login_entries_by_device_uuid(device_uuid: str):
+        return LoginEntry.query.filter_by(login_device_uuid=device_uuid).all()
+
+    @staticmethod
+    def get_login_entries_by_service_uuid(service_uuid: str):
+        return LoginEntry.query.filter_by(login_service_uuid=service_uuid).all()

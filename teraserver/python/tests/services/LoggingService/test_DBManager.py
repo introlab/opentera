@@ -19,7 +19,7 @@ class LoggingServiceDBManagerTest(unittest.TestCase):
 
     def tearDown(self):
         with flask_app.app_context():
-            pass
+            self.dbman.db.session.rollback()
 
     def test_create_defaults_should_create_one_log_entry_and_no_login_entry(self):
         with flask_app.app_context():

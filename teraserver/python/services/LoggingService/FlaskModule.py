@@ -230,9 +230,9 @@ class FlaskModule(BaseModule):
         kwargs |= additional_args
 
         from services.LoggingService.API.QueryLogEntries import QueryLogEntries
-        logging_api_ns.add_resource(QueryLogEntries, '/log_entries', resource_class_kwargs=kwargs)
+        namespace.add_resource(QueryLogEntries, '/log_entries', resource_class_kwargs=kwargs)
         from services.LoggingService.API.QueryLoginEntries import QueryLoginEntries
-        logging_api_ns.add_resource(QueryLoginEntries, '/login_entries', resource_class_kwargs=kwargs)
+        namespace.add_resource(QueryLoginEntries, '/login_entries', resource_class_kwargs=kwargs)
 
     def init_views(self):
         # Default arguments

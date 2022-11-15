@@ -33,13 +33,14 @@ class DBManager:
         'type': ''
     }"""
 
-    def __init__(self, test: bool = False):
+    def __init__(self, app=flask_app, test: bool = False):
         self.db_uri = None
         self.db = SQLAlchemy()
+        self.app = app
         self.test = test
 
     def create_defaults(self, config: ConfigManager, test: bool = False):
-        with flask_app.app_context():
+        with self.app.app_context():
             if LogEntry.get_count() == 0:
                 entry = LogEntry()
                 entry.log_level = LogEvent.LogLevel.LOGLEVEL_INFO
@@ -55,18 +56,18 @@ class DBManager:
     def open(self, db_infos, echo=False):
         self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos
 
-        flask_app.config.update({
+        self.app.config.update({
             'SQLALCHEMY_DATABASE_URI': self.db_uri,
             'SQLALCHEMY_TRACK_MODIFICATIONS': False,
             'SQLALCHEMY_ECHO': echo
         })
 
         # Create db engine
-        self.db.init_app(flask_app)
-        self.db.app = flask_app
+        self.db.init_app(self.app)
+        self.db.app = self.app
         BaseModel.set_db(self.db)
 
-        with flask_app.app_context():
+        with self.app.app_context():
             # Init tables
             BaseModel.create_all()
 
@@ -87,18 +88,18 @@ class DBManager:
         else:
             self.db_uri = 'sqlite:///%(filename)s' % db_infos
 
-        flask_app.config.update({
+        self.app.config.update({
             'SQLALCHEMY_DATABASE_URI': self.db_uri,
             'SQLALCHEMY_TRACK_MODIFICATIONS': False,
             'SQLALCHEMY_ECHO': echo
         })
 
         # Create db engine
-        self.db.init_app(flask_app)
-        self.db.app = flask_app
+        self.db.init_app(self.app)
+        self.db.app = self.app
         BaseModel.set_db(self.db)
 
-        with flask_app.app_context():
+        with self.app.app_context():
             BaseModel.create_all()
 
             inspector = Inspector.from_engine(self.db.engine)
@@ -161,7 +162,7 @@ class DBManager:
         command.stamp(config, revision, sql, tag)
 
     def store_log_event(self, event: LogEvent):
-        with flask_app.app_context():
+        with self.app.app_context():
             entry = LogEntry()
             entry.log_level = event.level
             entry.sender = event.sender
@@ -171,7 +172,7 @@ class DBManager:
             self.db.session.commit()
 
     def store_login_event(self, event: LoginEvent):
-        with flask_app.app_context():
+        with self.app.app_context():
             entry = LoginEntry()
             entry.login_timestamp = datetime.datetime.fromtimestamp(event.log_header.timestamp)
             entry.login_log_level = event.log_header.level

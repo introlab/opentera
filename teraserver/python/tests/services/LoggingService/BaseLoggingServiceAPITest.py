@@ -1,18 +1,13 @@
 import unittest
 from services.LoggingService.libloggingservice.db.DBManager import DBManager
 from services.LoggingService.ConfigManager import ConfigManager
-from opentera.modules.BaseModule import BaseModule
 from flask.testing import FlaskClient
-from opentera.redis.RedisVars import RedisVars
-from flask_session import Session
-from services.LoggingService.FlaskModule import flask_app
-import redis
 import uuid
 import random
 from string import digits, ascii_lowercase, ascii_uppercase
 import services.LoggingService.Globals as Globals
 from FakeLoggingService import FakeLoggingService
-from services.LoggingService.FlaskModule import FlaskModule, logging_api_ns
+from opentera.services.ServiceAccessManager import ServiceAccessManager
 
 
 def infinite_jti_sequence():
@@ -26,65 +21,39 @@ def infinite_jti_sequence():
 user_jti_generator = infinite_jti_sequence()
 
 
-class FakeFlaskModule(BaseModule):
-    def __init__(self,  config: ConfigManager):
-        BaseModule.__init__(self, config.service_config['name'] + '.FakeFlaskModule', config)
-
-        flask_app.debug = False
-        flask_app.testing = True
-        flask_app.secret_key = str(uuid.uuid4())  # Normally service UUID
-        flask_app.config.update({'SESSION_TYPE': 'redis'})
-        redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
-                                   % self.config.redis_config)
-
-        flask_app.config.update({'SESSION_REDIS': redis_url})
-        flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
-        flask_app.config.update({'SESSION_COOKIE_SECURE': True})
-
-        additional_args = {'test': True, 'flaskModule': self}
-
-        FlaskModule.init_api(self, logging_api_ns, additional_args)
-
-
 class BaseLoggingServiceAPITest(unittest.TestCase):
-
+    _config = None
+    _db_man = None
     test_endpoint = ''
-    user_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for i in range(36))
-    participant_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for i in range(36))
-    service_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for i in range(36))
-    device_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for i in range(36))
+    user_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for _ in range(36))
+    participant_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for _ in range(36))
+    service_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for _ in range(36))
+    device_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for _ in range(36))
 
     @classmethod
     def setUpClass(cls):
         cls._config = BaseLoggingServiceAPITest.getConfig()
-        cls._redis_client = redis.Redis(host=cls._config.redis_config['hostname'],
-                                        port=cls._config.redis_config['port'],
-                                        username=cls._config.redis_config['username'],
-                                        password=cls._config.redis_config['password'],
-                                        db=cls._config.redis_config['db'])
 
-        cls._db_man: DBManager = DBManager(test=True)
-        # Setup DB in RAM
-        cls._db_man.open_local({}, echo=False, ram=True)
-        # Will create test api
-        cls._flask_module = FakeFlaskModule(cls._config)
-        # Needed before creating instance of service
-        cls._setup_redis_keys()
+        # Instance of Fake service API will create a new flask_app
+        Globals.service = FakeLoggingService()
 
-        with flask_app.app_context():
+        cls._db_man: DBManager = DBManager(app=Globals.service.flask_app, test=True)
+
+        # Cheating using same db as FakeService
+        cls._db_man.db = Globals.service.db_manager.db
+
+        with BaseLoggingServiceAPITest.app_context():
             # Creating default users / tests. Time-consuming, only once per test file.
             cls._db_man.create_defaults(cls._config, test=True)
 
-            # Instance of Fake service API
-            Globals.service = FakeLoggingService(cls._db_man.db)
+    @classmethod
+    def app_context(cls):
+        return Globals.service.flask_app.app_context()
 
     @classmethod
     def tearDownClass(cls):
-        with flask_app.app_context():
-            cls._config = None
-            # LoginModule.redis_client = None
+        with BaseLoggingServiceAPITest.app_context():
             cls._db_man.db.session.remove()
-            cls._db_man = None
 
     @classmethod
     def getConfig(cls) -> ConfigManager:
@@ -93,46 +62,12 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         return config
 
     def setUp(self):
-        self.test_client = flask_app.test_client()
+        self.test_client = Globals.service.flask_app.test_client()
 
     def tearDown(self):
-        with flask_app.app_context():
+        with BaseLoggingServiceAPITest.app_context():
             # Make sure pending queries are rollbacked.
             self._db_man.db.session.rollback()
-
-    @classmethod
-    def _setup_redis_keys(cls):
-        # Initialize keys (create only if not found)
-        # Service (dynamic)
-        if not cls._redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
-            cls._redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, cls.service_token_key)
-        else:
-            cls.service_token_key = cls._redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
-
-        # User (dynamic)
-        if not cls._redis_client.exists(RedisVars.RedisVar_UserTokenAPIKey):
-            cls._redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, cls.user_token_key)
-        else:
-            cls.user_token_key = cls._redis_client.get(RedisVars.RedisVar_UserTokenAPIKey).decode('utf-8')
-
-        # Participant (dynamic)
-        if not cls._redis_client.exists(RedisVars.RedisVar_ParticipantTokenAPIKey):
-            cls._redis_client.set(RedisVars.RedisVar_ParticipantTokenAPIKey, cls.participant_token_key)
-        else:
-            cls.participant_token_key = cls._redis_client.get(
-                RedisVars.RedisVar_ParticipantTokenAPIKey).decode('utf-8')
-
-        # Device (dynamic)
-        if not cls._redis_client.exists(RedisVars.RedisVar_DeviceTokenAPIKey):
-            cls._redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey, cls.device_token_key)
-
-        # Device (static)
-        if not cls._redis_client.exists(RedisVars.RedisVar_DeviceStaticTokenAPIKey):
-            cls._redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey, cls.device_token_key)
-
-        # Participant (static)
-        if not cls._redis_client.exists(RedisVars.RedisVar_ParticipantStaticTokenAPIKey):
-            cls._redis_client.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey, cls.participant_token_key)
 
     def _generate_fake_user_token(self, name='FakeUser', user_uuid=str(uuid.uuid4()),
                                   superadmin=False, expiration=3600):
@@ -144,7 +79,7 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
 
         # Creating token with user info
         now = time.time()
-        token_key = self._redis_client.get(RedisVars.RedisVar_UserTokenAPIKey)
+        token_key = ServiceAccessManager.api_user_token_key
 
         payload = {
             'iat': int(now),
@@ -171,8 +106,8 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
 
         return client.get(endpoint, headers=headers, query_string=params)
 
-    def _post_with_service_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
-                                      params: dict = {}, endpoint: str = ''):
+    def _post_with_service_token_auth(self, client: FlaskClient, token: str = '', json: dict = None,
+                                      params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -181,7 +116,7 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
     def _delete_with_service_token_auth(self, client: FlaskClient, token: str = '',
-                                        params: dict = {}, endpoint: str = ''):
+                                        params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
