@@ -11,7 +11,7 @@ class BaseModelsTest(unittest.TestCase):
         cls._config.create_defaults()
         cls._db_man = DBManager(cls._config)
         # Setup DB in RAM
-        cls._db_man.open_local({}, echo=True, ram=True)
+        cls._db_man.open_local({}, echo=False, ram=True)
 
         # Creating default users / tests. Time-consuming, only once per test file.
         # with DBManager.app_context():
