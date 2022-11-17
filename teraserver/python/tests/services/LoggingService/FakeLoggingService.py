@@ -147,6 +147,11 @@ class FakeLoggingService(ServiceOpenTera):
             from opentera.db.models.TeraUser import TeraUser
             return [user.user_uuid for user in TeraUser.query.all() if user.user_enabled]
 
+    def get_enabled_users(self):
+        with self.flask_app.app_context():
+            from opentera.db.models.TeraUser import TeraUser
+            return [user for user in TeraUser.query.all() if user.user_enabled]
+
     def post_to_opentera(self, api_url: str, json_data: dict) -> Response:
         with self.flask_app.app_context():
             # Synchronous call to OpenTera fake backend
