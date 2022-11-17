@@ -79,36 +79,16 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 two_days_ago = current_date - timedelta(days=2)
                 a_week_ago = current_date - timedelta(weeks=1)
 
-                def create_entry_with_user_uuid_and_date(entry_uuid: str, entry_date: datetime):
-                    entry = LoginEntry()
-                    entry.login_timestamp = entry_date
-                    entry.login_log_level = 1
-                    entry.login_sender = 'LoggingServiceQueryLoginEntriesTest'
-                    entry.login_user_uuid = entry_uuid
-                    entry.login_participant_uuid = None
-                    entry.login_device_uuid = None
-                    entry.login_service_uuid = None
-                    entry.login_status = 2
-                    entry.login_type = 1
-                    entry.login_client_ip = '127.0.0.1'
-                    entry.login_server_endpoint = '/endpoint'
-                    entry.login_client_name = 'client name'
-                    entry.login_client_version = 'client version'
-                    entry.login_os_name = 'os name'
-                    entry.login_os_version = 'os version'
-                    entry.login_message = 'random message'
-                    return entry
-
-                current_entry = create_entry_with_user_uuid_and_date(user.user_uuid, current_date)
+                current_entry = self._create_entry_with_user_uuid_and_date(user.user_uuid, current_date)
                 LoginEntry.insert(current_entry)
 
-                yesterday_entry = create_entry_with_user_uuid_and_date(user.user_uuid, yesterday)
+                yesterday_entry = self._create_entry_with_user_uuid_and_date(user.user_uuid, yesterday)
                 LoginEntry.insert(yesterday_entry)
 
-                two_days_ago_entry = create_entry_with_user_uuid_and_date(user.user_uuid, two_days_ago)
+                two_days_ago_entry = self._create_entry_with_user_uuid_and_date(user.user_uuid, two_days_ago)
                 LoginEntry.insert(two_days_ago_entry)
 
-                a_week_ago_entry = create_entry_with_user_uuid_and_date(user.user_uuid, a_week_ago)
+                a_week_ago_entry = self._create_entry_with_user_uuid_and_date(user.user_uuid, a_week_ago)
                 LoginEntry.insert(a_week_ago_entry)
 
                 self.assertIsNotNone(current_entry.id_login_event)
@@ -125,14 +105,96 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
 
                 response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
                 self.assertEqual(response.status_code, 200)
-
-                print('a week ago ts', a_week_ago_entry.login_timestamp)
-                print('current ts', current_entry.login_timestamp)
-
                 self.assertEqual(len(response.json), 4)
+
+                params['start_date'] = str(current_date.isoformat())
+                params['end_date'] = str(current_date.isoformat())
+                response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json), 1)
 
                 # Cleanup
                 LoginEntry.delete(current_entry.id_login_event)
                 LoginEntry.delete(yesterday_entry.id_login_event)
                 LoginEntry.delete(two_days_ago_entry.id_login_event)
                 LoginEntry.delete(a_week_ago_entry.id_login_event)
+
+    def test_get_endpoint_with_valid_token_with_admin_with_limit(self):
+        with BaseLoggingServiceAPITest.app_context():
+            from services.LoggingService.Globals import service
+
+            # Will get only enabled user uuids
+            users = service.get_enabled_users()
+            for user in users:
+                all_entries = []
+                for i in range(50):
+                    entry = self._create_entry_with_user_uuid_and_date(user.user_uuid, datetime.now())
+                    self.assertIsNotNone(entry)
+                    LoginEntry.insert(entry)
+                    self.assertIsNotNone(entry.id_login_event)
+                    all_entries.append(entry)
+
+                params = {
+                    'limit': 10
+                }
+                token = self._generate_fake_user_token(name=user.user_username, user_uuid=user.user_uuid,
+                                                       superadmin=user.user_superadmin, expiration=3600)
+
+                response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json), 10)
+
+                # Cleanup
+                for entry in all_entries:
+                    LoginEntry.delete(entry.id_login_event)
+
+    def test_get_endpoint_with_valid_token_with_admin_with_offset(self):
+        with BaseLoggingServiceAPITest.app_context():
+            from services.LoggingService.Globals import service
+
+            # Will get only enabled user uuids
+            users = service.get_enabled_users()
+            for user in users:
+                all_entries = []
+                for i in range(50):
+                    entry = self._create_entry_with_user_uuid_and_date(user.user_uuid, datetime.now())
+                    self.assertIsNotNone(entry)
+                    LoginEntry.insert(entry)
+                    self.assertIsNotNone(entry.id_login_event)
+                    all_entries.append(entry)
+
+                params = {
+                    'offset': 10
+                }
+                token = self._generate_fake_user_token(name=user.user_username, user_uuid=user.user_uuid,
+                                                       superadmin=user.user_superadmin, expiration=3600)
+
+                response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json), 40)
+
+                # Cleanup
+                for entry in all_entries:
+                    LoginEntry.delete(entry.id_login_event)
+
+    def _create_entry_with_user_uuid_and_date(self, entry_uuid: str, entry_date: datetime):
+        self.assertIsNotNone(entry_uuid)
+        self.assertIsNotNone(entry_date)
+        entry = LoginEntry()
+        entry.login_timestamp = entry_date
+        entry.login_log_level = 1
+        entry.login_sender = 'LoggingServiceQueryLoginEntriesTest'
+        entry.login_user_uuid = entry_uuid
+        entry.login_participant_uuid = None
+        entry.login_device_uuid = None
+        entry.login_service_uuid = None
+        entry.login_status = 2
+        entry.login_type = 1
+        entry.login_client_ip = '127.0.0.1'
+        entry.login_server_endpoint = '/endpoint'
+        entry.login_client_name = 'client name'
+        entry.login_client_version = 'client version'
+        entry.login_os_name = 'os name'
+        entry.login_os_version = 'os version'
+        entry.login_message = 'random message'
+        return entry

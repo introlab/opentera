@@ -73,18 +73,21 @@ class QueryLoginEntries(Resource):
                     query = query.filter(
                         LoginEntry.db().func.datetime(
                             LoginEntry.login_timestamp) <= LoginEntry.db().func.datetime(args['end_date']))
+
+                if not current_user_client or (current_user_client and current_user_client.user_superadmin is False):
+                    # Filter according to access only for other than super admins
+                    query = query.filter(
+                        LoginEntry.login_user_uuid.in_(users_uuids) |
+                        LoginEntry.login_participant_uuid.in_(participants_uuids) |
+                        LoginEntry.login_device_uuid.in_(devices_uuids))
+
+                # Must be applied after filter
                 if args['limit']:
                     query = query.limit(args['limit'])
                 if args['offset']:
                     query = query.offset(args['offset'])
 
-                if current_user_client and current_user_client.user_superadmin is True:
-                    all_entries.extend(query.all())
-                else:
-                    all_entries.extend(query.filter(
-                        LoginEntry.login_user_uuid.in_(users_uuids) |
-                        LoginEntry.login_participant_uuid.in_(participants_uuids) |
-                        LoginEntry.login_device_uuid.in_(devices_uuids)).all())
+                all_entries.extend(query.all())
 
                 # Return json result
                 for entry in all_entries:
