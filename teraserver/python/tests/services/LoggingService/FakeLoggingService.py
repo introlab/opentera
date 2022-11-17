@@ -76,7 +76,7 @@ class FakeLoggingService(ServiceOpenTera):
         if db is not None:
             self.db_manager.db = db
         else:
-            self.db_manager.open_local({}, echo=False, ram=True)
+            self.db_manager.open_local({}, echo=True, ram=True)
 
         with self.flask_app.app_context():
             # Update redis vars and basic token

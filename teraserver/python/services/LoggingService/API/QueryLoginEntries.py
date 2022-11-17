@@ -11,10 +11,10 @@ get_parser = api.parser()
 get_parser.add_argument('limit', type=int, help='Maximum number of results to return', default=None)
 get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index',
                         default=None)
-get_parser.add_argument('start_date', type=inputs.date, help='Start date, sessions before that date will be ignored',
-                        default=None)
-get_parser.add_argument('end_date', type=inputs.date, help='End date, sessions after that date will be ignored',
-                        default=None)
+get_parser.add_argument('start_date', type=inputs.datetime_from_iso8601,
+                        help='Start date, sessions before that date will be ignored', default=None)
+get_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
+                        help='End date, sessions after that date will be ignored', default=None)
 
 
 class QueryLoginEntries(Resource):
@@ -67,10 +67,12 @@ class QueryLoginEntries(Resource):
                 # Handle query parameters
                 if args['start_date']:
                     query = query.filter(
-                        LoginEntry.db().func.date(LoginEntry.login_timestamp) >= args['start_date'])
+                        LoginEntry.db().func.datetime(
+                            LoginEntry.login_timestamp) >= LoginEntry.db().func.datetime(args['start_date']))
                 if args['end_date']:
                     query = query.filter(
-                        LoginEntry.db().func.date(LoginEntry.login_timestamp) <= args['end_date'])
+                        LoginEntry.db().func.datetime(
+                            LoginEntry.login_timestamp) <= LoginEntry.db().func.datetime(args['end_date']))
                 if args['limit']:
                     query = query.limit(args['limit'])
                 if args['offset']:

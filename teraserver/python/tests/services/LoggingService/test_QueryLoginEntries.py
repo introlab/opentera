@@ -117,14 +117,17 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 self.assertIsNotNone(a_week_ago_entry.id_login_event)
 
                 params = {
-                    'start_date': str(a_week_ago.date()),
-                    'end_date': str(current_date.date())
+                    'start_date': str(a_week_ago.isoformat()),
+                    'end_date': str(current_date.isoformat())
                 }
                 token = self._generate_fake_user_token(name=user.user_username, user_uuid=user.user_uuid,
                                                        superadmin=user.user_superadmin, expiration=3600)
 
                 response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
                 self.assertEqual(response.status_code, 200)
+
+                print('a week ago ts', a_week_ago_entry.login_timestamp)
+                print('current ts', current_entry.login_timestamp)
 
                 self.assertEqual(len(response.json), 4)
 
