@@ -218,74 +218,6 @@ class QueryAssetFile(Resource):
         full_json['access_token'] = access_token
         return full_json
 
-        #
-        # if not args['asset_uuid']:
-        #     return 'No asset_uuid specified', 400
-        #
-        # # Verify headers
-        # if request.content_type == 'application/octet-stream':
-        #     if 'X-Filename' not in request.headers:
-        #         return 'No file specified', 400
-        #
-        #     # Save file on disk
-        #     # TODO - Create another uuid for asset for filename?
-        #     # TODO - Handle write errors
-        #     fo = open(os.path.join(flask_app.config['UPLOAD_FOLDER'], args['asset_uuid'], "wb"))
-        #     fo.write(request.data)
-        #     fo.close()
-        #
-        #     # Create DB entry
-        #     file_asset = AssetFileData()
-        #     file_asset.asset_uuid = args['asset_uuid']
-        #     file_asset.asset_creator_service_uuid = current_service_client.service_uuid
-        #     file_asset.asset_original_filename = secure_filename(request.headers['X-Filename'])
-        #     file_asset.asset_file_size = len(request.data)
-        #     file_asset.asset_saved_date = datetime.now()
-        #     file_asset.asset_md5 = hashlib.md5(request.data).hexdigest()
-        #     db.session.add(file_asset)
-        #     db.commit()
-        #
-        #     return file_asset.to_json()
-        # elif request.content_type.__contains__('multipart/form-data'):
-        #     # TODO should have only one file
-        #     # check if the post request has the file part
-        #     if 'file' not in request.files:
-        #         return 'No file specified', 400
-        #
-        #     file = request.files['file']
-        #
-        #     # if user does not select file, browser also
-        #     # submit an empty part without filename
-        #     if file.filename == '':
-        #         return 'No filename specified', 400
-        #
-        #     if file:
-        #         filename = secure_filename(file.filename)
-        #
-        #         # Saving file
-        #         file.save(os.path.join(flask_app.config['UPLOAD_FOLDER'], args['asset_uuid']))
-        #         file_size = file.stream.tell()
-        #
-        #         # Reset stream
-        #         file.stream.seek(0)
-        #
-        #         # Create DB entry
-        #         file_asset = AssetFileData()
-        #         file_asset.asset_uuid = args['asset_uuid']
-        #         file_asset.asset_creator_service_uuid = current_service_client.service_uuid
-        #         file_asset.asset_original_filename = filename
-        #         file_asset.asset_file_size = file_size
-        #         file_asset.asset_saved_date = datetime.now()
-        #         # TODO avoid using a lot of RAM for md5?
-        #         file_asset.asset_md5 = hashlib.md5(file.stream.read()).hexdigest()
-        #         db.session.add(file_asset)
-        #         db.session.commit()
-        #         file.close()
-        #
-        #         return file_asset.to_json()
-        #
-        # return 'Unauthorized (invalid content type)', 403
-
     @api.expect(delete_parser, validate=True)
     @api.doc(description='Delete asset',
              responses={200: 'Success - asset deleted',
@@ -305,15 +237,5 @@ class QueryAssetFile(Resource):
         response = Globals.service.delete_from_opentera('/api/service/assets', {'uuid': uuid_todel})
         if response.status_code != 200:
             return gettext('Unable to delete asset') + ': ' + response.text, response.status_code
-
-        # Local asset information will be deleted when receiving asset deletion event (in asset_event_received)
-        # Delete local asset information - not needed anymore
-        # asset = AssetFileData.get_asset_for_uuid(uuid_asset=uuid_todel)
-        # if not asset:
-        #     return gettext('Access denied to asset'), 403
-        #
-        # # If we are here, we are allowed to delete. Do so.
-        # if not asset.delete_file_asset(flask_app.config['UPLOAD_FOLDER']):
-        #     return gettext('Error occured when deleting file asset'), 500
 
         return '', 200
