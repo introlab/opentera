@@ -1,4 +1,4 @@
-from flask_restx import Resource, reqparse
+from flask_restx import Resource, inputs
 from sqlalchemy.exc import InvalidRequestError
 from services.LoggingService.FlaskModule import logging_api_ns as api
 from opentera.services.ServiceAccessManager import ServiceAccessManager, current_user_client
@@ -6,6 +6,16 @@ from services.LoggingService.libloggingservice.db.models.LogEntry import LogEntr
 
 # Parser definition(s)
 get_parser = api.parser()
+
+# Parser definition(s)
+get_parser = api.parser()
+get_parser.add_argument('limit', type=int, help='Maximum number of results to return', default=None)
+get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index',
+                        default=None)
+get_parser.add_argument('start_date', type=inputs.datetime_from_iso8601,
+                        help='Start date, sessions before that date will be ignored', default=None)
+get_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
+                        help='End date, sessions after that date will be ignored', default=None)
 
 
 class QueryLogEntries(Resource):
@@ -24,11 +34,29 @@ class QueryLogEntries(Resource):
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     @ServiceAccessManager.token_required(allow_dynamic_tokens=True, allow_static_tokens=False)
     def get(self):
-
-        # TODO Only allow superadmins to query logs?
+        args = get_parser.parse_args()
+        # Only allow superadmins to query logs?
         if current_user_client and current_user_client.user_superadmin:
             try:
-                all_entries = LogEntry.query.all()
+                query = LogEntry.query.order_by(LogEntry.timestamp.desc())
+
+                # Handle query parameters
+                if args['start_date']:
+                    query = query.filter(
+                        LogEntry.db().func.datetime(
+                            LogEntry.timestamp) >= LogEntry.db().func.datetime(args['start_date']))
+                if args['end_date']:
+                    query = query.filter(
+                        LogEntry.db().func.datetime(
+                            LogEntry.timestamp) <= LogEntry.db().func.datetime(args['end_date']))
+
+                # Must be applied after filter
+                if args['limit']:
+                    query = query.limit(args['limit'])
+                if args['offset']:
+                    query = query.offset(args['offset'])
+
+                all_entries = query.all()
                 results = []
                 for entry in all_entries:
                     results.append(entry.to_json(minimal=False))
