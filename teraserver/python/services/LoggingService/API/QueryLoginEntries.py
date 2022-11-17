@@ -1,13 +1,20 @@
-from flask_restx import Resource, reqparse
 from sqlalchemy.exc import InvalidRequestError
 from services.LoggingService.FlaskModule import logging_api_ns as api
 from opentera.services.ServiceAccessManager import ServiceAccessManager, current_user_client, \
     current_participant_client, current_device_client
 from services.LoggingService.libloggingservice.db.models.LoginEntry import LoginEntry
 import services.LoggingService.Globals as Globals
+from flask_restx import Resource, inputs
 
 # Parser definition(s)
 get_parser = api.parser()
+get_parser.add_argument('limit', type=int, help='Maximum number of results to return', default=None)
+get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index',
+                        default=None)
+get_parser.add_argument('start_date', type=inputs.date, help='Start date, sessions before that date will be ignored',
+                        default=None)
+get_parser.add_argument('end_date', type=inputs.date, help='End date, sessions after that date will be ignored',
+                        default=None)
 
 
 class QueryLoginEntries(Resource):
@@ -25,6 +32,9 @@ class QueryLoginEntries(Resource):
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     @ServiceAccessManager.token_required(allow_dynamic_tokens=True, allow_static_tokens=False)
     def get(self):
+
+        args = get_parser.parse_args()
+
         # Request access from server params will depend on a user, participant or device
         params = {
             'from_user_uuid': current_user_client.user_uuid if current_user_client else None,
@@ -50,10 +60,29 @@ class QueryLoginEntries(Resource):
             try:
                 all_entries = []
                 results = []
-                all_entries.extend(LoginEntry.query.filter(
-                    LoginEntry.login_user_uuid.in_(users_uuids) |
-                    LoginEntry.login_participant_uuid.in_(participants_uuids) |
-                    LoginEntry.login_device_uuid.in_(devices_uuids)).all())
+
+                # Base query will order desc from most recent to last recent
+                query = LoginEntry.query.order_by(LoginEntry.login_timestamp.desc())
+
+                # Handle query parameters
+                if args['start_date']:
+                    query = query.filter(
+                        LoginEntry.db().func.date(LoginEntry.login_timestamp) >= args['start_date'])
+                if args['end_date']:
+                    query = query.filter(
+                        LoginEntry.db().func.date(LoginEntry.login_timestamp) <= args['end_date'])
+                if args['limit']:
+                    query = query.limit(args['limit'])
+                if args['offset']:
+                    query = query.offset(args['offset'])
+
+                if current_user_client and current_user_client.user_superadmin is True:
+                    all_entries.extend(query.all())
+                else:
+                    all_entries.extend(query.filter(
+                        LoginEntry.login_user_uuid.in_(users_uuids) |
+                        LoginEntry.login_participant_uuid.in_(participants_uuids) |
+                        LoginEntry.login_device_uuid.in_(devices_uuids)).all())
 
                 # Return json result
                 for entry in all_entries:
