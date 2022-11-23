@@ -38,42 +38,42 @@ class QueryLogEntries(Resource):
         args = get_parser.parse_args()
         # Only allow superadmins to query logs?
         if current_user_client and current_user_client.user_superadmin:
-            try:
-                query = LogEntry.query.order_by(LogEntry.timestamp.desc())
+            # try:
+            query = LogEntry.query.order_by(LogEntry.timestamp.desc())
 
-                # Handle query parameters
-                if args['start_date']:
-                    query = query.filter(
-                        LogEntry.db().func.datetime(
-                            LogEntry.timestamp) >= LogEntry.db().func.datetime(args['start_date']))
-                if args['end_date']:
-                    query = query.filter(
-                        LogEntry.db().func.datetime(
-                            LogEntry.timestamp) <= LogEntry.db().func.datetime(args['end_date']))
+            # Handle query parameters
+            if args['start_date']:
+                query = query.filter(
+                    LogEntry.db().func.datetime(
+                        LogEntry.timestamp) >= LogEntry.db().func.datetime(args['start_date']))
+            if args['end_date']:
+                query = query.filter(
+                    LogEntry.db().func.datetime(
+                        LogEntry.timestamp) <= LogEntry.db().func.datetime(args['end_date']))
 
-                if not args['stats']:
-                    # Must be applied after filter
-                    if args['limit']:
-                        query = query.limit(args['limit'])
-                    if args['offset']:
-                        query = query.offset(args['offset'])
+            if not args['stats']:
+                # Must be applied after filter
+                if args['limit']:
+                    query = query.limit(args['limit'])
+                if args['offset']:
+                    query = query.offset(args['offset'])
 
-                    all_entries = query.all()
-                    results = []
-                    for entry in all_entries:
-                        results.append(entry.to_json(minimal=False))
-                    return results
-                else:
-                    count = query.count()
-                    min_max_dates = query.with_entities(LogEntry.db().func.min(LogEntry.timestamp),
-                                                        LogEntry.db().func.max(LogEntry.timestamp)).first()
-                    rval = {'count': count,
-                            'min_timestamp': min_max_dates[0].isoformat(),
-                            'max_timestamp': min_max_dates[1].isoformat(),
-                            }
-                    return rval
-
-            except InvalidRequestError:
-                return '', 500
+                all_entries = query.all()
+                results = []
+                for entry in all_entries:
+                    results.append(entry.to_json(minimal=False))
+                return results
+            else:
+                count = query.count()
+                min_max_dates = query.with_entities(LogEntry.db().func.min(LogEntry.timestamp),
+                                                    LogEntry.db().func.max(LogEntry.timestamp))\
+                    .group_by(LogEntry.id_log_entry).first()
+                rval = {'count': count,
+                        'min_timestamp': min_max_dates[0].isoformat(),
+                        'max_timestamp': min_max_dates[1].isoformat(),
+                        }
+                return rval
+            # except InvalidRequestError:
+            #     return '', 500
 
         return 'Unauthorized', 403

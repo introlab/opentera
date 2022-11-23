@@ -116,7 +116,9 @@ class QueryLoginEntries(Resource):
                 else:
                     count = query.count()
                     min_max_dates = query.with_entities(LoginEntry.db().func.min(LoginEntry.login_timestamp),
-                                                        LoginEntry.db().func.max(LoginEntry.login_timestamp)).first()
+                                                        LoginEntry.db().func.max(LoginEntry.login_timestamp))\
+                        .group_by(LoginEntry.id_login_entry).first().first()
+
                     result = {'count': count,
                               'min_timestamp': min_max_dates[0].isoformat(),
                               'max_timestamp': min_max_dates[1].isoformat(),
