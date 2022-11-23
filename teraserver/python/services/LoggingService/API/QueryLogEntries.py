@@ -47,10 +47,10 @@ class QueryLogEntries(Resource):
                 if args['log_level']:
                     query = query.filter(LogEntry.log_level >= args['log_level'])
 
-            if args['start_date']:
-                query = query.filter(LogEntry.timestamp >= args['start_date'])
-            if args['end_date']:
-                query = query.filter(LogEntry.timestamp <= args['end_date'])
+                if args['start_date']:
+                    query = query.filter(LogEntry.timestamp >= args['start_date'])
+                if args['end_date']:
+                    query = query.filter(LogEntry.timestamp <= args['end_date'])
 
                 if not args['stats']:
                     query = query.order_by(LogEntry.timestamp.desc())
