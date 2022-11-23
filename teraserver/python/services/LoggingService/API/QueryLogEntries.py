@@ -16,6 +16,7 @@ get_parser.add_argument('start_date', type=inputs.datetime_from_iso8601,
                         help='Start date, sessions before that date will be ignored', default=None)
 get_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
                         help='End date, sessions after that date will be ignored', default=None)
+get_parser.add_argument('stats', type=inputs.boolean, help='Only query stats about the logs', default=False)
 
 
 class QueryLogEntries(Resource):
@@ -50,17 +51,27 @@ class QueryLogEntries(Resource):
                         LogEntry.db().func.datetime(
                             LogEntry.timestamp) <= LogEntry.db().func.datetime(args['end_date']))
 
-                # Must be applied after filter
-                if args['limit']:
-                    query = query.limit(args['limit'])
-                if args['offset']:
-                    query = query.offset(args['offset'])
+                if not args['stats']:
+                    # Must be applied after filter
+                    if args['limit']:
+                        query = query.limit(args['limit'])
+                    if args['offset']:
+                        query = query.offset(args['offset'])
 
-                all_entries = query.all()
-                results = []
-                for entry in all_entries:
-                    results.append(entry.to_json(minimal=False))
-                return results
+                    all_entries = query.all()
+                    results = []
+                    for entry in all_entries:
+                        results.append(entry.to_json(minimal=False))
+                    return results
+                else:
+                    count = query.count()
+                    min_max_dates = query.with_entities(LogEntry.db().func.min(LogEntry.timestamp),
+                                                        LogEntry.db().func.max(LogEntry.timestamp)).first()
+                    rval = {'count': count,
+                            'min_timestamp': min_max_dates[0].isoformat(),
+                            'max_timestamp': min_max_dates[1].isoformat(),
+                            }
+                    return rval
 
             except InvalidRequestError:
                 return '', 500
