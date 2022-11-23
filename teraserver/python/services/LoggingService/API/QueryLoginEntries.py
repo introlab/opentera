@@ -5,6 +5,7 @@ from opentera.services.ServiceAccessManager import ServiceAccessManager, current
 from services.LoggingService.libloggingservice.db.models.LoginEntry import LoginEntry
 import services.LoggingService.Globals as Globals
 from flask_restx import Resource, inputs
+from flask_babel import gettext
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -131,8 +132,8 @@ class QueryLoginEntries(Resource):
                               }
                     return result
 
-            except InvalidRequestError:
-                return '', 500
+            except InvalidRequestError as e:
+                gettext('Database error: ') + str(e), 500
 
         else:
             return 'Unauthorized', 403
