@@ -249,6 +249,8 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                     response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
                     self.assertEqual(response.status_code, 200)
                     self.assertTrue('count' in response.json)
+                    self.assertTrue('min_timestamp' in response.json)
+                    self.assertTrue('max_timestamp' in response.json)
                     self.assertEqual(response.json['count'], 50)
 
             # Cleanup
