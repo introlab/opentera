@@ -1,3 +1,5 @@
+import datetime
+
 from flask_restx import Resource, inputs
 from sqlalchemy.exc import InvalidRequestError
 from services.LoggingService.FlaskModule import logging_api_ns as api
@@ -45,7 +47,7 @@ class QueryLogEntries(Resource):
 
                 # Handle query parameters
                 if args['log_level']:
-                    query = query.filter(LogEntry.log_level >= args['log_level'])
+                    query = query.filter(LogEntry.log_level <= args['log_level'])
 
                 if args['start_date']:
                     query = query.filter(LogEntry.timestamp >= args['start_date'])
@@ -71,8 +73,11 @@ class QueryLogEntries(Resource):
                     min_max_dates = query.with_entities(LogEntry.db().func.min(LogEntry.timestamp),
                                                         LogEntry.db().func.max(LogEntry.timestamp)).first()
                     rval = {'count': count,
-                            'min_timestamp': min_max_dates[0].isoformat(),
-                            'max_timestamp': min_max_dates[1].isoformat(),
+                            'min_timestamp':
+                                min_max_dates[0].isoformat()
+                                if min_max_dates[0] else datetime.datetime.now().isoformat(),
+                            'max_timestamp': min_max_dates[1].isoformat()
+                            if min_max_dates[1] else datetime.datetime.now().isoformat()
                             }
                     return rval
             except InvalidRequestError as e:
