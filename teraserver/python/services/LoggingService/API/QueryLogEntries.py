@@ -39,7 +39,7 @@ class QueryLogEntries(Resource):
         # Only allow superadmins to query logs?
         if current_user_client and current_user_client.user_superadmin:
             # try:
-            query = LogEntry.query.order_by(LogEntry.timestamp.desc())
+            query = LogEntry.query
 
             # Handle query parameters
             if args['start_date']:
@@ -58,6 +58,8 @@ class QueryLogEntries(Resource):
                 if args['offset']:
                     query = query.offset(args['offset'])
 
+                query = query.order_by(LogEntry.timestamp.desc())
+
                 all_entries = query.all()
                 results = []
                 for entry in all_entries:
@@ -66,8 +68,7 @@ class QueryLogEntries(Resource):
             else:
                 count = query.count()
                 min_max_dates = query.with_entities(LogEntry.db().func.min(LogEntry.timestamp),
-                                                    LogEntry.db().func.max(LogEntry.timestamp))\
-                    .group_by(LogEntry.id_log_entry).first()
+                                                    LogEntry.db().func.max(LogEntry.timestamp)).first()
                 rval = {'count': count,
                         'min_timestamp': min_max_dates[0].isoformat(),
                         'max_timestamp': min_max_dates[1].isoformat(),

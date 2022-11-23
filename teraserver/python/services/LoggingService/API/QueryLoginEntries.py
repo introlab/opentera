@@ -80,7 +80,7 @@ class QueryLoginEntries(Resource):
                         if args['device_uuid'] in devices_uuids else []
 
                 # Base query will order desc from most recent to last recent
-                query = LoginEntry.query.order_by(LoginEntry.login_timestamp.desc())
+                query = LoginEntry.query
 
                 # Handle query parameters
                 if args['start_date']:
@@ -107,6 +107,7 @@ class QueryLoginEntries(Resource):
                     if args['offset']:
                         query = query.offset(args['offset'])
 
+                    query = query.order_by(LoginEntry.login_timestamp.desc())
                     all_entries.extend(query.all())
 
                     # Return json result
@@ -116,8 +117,7 @@ class QueryLoginEntries(Resource):
                 else:
                     count = query.count()
                     min_max_dates = query.with_entities(LoginEntry.db().func.min(LoginEntry.login_timestamp),
-                                                        LoginEntry.db().func.max(LoginEntry.login_timestamp))\
-                        .group_by(LoginEntry.id_login_entry).first().first()
+                                                        LoginEntry.db().func.max(LoginEntry.login_timestamp)).first()
 
                     result = {'count': count,
                               'min_timestamp': min_max_dates[0].isoformat(),
