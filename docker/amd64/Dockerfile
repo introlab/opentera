@@ -2,7 +2,7 @@
 # LABEL version="1.0.6"
 # LABEL description="OpenTera Test Server from IntRoLab."
 
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 # Install build dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -23,13 +23,13 @@ RUN git clone --recurse-submodules -b main https://github.com/introlab/opentera.
 #Create dbs and users
 RUN service postgresql start &&\
 	sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'opentera';"&&\
-	sudo -u postgres psql -c "create database opentera" &&\
+	sudo -u postgres psql -c "create database opentera;" &&\
 	sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"&&\
 	sudo -u postgres psql -c "grant all privileges on database opentera to TeraAgent;"&&\
 	sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"&&\
-	sudo -u postgres psql -c "create database openteralogs" &&\
+	sudo -u postgres psql -c "create database openteralogs;" &&\
 	sudo -u postgres psql -c "grant all privileges on database openteralogs to TeraAgent;"&&\
-	sudo -u postgres psql -c "create database openterafiles" &&\
+	sudo -u postgres psql -c "create database openterafiles;" &&\
 	sudo -u postgres psql -c "grant all privileges on database openterafiles to TeraAgent;"&&\
 	sudo -u postgres psql -c "\l"
 
@@ -54,7 +54,7 @@ WORKDIR /opentera/teraserver
 RUN ["/bin/bash", "-c", "cmake ."]
 RUN ["/bin/bash", "-c", "make python-all"]
 
-ENV PYTHON3_EXEC /opentera/teraserver/python/env/python-3.8/bin/python3
+ENV PYTHON3_EXEC /opentera/teraserver/python/env/python-3.10/bin/python3
 
 # Install nodejs package
 WORKDIR /opentera/teraserver/easyrtc
