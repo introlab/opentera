@@ -17,6 +17,7 @@ get_parser.add_argument('start_date', type=inputs.datetime_from_iso8601,
 get_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
                         help='End date, sessions after that date will be ignored', default=None)
 get_parser.add_argument('stats', type=inputs.boolean, help='Only query stats about the logs', default=False)
+get_parser.add_argument('log_level', type=int, help='Minimum log level to retrieve', default=None)
 
 
 class QueryLogEntries(Resource):
@@ -42,6 +43,9 @@ class QueryLogEntries(Resource):
                 query = LogEntry.query.order_by(LogEntry.timestamp.desc())
 
                 # Handle query parameters
+                if args['log_level']:
+                    query = query.filter(LogEntry.log_level >= args['log_level'])
+
                 if args['start_date']:
                     query = query.filter(
                         LogEntry.db().func.datetime(

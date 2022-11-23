@@ -19,6 +19,7 @@ get_parser.add_argument('user_uuid', type=str, help='filter results for this use
 get_parser.add_argument('participant_uuid', type=str, help='filter results for this participant_uuid', default=None)
 get_parser.add_argument('device_uuid', type=str, help='filter results for this device_uuid', default=None)
 get_parser.add_argument('stats', type=inputs.boolean, help='Only query stats about the logs', default=False)
+get_parser.add_argument('log_level', type=int, help='Minimum log level to retrieve', default=None)
 
 
 class QueryLoginEntries(Resource):
@@ -83,6 +84,9 @@ class QueryLoginEntries(Resource):
                 query = LoginEntry.query.order_by(LoginEntry.login_timestamp.desc())
 
                 # Handle query parameters
+                if args['log_level']:
+                    query = query.filter(LoginEntry.login_log_level >= args['log_level'])
+
                 if args['start_date']:
                     query = query.filter(
                         LoginEntry.db().func.datetime(

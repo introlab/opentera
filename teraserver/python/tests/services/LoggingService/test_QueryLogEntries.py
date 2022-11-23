@@ -137,6 +137,35 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
             for entry in all_entries:
                 LogEntry.delete(entry.id_log_entry)
 
+    def test_get_endpoint_with_valid_token_and_admin_and_log_level(self):
+        with BaseLoggingServiceAPITest.app_context():
+            token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
+
+            all_entries = []
+            min_timestamp = ''
+            max_timestamp = ''
+            for i in range(50):
+                current_time = datetime.now()
+                entry = self._create_log_entry(current_time, 99, 'test', 'test_message')
+                self.assertIsNotNone(entry)
+                LogEntry.insert(entry)
+                self.assertIsNotNone(entry.id_log_entry)
+                all_entries.append(entry)
+
+            # Filter with higher log level should give no entry
+            response = self._get_with_service_token_auth(self.test_client, token=token, params={'log_level': 100})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
+
+            # Filter with exact log level should give at least amount
+            response = self._get_with_service_token_auth(self.test_client, token=token, params={'log_level': 99})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 50)
+
+            # Cleanup
+            for entry in all_entries:
+                LogEntry.delete(entry.id_log_entry)
+
     def test_get_endpoint_stats_with_valid_token_and_admin(self):
         with BaseLoggingServiceAPITest.app_context():
             token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
