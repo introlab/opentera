@@ -15,6 +15,9 @@ get_parser.add_argument('start_date', type=inputs.datetime_from_iso8601,
                         help='Start date, sessions before that date will be ignored', default=None)
 get_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
                         help='End date, sessions after that date will be ignored', default=None)
+get_parser.add_argument('user_uuid', type=str, help='filter results for this user_uuid', default=None)
+get_parser.add_argument('participant_uuid', type=str, help='filter results for this participant_uuid', default=None)
+get_parser.add_argument('device_uuid', type=str, help='filter results for this device_uuid', default=None)
 
 
 class QueryLoginEntries(Resource):
@@ -54,12 +57,26 @@ class QueryLoginEntries(Resource):
             users_uuids = response.json['users_uuids']
             participants_uuids = response.json['participants_uuids']
             devices_uuids = response.json['devices_uuids']
-            projects_ids = response.json['projects_ids']
-            sites_ids = response.json['sites_ids']
+            # TODO not used for now...
+            # projects_ids = response.json['projects_ids']
+            # sites_ids = response.json['sites_ids']
 
             try:
                 all_entries = []
                 results = []
+
+                # Update uuids for specific requests
+                # Doing list intersection with requested uuids and accessible uuids
+                if args['user_uuid']:
+                    users_uuids = [args['user_uuid']] if args['user_uuid'] in users_uuids else []
+
+                if args['participant_uuid']:
+                    participants_uuids = [args['participant_uuid']] \
+                        if args['participant_uuid'] in participants_uuids else []
+
+                if args['device_uuid']:
+                    devices_uuids = [args['device_uuid']] \
+                        if args['device_uuid'] in devices_uuids else []
 
                 # Base query will order desc from most recent to last recent
                 query = LoginEntry.query.order_by(LoginEntry.login_timestamp.desc())
@@ -74,8 +91,9 @@ class QueryLoginEntries(Resource):
                         LoginEntry.db().func.datetime(
                             LoginEntry.login_timestamp) <= LoginEntry.db().func.datetime(args['end_date']))
 
-                if not current_user_client or (current_user_client and current_user_client.user_superadmin is False):
-                    # Filter according to access only for other than super admins
+                if not current_user_client or (current_user_client and current_user_client.user_superadmin is False) \
+                        or args['user_uuid'] or args['participant_uuid'] or args['device_uuid']:
+                    # Filter according to access only for other than super admins unless specific uuids are requested.
                     query = query.filter(
                         LoginEntry.login_user_uuid.in_(users_uuids) |
                         LoginEntry.login_participant_uuid.in_(participants_uuids) |

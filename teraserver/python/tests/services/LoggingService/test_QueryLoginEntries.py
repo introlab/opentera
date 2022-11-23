@@ -67,7 +67,7 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                     LoginEntry.delete(entry.id_login_event)
                     self.assertIsNone(LoginEntry.get_login_entry_by_id(entry.id_login_event))
 
-    def test_get_endpoint_with_valid_token_with_admin_with_start_date_with_end_date(self):
+    def test_get_endpoint_with_valid_token_with_user_with_start_date_with_end_date(self):
         with BaseLoggingServiceAPITest.app_context():
             from services.LoggingService.Globals import service
 
@@ -119,7 +119,7 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 LoginEntry.delete(two_days_ago_entry.id_login_event)
                 LoginEntry.delete(a_week_ago_entry.id_login_event)
 
-    def test_get_endpoint_with_valid_token_with_admin_with_limit(self):
+    def test_get_endpoint_with_valid_token_with_user_with_limit(self):
         with BaseLoggingServiceAPITest.app_context():
             from services.LoggingService.Globals import service
 
@@ -148,7 +148,7 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 for entry in all_entries:
                     LoginEntry.delete(entry.id_login_event)
 
-    def test_get_endpoint_with_valid_token_with_admin_with_offset(self):
+    def test_get_endpoint_with_valid_token_with_user_with_offset(self):
         with BaseLoggingServiceAPITest.app_context():
             from services.LoggingService.Globals import service
 
@@ -176,6 +176,44 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 # Cleanup
                 for entry in all_entries:
                     LoginEntry.delete(entry.id_login_event)
+
+    def test_get_endpoint_with_valid_token_with_admin_with_specific_user_uuid(self):
+        with BaseLoggingServiceAPITest.app_context():
+            from services.LoggingService.Globals import service
+
+            # Will get only enabled users
+            users = service.get_enabled_users()
+            all_entries = []
+            super_admins = []
+            # Create a lot of entries
+            for user in users:
+                # Keep superadmin users
+                if user.user_superadmin:
+                    super_admins.append(user)
+
+                for i in range(50):
+                    entry = self._create_entry_with_user_uuid_and_date(user.user_uuid, datetime.now())
+                    self.assertIsNotNone(entry)
+                    LoginEntry.insert(entry)
+                    self.assertIsNotNone(entry.id_login_event)
+                    all_entries.append(entry)
+
+            for admin in super_admins:
+                for user in users:
+                    params = {
+                        'user_uuid': user.user_uuid
+                    }
+
+                    token = self._generate_fake_user_token(name=admin.user_username, user_uuid=admin.user_uuid,
+                                                           superadmin=admin.user_superadmin, expiration=3600)
+
+                    response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(len(response.json), 50)
+
+            # Cleanup
+            for entry in all_entries:
+                LoginEntry.delete(entry.id_login_event)
 
     def _create_entry_with_user_uuid_and_date(self, entry_uuid: str, entry_date: datetime):
         self.assertIsNotNone(entry_uuid)
