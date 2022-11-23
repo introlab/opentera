@@ -157,6 +157,7 @@ class TeraSessionForm:
                                       item_options={"default": 0, "readonly": True}))
         # Session status is hidden as it needs to be handled elsewhere for now
         section.add_item(TeraFormItem("session_status", gettext("State"), "array", True, item_values=status_list))
+        section.add_item(TeraFormItem("session_parameters", gettext("Parameters"), "json", False))
         section.add_item(TeraFormItem("session_comments", gettext("Comments"), "longtext", False))
 
         # Hidden as handled elsewhere

@@ -137,6 +137,38 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
             for entry in all_entries:
                 LogEntry.delete(entry.id_log_entry)
 
+    def test_get_endpoint_stats_with_valid_token_and_admin(self):
+        with BaseLoggingServiceAPITest.app_context():
+            token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
+
+            all_entries = []
+            min_timestamp = ''
+            max_timestamp = ''
+            for i in range(50):
+                current_time = datetime.now()
+                if i == 0:
+                    min_timestamp = current_time.isoformat()
+                if i == 49:
+                    max_timestamp = current_time.isoformat()
+                entry = self._create_log_entry(current_time, 1, 'test', 'test_message')
+                self.assertIsNotNone(entry)
+                LogEntry.insert(entry)
+                self.assertIsNotNone(entry.id_log_entry)
+                all_entries.append(entry)
+
+            response = self._get_with_service_token_auth(self.test_client, token=token, params={'stats': True})
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue('count' in response.json)
+            self.assertGreaterEqual(response.json['count'], 51)
+            self.assertTrue('min_timestamp' in response.json)
+            self.assertLessEqual(response.json['min_timestamp'], min_timestamp)
+            self.assertTrue('max_timestamp' in response.json)
+            self.assertEqual(response.json['max_timestamp'], max_timestamp)
+
+            # Cleanup
+            for entry in all_entries:
+                LogEntry.delete(entry.id_log_entry)
+
     def _create_log_entry(self, timestamp: datetime, log_level: int, sender: str, message: str):
         self.assertIsNotNone(timestamp)
         self.assertIsNotNone(log_level)
