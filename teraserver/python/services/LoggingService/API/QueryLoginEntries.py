@@ -88,13 +88,9 @@ class QueryLoginEntries(Resource):
                     query = query.filter(LoginEntry.login_log_level >= args['log_level'])
 
                 if args['start_date']:
-                    query = query.filter(
-                        LoginEntry.db().func.datetime(
-                            LoginEntry.login_timestamp) >= LoginEntry.db().func.datetime(args['start_date']))
+                    query = query.filter(LoginEntry.login_timestamp >= args['start_date'])
                 if args['end_date']:
-                    query = query.filter(
-                        LoginEntry.db().func.datetime(
-                            LoginEntry.login_timestamp) <= LoginEntry.db().func.datetime(args['end_date']))
+                    query = query.filter(LoginEntry.login_timestamp <= args['end_date'])
 
                 if not current_user_client or (current_user_client and current_user_client.user_superadmin is False) \
                         or args['user_uuid'] or args['participant_uuid'] or args['device_uuid']:
