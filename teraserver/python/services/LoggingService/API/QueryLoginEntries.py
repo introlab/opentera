@@ -105,13 +105,15 @@ class QueryLoginEntries(Resource):
                         LoginEntry.login_device_uuid.in_(devices_uuids))
 
                 if not args['stats']:
+
+                    query = query.order_by(LoginEntry.login_timestamp.desc())
+
                     # Must be applied after filter
                     if args['limit']:
                         query = query.limit(args['limit'])
                     if args['offset']:
                         query = query.offset(args['offset'])
 
-                    query = query.order_by(LoginEntry.login_timestamp.desc())
                     all_entries.extend(query.all())
 
                     # Return json result

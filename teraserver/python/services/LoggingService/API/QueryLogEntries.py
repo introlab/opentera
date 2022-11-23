@@ -56,13 +56,13 @@ class QueryLogEntries(Resource):
                         LogEntry.timestamp) <= LogEntry.db().func.datetime(args['end_date']))
 
             if not args['stats']:
+                query = query.order_by(LogEntry.timestamp.desc())
+
                 # Must be applied after filter
                 if args['limit']:
                     query = query.limit(args['limit'])
                 if args['offset']:
                     query = query.offset(args['offset'])
-
-                query = query.order_by(LogEntry.timestamp.desc())
 
                 all_entries = query.all()
                 results = []
