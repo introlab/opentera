@@ -86,7 +86,7 @@ class QueryLoginEntries(Resource):
 
                 # Handle query parameters
                 if args['log_level']:
-                    query = query.filter(LoginEntry.login_log_level >= args['log_level'])
+                    query = query.filter(LoginEntry.login_log_level == args['log_level'])
 
                 if args['start_date']:
                     query = query.filter(LoginEntry.login_timestamp >= args['start_date'])

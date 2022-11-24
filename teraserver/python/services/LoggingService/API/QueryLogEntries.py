@@ -47,7 +47,7 @@ class QueryLogEntries(Resource):
 
                 # Handle query parameters
                 if args['log_level']:
-                    query = query.filter(LogEntry.log_level >= args['log_level'])
+                    query = query.filter(LogEntry.log_level == args['log_level'])
 
                 if args['start_date']:
                     query = query.filter(LogEntry.timestamp >= args['start_date'])

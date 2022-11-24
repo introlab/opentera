@@ -153,7 +153,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
                 all_entries.append(entry)
 
             # Filter with higher log level should give no entry
-            response = self._get_with_service_token_auth(self.test_client, token=token, params={'log_level': 100})
+            response = self._get_with_service_token_auth(self.test_client, token=token, params={'log_level': 1})
             self.assertEqual(response.status_code, 200)
             self.assertEqual(len(response.json), 0)
 
