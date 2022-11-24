@@ -56,10 +56,12 @@ class QueryLoginEntries(Resource):
 
         response = Globals.service.get_from_opentera('/api/service/access', params)
         if response.status_code == 200:
+            import json
+            response_json = json.loads(response.text)
             # Response should include ourselves (user, participant or device)
-            users_uuids = response.json['users_uuids']
-            participants_uuids = response.json['participants_uuids']
-            devices_uuids = response.json['devices_uuids']
+            users_uuids = response_json['users_uuids']
+            participants_uuids = response_json['participants_uuids']
+            devices_uuids = response_json['devices_uuids']
             # TODO not used for now...
             # projects_ids = response.json['projects_ids']
             # sites_ids = response.json['sites_ids']

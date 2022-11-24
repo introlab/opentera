@@ -52,15 +52,6 @@ class ServiceQueryAccess(Resource):
         service_access = DBManager.serviceAccess(current_service)
         args = get_parser.parse_args()
 
-        # Host information can be overwritten by NGINX
-        servername = self.module.config.server_config['hostname']
-        port = self.module.config.server_config['port']
-        if 'X_EXTERNALSERVER' in request.headers:
-            servername = request.headers['X_EXTERNALSERVER']
-
-        if 'X_EXTERNALPORT' in request.headers:
-            port = request.headers['X_EXTERNALPORT']
-
         from_user_uuid = None
         from_participant_uuid = None
         from_device_uuid = None
