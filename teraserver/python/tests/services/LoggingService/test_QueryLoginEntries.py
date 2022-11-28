@@ -257,6 +257,47 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
             for entry in all_entries:
                 LoginEntry.delete(entry.id_login_event)
 
+    def test_get_endpoint_with_valid_token_with_admin_with_specific_user_uuid_with_names(self):
+        with BaseLoggingServiceAPITest.app_context():
+            from services.LoggingService.Globals import service
+
+            # Will get only enabled users
+            users = service.get_enabled_users()
+            all_entries = []
+            super_admins = []
+            # Create a lot of entries
+            for user in users:
+                # Keep superadmin users
+                if user.user_superadmin:
+                    super_admins.append(user)
+
+                for i in range(50):
+                    entry = self._create_entry_with_user_uuid_and_date(user.user_uuid, datetime.now())
+                    self.assertIsNotNone(entry)
+                    LoginEntry.insert(entry)
+                    self.assertIsNotNone(entry.id_login_event)
+                    all_entries.append(entry)
+
+            for admin in super_admins:
+                for user in users:
+                    params = {
+                        'user_uuid': user.user_uuid,
+                        'with_names': True
+                    }
+
+                    token = self._generate_fake_user_token(name=admin.user_username, user_uuid=admin.user_uuid,
+                                                           superadmin=admin.user_superadmin, expiration=3600)
+
+                    response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(len(response.json), 50)
+                    self.assertTrue('login_user_name' in response.json[0])
+                    self.assertEqual(response.json[0]['login_user_name'], user.get_fullname())
+
+            # Cleanup
+            for entry in all_entries:
+                LoginEntry.delete(entry.id_login_event)
+
     def _create_entry_with_user_uuid_and_date(self, entry_uuid: str, entry_date: datetime):
         self.assertIsNotNone(entry_uuid)
         self.assertIsNotNone(entry_date)

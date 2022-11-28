@@ -104,7 +104,7 @@ class UserQueryProjects(Resource):
                         project.id_project))
                     projects_list.append(project_json)
 
-            return jsonify(projects_list)
+            return projects_list
         except InvalidRequestError as e:
             self.module.logger.log_error(self.module.module_name,
                                          UserQueryProjects.__name__,
