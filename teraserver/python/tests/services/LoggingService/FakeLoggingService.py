@@ -6,10 +6,13 @@ from opentera.modules.BaseModule import BaseModule
 from opentera.services.ServiceOpenTera import ServiceOpenTera
 from opentera.redis.RedisVars import RedisVars
 from opentera.services.ServiceAccessManager import ServiceAccessManager
+from modules.LoginModule.LoginModule import LoginModule
 from flask import Flask
+from flask import Response as FlaskResponse
 from flask_babel import Babel
 import redis
 import uuid
+from io import BytesIO
 
 
 class FakeFlaskModule(BaseModule):
@@ -66,12 +69,9 @@ class FakeLoggingService(ServiceOpenTera):
 
     def __init__(self, db=None):
         self.flask_app = Flask('FakeLoggingService')
-        self.service_config = ConfigManager()
-        self.service_config.create_defaults()
-
-        from modules.LoginModule.LoginModule import LoginModule
-        self.login_module = LoginModule(self.service_config)
-        self.db_manager = DBManager(self.service_config, self.flask_app)
+        self.config_man = ConfigManager()
+        self.config_man.create_defaults()
+        self.db_manager = DBManager(self.config_man, self.flask_app)
         # Cheating on db (reusing already opened from test)
         if db is not None:
             self.db_manager.db = db
@@ -80,24 +80,28 @@ class FakeLoggingService(ServiceOpenTera):
 
         with self.flask_app.app_context():
             # Update redis vars and basic token
-            self.db_manager.create_defaults(self.service_config, test=True)
+            self.db_manager.create_defaults(self.config_man, test=True)
+
+            self.setup_service_access_manager()
+
+            # Redis variables & db must be initialized before
+            ServiceOpenTera.__init__(self, self.config_man, {})
+
+            self.login_module = LoginModule(self.config_man)
 
             from opentera.db.models.TeraService import TeraService
             logging_service: TeraService = TeraService.get_service_by_key('LoggingService')
 
             # Use LoggingService UUID
             if logging_service:
-                self.service_config.service_config['ServiceUUID'] = logging_service.service_uuid
-
-        # Will need redis from here
-        ServiceOpenTera.__init__(self, self.service_config, {})
+                self.config['ServiceUUID'] = logging_service.service_uuid
+                self.config_man.service_config['ServiceUUID'] = logging_service.service_uuid
 
         # Setup modules
-        self.flask_module = FakeFlaskModule(self.service_config, self.flask_app)
+        self.flask_module = FakeFlaskModule(self.config_man, self.flask_app)
         self.test_client = self.flask_app.test_client()
 
         with self.flask_app.app_context():
-            self.setup_service_access_manager()
             self.service_token = self.generate_service_token()
 
     def generate_service_token(self) -> str:
@@ -113,6 +117,13 @@ class FakeLoggingService(ServiceOpenTera):
 
     def setup_service_access_manager(self):
         from opentera.db.models.TeraServerSettings import TeraServerSettings
+
+        self.redis = redis.Redis(host=self.config_man.redis_config['hostname'],
+                                 port=self.config_man.redis_config['port'],
+                                 db=self.config_man.redis_config['db'],
+                                 username=self.config_man.redis_config['username'],
+                                 password=self.config_man.redis_config['password'],
+                                 client_name=self.__class__.__name__)
 
         # Initialize service from redis, posing as LoggingService
         # Update Service Access information
@@ -140,7 +151,7 @@ class FakeLoggingService(ServiceOpenTera):
         self.redis.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey, ServiceAccessManager.api_device_static_token_key)
         ServiceAccessManager.api_service_token_key = 'test'
         self.redis.set(RedisVars.RedisVar_ServiceTokenAPIKey, ServiceAccessManager.api_service_token_key)
-        ServiceAccessManager.config_man = self.config
+        ServiceAccessManager.config_man = self.config_man
 
     def get_users_uuids(self):
         with self.flask_app.app_context():
@@ -152,23 +163,35 @@ class FakeLoggingService(ServiceOpenTera):
             from opentera.db.models.TeraUser import TeraUser
             return [user for user in TeraUser.query.all() if user.user_enabled]
 
+    @staticmethod
+    def convert_to_standard_request_response(flask_response: FlaskResponse):
+        result = Response()
+        result.status_code = flask_response.status_code
+        result.headers = flask_response.headers
+        result.encoding = flask_response.content_encoding
+        result.raw = BytesIO(flask_response.data)
+        return result
+
     def post_to_opentera(self, api_url: str, json_data: dict) -> Response:
         with self.flask_app.app_context():
             # Synchronous call to OpenTera fake backend
             request_headers = {'Authorization': 'OpenTera ' + self.service_token}
-            return self.test_client.post(api_url, headers=request_headers, json=json_data)
+            answer = self.test_client.post(api_url, headers=request_headers, json=json_data)
+            return FakeLoggingService.convert_to_standard_request_response(answer)
 
     def get_from_opentera(self, api_url: str, params: dict) -> Response:
         with self.flask_app.app_context():
             # Synchronous call to OpenTera fake backend
             request_headers = {'Authorization': 'OpenTera ' + self.service_token}
-            return self.test_client.get(api_url, headers=request_headers, query_string=params)
+            answer = self.test_client.get(api_url, headers=request_headers, query_string=params)
+            return FakeLoggingService.convert_to_standard_request_response(answer)
 
     def delete_from_opentera(self, api_url: str, params: dict) -> Response:
         with self.flask_app.app_context():
             # Synchronous call to OpenTera fake backend
             request_headers = {'Authorization': 'OpenTera ' + self.service_token}
-            return self.test_client.delete(api_url, headers=request_headers, query_string=params)
+            answer = self.test_client.delete(api_url, headers=request_headers, query_string=params)
+            return FakeLoggingService.convert_to_standard_request_response(answer)
 
 
 if __name__ == '__main__':
