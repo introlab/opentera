@@ -58,6 +58,7 @@ class TeraTest(BaseModel):
         if not minimal:
             test_json['test_session_name'] = self.test_session.session_name
             test_json['test_test_type_name'] = self.test_test_type.test_type_name
+            test_json['test_test_type_uuid'] = self.test_test_type.test_type_uuid
             if self.id_device:
                 test_json['test_device'] = self.test_device.device_name
             if self.id_user:
