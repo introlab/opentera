@@ -7,13 +7,13 @@ from opentera.db.models.TeraProject import TeraProject
 class TeraParticipantGroup(BaseModel):
     __tablename__ = 't_participants_groups'
     id_participant_group = Column(Integer, Sequence('id_participantgroup_sequence'), primary_key=True,
-                                     autoincrement=True)
+                                  autoincrement=True)
     id_project = Column(Integer, ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
     participant_group_name = Column(String, nullable=False, unique=False)
 
     participant_group_project = relationship('TeraProject', back_populates='project_participants_groups')
     participant_group_participants = relationship("TeraParticipant", back_populates='participant_participant_group',
-                                                     passive_deletes=True)
+                                                  passive_deletes=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -68,3 +68,13 @@ class TeraParticipantGroup(BaseModel):
 
         # from opentera.db.models.TeraSession import TeraSession
         # TeraSession.delete_orphaned_sessions()
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        # If group project changed, also changed project from all participants in that group
+        if 'id_project' in values:
+            updated_group:TeraParticipantGroup = TeraParticipantGroup.get_participant_group_by_id(update_id)
+            if updated_group:
+                for participant in updated_group.participant_group_participants:
+                    participant.id_project = values['id_project']
+        super().update(update_id=update_id, values=values)
