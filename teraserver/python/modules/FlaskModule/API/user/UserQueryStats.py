@@ -247,6 +247,8 @@ class UserQueryUserStats(Resource):
         project_groups_total = len(project.project_participants_groups)
         participants_total = len(project.project_participants)
         participants_enabled = len([part for part in project.project_participants if part.participant_enabled])
+        devices_total = len(project.project_devices)
+        devices_enabled = len([dev for dev in project.project_devices if dev.device_enabled])
         sessions_total = 0
         for part in project.project_participants:
             sessions_total += TeraSessionParticipants.get_session_count_for_participant(
@@ -257,6 +259,8 @@ class UserQueryUserStats(Resource):
                  'participants_groups_count': project_groups_total,
                  'participants_total_count': participants_total,
                  'participants_enabled_count': participants_enabled,
+                 'devices_total_count': devices_total,
+                 'devices_enabled_count': devices_enabled,
                  'sessions_total_count': sessions_total
                  }
 
