@@ -58,8 +58,7 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
         print('TeraWebSocketServerProtocol - onServerConnectionDropTimeout', self)
 
     def redis_tera_module_message_received(self, pattern, channel, message):
-        print('TeraWebSocketServerProtocol - redis_tera_message_received', pattern, channel, message)
-
+        # print('TeraWebSocketServerProtocol - redis_tera_module_message_received', pattern, channel, message)
         try:
             tera_module_message = messages.TeraModuleMessage()
             if isinstance(message, str):
