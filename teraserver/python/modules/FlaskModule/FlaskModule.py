@@ -133,7 +133,7 @@ class FlaskModule(BaseModule):
             dest=create_module_event_topic_from_name(ModuleNames.TWISTED_MODULE_NAME, uuid)
         )
         server_command = messages.ServerCommand()
-        command.type = messages.ServerCommand.CMD_CLIENT_DISCONNECT
+        server_command.type = messages.ServerCommand.CMD_CLIENT_DISCONNECT
         command_message = messages.Any()
         command_message.Pack(server_command)
         module_message.data.extend([command_message])
@@ -377,13 +377,3 @@ def apply_caching(response):
 def compute_request_time():
     import time
     g.start_time = time.time()
-
-
-if __name__ == '__main__':
-
-    message = messages.TeraModuleMessage()
-    command = messages.ServerCommand()
-    command.type = messages.ServerCommand.CMD_CLIENT_DISCONNECT
-    any_message = messages.Any()
-    any_message.Pack(command)
-    message.data.extend([any_message])

@@ -73,8 +73,7 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
 
                 if any_message.Unpack(server_command):
                     if server_command.type == messages.ServerCommand.CMD_CLIENT_DISCONNECT:
-                        # TODO Validate string in data to be equal to UUID
-                        self.close()
+                        self.sendClose()
 
         except DecodeError as d:
             print('TeraWebSocketServerProtocol - DecodeError ', pattern, channel, message, d)
