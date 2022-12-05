@@ -64,6 +64,9 @@ class BaseModule(RedisClient):
         message.events.extend([any_message])
         self.publish(message.header.topic, message.SerializeToString())
 
+    def send_module_message(self, message: messages.TeraModuleMessage):
+        self.publish(message.head.dest, message.SerializeToString())
+
     def redisConnectionMade(self):
         print('*************************** BaseModule.connectionMade', self.module_name)
 
@@ -166,6 +169,27 @@ class BaseModule(RedisClient):
         event_message.header.time = datetime.datetime.now().timestamp()
         event_message.header.topic = topic
         return event_message
+
+    def create_module_message(self, src, dest):
+        """
+            message Header {
+            uint32 version = 1;
+            double time = 2;
+            uint32 seq = 3;
+            string source = 4;
+            string dest = 5;
+        }
+        Header head = 1;
+        repeated google.protobuf.Any data = 2;
+        """
+
+        module_message = messages.TeraModuleMessage()
+        module_message.head.version = 1
+        module_message.head.time = datetime.datetime.now().timestamp()
+        module_message.head.seq = 0
+        module_message.head.source = src
+        module_message.head.dest = dest
+        return module_message
 
     def source_name(self):
         return "module." + self.module_name + ".messages"

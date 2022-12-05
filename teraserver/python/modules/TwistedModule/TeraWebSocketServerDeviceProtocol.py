@@ -39,13 +39,17 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
             ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
 
-            ret2 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+            # Events from FlaskModule
+            ret2 = yield self.subscribe_pattern_with_callback(
+                create_module_event_topic_from_name(ModuleNames.TWISTED_MODULE_NAME, self.device.device_uuid),
+                self.redis_tera_module_message_received)
+
+            ret3 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.DATABASE_MODULE_NAME), self.redis_event_message_received)
 
             # Direct events
-            ret3 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+            ret4 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
-            print(ret1, ret2, ret3)
             # MAKE SURE TO SUBSCRIBE TO EVENTS BEFORE SENDING ONLINE MESSAGE
             tera_message = self.create_tera_message(
                 create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME))
@@ -130,17 +134,20 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
                 create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                 self.redis_event_message_received)
 
+            # Events from FlaskModule
             ret2 = yield self.unsubscribe_pattern_with_callback(
+                create_module_event_topic_from_name(ModuleNames.TWISTED_MODULE_NAME, self.device.device_uuid),
+                self.redis_tera_module_message_received)
+
+            ret3 = yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
                 self.redis_event_message_received)
 
-            ret3 = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+            ret4 = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
             # log information
             self.logger.log_info(self, "Device websocket disconnected",
                                  self.device.device_name, self.device.device_uuid)
-
-            print(ret1, ret2, ret3)
 
         # Unsubscribe to messages
         # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
