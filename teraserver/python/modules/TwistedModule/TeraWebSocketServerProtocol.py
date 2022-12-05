@@ -72,7 +72,7 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
 
                 if any_message.Unpack(server_command):
                     if server_command.type == messages.ServerCommand.CMD_CLIENT_DISCONNECT:
-                        self.sendClose()
+                        self.sendClose(4000, 'CMD_CLIENT_DISCONNECT')
 
         except DecodeError as d:
             print('TeraWebSocketServerProtocol - DecodeError ', pattern, channel, message, d)

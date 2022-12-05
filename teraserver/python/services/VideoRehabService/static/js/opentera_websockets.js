@@ -37,18 +37,24 @@ function ws_Error(error){
 	console.error('Websocket Error: ' + JSON.stringify(error));
 }
 
-function ws_Closed(){
+function ws_Closed(event){
 	document.getElementById("imgStatus").src="./static/images/red_button.png";
 
-	console.log("Websocket closed.");
+	console.log("Websocket closed.", event);
 
-	// Must make a new "login" request?
-	// Retry to connect in 2 seconds...
-    setTimeout(function(){ doParticipantLogin(backend_hostname, backend_port, participant_token); }, 2000);
+    // Close forced by server, will not login
+    if (event.code !== 4000)
+    {
+        // Must make a new "login" request?
+        // Retry to connect in 2 seconds...
+        setTimeout(function(){ doParticipantLogin(backend_hostname, backend_port, participant_token); }, 2000);
 
-	// Redirect to login for now...
-	//window.location.replace("login");
-
+        // Redirect to login for now...
+        //window.location.replace("login");
+    }
+    else {
+        window.location.replace("participant_endpoint?token=" + sessionStorage.getItem("participant_token"));
+    }
 }
 
 function ws_MessageReceived(evt){
