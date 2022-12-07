@@ -53,11 +53,16 @@ delete_parser.add_argument('id', type=int, help='Device ID to delete', required=
 class UserQueryDevices(Resource):
 
     @staticmethod
-    def _value_counter(args):
+    def _value_counter(args, ids_only=False):
         res = 0
-        for value in args.values():
-            if value is not None:
-                res += 1
+        if not ids_only:
+            for value in args.values():
+                if value is not None:
+                    res += 1
+        else:
+            for key in args.keys():
+                if (key.startswith('id_') or key.find('uuid') >= 0 or key == 'name') and args[key] is not None:
+                    res += 1
         return res
 
     def __init__(self, _api, *args, **kwargs):
@@ -100,7 +105,7 @@ class UserQueryDevices(Resource):
                 devices = user_access.query_devices_by_type(id_device_type)
             else:
                 devices = user_access.get_accessible_devices()
-        elif self._value_counter(args=args) == 1:
+        elif self._value_counter(args=args, ids_only=True) == 1:
             if args['id_device']:
                 if args['id_device'] in user_access.get_accessible_devices_ids():
                     devices = [TeraDevice.get_device_by_id(args['id_device'])]
