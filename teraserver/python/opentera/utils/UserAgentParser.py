@@ -41,8 +41,12 @@ class UserAgentParser:
 
         if 'X-Client-Name' in http_request.headers:
             infos['client_name'] = http_request.headers['X-Client-Name']
-        if 'X-Client_Version' in http_request.headers:
+        if 'X-Client-Version' in http_request.headers:
             infos['client_version'] = http_request.headers['X-Client-Version']
+        if 'X-OS-Name' in http_request.headers:
+            infos['os_name'] = http_request.headers['X-OS-Name']
+        if 'X-OS-Version' in http_request.headers:
+            infos['os_version'] = http_request.headers['X-OS-Version']
 
         if 'X-Script-Name' in http_request.headers:
             infos['server_endpoint'] = http_request.headers['X-Script-Name']
