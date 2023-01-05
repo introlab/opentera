@@ -1,0 +1,299 @@
+# French translations for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-02-15 10:44-0500\n"
+"PO-Revision-Date: 2021-10-26 09:19-0400\n"
+"Last-Translator: \n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: API/QueryAssetFile.py:46 API/QueryAssetFile.py:257 API/QueryAssetFile.py:267
+msgid "Access denied to asset"
+msgstr ""
+
+#: API/QueryAssetFile.py:63
+msgid "Wrong content type"
+msgstr ""
+
+#: API/QueryAssetFile.py:66
+msgid "Missing file asset information"
+msgstr ""
+
+#: API/QueryAssetFile.py:69
+msgid "Missing uploaded file"
+msgstr ""
+
+#: API/QueryAssetFile.py:74
+msgid "Missing filename"
+msgstr ""
+
+#: API/QueryAssetFile.py:80
+msgid "Invalid file_asset format"
+msgstr ""
+
+#: API/QueryAssetFile.py:83
+msgid "Missing required field(s) in asset descriptor"
+msgstr ""
+
+#: API/QueryAssetFile.py:94 API/QueryAssetFile.py:101 API/QueryAssetFile.py:108
+#: API/QueryAssetFile.py:115
+msgid "Session access is forbidden"
+msgstr ""
+
+#: API/QueryAssetFile.py:122
+msgid "Missing at least one ID creator"
+msgstr ""
+
+#: API/QueryAssetFile.py:145
+msgid "Unable to determine asset type. Please specify manually"
+msgstr ""
+
+#: API/QueryAssetFile.py:155
+#, fuzzy
+msgid "Unable to create asset"
+msgstr "Impossible de se connecter"
+
+#: API/QueryAssetFile.py:262
+msgid "Unable to delete asset"
+msgstr ""
+
+#: API/QueryAssetFile.py:271
+msgid "Error occured when deleting file asset"
+msgstr ""
+
+#: API/QueryAssetFileInfos.py:59
+msgid "Access denied for that asset"
+msgstr ""
+
+#: API/QueryAssetFileInfos.py:65
+msgid "No asset found"
+msgstr ""
+
+#: API/QueryAssetFileInfos.py:79
+msgid "Missing access token"
+msgstr ""
+
+#: API/QueryAssetFileInfos.py:82
+msgid "Badly formatted request"
+msgstr ""
+
+#: API/QueryAssetFileInfos.py:91
+msgid "Access denied for at least one requested asset"
+msgstr ""
+
+#: API/QueryAssetFileInfos.py:100
+msgid "Missing asset uuid"
+msgstr ""
+
+#: API/QueryAssetFileInfos.py:103
+msgid "Forbidden"
+msgstr ""
+
+#: API/QueryAssetFileInfos.py:107
+msgid "Only original filename can be changed from here"
+msgstr ""
+
+#: API/QueryAssetFileInfos.py:112
+#, fuzzy
+msgid "Unknown asset"
+msgstr "Séance inconnue"
+
+#~ msgid "User: "
+#~ msgstr "Utilisateur:"
+
+#~ msgid "Participant: "
+#~ msgstr "Participant:"
+
+#~ msgid "Device: "
+#~ msgstr "Appareil:"
+
+#~ msgid "Join me!"
+#~ msgstr "Rejoignez-moi!"
+
+#~ msgid "Cannot create session event"
+#~ msgstr "Impossible de créer l'événement de séance"
+
+#~ msgid "Cannot create process"
+#~ msgstr "Impossible de démarrer le processus"
+
+#~ msgid "Cannot create session"
+#~ msgstr "Impossible de créer la séance"
+
+#~ msgid "Cannot create STOP session event"
+#~ msgstr "Impossible de créer l'événement \"Fin de séance\""
+
+#~ msgid "Error stopping session - check server logs"
+#~ msgstr "Erreur lors de l'arrêt de la séance - vérifiez les journaux du serveur"
+
+#~ msgid "No matching session to stop"
+#~ msgstr "Aucune séance correspondante à arrêter"
+
+#~ msgid "Error creating user invited session event"
+#~ msgstr "Erreur lors de la création de l'événement \"Utilisateur invité\""
+
+#~ msgid "Error creating participant invited session event"
+#~ msgstr "Erreur lors de la création de l'événement \"Participant invité\""
+
+#~ msgid "Error creating device invited session event"
+#~ msgstr "Erreur lors de la création de l'événement \"Appareil invité\""
+
+#~ msgid "Error updating session"
+#~ msgstr "Erreur lors de la mise à jour de la séance"
+
+#~ msgid "Error creating user left session event"
+#~ msgstr ""
+#~ "Erreur lors de la création de "
+#~ "l'événement \"Utilisateur a quitté la "
+#~ "séance\""
+
+#~ msgid "Error creating participant left session event"
+#~ msgstr ""
+#~ "Erreur lors de la création de "
+#~ "l'événement \"Participant a quitté la "
+#~ "séance\""
+
+#~ msgid "Error creating device left session event"
+#~ msgstr ""
+#~ "Erreur lors de la création de "
+#~ "l'événement \"Appareil a quitté la "
+#~ "séance\""
+
+#~ msgid "Cannot create refused session event"
+#~ msgstr "Erreur lors de la création de l'événement \"Invitation refusée\""
+
+#~ msgid "Anonymous"
+#~ msgstr "Anonyme"
+
+#~ msgid "Only participants can access this page. Sorry."
+#~ msgstr "Désolé - seulement les participants peuvent accéder à cette page."
+
+#~ msgid "Unknown error"
+#~ msgstr "Erreur inconnue"
+
+#~ msgid "Your session will start soon. Thank you for your patience!"
+#~ msgstr "La séance va démarrer bientôt. Merci de votre patience!"
+
+#~ msgid "Only users can access this page. Sorry."
+#~ msgstr "Désolé - seulement les utilisateurs peuvent accéder à cette page."
+
+#~ msgid "An existing session needs to be specified."
+#~ msgstr "Une séance existante doit être spécifiée."
+
+#~ msgid "Can't query session information: Error "
+#~ msgstr "Impossible d'obtenir les informations de la séance: Erreur "
+
+#~ msgid "Work in progress!"
+#~ msgstr "En construction!"
+
+#~ msgid "OpenTera - Participant Video Dashboard"
+#~ msgstr "OpenTera - Tableau de bord participant"
+
+#~ msgid "Unsupported browser detected"
+#~ msgstr "Navigateur non-supporté détecté"
+
+#~ msgid ""
+#~ "Your browser is not supported. Session"
+#~ " might or might not work, but "
+#~ "it is recommended to user another "
+#~ "browser."
+#~ msgstr ""
+#~ "Votre navigateur Internet n'est pas "
+#~ "supporté. La séance peut quand même "
+#~ "fonctionner correctement, mais il est "
+#~ "recommandé d'utiliser un autre navigateur."
+
+#~ msgid "Your browser"
+#~ msgstr "Votre navigateur"
+
+#~ msgid "Supported browsers"
+#~ msgstr "Navigateurs compatibles"
+
+#~ msgid ""
+#~ "Your access might have been disabled "
+#~ "or you might be already logged in"
+#~ " on another device"
+#~ msgstr ""
+#~ "Votre accès peut avoir été désactivé "
+#~ "ou vous êtes peut-être déjà "
+#~ "connecté sur un autre appareil"
+
+#~ msgid "Your session is now over. You may now logout or close this page."
+#~ msgstr ""
+#~ "La séance est maintenant terminée. Vous"
+#~ " pouvez vous déconnecter ou fermer "
+#~ "cette page."
+
+#~ msgid "Error"
+#~ msgstr "Erreur"
+
+#~ msgid "Retry"
+#~ msgstr "Réessayer"
+
+#~ msgid "Ignore"
+#~ msgstr "Ignorer"
+
+#~ msgid "Logout"
+#~ msgstr "Déconnexion"
+
+#~ msgid "OpenTera - Session completed"
+#~ msgstr "OpenTera - Séance complétée"
+
+#~ msgid "Thank you"
+#~ msgstr "Merci"
+
+#~ msgid "We hope that you enjoyed your session"
+#~ msgstr "Nous espérons que vous avez apprécié votre séance"
+
+#~ msgid "Click here to login again"
+#~ msgstr "Cliquez ici pour vous reconnecter"
+
+#~ msgid "OpenTera - Error"
+#~ msgstr "OpenTera - Erreur"
+
+#~ msgid "We are sorry, an error has happened"
+#~ msgstr "Nous sommes désolés, une erreur est survenue"
+
+#~ msgid "OpenTeraPlus - Participant - Local view"
+#~ msgstr "OpenTeraPlus - Participant - Vue locale"
+
+#~ msgid "Unable to access camera and/or microphone"
+#~ msgstr "Impossible d'accéder à la caméra et/ou au microphone"
+
+#~ msgid "Error message"
+#~ msgstr "Message d'erreur"
+
+#~ msgid "Session starting..."
+#~ msgstr "Démarrage de la séance en cours..."
+
+#~ msgid "The session is about to start... Enjoy your session!"
+#~ msgstr "La séance est sur le point de démarrer. Bonne séance!"
+
+#~ msgid "OpenTera - User Video Dashboard"
+#~ msgstr "OpenTera - Tableau de bord utilisateur"
+
+#~ msgid "OpenTeraPlus - User - Session lobby"
+#~ msgstr "OpenTera - Utilisateur - Vestibule de séance"
+
+#~ msgid "Start session"
+#~ msgstr "Démarrer séance"
+
+#~ msgid "Users"
+#~ msgstr "Utilisateurs"
+
+#~ msgid "Participants"
+#~ msgstr "Participants"
+
+#~ msgid "Devices"
+#~ msgstr "Appareils"
+
