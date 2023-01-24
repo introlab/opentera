@@ -355,6 +355,7 @@ class UserQueryUserStats(Resource):
         stats = {'assets_total_count': len(device.device_assets),
                  'projects_total_count': len(device.device_projects),
                  'participants_total_count': len(device.device_participants),
+                 'sessions_total_count': len(device.device_sessions)
                  }
         return stats
 

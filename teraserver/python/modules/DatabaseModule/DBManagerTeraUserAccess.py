@@ -1207,7 +1207,7 @@ class DBManagerTeraUserAccess:
                               if (admin_only and proj_role['project_role'] == 'admin') or not admin_only]:
                 users.add(user)
 
-        return users
+        return sorted(users, key=lambda suser: suser.user_firstname)
 
     def query_service_configs(self, service_id: int = None, user_id: int = None, device_id: int = None,
                               participant_id: int = None, include_services_without_config: bool = False):

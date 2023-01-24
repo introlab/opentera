@@ -296,7 +296,7 @@ class TeraSession(BaseModel):
 
     @staticmethod
     def get_sessions_for_device(device_id: int, status: int = None, limit: int = None, offset: int = None,
-                                start_date: datetime.date = None, end_date: datetime.date = None, filters:dict = None):
+                                start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None):
         from opentera.db.models.TeraDevice import TeraDevice
         query = TeraSession.query.join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
         query = query.order_by(TeraSession.session_start_datetime.desc())
