@@ -197,6 +197,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQueryTestTypeProjects import UserQueryTestTypeProjects
         from modules.FlaskModule.API.user.UserQueryTestType import UserQueryTestTypes
         from modules.FlaskModule.API.user.UserQueryTests import UserQueryTests
+        from modules.FlaskModule.API.user.UserQueryDisconnect import UserQueryDisconnect
 
         # Resources
         namespace.add_resource(UserQueryAssets,               '/assets', resource_class_kwargs=kwargs)
@@ -242,6 +243,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQueryOnlineUsers,          '/users/online', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryUserGroups,           '/usergroups', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryUserUserGroups,       '/users/usergroups', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserQueryDisconnect,           '/users/disconnect', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryUserPreferences,      '/users/preferences', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryVersions,             '/versions', resource_class_kwargs=kwargs)
         # api.add_namespace(user_api_ns)
@@ -324,6 +326,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQueryTestTypes import ServiceQueryTestTypes
         from modules.FlaskModule.API.service.ServiceQueryTests import ServiceQueryTests
         from modules.FlaskModule.API.service.ServiceQueryAccess import ServiceQueryAccess
+        from modules.FlaskModule.API.service.ServiceQueryDisconnect import ServiceQueryDisconnect
 
         namespace.add_resource(ServiceQueryUsers,          '/users', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
@@ -340,6 +343,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(ServiceQueryTestTypes,      '/testtypes', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryTests,          '/tests', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryAccess,         '/access', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryDisconnect,     '/disconnect', resource_class_kwargs=kwargs)
 
         # Add namespace
         # api.add_namespace(service_api_ns)
