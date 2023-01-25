@@ -210,7 +210,7 @@ class UserQueryParticipants(Resource):
                         403: 'Logged user can\'t create/update the specified participant',
                         400: 'Badly formed JSON or missing fields(id_participant or id_project/id_group [only one of '
                              'them]) in the JSON body, or mismatch between id_project and participant group project',
-                        500: 'Internal error when saving device'})
+                        500: 'Internal error when saving participant'})
     def post(self):
         current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)

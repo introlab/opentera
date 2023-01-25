@@ -270,6 +270,8 @@ class TeraSession(BaseModel):
                                                                                 part_id)
 
         query = query.order_by(TeraSession.session_start_datetime.desc())
+        # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
+        query = query.order_by(TeraSession.id_session.desc())
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
@@ -284,7 +286,10 @@ class TeraSession(BaseModel):
                               start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None):
         from opentera.db.models.TeraUser import TeraUser
         query = TeraSession.query.join(TeraSession.session_users).filter(TeraUser.id_user == user_id)
+
         query = query.order_by(TeraSession.session_start_datetime.desc())
+        # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
+        query = query.order_by(TeraSession.id_session.desc())
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
@@ -300,6 +305,8 @@ class TeraSession(BaseModel):
         from opentera.db.models.TeraDevice import TeraDevice
         query = TeraSession.query.join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
         query = query.order_by(TeraSession.session_start_datetime.desc())
+        # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
+        query = query.order_by(TeraSession.id_session.desc())
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
