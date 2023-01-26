@@ -1,4 +1,4 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
@@ -17,7 +17,7 @@ class TeraSessionStatus(Enum):
     STATUS_TERMINATED = 4
 
 
-class TeraSession(BaseModel):
+class TeraSession(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_sessions'
     id_session = Column(Integer, Sequence('id_session_sequence'), primary_key=True, autoincrement=True)
     session_uuid = Column(String(36), nullable=False, unique=True)
@@ -413,7 +413,9 @@ class TeraSession(BaseModel):
     def delete(cls, id_todel):
         # from opentera.db.models.TeraDeviceData import TeraDeviceData
         # TeraDeviceData.delete_files_for_session(id_todel)
-        super().delete(id_todel)
+        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
+        delete_obj.soft_delete()
+        TeraSession.db().session.commit()
 
     @classmethod
     def insert(cls, session):

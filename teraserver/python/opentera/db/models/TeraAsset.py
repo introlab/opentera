@@ -1,4 +1,4 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 import uuid
 # from enum import Enum, unique
 from sqlalchemy import or_
@@ -17,7 +17,7 @@ from sqlalchemy.orm import relationship
 #         return self.name, self.value
 
 
-class TeraAsset(BaseModel):
+class TeraAsset(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_assets'
     id_asset = Column(Integer, Sequence('id_asset_sequence'), primary_key=True, autoincrement=True)
     id_session = Column(Integer, ForeignKey("t_sessions.id_session", ondelete='cascade'), nullable=False)

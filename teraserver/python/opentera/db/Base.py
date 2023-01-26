@@ -7,11 +7,18 @@ import sqlalchemy.sql.sqltypes
 from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger
+from sqlalchemy_easy_softdelete.mixin import generate_soft_delete_mixin_class
 
 
 class _QueryProperty:
     def __get__(self, obj: Model | None, cls: t.Type[Model]) -> BaseQuery:
         return cls.db().session.query(cls)
+
+
+# Create a Class that inherits from our class builder
+class SoftDeleteMixin(generate_soft_delete_mixin_class(delete_method_name='soft_delete')):
+    # type hint for autocomplete IDE support
+    deleted_at: datetime
 
 
 class BaseMixin(object):
@@ -95,7 +102,7 @@ class BaseMixin(object):
     @staticmethod
     def is_valid_property_name(name: str) -> bool:
         return not name.startswith('__') and not name.startswith('_') and not name.startswith('query') and \
-               not name.startswith('metadata') and name != 'version_id' and name != 'registry'
+               not name.startswith('metadata') and name != 'version_id' and name != 'registry' and name != 'deleted_at'
 
     @staticmethod
     def is_valid_property_value(value: str) -> bool:
