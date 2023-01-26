@@ -7,6 +7,7 @@ from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipant import TeraParticipant
 from modules.DatabaseModule.DBManager import DBManager
+from modules.DatabaseModule.DBManagerTeraServiceAccess import DBManagerTeraServiceAccess
 from sqlalchemy.exc import InvalidRequestError
 
 # Parser definition(s)
@@ -37,33 +38,46 @@ class ServiceQueryDisconnect(Resource):
     def get(self):
 
         args = get_parser.parse_args()
-        service_access = DBManager.serviceAccess(current_service)
+        service_access: DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
 
         try:
             if args['id_user']:
                 if args['id_user'] in service_access.get_accessible_users_ids():
                     user = TeraUser.get_user_by_id(args['id_user'])
                     self.module.send_user_disconnect_module_message(user.user_uuid)
+                else:
+                    return gettext('Forbidden'), 403
             elif args['user_uuid']:
                 if args['user_uuid'] in service_access.get_accessible_users_uuids():
                     user = TeraUser.get_user_by_uuid(args['user_uuid'])
                     self.module.send_user_disconnect_module_message(user.user_uuid)
+                else:
+                    return gettext('Forbidden'), 403
+
             elif args['id_participant']:
                 if args['id_participant'] in service_access.get_accessible_participants_ids():
                     participant = TeraParticipant.get_participant_by_id(args['id_participant'])
                     self.module.send_participant_disconnect_module_message(participant.participant_uuid)
+                else:
+                    return gettext('Forbidden'), 403
             elif args['participant_uuid']:
                 if args['participant_uuid'] in service_access.get_accessible_participants_uuids():
                     participant = TeraParticipant.get_participant_by_uuid(args['participant_uuid'])
                     self.module.send_participant_disconnect_module_message(participant.participant_uuid)
+                else:
+                    return gettext('Forbidden'), 403
             elif args['id_device']:
                 if args['id_device'] in service_access.get_accessible_devices_ids():
                     device = TeraDevice.get_device_by_id(args['id_device'])
                     self.module.send_device_disconnect_module_message(device.device_uuid)
+                else:
+                    return gettext('Forbidden'), 403
             elif args['device_uuid']:
                 if args['device_uuid'] in service_access.get_accessible_devices_uuids():
                     device = TeraDevice.get_device_by_uuid(args['device_uuid'])
                     self.module.send_device_disconnect_module_message(device.device_uuid)
+                else:
+                    return gettext('Forbidden'), 403
             else:
                 return gettext('Invalid request'), 400
 

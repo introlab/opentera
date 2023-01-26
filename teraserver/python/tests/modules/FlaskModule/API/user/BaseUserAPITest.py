@@ -47,6 +47,18 @@ class FakeFlaskModule(BaseModule):
 
         FlaskModule.init_user_api(self, self.namespace, additional_args)
 
+    def send_user_disconnect_module_message(self, user_uuid: str):
+        print('FakeFlaskModule : send_user_disconnect_module_message')
+        pass
+
+    def send_participant_disconnect_module_message(self, participant_uuid: str):
+        print('FakeFlaskModule : send_participant_disconnect_module_message')
+        pass
+
+    def send_device_disconnect_module_message(self, device_uuid: str):
+        print('FakeFlaskModule : send_device_disconnect_module_message')
+        pass
+
 
 class BaseUserAPITest(unittest.TestCase):
     test_endpoint: str = ''

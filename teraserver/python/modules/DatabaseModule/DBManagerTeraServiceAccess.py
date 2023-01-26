@@ -19,12 +19,10 @@ class DBManagerTeraServiceAccess:
         return query.all()
 
     def get_accessible_devices_ids(self, admin_only=False):
-        devices = []
+        return [device.id_device for device in self.get_accessible_devices(admin_only=admin_only)]
 
-        for device in self.get_accessible_devices(admin_only=admin_only):
-            devices.append(device.id_device)
-
-        return devices
+    def get_accessible_devices_uuids(self, admin_only=False):
+        return [device.device_uuid for device in self.get_accessible_devices(admin_only=admin_only)]
 
     def get_accessible_projects(self, admin_only=False):
         project_list = []
@@ -123,12 +121,10 @@ class DBManagerTeraServiceAccess:
         return participant_list
 
     def get_accessible_participants_ids(self, admin_only=False):
-        parts = []
+        return [participant.id_participant for participant in self.get_accessible_participants(admin_only=admin_only)]
 
-        for part in self.get_accessible_participants(admin_only=admin_only):
-            parts.append(part.id_participant)
-
-        return parts
+    def get_accessible_participants_uuids(self, admin_only=False):
+        return [participant.participant_uuid for participant in self.get_accessible_participants(admin_only=admin_only)]
 
     def get_accessible_users(self, admin_only=False):
         projects = self.get_accessible_projects(admin_only=admin_only)
@@ -143,6 +139,9 @@ class DBManagerTeraServiceAccess:
 
     def get_accessible_users_ids(self, admin_only=False):
         return [user.id_user for user in self.get_accessible_users(admin_only=admin_only)]
+
+    def get_accessible_users_uuids(self, admin_only=False):
+        return [user.user_uuid for user in self.get_accessible_users(admin_only=admin_only)]
 
     def get_accessible_sessions_types(self):
         from opentera.db.models.TeraSessionType import TeraSessionType

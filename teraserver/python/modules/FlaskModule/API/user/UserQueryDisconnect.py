@@ -6,6 +6,7 @@ from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
 from modules.DatabaseModule.DBManager import DBManager
+from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 from sqlalchemy.exc import InvalidRequestError
 from flask_babel import gettext
 
@@ -37,7 +38,7 @@ class UserQueryDisconnect(Resource):
     @user_multi_auth.login_required
     def get(self):
         args = get_parser.parse_args()
-        user_access = DBManager.userAccess(current_user)
+        user_access: DBManagerTeraUserAccess = DBManager.userAccess(current_user)
 
         try:
             if args['id_user']:
@@ -46,28 +47,40 @@ class UserQueryDisconnect(Resource):
                     if user.user_uuid == current_user.user_uuid:
                         return gettext('Use Logout instead to disconnect current user'), 400
                     self.module.send_user_disconnect_module_message(user.user_uuid)
+                else:
+                    return gettext('Forbidden'), 403
             elif args['user_uuid']:
                 if args['user_uuid'] in user_access.get_accessible_users_uuids(admin_only=True):
                     user = TeraUser.get_user_by_uuid(args['user_uuid'])
                     if user.user_uuid == current_user.user_uuid:
                         return gettext('Use Logout instead to disconnect current user'), 400
                     self.module.send_user_disconnect_module_message(user.user_uuid)
+                else:
+                    return gettext('Forbidden'), 403
             elif args['id_participant']:
                 if args['id_participant'] in user_access.get_accessible_participants_ids(admin_only=True):
                     participant = TeraParticipant.get_participant_by_id(args['id_participant'])
                     self.module.send_participant_disconnect_module_message(participant.participant_uuid)
+                else:
+                    return gettext('Forbidden'), 403
             elif args['participant_uuid']:
                 if args['participant_uuid'] in user_access.get_accessible_participants_uuids(admin_only=True):
                     participant = TeraParticipant.get_participant_by_uuid(args['participant_uuid'])
                     self.module.send_participant_disconnect_module_message(participant.participant_uuid)
+                else:
+                    return gettext('Forbidden'), 403
             elif args['id_device']:
                 if args['id_device'] in user_access.get_accessible_devices_ids(admin_only=True):
                     device = TeraDevice.get_device_by_id(args['id_device'])
                     self.module.send_device_disconnect_module_message(device.device_uuid)
+                else:
+                    return gettext('Forbidden'), 403
             elif args['device_uuid']:
                 if args['device_uuid'] in user_access.get_accessible_devices_uuids(admin_only=True):
                     device = TeraDevice.get_device_by_uuid(args['device_uuid'])
                     self.module.send_device_disconnect_module_message(device.device_uuid)
+                else:
+                    return gettext('Forbidden'), 403
             else:
                 return gettext('Invalid request'), 400
 
