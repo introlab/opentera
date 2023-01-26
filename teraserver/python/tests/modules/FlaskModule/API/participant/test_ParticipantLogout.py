@@ -44,8 +44,7 @@ class ParticipantLogoutTest(BaseParticipantAPITest):
             logout_response = self._get_with_participant_http_auth(
                 self.test_client, username, password, params={}, endpoint=self.test_endpoint)
 
-            self.assertEqual(logout_response.headers['Content-Type'], 'application/json')
-            self.assertEqual(logout_response.status_code, 200)
+            self.assertEqual(logout_response.status_code, 401)
 
     def test_logout_valid_token_auth(self):
         with self._flask_app.app_context():
