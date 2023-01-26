@@ -58,6 +58,7 @@ class TeraVideoRecorder
     constructor(){
         this.recorder = null;
         this.fileWriter = null;
+        this.paused = false;
     }
 
     startRecording(){
@@ -80,6 +81,8 @@ class TeraVideoRecorder
                 }, self.errorHandler);
             }, self.errorHandler);
         }, {});
+
+        this.paused = false;
 
         let streams = getActiveStreams();
         let stream;
@@ -118,9 +121,21 @@ class TeraVideoRecorder
         this.recorder.resetVideoStreams(streams);
     }
 
+    pauseRecording(){
+        if (this.paused){
+            this.recorder.resume();
+            this.paused = false;
+        }else{
+            this.recorder.pause();
+            this.paused = true;
+        }
+    }
+
     stopRecording(){
         if (!this.recorder)
             return;
+
+        this.paused = false;
 
         console.log("Stopping local recording.");
 
