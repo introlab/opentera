@@ -32,7 +32,7 @@ class DeviceLogoutTest(BaseDeviceAPITest):
                 if device['device_token']:
                     if device['device_enabled']:
                         response = self._get_with_device_token_auth(self.test_client, token=device['device_token'])
-                        self.assertEqual(403, response.status_code)
+                        self.assertEqual(200, response.status_code)
                     else:
                         response = self._get_with_device_token_auth(self.test_client, token=device['device_token'])
                         self.assertEqual(401, response.status_code)

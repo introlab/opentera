@@ -505,7 +505,7 @@ class LoginModule(BaseModule):
             token_dict = jwt.decode(token_value, self.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey),
                                     algorithms='HS256')
         except jwt.exceptions.PyJWTError as e:
-            #print(e)
+            # print(e)
             # self.logger.log_error(self.module_name, 'Participant Token exception occurred')
             login_infos = UserAgentParser.parse_request_for_login_infos(request)
             self.logger.send_login_event(sender='LoginModule.participant_verify_token',

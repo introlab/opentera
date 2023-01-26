@@ -33,7 +33,7 @@ class ParticipantLogin(Resource):
         self.test = kwargs.get('test', False)
 
     # @participant_http_auth.login_required
-    @participant_multi_auth.login_required(role='limited')
+
     @api.expect(get_parser)
     @api.doc(description='Participant login with HTTPAuth',
              responses={200: 'Success - Login succeeded',
@@ -41,6 +41,7 @@ class ParticipantLogin(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     # @api.marshal_with(model, mask=None)
+    @participant_multi_auth.login_required(role='limited')
     def get(self):
         if current_participant:
 

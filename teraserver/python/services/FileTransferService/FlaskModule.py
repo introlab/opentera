@@ -21,8 +21,29 @@ import os
 # Flask application
 flask_app = Flask("FileTransferService")
 
+
+
+def get_locale():
+    # if a user is logged in, use the locale from the user settings
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.locale
+    # otherwise try to guess the language from the user accept
+    # header the browser transmits.  We support fr/en in this
+    # example.  The best match wins.
+    return request.accept_languages.best_match(['fr', 'en'])
+
+
+def get_timezone():
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.timezone
+
+
 # Translations
-babel = Babel(flask_app, default_domain='filetransferservice')
+babel = Babel(flask_app, locale_selector=get_locale,
+              timezone_selector=get_timezone,
+              default_domain='filetransferservice')
 
 
 class MyHTTPChannel(HTTPChannel):
@@ -64,25 +85,6 @@ class MySite(Site):
 
     def __init__(self, resource, requestFactory=None, *args, **kwargs):
         super().__init__(resource, requestFactory, *args, **kwargs)
-
-
-@babel.localeselector
-def get_locale():
-    # if a user is logged in, use the locale from the user settings
-    user = getattr(g, 'user', None)
-    if user is not None:
-        return user.locale
-    # otherwise try to guess the language from the user accept
-    # header the browser transmits.  We support fr/en in this
-    # example.  The best match wins.
-    return request.accept_languages.best_match(['fr', 'en'])
-
-
-@babel.timezoneselector
-def get_timezone():
-    user = getattr(g, 'user', None)
-    if user is not None:
-        return user.timezone
 
 
 # Simple fix for API documentation used with reverse proxy

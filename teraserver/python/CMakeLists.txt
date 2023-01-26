@@ -39,6 +39,9 @@ add_custom_target(
     COMMAND ${PYBABEL_EXECUTABLE} update -i ${translation_pot_file} -d translations
     COMMAND ${PYBABEL_EXECUTABLE} compile -d translations
     DEPENDS python-env ${PYBABEL_EXECUTABLE}
+    DEPENDS videorehabservice-python-translations
+    DEPENDS loggingservice-python-translations
+    DEPENDS filetransferservice-python-translations
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     SOURCES babel.cfg
 )
@@ -53,6 +56,9 @@ add_custom_target(
     # COMMAND ${PYBABEL_EXECUTABLE} update -i ${translation_pot_file} -d translations
     COMMAND ${PYBABEL_EXECUTABLE} compile -d translations
     DEPENDS python-env ${PYBABEL_EXECUTABLE}
+    DEPENDS videorehabservice-python-translations-compile-only
+    DEPENDS loggingservice-python-translations-compile-only
+    DEPENDS filetransferservice-python-translations-compile-only
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     SOURCES babel.cfg
 )

@@ -19,7 +19,7 @@ import uuid
 from modules.FlaskModule.FlaskModule import flask_app
 from sqlalchemy.exc import SQLAlchemyError
 
-limiter = Limiter(flask_app, key_func=get_remote_address, storage_uri="memory://")
+limiter = Limiter(get_remote_address, app=flask_app, storage_uri="memory://")
 
 
 class DeviceRegister(Resource):

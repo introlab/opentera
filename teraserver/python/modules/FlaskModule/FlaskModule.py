@@ -15,8 +15,27 @@ import opentera.messages.python as messages
 # Flask application
 flask_app = Flask("TeraServer")
 
+
+def get_locale():
+    # if a user is logged in, use the locale from the user settings
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.locale
+    # otherwise try to guess the language from the user accept
+    # header the browser transmits.  We support fr/en in this
+    # example.  The best match wins.
+    lang = request.accept_languages.best_match(['fr', 'en'])
+    return lang
+
+
+def get_timezone():
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.timezone
+
+
 # Translations
-babel = Babel(flask_app)
+babel = Babel(flask_app, locale_selector=get_locale, timezone_selector=get_timezone)
 
 # API
 authorizations = {
@@ -56,26 +75,6 @@ user_api_ns = api.namespace('user', description='API for user calls')
 device_api_ns = api.namespace('device', description='API for device calls')
 participant_api_ns = api.namespace('participant', description='API for participant calls')
 service_api_ns = api.namespace('service', description='API for service calls')
-
-
-@babel.localeselector
-def get_locale():
-    # if a user is logged in, use the locale from the user settings
-    user = getattr(g, 'user', None)
-    if user is not None:
-        return user.locale
-    # otherwise try to guess the language from the user accept
-    # header the browser transmits.  We support fr/en in this
-    # example.  The best match wins.
-    lang = request.accept_languages.best_match(['fr', 'en'])
-    return lang
-
-
-@babel.timezoneselector
-def get_timezone():
-    user = getattr(g, 'user', None)
-    if user is not None:
-        return user.timezone
 
 
 class FlaskModule(BaseModule):
