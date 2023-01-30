@@ -7,7 +7,7 @@ import sqlalchemy.sql.sqltypes
 from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger
-from sqlalchemy_easy_softdelete.mixin import generate_soft_delete_mixin_class
+from opentera.db.SoftDeleteMixin import generate_soft_delete_mixin_class
 
 
 class _QueryProperty:

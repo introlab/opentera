@@ -26,8 +26,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
     id_creator_user = Column(Integer, ForeignKey('t_users.id_user'), nullable=True)
     id_creator_device = Column(Integer, ForeignKey('t_devices.id_device'), nullable=True)
     id_creator_participant = Column(Integer, ForeignKey('t_participants.id_participant'), nullable=True)
-    id_creator_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='set null'),
-                                   nullable=True)
+    id_creator_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='set null'), nullable=True)
 
     session_name = Column(String, nullable=False)
     session_start_datetime = Column(TIMESTAMP(timezone=True), nullable=False)

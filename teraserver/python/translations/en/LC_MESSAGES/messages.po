@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-26 13:30-0500\n"
+"POT-Creation-Date: 2023-01-26 14:21-0500\n"
 "PO-Revision-Date: 2021-01-25 13:01-0500\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -343,11 +343,11 @@ msgstr ""
 msgid "Invalid content type"
 msgstr ""
 
-#: modules/FlaskModule/API/participant/ParticipantLogin.py:96
+#: modules/FlaskModule/API/participant/ParticipantLogin.py:97
 msgid "Participant already logged in."
 msgstr ""
 
-#: modules/FlaskModule/API/participant/ParticipantLogin.py:130
+#: modules/FlaskModule/API/participant/ParticipantLogin.py:131
 msgid "Missing current_participant"
 msgstr ""
 
