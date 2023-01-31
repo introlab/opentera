@@ -1,14 +1,14 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraSessionTypeSite(BaseModel):
+class TeraSessionTypeSite(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_sessions_types_sites'
     id_session_type_site = Column(Integer, Sequence('id_session_type_site_sequence'), primary_key=True,
-                                     autoincrement=True)
+                                  autoincrement=True)
     id_session_type = Column('id_session_type', Integer, ForeignKey('t_sessions_types.id_session_type',
-                                                                             ondelete='cascade'), nullable=False)
+                                                                    ondelete='cascade'), nullable=False)
     id_site = Column('id_site', Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
 
     session_type_site_session_type = relationship("TeraSessionType", viewonly=True)

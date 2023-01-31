@@ -1,12 +1,11 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraServiceSite(BaseModel):
+class TeraServiceSite(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_services_sites'
-    id_service_site = Column(Integer, Sequence('id_service_site_sequence'), primary_key=True,
-                                autoincrement=True)
+    id_service_site = Column(Integer, Sequence('id_service_site_sequence'), primary_key=True, autoincrement=True)
     id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
     id_site = Column(Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
 

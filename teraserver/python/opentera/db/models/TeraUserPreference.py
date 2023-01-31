@@ -1,12 +1,11 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraUserPreference(BaseModel):
+class TeraUserPreference(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_users_preferences'
-    id_user_preference = Column(Integer, Sequence('id_userpreference_sequence'), primary_key=True,
-                                   autoincrement=True)
+    id_user_preference = Column(Integer, Sequence('id_userpreference_sequence'), primary_key=True, autoincrement=True)
     id_user = Column(Integer, ForeignKey('t_users.id_user', ondelete='cascade'), nullable=False)
     user_preference_app_tag = Column(String, nullable=False)
     user_preference_preference = Column(String, nullable=False)

@@ -1,13 +1,12 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraSessionParticipants(BaseModel):
+class TeraSessionParticipants(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_sessions_participants'
-    id_session_participant = Column(Integer, Sequence('id_session_participant'), primary_key=True,
-                                       autoincrement=True)
-    id_session = Column(Integer, ForeignKey('t_sessions.id_session'))
+    id_session_participant = Column(Integer, Sequence('id_session_participant'), primary_key=True, autoincrement=True)
+    id_session = Column(Integer, ForeignKey('t_sessions.id_session', ondelete='cascade'))
     id_participant = Column(Integer, ForeignKey('t_participants.id_participant'))
 
     session_participant_session = relationship('TeraSession', viewonly=True)

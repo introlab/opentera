@@ -1,4 +1,4 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from flask_babel import gettext
@@ -6,7 +6,7 @@ from flask_babel import gettext
 import uuid
 
 
-class TeraService(BaseModel):
+class TeraService(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_services'
 
     id_service = Column(Integer, Sequence('id_service_sequence'), primary_key=True, autoincrement=True)

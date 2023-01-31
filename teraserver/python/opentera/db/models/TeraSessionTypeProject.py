@@ -1,17 +1,17 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
 
-class TeraSessionTypeProject(BaseModel):
+class TeraSessionTypeProject(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_sessions_types_projects'
     id_session_type_project = Column(Integer, Sequence('id_session_type_project_sequence'), primary_key=True,
-                                        autoincrement=True)
+                                     autoincrement=True)
     id_session_type = Column('id_session_type', Integer, ForeignKey('t_sessions_types.id_session_type',
-                                                                             ondelete='cascade'), nullable=False)
+                                                                    ondelete='cascade'), nullable=False)
     id_project = Column('id_project', Integer, ForeignKey('t_projects.id_project', ondelete='cascade'),
-                           nullable=False)
+                        nullable=False)
 
     session_type_project_session_type = relationship("TeraSessionType", viewonly=True)
     session_type_project_project = relationship("TeraProject", viewonly=True)

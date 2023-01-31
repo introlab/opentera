@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from enum import Enum
 import uuid
 import json
@@ -12,7 +12,7 @@ class TeraTestStatus(Enum):
     TEST_COMPLETED = 2
 
 
-class TeraTest(BaseModel):
+class TeraTest(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_tests'
     id_test = Column(Integer, Sequence('id_test_sequence'), primary_key=True, autoincrement=True)
     id_test_type = Column(Integer, ForeignKey('t_tests_types.id_test_type'), nullable=False)

@@ -1,9 +1,9 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraDeviceSite(BaseModel):
+class TeraDeviceSite(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_devices_sites'
     id_device_site = Column(Integer, Sequence('id_device_site_sequence'), primary_key=True, autoincrement=True)
     id_device = Column(Integer, ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)

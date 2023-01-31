@@ -1,4 +1,4 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from opentera.db.models.TeraDeviceType import TeraDeviceType
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 
@@ -10,7 +10,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, T
 from sqlalchemy.orm import relationship
 
 
-class TeraDevice(BaseModel):
+class TeraDevice(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_devices'
     id_device = Column(Integer, Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
 
@@ -31,12 +31,12 @@ class TeraDevice(BaseModel):
     device_sites = relationship("TeraSite", secondary='t_devices_sites', back_populates='site_devices')
     # device_projects = relationship('TeraDeviceProject', cascade='delete')
     device_projects = relationship("TeraProject", secondary="t_devices_projects",
-                                      back_populates="project_devices", lazy='joined')
+                                   back_populates="project_devices", lazy='joined')
     # device_session_types = relationship("TeraSessionTypeDeviceType")
     device_participants = relationship("TeraParticipant",  secondary="t_devices_participants",
-                                          back_populates="participant_devices", passive_deletes=True)
+                                       back_populates="participant_devices", passive_deletes=True)
     device_sessions = relationship("TeraSession", secondary="t_sessions_devices", back_populates="session_devices",
-                                      passive_deletes=True)
+                                   passive_deletes=True)
     device_type = relationship('TeraDeviceType')
     device_subtype = relationship('TeraDeviceSubType')
     device_assets = relationship('TeraAsset', passive_deletes=True, back_populates='asset_device', lazy='select')
@@ -248,10 +248,3 @@ class TeraDevice(BaseModel):
             del values['device_subtype']
 
         super().update(update_id=update_id, values=values)
-
-    @classmethod
-    def delete(cls, id_todel):
-        super().delete(id_todel)
-
-        # from opentera.db.models.TeraDeviceData import TeraDeviceData
-        # TeraDeviceData.delete_files_for_device(id_todel)

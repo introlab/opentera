@@ -1,15 +1,15 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraDeviceParticipant(BaseModel):
+class TeraDeviceParticipant(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_devices_participants'
     id_device_participant = Column(Integer, Sequence('id_device_participant_sequence'), primary_key=True,
-                                      autoincrement=True)
+                                   autoincrement=True)
     id_device = Column(Integer, ForeignKey("t_devices.id_device"), nullable=False)
     id_participant = Column(Integer, ForeignKey("t_participants.id_participant", ondelete='cascade'),
-                               nullable=False)
+                            nullable=False)
 
     device_participant_participant = relationship("TeraParticipant", viewonly=True)
     device_participant_device = relationship("TeraDevice", viewonly=True)
@@ -65,5 +65,22 @@ class TeraDeviceParticipant(BaseModel):
         return TeraDeviceParticipant.query.filter_by(id_device=device_id).all()
 
     @staticmethod
-    def query_device_participant_for_participant_device(device_id: int, participant_id: int):
-        return TeraDeviceParticipant.query.filter_by(id_device=device_id, id_participant=participant_id).first()
+    def query_device_participant_for_participant_device(device_id: int, participant_id: int,
+                                                        with_deleted: bool = False):
+        return TeraDeviceParticipant.query.filter_by(id_device=device_id, id_participant=participant_id)\
+            .execution_options(include_deleted=with_deleted).first()
+
+    @classmethod
+    def insert(cls, db_object):
+        # # Check if we have an already present delete association
+        # item = TeraDeviceParticipant.query_device_participant_for_participant_device(device_id=db_object.id_device,
+        #                                                                              participant_id=
+        #                                                                              db_object.id_participant,
+        #                                                                              with_deleted=True)
+        # if item:
+        #     if item.deleted_at:
+        #         item.deleted_at = None
+        #
+        # else:
+        #     # No existing item found
+        super().insert(db_object)

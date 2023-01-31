@@ -1,4 +1,4 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
@@ -8,7 +8,7 @@ import random
 from sqlalchemy import asc
 
 
-class TeraSessionEvent(BaseModel):
+class TeraSessionEvent(BaseModel, SoftDeleteMixin):
     @unique
     class SessionEventTypes(Enum):
         GENERAL_ERROR = 0

@@ -1,9 +1,9 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraTestTypeSite(BaseModel):
+class TeraTestTypeSite(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_tests_types_sites'
     id_test_type_site = Column(Integer, Sequence('id_test_type_site_sequence'), primary_key=True,
                                   autoincrement=True)

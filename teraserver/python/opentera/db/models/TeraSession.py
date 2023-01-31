@@ -36,10 +36,10 @@ class TeraSession(BaseModel, SoftDeleteMixin):
     session_parameters = Column(String, nullable=True)
 
     session_participants = relationship("TeraParticipant", secondary="t_sessions_participants",
-                                           back_populates="participant_sessions")
+                                        back_populates="participant_sessions")
     session_users = relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions")
     session_devices = relationship("TeraDevice", secondary="t_sessions_devices",
-                                      back_populates="device_sessions")
+                                   back_populates="device_sessions")
 
     session_creator_user = relationship('TeraUser')
     session_creator_device = relationship('TeraDevice')
@@ -408,13 +408,11 @@ class TeraSession(BaseModel, SoftDeleteMixin):
     #     if commit_changes:
     #         db.session.commit()
 
-    @classmethod
-    def delete(cls, id_todel):
-        # from opentera.db.models.TeraDeviceData import TeraDeviceData
-        # TeraDeviceData.delete_files_for_session(id_todel)
-        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
-        delete_obj.soft_delete()
-        TeraSession.db().session.commit()
+    # @classmethod
+    # def delete(cls, id_todel):
+    #     delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
+    #     delete_obj.soft_delete()
+    #     cls.db().session.commit()
 
     @classmethod
     def insert(cls, session):

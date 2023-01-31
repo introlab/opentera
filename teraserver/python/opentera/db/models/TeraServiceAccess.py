@@ -1,20 +1,20 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 
 
-class TeraServiceAccess(BaseModel):
+class TeraServiceAccess(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_services_access'
     id_service_access = Column(Integer, Sequence('id_service_project_role_sequence'), primary_key=True,
-                                  autoincrement=True)
+                               autoincrement=True)
     id_user_group = Column(Integer, ForeignKey('t_users_groups.id_user_group', ondelete='cascade'),
-                              nullable=True)
+                           nullable=True)
     id_device = Column(Integer, ForeignKey('t_devices.id_device', ondelete='cascade'), nullable=True)
-    id_participant_group = Column(Integer, ForeignKey('t_participants_groups.id_participant_group',
-                                                               ondelete='cascade'), nullable=True)
+    id_participant_group = Column(Integer, ForeignKey('t_participants_groups.id_participant_group', ondelete='cascade'),
+                                  nullable=True)
     id_service_role = Column(Integer, ForeignKey('t_services_roles.id_service_role', ondelete='cascade'),
-                                nullable=False)
+                             nullable=False)
 
     service_access_role = relationship("TeraServiceRole")
     service_access_user_group = relationship("TeraUserGroup", back_populates='user_group_services_access')

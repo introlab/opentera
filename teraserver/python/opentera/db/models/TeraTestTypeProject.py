@@ -1,10 +1,10 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
 
-class TeraTestTypeProject(BaseModel):
+class TeraTestTypeProject(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_tests_types_projects'
     id_test_type_project = Column(Integer, Sequence('id_test_type_project_sequence'), primary_key=True,
                                      autoincrement=True)

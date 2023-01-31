@@ -5,11 +5,9 @@ from sqlalchemy.orm import relationship
 
 class TeraUserUserGroup(BaseModel):
     __tablename__ = 't_users_users_groups'
-    id_user_user_group = Column(Integer, Sequence('id_user_user_group_sequence'), primary_key=True,
-                                   autoincrement=True)
+    id_user_user_group = Column(Integer, Sequence('id_user_user_group_sequence'), primary_key=True, autoincrement=True)
     id_user = Column(Integer, ForeignKey("t_users.id_user", ondelete='cascade'), nullable=False)
-    id_user_group = Column(Integer, ForeignKey("t_users_groups.id_user_group"),
-                              nullable=False)
+    id_user_group = Column(Integer, ForeignKey("t_users_groups.id_user_group"), nullable=False)
 
     user_user_group_user = relationship("TeraUser", viewonly=True)
     user_user_group_user_group = relationship("TeraUserGroup", viewonly=True)  # Fun variable name!

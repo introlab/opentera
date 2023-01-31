@@ -1,9 +1,9 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraUserGroup(BaseModel):
+class TeraUserGroup(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_users_groups'
     id_user_group = Column(Integer, Sequence('id_usergroup_sequence'), primary_key=True, autoincrement=True)
     user_group_name = Column(String, nullable=False, unique=False)

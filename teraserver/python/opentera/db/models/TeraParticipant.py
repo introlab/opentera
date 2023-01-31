@@ -1,4 +1,4 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
@@ -22,7 +22,7 @@ def infinite_jti_sequence():
 participant_jti_generator = infinite_jti_sequence()
 
 
-class TeraParticipant(BaseModel):
+class TeraParticipant(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_participants'
     id_participant = Column(Integer, Sequence('id_participant_sequence'), primary_key=True, autoincrement=True)
     participant_uuid = Column(String(36), nullable=False, unique=True)
@@ -35,19 +35,19 @@ class TeraParticipant(BaseModel):
     participant_lastonline = Column(TIMESTAMP(timezone=True), nullable=True)
     participant_enabled = Column(Boolean, nullable=False, default=True)
     participant_login_enabled = Column(Boolean, nullable=False, default=False)
-    id_participant_group = Column(Integer, ForeignKey('t_participants_groups.id_participant_group',
-                                                               ondelete='cascade'), nullable=True)
+    id_participant_group = Column(Integer, ForeignKey('t_participants_groups.id_participant_group', ondelete='cascade'),
+                                  nullable=True)
 
     id_project = Column(Integer, ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
 
     participant_devices = relationship("TeraDevice", secondary="t_devices_participants",
-                                          back_populates="device_participants", viewonly=True)
+                                       back_populates="device_participants", viewonly=True)
 
     participant_sessions = relationship("TeraSession", secondary="t_sessions_participants",
-                                           back_populates="session_participants", passive_deletes=True)
+                                        back_populates="session_participants", passive_deletes=True)
 
     participant_participant_group = relationship("TeraParticipantGroup",
-                                                    back_populates='participant_group_participants')
+                                                 back_populates='participant_group_participants')
 
     participant_project = relationship("TeraProject", back_populates='project_participants', lazy='joined')
 
@@ -351,12 +351,3 @@ class TeraParticipant(BaseModel):
         if participant.participant_token_enabled and participant.participant_enabled:
             participant.create_token()
         TeraParticipant.db().session.commit()
-
-    @classmethod
-    def delete(cls, id_todel: int):
-        super().delete(id_todel)
-        # Check if we need to delete orphan sessions (sessions that have no more participants left
-        # from opentera.db.models.TeraSession import TeraSession
-        # TeraSession.delete_orphaned_sessions(False)
-        #
-        # db.session.commit()

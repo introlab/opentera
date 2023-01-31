@@ -1,11 +1,11 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from enum import Enum, unique
 from flask_babel import gettext
 
 
-class TeraSessionType(BaseModel):
+class TeraSessionType(BaseModel, SoftDeleteMixin):
     @unique
     class SessionCategoryEnum(Enum):
         SERVICE = 1
@@ -17,8 +17,7 @@ class TeraSessionType(BaseModel):
             return self.name, self.value
 
     __tablename__ = 't_sessions_types'
-    id_session_type = Column(Integer, Sequence('id_session_type_sequence'), primary_key=True,
-                                autoincrement=True)
+    id_session_type = Column(Integer, Sequence('id_session_type_sequence'), primary_key=True, autoincrement=True)
     id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=True)
     session_type_name = Column(String, nullable=False, unique=False)
     session_type_online = Column(Boolean, nullable=False)
@@ -30,7 +29,7 @@ class TeraSessionType(BaseModel):
     session_type_session_type_sites = relationship("TeraSessionTypeSite", viewonly=True)
 
     session_type_projects = relationship("TeraProject", secondary="t_sessions_types_projects",
-                                            back_populates="project_session_types")
+                                         back_populates="project_session_types")
     session_type_sites = relationship("TeraSite", secondary="t_sessions_types_sites")
 
     session_type_service = relationship("TeraService")

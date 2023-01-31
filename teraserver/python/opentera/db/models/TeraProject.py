@@ -1,9 +1,9 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraProject(BaseModel):
+class TeraProject(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_projects'
     id_project = Column(Integer, Sequence('id_project_sequence'), primary_key=True, autoincrement=True)
     id_site = Column(Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
@@ -122,13 +122,6 @@ class TeraProject(BaseModel):
         if isinstance(filter_args, dict):
             return TeraProject.query.filter_by(**filter_args).all()
         return None
-
-    @classmethod
-    def delete(cls, id_todel):
-        super().delete(id_todel)
-
-        # from opentera.db.models.TeraSession import TeraSession
-        # TeraSession.delete_orphaned_sessions()
 
     @classmethod
     def insert(cls, project):

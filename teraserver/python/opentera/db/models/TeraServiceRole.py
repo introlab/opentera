@@ -1,9 +1,9 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraServiceRole(BaseModel):
+class TeraServiceRole(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_services_roles'
     id_service_role = Column(Integer, Sequence('id_service_role_sequence'), primary_key=True,
                                 autoincrement=True)

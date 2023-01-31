@@ -1,4 +1,4 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from opentera.db.models.TeraSite import TeraSite
@@ -22,7 +22,7 @@ def infinite_jti_sequence():
 user_jti_generator = infinite_jti_sequence()
 
 
-class TeraUser(BaseModel):
+class TeraUser(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_users'
     id_user = Column(Integer, Sequence('id_user_sequence'), primary_key=True, autoincrement=True)
     user_username = Column(String(50), nullable=False, unique=True)

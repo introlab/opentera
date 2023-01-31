@@ -169,7 +169,10 @@ class BaseMixin(object):
     def delete(cls, id_todel):
         delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
         if delete_obj:
-            cls.db().session.delete(delete_obj)
+            if getattr(delete_obj, 'soft_delete', None):
+                delete_obj.soft_delete()
+            else:
+                cls.db().session.delete(delete_obj)
             cls.commit()
 
     @classmethod

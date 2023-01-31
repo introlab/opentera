@@ -1,10 +1,10 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
 
-class TeraServiceProject(BaseModel):
+class TeraServiceProject(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_services_projects'
     id_service_project = Column(Integer, Sequence('id_service_project_sequence'), primary_key=True,
                                    autoincrement=True)

@@ -1,10 +1,10 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from opentera.db.models.TeraProject import TeraProject
 
 
-class TeraParticipantGroup(BaseModel):
+class TeraParticipantGroup(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_participants_groups'
     id_participant_group = Column(Integer, Sequence('id_participantgroup_sequence'), primary_key=True,
                                   autoincrement=True)
@@ -61,13 +61,6 @@ class TeraParticipantGroup(BaseModel):
             base_pgroup2.id_project = TeraProject.get_project_by_projectname('Default Project #2').id_project
             TeraParticipantGroup.db().session.add(base_pgroup2)
             TeraParticipantGroup.db().session.commit()
-
-    @classmethod
-    def delete(cls, id_todel):
-        super().delete(id_todel)
-
-        # from opentera.db.models.TeraSession import TeraSession
-        # TeraSession.delete_orphaned_sessions()
 
     @classmethod
     def update(cls, update_id: int, values: dict):

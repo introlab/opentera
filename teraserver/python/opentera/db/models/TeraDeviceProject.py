@@ -1,12 +1,12 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraDeviceProject(BaseModel):
+class TeraDeviceProject(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_devices_projects'
     id_device_project = Column(Integer, Sequence('id_device_project_sequence'), primary_key=True,
-                                  autoincrement=True)
+                               autoincrement=True)
     id_device = Column(Integer, ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
     id_project = Column(Integer, ForeignKey("t_projects.id_project", ondelete='cascade'), nullable=False)
 

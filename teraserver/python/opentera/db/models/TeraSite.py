@@ -1,9 +1,9 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraSite(BaseModel):
+class TeraSite(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_sites'
     id_site = Column(Integer, Sequence('id_site_sequence'), primary_key=True, autoincrement=True)
     site_name = Column(String, nullable=False, unique=True)
@@ -56,13 +56,6 @@ class TeraSite(BaseModel):
     #     if isinstance(filter_args, dict):
     #         return TeraSite.query.filter_by(**filter_args).all()
     #     return None
-
-    @classmethod
-    def delete(cls, id_todel):
-        super().delete(id_todel)
-
-        # from opentera.db.models.TeraSession import TeraSession
-        # TeraSession.delete_orphaned_sessions()
 
     @classmethod
     def insert(cls, site):

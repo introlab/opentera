@@ -1,4 +1,4 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -6,12 +6,12 @@ import json
 import jsonschema
 
 
-class TeraServiceConfigSpecific(BaseModel):
+class TeraServiceConfigSpecific(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_services_configs_specifics'
     id_service_config_specific = Column(Integer, Sequence('id_service_config_specific_sequence'),
-                                           primary_key=True, autoincrement=True)
+                                        primary_key=True, autoincrement=True)
     id_service_config = Column(Integer, ForeignKey('t_services_configs.id_service_config', ondelete='cascade'),
-                                  nullable=False)
+                               nullable=False)
     service_config_specific_id = Column(String, nullable=False)
     service_config_specific_config = Column(String, nullable=False)
 

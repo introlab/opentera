@@ -1,10 +1,10 @@
-from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel, SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 import uuid
 
 
-class TeraTestType(BaseModel):
+class TeraTestType(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_tests_types'
     id_test_type = Column(Integer, Sequence('id_test_type_sequence'), primary_key=True, autoincrement=True)
     id_service = Column(Integer, ForeignKey("t_services.id_service", ondelete='cascade'), nullable=False)
