@@ -199,6 +199,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQueryTestType import UserQueryTestTypes
         from modules.FlaskModule.API.user.UserQueryTests import UserQueryTests
         from modules.FlaskModule.API.user.UserQueryDisconnect import UserQueryDisconnect
+        from modules.FlaskModule.API.user.UserQueryUndelete import UserQueryUndelete
 
         # Resources
         namespace.add_resource(UserQueryAssets,               '/assets', resource_class_kwargs=kwargs)
@@ -247,6 +248,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQueryDisconnect,           '/disconnect', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryUserPreferences,      '/users/preferences', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryVersions,             '/versions', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserQueryUndelete,             '/undelete', resource_class_kwargs=kwargs)
         # api.add_namespace(user_api_ns)
 
     @staticmethod

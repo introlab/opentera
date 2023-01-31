@@ -119,8 +119,8 @@ class TeraAsset(BaseModel, SoftDeleteMixin):
             TeraAsset.insert(new_asset)
 
     @staticmethod
-    def get_asset_by_id(asset_id: int):
-        return TeraAsset.query.filter_by(id_asset=asset_id).first()
+    def get_asset_by_id(asset_id: int, with_deleted: bool = False):
+        return TeraAsset.query.filter_by(id_asset=asset_id).execution_options(include_deleted=with_deleted).first()
 
     @staticmethod
     def get_asset_by_uuid(asset_uuid: str):

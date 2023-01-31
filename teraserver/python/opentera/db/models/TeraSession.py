@@ -229,8 +229,8 @@ class TeraSession(BaseModel, SoftDeleteMixin):
             TeraSession.db().session.commit()
 
     @staticmethod
-    def get_session_by_id(ses_id: int):
-        return TeraSession.query.filter_by(id_session=ses_id).first()
+    def get_session_by_id(ses_id: int, with_deleted: bool = False):
+        return TeraSession.query.filter_by(id_session=ses_id).execution_options(include_deleted=with_deleted).first()
 
     @staticmethod
     def get_session_by_uuid(s_uuid):

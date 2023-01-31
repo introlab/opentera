@@ -3,7 +3,8 @@
 from datetime import datetime
 from typing import Any, Callable, Optional, Type
 
-from sqlalchemy import Column, DateTime
+from sqlalchemy import Column, DateTime, text
+from sqlalchemy.inspection import inspect
 from sqlalchemy.sql.type_api import TypeEngine
 
 from sqlalchemy_easy_softdelete.handler.sqlalchemy_easy_softdelete import activate_soft_delete_hook
@@ -29,14 +30,12 @@ def generate_soft_delete_mixin_class(
         def delete_method(_self, v: Optional[Any] = None):
             setattr(_self, deleted_field_name, v or delete_method_default_value())
             if handle_cascade_delete:
-                from sqlalchemy.inspection import inspect
-
                 for relation in inspect(_self.__class__).relationships.items():
                     if relation[1].cascade.delete:  # Relationship has a cascade delete
                         # Item has a delete_at field (thus supports soft-delete)
-                        if 'deleted_at' in relation[1].entity.columns.keys():
+                        if deleted_field_name in relation[1].entity.columns.keys():
                             # Cascade soft delete for each item
-                            for item in _self.__getattribute__(relation[0]):
+                            for item in getattr(_self, relation[0]):
                                 item_deleter = getattr(item, delete_method_name)
                                 item_deleter()
 
@@ -45,18 +44,20 @@ def generate_soft_delete_mixin_class(
     if generate_undelete_method:
 
         def undelete_method(_self):
-            setattr(_self, deleted_field_name, None)
             if handle_cascade_delete:
-                from sqlalchemy.inspection import inspect
-
                 for relation in inspect(_self.__class__).relationships.items():
                     if relation[1].cascade.delete:  # Relationship has a cascade delete
                         # Item has a delete_at field (thus supports soft-delete)
-                        if 'deleted_at' in relation[1].entity.columns.keys():
-                            # Cascade soft delete for each item
-                            for item in _self.__getattribute__(relation[0]):
+                        if deleted_field_name in relation[1].entity.columns.keys():
+                            # Cascade undelete - must manually query to get deleted rows
+                            primary_key_name = inspect(_self.__class__).primary_key[0].name
+                            related_items = relation[1].entity.class_.query.execution_options(include_deleted=True).\
+                                filter(text(primary_key_name + '==' + str(getattr(_self, primary_key_name)))).all()
+                            for item in related_items:
                                 item_undeleter = getattr(item, undelete_method_name)
                                 item_undeleter()
+
+            setattr(_self, deleted_field_name, None)
 
         class_attributes[undelete_method_name] = undelete_method
 
