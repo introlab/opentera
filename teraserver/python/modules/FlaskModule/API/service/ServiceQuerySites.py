@@ -9,6 +9,7 @@ from opentera.db.models.TeraSite import TeraSite
 get_parser = api.parser()
 get_parser.add_argument('id_site', type=int, help='ID of the site to query')
 get_parser.add_argument('id_user', type=int, help='ID of the user to query sites for')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQuerySites(Resource):
@@ -18,16 +19,15 @@ class ServiceQuerySites(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Return sites information.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'})
+    @api.expect(get_parser)
+    @LoginModule.service_token_or_certificate_required
     def get(self):
         args = get_parser.parse_args(strict=True)
-
         service_access = DBManager.serviceAccess(current_service)
 
         sites = []

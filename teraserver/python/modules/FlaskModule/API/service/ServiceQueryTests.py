@@ -25,11 +25,14 @@ get_parser.add_argument('service_uuid', type=str, help='Query all tests associat
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include tests infos and download-upload url')
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 
 delete_parser = api.parser()
 delete_parser.add_argument('uuid', type=str, help='Test UUID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQueryTests(Resource):
@@ -40,16 +43,15 @@ class ServiceQueryTests(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Return tests information.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'})
+    @api.expect(get_parser)
+    @LoginModule.service_token_or_certificate_required
     def get(self):
         service_access = DBManager.serviceAccess(current_service)
-
         args = get_parser.parse_args()
 
         # If we have no arguments, don't do anything!
@@ -116,13 +118,13 @@ class ServiceQueryTests(Resource):
 
         return tests_list
 
-    @LoginModule.service_token_or_certificate_required
-    # @api.expect(post_parser)
     @api.doc(description='Adds a new test to the OpenTera database',
              responses={200: 'Success - test correctly added',
                         400: 'Bad request - wrong or missing parameters in query',
                         500: 'Required parameter is missing',
                         403: 'Service doesn\'t have permission to post that test'})
+    @api.expect(post_parser)
+    @LoginModule.service_token_or_certificate_required
     def post(self):
         service_access = DBManager.serviceAccess(current_service)
 
@@ -245,17 +247,15 @@ class ServiceQueryTests(Resource):
 
         return [update_test.to_json()]
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific test',
              responses={200: 'Success',
                         403: 'Service can\'t delete test',
                         500: 'Database error.'})
+    @api.expect(delete_parser)
+    @LoginModule.service_token_or_certificate_required
     def delete(self):
         service_access = DBManager.serviceAccess(current_service)
-        parser = delete_parser
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         uuid_todel = args['uuid']
 
         test = TeraTest.get_test_by_uuid(uuid_todel)

@@ -19,11 +19,14 @@ get_parser.add_argument('with_device_subtype', type=inputs.boolean, help='Give m
                         default=False)
 get_parser.add_argument('with_device_assets', type=inputs.boolean, help='Give more information about assets',
                         default=False)
+get_parser.add_argument('token', type=str, help='Secret Token')
+
 # Unused for now
-# post_parser = api.parser()
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 
 device_schema = api.schema_model('service_device',
-                               {'properties': TeraDevice.get_json_schema(), 'type': 'object', 'location': 'json'})
+                                 {'properties': TeraDevice.get_json_schema(), 'type': 'object', 'location': 'json'})
 
 
 class ServiceQueryDevices(Resource):
@@ -34,13 +37,13 @@ class ServiceQueryDevices(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Return device information.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'})
+    @api.expect(get_parser)
+    @LoginModule.service_token_or_certificate_required
     def get(self):
         args = get_parser.parse_args()
         # args['device_uuid'] Will be None if not specified in args
@@ -71,16 +74,15 @@ class ServiceQueryDevices(Resource):
         return gettext('Missing arguments'), 400
 
     @LoginModule.service_token_or_certificate_required
+    @api.expect(post_parser)
     @api.expect(device_schema, validate=True)
-    @api.doc(description='To be documented '
-                         'To be documented',
-             responses={200: 'Success - To be documented',
+    @api.doc(description='Update device information ',
+             responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'})
     def post(self):
         # args = post_parser.parse_args()
-
         # Using request.json instead of parser, since parser messes up the json!
         if 'device' not in request.json:
             return gettext('Missing arguments'), 400

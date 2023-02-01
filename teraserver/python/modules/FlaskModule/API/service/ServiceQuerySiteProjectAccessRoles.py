@@ -9,6 +9,7 @@ get_parser = api.parser()
 get_parser.add_argument('id_project', type=int, help='ID of the project to query')
 get_parser.add_argument('id_site', type=int, help='ID of the site to query')
 get_parser.add_argument('uuid_user', type=str, help='UUID of the user', required=True)
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQuerySiteProjectAccessRoles(Resource):
@@ -19,16 +20,15 @@ class ServiceQuerySiteProjectAccessRoles(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Return sessions information.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'})
+    @api.expect(get_parser)
+    @LoginModule.service_token_or_certificate_required
     def get(self):
-        parser = get_parser
-        args = parser.parse_args(strict=True)
+        args = get_parser.parse_args(strict=True)
         service_access = DBManager.serviceAccess(current_service)
 
         project_admin_info = {

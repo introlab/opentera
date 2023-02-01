@@ -18,6 +18,7 @@ get_parser.add_argument('id_participant', type=int, help='ID of the participant 
 get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the device to query', default=None)
 get_parser.add_argument('id_device', type=int, help='ID of the device to query', default=None)
 get_parser.add_argument('device_uuid', type=str, help='Device uuid of the device to query', default=None)
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQueryDisconnect(Resource):
@@ -36,7 +37,6 @@ class ServiceQueryDisconnect(Resource):
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
-
         args = get_parser.parse_args()
         service_access: DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
 

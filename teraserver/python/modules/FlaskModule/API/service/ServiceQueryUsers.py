@@ -8,8 +8,7 @@ from modules.FlaskModule.FlaskModule import service_api_ns as api
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('user_uuid', type=str, help='User uuid of the user to query')
-
-post_parser = api.parser()
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQueryUsers(Resource):
@@ -20,15 +19,14 @@ class ServiceQueryUsers(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Return user information.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'})
+    @api.expect(get_parser)
+    @LoginModule.service_token_or_certificate_required
     def get(self):
-
         args = get_parser.parse_args()
 
         # args['user_id'] Will be None if not specified in args

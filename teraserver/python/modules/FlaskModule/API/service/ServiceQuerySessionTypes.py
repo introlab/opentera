@@ -12,6 +12,7 @@ get_parser = api.parser()
 get_parser.add_argument('id_site', type=int, help='ID of the site to query session types for')
 get_parser.add_argument('id_project', type=int, help='ID of the project to query session types for')
 get_parser.add_argument('id_participant', type=int, help='ID of the participant to query types for')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQuerySessionTypes(Resource):
@@ -21,16 +22,15 @@ class ServiceQuerySessionTypes(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Return session types information for the current service',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'})
+    @api.expect(get_parser)
+    @LoginModule.service_token_or_certificate_required
     def get(self):
-        parser = get_parser
-        args = parser.parse_args()
+        args = get_parser.parse_args()
         service_access = DBManager.serviceAccess(current_service)
 
         session_types = []

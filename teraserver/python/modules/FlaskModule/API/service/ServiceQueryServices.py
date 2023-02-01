@@ -12,6 +12,7 @@ get_parser.add_argument('id_service', type=int, help='ID of the service to query
 get_parser.add_argument('uuid_service', type=str, help='UUID of the service to query')
 get_parser.add_argument('service_key', type=str, help='Key of the service to query')
 get_parser.add_argument('with_base_url', type=inputs.boolean, help='Also include base external URL for that service')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQueryServices(Resource):
@@ -21,16 +22,15 @@ class ServiceQueryServices(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Return services information.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'})
+    @api.expect(get_parser)
+    @LoginModule.service_token_or_certificate_required
     def get(self):
-        parser = get_parser
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         services = []
         # Can only query service with a key, id or uuid
