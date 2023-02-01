@@ -12,16 +12,17 @@ from sqlalchemy import exc
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query events for', required=True)
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session_event', type=str, location='json', help='Session event to create / update',
-#                          required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_session_event', {'properties': TeraSessionEvent.get_json_schema(),
                                                       'type': 'object',
                                                       'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Session event ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQuerySessionEvents(Resource):
@@ -68,6 +69,7 @@ class UserQuerySessionEvents(Resource):
                         403: 'Logged user can\'t create/update the specified event',
                         400: 'Badly formed JSON or missing fields(id_session_event or id_session) in the JSON body',
                         500: 'Internal error when saving device'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

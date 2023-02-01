@@ -14,16 +14,17 @@ get_parser = api.parser()
 get_parser.add_argument('id_device_subtype', type=int, help='ID of the device subtype to query')
 get_parser.add_argument('id_device_type', type=int, help='ID of the device type from which to get all subtypes')
 get_parser.add_argument('list', type=inputs.boolean, help='Return minimal information')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('device_subtype', type=str, location='json', help='Device subtype to create / update',
-#                          required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_device_subtype', {'properties': TeraDeviceSubType.get_json_schema(),
                                                        'type': 'object',
                                                        'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Device subtype ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryDeviceSubTypes(Resource):
@@ -94,6 +95,7 @@ class UserQueryDeviceSubTypes(Resource):
                         400: 'Badly formed JSON or missing fields(id_device_subtype or id_device_type) in the JSON '
                              'body',
                         500: 'Internal error occured when saving device subtype'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

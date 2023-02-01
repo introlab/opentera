@@ -33,6 +33,7 @@ get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only inclu
                                                                      'Will ignore with_urls if specified.')
 get_parser.add_argument('full', type=inputs.boolean, help='Also include names of sessions, users, services, ... in the '
                                                           'reply')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryAssets(Resource):

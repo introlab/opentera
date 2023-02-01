@@ -7,6 +7,7 @@ from flask_babel import gettext
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to undelete')
 get_parser.add_argument('id_asset', type=int, help='ID of the asset to undelete')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryUndelete(Resource):

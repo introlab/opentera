@@ -25,16 +25,17 @@ get_parser.add_argument('id_specific', type=str, help='ID of the specific config
 get_parser.add_argument('with_empty', type=inputs.boolean, help='Also include empty configs for services without '
                                                                 'config.')
 get_parser.add_argument('list', type=inputs.boolean, help='Also includes a list of all available specifics configs.')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('service_config', {'properties': TeraServiceConfig.get_json_schema(),
                                                   'type': 'object',
                                                   'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Service config ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryServiceConfig(Resource):
@@ -112,6 +113,7 @@ class UserQueryServiceConfig(Resource):
                         400: 'Badly formed JSON or missing fields(service_config, id_service_config, id_service) in the'
                              ' JSON body',
                         500: 'Internal error when saving service config'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

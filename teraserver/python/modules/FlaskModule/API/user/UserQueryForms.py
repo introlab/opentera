@@ -49,6 +49,7 @@ get_parser.add_argument(name='id', type=int, help='Specific id of subitem to que
 get_parser.add_argument(name='id_project', type=int, help='Specific id_project used to limit arrays list in some forms')
 get_parser.add_argument(name='id_site', type=int, help='Specific id_site used to limit arrays list in some forms')
 get_parser.add_argument(name='key', type=str, help='Specific key of subitem to query. Used with service_config.')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryForms(Resource):

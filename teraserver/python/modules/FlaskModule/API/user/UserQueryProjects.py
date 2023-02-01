@@ -21,16 +21,17 @@ get_parser.add_argument('id_service', type=int, help='ID of the service from whi
 get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get all projects that are accessible')
 get_parser.add_argument('name', type=str, help='Project to query by name')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('project', type=str, location='json', help='Project to create / update', required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_project', {'properties': TeraProject.get_json_schema(),
                                                 'type': 'object',
                                                 'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Project ID to delete', required=True)
-
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 class UserQueryProjects(Resource):
 
@@ -115,6 +116,7 @@ class UserQueryProjects(Resource):
                         403: 'Logged user can\'t create/update the specified project',
                         400: 'Badly formed JSON or missing fields(id_site or id_project) in the JSON body',
                         500: 'Internal error occured when saving project'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

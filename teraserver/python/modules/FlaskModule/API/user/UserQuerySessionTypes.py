@@ -16,17 +16,17 @@ get_parser.add_argument('id_session_type', type=int, help='ID of the session typ
 get_parser.add_argument('id_project', type=int, help='ID of the project to get session type for')
 get_parser.add_argument('id_site', type=int, help='ID of the site to get session types for')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session_type', type=str, location='json', help='Session type to create / update',
-#                          required=True)
-
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_session_type', {'properties': TeraSessionType.get_json_schema(),
                                                      'type': 'object',
                                                      'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Session type ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQuerySessionTypes(Resource):
@@ -84,6 +84,7 @@ class UserQuerySessionTypes(Resource):
                         403: 'Logged user can\'t create/update the specified session type',
                         400: 'Badly formed JSON or missing field(id_session_type) in the JSON body',
                         500: 'Internal error when saving session type'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

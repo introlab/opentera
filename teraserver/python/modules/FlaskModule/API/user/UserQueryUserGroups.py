@@ -17,15 +17,17 @@ get_parser.add_argument('id_user_group', type=int, help='ID of the user group to
 get_parser.add_argument('id_user', type=int, help='ID of the user to get all user groups')
 get_parser.add_argument('id_site', type=int, help='ID of the site to get all user groups with access in that site')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('user_group', type=str, location='json', help='User group to create / update', required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_group', {'properties': TeraUserGroup.get_json_schema(),
                                               'type': 'object',
                                               'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='User group ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryUserGroups(Resource):
@@ -122,6 +124,7 @@ class UserQueryUserGroups(Resource):
                         403: 'Logged user can\'t create/update the specified user group',
                         400: 'Badly formed JSON or missing field(id_user_group) in the JSON body',
                         500: 'Internal error when saving user group'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

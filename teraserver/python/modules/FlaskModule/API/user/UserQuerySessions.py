@@ -25,15 +25,17 @@ get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the 
 get_parser.add_argument('start_date', type=inputs.date, help='Start date, sessions before that date will be ignored')
 get_parser.add_argument('end_date', type=inputs.date, help='End date, sessions after that date will be ignored')
 get_parser.add_argument('with_session_type', type=inputs.boolean, help='Include session type informations')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_session', {'properties': TeraSession.get_json_schema(),
                                                 'type': 'object',
                                                 'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Session ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQuerySessions(Resource):
@@ -110,6 +112,7 @@ class UserQuerySessions(Resource):
                         400: 'Badly formed JSON or missing fields(session, id_session, session_participants_ids and/or '
                              'session_users_ids[for new sessions]) in the JSON body',
                         500: 'Internal error when saving session'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

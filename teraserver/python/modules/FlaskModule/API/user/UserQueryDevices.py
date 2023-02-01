@@ -39,15 +39,17 @@ get_parser.add_argument('with_sites', type=inputs.boolean, help='Flag that indic
                                                                 'should be included in the returned device list')
 get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
                                                                  'for each device')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('device', type=str, location='json', help='Device to create / update', required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_device', {'properties': TeraDevice.get_json_schema(),
                                                'type': 'object',
                                                'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Device ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryDevices(Resource):
@@ -237,6 +239,7 @@ class UserQueryDevices(Resource):
                         403: 'Logged user can\'t create/update the specified device',
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
                         500: 'Internal error occured when saving device'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

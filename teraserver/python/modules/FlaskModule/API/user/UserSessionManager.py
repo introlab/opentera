@@ -14,6 +14,7 @@ import json
 post_parser = api.parser()
 post_parser.add_argument('session_manage', type=str, location='json', help='Informations to manage the session',
                          required=True)
+post_parser.add_argument('token', type=str, help='Secret Token')
 
 session_manager_schema = api.schema_model('session_manage', {
     'properties': {
@@ -90,6 +91,7 @@ class UserSessionManager(Resource):
                         500: 'Internal server error',
                         501: 'Not implemented',
                         403: 'Logged user doesn\'t have enough permission'})
+    @api.expect(post_parser)
     @api.expect(session_manager_schema)
     @user_multi_auth.login_required
     def post(self):

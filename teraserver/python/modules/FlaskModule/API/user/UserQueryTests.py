@@ -24,9 +24,14 @@ get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only inclu
                                                                      'Will ignore with_urls if specified.')
 get_parser.add_argument('full', type=inputs.boolean, help='Also include names of sessions, users, services, ... in the '
                                                           'reply')
+get_parser.add_argument('token', type=str, help='Secret Token')
+
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 
 delete_parser = api.parser()
 delete_parser.add_argument('id', type=int, help='Test type ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryTests(Resource):
@@ -113,6 +118,7 @@ class UserQueryTests(Resource):
 
     @api.doc(description='Delete test.',
              responses={501: 'Unable to update test from here - use service!'})
+    @api.expect(post_parser)
     @user_multi_auth.login_required
     def post(self):
         return gettext('Test information update and creation must be done directly into a service (such as '

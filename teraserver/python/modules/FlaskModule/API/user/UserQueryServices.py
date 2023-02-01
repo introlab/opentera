@@ -22,16 +22,17 @@ get_parser.add_argument('service_key', type=str, help='Service Key to query')
 get_parser.add_argument('key', type=str, help='Alias for "service_key"')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_config', type=inputs.boolean, help='Only return services with editable configuration')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('service', type=str, location='json', help='Service to create / update', required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_service', {'properties': TeraService.get_json_schema(),
                                                 'type': 'object',
                                                 'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Service ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryServices(Resource):
@@ -111,6 +112,7 @@ class UserQueryServices(Resource):
                         403: 'Logged user can\'t create/update the specified service',
                         400: 'Badly formed JSON or missing fields(id_service) in the JSON body',
                         500: 'Internal error occured when saving service'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

@@ -11,6 +11,7 @@ from opentera.modules.BaseModule import ModuleNames
 from modules.DatabaseModule.DBManager import DBManager
 
 get_parser = api.parser()
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryOnlineParticipants(Resource):

@@ -11,6 +11,7 @@ from opentera.modules.BaseModule import ModuleNames
 from modules.DatabaseModule.DBManager import DBManager
 
 get_parser = api.parser()
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryOnlineDevices(Resource):
@@ -54,10 +55,4 @@ class UserQueryOnlineDevices(Resource):
                                          UserQueryOnlineDevices.__name__,
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Internal server error when making RPC call.'), 500
-
-    # def post(self):
-    #     return '', 501
-    #
-    # def delete(self):
-    #     return '', 501
 

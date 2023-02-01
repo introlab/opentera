@@ -26,17 +26,17 @@ get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the 
 get_parser.add_argument('with_usergroups', type=inputs.boolean, help='Include usergroups information for each user.')
 get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
                                                                  'for each user')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-post_parser = reqparse.RequestParser()
-# post_parser.add_argument('user', type=str, location='json', help='User to create / update. If structure has a field '
-#                                                                '"user_groups", also update user groups for that user',
-#                          required=True)
 
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_user', {'properties': TeraUser.get_json_schema(), 'type': 'object',
                                              'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='User ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryUsers(Resource):
@@ -162,6 +162,7 @@ class UserQueryUsers(Resource):
                              'JSON body',
                         409: 'Username is already taken',
                         500: 'Internal error when saving user'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

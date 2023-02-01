@@ -22,16 +22,16 @@ get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the 
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include test types urls')
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session_type', type=str, location='json', help='Session type to create / update',
-#                          required=True)
-
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_test_type', {'properties': TeraTestType.get_json_schema(), 'type': 'object',
                                                   'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Test type ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryTestTypes(Resource):
@@ -119,6 +119,7 @@ class UserQueryTestTypes(Resource):
                         403: 'Logged user can\'t create/update the specified test type',
                         400: 'Badly formed JSON or missing field in the JSON body',
                         500: 'Internal error when saving test type'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

@@ -16,16 +16,17 @@ get_parser.add_argument('id_group', type=int, help='ID of the participant group 
 get_parser.add_argument('id_project', type=int, help='ID of the project from which to get all participant groups')
 get_parser.add_argument('id', type=int, help='Alias for "id_group"')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('group', type=str, location='json', help='Participant group to create / update',
-# required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_participant_group', {'properties': TeraParticipantGroup.get_json_schema(),
                                                           'type': 'object',
                                                           'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Participant Group ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryParticipantGroup(Resource):
@@ -84,6 +85,7 @@ class UserQueryParticipantGroup(Resource):
                         403: 'Logged user can\'t create/update the specified device',
                         400: 'Badly formed JSON or missing fields(id_participant_group or id_project) in the JSON body',
                         500: 'Internal error occurred when saving device'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

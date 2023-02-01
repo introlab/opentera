@@ -16,18 +16,18 @@ get_parser = api.parser()
 get_parser.add_argument('id_device_type', type=int, help='ID of the device type')
 get_parser.add_argument('device_type_key', type=str, help='Key of the device type')
 get_parser.add_argument('list', type=inputs.boolean, help='List of all device types')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('id_device_type', type=str, location='json', help='Device type to create / update',
-#                          required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('device_type', {'properties': TeraDeviceType.get_json_schema(),
-                                                  'type': 'object',
-                                                  'location': 'json'})
+                                               'type': 'object',
+                                               'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Device type ID to delete')
 delete_parser.add_argument('device_type_key', type=str, help='Unique device key to delete')
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryDeviceTypes(Resource):
@@ -87,6 +87,7 @@ class UserQueryDeviceTypes(Resource):
                         400: 'Badly formed JSON or missing fields(id_device_name or id_device_type) in the JSON '
                              'body',
                         500: 'Internal error occured when saving device type'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

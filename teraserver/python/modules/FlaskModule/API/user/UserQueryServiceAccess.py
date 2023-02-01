@@ -15,7 +15,10 @@ get_parser.add_argument('id_user_group', type=int, help='Usergroup ID to query s
 get_parser.add_argument('id_participant_group', type=int, help='Participant group ID to query service access')
 get_parser.add_argument('id_device', type=int, help='Device ID to query service access')
 get_parser.add_argument('id_service', type=int, help='Service ID to query associated access from')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_service_access', {'properties': TeraServiceAccess.get_json_schema(),
                                                        'type': 'object',
                                                        'location': 'json'})
@@ -24,6 +27,7 @@ delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific service access ID to delete. '
                                                 'Be careful: this is not the service or service role ID, but the ID'
                                                 ' of the association itself!', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryServiceAccess(Resource):
@@ -82,6 +86,7 @@ class UserQueryServiceAccess(Resource):
                         403: 'Logged user can\'t modify association (only site admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',
                         500: 'Internal error occurred when saving association'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

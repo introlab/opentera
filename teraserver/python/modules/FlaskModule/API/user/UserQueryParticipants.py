@@ -36,16 +36,19 @@ get_parser.add_argument('limit', type=int, help='Returns at most "limit" partici
 
 get_parser.add_argument('no_group', type=inputs.boolean,
                         help='Flag that limits the returned data with only participants without a group')
+get_parser.add_argument('token', type=str, help='Secret Token')
 # get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
 #                                                                  'for each participant')
 
-# post_parser = reqparse.RequestParser()
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_participant', {'properties': TeraParticipant.get_json_schema(),
                                                     'type': 'object',
                                                     'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Participant ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryParticipants(Resource):
@@ -205,6 +208,7 @@ class UserQueryParticipants(Resource):
                         400: 'Badly formed JSON or missing fields(id_participant or id_project/id_group [only one of '
                              'them]) in the JSON body, or mismatch between id_project and participant group project',
                         500: 'Internal error when saving participant'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

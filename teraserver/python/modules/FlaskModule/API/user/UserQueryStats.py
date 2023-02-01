@@ -26,6 +26,7 @@ get_parser.add_argument('with_warnings', type=inputs.boolean, help='Also include
                                                                    'participant not having sessions for some time or '
                                                                    'users not having logged on for some time. Can only '
                                                                    'be used with "id_site" for now.')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryUserStats(Resource):

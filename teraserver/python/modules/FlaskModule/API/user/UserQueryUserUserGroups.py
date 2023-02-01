@@ -16,15 +16,17 @@ get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the 
 get_parser.add_argument('with_empty', type=inputs.boolean, help="Used with id_user, also returns users groups that the "
                                                                 "user is not part of. Used with id_user_group, also "
                                                                 "returns users not part of that user group.")
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('user_group', type=str, location='json', help='User group to create / update', required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_user_group', {'properties': TeraUserUserGroup.get_json_schema(),
                                                    'type': 'object',
                                                    'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='User - User group relationship ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryUserUserGroups(Resource):
@@ -79,6 +81,7 @@ class UserQueryUserUserGroups(Resource):
                         403: 'Logged user can\'t create/update the specified user group',
                         400: 'Badly formed JSON or missing field(id_user_group) in the JSON body',
                         500: 'Internal error when saving user group'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

@@ -24,10 +24,10 @@ get_parser.add_argument('id_device_type', type=int, help='ID of device type from
                                                          'associated participants')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ids only)')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('device_participant', type=str, location='json',
-#                          help='Device participant to create / update', required=True)
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_device_participant', {'properties': TeraDeviceParticipant.get_json_schema(),
                                                            'type': 'object',
                                                            'location': 'json'})
@@ -36,6 +36,7 @@ delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific device-participant association ID to delete. Be careful: this'
                                                 ' is not the device or the participant ID, but the ID of the '
                                                 'association itself!', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 model = api.model('QueryDeviceParticipants', {
@@ -108,6 +109,7 @@ class UserQueryDeviceParticipants(Resource):
                         403: 'Logged user can\'t modify device association',
                         400: 'Badly formed JSON or missing fields(id_participant or id_device) in the JSON body',
                         500: 'Internal error occured when saving device association'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

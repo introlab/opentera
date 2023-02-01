@@ -26,8 +26,10 @@ get_parser.add_argument('with_empty', type=inputs.boolean, help='Used with id_si
                                                                 'that don\'t have any access to the site. Used with '
                                                                 'id_user_group, also return sites that don\'t '
                                                                 'have any access with that user group')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
-# post_parser = reqparse.RequestParser()
+post_parser = api.parser()
+post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_site_access', {
     'properties': {
         'site_access': {
@@ -54,6 +56,7 @@ post_schema = api.schema_model('user_site_access', {
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Site Access ID to delete', required=True)
+delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQuerySiteAccess(Resource):
@@ -156,6 +159,7 @@ class UserQuerySiteAccess(Resource):
                         403: 'Logged user can\'t modify this site or user access (site admin access required)',
                         400: 'Badly formed JSON or missing fields(id_user or id_site) in the JSON body',
                         500: 'Database error'})
+    @api.expect(post_parser)
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
