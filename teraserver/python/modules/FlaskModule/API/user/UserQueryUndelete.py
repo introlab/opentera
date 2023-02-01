@@ -16,23 +16,21 @@ class UserQueryUndelete(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Undelete an item if that item can be undeleted. Only one ID is supported at once',
              responses={200: 'Success - item was undeleted',
                         400: 'Required parameter is missing',
                         401: 'Requested item not found or is undeletable',
                         403: 'Access level insufficient to access that API or the item to undelete',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         if not current_user.user_superadmin:
             return gettext('No access to this API'), 403
 
         # For now, only super admins can undelete, so no need to check for access to the item to undelete
         # This should be done when / if that API is opened to site admins (for example)
-
-        parser = get_parser
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         object_to_undelete = None
         if args['id_session']:

@@ -5,6 +5,7 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraDevice import TeraDevice
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -42,18 +43,15 @@ class UserQuerySessions(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get sessions information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of sessions',
                         400: 'No parameters specified at least one id must be used',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         sessions = []
         # Can't query sessions, unless we have a parameter!
@@ -104,7 +102,6 @@ class UserQuerySessions(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
     @api.doc(description='Create / update session. id_session must be set to "0" to create a new '
                          'session. A session can be created/modified if the user has access to all participants and '
                          'users in the session.',
@@ -114,10 +111,8 @@ class UserQuerySessions(Resource):
                              'session_users_ids[for new sessions]) in the JSON body',
                         500: 'Internal error when saving session'})
     @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-        from opentera.db.models.TeraDevice import TeraDevice
-
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:
@@ -220,19 +215,16 @@ class UserQuerySessions(Resource):
 
         return [update_session.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific session',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete session (must have access to all participants and users in the '
                              'session to delete)',
                         500: 'Database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

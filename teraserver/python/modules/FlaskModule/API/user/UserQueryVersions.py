@@ -1,7 +1,7 @@
 from flask import session, request
 from flask_restx import Resource
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 from opentera.utils.TeraVersions import TeraVersions, ClientVersions
@@ -24,31 +24,27 @@ class UserQueryVersions(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get server versions',
              responses={200: 'Success - returns list of assets',
                         400: 'Required parameter is missing',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         # As soon as we are authorized, we can output the server versions
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         args = get_parser.parse_args()
 
         current_settings = json.loads(TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerVersions))
         return current_settings
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Post server versions',
              responses={200: 'Success - asset posted',
                         500: 'Database error occurred',
                         403: 'Logged user doesn\'t have permission to delete the requested asset (must be an user of'
                              'the related project)'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-
         # Only superuser can change the versions settings
         # Only some fields can be changed.
         if current_user.user_superadmin:

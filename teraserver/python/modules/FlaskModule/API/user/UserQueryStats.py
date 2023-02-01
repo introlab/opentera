@@ -35,17 +35,14 @@ class UserQueryUserStats(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get stats for the specified item.',
              responses={200: 'Success',
                         400: 'Missing parameter - one id must be specified.',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        parser = get_parser
-
-        args = parser.parse_args()
-
+        args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
         if args['id_user_group']:

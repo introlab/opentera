@@ -1,6 +1,6 @@
 from flask import jsonify, session
 from flask_restx import Resource, reqparse
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
 from flask_babel import gettext
@@ -58,16 +58,14 @@ class UserQueryForms(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get json description of standard input form for the specified data type.',
              responses={200: 'Success',
                         400: 'Missing required parameter',
                         500: 'Unknown or unsupported data type'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        parser = get_parser
-        args = parser.parse_args()
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
+        args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
         # if args['type'] == 'user_profile':

@@ -47,20 +47,16 @@ class UserQueryServiceProjects(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get services that are associated with a project. Only one "ID" parameter required and '
                          'supported at once.',
              responses={200: 'Success - returns list of services - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error when getting association'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        # current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         service_projects = []
         # If we have no arguments, return error
@@ -127,17 +123,16 @@ class UserQueryServiceProjects(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update service - project association. If a "service" json is received, the list of '
                          '"projects" is replaced. If a "project" json is received, the list of "services" is replaced.'
                          'If a "service_project" is received, each of the item in the list is added.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only site admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',
-                        500: 'Internal error occured when saving association'})
+                        500: 'Internal error occurred when saving association'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -267,17 +262,15 @@ class UserQueryServiceProjects(Resource):
 
         return jsonify(update_sp)
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific service - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (not site admin of the associated project)',
                         500: 'Association not found or database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

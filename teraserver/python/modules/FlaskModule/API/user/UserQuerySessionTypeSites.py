@@ -41,19 +41,16 @@ class UserQuerySessionTypeSites(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get session types that are related to a site. Only one "ID" parameter required and supported'
                          ' at once.',
              responses={200: 'Success - returns list of session types - sites association',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading devices for sites'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         sts_sites = []
         # If we have no arguments, return error
@@ -102,15 +99,14 @@ class UserQuerySessionTypeSites(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update session types associated with a site.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify device association',
                         400: 'Badly formed JSON or missing fields(id_site or id_device) in the JSON body',
                         500: 'Internal error occured when saving device association'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
         user_access = DBManager.userAccess(current_user)
 
         # Only super admins can change session type - site associations
@@ -222,18 +218,15 @@ class UserQuerySessionTypeSites(Resource):
 
         return json_sts
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific session type-site association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (no admin access to site)',
                         500: 'Session type - site association not found or database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        # current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

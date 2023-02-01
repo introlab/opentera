@@ -1,7 +1,7 @@
 from flask import session, request
 from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDeviceSubType import TeraDeviceSubType
@@ -33,21 +33,17 @@ class UserQueryDeviceSubTypes(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get devices subtypes. Only one of the ID parameter is supported at once.',
              responses={200: 'Success - returns list of devices subtypes',
                         400: 'No parameters specified at least one id must be used',
                         403: 'Forbidden access to the device type specified. Please check that the user has access to a'
                              ' session type containing that device type.',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
         has_list = args.pop('list')
 
         #  if we have 2 IDs, return error
@@ -91,8 +87,6 @@ class UserQueryDeviceSubTypes(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return '', 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update devices subtypes. id_device_subtype must be set to "0" to create a new '
                          'subtype. Only site admins can create new devices subtypes.',
              responses={200: 'Success',
@@ -100,9 +94,9 @@ class UserQueryDeviceSubTypes(Resource):
                         400: 'Badly formed JSON or missing fields(id_device_subtype or id_device_type) in the JSON '
                              'body',
                         500: 'Internal error occured when saving device subtype'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_device_subtype = request.json['device_subtype']
@@ -152,18 +146,15 @@ class UserQueryDeviceSubTypes(Resource):
 
         return [update_device.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific device subtype',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete device subtype (can delete if site admin)',
                         500: 'Device subtype not found or database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

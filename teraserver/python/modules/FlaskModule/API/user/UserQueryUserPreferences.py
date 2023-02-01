@@ -1,7 +1,7 @@
 from flask import session, request
 from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraUserPreference import TeraUserPreference
@@ -26,20 +26,16 @@ class UserQueryUserPreferences(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get user preferences. If no id_user field specified, returns preferences for current user.',
              responses={200: 'Success - returns list of user preferences',
                         400: 'Missing parameter or bad app_tag',
                         403: 'Forbidden access to that user.',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         if not args['id_user']:
             # No id_user specified - query for current user!
@@ -68,8 +64,6 @@ class UserQueryUserPreferences(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update user preferences. Only one preference is allowed for a specific app_tag. '
                          'Preference will be overwritten if app_tag already exists for the user, and will be deleted '
                          'if empty or null. If id_user isn\'t set, will update current user preferences',
@@ -77,9 +71,9 @@ class UserQueryUserPreferences(Resource):
                         403: 'Logged user can\'t create/update the user linked to that preference',
                         400: 'Badly formed JSON or missing fields(app_tag) in the JSON body',
                         500: 'Internal error occured when saving user preference'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_user_pref = request.json['user_preference']

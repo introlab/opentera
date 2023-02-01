@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
@@ -34,17 +34,13 @@ class UserQueryUserUserGroups(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get user - user group information. At least one "id" field must be specified',
              responses={200: 'Success',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        parser = get_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-        args = parser.parse_args()
-
+        args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
         user_user_groups = []
@@ -77,18 +73,15 @@ class UserQueryUserUserGroups(Resource):
                 user_user_groups_list.append(uug_json)
         return user_user_groups_list
 
-    @user_multi_auth.login_required
-    # @api.expect(post_parser)
-    @api.expect(post_schema)
     @api.doc(description='Create / update user - user group relationship, creating it if it doesn\'t exist, updating it'
                          ' otherwise.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified user group',
                         400: 'Badly formed JSON or missing field(id_user_group) in the JSON body',
                         500: 'Internal error when saving user group'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -142,19 +135,16 @@ class UserQueryUserUserGroups(Resource):
 
         return json_user_groups
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific user - user group relationship',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete user group (only a site admin that includes that user group in '
                              'their site can delete)',
                         500: 'Database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

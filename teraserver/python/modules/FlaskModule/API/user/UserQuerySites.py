@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from opentera.db.models.TeraUser import TeraUser
@@ -34,17 +34,14 @@ class UserQuerySites(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get site information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of sites',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        parser = get_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         sites = []
         if args['id']:
@@ -99,8 +96,6 @@ class UserQuerySites(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update site. id_site must be set to "0" to create a new '
                          'site. A site can be created/modified if the user has admin rights to the site itself or is'
                          'superadmin.',
@@ -108,11 +103,9 @@ class UserQuerySites(Resource):
                         403: 'Logged user can\'t create/update the specified site',
                         400: 'Badly formed JSON or missing field(id_site) in the JSON body',
                         500: 'Internal error when saving site'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = reqparse.RequestParser()
-        # parser.add_argument('site', type=str, location='json', help='Site to create / update', required=True)
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_site = request.json['site']
@@ -159,18 +152,14 @@ class UserQuerySites(Resource):
 
         return jsonify([update_site.to_json()])
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific site',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete site (only super admin can delete)',
                         500: 'Database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

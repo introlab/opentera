@@ -9,7 +9,7 @@ from opentera.db.models.TeraDeviceType import TeraDeviceType
 from opentera.db.models.TeraUser import TeraUser
 from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -37,8 +37,6 @@ class UserQueryDeviceTypes(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get devices types. Only one of the ID parameter is supported at once.'
                          ' The ID is dominant on the device_type_key',
              responses={200: 'Success - returns list of devices types',
@@ -46,12 +44,11 @@ class UserQueryDeviceTypes(Resource):
                         403: 'Forbidden access to the device type specified. Please check that the user has access to a'
                              ' session type containing that device type.',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-        args = parser.parse_args()
+        args = get_parser.parse_args()
         device_type = []
 
         # If we have no arguments, return all accessible device types
@@ -83,18 +80,16 @@ class UserQueryDeviceTypes(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Database Error'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update devices types. id_device_type must be set to "0" to create a new '
                          'type. Only site admins can create new devices types.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified device type',
                         400: 'Badly formed JSON or missing fields(id_device_name or id_device_type) in the JSON '
                              'body',
-                        500: 'Internal error occured when saving device type',})
+                        500: 'Internal error occured when saving device type'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_device_type = request.json['device_type']
@@ -142,19 +137,17 @@ class UserQueryDeviceTypes(Resource):
 
         return [update_device.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific device type',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete device type (can delete if site admin)',
                         500: 'Device type not found or database error.',
                         501: 'Tried to delete with 2 parameters'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-        args = parser.parse_args()
-        # To accomodate the 'delete_with_http_auth' function which uses id as args, the id_device_type is rename as id
+        args = delete_parser.parse_args()
+        # To accommodate the 'delete_with_http_auth' function which uses id as args, the id_device_type is rename as id
         # If not argument or both argument incorrect
         if not any([args['id'], args['device_type_key']]):
             return gettext('Missing arguments'), 400

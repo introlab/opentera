@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -39,17 +39,14 @@ class UserQueryProjects(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get projects information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of participants',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        parser = get_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         projects = []
         # If we have no arguments, return all accessible projects
@@ -111,8 +108,6 @@ class UserQueryProjects(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update projects. id_project must be set to "0" to create a new '
                          'project. A project can be created/modified if the user has admin rights to the '
                          'related site.',
@@ -120,10 +115,9 @@ class UserQueryProjects(Resource):
                         403: 'Logged user can\'t create/update the specified project',
                         400: 'Badly formed JSON or missing fields(id_site or id_project) in the JSON body',
                         500: 'Internal error occured when saving project'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_project = request.json['project']
@@ -220,18 +214,15 @@ class UserQueryProjects(Resource):
 
         return [update_project.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific project',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete project (only site admin can delete)',
                         500: 'Database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

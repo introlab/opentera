@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, fields, inputs
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
@@ -52,15 +52,14 @@ class UserQueryDeviceParticipants(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get devices that are related to a participant. Only one "ID" parameter required and supported'
                          ' at once.',
              responses={200: 'Success - returns list of devices - participants association',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading devices for participant'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         args = get_parser.parse_args()
@@ -104,15 +103,14 @@ class UserQueryDeviceParticipants(Resource):
                                          'get', 500, 'Database error', str(e))
             return '', 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update devices associated with a participant.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify device association',
                         400: 'Badly formed JSON or missing fields(id_participant or id_device) in the JSON body',
                         500: 'Internal error occured when saving device association'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -184,18 +182,16 @@ class UserQueryDeviceParticipants(Resource):
 
         return jsonify(update_device_part)
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific device-participant association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete device association',
                         500: 'Device-participant association not found or database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
 
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

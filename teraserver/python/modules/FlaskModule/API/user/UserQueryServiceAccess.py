@@ -3,6 +3,7 @@ from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+from opentera.db.models.TeraServiceRole import TeraServiceRole
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -32,20 +33,16 @@ class UserQueryServiceAccess(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get access roles for a specific items. Only one "ID" parameter required and '
                          'supported at once.',
              responses={200: 'Success - returns list of access roles',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error when getting association'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        from opentera.db.models.TeraServiceAccess import TeraServiceAccess
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         service_access = []
         # If we have no arguments, return error
@@ -80,15 +77,14 @@ class UserQueryServiceAccess(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update service - access association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only site admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',
-                        500: 'Internal error occured when saving association'})
+                        500: 'Internal error occurred when saving association'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        from opentera.db.models.TeraServiceRole import TeraServiceRole
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -187,17 +183,15 @@ class UserQueryServiceAccess(Resource):
 
         return json_sa_list
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific service access.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (not admin of the associated elements)',
                         500: 'Association not found or database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

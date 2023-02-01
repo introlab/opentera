@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDevice import TeraDevice
@@ -70,21 +70,17 @@ class UserQueryDevices(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get devices information. Only one of the ID parameter is supported at once. If no ID is '
                          'specified, returns all accessible devices for the logged user.',
              responses={200: 'Success - returns list of devices',
                         400: 'User Error : Too Many IDs',
                         403: 'Forbidden access',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         if args['id']:
             args['id_device'] = args['id']
@@ -234,8 +230,6 @@ class UserQueryDevices(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return '', 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update devices. id_device must be set to "0" to create a new device. Only '
                          'superadmins can create new devices, site admin can update and project admin can modify config'
                          ' and notes.',
@@ -243,9 +237,9 @@ class UserQueryDevices(Resource):
                         403: 'Logged user can\'t create/update the specified device',
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
                         500: 'Internal error occured when saving device'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_device = request.json['device']
@@ -387,19 +381,16 @@ class UserQueryDevices(Resource):
 
         return [update_device.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific device',
              responses={200: 'Success',
                         400: 'Wrong ID/ No ID',
                         403: 'Logged user can\'t delete device (can delete if superadmin)',
                         500: 'Device not found or database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

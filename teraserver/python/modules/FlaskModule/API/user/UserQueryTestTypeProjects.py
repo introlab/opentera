@@ -46,19 +46,16 @@ class UserQueryTestTypeProjects(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get test types that are associated with a project. Only one "ID" parameter required and '
                          'supported at once.',
              responses={200: 'Success - returns list of test-types - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error when getting association'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         test_type_projects = []
         # If we have no arguments, return error
@@ -113,13 +110,13 @@ class UserQueryTestTypeProjects(Resource):
                                          'get', 500, 'InvalidRequestError', e)
             return '', 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update test-type - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (project admin access required)',
                         400: 'Badly formed JSON or missing fields in the JSON body',
                         500: 'Internal error occured when saving association'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
         user_access = DBManager.userAccess(current_user)
 
@@ -241,17 +238,15 @@ class UserQueryTestTypeProjects(Resource):
 
         return json_ttp
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific test-type - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (no access to test-type or project)',
                         400: 'Association not found (invalid id?)'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraSession import TeraSession
@@ -55,19 +55,15 @@ class UserQueryParticipants(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get participants information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of participants',
                         400: 'No parameters specified at least one id must be used',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         participants = []
         if args['id']:
@@ -201,8 +197,6 @@ class UserQueryParticipants(Resource):
                                          'get', 500, 'Database error', str(e))
             return '', 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update participants. id_participant must be set to "0" to create a new '
                          'participant. A participant can be created/modified if the user has admin rights to the '
                          'project.',
@@ -211,8 +205,9 @@ class UserQueryParticipants(Resource):
                         400: 'Badly formed JSON or missing fields(id_participant or id_project/id_group [only one of '
                              'them]) in the JSON body, or mismatch between id_project and participant group project',
                         500: 'Internal error when saving participant'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'participant' not in request.json:
@@ -325,19 +320,15 @@ class UserQueryParticipants(Resource):
 
         return jsonify([update_participant_json])
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific participant',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete participant (only project admin can delete)',
                         500: 'Database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

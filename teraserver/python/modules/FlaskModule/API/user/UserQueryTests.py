@@ -36,12 +36,12 @@ class UserQueryTests(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get test information. Only one of the ID parameter is supported at once',
              responses={200: 'Success - returns list of assets',
                         400: 'Required parameter is missing',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
@@ -111,22 +111,21 @@ class UserQueryTests(Resource):
 
         return tests_list
 
-    @user_multi_auth.login_required
     @api.doc(description='Delete test.',
              responses={501: 'Unable to update test from here - use service!'})
+    @user_multi_auth.login_required
     def post(self):
         return gettext('Test information update and creation must be done directly into a service (such as '
                        'Test service)'), 501
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific test',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete test',
                         500: 'Database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
         user_access = DBManager.userAccess(current_user)
-
         args = delete_parser.parse_args(strict=True)
         id_todel = args['id']
 

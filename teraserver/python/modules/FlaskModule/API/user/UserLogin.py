@@ -29,9 +29,9 @@ class UserLogin(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_http_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Login to the server using HTTP Basic Authentification (HTTPAuth)')
+    @api.expect(get_parser)
+    @user_http_auth.login_required
     def get(self):
 
         parser = get_parser

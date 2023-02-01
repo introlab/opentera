@@ -2,10 +2,11 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 from modules.DatabaseModule.DBManager import DBManager
 import modules.Globals as Globals
@@ -62,19 +63,15 @@ class UserQuerySiteAccess(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get user roles for sites. Only one  parameter required and supported at once.',
              responses={200: 'Success - returns list of users roles in sites',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading sites roles'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        from opentera.db.models.TeraSite import TeraSite
-        parser = get_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         access = None
         # If we have no arguments, return bad request
@@ -154,17 +151,14 @@ class UserQuerySiteAccess(Resource):
         # No access, but still fine
         return [], 200
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update site access for a user group.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify this site or user access (site admin access required)',
                         400: 'Badly formed JSON or missing fields(id_user or id_site) in the JSON body',
                         500: 'Database error'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_sites = request.json['site_access']
@@ -249,19 +243,15 @@ class UserQuerySiteAccess(Resource):
 
         return json_rval
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific site access',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete site access(only user who is admin in that site can remove it)',
                         500: 'Database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         site_access = TeraServiceAccess.get_service_access_by_id(id_todel)

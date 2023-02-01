@@ -41,19 +41,16 @@ class UserQueryDeviceSites(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get devices that are related to a site. Only one "ID" parameter required and supported'
                          ' at once.',
              responses={200: 'Success - returns list of devices - sites association',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error occured when loading devices for sites'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         device_sites = []
         # If we have no arguments, return error
@@ -108,17 +105,14 @@ class UserQueryDeviceSites(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update devices associated with a site.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify device association',
                         400: 'Badly formed JSON or missing fields(id_site or id_device) in the JSON body',
                         500: 'Internal error occured when saving device association'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-        # user_access = DBManager.userAccess(current_user)
-
         # Only super admins can change service - site associations
         if not current_user.user_superadmin:
             return gettext('Forbidden'), 403
@@ -219,75 +213,16 @@ class UserQueryDeviceSites(Resource):
 
         return json_dss
 
-        # current_user: TeraUser = TeraUser.get_user_by_uuid(session['_user_id'])
-        # user_access = DBManager.userAccess(current_user)
-        #
-        # if not current_user.user_superadmin:
-        #     return gettext('Forbidden'), 403
-        #
-        # # Using request.json instead of parser, since parser messes up the json!
-        # json_device_sites = request.json['device_site']
-        # if not isinstance(json_device_sites, list):
-        #     json_device_sites = [json_device_sites]
-        #
-        # # Validate if we have an id
-        # for json_device_site in json_device_sites:
-        #     if 'id_device' not in json_device_site or 'id_site' not in json_device_site:
-        #         return gettext('Missing id_device or id_site'), 400
-        #
-        #     # Check if current user can modify the posted device
-        #     if json_device_site['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True) or \
-        #             json_device_site['id_device'] not in user_access.get_accessible_devices_ids(admin_only=True):
-        #         return gettext('Forbidden'), 403
-        #
-        #     # Check if association already exists
-        #     device_site = TeraDeviceSite.get_device_site_id_for_device_and_site(device_id=json_device_site['id_device'],
-        #                                                                         site_id=json_device_site['id_site'])
-        #
-        #     if device_site:
-        #         json_device_site['id_device_site'] = device_site.id_device_site
-        #     else:
-        #         json_device_site['id_device_site'] = 0
-        #
-        #     # Do the update!
-        #     if json_device_site['id_device_site'] > 0:
-        #         # Already existing
-        #         try:
-        #             TeraDeviceSite.update(json_device_site['id_device_site'], json_device_site)
-        #         except exc.SQLAlchemyError as e:
-        #             import sys
-        #             print(sys.exc_info())
-        #             self.module.logger.log_error(self.module.module_name,
-        #                                          UserQueryDeviceSites.__name__,
-        #                                          'post', 500, 'Database error', str(e))
-        #             return gettext('Database error'), 500
-        #     else:
-        #         try:
-        #             new_device_site = TeraDeviceSite()
-        #             new_device_site.from_json(json_device_site)
-        #             TeraDeviceSite.insert(new_device_site)
-        #         except exc.SQLAlchemyError as e:
-        #             import sys
-        #             print(sys.exc_info())
-        #             self.module.logger.log_error(self.module.module_name,
-        #                                          UserQueryDeviceSites.__name__,
-        #                                          'post', 500, 'Database error', str(e))
-        #             return gettext('Database error'), 500
-        #
-        # return json_device_sites
-
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific device-site association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete device association (no admin access to site)',
                         500: 'Device-site association not found or database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
+        args = delete_parser.parse_args()
 
-        args = parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

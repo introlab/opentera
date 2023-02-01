@@ -1,11 +1,12 @@
 from flask import session, request
 from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import user_token_auth
+from modules.LoginModule.LoginModule import user_token_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.LoginModule.LoginModule import LoginModule
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
+from opentera.redis.RedisVars import RedisVars
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -20,23 +21,18 @@ class UserRefreshToken(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_token_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Refresh token, old token needs to be passed in request headers.',
              responses={200: 'Success',
                         500: 'Server error'})
+    @api.expect(get_parser)
+    @user_token_auth.login_required
     def get(self):
         # If we have made it this far, token passed in headers was valid.
         # Get user token key from redis
-        from opentera.redis.RedisVars import RedisVars
         token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
 
         # Get token for user
-        from opentera.db.models.TeraUser import TeraUser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-
-        parser = get_parser
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         websocket_url = None
         if args['with_websocket']:

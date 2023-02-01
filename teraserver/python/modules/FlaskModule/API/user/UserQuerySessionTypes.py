@@ -1,6 +1,6 @@
 from flask import session, request
 from flask_restx import Resource, reqparse, inputs
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSessionType import TeraSessionType
@@ -36,19 +36,15 @@ class UserQuerySessionTypes(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get session type information. If no id_session_type specified, returns all available '
                          'session types',
              responses={200: 'Success - returns list of session types',
                         500: 'Database error'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         if args['id_session_type']:
             session_types = [user_access.query_session_type_by_id(args['id_session_type'])]
@@ -81,8 +77,6 @@ class UserQuerySessionTypes(Resource):
                                          'get', 500, 'InvalidRequestError')
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update session type. id_session_type must be set to "0" to create a new '
                          'type. A session type can be created/modified if the user has access to a related session type'
                          'project.',
@@ -90,8 +84,9 @@ class UserQuerySessionTypes(Resource):
                         403: 'Logged user can\'t create/update the specified session type',
                         400: 'Badly formed JSON or missing field(id_session_type) in the JSON body',
                         500: 'Internal error when saving session type'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_type' not in request.json:
@@ -296,20 +291,16 @@ class UserQuerySessionTypes(Resource):
 
         return [update_session_type.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific session type',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete session type (no admin access to project related to that type '
                              'or sessions of that type exists in the system somewhere)',
                         500: 'Database error.'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete
