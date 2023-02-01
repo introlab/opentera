@@ -18,7 +18,6 @@ get_parser.add_argument('list', type=inputs.boolean, help='List all sessions')
 
 post_parser = api.parser()
 post_parser.add_argument('token', type=str, help='Secret Token')
-# post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
 
 session_schema = api.schema_model('device_session', {
     'properties': {

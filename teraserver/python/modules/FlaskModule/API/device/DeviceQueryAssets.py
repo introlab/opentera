@@ -14,6 +14,7 @@ get_parser.add_argument('id_asset', type=int, help='Asset ID to query', default=
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download-upload url')
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class DeviceQueryAssets(Resource):
@@ -46,15 +47,6 @@ class DeviceQueryAssets(Resource):
         if (args['with_urls'] or args['with_only_token']) and assets:
             services_infos = {service.service_uuid: service.service_clientendpoint
                               for service in device_access.get_accessible_services()}
-
-            # Access token
-            # from opentera.redis.RedisVars import RedisVars
-            # token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
-            # access_token = TeraAsset.get_access_token(asset_uuids=[asset.asset_uuid for asset in assets],
-            #                                           token_key=token_key, requester_uuid=current_device.device_uuid,
-            #                                           expiration=1800)
-            # if args['with_only_token']:
-            #     return {'access_token': access_token}
 
         assets_json = []
         for asset in assets:

@@ -1,7 +1,7 @@
 from flask import session, request
 from flask_restx import Resource, fields, inputs
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import participant_multi_auth, current_participant, LoginModule
+from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from opentera.redis.RedisVars import RedisVars
 from opentera.redis.RedisRPCClient import RedisRPCClient
@@ -13,7 +13,6 @@ import opentera.messages.python as messages
 get_parser = api.parser()
 get_parser.add_argument('with_websocket', type=inputs.boolean, help='If set, requires that a websocket url is returned.'
                                                                     'If not possible to do so, return a 403 error.')
-post_parser = api.parser()
 
 model = api.model('ParticipantLogin', {
     'websocket_url': fields.String,
@@ -32,21 +31,16 @@ class ParticipantLogin(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    # @participant_http_auth.login_required
-
-    @api.expect(get_parser)
     @api.doc(description='Participant login with HTTPAuth',
              responses={200: 'Success - Login succeeded',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
-    # @api.marshal_with(model, mask=None)
+    @api.expect(get_parser)
     @participant_multi_auth.login_required(role='limited')
     def get(self):
         if current_participant:
-
-            parser = get_parser
-            args = parser.parse_args()
+            args = get_parser.parse_args()
 
             servername = self.module.config.server_config['hostname']
             port = self.module.config.server_config['port']

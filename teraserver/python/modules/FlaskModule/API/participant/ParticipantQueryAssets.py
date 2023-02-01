@@ -1,6 +1,6 @@
 from flask import session, request
 from flask_restx import Resource, inputs
-from modules.LoginModule.LoginModule import participant_multi_auth
+from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
 from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraParticipant import TeraParticipant
@@ -15,6 +15,7 @@ get_parser.add_argument('id_asset', type=int, help='Asset ID to query', default=
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download-upload url')
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
+get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ParticipantQueryAssets(Resource):
@@ -24,17 +25,14 @@ class ParticipantQueryAssets(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @participant_multi_auth.login_required(role='full')
-    @api.expect(get_parser)
     @api.doc(description='Get participant assets based on the ID or, if no parameters, get all assets',
              responses={200: 'Success',
                         403: 'Participant doesn\'t have access to the specified asset'})
+    @api.expect(get_parser)
+    @participant_multi_auth.login_required(role='full')
     def get(self):
-
-        participant = TeraParticipant.get_participant_by_uuid(session['_user_id'])
         args = get_parser.parse_args()
-
-        participant_access = DBManager.participantAccess(participant)
+        participant_access = DBManager.participantAccess(current_participant)
         assets = participant_access.get_accessible_assets(id_asset=args['id_asset'], uuid_asset=args['asset_uuid'])
 
         # Create response
@@ -51,15 +49,6 @@ class ParticipantQueryAssets(Resource):
             services_infos = {service.service_uuid: service.service_clientendpoint
                               for service in participant_access.get_accessible_services()}
 
-            # Access token
-            # from opentera.redis.RedisVars import RedisVars
-            # token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
-            # access_token = TeraAsset.get_access_token(asset_uuids=[asset.asset_uuid for asset in assets],
-            #                                           token_key=token_key, requester_uuid=participant.participant_uuid,
-            #                                           expiration=1800)
-            # if args['with_only_token']:
-            #     return {'access_token': access_token}
-
         assets_json = []
         for asset in assets:
             if args['with_only_token']:
@@ -73,7 +62,7 @@ class ParticipantQueryAssets(Resource):
                 token_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
                 access_token = TeraAsset.get_access_token(asset_uuids=asset.asset_uuid,
                                                           token_key=token_key,
-                                                          requester_uuid=participant.participant_uuid,
+                                                          requester_uuid=current_participant.participant_uuid,
                                                           expiration=1800)
                 asset_json['access_token'] = access_token
             if args['with_urls']:
