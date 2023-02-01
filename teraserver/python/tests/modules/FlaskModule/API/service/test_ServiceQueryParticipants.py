@@ -50,7 +50,7 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
     def test_post_endpoint_without_token_auth(self):
         with self._flask_app.app_context():
             response = self.test_client.post(self.test_endpoint, json={})
-            self.assertEqual(400, response.status_code)
+            self.assertEqual(401, response.status_code)
 
     def test_post_endpoint_with_token_auth_empty_json(self):
         with self._flask_app.app_context():
