@@ -72,6 +72,12 @@ class DeviceRegister(Resource):
 
         return device
 
+    @api.doc(description='Register a device with certificate or token request. This endpoint is rate limited. '
+                         'Use application/octet-stream to send CSR or application/json Content-Type for token '
+                         'generation.',
+             responses={200: 'Success, will return registration information. Devices must then be enabled by admin.',
+                        400: 'Missing parameter(s)',
+                        500: 'Internal server error'})
     def post(self):
         # We should receive a certificate signing request (base64) in an octet-stream
         if request.content_type == 'application/octet-stream':

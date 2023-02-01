@@ -4,7 +4,7 @@ from flask_babel import gettext
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraParticipant import TeraParticipant
 from modules.DatabaseModule.DBManager import DBManager
-from modules.LoginModule.LoginModule import LoginModule
+from modules.LoginModule.LoginModule import LoginModule, current_device
 from sqlalchemy import exc
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
@@ -18,7 +18,7 @@ get_parser.add_argument('list', type=inputs.boolean, help='List all sessions')
 
 post_parser = api.parser()
 post_parser.add_argument('token', type=str, help='Secret Token')
-post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
+# post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
 
 session_schema = api.schema_model('device_session', {
     'properties': {
@@ -66,26 +66,24 @@ class DeviceQuerySessions(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.device_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Get session',
              responses={403: 'Forbidden for security reasons.'})
+    @api.expect(get_parser)
+    @LoginModule.device_token_or_certificate_required
     def get(self):
         return gettext('Forbidden for security reasons'), 403
 
-    @LoginModule.device_token_or_certificate_required
-    @api.expect(session_schema)
-    @api.expect(post_parser)
     @api.doc(description='Update/Create session',
              responses={200: 'Success',
                         400: 'Required parameter is missing',
                         500: 'Internal server error',
                         501: 'Not implemented',
                         403: 'Logged device doesn\'t have permission to access the requested data'})
+    @api.expect(session_schema)
+    @api.expect(post_parser)
+    @LoginModule.device_token_or_certificate_required
     def post(self):
-        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
-        args = post_parser.parse_args()
-
+        # args = post_parser.parse_args()
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:
             return gettext('Missing arguments'), 400

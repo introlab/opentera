@@ -1,6 +1,6 @@
 from flask import session, request
 from flask_restx import Resource
-from modules.LoginModule.LoginModule import LoginModule
+from modules.LoginModule.LoginModule import LoginModule, current_device
 from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
@@ -23,20 +23,18 @@ class DeviceLogin(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.device_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Login device with Token.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented',
                         403: 'Logged device doesn\'t have permission to access the requested data'})
+    @api.expect(get_parser)
+    @LoginModule.device_token_or_certificate_required
     def get(self):
-
         # Redis key is handled in LoginModule
         server_name = self.module.config.server_config['hostname']
         port = self.module.config.server_config['port']
 
-        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
         current_device.update_last_online()
         args = get_parser.parse_args(strict=True)
 
