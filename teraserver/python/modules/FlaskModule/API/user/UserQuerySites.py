@@ -16,17 +16,14 @@ get_parser.add_argument('id', type=int, help='Alias for "id_site"')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all related sites')
 get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get all sites that are accessible')
 get_parser.add_argument('name', type=str, help='Site name to query')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_site', {'properties': TeraSite.get_json_schema(),
                                              'type': 'object',
                                              'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Site ID to delete', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQuerySites(Resource):
@@ -38,7 +35,8 @@ class UserQuerySites(Resource):
 
     @api.doc(description='Get site information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of sites',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -104,8 +102,8 @@ class UserQuerySites(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified site',
                         400: 'Badly formed JSON or missing field(id_site) in the JSON body',
-                        500: 'Internal error when saving site'})
-    @api.expect(post_parser)
+                        500: 'Internal error when saving site'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -158,7 +156,8 @@ class UserQuerySites(Resource):
     @api.doc(description='Delete a specific site',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete site (only super admin can delete)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

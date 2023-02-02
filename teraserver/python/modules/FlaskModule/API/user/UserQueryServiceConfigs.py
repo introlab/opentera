@@ -25,17 +25,14 @@ get_parser.add_argument('id_specific', type=str, help='ID of the specific config
 get_parser.add_argument('with_empty', type=inputs.boolean, help='Also include empty configs for services without '
                                                                 'config.')
 get_parser.add_argument('list', type=inputs.boolean, help='Also includes a list of all available specifics configs.')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('service_config', {'properties': TeraServiceConfig.get_json_schema(),
                                                   'type': 'object',
                                                   'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Service config ID to delete', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryServiceConfig(Resource):
@@ -50,7 +47,8 @@ class UserQueryServiceConfig(Resource):
                          'config the current user.',
              responses={200: 'Success - returns list of configurations',
                         400: 'No parameters specified - id_service is at least required',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -112,8 +110,8 @@ class UserQueryServiceConfig(Resource):
                         403: 'Logged user can\'t create/update the specified session',
                         400: 'Badly formed JSON or missing fields(service_config, id_service_config, id_service) in the'
                              ' JSON body',
-                        500: 'Internal error when saving service config'})
-    @api.expect(post_parser)
+                        500: 'Internal error when saving service config'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -226,7 +224,8 @@ class UserQueryServiceConfig(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete config (must have admin access to the related object - user,'
                              'device or participant, or be its own config)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

@@ -21,12 +21,10 @@ get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_se
                                                                 'don\'t have any association with that service')
 get_parser.add_argument('with_services', type=inputs.boolean, help='Used with id_site. Also return services that '
                                                                    'don\'t have any association with that site')
-get_parser.add_argument('with_roles', type=inputs.boolean, help='Used with id_site. Returns detailled information on'
+get_parser.add_argument('with_roles', type=inputs.boolean, help='Used with id_site. Returns detailed information on'
                                                                 'each role for this service.')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('service_site', {'properties': TeraServiceSite.get_json_schema(),
                                                 'type': 'object',
                                                 'location': 'json'})
@@ -35,7 +33,6 @@ delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific service - site association ID to delete. '
                                                 'Be careful: this is not the service or site ID, but the ID'
                                                 ' of the association itself!', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryServiceSites(Resource):
@@ -49,7 +46,8 @@ class UserQueryServiceSites(Resource):
                          'supported at once.',
              responses={200: 'Success - returns list of services - sites association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'})
+                        500: 'Error when getting association'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -119,8 +117,8 @@ class UserQueryServiceSites(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only super admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',
-                        500: 'Internal error occurred when saving association'})
-    @api.expect(post_parser)
+                        500: 'Internal error occurred when saving association'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -229,7 +227,8 @@ class UserQueryServiceSites(Resource):
     @api.doc(description='Delete a specific service - site association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (only super admins can)',
-                        500: 'Association not found or database error.'})
+                        500: 'Association not found or database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

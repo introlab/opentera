@@ -11,11 +11,9 @@ from opentera.db.models.TeraUser import TeraUser
 # Parser definition(s)
 # GET
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 # POST
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('ClientVersions',
                                {'properties': ClientVersions.get_json_schema(), 'type': 'object', 'location': 'json'})
 
@@ -30,7 +28,8 @@ class UserQueryVersions(Resource):
     @api.doc(description='Get server versions',
              responses={200: 'Success - returns list of assets',
                         400: 'Required parameter is missing',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Logged user doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -44,8 +43,8 @@ class UserQueryVersions(Resource):
              responses={200: 'Success - asset posted',
                         500: 'Database error occurred',
                         403: 'Logged user doesn\'t have permission to delete the requested asset (must be an user of'
-                             'the related project)'})
-    @api.expect(post_parser)
+                             'the related project)'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

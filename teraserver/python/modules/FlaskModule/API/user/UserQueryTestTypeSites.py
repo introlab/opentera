@@ -22,11 +22,9 @@ get_parser.add_argument('with_test_types', type=inputs.boolean, help='Used with 
                                                                      'that site')
 get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_site. Also return site information '
                                                                 'of the returned test types.')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_test_type_site', {'properties': TeraTestTypeSite.get_json_schema(),
                                                        'type': 'object',
                                                        'location': 'json'})
@@ -35,7 +33,6 @@ delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific test type-site association ID to delete. Be careful: this'
                                                 ' is not the test type or the site ID, but the ID of the '
                                                 'association itself!', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryTestTypeSites(Resource):
@@ -49,7 +46,8 @@ class UserQueryTestTypeSites(Resource):
                          ' at once.',
              responses={200: 'Success - returns list of session types - sites association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error occured when loading devices for sites'})
+                        500: 'Error occured when loading devices for sites'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -104,8 +102,8 @@ class UserQueryTestTypeSites(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association',
                         400: 'Badly formed JSON or missing fields(id_site or id_test_type) in the JSON body',
-                        500: 'Internal error occurred when saving device association'})
-    @api.expect(post_parser)
+                        500: 'Internal error occurred when saving device association'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -222,7 +220,8 @@ class UserQueryTestTypeSites(Resource):
     @api.doc(description='Delete a specific test type-site association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (no admin access to site)',
-                        500: 'Session type - site association not found or database error.'})
+                        500: 'Session type - site association not found or database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
