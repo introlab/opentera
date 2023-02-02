@@ -27,7 +27,6 @@ get_parser.add_argument('with_sites', type=inputs.boolean, help='List accessible
 get_parser.add_argument('admin', type=inputs.boolean, help='List only accessible with admin rights', default=False)
 get_parser.add_argument('with_names', type=inputs.boolean, help='Also includes the names of the returned items',
                         default=False)
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQueryAccess(Resource):
@@ -41,7 +40,8 @@ class ServiceQueryAccess(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):

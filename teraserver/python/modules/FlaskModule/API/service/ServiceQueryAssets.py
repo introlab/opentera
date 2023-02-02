@@ -28,14 +28,11 @@ get_parser.add_argument('id_creator_device', type=int, help='ID of the device fr
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download-upload url')
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 
 delete_parser = api.parser()
 delete_parser.add_argument('uuid', type=str, help='Asset UUID to delete', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQueryAssets(Resource):
@@ -50,7 +47,8 @@ class ServiceQueryAssets(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
@@ -152,7 +150,8 @@ class ServiceQueryAssets(Resource):
              responses={200: 'Success - asset correctly added',
                         400: 'Bad request - wrong or missing parameters in query',
                         500: 'Required parameter is missing',
-                        403: 'Service doesn\'t have permission to post that asset'})
+                        403: 'Service doesn\'t have permission to post that asset'},
+             params={'token': 'Secret token'})
     @api.expect(post_parser)
     @LoginModule.service_token_or_certificate_required
     def post(self):
@@ -254,7 +253,8 @@ class ServiceQueryAssets(Resource):
     @api.doc(description='Delete a specific asset',
              responses={200: 'Success',
                         403: 'Service can\'t delete asset',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @LoginModule.service_token_or_certificate_required
     def delete(self):

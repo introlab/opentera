@@ -26,7 +26,6 @@ get_parser.add_argument('with_warnings', type=inputs.boolean, help='Also include
                                                                    'participant not having sessions for some time or '
                                                                    'users not having logged on for some time. Can only '
                                                                    'be used with "id_site" for now.')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryUserStats(Resource):
@@ -39,7 +38,8 @@ class UserQueryUserStats(Resource):
     @api.doc(description='Get stats for the specified item.',
              responses={200: 'Success',
                         400: 'Missing parameter - one id must be specified.',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):

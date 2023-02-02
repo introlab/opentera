@@ -22,16 +22,13 @@ get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the 
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include test types urls')
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_test_type', {'properties': TeraTestType.get_json_schema(), 'type': 'object',
                                                   'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Test type ID to delete', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryTestTypes(Resource):
@@ -43,7 +40,8 @@ class UserQueryTestTypes(Resource):
 
     @api.doc(description='Get test type information. If no id_test_type specified, returns all available test types',
              responses={200: 'Success - returns list of test types',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -118,8 +116,8 @@ class UserQueryTestTypes(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified test type',
                         400: 'Badly formed JSON or missing field in the JSON body',
-                        500: 'Internal error when saving test type'})
-    @api.expect(post_parser)
+                        500: 'Internal error when saving test type'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -306,7 +304,8 @@ class UserQueryTestTypes(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete test type (no admin access to project related to that type '
                              'or tests of that type exists in the system somewhere)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

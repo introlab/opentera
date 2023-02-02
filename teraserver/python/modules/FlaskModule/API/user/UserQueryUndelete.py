@@ -7,7 +7,6 @@ from flask_babel import gettext
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to undelete')
 get_parser.add_argument('id_asset', type=int, help='ID of the asset to undelete')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryUndelete(Resource):
@@ -22,7 +21,8 @@ class UserQueryUndelete(Resource):
                         400: 'Required parameter is missing',
                         401: 'Requested item not found or is undeletable',
                         403: 'Access level insufficient to access that API or the item to undelete',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):

@@ -13,10 +13,8 @@ from modules.DatabaseModule.DBManager import DBManager
 get_parser = api.parser()
 get_parser.add_argument('id_user', type=int, help='ID of the user to get preference for')
 get_parser.add_argument('app_tag', type=str, help='Tag of the application for which to get preferences')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_preference', {'properties': TeraUserPreference.get_json_schema(),
                                                    'type': 'object',
                                                    'location': 'json'})
@@ -33,7 +31,8 @@ class UserQueryUserPreferences(Resource):
              responses={200: 'Success - returns list of user preferences',
                         400: 'Missing parameter or bad app_tag',
                         403: 'Forbidden access to that user.',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -73,8 +72,8 @@ class UserQueryUserPreferences(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the user linked to that preference',
                         400: 'Badly formed JSON or missing fields(app_tag) in the JSON body',
-                        500: 'Internal error occurred when saving user preference'})
-    @api.expect(post_parser)
+                        500: 'Internal error occurred when saving user preference'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):

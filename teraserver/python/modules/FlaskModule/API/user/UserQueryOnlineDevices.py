@@ -11,7 +11,6 @@ from opentera.modules.BaseModule import ModuleNames
 from modules.DatabaseModule.DBManager import DBManager
 
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryOnlineDevices(Resource):
@@ -21,7 +20,8 @@ class UserQueryOnlineDevices(Resource):
         self.test = kwargs.get('test', False)
 
     @api.doc(description='Get online devices uuids.',
-             responses={200: 'Success'})
+             responses={200: 'Success'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):

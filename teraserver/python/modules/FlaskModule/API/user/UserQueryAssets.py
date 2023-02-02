@@ -33,7 +33,6 @@ get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only inclu
                                                                      'Will ignore with_urls if specified.')
 get_parser.add_argument('full', type=inputs.boolean, help='Also include names of sessions, users, services, ... in the '
                                                           'reply')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryAssets(Resource):
@@ -46,7 +45,8 @@ class UserQueryAssets(Resource):
     @api.doc(description='Get asset information. Only one of the ID parameter is supported at once',
              responses={200: 'Success - returns list of assets',
                         400: 'Required parameter is missing',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Logged user doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -166,14 +166,16 @@ class UserQueryAssets(Resource):
         return assets_list
 
     @api.doc(description='Delete asset.',
-             responses={501: 'Unable to update asset information from here'})
+             responses={501: 'Unable to update asset information from here'},
+             params={'token': 'Secret token'})
     @user_multi_auth.login_required
     def post(self):
         return gettext('Asset information update and creation must be done directly into a service (such as '
                        'Filetransfer service)'), 501
 
     @api.doc(description='Delete asset.',
-             responses={501: 'Unable to delete asset information from here'})
+             responses={501: 'Unable to delete asset information from here'},
+             params={'token': 'Secret token'})
     @user_multi_auth.login_required
     def delete(self):
         return gettext('Asset information deletion must be done directly into a service (such as '

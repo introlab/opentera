@@ -26,10 +26,8 @@ get_parser.add_argument('with_empty', type=inputs.boolean, help='Used with id_si
                                                                 'that don\'t have any access to the site. Used with '
                                                                 'id_user_group, also return sites that don\'t '
                                                                 'have any access with that user group')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_site_access', {
     'properties': {
         'site_access': {
@@ -56,7 +54,6 @@ post_schema = api.schema_model('user_site_access', {
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Site Access ID to delete', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQuerySiteAccess(Resource):
@@ -69,7 +66,8 @@ class UserQuerySiteAccess(Resource):
     @api.doc(description='Get user roles for sites. Only one  parameter required and supported at once.',
              responses={200: 'Success - returns list of users roles in sites',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error occured when loading sites roles'})
+                        500: 'Error occurred when loading sites roles'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -158,8 +156,8 @@ class UserQuerySiteAccess(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify this site or user access (site admin access required)',
                         400: 'Badly formed JSON or missing fields(id_user or id_site) in the JSON body',
-                        500: 'Database error'})
-    @api.expect(post_parser)
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -250,7 +248,8 @@ class UserQuerySiteAccess(Resource):
     @api.doc(description='Delete a specific site access',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete site access(only user who is admin in that site can remove it)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

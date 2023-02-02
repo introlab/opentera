@@ -12,7 +12,6 @@ get_parser = api.parser()
 get_parser.add_argument('id_site', type=int, help='ID of the site to query session types for')
 get_parser.add_argument('id_project', type=int, help='ID of the project to query session types for')
 get_parser.add_argument('id_participant', type=int, help='ID of the participant to query types for')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQuerySessionTypes(Resource):
@@ -26,7 +25,8 @@ class ServiceQuerySessionTypes(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):

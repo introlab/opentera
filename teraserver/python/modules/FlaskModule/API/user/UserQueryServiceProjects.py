@@ -26,10 +26,8 @@ get_parser.add_argument('with_roles', type=inputs.boolean, help='Used with id_pr
                                                                 'each role for this service.')
 get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_service. Also return site information '
                                                                 'of the returned projects.')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('service_project', {'properties': TeraServiceProject.get_json_schema(),
                                                    'type': 'object',
                                                    'location': 'json'})
@@ -38,7 +36,6 @@ delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Specific service - project association ID to delete. '
                                                 'Be careful: this is not the service or project ID, but the ID'
                                                 ' of the association itself!', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryServiceProjects(Resource):
@@ -52,7 +49,8 @@ class UserQueryServiceProjects(Resource):
                          'supported at once.',
              responses={200: 'Success - returns list of services - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'})
+                        500: 'Error when getting association'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -130,8 +128,8 @@ class UserQueryServiceProjects(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only site admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',
-                        500: 'Internal error occurred when saving association'})
-    @api.expect(post_parser)
+                        500: 'Internal error occurred when saving association'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -267,7 +265,8 @@ class UserQueryServiceProjects(Resource):
     @api.doc(description='Delete a specific service - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (not site admin of the associated project)',
-                        500: 'Association not found or database error.'})
+                        500: 'Association not found or database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

@@ -19,7 +19,6 @@ get_parser.add_argument('id_participant', type=int, help='ID of the participant 
 get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the device to query', default=None)
 get_parser.add_argument('id_device', type=int, help='ID of the device to query', default=None)
 get_parser.add_argument('device_uuid', type=str, help='Device uuid of the device to query', default=None)
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryDisconnect(Resource):
@@ -34,7 +33,8 @@ class UserQueryDisconnect(Resource):
                         400: 'No parameters specified, at least one id / uuid must be used',
                         403: 'Forbidden access. Please check that the user has access to'
                              ' the requested id/uuid.',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):

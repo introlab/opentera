@@ -16,17 +16,14 @@ get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the 
 get_parser.add_argument('with_empty', type=inputs.boolean, help="Used with id_user, also returns users groups that the "
                                                                 "user is not part of. Used with id_user_group, also "
                                                                 "returns users not part of that user group.")
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_user_group', {'properties': TeraUserUserGroup.get_json_schema(),
                                                    'type': 'object',
                                                    'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='User - User group relationship ID to delete', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryUserUserGroups(Resource):
@@ -38,7 +35,8 @@ class UserQueryUserUserGroups(Resource):
 
     @api.doc(description='Get user - user group information. At least one "id" field must be specified',
              responses={200: 'Success',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -80,8 +78,8 @@ class UserQueryUserUserGroups(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified user group',
                         400: 'Badly formed JSON or missing field(id_user_group) in the JSON body',
-                        500: 'Internal error when saving user group'})
-    @api.expect(post_parser)
+                        500: 'Internal error when saving user group'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -142,7 +140,8 @@ class UserQueryUserUserGroups(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete user group (only a site admin that includes that user group in '
                              'their site can delete)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

@@ -14,17 +14,14 @@ get_parser = api.parser()
 get_parser.add_argument('id_device_subtype', type=int, help='ID of the device subtype to query')
 get_parser.add_argument('id_device_type', type=int, help='ID of the device type from which to get all subtypes')
 get_parser.add_argument('list', type=inputs.boolean, help='Return minimal information')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_device_subtype', {'properties': TeraDeviceSubType.get_json_schema(),
                                                        'type': 'object',
                                                        'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Device subtype ID to delete', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryDeviceSubTypes(Resource):
@@ -39,7 +36,8 @@ class UserQueryDeviceSubTypes(Resource):
                         400: 'No parameters specified at least one id must be used',
                         403: 'Forbidden access to the device type specified. Please check that the user has access to a'
                              ' session type containing that device type.',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -94,8 +92,8 @@ class UserQueryDeviceSubTypes(Resource):
                         403: 'Logged user can\'t create/update the specified device subtype',
                         400: 'Badly formed JSON or missing fields(id_device_subtype or id_device_type) in the JSON '
                              'body',
-                        500: 'Internal error occured when saving device subtype'})
-    @api.expect(post_parser)
+                        500: 'Internal error occured when saving device subtype'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -151,7 +149,8 @@ class UserQueryDeviceSubTypes(Resource):
     @api.doc(description='Delete a specific device subtype',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete device subtype (can delete if site admin)',
-                        500: 'Device subtype not found or database error.'})
+                        500: 'Device subtype not found or database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

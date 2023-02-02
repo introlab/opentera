@@ -16,17 +16,14 @@ get_parser.add_argument('id_session_type', type=int, help='ID of the session typ
 get_parser.add_argument('id_project', type=int, help='ID of the project to get session type for')
 get_parser.add_argument('id_site', type=int, help='ID of the site to get session types for')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_session_type', {'properties': TeraSessionType.get_json_schema(),
                                                      'type': 'object',
                                                      'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Session type ID to delete', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQuerySessionTypes(Resource):
@@ -39,7 +36,8 @@ class UserQuerySessionTypes(Resource):
     @api.doc(description='Get session type information. If no id_session_type specified, returns all available '
                          'session types',
              responses={200: 'Success - returns list of session types',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -83,8 +81,8 @@ class UserQuerySessionTypes(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified session type',
                         400: 'Badly formed JSON or missing field(id_session_type) in the JSON body',
-                        500: 'Internal error when saving session type'})
-    @api.expect(post_parser)
+                        500: 'Internal error when saving session type'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -296,7 +294,8 @@ class UserQuerySessionTypes(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete session type (no admin access to project related to that type '
                              'or sessions of that type exists in the system somewhere)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

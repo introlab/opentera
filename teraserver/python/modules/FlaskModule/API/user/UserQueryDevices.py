@@ -39,17 +39,15 @@ get_parser.add_argument('with_sites', type=inputs.boolean, help='Flag that indic
                                                                 'should be included in the returned device list')
 get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
                                                                  'for each device')
-get_parser.add_argument('token', type=str, help='Secret Token')
+
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_device', {'properties': TeraDevice.get_json_schema(),
                                                'type': 'object',
                                                'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Device ID to delete', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryDevices(Resource):
@@ -77,7 +75,8 @@ class UserQueryDevices(Resource):
              responses={200: 'Success - returns list of devices',
                         400: 'User Error : Too Many IDs',
                         403: 'Forbidden access',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -238,8 +237,8 @@ class UserQueryDevices(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified device',
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
-                        500: 'Internal error occured when saving device'})
-    @api.expect(post_parser)
+                        500: 'Internal error occurred when saving device'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -388,7 +387,8 @@ class UserQueryDevices(Resource):
              responses={200: 'Success',
                         400: 'Wrong ID/ No ID',
                         403: 'Logged user can\'t delete device (can delete if superadmin)',
-                        500: 'Device not found or database error.'})
+                        500: 'Device not found or database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

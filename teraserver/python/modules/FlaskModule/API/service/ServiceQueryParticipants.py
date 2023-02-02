@@ -10,10 +10,8 @@ from datetime import datetime
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the participant to query')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 
 participant_schema = api.schema_model('participant', {
     'properties': {
@@ -54,7 +52,8 @@ class ServiceQueryParticipants(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
@@ -72,8 +71,8 @@ class ServiceQueryParticipants(Resource):
              responses={200: 'Success - To be documented',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
-    @api.expect(post_parser)
+                        403: 'Logged user doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(participant_schema, validate=True)
     @LoginModule.service_token_or_certificate_required
     def post(self):

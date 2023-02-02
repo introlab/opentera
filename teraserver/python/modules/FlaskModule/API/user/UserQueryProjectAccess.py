@@ -26,10 +26,8 @@ get_parser.add_argument('with_empty', type=inputs.boolean, help='Used with id_us
                                                                 'don\'t have any access with that user group. Used with'
                                                                 ' id_project. also return user groups that don\'t have '
                                                                 'any access to the project')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_project_access', {
     'properties': {
         'project_access': {
@@ -57,7 +55,6 @@ post_schema = api.schema_model('user_project_access', {
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Project Access ID to delete', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserQueryProjectAccess(Resource):
@@ -70,7 +67,8 @@ class UserQueryProjectAccess(Resource):
     @api.doc(description='Get user roles for projects. Only one ID parameter required and supported at once.',
              responses={200: 'Success - returns list of users roles in projects',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error occured when loading project roles'})
+                        500: 'Error occured when loading project roles'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -173,8 +171,8 @@ class UserQueryProjectAccess(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify this project or user access (project admin access required)',
                         400: 'Badly formed JSON or missing fields(id_user_group or id_project) in the JSON body',
-                        500: 'Database error'})
-    @api.expect(post_parser)
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -253,7 +251,8 @@ class UserQueryProjectAccess(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete project access(only user who is admin in that project can '
                              'remove it)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

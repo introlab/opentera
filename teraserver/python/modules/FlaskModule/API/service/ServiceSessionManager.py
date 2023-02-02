@@ -14,7 +14,6 @@ import json
 post_parser = api.parser()
 post_parser.add_argument('session_manage', type=str, location='json', help='Informations to manage the session',
                          required=True)
-post_parser.add_argument('token', type=str, help='Secret Token')
 
 session_manager_schema = api.schema_model('session_manage', {
     'properties': {
@@ -99,8 +98,8 @@ class ServiceSessionManager(Resource):
                         400: 'Required parameter is missing',
                         500: 'Internal server error',
                         501: 'Not implemented',
-                        403: 'Service doesn\'t have enough permission'})
-    @api.expect(post_parser)
+                        403: 'Service doesn\'t have enough permission'},
+             params={'token': 'Secret token'})
     @api.expect(session_manager_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):

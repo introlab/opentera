@@ -12,7 +12,6 @@ from opentera.redis.RedisVars import RedisVars
 get_parser = api.parser()
 get_parser.add_argument('with_websocket', type=inputs.boolean, help='If set, requires that a websocket url is returned.'
                                                                     'If not possible to do so, return a 403 error.')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class UserRefreshToken(Resource):
@@ -24,7 +23,8 @@ class UserRefreshToken(Resource):
 
     @api.doc(description='Refresh token, old token needs to be passed in request headers.',
              responses={200: 'Success',
-                        500: 'Server error'})
+                        500: 'Server error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_token_auth.login_required
     def get(self):
