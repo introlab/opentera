@@ -6,7 +6,7 @@ import typing as t
 import sqlalchemy.sql.sqltypes
 from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger
+from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, text
 from opentera.db.SoftDeleteMixin import generate_soft_delete_mixin_class
 
 
@@ -148,7 +148,7 @@ class BaseMixin(object):
     @classmethod
     def update(cls, update_id: int, values: dict):
         values = cls.clean_values(values)
-        update_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
+        update_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()
         update_obj.from_json(values)
         cls.commit()
 
@@ -158,12 +158,16 @@ class BaseMixin(object):
 
     @classmethod
     def insert(cls, db_object):
-        # Clear primary key value
-        setattr(db_object, cls.get_primary_key_name(), None)
+        if getattr(db_object, 'soft_insert', None):
+            return db_object.soft_insert(db_object)
+        else:
+            # Clear primary key value
+            setattr(db_object, cls.get_primary_key_name(), None)
 
-        # Add to database session and commit
-        cls.db().session.add(db_object)
-        cls.commit()
+            # Add to database session and commit
+            cls.db().session.add(db_object)
+            cls.commit()
+            return db_object
 
     @classmethod
     def delete(cls, id_todel):

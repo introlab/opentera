@@ -1,9 +1,10 @@
 from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraDeviceParticipant(BaseModel, SoftDeleteMixin):
+class TeraDeviceParticipant(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_devices_participants'
     id_device_participant = Column(Integer, Sequence('id_device_participant_sequence'), primary_key=True,
                                    autoincrement=True)
@@ -71,16 +72,5 @@ class TeraDeviceParticipant(BaseModel, SoftDeleteMixin):
             .execution_options(include_deleted=with_deleted).first()
 
     @classmethod
-    def insert(cls, db_object):
-        # # Check if we have an already present delete association
-        # item = TeraDeviceParticipant.query_device_participant_for_participant_device(device_id=db_object.id_device,
-        #                                                                              participant_id=
-        #                                                                              db_object.id_participant,
-        #                                                                              with_deleted=True)
-        # if item:
-        #     if item.deleted_at:
-        #         item.deleted_at = None
-        #
-        # else:
-        #     # No existing item found
-        super().insert(db_object)
+    def update(cls, update_id: int, values: dict):
+        return

@@ -108,8 +108,8 @@ class UserQueryDeviceParticipants(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify device association',
                         400: 'Badly formed JSON or missing fields(id_participant or id_device) in the JSON body',
-                        500: 'Internal error occured when saving device association'})
-    @api.expect(post_parser)
+                        500: 'Internal error occured when saving device association'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -152,20 +152,21 @@ class UserQueryDeviceParticipants(Resource):
             # Do the update!
             if json_device_part['id_device_participant'] > 0:
                 # Already existing
-                try:
-                    TeraDeviceParticipant.update(json_device_part['id_device_participant'], json_device_part)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQueryDeviceParticipants.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # try:
+                #     TeraDeviceParticipant.update(json_device_part['id_device_participant'], json_device_part)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQueryDeviceParticipants.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                return gettext('Can\'t update an existing relationship'), 400
             else:
                 try:
                     new_device_part = TeraDeviceParticipant()
                     new_device_part.from_json(json_device_part)
-                    TeraDeviceParticipant.insert(new_device_part)
+                    new_device_part = TeraDeviceParticipant.insert(new_device_part)
                     # Update ID for further use
                     json_device_part['id_device_participant'] = new_device_part.id_device_participant
                     json_device_part['participant_name'] = new_device_part.device_participant_participant.\
