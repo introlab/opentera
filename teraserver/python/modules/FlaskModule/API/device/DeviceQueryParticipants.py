@@ -8,7 +8,6 @@ from opentera.db.models.TeraDevice import TeraDevice
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class DeviceQueryParticipants(Resource):
@@ -22,7 +21,8 @@ class DeviceQueryParticipants(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented',
-                        403: 'Logged device doesn\'t have permission to access the requested data'})
+                        403: 'Logged device doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.device_token_or_certificate_required
     def get(self):

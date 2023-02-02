@@ -10,10 +10,7 @@ from opentera.db.models.TeraDevice import TeraDevice
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
-
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class DeviceQueryDevices(Resource):
@@ -27,7 +24,8 @@ class DeviceQueryDevices(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented',
-                        403: 'Logged device doesn\'t have permission to access the requested data'})
+                        403: 'Logged device doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.device_token_or_certificate_required
     def get(self):
@@ -63,8 +61,8 @@ class DeviceQueryDevices(Resource):
              responses={200: 'Success',
                         403: 'Logged device can\'t update the specified device',
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
-                        500: 'Internal error occurred when saving device'})
-    @api.expect(post_parser)
+                        500: 'Internal error occurred when saving device'},
+             params={'token': 'Secret token'})
     @LoginModule.device_token_or_certificate_required
     def post(self):
         if 'device' not in request.json:

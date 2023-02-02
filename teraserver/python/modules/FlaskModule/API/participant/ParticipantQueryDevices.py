@@ -10,10 +10,8 @@ from modules.DatabaseModule.DBManager import DBManager
 get_parser = api.parser()
 get_parser.add_argument('id_device', type=int, help='ID of the device to query')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ParticipantQueryDevices(Resource):
@@ -28,7 +26,8 @@ class ParticipantQueryDevices(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Logged user doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @participant_multi_auth.login_required(role='full')
     def get(self):
@@ -53,7 +52,8 @@ class ParticipantQueryDevices(Resource):
              responses={200: 'Success - To be documented',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Logged user doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(post_parser)
     @participant_multi_auth.login_required(role='full')
     def post(self):

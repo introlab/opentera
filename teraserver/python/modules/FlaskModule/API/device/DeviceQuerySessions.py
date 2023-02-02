@@ -12,12 +12,10 @@ import datetime
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
 get_parser.add_argument('id_session', type=int, help='Session ID')
 get_parser.add_argument('list', type=inputs.boolean, help='List all sessions')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 
 session_schema = api.schema_model('device_session', {
     'properties': {
@@ -66,7 +64,8 @@ class DeviceQuerySessions(Resource):
         self.test = kwargs.get('test', False)
 
     @api.doc(description='Get session',
-             responses={403: 'Forbidden for security reasons.'})
+             responses={403: 'Forbidden for security reasons.'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.device_token_or_certificate_required
     def get(self):
@@ -77,9 +76,9 @@ class DeviceQuerySessions(Resource):
                         400: 'Required parameter is missing',
                         500: 'Internal server error',
                         501: 'Not implemented',
-                        403: 'Logged device doesn\'t have permission to access the requested data'})
+                        403: 'Logged device doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(session_schema)
-    @api.expect(post_parser)
     @LoginModule.device_token_or_certificate_required
     def post(self):
         # args = post_parser.parse_args()

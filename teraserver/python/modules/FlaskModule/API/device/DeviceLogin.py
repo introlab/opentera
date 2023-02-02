@@ -13,7 +13,6 @@ import opentera.messages.python as messages
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('token', type=str, help='Secret Token')
-post_parser = api.parser()
 
 
 class DeviceLogin(Resource):

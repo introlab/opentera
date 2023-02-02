@@ -8,7 +8,6 @@ from opentera.db.models.TeraParticipant import TeraParticipant
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ParticipantRefreshToken(Resource):
@@ -20,7 +19,8 @@ class ParticipantRefreshToken(Resource):
 
     @api.doc(description='Refresh token, old token needs to be passed in request headers.',
              responses={200: 'Success',
-                        500: 'Server error'})
+                        500: 'Server error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @participant_token_auth.login_required(role='full')
     def get(self):

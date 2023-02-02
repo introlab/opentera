@@ -15,7 +15,6 @@ get_parser.add_argument('id_asset', type=int, help='Asset ID to query', default=
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download-upload url')
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ParticipantQueryAssets(Resource):
@@ -27,7 +26,8 @@ class ParticipantQueryAssets(Resource):
 
     @api.doc(description='Get participant assets based on the ID or, if no parameters, get all assets',
              responses={200: 'Success',
-                        403: 'Participant doesn\'t have access to the specified asset'})
+                        403: 'Participant doesn\'t have access to the specified asset'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @participant_multi_auth.login_required(role='full')
     def get(self):

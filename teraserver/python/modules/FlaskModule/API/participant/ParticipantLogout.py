@@ -7,7 +7,6 @@ from modules.FlaskModule.FlaskModule import participant_api_ns as api
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ParticipantLogout(Resource):
@@ -22,7 +21,8 @@ class ParticipantLogout(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Logged user doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @participant_multi_auth.login_required
     def get(self):

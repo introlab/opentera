@@ -10,7 +10,6 @@ import json
 
 # Parser definition(s)
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 
 status_schema = api.schema_model('device_status', {
     'type': 'object',
@@ -38,9 +37,9 @@ class DeviceQueryStatus(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented',
-                        403: 'Logged device doesn\'t have permission to access the requested data'})
+                        403: 'Logged device doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(status_schema)
-    @api.expect(post_parser)
     @LoginModule.device_token_or_certificate_required
     def post(self):
         # status_schema.validate(request.json)

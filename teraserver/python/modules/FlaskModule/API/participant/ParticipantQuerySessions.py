@@ -18,10 +18,8 @@ get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the 
 get_parser.add_argument('status', type=int, help='Limit to specific session status')
 get_parser.add_argument('start_date', type=inputs.date, help='Start date, sessions before that date will be ignored')
 get_parser.add_argument('end_date', type=inputs.date, help='End date, sessions after that date will be ignored')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ParticipantQuerySessions(Resource):
@@ -38,7 +36,8 @@ class ParticipantQuerySessions(Resource):
                         400: 'Bad request',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Logged user doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     def get(self):
         participant_access = DBManager.participantAccess(current_participant)
         args = get_parser.parse_args(strict=True)
@@ -61,13 +60,14 @@ class ParticipantQuerySessions(Resource):
 
         return sessions_list
 
-    @participant_multi_auth.login_required(role='full')
-    @api.expect(post_parser)
     @api.doc(description='To be documented '
                          'To be documented',
              responses={200: 'Success - To be documented',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'})
+                        403: 'Logged user doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
+    @api.expect(post_parser)
+    @participant_multi_auth.login_required(role='full')
     def post(self):
         return gettext('Not implemented'), 501

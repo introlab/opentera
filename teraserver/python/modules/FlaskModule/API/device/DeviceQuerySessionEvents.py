@@ -10,11 +10,9 @@ from opentera.db.models.TeraDevice import TeraDevice
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
 get_parser.add_argument('id_session', type=int, help='Session ID', required=True)
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class DeviceQuerySessionEvents(Resource):
@@ -25,7 +23,8 @@ class DeviceQuerySessionEvents(Resource):
         self.test = kwargs.get('test', False)
 
     @api.doc(description='Get session events',
-             responses={403: 'Forbidden for security reasons.'})
+             responses={403: 'Forbidden for security reasons.'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.device_token_or_certificate_required
     def get(self):
@@ -36,7 +35,8 @@ class DeviceQuerySessionEvents(Resource):
                         400: 'Required parameter is missing',
                         500: 'Internal server error',
                         501: 'Not implemented',
-                        403: 'Logged device doesn\'t have permission to access the requested data'})
+                        403: 'Logged device doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(post_parser)
     @LoginModule.device_token_or_certificate_required
     def post(self):
