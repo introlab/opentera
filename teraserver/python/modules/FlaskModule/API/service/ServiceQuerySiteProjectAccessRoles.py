@@ -9,7 +9,6 @@ get_parser = api.parser()
 get_parser.add_argument('id_project', type=int, help='ID of the project to query')
 get_parser.add_argument('id_site', type=int, help='ID of the site to query')
 get_parser.add_argument('uuid_user', type=str, help='UUID of the user', required=True)
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQuerySiteProjectAccessRoles(Resource):
@@ -24,7 +23,8 @@ class ServiceQuerySiteProjectAccessRoles(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):

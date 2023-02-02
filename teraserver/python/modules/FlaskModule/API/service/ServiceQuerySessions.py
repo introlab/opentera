@@ -29,17 +29,14 @@ get_parser.add_argument('limit', type=int, help='Maximum number of results to re
 get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index')
 get_parser.add_argument('start_date', type=inputs.date, help='Start date, sessions before that date will be ignored')
 get_parser.add_argument('end_date', type=inputs.date, help='End date, sessions after that date will be ignored')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('user_session', {'properties': TeraSession.get_json_schema(),
                                                 'type': 'object',
                                                 'location': 'json'})
 
 # delete_parser =  api.parser()
 # delete_parser.add_argument('id', type=int, help='Session ID to delete', required=True)
-# delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQuerySessions(Resource):
@@ -54,7 +51,8 @@ class ServiceQuerySessions(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
@@ -129,8 +127,8 @@ class ServiceQuerySessions(Resource):
                         403: 'Service can\'t create/update the specified session',
                         400: 'Badly formed JSON or missing fields(session, id_session, session_participants_ids and/or '
                              'session_users_ids[for new sessions]) in the JSON body',
-                        500: 'Internal error when saving session'})
-    @api.expect(post_parser)
+                        500: 'Internal error when saving session'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
@@ -259,7 +257,8 @@ class ServiceQuerySessions(Resource):
     # @api.doc(description='Delete a specific session',
     #          responses={200: 'Success',
     #                     403: 'Service can\'t delete session',
-    #                     500: 'Database error.'})
+    #                     500: 'Database error.'},
+    #          params={'token': 'Secret token'})
     # @api.expect(delete_parser)
     # @LoginModule.service_token_or_certificate_required
     # def delete(self):

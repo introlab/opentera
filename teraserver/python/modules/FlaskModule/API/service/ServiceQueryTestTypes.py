@@ -16,7 +16,6 @@ get_parser.add_argument('id_project', type=int, help='ID of the project to query
 get_parser.add_argument('id_participant', type=int, help='ID of the participant to query types for')
 get_parser.add_argument('test_type_key', type=str, help='Test type key to query for')
 get_parser.add_argument('id_test_type', type=int, help='ID of the test type to query for')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQueryTestTypes(Resource):
@@ -30,7 +29,8 @@ class ServiceQueryTestTypes(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):

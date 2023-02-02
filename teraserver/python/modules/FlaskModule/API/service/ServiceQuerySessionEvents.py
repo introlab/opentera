@@ -13,16 +13,13 @@ from sqlalchemy import exc
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query events for', required=True)
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
 post_schema = api.schema_model('session_event', {'properties': TeraSessionEvent.get_json_schema(),
                                                  'type': 'object', 'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
 delete_parser.add_argument('id', type=int, help='Session event ID to delete', required=True)
-delete_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQuerySessionEvents(Resource):
@@ -36,7 +33,8 @@ class ServiceQuerySessionEvents(Resource):
              responses={200: 'Success - returns list of events',
                         400: 'Required parameter is missing (id_session)',
                         403: 'Service doesn\'t have permission to access the requested data',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
@@ -68,8 +66,8 @@ class ServiceQuerySessionEvents(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified event',
                         400: 'Badly formed JSON or missing fields(id_session_event or id_session) in the JSON body',
-                        500: 'Internal error when saving device'})
-    @api.expect(post_parser)
+                        500: 'Internal error when saving device'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
@@ -131,7 +129,8 @@ class ServiceQuerySessionEvents(Resource):
     # @api.doc(description='Delete a specific session event',
     #          responses={200: 'Success',
     #                     403: 'Logged user can\'t delete event (no access to that session)',
-    #                     500: 'Database error.'})
+    #                     500: 'Database error.'},
+    #                     params={'token': 'Secret token'})
     # def delete(self):
     #     parser = delete_parser
     #

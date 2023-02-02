@@ -12,7 +12,6 @@ get_parser.add_argument('id_service', type=int, help='ID of the service to query
 get_parser.add_argument('uuid_service', type=str, help='UUID of the service to query')
 get_parser.add_argument('service_key', type=str, help='Key of the service to query')
 get_parser.add_argument('with_base_url', type=inputs.boolean, help='Also include base external URL for that service')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class ServiceQueryServices(Resource):
@@ -26,7 +25,8 @@ class ServiceQueryServices(Resource):
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
