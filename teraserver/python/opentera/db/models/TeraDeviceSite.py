@@ -1,9 +1,11 @@
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraDeviceSite(BaseModel, SoftDeleteMixin):
+class TeraDeviceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_devices_sites'
     id_device_site = Column(Integer, Sequence('id_device_site_sequence'), primary_key=True, autoincrement=True)
     id_device = Column(Integer, ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
@@ -101,3 +103,7 @@ class TeraDeviceSite(BaseModel, SoftDeleteMixin):
 
             # Ok, delete it
             super().delete(id_todel)
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        return

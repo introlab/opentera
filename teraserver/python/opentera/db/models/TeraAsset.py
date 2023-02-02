@@ -1,4 +1,5 @@
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 import uuid
 # from enum import Enum, unique
 from sqlalchemy import or_

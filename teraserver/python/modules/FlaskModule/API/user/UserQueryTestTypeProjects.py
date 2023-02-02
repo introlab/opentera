@@ -211,21 +211,22 @@ class UserQueryTestTypeProjects(Resource):
 
             # Do the update!
             if int(json_tt['id_test_type_project']) > 0:
-                # Already existing
-                try:
-                    TeraTestTypeProject.update(int(json_tt['id_test_type_project']), json_tt)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQueryTestTypeProjects.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # # Already existing
+                # try:
+                #     TeraTestTypeProject.update(int(json_tt['id_test_type_project']), json_tt)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQueryTestTypeProjects.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_ttp = TeraTestTypeProject()
                     new_ttp.from_json(json_tt)
-                    TeraTestTypeProject.insert(new_ttp)
+                    new_ttp = TeraTestTypeProject.insert(new_ttp)
                     # Update ID for further use
                     json_tt['id_test_type_project'] = new_ttp.id_test_type_project
                 except exc.SQLAlchemyError as e:

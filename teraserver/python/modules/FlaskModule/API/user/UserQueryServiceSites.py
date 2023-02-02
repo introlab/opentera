@@ -198,20 +198,21 @@ class UserQueryServiceSites(Resource):
             # Do the update!
             if int(json_ss['id_service_site']) > 0:
                 # Already existing
-                try:
-                    TeraServiceSite.update(int(json_ss['id_service_site']), json_ss)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQueryServiceSites.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # try:
+                #     TeraServiceSite.update(int(json_ss['id_service_site']), json_ss)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQueryServiceSites.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_ss = TeraServiceSite()
                     new_ss.from_json(json_ss)
-                    TeraServiceSite.insert(new_ss)
+                    new_ss = TeraServiceSite.insert(new_ss)
                     # Update ID for further use
                     json_ss['id_service_site'] = new_ss.id_service_site
                 except exc.SQLAlchemyError as e:

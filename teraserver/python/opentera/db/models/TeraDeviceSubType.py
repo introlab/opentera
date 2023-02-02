@@ -1,4 +1,5 @@
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
@@ -6,10 +7,8 @@ from sqlalchemy.orm import relationship
 class TeraDeviceSubType(BaseModel, SoftDeleteMixin):
 
     __tablename__ = 't_devices_subtypes'
-    id_device_subtype = Column(Integer, Sequence('id_device_subtype_sequence'), primary_key=True,
-                                  autoincrement=True)
-    id_device_type = Column(Integer, ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
-                               nullable=False)
+    id_device_subtype = Column(Integer, Sequence('id_device_subtype_sequence'), primary_key=True, autoincrement=True)
+    id_device_type = Column(Integer, ForeignKey('t_devices_types.id_device_type', ondelete='cascade'), nullable=False)
     device_subtype_name = Column(String, nullable=False)
 
     device_subtype_type = relationship("TeraDeviceType")

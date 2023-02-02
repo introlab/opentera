@@ -1,9 +1,11 @@
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraDeviceProject(BaseModel, SoftDeleteMixin):
+class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_devices_projects'
     id_device_project = Column(Integer, Sequence('id_device_project_sequence'), primary_key=True,
                                autoincrement=True)
@@ -94,16 +96,6 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin):
         # Ok, delete it
         super().delete(id_todel)
 
-    # @staticmethod
-    # def query_sites_for_device(device_id: int) -> list:
-    #     from opentera.db.models.TeraProject import TeraProject
-    #     return TeraDeviceProject.query.filter_by(id_device=device_id).join(TeraDeviceProject.device_project_project)\
-    #         .join(TeraProject.project_site).all()
-    #     # TeraSite.query.join(TeraSite.site_projects).join(TeraDeviceProject.device_project_project)\
-    #     # .filter(id_device=device_id).all()
-
-    # @staticmethod
-    # def query_devices_for_site(site_id: int) -> list:
-    #     from opentera.db.models.TeraDevice import TeraDevice
-    #     return TeraDeviceProject.query.join(TeraDeviceProject.device_project_project).filter_by(id_site=site_id).all()
-    #     # return TeraDevice.query.join(TeraDevice.device_projects).filter_by(id_site=site_id).all()
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        return

@@ -160,7 +160,7 @@ class UserQueryDeviceParticipants(Resource):
                 #                                  UserQueryDeviceParticipants.__name__,
                 #                                  'post', 500, 'Database error', str(e))
                 #     return gettext('Database error'), 500
-                return gettext('Can\'t update an existing relationship'), 400
+                pass
             else:
                 try:
                     new_device_part = TeraDeviceParticipant()

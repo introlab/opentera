@@ -27,7 +27,7 @@ class SoftInsertMixin:
             return item
         else:
             # Insert item
-            setattr(cls, primary_key_name, None)
+            setattr(db_object, primary_key_name, None)
             cls.db().session.add(db_object)
             cls.commit()
             return db_object

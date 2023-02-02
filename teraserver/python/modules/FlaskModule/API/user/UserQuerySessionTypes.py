@@ -2,8 +2,9 @@ from flask import session, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from opentera.db.models.TeraServiceSite import TeraServiceSite
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError, IntegrityError
@@ -237,7 +238,7 @@ class UserQuerySessionTypes(Resource):
 
             # Ensure that the newly added session types sites have a correct service site association, if required
             for sts in update_session_type.session_type_session_type_sites:
-                sts.check_integrity()
+                TeraSessionTypeSite.check_integrity(sts)
 
         # Update session type projects, if needed
         if update_st_projects:
@@ -284,7 +285,7 @@ class UserQuerySessionTypes(Resource):
             # Ensure that the newly added session types projects have a correct service project association, if required
             for stp in update_session_type.session_type_session_type_projects:
                 try:
-                    stp.check_integrity()
+                    TeraSessionTypeProject.check_integrity(stp)
                 except IntegrityError:
                     return gettext('Session type has a a service not associated to its site'), 400
 

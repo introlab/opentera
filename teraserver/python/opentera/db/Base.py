@@ -7,18 +7,11 @@ import sqlalchemy.sql.sqltypes
 from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, text
-from opentera.db.SoftDeleteMixin import generate_soft_delete_mixin_class
 
 
 class _QueryProperty:
     def __get__(self, obj: Model | None, cls: t.Type[Model]) -> BaseQuery:
         return cls.db().session.query(cls)
-
-
-# Create a Class that inherits from our class builder
-class SoftDeleteMixin(generate_soft_delete_mixin_class(delete_method_name='soft_delete')):
-    # type hint for autocomplete IDE support
-    deleted_at: datetime
 
 
 class BaseMixin(object):

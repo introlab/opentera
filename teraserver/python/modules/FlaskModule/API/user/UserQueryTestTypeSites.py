@@ -191,20 +191,21 @@ class UserQueryTestTypeSites(Resource):
             # Do the update!
             if int(json_tt['id_test_type_site']) > 0:
                 # Already existing
-                try:
-                    TeraTestTypeSite.update(int(json_tt['id_test_type_site']), json_tt)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQueryTestTypeSites.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # try:
+                #     TeraTestTypeSite.update(int(json_tt['id_test_type_site']), json_tt)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQueryTestTypeSites.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_tts = TeraTestTypeSite()
                     new_tts.from_json(json_tt)
-                    TeraTestTypeSite.insert(new_tts)
+                    new_tts = TeraTestTypeSite.insert(new_tts)
                     # Update ID for further use
                     json_tt['id_test_type_site'] = new_tts.id_test_type_site
                 except exc.SQLAlchemyError as e:

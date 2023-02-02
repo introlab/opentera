@@ -233,21 +233,22 @@ class UserQueryServiceProjects(Resource):
 
             # Do the update!
             if int(json_sp['id_service_project']) > 0:
-                # Already existing
-                try:
-                    TeraServiceProject.update(int(json_sp['id_service_project']), json_sp)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQueryServiceProjects.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # # Already existing
+                # try:
+                #     TeraServiceProject.update(int(json_sp['id_service_project']), json_sp)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQueryServiceProjects.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_sp = TeraServiceProject()
                     new_sp.from_json(json_sp)
-                    TeraServiceProject.insert(new_sp)
+                    new_sp = TeraServiceProject.insert(new_sp)
                     # Update ID for further use
                     json_sp['id_service_project'] = new_sp.id_service_project
                 except exc.SQLAlchemyError as e:

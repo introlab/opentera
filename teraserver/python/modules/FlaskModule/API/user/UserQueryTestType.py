@@ -5,6 +5,7 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraServiceSite import TeraServiceSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
+from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError, IntegrityError
 from sqlalchemy import exc
@@ -256,7 +257,7 @@ class UserQueryTestTypes(Resource):
 
             # Ensure that the newly added session types sites have a correct service site association, if required
             for tts in update_test_type.test_type_test_type_sites:
-                tts.check_integrity()
+                TeraTestTypeSite.check_integrity(tts)
 
         # Update test type projects, if needed
         if update_tt_projects:
@@ -294,7 +295,7 @@ class UserQueryTestTypes(Resource):
             # Ensure that the newly added test types projects have a correct service project association, if required
             for ttp in update_test_type.test_type_test_type_projects:
                 try:
-                    ttp.check_integrity()
+                    TeraTestTypeProject.check_integrity(ttp)
                 except IntegrityError:
                     return gettext('Test type has a a service not associated to its site'), 400
 

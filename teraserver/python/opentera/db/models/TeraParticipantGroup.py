@@ -1,6 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.models.TeraProject import TeraProject
 
 

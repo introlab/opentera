@@ -1,13 +1,14 @@
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
 
-class TeraServiceProject(BaseModel, SoftDeleteMixin):
+class TeraServiceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_services_projects'
-    id_service_project = Column(Integer, Sequence('id_service_project_sequence'), primary_key=True,
-                                   autoincrement=True)
+    id_service_project = Column(Integer, Sequence('id_service_project_sequence'), primary_key=True, autoincrement=True)
     id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
     id_project = Column(Integer, ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
 
@@ -89,21 +90,25 @@ class TeraServiceProject(BaseModel, SoftDeleteMixin):
         if not service_site:
             raise IntegrityError(params='Service not associated to project site', orig='TeraServiceProject.insert',
                                  statement='insert')
-        super().insert(stp)
+        return super().insert(stp)
+
+    # @classmethod
+    # def update(cls, update_id: int, values: dict):
+    #     values = cls.clean_values(values)
+    #     stp = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
+    #     stp.from_json(values)
+    #     # Check if that site of that project has the site associated to it
+    #     from opentera.db.models.TeraServiceSite import TeraServiceSite
+    #     service_site = TeraServiceSite.get_service_site_for_service_site(site_id=stp.service_project_project.id_site,
+    #                                                                      service_id=stp.id_service)
+    #     if not service_site:
+    #         raise IntegrityError(params='Service not associated to project site', orig='TeraServiceProject.update',
+    #                              statement='update')
+    #     cls.commit()
 
     @classmethod
     def update(cls, update_id: int, values: dict):
-        values = cls.clean_values(values)
-        stp = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
-        stp.from_json(values)
-        # Check if that site of that project has the site associated to it
-        from opentera.db.models.TeraServiceSite import TeraServiceSite
-        service_site = TeraServiceSite.get_service_site_for_service_site(site_id=stp.service_project_project.id_site,
-                                                                         service_id=stp.id_service)
-        if not service_site:
-            raise IntegrityError(params='Service not associated to project site', orig='TeraServiceProject.update',
-                                 statement='update')
-        cls.commit()
+        return
 
     @staticmethod
     def delete_with_ids(service_id: int, project_id: int):

@@ -1,9 +1,11 @@
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraSessionTypeSite(BaseModel, SoftDeleteMixin):
+class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_sessions_types_sites'
     id_session_type_site = Column(Integer, Sequence('id_session_type_site_sequence'), primary_key=True,
                                   autoincrement=True)
@@ -108,20 +110,21 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin):
             filter(TeraSessionType.id_service == service_id). \
             filter(TeraSessionTypeSite.id_site == site_id).all()
 
-    def check_integrity(self):
+    @staticmethod
+    def check_integrity(obj_to_check):
         from opentera.db.models.TeraSessionType import TeraSessionType
         # If that session type is related to a service, make sure that the service is associated to that site
-        if self.session_type_site_session_type.session_type_category == \
+        if obj_to_check.session_type_site_session_type.session_type_category == \
                 TeraSessionType.SessionCategoryEnum.SERVICE.value:
             service_sites = [site.id_site for site in
-                             self.session_type_site_session_type.session_type_service.service_sites]
-            if self.id_site not in service_sites:
+                             obj_to_check.session_type_site_session_type.session_type_service.service_sites]
+            if obj_to_check.id_site not in service_sites:
                 # We must also associate that service to that site!
                 from opentera.db.models.TeraServiceSite import TeraServiceSite
                 new_service_site = TeraServiceSite()
-                new_service_site.id_service = self.session_type_site_session_type \
+                new_service_site.id_service = obj_to_check.session_type_site_session_type \
                     .session_type_service.id_service
-                new_service_site.id_site = self.id_site
+                new_service_site.id_site = obj_to_check.id_site
                 TeraServiceSite.insert(new_service_site)
 
     @staticmethod
@@ -147,11 +150,16 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin):
 
     @classmethod
     def insert(cls, sts):
-        super().insert(sts)
-        sts.check_integrity()
+        inserted_obj = super().insert(sts)
+        TeraSessionTypeSite.check_integrity(inserted_obj)
+        return inserted_obj
+
+    # @classmethod
+    # def update(cls, update_id: int, values: dict):
+    #     super().update(update_id, values)
+    #     sts = TeraSessionTypeSite.get_session_type_site_by_id(update_id)
+    #     sts.check_integrity()
 
     @classmethod
     def update(cls, update_id: int, values: dict):
-        super().update(update_id, values)
-        sts = TeraSessionTypeSite.get_session_type_site_by_id(update_id)
-        sts.check_integrity()
+        return

@@ -1,10 +1,12 @@
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
 
-class TeraSessionTypeProject(BaseModel, SoftDeleteMixin):
+class TeraSessionTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_sessions_types_projects'
     id_session_type_project = Column(Integer, Sequence('id_session_type_project_sequence'), primary_key=True,
                                      autoincrement=True)
@@ -97,20 +99,21 @@ class TeraSessionTypeProject(BaseModel, SoftDeleteMixin):
         if delete_obj:
             TeraSessionTypeProject.delete(delete_obj.id_session_type_project)
 
-    def check_integrity(self):
+    @staticmethod
+    def check_integrity(obj_to_check):
         from opentera.db.models.TeraSessionType import TeraSessionType
         # If that session type is related to a service, make sure that the service is associated to that project
-        if self.session_type_project_session_type.session_type_category == \
+        if obj_to_check.session_type_project_session_type.session_type_category == \
                 TeraSessionType.SessionCategoryEnum.SERVICE.value:
             service_projects = [proj.id_project for proj in
-                                self.session_type_project_session_type.session_type_service.service_projects]
-            if self.id_project not in service_projects:
+                                obj_to_check.session_type_project_session_type.session_type_service.service_projects]
+            if obj_to_check.id_project not in service_projects:
                 # We must also associate that service to that project!
                 from opentera.db.models.TeraServiceProject import TeraServiceProject
                 new_service_project = TeraServiceProject()
-                new_service_project.id_service = self.session_type_project_session_type \
+                new_service_project.id_service = obj_to_check.session_type_project_session_type \
                     .session_type_service.id_service
-                new_service_project.id_project = self.session_type_project_project.id_project
+                new_service_project.id_project = obj_to_check.session_type_project_project.id_project
                 TeraServiceProject.insert(new_service_project)
 
     @classmethod
@@ -125,22 +128,26 @@ class TeraSessionTypeProject(BaseModel, SoftDeleteMixin):
         if not st_site:
             raise IntegrityError(params='Session type not associated to project site',
                                  orig='TeraSessionTypeProject.insert', statement='insert')
-        super().insert(stp)
-        stp.check_integrity()
+        inserted_obj = super().insert(stp)
+        TeraSessionTypeProject.check_integrity(inserted_obj)
+        return inserted_obj
 
+    # @classmethod
+    # def update(cls, update_id: int, values: dict):
+    #     values = cls.clean_values(values)
+    #     stp = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
+    #     stp.from_json(values)
+    #     # Check if that site of that project has the site associated to the session type
+    #     from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+    #     st_site = TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(
+    #         site_id=stp.session_type_project_project.id_site, session_type_id=stp.id_session_type)
+    #     if not st_site:
+    #         raise IntegrityError(params='Session type not associated to project site',
+    #                              orig='TeraSessionTypeProject.update', statement='update')
+    #
+    #     stp = TeraSessionTypeProject.get_session_type_project_by_id(update_id)
+    #     stp.check_integrity()
+    #     cls.commit()
     @classmethod
     def update(cls, update_id: int, values: dict):
-        values = cls.clean_values(values)
-        stp = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
-        stp.from_json(values)
-        # Check if that site of that project has the site associated to the session type
-        from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
-        st_site = TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(
-            site_id=stp.session_type_project_project.id_site, session_type_id=stp.id_session_type)
-        if not st_site:
-            raise IntegrityError(params='Session type not associated to project site',
-                                 orig='TeraSessionTypeProject.update', statement='update')
-
-        stp = TeraSessionTypeProject.get_session_type_project_by_id(update_id)
-        stp.check_integrity()
-        cls.commit()
+        return

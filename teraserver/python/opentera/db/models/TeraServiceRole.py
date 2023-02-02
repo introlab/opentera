@@ -1,12 +1,12 @@
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
 class TeraServiceRole(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_services_roles'
-    id_service_role = Column(Integer, Sequence('id_service_role_sequence'), primary_key=True,
-                                autoincrement=True)
+    id_service_role = Column(Integer, Sequence('id_service_role_sequence'), primary_key=True, autoincrement=True)
     id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
     # Specific project role for a project, used mostly with OpenTera service for project access
     id_project = Column(Integer, ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=True)

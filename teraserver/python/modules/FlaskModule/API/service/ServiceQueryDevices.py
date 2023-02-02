@@ -72,14 +72,14 @@ class ServiceQueryDevices(Resource):
 
         return gettext('Missing arguments'), 400
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(device_schema, validate=True)
     @api.doc(description='Update device information ',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
              params={'token': 'Secret token'})
+    @api.expect(device_schema, validate=True)
+    @LoginModule.service_token_or_certificate_required
     def post(self):
         # args = post_parser.parse_args()
         # Using request.json instead of parser, since parser messes up the json!

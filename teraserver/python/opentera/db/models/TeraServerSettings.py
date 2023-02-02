@@ -9,8 +9,7 @@ import uuid
 
 class TeraServerSettings(BaseModel):
     __tablename__ = 't_server_settings'
-    id_server_settings = Column(Integer, Sequence('id_server_settings_sequence'), primary_key=True,
-                                   autoincrement=True)
+    id_server_settings = Column(Integer, Sequence('id_server_settings_sequence'), primary_key=True, autoincrement=True)
     server_settings_name = Column(String, nullable=False, unique=True)
     server_settings_value = Column(String, nullable=False, unique=False)
 

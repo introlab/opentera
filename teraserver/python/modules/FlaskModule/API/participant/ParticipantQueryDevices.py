@@ -46,15 +46,3 @@ class ParticipantQueryDevices(Resource):
         devices_list = [data.to_json(minimal=minimal) for data in participant_access.query_device(filters)]
 
         return devices_list
-
-    @api.doc(description='To be documented '
-                         'To be documented',
-             responses={200: 'Success - To be documented',
-                        500: 'Required parameter is missing',
-                        501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
-    @api.expect(post_parser)
-    @participant_multi_auth.login_required(role='full')
-    def post(self):
-        return gettext('Not implemented'), 501

@@ -1,14 +1,16 @@
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraTestTypeSite(BaseModel, SoftDeleteMixin):
+class TeraTestTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_tests_types_sites'
     id_test_type_site = Column(Integer, Sequence('id_test_type_site_sequence'), primary_key=True,
-                                  autoincrement=True)
-    id_test_type = Column('id_test_type', Integer, ForeignKey('t_tests_types.id_test_type',
-                                                                       ondelete='cascade'), nullable=False)
+                               autoincrement=True)
+    id_test_type = Column('id_test_type', Integer, ForeignKey('t_tests_types.id_test_type', ondelete='cascade'),
+                          nullable=False)
     id_site = Column('id_site', Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
 
     test_type_site_test_type = relationship("TeraTestType", viewonly=True)
@@ -84,16 +86,17 @@ class TeraTestTypeSite(BaseModel, SoftDeleteMixin):
             filter(TeraTestType.id_service == service_id). \
             filter(TeraTestTypeSite.id_site == site_id).all()
 
-    def check_integrity(self):
+    @staticmethod
+    def check_integrity(obj_to_check):
         # If that test type is related to a service, make sure that the service is associated to that site
         service_sites = [site.id_site for site in
-                         self.test_type_site_test_type.test_type_service.service_sites]
-        if self.id_site not in service_sites:
+                         obj_to_check.test_type_site_test_type.test_type_service.service_sites]
+        if obj_to_check.id_site not in service_sites:
             # We must also associate that service to that site!
             from opentera.db.models.TeraServiceSite import TeraServiceSite
             new_service_site = TeraServiceSite()
-            new_service_site.id_service = self.test_type_site_test_type.test_type_service.id_service
-            new_service_site.id_site = self.id_site
+            new_service_site.id_service = obj_to_check.test_type_site_test_type.test_type_service.id_service
+            new_service_site.id_site = obj_to_check.id_site
             TeraServiceSite.insert(new_service_site)
 
     @staticmethod
@@ -119,11 +122,16 @@ class TeraTestTypeSite(BaseModel, SoftDeleteMixin):
 
     @classmethod
     def insert(cls, tts):
-        super().insert(tts)
-        tts.check_integrity()
+        inserted_obj = super().insert(tts)
+        TeraTestTypeSite.check_integrity(inserted_obj)
+        return inserted_obj
+
+    # @classmethod
+    # def update(cls, update_id: int, values: dict):
+    #     super().update(update_id, values)
+    #     tts = TeraTestTypeSite.get_test_type_site_by_id(update_id)
+    #     tts.check_integrity()
 
     @classmethod
     def update(cls, update_id: int, values: dict):
-        super().update(update_id, values)
-        tts = TeraTestTypeSite.get_test_type_site_by_id(update_id)
-        tts.check_integrity()
+        return

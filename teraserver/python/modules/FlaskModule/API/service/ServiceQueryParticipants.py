@@ -73,7 +73,7 @@ class ServiceQueryParticipants(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'},
              params={'token': 'Secret token'})
-    @api.expect(participant_schema, validate=True)
+    @api.expect(participant_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
         args = post_parser.parse_args()

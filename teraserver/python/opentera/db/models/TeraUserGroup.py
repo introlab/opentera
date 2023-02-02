@@ -1,4 +1,5 @@
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
@@ -9,9 +10,9 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
     user_group_name = Column(String, nullable=False, unique=False)
 
     user_group_services_access = relationship('TeraServiceAccess', cascade="all,delete",
-                                                 back_populates='service_access_user_group')
+                                              back_populates='service_access_user_group')
     user_group_users = relationship("TeraUser", secondary="t_users_users_groups", back_populates="user_user_groups",
-                                       passive_deletes=True)
+                                    passive_deletes=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:

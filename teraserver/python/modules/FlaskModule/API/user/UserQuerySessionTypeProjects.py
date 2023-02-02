@@ -208,20 +208,21 @@ class UserQuerySessionTypeProjects(Resource):
             # Do the update!
             if int(json_st['id_session_type_project']) > 0:
                 # Already existing
-                try:
-                    TeraSessionTypeProject.update(int(json_st['id_session_type_project']), json_st)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQuerySessionTypeProjects.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # try:
+                #     TeraSessionTypeProject.update(int(json_st['id_session_type_project']), json_st)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQuerySessionTypeProjects.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_stp = TeraSessionTypeProject()
                     new_stp.from_json(json_st)
-                    TeraSessionTypeProject.insert(new_stp)
+                    new_stp = TeraSessionTypeProject.insert(new_stp)
                     # Update ID for further use
                     json_st['id_session_type_project'] = new_stp.id_session_type_project
                 except exc.SQLAlchemyError as e:

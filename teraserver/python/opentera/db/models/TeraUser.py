@@ -1,4 +1,5 @@
-from opentera.db.Base import BaseModel, SoftDeleteMixin
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from opentera.db.models.TeraSite import TeraSite
@@ -40,9 +41,9 @@ class TeraUser(BaseModel, SoftDeleteMixin):
     # user_sites_access = relationship('TeraSiteAccess', cascade="all,delete")
     # user_projects_access = relationship("TeraProjectAccess", cascade="all,delete")
     user_user_groups = relationship("TeraUserGroup", secondary="t_users_users_groups",
-                                       back_populates="user_group_users", lazy='joined')
+                                    back_populates="user_group_users", lazy='joined')
     user_sessions = relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users",
-                                    passive_deletes=True)
+                                 passive_deletes=True)
 
     authenticated = False
 

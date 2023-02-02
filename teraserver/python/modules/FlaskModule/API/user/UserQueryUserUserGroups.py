@@ -123,7 +123,7 @@ class UserQueryUserUserGroups(Resource):
                 try:
                     new_uug = TeraUserUserGroup()
                     new_uug.from_json(json_user_group)
-                    TeraUserUserGroup.insert(new_uug)
+                    new_uug = TeraUserUserGroup.insert(new_uug)
                     # Update ID User Group for further use
                     json_user_group['id_user_user_group'] = new_uug.id_user_user_group
                 except exc.SQLAlchemyError as e:

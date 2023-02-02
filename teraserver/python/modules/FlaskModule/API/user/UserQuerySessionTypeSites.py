@@ -193,21 +193,22 @@ class UserQuerySessionTypeSites(Resource):
 
             # Do the update!
             if int(json_st['id_session_type_site']) > 0:
-                # Already existing
-                try:
-                    TeraSessionTypeSite.update(int(json_st['id_session_type_site']), json_st)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQuerySessionTypeSites.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # # Already existing
+                # try:
+                #     TeraSessionTypeSite.update(int(json_st['id_session_type_site']), json_st)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQuerySessionTypeSites.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_sts = TeraSessionTypeSite()
                     new_sts.from_json(json_st)
-                    TeraSessionTypeSite.insert(new_sts)
+                    new_sts = TeraSessionTypeSite.insert(new_sts)
                     # Update ID for further use
                     json_st['id_session_type_site'] = new_sts.id_session_type_site
                 except exc.SQLAlchemyError as e:

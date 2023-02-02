@@ -34,6 +34,7 @@ class FakeFlaskModule(BaseModule):
         self.flask_app.config.update({'SESSION_REDIS': redis_url})
         self.flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         self.flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        self.flask_app.config.update({'PROPAGATE_EXCEPTIONS': True})
 
         additional_args = {'test': True, 'flaskModule': self}
         FlaskModule.init_service_api(self, self.namespace, additional_args)

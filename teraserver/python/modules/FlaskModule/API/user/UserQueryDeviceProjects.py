@@ -34,7 +34,7 @@ post_schema = api.schema_model('user_device_project', {'properties': TeraDeviceP
                                                        'type': 'object',
                                                        'location': 'json'})
 
-delete_parser = reqparse.RequestParser()
+delete_parser = api.parser()
 delete_parser.add_argument('id', type=int, help='Specific device-project association ID to delete. Be careful: this'
                                                 ' is not the device or the project ID, but the ID of the '
                                                 'association itself!', required=True)
@@ -233,20 +233,21 @@ class UserQueryDeviceProjects(Resource):
             # Do the update!
             if int(json_dp['id_device_project']) > 0:
                 # Already existing
-                try:
-                    TeraDeviceProject.update(int(json_dp['id_device_project']), json_dp)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQueryDeviceProjects.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # try:
+                #     TeraDeviceProject.update(int(json_dp['id_device_project']), json_dp)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQueryDeviceProjects.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_dp = TeraDeviceProject()
                     new_dp.from_json(json_dp)
-                    TeraDeviceProject.insert(new_dp)
+                    new_dp = TeraDeviceProject.insert(new_dp)
                     # Update ID for further use
                     json_dp['id_device_project'] = new_dp.id_device_project
                 except exc.SQLAlchemyError as e:

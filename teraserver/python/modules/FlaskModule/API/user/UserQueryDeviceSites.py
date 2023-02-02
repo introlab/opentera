@@ -191,20 +191,21 @@ class UserQueryDeviceSites(Resource):
             # Do the update!
             if int(json_ds['id_device_site']) > 0:
                 # Already existing
-                try:
-                    TeraDeviceSite.update(int(json_ds['id_device_site']), json_ds)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQueryDeviceSites.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # try:
+                #     TeraDeviceSite.update(int(json_ds['id_device_site']), json_ds)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQueryDeviceSites.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_ds = TeraDeviceSite()
                     new_ds.from_json(json_ds)
-                    TeraDeviceSite.insert(new_ds)
+                    new_ds = TeraDeviceSite.insert(new_ds)
                     # Update ID for further use
                     json_ds['id_device_site'] = new_ds.id_device_site
                 except exc.SQLAlchemyError as e:

@@ -41,12 +41,14 @@ class FakeFlaskModule(BaseModule):
         self.flask_app.config.update({'SESSION_REDIS': redis_url})
         self.flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         self.flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        self.flask_app.config.update({'PROPAGATE_EXCEPTIONS': True})
 
         additional_args = {'test': True,
                            'user_manager_module': user_manager_module,
                            'flaskModule': self}
 
         FlaskModule.init_device_api(self, self.namespace, additional_args)
+
     def send_user_disconnect_module_message(self, user_uuid: str):
         print('FakeFlaskModule : send_user_disconnect_module_message')
         pass
@@ -84,7 +86,7 @@ class BaseDeviceAPITest(unittest.TestCase):
         cls._db_man: DBManager = DBManager(cls._config, cls._flask_app)
 
         # Setup DB in RAM
-        cls._db_man.open_local({}, echo=False, ram=True)
+        cls._db_man.open_local({}, echo=True, ram=True)
 
         with cls._flask_app.app_context():
             cls._flask_module = FakeFlaskModule(cls._config, cls._flask_app, cls._user_manager_module)
