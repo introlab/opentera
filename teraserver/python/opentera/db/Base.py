@@ -49,8 +49,10 @@ class BaseMixin(object):
             ignore_fields = []
         pr = {}
         for name in dir(self):
-            if self.is_valid_property_name(name) and name not in ignore_fields:
+            if (self.is_valid_property_name(name) and name not in ignore_fields) or name == 'deleted_at':
                 value = getattr(self, name)
+                if name == 'deleted_at' and value is None:
+                    continue  # If deleted field, but not deleted, don't add to the json
                 if self.is_valid_property_value(value):
                     if isinstance(value, datetime.datetime):
                         value = value.isoformat()
@@ -68,6 +70,7 @@ class BaseMixin(object):
     def from_json(self, json, ignore_fields=None):
         if ignore_fields is None:
             ignore_fields = []
+        ignore_fields.append('deleted_at')
         for name in json:
             if name not in ignore_fields:
                 if hasattr(self, name):
