@@ -99,3 +99,14 @@ class TeraUserUserGroup(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     @classmethod
     def update(cls, update_id: int, values: dict):
         return
+
+    @classmethod
+    def insert(cls, db_object):
+        existing_uug = TeraUserUserGroup.query_user_user_group_for_user_user_group(db_object.id_user,
+                                                                                   db_object.id_user_group)
+        # Avoid duplicates
+        if existing_uug:
+            return existing_uug
+
+        # Insert new uug, SoftInsertMixin will take care of restoring it if it was soft-deleted
+        return super().insert(db_object)
