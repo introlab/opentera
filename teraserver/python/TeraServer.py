@@ -193,9 +193,9 @@ if __name__ == '__main__':
 
         # Echo will be set by "debug_mode" flag
         if args.enable_tests:
-            # In RAM SQLITE DB for tests
-            db_infos = {'filename': '/Users/dominic/WA/opentera.git/teraserver/python/softdelete.db'}
-            Globals.db_man.open_local(db_infos, echo=True, ram=False)
+            # In RAM SQLITE DB for tests, change to ram=False and enter full path in db_infos to use a file
+            db_infos = {'filename': ''}
+            Globals.db_man.open_local(db_infos, echo=True, ram=True)
 
             # Create default values, if required
             Globals.db_man.create_defaults(config=config_man, test=True)

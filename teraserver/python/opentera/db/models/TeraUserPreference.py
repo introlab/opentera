@@ -93,7 +93,7 @@ class TeraUserPreference(BaseModel, SoftDeleteMixin):
             if prefs is None or prefs == '':
                 TeraUserPreference.db().session.delete(existing_pref)
             else:
-                # Updage pref
+                # Update pref
                 existing_pref.user_preference_preference = prefs
         else:
             # Insert
