@@ -6,11 +6,14 @@
 alembic revision -m "create account table"
 ```
 
-Changes for next version (Feb 6 2023) :
+## Changes for next version (Feb 6 2023) :
+
+**Modified tables / constraints**
 * TeraSite.site_name unique constraint removed
 * TeraSessionParticipants.id_session add ondelete='cascade'
-* 
-* Add deleted_at datetime field to :
+
+
+**Add deleted_at datetime field to :**
 - TeraAsset
 - TeraDevice
 - TeraDeviceParticipant
@@ -32,7 +35,7 @@ Changes for next version (Feb 6 2023) :
 - TeraSessionParticipants
 - TeraSessionType
 - TeraSessionTypeProject
-- TEraSessionTypeSite
+- TeraSessionTypeSite
 - TeraSessionUsers
 - TeraSite
 - TeraTest
