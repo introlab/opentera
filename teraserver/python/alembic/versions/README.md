@@ -14,7 +14,7 @@ alembic revision -m "create account table"
 * TeraSessionParticipants.id_session add ondelete='cascade'
 
 
-**Add deleted_at datetime field to :**
+**Add deleted_at datetime field (set tu NULL) to :**
 - TeraAsset
 - TeraDevice
 - TeraDeviceParticipant
