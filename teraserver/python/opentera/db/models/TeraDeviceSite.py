@@ -69,20 +69,24 @@ class TeraDeviceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                     TeraDeviceSite.db().session.commit()
 
     @staticmethod
-    def get_device_site_by_id(device_site_id: int):
-        return TeraDeviceSite.query.filter_by(id_device_site=device_site_id).first()
+    def get_device_site_by_id(device_site_id: int, with_deleted: bool = False):
+        return TeraDeviceSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_device_site=device_site_id).first()
 
     @staticmethod
-    def get_device_site_id_for_device_and_site(device_id: int, site_id: int):
-        return TeraDeviceSite.query.filter_by(id_site=site_id, id_device=device_id).first()
+    def get_device_site_id_for_device_and_site(device_id: int, site_id: int, with_deleted: bool = False):
+        return TeraDeviceSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_site=site_id, id_device=device_id).first()
 
     @staticmethod
-    def get_devices_for_site(site_id: int):
-        return TeraDeviceSite.query.filter_by(id_site=site_id).all()
+    def get_devices_for_site(site_id: int, with_deleted: bool = False):
+        return TeraDeviceSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_site=site_id).all()
 
     @staticmethod
-    def get_sites_for_device(device_id: int):
-        return TeraDeviceSite.query.filter_by(id_device=device_id).all()
+    def get_sites_for_device(device_id: int, with_deleted: bool = False):
+        return TeraDeviceSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_device=device_id).all()
 
     @staticmethod
     def delete_with_ids(device_id: int, site_id: int):

@@ -88,25 +88,29 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                     TeraSessionTypeSite.db().session.commit()
 
     @staticmethod
-    def get_session_type_site_by_id(sts_id: int):
-        return TeraSessionTypeSite.query.filter_by(id_session_type_site=sts_id).first()
+    def get_session_type_site_by_id(sts_id: int, with_deleted: bool = False):
+        return TeraSessionTypeSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_session_type_site=sts_id).first()
 
     @staticmethod
-    def get_sites_for_session_type(session_type_id: int):
-        return TeraSessionTypeSite.query.filter_by(id_session_type=session_type_id).all()
+    def get_sites_for_session_type(session_type_id: int, with_deleted: bool = False):
+        return TeraSessionTypeSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_session_type=session_type_id).all()
 
     @staticmethod
-    def get_sessions_types_for_site(site_id: int):
-        return TeraSessionTypeSite.query.filter_by(id_site=site_id).all()
+    def get_sessions_types_for_site(site_id: int, with_deleted: bool = False):
+        return TeraSessionTypeSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_site=site_id).all()
 
     @staticmethod
-    def get_session_type_site_for_session_type_and_site(site_id: int, session_type_id: int):
-        return TeraSessionTypeSite.query.filter_by(id_site=site_id, id_session_type=session_type_id).first()
+    def get_session_type_site_for_session_type_and_site(site_id: int, session_type_id: int, with_deleted: bool = False):
+        return TeraSessionTypeSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_site=site_id, id_session_type=session_type_id).first()
 
     @staticmethod
-    def get_session_type_site_for_site_and_service(site_id: int, service_id: int):
+    def get_session_type_site_for_site_and_service(site_id: int, service_id: int, with_deleted: bool = False):
         from opentera.db.models.TeraSessionType import TeraSessionType
-        return TeraSessionTypeSite.query.join(TeraSessionType). \
+        return TeraSessionTypeSite.query.execution_options(include_deleted=with_deleted).join(TeraSessionType). \
             filter(TeraSessionType.id_service == service_id). \
             filter(TeraSessionTypeSite.id_site == site_id).all()
 

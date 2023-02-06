@@ -43,12 +43,12 @@ class TeraSite(BaseModel, SoftDeleteMixin):
             TeraSite.insert(base_site)
 
     @staticmethod
-    def get_site_by_sitename(sitename):
-        return TeraSite.query.filter_by(site_name=sitename).first()
+    def get_site_by_sitename(sitename, with_deleted: bool = False):
+        return TeraSite.query.execution_options(include_deleted=with_deleted).filter_by(site_name=sitename).first()
 
     @staticmethod
-    def get_site_by_id(site_id: int):
-        return TeraSite.query.filter_by(id_site=site_id).first()
+    def get_site_by_id(site_id: int, with_deleted: bool = False):
+        return TeraSite.query.execution_options(include_deleted=with_deleted).filter_by(id_site=site_id).first()
 
     # @staticmethod
     # def query_data(filter_args):

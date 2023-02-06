@@ -87,8 +87,8 @@ class TeraService(BaseModel, SoftDeleteMixin):
         return jwt.encode(payload, token_key, algorithm='HS256')
 
     @staticmethod
-    def get_service_by_key(key: str):
-        service = TeraService.query.filter_by(service_key=key).first()
+    def get_service_by_key(key: str, with_deleted: bool = False):
+        service = TeraService.query.execution_options(include_deleted=with_deleted).filter_by(service_key=key).first()
 
         if service:
             return service
@@ -96,8 +96,9 @@ class TeraService(BaseModel, SoftDeleteMixin):
         return None
 
     @staticmethod
-    def get_service_by_uuid(p_uuid: str):
-        service = TeraService.query.filter_by(service_uuid=p_uuid).first()
+    def get_service_by_uuid(p_uuid: str, with_deleted: bool = False):
+        service = TeraService.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(service_uuid=p_uuid).first()
 
         if service:
             return service
@@ -105,12 +106,12 @@ class TeraService(BaseModel, SoftDeleteMixin):
         return None
 
     @staticmethod
-    def get_service_by_name(name: str):
-        return TeraService.query.filter_by(service_name=name).first()
+    def get_service_by_name(name: str, with_deleted: bool = False):
+        return TeraService.query.execution_options(include_deleted=with_deleted).filter_by(service_name=name).first()
 
     @staticmethod
-    def get_service_by_id(s_id: int):
-        return TeraService.query.filter_by(id_service=s_id).first()
+    def get_service_by_id(s_id: int, with_deleted: bool = False):
+        return TeraService.query.execution_options(include_deleted=with_deleted).filter_by(id_service=s_id).first()
 
     @staticmethod
     def get_openteraserver_service():

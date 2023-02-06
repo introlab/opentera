@@ -1,10 +1,9 @@
 from opentera.db.Base import BaseModel
-from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraDeviceSubType(BaseModel, SoftDeleteMixin):
+class TeraDeviceSubType(BaseModel):
 
     __tablename__ = 't_devices_subtypes'
     id_device_subtype = Column(Integer, Sequence('id_device_subtype_sequence'), primary_key=True, autoincrement=True)

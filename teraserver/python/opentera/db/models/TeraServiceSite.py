@@ -29,20 +29,23 @@ class TeraServiceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         return super().to_json(ignore_fields=ignore_fields)
 
     @staticmethod
-    def get_services_for_site(id_site: int):
-        return TeraServiceSite.query.filter_by(id_site=id_site).all()
+    def get_services_for_site(id_site: int, with_deleted: bool = False):
+        return TeraServiceSite.query.execution_options(include_deleted=with_deleted).filter_by(id_site=id_site).all()
 
     @staticmethod
-    def get_sites_for_service(id_service: int):
-        return TeraServiceSite.query.filter_by(id_service=id_service).all()
+    def get_sites_for_service(id_service: int, with_deleted: bool = False):
+        return TeraServiceSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=id_service).all()
 
     @staticmethod
-    def get_service_site_by_id(service_site_id: int):
-        return TeraServiceSite.query.filter_by(id_service_site=service_site_id).first()
+    def get_service_site_by_id(service_site_id: int, with_deleted: bool = False):
+        return TeraServiceSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service_site=service_site_id).first()
 
     @staticmethod
-    def get_service_site_for_service_site(site_id: int, service_id: int):
-        return TeraServiceSite.query.filter_by(id_site=site_id, id_service=service_id).first()
+    def get_service_site_for_service_site(site_id: int, service_id: int, with_deleted: bool = False):
+        return TeraServiceSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_site=site_id, id_service=service_id).first()
 
     @staticmethod
     def create_defaults(test=False):

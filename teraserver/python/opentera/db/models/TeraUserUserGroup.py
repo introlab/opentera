@@ -66,20 +66,24 @@ class TeraUserUserGroup(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             TeraUserUserGroup.db().session.commit()
 
     @staticmethod
-    def get_user_user_group_by_id(user_user_group_id: int):
-        return TeraUserUserGroup.query.filter_by(id_user_user_group=user_user_group_id).first()
+    def get_user_user_group_by_id(user_user_group_id: int, with_deleted: bool = False):
+        return TeraUserUserGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user_user_group=user_user_group_id).first()
 
     @staticmethod
-    def query_users_for_user_group(user_group_id: int):
-        return TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).all()
+    def query_users_for_user_group(user_group_id: int, with_deleted: bool = False):
+        return TeraUserUserGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user_group=user_group_id).all()
 
     @staticmethod
-    def query_users_groups_for_user(user_id: int):
-        return TeraUserUserGroup.query.filter_by(id_user=user_id).all()
+    def query_users_groups_for_user(user_id: int, with_deleted: bool = False):
+        return TeraUserUserGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user=user_id).all()
 
     @staticmethod
-    def query_user_user_group_for_user_user_group(user_id: int, user_group_id: int):
-        return TeraUserUserGroup.query.filter_by(id_user=user_id, id_user_group=user_group_id).first()
+    def query_user_user_group_for_user_user_group(user_id: int, user_group_id: int, with_deleted: bool = False):
+        return TeraUserUserGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user=user_id, id_user_group=user_group_id).first()
 
     # @staticmethod
     # def insert_user_user_group(id_user_group: int, id_user: int):

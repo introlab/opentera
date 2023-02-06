@@ -71,12 +71,14 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
         return sites_roles
 
     @staticmethod
-    def get_user_group_by_group_name(name: str):
-        return TeraUserGroup.query.filter_by(user_group_name=name).first()
+    def get_user_group_by_group_name(name: str, with_deleted: bool = False):
+        return TeraUserGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(user_group_name=name).first()
 
     @staticmethod
-    def get_user_group_by_id(group_id: int):
-        return TeraUserGroup.query.filter_by(id_user_group=group_id).first()
+    def get_user_group_by_id(group_id: int, with_deleted: bool = False):
+        return TeraUserGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user_group=group_id).first()
 
     @staticmethod
     def create_defaults(test=False):

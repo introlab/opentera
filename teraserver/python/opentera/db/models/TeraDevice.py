@@ -116,8 +116,8 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
         TeraDevice.db().session.commit()
 
     @staticmethod
-    def get_device_by_token(token):
-        device = TeraDevice.query.filter_by(device_token=token).first()
+    def get_device_by_token(token, with_deleted: bool = False):
+        device = TeraDevice.query.execution_options(include_deleted=with_deleted).filter_by(device_token=token).first()
 
         if device:
             # Validate token, key loaded from DB
@@ -135,21 +135,23 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
         return None
 
     @staticmethod
-    def get_device_by_certificate(certificate):
-        return TeraDevice.query.filter_by(device_certificate=certificate).first()
+    def get_device_by_certificate(certificate, with_deleted: bool = False):
+        return TeraDevice.query.execution_options(include_deleted=with_deleted).\
+            filter_by(device_certificate=certificate).first()
 
     @staticmethod
-    def get_device_by_uuid(dev_uuid):
-        device = TeraDevice.query.filter_by(device_uuid=dev_uuid).first()
+    def get_device_by_uuid(dev_uuid, with_deleted: bool = False):
+        device = TeraDevice.query.execution_options(include_deleted=with_deleted).\
+            filter_by(device_uuid=dev_uuid).first()
         return device
 
     @staticmethod
-    def get_device_by_name(name):
-        return TeraDevice.query.filter_by(device_name=name).first()
+    def get_device_by_name(name, with_deleted: bool = False):
+        return TeraDevice.query.execution_options(include_deleted=with_deleted).filter_by(device_name=name).first()
 
     @staticmethod
-    def get_device_by_id(device_id):
-        return TeraDevice.query.filter_by(id_device=device_id).first()
+    def get_device_by_id(device_id, with_deleted: bool = False):
+        return TeraDevice.query.execution_options(include_deleted=with_deleted).filter_by(id_device=device_id).first()
 
     @staticmethod
     def create_defaults(test=False):

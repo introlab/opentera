@@ -80,11 +80,13 @@ class TeraSessionEvent(BaseModel, SoftDeleteMixin):
             TeraSessionEvent.db().session.commit()
 
     @staticmethod
-    def get_session_event_by_id(event_id: int):
-        return TeraSessionEvent.query.filter_by(id_session_event=event_id).first()
+    def get_session_event_by_id(event_id: int, with_deleted: bool = False):
+        return TeraSessionEvent.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_session_event=event_id).first()
 
     @staticmethod
-    def get_events_for_session(id_session: int):
+    def get_events_for_session(id_session: int, with_deleted: bool = False):
         from .TeraSession import TeraSession
-        return TeraSessionEvent.db().session.query(TeraSessionEvent).join(TeraSessionEvent.session_event_session)\
+        return TeraSessionEvent.db().session.query(TeraSessionEvent).execution_options(include_deleted=with_deleted)\
+            .join(TeraSessionEvent.session_event_session)\
             .filter(TeraSession.id_session == id_session).order_by(asc(TeraSessionEvent.session_event_datetime)).all()

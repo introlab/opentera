@@ -64,25 +64,29 @@ class TeraTestTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             TeraTestTypeSite.db().session.commit()
 
     @staticmethod
-    def get_test_type_site_by_id(tts_id: int):
-        return TeraTestTypeSite.query.filter_by(id_test_type_site=tts_id).first()
+    def get_test_type_site_by_id(tts_id: int, with_deleted: bool = False):
+        return TeraTestTypeSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_test_type_site=tts_id).first()
 
     @staticmethod
-    def get_sites_for_test_type(test_type_id: int):
-        return TeraTestTypeSite.query.filter_by(id_test_type=test_type_id).all()
+    def get_sites_for_test_type(test_type_id: int, with_deleted: bool = False):
+        return TeraTestTypeSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_test_type=test_type_id).all()
 
     @staticmethod
-    def get_tests_types_for_site(site_id: int):
-        return TeraTestTypeSite.query.filter_by(id_site=site_id).all()
+    def get_tests_types_for_site(site_id: int, with_deleted: bool = False):
+        return TeraTestTypeSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_site=site_id).all()
 
     @staticmethod
-    def get_test_type_site_for_test_type_and_site(site_id: int, test_type_id: int):
-        return TeraTestTypeSite.query.filter_by(id_site=site_id, id_test_type=test_type_id).first()
+    def get_test_type_site_for_test_type_and_site(site_id: int, test_type_id: int, with_deleted: bool = False):
+        return TeraTestTypeSite.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_site=site_id, id_test_type=test_type_id).first()
 
     @staticmethod
-    def get_test_type_site_for_site_and_service(site_id: int, service_id: int):
+    def get_test_type_site_for_site_and_service(site_id: int, service_id: int, with_deleted: bool = False):
         from opentera.db.models.TeraTestType import TeraTestType
-        return TeraTestTypeSite.query.join(TeraTestType). \
+        return TeraTestTypeSite.query.execution_options(include_deleted=with_deleted).join(TeraTestType). \
             filter(TeraTestType.id_service == service_id). \
             filter(TeraTestTypeSite.id_site == site_id).all()
 

@@ -189,22 +189,22 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         return None
 
     @staticmethod
-    def get_user_by_username(username):
-        return TeraUser.query.filter_by(user_username=username).first()
+    def get_user_by_username(username, with_deleted: bool = False):
+        return TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(user_username=username).first()
 
     @staticmethod
-    def get_user_by_uuid(u_uuid):
-        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
+    def get_user_by_uuid(u_uuid, with_deleted: bool = False):
+        user = TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(user_uuid=u_uuid).first()
         return user
 
     @staticmethod
-    def get_user_by_id(id_user):
-        user = TeraUser.query.filter_by(id_user=id_user).first()
+    def get_user_by_id(id_user, with_deleted: bool = False):
+        user = TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(id_user=id_user).first()
         return user
 
     @staticmethod
-    def get_superadmins():
-        return TeraUser.query.filter_by(user_superadmin=True).all()
+    def get_superadmins(with_deleted: bool = False):
+        return TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(user_superadmin=True).all()
 
     @classmethod
     def update(cls, id_user: int, values: dict):

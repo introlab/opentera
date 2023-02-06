@@ -186,8 +186,9 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         return None
 
     @staticmethod
-    def get_participant_by_token(token):
-        participant = TeraParticipant.query.filter_by(participant_token=token).first()
+    def get_participant_by_token(token, with_deleted: bool = False):
+        participant = TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(participant_token=token).first()
 
         if participant and participant.participant_enabled and participant.participant_token_enabled:
             # Validate token
@@ -203,8 +204,9 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         return None
 
     @staticmethod
-    def get_participant_by_uuid(p_uuid):
-        participant = TeraParticipant.query.filter_by(participant_uuid=p_uuid).first()
+    def get_participant_by_uuid(p_uuid, with_deleted: bool = False):
+        participant = TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(participant_uuid=p_uuid).first()
 
         if participant:
             return participant
@@ -212,20 +214,24 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         return None
 
     @staticmethod
-    def get_participant_by_username(username):
-        return TeraParticipant.query.filter_by(participant_username=username).first()
+    def get_participant_by_username(username, with_deleted: bool = False):
+        return TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(participant_username=username).first()
 
     @staticmethod
-    def get_participant_by_email(email: str):
-        return TeraParticipant.query.filter_by(participant_email=email).first()
+    def get_participant_by_email(email: str, with_deleted: bool = False):
+        return TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(participant_email=email).first()
 
     @staticmethod
-    def get_participant_by_name(name):
-        return TeraParticipant.query.filter_by(participant_name=name).first()
+    def get_participant_by_name(name, with_deleted: bool = False):
+        return TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(participant_name=name).first()
 
     @staticmethod
-    def get_participant_by_id(part_id: int):
-        return TeraParticipant.query.filter_by(id_participant=part_id).first()
+    def get_participant_by_id(part_id: int, with_deleted: bool = False):
+        return TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_participant=part_id).first()
 
     @staticmethod
     def is_participant_username_available(username: str) -> bool:

@@ -55,20 +55,24 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             TeraDeviceProject.db().session.commit()
 
     @staticmethod
-    def get_device_project_by_id(device_project_id: int):
-        return TeraDeviceProject.query.filter_by(id_device_project=device_project_id).first()
+    def get_device_project_by_id(device_project_id: int, with_deleted: bool = False):
+        return TeraDeviceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_device_project=device_project_id).first()
 
     @staticmethod
-    def get_device_project_id_for_device_and_project(device_id: int, project_id: int):
-        return TeraDeviceProject.query.filter_by(id_project=project_id, id_device=device_id).first()
+    def get_device_project_id_for_device_and_project(device_id: int, project_id: int, with_deleted: bool = False):
+        return TeraDeviceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_project=project_id, id_device=device_id).first()
 
     @staticmethod
-    def get_devices_for_project(project_id: int):
-        return TeraDeviceProject.query.filter_by(id_project=project_id).all()
+    def get_devices_for_project(project_id: int, with_deleted: bool = False):
+        return TeraDeviceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_project=project_id).all()
 
     @staticmethod
-    def get_projects_for_device(device_id: int):
-        return TeraDeviceProject.query.filter_by(id_device=device_id).all()
+    def get_projects_for_device(device_id: int, with_deleted: bool = False):
+        return TeraDeviceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_device=device_id).all()
 
     @staticmethod
     def delete_with_ids(device_id: int, project_id: int):

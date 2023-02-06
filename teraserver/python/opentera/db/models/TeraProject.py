@@ -12,11 +12,11 @@ class TeraProject(BaseModel, SoftDeleteMixin):
 
     project_site = relationship("TeraSite", back_populates='site_projects')
     project_participants = relationship("TeraParticipant", back_populates='participant_project',
-                                           passive_deletes=True)
+                                        passive_deletes=True)
     project_participants_groups = relationship("TeraParticipantGroup", passive_deletes=True)
     project_devices = relationship("TeraDevice", secondary="t_devices_projects", back_populates="device_projects")
     project_session_types = relationship("TeraSessionType", secondary="t_sessions_types_projects",
-                                            back_populates="session_type_projects")
+                                         back_populates="session_type_projects")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -42,9 +42,9 @@ class TeraProject(BaseModel, SoftDeleteMixin):
         # Minimal information, delete can not be filtered
         return {'id_project': self.id_project}
 
-    def get_users_ids_in_project(self):
+    def get_users_ids_in_project(self, with_deleted: bool = False):
         # Get all users who has a role in the project
-        users = self.get_users_in_project()
+        users = self.get_users_in_project(with_deleted=with_deleted)
         users_ids = []
 
         for user in users:
@@ -52,13 +52,14 @@ class TeraProject(BaseModel, SoftDeleteMixin):
 
         return users_ids
 
-    def get_users_in_project(self, include_superadmins=False, include_site_access=False):
+    def get_users_in_project(self, include_superadmins=False, include_site_access=False, with_deleted: bool = False):
         import modules.Globals as Globals
         from opentera.db.models.TeraServiceAccess import TeraServiceAccess
         from opentera.db.models.TeraUser import TeraUser
         # Get all users who have a role in the project
         project_access = TeraServiceAccess.get_service_access_for_project(id_service=Globals.opentera_service_id,
-                                                                          id_project=self.id_project)
+                                                                          id_project=self.id_project,
+                                                                          with_deleted=with_deleted)
 
         users = []
         for access in project_access:
@@ -72,7 +73,8 @@ class TeraProject(BaseModel, SoftDeleteMixin):
         # Also appends users with site access but no direct access to project
         if include_site_access:
             site_access = TeraServiceAccess.get_service_access_for_site(id_service=Globals.opentera_service_id,
-                                                                        id_site=self.id_site)
+                                                                        id_site=self.id_site,
+                                                                        with_deleted=with_deleted)
             for access in site_access:
                 if access.service_access_role.service_role_name == 'admin':
                     if access.service_access_user_group:
@@ -109,19 +111,23 @@ class TeraProject(BaseModel, SoftDeleteMixin):
             TeraProject.insert(secret_project)
 
     @staticmethod
-    def get_project_by_projectname(projectname):
-        return TeraProject.query.filter_by(project_name=projectname).first()
+    def get_project_by_projectname(projectname, with_deleted: bool = False):
+        return TeraProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(project_name=projectname).first()
 
     @staticmethod
-    def get_project_by_id(project_id):
-        return TeraProject.query.filter_by(id_project=project_id).first()
+    def get_project_by_id(project_id, with_deleted: bool = False):
+        return TeraProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_project=project_id).first()
 
     @staticmethod
-    def query_data(filter_args):
+    def query_data(filter_args, with_deleted: bool = False):
         if isinstance(filter_args, tuple):
-            return TeraProject.query.filter_by(*filter_args).all()
+            return TeraProject.query.execution_options(include_deleted=with_deleted)\
+                .filter_by(*filter_args).all()
         if isinstance(filter_args, dict):
-            return TeraProject.query.filter_by(**filter_args).all()
+            return TeraProject.query.execution_options(include_deleted=with_deleted)\
+                .filter_by(**filter_args).all()
         return None
 
     @classmethod

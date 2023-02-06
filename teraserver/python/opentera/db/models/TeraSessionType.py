@@ -133,12 +133,14 @@ class TeraSessionType(BaseModel, SoftDeleteMixin):
         TeraSessionType.db().session.commit()
 
     @staticmethod
-    def get_session_type_by_id(ses_type_id: int):
-        return TeraSessionType.query.filter_by(id_session_type=ses_type_id).first()
+    def get_session_type_by_id(ses_type_id: int, with_deleted: bool = False):
+        return TeraSessionType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_session_type=ses_type_id).first()
 
     @staticmethod
-    def get_session_types_for_service(id_service: int):
-        return TeraSessionType.query.filter_by(id_service=id_service).all()
+    def get_session_types_for_service(id_service: int, with_deleted: bool = False):
+        return TeraSessionType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_category_name(category: SessionCategoryEnum):

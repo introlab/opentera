@@ -30,20 +30,24 @@ class TeraServiceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         return super().to_json(ignore_fields=ignore_fields)
 
     @staticmethod
-    def get_services_for_project(id_project: int):
-        return TeraServiceProject.query.filter_by(id_project=id_project).all()
+    def get_services_for_project(id_project: int, with_deleted: bool = False):
+        return TeraServiceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_project=id_project).all()
 
     @staticmethod
-    def get_projects_for_service(id_service: int):
-        return TeraServiceProject.query.filter_by(id_service=id_service).all()
+    def get_projects_for_service(id_service: int, with_deleted: bool = False):
+        return TeraServiceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=id_service).all()
 
     @staticmethod
-    def get_service_project_by_id(service_project_id: int):
-        return TeraServiceProject.query.filter_by(id_service_project=service_project_id).first()
+    def get_service_project_by_id(service_project_id: int, with_deleted: bool = False):
+        return TeraServiceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service_project=service_project_id).first()
 
     @staticmethod
-    def get_service_project_for_service_project(project_id: int, service_id: int):
-        return TeraServiceProject.query.filter_by(id_project=project_id, id_service=service_id).first()
+    def get_service_project_for_service_project(project_id: int, service_id: int, with_deleted: bool = False):
+        return TeraServiceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_project=project_id, id_service=service_id).first()
 
     @staticmethod
     def create_defaults(test=False):

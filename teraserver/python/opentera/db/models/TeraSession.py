@@ -234,20 +234,22 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         return TeraSession.query.filter_by(id_session=ses_id).execution_options(include_deleted=with_deleted).first()
 
     @staticmethod
-    def get_session_by_uuid(s_uuid):
-        session = TeraSession.query.filter_by(session_uuid=s_uuid).first()
+    def get_session_by_uuid(s_uuid, with_deleted: bool = False):
+        session = TeraSession.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(session_uuid=s_uuid).first()
         if session:
             return session
 
         return None
 
     @staticmethod
-    def get_session_by_name(name: str):
-        return TeraSession.query.filter_by(session_name=name).first()
+    def get_session_by_name(name: str, with_deleted: bool = False):
+        return TeraSession.query.execution_options(include_deleted=with_deleted).filter_by(session_name=name).first()
 
     @staticmethod
     def _set_query_parameters(query, status: int = None, limit: int = None, offset: int = None,
-                              start_date: datetime.date = None, end_date: datetime.date = None):
+                              start_date: datetime.date = None, end_date: datetime.date = None,
+                              with_deleted: bool = False):
         if status is not None:
             query = query.filter(TeraSession.session_status == status)
         if start_date:
@@ -259,15 +261,16 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         if offset:
             query = query.offset(offset)
 
+        query = query.execution_options(include_deleted=with_deleted)
         return query
 
     @staticmethod
     def get_sessions_for_participant(part_id: int, status: int = None, limit: int = None, offset: int = None,
                                      start_date: datetime.date = None, end_date: datetime.date = None,
-                                     filters: dict = None):
+                                     filters: dict = None, with_deleted: bool = False):
         from opentera.db.models.TeraParticipant import TeraParticipant
-        query = TeraSession.query.join(TeraSession.session_participants).filter(TeraParticipant.id_participant ==
-                                                                                part_id)
+        query = TeraSession.query.execution_options(include_deleted=with_deleted)\
+            .join(TeraSession.session_participants).filter(TeraParticipant.id_participant == part_id)
 
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
@@ -283,9 +286,11 @@ class TeraSession(BaseModel, SoftDeleteMixin):
 
     @staticmethod
     def get_sessions_for_user(user_id: int, status: int = None, limit: int = None, offset: int = None,
-                              start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None):
+                              start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None,
+                              with_deleted: bool = False):
         from opentera.db.models.TeraUser import TeraUser
-        query = TeraSession.query.join(TeraSession.session_users).filter(TeraUser.id_user == user_id)
+        query = TeraSession.query.execution_options(include_deleted=with_deleted)\
+            .join(TeraSession.session_users).filter(TeraUser.id_user == user_id)
 
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
@@ -301,9 +306,11 @@ class TeraSession(BaseModel, SoftDeleteMixin):
 
     @staticmethod
     def get_sessions_for_device(device_id: int, status: int = None, limit: int = None, offset: int = None,
-                                start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None):
+                                start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None,
+                                with_deleted: bool = False):
         from opentera.db.models.TeraDevice import TeraDevice
-        query = TeraSession.query.join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
+        query = TeraSession.query.execution_options(include_deleted=with_deleted)\
+            .join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
         query = query.order_by(TeraSession.id_session.desc())
@@ -317,24 +324,25 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         return query.all()
 
     @staticmethod
-    def get_sessions_for_type(session_type_id: int):
-        return TeraSession.query.filter_by(id_session_type=session_type_id).all()
+    def get_sessions_for_type(session_type_id: int, with_deleted: bool = False):
+        return TeraSession.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_session_type=session_type_id).all()
 
     @staticmethod
-    def is_user_in_session(session_uuid: str, user_uuid: str) -> bool:
-        session = TeraSession.get_session_by_uuid(session_uuid)
+    def is_user_in_session(session_uuid: str, user_uuid: str, with_deleted: bool = False) -> bool:
+        session = TeraSession.get_session_by_uuid(session_uuid, with_deleted=with_deleted)
         user_uuids = [user.user_uuid for user in session.session_users]
         return user_uuid in user_uuids
 
     @staticmethod
-    def is_device_in_session(session_uuid: str, device_uuid: str) -> bool:
-        session = TeraSession.get_session_by_uuid(session_uuid)
+    def is_device_in_session(session_uuid: str, device_uuid: str, with_deleted: bool = False) -> bool:
+        session = TeraSession.get_session_by_uuid(session_uuid, with_deleted=with_deleted)
         device_uuids = [device.device_uuid for device in session.session_devices]
         return device_uuid in device_uuids
 
     @staticmethod
-    def is_participant_in_session(session_uuid: str, participant_uuid: str) -> bool:
-        session = TeraSession.get_session_by_uuid(session_uuid)
+    def is_participant_in_session(session_uuid: str, participant_uuid: str, with_deleted: bool = False) -> bool:
+        session = TeraSession.get_session_by_uuid(session_uuid, with_deleted=with_deleted)
         participant_uuids = [participant.participant_uuid for participant in session.session_participants]
         return participant_uuid in participant_uuids
 

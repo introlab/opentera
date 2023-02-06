@@ -122,8 +122,8 @@ class BaseMixin(object):
         return clean_values
 
     @classmethod
-    def get_count(cls, filters: dict = None) -> int:
-        query = cls.db().session.query(cls)
+    def get_count(cls, filters: dict = None, with_deleted: bool = False) -> int:
+        query = cls.db().session.query(cls).execution_options(include_deleted=with_deleted)
         if filters:
             query = query.filter_by(**filters)
         return query.count()
@@ -142,10 +142,10 @@ class BaseMixin(object):
     @classmethod
     def update(cls, update_id: int, values: dict):
         values = cls.clean_values(values)
-        with Session(cls.db().engine) as session:
-            update_obj = session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()
-            update_obj.from_json(values)
-            session.commit()
+        # with Session(cls.db().engine) as session:
+        update_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()
+        update_obj.from_json(values)
+        cls.db().session.commit()
 
     @classmethod
     def commit(cls):
@@ -175,18 +175,18 @@ class BaseMixin(object):
             cls.commit()
 
     @classmethod
-    def query_with_filters(cls, filters=None):
+    def query_with_filters(cls, filters=None, with_deleted: bool = False):
         if filters is None:
             filters = dict()
 
-        return cls.db().session.query(cls).filter_by(**filters).all()
+        return cls.db().session.query(cls).execution_options(include_deleted=with_deleted).filter_by(**filters).all()
 
     @classmethod
-    def count_with_filters(cls, filters=None):
+    def count_with_filters(cls, filters=None, with_deleted: bool = False):
         if filters is None:
             filters = dict()
 
-        return cls.db().session.query(cls).filter_by(**filters).count()
+        return cls.db().session.query(cls).execution_options(include_deleted=with_deleted).filter_by(**filters).count()
 
     @classmethod
     def get_json_schema(cls) -> dict:

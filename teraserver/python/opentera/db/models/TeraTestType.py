@@ -78,20 +78,24 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
             TeraTestType.db().session.commit()
 
     @staticmethod
-    def get_test_type_by_id(test_type_id: int):
-        return TeraTestType.query.filter_by(id_test_type=test_type_id).first()
+    def get_test_type_by_id(test_type_id: int, with_deleted: bool = False):
+        return TeraTestType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_test_type=test_type_id).first()
 
     @staticmethod
-    def get_test_type_by_key(tt_key: int):
-        return TeraTestType.query.filter_by(test_type_key=tt_key).first()
+    def get_test_type_by_key(tt_key: int, with_deleted: bool = False):
+        return TeraTestType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(test_type_key=tt_key).first()
 
     @staticmethod
-    def get_test_type_by_uuid(tt_uuid: int):
-        return TeraTestType.query.filter_by(test_type_uuid=tt_uuid).first()
+    def get_test_type_by_uuid(tt_uuid: int, with_deleted: bool = False):
+        return TeraTestType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(test_type_uuid=tt_uuid).first()
 
     @staticmethod
-    def get_test_types_for_service(id_service: int):
-        return TeraTestType.query.filter_by(id_service=id_service).all()
+    def get_test_types_for_service(id_service: int, with_deleted: bool = False):
+        return TeraTestType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_access_token(test_type_uuids: list, token_key: str, requester_uuid: str, can_edit: bool, expiration=3600):

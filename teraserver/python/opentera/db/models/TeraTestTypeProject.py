@@ -61,25 +61,29 @@ class TeraTestTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             TeraTestTypeProject.db().session.commit()
 
     @staticmethod
-    def get_test_type_project_by_id(stp_id: int):
-        return TeraTestTypeProject.query.filter_by(id_test_type_project=stp_id).first()
+    def get_test_type_project_by_id(stp_id: int, with_deleted: bool = False):
+        return TeraTestTypeProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_test_type_project=stp_id).first()
 
     @staticmethod
-    def get_projects_for_test_type(test_type_id: int):
-        return TeraTestTypeProject.query.filter_by(id_test_type=test_type_id).all()
+    def get_projects_for_test_type(test_type_id: int, with_deleted: bool = False):
+        return TeraTestTypeProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_test_type=test_type_id).all()
 
     @staticmethod
-    def get_tests_types_for_project(project_id: int):
-        return TeraTestTypeProject.query.filter_by(id_project=project_id).all()
+    def get_tests_types_for_project(project_id: int, with_deleted: bool = False):
+        return TeraTestTypeProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_project=project_id).all()
 
     @staticmethod
-    def get_test_type_project_for_test_type_project(project_id: int, test_type_id: int):
-        return TeraTestTypeProject.query.filter_by(id_project=project_id, id_test_type=test_type_id).first()
+    def get_test_type_project_for_test_type_project(project_id: int, test_type_id: int, with_deleted: bool = False):
+        return TeraTestTypeProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_project=project_id, id_test_type=test_type_id).first()
 
     @staticmethod
-    def get_test_type_project_for_project_and_service(project_id: int, service_id: int):
+    def get_test_type_project_for_project_and_service(project_id: int, service_id: int, with_deleted: bool = False):
         from opentera.db.models.TeraTestType import TeraTestType
-        return TeraTestTypeProject.query.join(TeraTestType).\
+        return TeraTestTypeProject.query.execution_options(include_deleted=with_deleted).join(TeraTestType).\
             filter(TeraTestType.id_service == service_id).\
             filter(TeraTestTypeProject.id_project == project_id).all()
 

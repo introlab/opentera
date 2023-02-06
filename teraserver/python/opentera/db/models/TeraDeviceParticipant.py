@@ -55,16 +55,19 @@ class TeraDeviceParticipant(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             TeraDeviceParticipant.db().session.commit()
 
     @staticmethod
-    def get_device_participant_by_id(device_participant_id: int):
-        return TeraDeviceParticipant.query.filter_by(id_device_participant=device_participant_id).first()
+    def get_device_participant_by_id(device_participant_id: int, with_deleted: bool = False):
+        return TeraDeviceParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_device_participant=device_participant_id).first()
 
     @staticmethod
-    def query_devices_for_participant(participant_id: int):
-        return TeraDeviceParticipant.query.filter_by(id_participant=participant_id).all()
+    def query_devices_for_participant(participant_id: int, with_deleted: bool = False):
+        return TeraDeviceParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_participant=participant_id).all()
 
     @staticmethod
-    def query_participants_for_device(device_id: int):
-        return TeraDeviceParticipant.query.filter_by(id_device=device_id).all()
+    def query_participants_for_device(device_id: int, with_deleted: bool = False):
+        return TeraDeviceParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_device=device_id).all()
 
     @staticmethod
     def query_device_participant_for_participant_device(device_id: int, participant_id: int,

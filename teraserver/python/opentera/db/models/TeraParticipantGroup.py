@@ -38,16 +38,19 @@ class TeraParticipantGroup(BaseModel, SoftDeleteMixin):
         return {'id_participant_group': self.id_participant_group}
 
     @staticmethod
-    def get_participant_group_by_group_name(name: str):
-        return TeraParticipantGroup.query.filter_by(participant_group_name=name).first()
+    def get_participant_group_by_group_name(name: str, with_deleted: bool = False):
+        return TeraParticipantGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(participant_group_name=name).first()
 
     @staticmethod
-    def get_participant_group_by_id(group_id: int):
-        return TeraParticipantGroup.query.filter_by(id_participant_group=group_id).first()
+    def get_participant_group_by_id(group_id: int, with_deleted: bool = False):
+        return TeraParticipantGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_participant_group=group_id).first()
 
     @staticmethod
-    def get_participant_group_for_project(project_id: int):
-        return TeraParticipantGroup.query.filter_by(id_project=project_id).all()
+    def get_participant_group_for_project(project_id: int, with_deleted: bool = False):
+        return TeraParticipantGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_project=project_id).all()
 
     @staticmethod
     def create_defaults(test=False):
