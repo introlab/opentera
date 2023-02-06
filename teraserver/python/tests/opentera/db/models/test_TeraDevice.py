@@ -86,3 +86,25 @@ class TeraDeviceTest(BaseModelsTest):
             # Make sure device is deleted
             # Warning, device was deleted, device object is not valid anymore
             self.assertIsNone(TeraDevice.get_device_by_id(id_device))
+
+    def test_soft_delete(self):
+        with flask_app.app_context():
+            # Create a new device
+            device = TeraDevice()
+            device.device_name = 'Test device'
+            device.id_device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
+            TeraDevice.insert(device)
+            self.assertIsNotNone(device.id_device)
+            id_device = device.id_device
+            # Delete device
+            TeraDevice.delete(device.id_device)
+            # Make sure device is deleted
+            # Warning, device was deleted, device object is not valid anymore
+            self.assertIsNone(TeraDevice.get_device_by_id(id_device))
+
+            # Query device, with soft delete flag
+            device = TeraDevice.query.filter_by(id_device=id_device).execution_options(include_deleted=True).first()
+            self.assertIsNotNone(device)
+            self.assertIsNotNone(device.deleted_at)
+
+
