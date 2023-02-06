@@ -6,8 +6,9 @@
 alembic revision -m "create account table"
 ```
 
-## Changes for next version (Feb 6 2023) :
+## Changes for next version (Feb 6 2023)
 
+### TeraServer
 **Modified tables / constraints**
 * TeraSite.site_name unique constraint removed
 * TeraSessionParticipants.id_session add ondelete='cascade'
@@ -47,3 +48,5 @@ alembic revision -m "create account table"
 - TeraUserPreference
 - TeraUserUserGroup
 
+### LoggingService
+- New table LoginEntry (create_all)
