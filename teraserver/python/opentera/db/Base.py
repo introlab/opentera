@@ -175,6 +175,13 @@ class BaseMixin(object):
             cls.commit()
 
     @classmethod
+    def hard_delete(cls, id_todel):
+        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
+        if delete_obj:
+            cls.db().session.delete(delete_obj)
+            cls.commit()
+
+    @classmethod
     def query_with_filters(cls, filters=None, with_deleted: bool = False):
         if filters is None:
             filters = dict()
