@@ -7,6 +7,7 @@ import sqlalchemy.sql.sqltypes
 from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, text
+from sqlalchemy.orm import Session
 
 
 class _QueryProperty:
@@ -141,9 +142,10 @@ class BaseMixin(object):
     @classmethod
     def update(cls, update_id: int, values: dict):
         values = cls.clean_values(values)
-        update_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()
-        update_obj.from_json(values)
-        cls.commit()
+        with Session(cls.db().engine) as session:
+            update_obj = session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()
+            update_obj.from_json(values)
+            session.commit()
 
     @classmethod
     def commit(cls):

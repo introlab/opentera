@@ -68,6 +68,7 @@ class TeraDeviceTest(BaseModelsTest):
             update_info = {'device_notes': 'Test notes'}
             # device.device_notes = 'Test notes'
             TeraDevice.update(device.id_device, update_info)
+            # TeraDevice.update(device.id_device, device.to_json(minimal=True))
             device = TeraDevice.get_device_by_id(1)
             self.assertIsNotNone(device)
             self.assertEqual('Test notes', device.device_notes)
