@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 class TeraSite(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_sites'
     id_site = Column(Integer, Sequence('id_site_sequence'), primary_key=True, autoincrement=True)
-    site_name = Column(String, nullable=False, unique=True)
+    site_name = Column(String, nullable=False)
 
     site_devices = relationship("TeraDevice", secondary="t_devices_sites", back_populates="device_sites")
     site_projects = relationship("TeraProject", cascade="delete", passive_deletes=True,
