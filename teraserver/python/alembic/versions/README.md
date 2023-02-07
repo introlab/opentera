@@ -45,7 +45,6 @@ alembic revision -m "create account table"
 - TeraTestTypeSite
 - TeraUser
 - TeraUserGroup
-- TeraUserPreference
 - TeraUserUserGroup
 
 ### LoggingService
