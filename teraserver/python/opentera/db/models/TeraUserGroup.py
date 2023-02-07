@@ -17,12 +17,10 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['user_group_users', 'user_group_services_access', 'user_group_projects_access'])
+        ignore_fields.extend(['user_group_users', 'user_group_services_access'])
         if minimal:
             ignore_fields.extend([])
-        rval = super().to_json(ignore_fields=ignore_fields)
-
-        return rval
+        return super().to_json(ignore_fields=ignore_fields)
 
     def to_json_create_event(self):
         return self.to_json(minimal=True)

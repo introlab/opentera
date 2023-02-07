@@ -12,7 +12,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
         with flask_app.app_context():
             preference: TeraUserPreference = TeraUserPreference.get_user_preferences_for_app('openteraplus')
             self.assertIsNotNone(preference)
-            self.assertEqual(preference.user_preference_app_tag,'openteraplus')
+            self.assertEqual(preference.user_preference_app_tag, 'openteraplus')
             json_user_preferences = json.loads(preference.user_preference_preference)
             self.assertIsInstance(json_user_preferences, dict)
             self.assertTrue('language' in json_user_preferences)
@@ -22,7 +22,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
         with flask_app.app_context():
             preference: TeraUserPreference = TeraUserPreference.get_user_preferences_for_app('anotherapp')
             self.assertIsNotNone(preference)
-            self.assertEqual(preference.user_preference_app_tag,'anotherapp')
+            self.assertEqual(preference.user_preference_app_tag, 'anotherapp')
             json_user_preferences = json.loads(preference.user_preference_preference)
             self.assertIsInstance(json_user_preferences, dict)
             self.assertTrue('gui_style' in json_user_preferences)
@@ -30,7 +30,8 @@ class TeraUserPreferenceTest(BaseModelsTest):
 
     def test_default_user_preference_for_openteraplus_multiple(self):
         with flask_app.app_context():
-            preferences: list[TeraUserPreference] = TeraUserPreference.query.filter_by(user_preference_app_tag='openteraplus').all()
+            preferences: list[TeraUserPreference] = \
+                TeraUserPreference.query.filter_by(user_preference_app_tag='openteraplus').all()
             self.assertEqual(2, len(preferences))
             self.assertNotEqual(preferences[0].id_user, preferences[1].id_user)
             for preference in preferences:
