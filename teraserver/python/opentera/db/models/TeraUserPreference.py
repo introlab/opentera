@@ -1,10 +1,9 @@
 from opentera.db.Base import BaseModel
-from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraUserPreference(BaseModel, SoftDeleteMixin):
+class TeraUserPreference(BaseModel):
     __tablename__ = 't_users_preferences'
     id_user_preference = Column(Integer, Sequence('id_userpreference_sequence'), primary_key=True, autoincrement=True)
     id_user = Column(Integer, ForeignKey('t_users.id_user', ondelete='cascade'), nullable=False)
@@ -24,24 +23,20 @@ class TeraUserPreference(BaseModel, SoftDeleteMixin):
         return rval
 
     @staticmethod
-    def get_user_preferences_for_app(app_tag: str, with_deleted: bool = False):
-        return TeraUserPreference.query.execution_options(include_deleted=with_deleted)\
-            .filter_by(user_preference_app_tag=app_tag).first()
+    def get_user_preferences_for_app(app_tag: str):
+        return TeraUserPreference.query.filter_by(user_preference_app_tag=app_tag).first()
 
     @staticmethod
-    def get_user_preference_by_id(user_pref_id: int, with_deleted: bool = False):
-        return TeraUserPreference.query.execution_options(include_deleted=with_deleted)\
-            .filter_by(id_user_prefrence=user_pref_id).first()
+    def get_user_preference_by_id(user_pref_id: int):
+        return TeraUserPreference.query.filter_by(id_user_prefrence=user_pref_id).first()
 
     @staticmethod
-    def get_user_preferences_for_user(user_id: int, with_deleted: bool = False):
-        return TeraUserPreference.query.execution_options(include_deleted=with_deleted)\
-            .filter_by(id_user=user_id).all()
+    def get_user_preferences_for_user(user_id: int):
+        return TeraUserPreference.query.filter_by(id_user=user_id).all()
 
     @staticmethod
-    def get_user_preferences_for_user_and_app(user_id: int, app_tag: str, with_deleted: bool = False):
-        return TeraUserPreference.query.execution_options(include_deleted=with_deleted)\
-            .filter_by(id_user=user_id, user_preference_app_tag=app_tag).first()
+    def get_user_preferences_for_user_and_app(user_id: int, app_tag: str):
+        return TeraUserPreference.query.filter_by(id_user=user_id, user_preference_app_tag=app_tag).first()
 
     @staticmethod
     def create_defaults(test=False):
