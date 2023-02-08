@@ -191,10 +191,7 @@ class BaseMixin(object):
                 cls.db().session.delete(delete_obj)
             cls.commit()
 
-
-
     @classmethod
-    @HandleIncludeDeletedFlag(cls=cls)
     def undelete(cls, id_to_undelete):
         undelete_obj = cls.db().session.query(cls).execution_options(include_deleted=True).filter(
             getattr(cls, cls.get_primary_key_name()) == id_to_undelete).first()
