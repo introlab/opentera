@@ -12,7 +12,8 @@ alembic revision -m "create account table"
 **Modified tables / constraints**
 * TeraSite.site_name unique constraint removed
 * TeraSessionParticipants.id_session add ondelete='cascade'
-
+* id_user_group = Column(Integer, ForeignKey("t_users_groups.id_user_group", ondelete='cascade'), nullable=False)
+* class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
 
 **Add deleted_at datetime field (set to NULL) to :**
 - TeraAsset

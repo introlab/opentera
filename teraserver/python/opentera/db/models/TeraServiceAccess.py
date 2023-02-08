@@ -1,11 +1,12 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 
 
-class TeraServiceAccess(BaseModel, SoftDeleteMixin):
+class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_services_access'
     id_service_access = Column(Integer, Sequence('id_service_project_role_sequence'), primary_key=True,
                                autoincrement=True)
@@ -17,10 +18,15 @@ class TeraServiceAccess(BaseModel, SoftDeleteMixin):
     id_service_role = Column(Integer, ForeignKey('t_services_roles.id_service_role', ondelete='cascade'),
                              nullable=False)
 
-    service_access_role = relationship("TeraServiceRole")
-    service_access_user_group = relationship("TeraUserGroup", back_populates='user_group_services_access')
-    service_access_device = relationship("TeraDevice")
-    service_access_participant_group = relationship("TeraParticipantGroup")
+    service_access_role = relationship("TeraServiceRole", viewonly=True)
+    service_access_user_group = relationship("TeraUserGroup", viewonly=True)
+    service_access_device = relationship("TeraDevice", viewonly=True)
+    service_access_participant_group = relationship("TeraParticipantGroup", viewonly=True)
+
+    # service_access_role = relationship("TeraServiceRole")
+    # service_access_user_group = relationship("TeraUserGroup", back_populates='user_group_services_access')
+    # service_access_device = relationship("TeraDevice")
+    # service_access_participant_group = relationship("TeraParticipantGroup")
 
     def __init__(self):
         pass

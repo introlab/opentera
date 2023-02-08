@@ -9,15 +9,28 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
     id_user_group = Column(Integer, Sequence('id_usergroup_sequence'), primary_key=True, autoincrement=True)
     user_group_name = Column(String, nullable=False, unique=False)
 
-    user_group_services_access = relationship('TeraServiceAccess', cascade="all,delete",
-                                              back_populates='service_access_user_group')
-    user_group_users = relationship("TeraUser", secondary="t_users_users_groups", back_populates="user_user_groups",
+    # user_group_services_access = relationship("TeraServiceAccess",
+    #                                           back_populates="service_access_user_group",
+    #                                           passive_deletes=True)
+
+    user_group_service_role = relationship("TeraServiceRole", secondary="t_services_access",
+                                           back_populates="service_role_user_group",
+                                           passive_deletes=True)
+
+    user_group_users = relationship("TeraUser", secondary="t_users_users_groups",
+                                    back_populates="user_user_groups",
                                     passive_deletes=True)
+
+    def __str__(self):
+        return '<TeraUserGroup ' + str(self.user_group_name) + ' >'
+
+    def __repr__(self):
+        return self.__str__()
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['user_group_users', 'user_group_services_access'])
+        ignore_fields.extend(['user_group_users', 'user_group_services_access', 'user_group_service_role'])
         if minimal:
             ignore_fields.extend([])
         return super().to_json(ignore_fields=ignore_fields)

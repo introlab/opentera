@@ -8,11 +8,25 @@ from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, text
 from sqlalchemy.orm import Session
+from functools import wraps
 
 
 class _QueryProperty:
     def __get__(self, obj: Model | None, cls: t.Type[Model]) -> BaseQuery:
         return cls.db().session.query(cls)
+
+
+class HandleIncludeDeletedFlag:
+    def __init__(self, cls):
+        self.cls = cls
+
+    def __call__(self, f, *args, **kwargs):
+        if 'include_deleted' not in self.cls.db().session.info:
+            self.cls.db().session.info['include_deleted'] = list()
+        self.cls.db().session.info['include_deleted'].push(self.cls.__name__)
+        retval = f(args, kwargs)
+        self.cls.db().session.info['include_deleted'].pop(-1)
+        return retval
 
 
 class BaseMixin(object):
@@ -176,6 +190,32 @@ class BaseMixin(object):
             else:
                 cls.db().session.delete(delete_obj)
             cls.commit()
+
+
+
+    @classmethod
+    @HandleIncludeDeletedFlag(cls=cls)
+    def undelete(cls, id_to_undelete):
+        undelete_obj = cls.db().session.query(cls).execution_options(include_deleted=True).filter(
+            getattr(cls, cls.get_primary_key_name()) == id_to_undelete).first()
+        if undelete_obj:
+            if getattr(undelete_obj, 'soft_undelete', None):
+                undelete_obj.soft_undelete()
+            cls.commit()
+        else:
+            print(cls.__name__ + ' with id ' + str(id_to_undelete) + ' cannot undelete.')
+
+
+
+    # @classmethod
+    # def handle_include_deleted_flag(cls, include_deleted=False):
+    #     if 'include_deleted' not in cls.db().session.info:
+    #         cls.db().session.info['include_deleted'] = list()
+    #
+    #     if include_deleted:
+    #         cls.db().session.info['include_deleted'].push(cls.__name__)
+    #     else:
+    #         cls.db().session.info['include_deleted'].pop(-1)
 
     @classmethod
     def hard_delete(cls, id_todel):

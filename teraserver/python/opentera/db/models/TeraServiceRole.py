@@ -18,6 +18,9 @@ class TeraServiceRole(BaseModel, SoftDeleteMixin):
     service_role_project = relationship('TeraProject', viewonly=True)
     service_role_site = relationship('TeraSite', viewonly=True)
 
+    service_role_user_group = relationship("TeraUserGroup", secondary="t_services_access",
+                                           back_populates="user_group_service_role",  lazy='joined')
+
     def __init__(self):
         pass
 
@@ -32,7 +35,8 @@ class TeraServiceRole(BaseModel, SoftDeleteMixin):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend(['service_role_service', 'service_role_project', 'service_role_site'])
+        ignore_fields.extend(['service_role_service', 'service_role_project', 'service_role_site',
+                              'service_role_user_group'])
 
         if minimal:
             ignore_fields.extend([])

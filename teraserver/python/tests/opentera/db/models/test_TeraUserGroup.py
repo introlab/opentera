@@ -91,25 +91,35 @@ class TeraUserGroupTest(BaseModelsTest):
             self.assertGreater(len(groups), 0)
             # Delete all groups
             for group in groups:
+                # self.db.session.info['include_deleted'] = True
+                print('Session = ', self.db.session, self.db.session.info)
                 group_name = group.user_group_name
-                group_service_access_count = len(group.user_group_services_access)
+                group_service_role_count = len(group.user_group_service_role)
                 group_users_count = len(group.user_group_users)
+
+                id_user_group = group.id_user_group
                 group.delete(group.id_user_group)
+
+                # from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
+                # user_user_groups = TeraUserUserGroup.query_users_for_user_group(id_user_group, with_deleted=True)
+
                 test_group = TeraUserGroup.get_user_group_by_group_name(name=group_name, with_deleted=True)
                 self.assertIsNotNone(test_group)
                 self.assertIsNotNone(test_group.deleted_at)
                 # Make sure users are not deleted
-                self.assertEqual(len(test_group.user_group_users), group_users_count)
+                self.assertEqual(group_users_count, len(test_group.user_group_users), 'Group users count mismatch')
                 for user in test_group.user_group_users:
                     self.assertIsNone(user.deleted_at)
-                # Make sure service_access is not deleted
-                self.assertEqual(len(test_group.user_group_services_access), group_service_access_count)
-                for service_access in test_group.user_group_services_access:
-                    self.assertIsNone(service_access.deleted_at)
+                # Make sure service_roles are not deleted
+                self.assertEqual(group_service_role_count, len(test_group.user_group_service_role),
+                                 'Group service roles count mismatch')
+                for service_role in test_group.user_group_service_role:
+                    self.assertIsNone(service_role.deleted_at)
 
                 # Undelete group
-                test_group.undelete()
-                test_group.db().session.commit()
+                TeraUserGroup.undelete(id_user_group)
+                # self.db.session.info['include_deleted'] = False
+                test_group = TeraUserGroup.get_user_group_by_group_name(name=group_name, with_deleted=False)
                 self.assertIsNone(test_group.deleted_at)
 
     def test_get_user_group_by_id(self):

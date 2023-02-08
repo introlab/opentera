@@ -27,6 +27,9 @@ def activate_soft_delete_hook(deleted_field_name: str, disable_soft_delete_optio
     def soft_delete_execute(state: ORMExecuteState):
         if not state.is_select:
             return
+        if 'include_deleted' in state.session.info and len(state.session.info['include_deleted']) > 0:
+            print('test_include_deleted')
+            return
 
         adapted = SoftDeleteQueryRewriter(deleted_field_name, disable_soft_delete_option_name).rewrite_statement(
             state.statement
@@ -125,7 +128,8 @@ def generate_soft_delete_mixin_class(
 
 
 # Create a Class that inherits from our class builder
-class SoftDeleteMixin(generate_soft_delete_mixin_class(delete_method_name='soft_delete')):
+class SoftDeleteMixin(generate_soft_delete_mixin_class(delete_method_name='soft_delete',
+                                                       undelete_method_name='soft_undelete')):
     # type hint for autocomplete IDE support
     deleted_at: datetime
 
