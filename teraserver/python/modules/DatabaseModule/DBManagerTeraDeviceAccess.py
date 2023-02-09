@@ -12,14 +12,19 @@ class DBManagerTeraDeviceAccess:
     def __init__(self, device: TeraDevice):
         self.device = device
 
-    def query_session(self, session_id: int):
-        sessions = []
-        for part in self.device.device_participants:
-            for ses in part.participant_sessions:
-                if ses.id_session == session_id:
-                    sessions = [TeraSession.get_session_by_id(session_id)]
-                    return sessions
-        return sessions
+    def query_session(self, session_id: int) -> TeraSession | None:
+        requested_session = TeraSession.get_session_by_id(session_id)
+        if self.device.id_device not in [ses_device.id_device for ses_device in requested_session.session_devices] and \
+                requested_session.id_creator_device != self.device.id_device:
+            return None
+        return requested_session
+        # sessions = []
+        # for part in self.device.device_participants:
+        #     for ses in part.participant_sessions:
+        #         if ses.id_session == session_id:
+        #             sessions = [TeraSession.get_session_by_id(session_id)]
+        #             return sessions
+
 
     def query_existing_session(self, session_name: str, session_type_id: int, session_date: datetime,
                                participant_uuids: list):
