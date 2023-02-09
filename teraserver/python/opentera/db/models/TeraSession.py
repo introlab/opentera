@@ -27,7 +27,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
     id_creator_user = Column(Integer, ForeignKey('t_users.id_user'), nullable=True)
     id_creator_device = Column(Integer, ForeignKey('t_devices.id_device'), nullable=True)
     id_creator_participant = Column(Integer, ForeignKey('t_participants.id_participant'), nullable=True)
-    id_creator_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='set null'), nullable=True)
+    id_creator_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=True)
 
     session_name = Column(String, nullable=False)
     session_start_datetime = Column(TIMESTAMP(timezone=True), nullable=False)
@@ -281,6 +281,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                                      start_date: datetime.date = None, end_date: datetime.date = None,
                                      filters: dict = None, with_deleted: bool = False):
         from opentera.db.models.TeraParticipant import TeraParticipant
+        # TODO: Also include sessions created by that participant
         query = TeraSession.query.execution_options(include_deleted=with_deleted)\
             .join(TeraSession.session_participants).filter(TeraParticipant.id_participant == part_id)
 
@@ -301,6 +302,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                               start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None,
                               with_deleted: bool = False):
         from opentera.db.models.TeraUser import TeraUser
+        # TODO: Also include sessions created by that user
         query = TeraSession.query.execution_options(include_deleted=with_deleted)\
             .join(TeraSession.session_users).filter(TeraUser.id_user == user_id)
 
@@ -321,6 +323,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                                 start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None,
                                 with_deleted: bool = False):
         from opentera.db.models.TeraDevice import TeraDevice
+        # TODO: Also include sessions created by that device
         query = TeraSession.query.execution_options(include_deleted=with_deleted)\
             .join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
         query = query.order_by(TeraSession.session_start_datetime.desc())

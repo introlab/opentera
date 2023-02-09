@@ -14,6 +14,7 @@ alembic revision -m "create account table"
 * TeraSessionParticipants.id_session add ondelete='cascade'
 * id_user_group = Column(Integer, ForeignKey("t_users_groups.id_user_group", ondelete='cascade'), nullable=False)
 * class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
+* TeraSession: id_creator_service - change "cascade set null" to "cascade delete"
 
 **Add deleted_at datetime field (set to NULL) to :**
 - TeraAsset
