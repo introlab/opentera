@@ -17,4 +17,3 @@ class TeraSessionDevices(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     @classmethod
     def update(cls, update_id: int, values: dict):
         return
-

@@ -77,6 +77,18 @@ class TeraSessionEvent(BaseModel, SoftDeleteMixin):
                 event.session_event_context = 'Défaut'
                 event.session_event_text = str(TeraSessionEvent.SessionEventTypes(i))
                 TeraSessionEvent.db().session.add(event)
+
+            base_session = TeraSession.query.filter_by(id_creator_participant=1).first()
+            for i in range(12):
+                event = TeraSessionEvent()
+                event.session_event_session = base_session
+                event.id_session_event_type = i
+                event.session_event_datetime = datetime.now() - timedelta(hours=random.randint(0, 10)) - timedelta(
+                    minutes=random.randint(0, 45))
+                event.session_event_context = 'Défaut'
+                event.session_event_text = str(TeraSessionEvent.SessionEventTypes(i))
+                TeraSessionEvent.db().session.add(event)
+
             TeraSessionEvent.db().session.commit()
 
     @staticmethod

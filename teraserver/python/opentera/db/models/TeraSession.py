@@ -205,6 +205,18 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                 base_session.session_status = ses_status
                 base_session.session_participants = [base_session.session_creator_participant]
                 base_session.session_uuid = str(uuid.uuid4())
+
+                if i < 4:
+                    # Add device
+                    device = TeraDevice.query.filter_by(id_device=1).first()
+                    if base_session and device:
+                        base_session.session_devices.append(device)
+                else:
+                    # Add user
+                    user = TeraUser.get_user_by_username('user3')
+                    if base_session and user:
+                        base_session.session_users.append(user)
+
                 TeraSession.db().session.add(base_session)
 
             # Create service sessions

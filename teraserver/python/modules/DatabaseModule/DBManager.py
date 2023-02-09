@@ -43,6 +43,7 @@ from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
 from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraSessionDevices import TeraSessionDevices
 from opentera.db.Base import BaseModel
 
 from opentera.config.ConfigManager import ConfigManager

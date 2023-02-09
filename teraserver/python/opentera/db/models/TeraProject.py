@@ -11,19 +11,27 @@ class TeraProject(BaseModel, SoftDeleteMixin):
     project_name = Column(String, nullable=False, unique=False)
 
     project_site = relationship("TeraSite", back_populates='site_projects')
-    project_participants = relationship("TeraParticipant", back_populates='participant_project',
+    project_participants = relationship("TeraParticipant", cascade='delete', back_populates='participant_project',
                                         passive_deletes=True)
-    project_participants_groups = relationship("TeraParticipantGroup", passive_deletes=True)
+    project_participants_groups = relationship("TeraParticipantGroup", cascade='delete', passive_deletes=True)
     project_devices = relationship("TeraDevice", secondary="t_devices_projects", back_populates="device_projects")
     project_session_types = relationship("TeraSessionType", secondary="t_sessions_types_projects",
                                          back_populates="session_type_projects")
+
+    project_services = relationship("TeraService", secondary="t_services_projects", viewonly=True)
+
+    project_services_roles = relationship("TeraServiceRole", cascade='delete', passive_deletes=True)
+
+    project_tests_types = relationship("TeraTestType", secondary="t_tests_types_projects", viewonly=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
 
         ignore_fields.extend(['project_site', 'project_participants', 'project_participants_groups', 'project_devices',
-                              'project_session_types'])
+                              'project_session_types', 'project_services', 'project_services_roles',
+                              'project_tests_types'])
+
         rval = super().to_json(ignore_fields=ignore_fields)
 
         # Add sitename

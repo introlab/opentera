@@ -11,13 +11,22 @@ class TeraSite(BaseModel, SoftDeleteMixin):
 
     site_devices = relationship("TeraDevice", secondary="t_devices_sites", back_populates="device_sites")
     site_projects = relationship("TeraProject", cascade="delete", passive_deletes=True,
-                                    back_populates='project_site', lazy='joined')
+                                 back_populates='project_site', lazy='joined')
+
+    site_services_roles = relationship("TeraServiceRole", cascade='delete', passive_deletes=True)
+
+    site_services = relationship("TeraService", secondary="t_services_sites", viewonly=True)
+
+    site_sessions_types = relationship("TeraSessionType", secondary="t_sessions_types_sites", viewonly=True)
+
+    site_tests_types = relationship("TeraTestType", secondary="t_tests_types_sites", viewonly=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
 
-        ignore_fields.extend(['site_projects', 'site_devices'])
+        ignore_fields.extend(['site_projects', 'site_devices', 'site_services_roles', 'site_services',
+                              'site_sessions_types', 'site_tests_types'])
 
         return super().to_json(ignore_fields=ignore_fields)
 

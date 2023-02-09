@@ -52,6 +52,11 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
 
     participant_project = relationship("TeraProject", back_populates='project_participants', lazy='joined')
 
+    participant_created_sessions = relationship("TeraSession", cascade='delete',
+                                                back_populates='session_creator_participant', passive_deletes=True)
+
+    participant_service_config = relationship("TeraServiceConfig", cascade='delete', passive_deletes=True)
+
     authenticated = False
     fullAccess = False
 
@@ -106,7 +111,8 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
 
         ignore_fields.extend(['authenticated', 'participant_devices',
                               'participant_sessions', 'participant_password',
-                              'participant_project', 'participant_participant_group', 'fullAccess'
+                              'participant_project', 'participant_participant_group', 'fullAccess',
+                              'participant_created_sessions', 'participant_service_config'
                               ])
         if minimal:
             ignore_fields.extend(['participant_username', 'participant_lastonline',

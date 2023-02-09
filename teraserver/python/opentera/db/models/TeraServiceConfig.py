@@ -17,10 +17,10 @@ class TeraServiceConfig(BaseModel, SoftDeleteMixin):
     id_device = Column(Integer, ForeignKey('t_devices.id_device', ondelete='cascade'), nullable=True)
     service_config_config = Column(String, nullable=False, default='{}')
 
-    service_config_service = relationship("TeraService")
-    service_config_user = relationship("TeraUser")
-    service_config_participant = relationship('TeraParticipant')
-    service_config_device = relationship('TeraDevice')
+    service_config_service = relationship("TeraService", viewonly=True)
+    service_config_user = relationship("TeraUser", viewonly=True)
+    service_config_participant = relationship('TeraParticipant', viewonly=True)
+    service_config_device = relationship('TeraDevice', viewonly=True)
     service_config_specifics = relationship('TeraServiceConfigSpecific', cascade='delete')
 
     def to_json(self, ignore_fields=None, minimal=False, specific_id=None):
