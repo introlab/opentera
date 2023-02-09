@@ -13,9 +13,9 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
     #                                           back_populates="service_access_user_group",
     #                                           passive_deletes=True)
 
-    user_group_service_role = relationship("TeraServiceRole", secondary="t_services_access",
-                                           back_populates="service_role_user_group",
-                                           passive_deletes=True)
+    user_group_services_roles = relationship("TeraServiceRole", secondary="t_services_access",
+                                             back_populates="service_role_user_groups",
+                                             passive_deletes=True)
 
     user_group_users = relationship("TeraUser", secondary="t_users_users_groups",
                                     back_populates="user_user_groups",
@@ -30,7 +30,7 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
-        ignore_fields.extend(['user_group_users', 'user_group_services_access', 'user_group_service_role'])
+
         if minimal:
             ignore_fields.extend([])
         return super().to_json(ignore_fields=ignore_fields)
@@ -49,17 +49,17 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
         projects_roles = {}
 
         # Projects
-        for service_access in self.user_group_services_access:
-            if service_access.service_access_role.id_project:
-                projects_roles[service_access.service_access_role.service_role_project] = \
-                    {'project_role': service_access.service_access_role.service_role_name, 'inherited': False}
+        for service_role in self.user_group_services_roles:
+            if service_role.id_project:
+                projects_roles[service_role.service_role_project] = \
+                    {'project_role': service_role.service_role_name, 'inherited': False}
 
         # Sites - if we are admin in a site, we are automatically admin in all its project
         if not no_inheritance:
-            for service_access in self.user_group_services_access:
-                if service_access.service_access_role.id_site:
-                    if service_access.service_access_role.service_role_name == 'admin':
-                        for project in service_access.service_access_role.service_role_site.site_projects:
+            for service_role in self.user_group_services_roles:
+                if service_role.id_site:
+                    if service_role.service_role_name == 'admin':
+                        for project in service_role.service_role_site.site_projects:
                             projects_roles[project] = {'project_role': 'admin', 'inherited': True}
 
         return projects_roles
@@ -67,15 +67,15 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
     def get_sites_roles(self) -> dict:
         sites_roles = {}
         # Sites
-        for service_access in self.user_group_services_access:
-            if service_access.service_access_role.id_site:
-                sites_roles[service_access.service_access_role.service_role_site] = \
-                    {'site_role': service_access.service_access_role.service_role_name, 'inherited': False}
+        for service_role in self.user_group_services_roles:
+            if service_role.id_site:
+                sites_roles[service_role.service_role_site] = \
+                    {'site_role': service_role.service_role_name, 'inherited': False}
 
         # Projects - each project's site also provides a "user" access for that site
-        for service_access in self.user_group_services_access:
-            if service_access.service_access_role.id_project:
-                project_site = service_access.service_access_role.service_role_project.project_site
+        for service_role in self.user_group_services_roles:
+            if service_role.id_project:
+                project_site = service_role.service_role_project.project_site
                 if project_site not in sites_roles:
                     sites_roles[project_site] = {'site_role': 'user', 'inherited': True}
 

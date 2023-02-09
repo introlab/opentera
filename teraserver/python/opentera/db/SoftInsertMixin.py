@@ -16,7 +16,9 @@ class SoftInsertMixin:
         query = db_object.query.execution_options(include_deleted=True)
         for key in foreign_keys:
             # query = query.filter(key == getattr(db_object, key.parent.name))
-            query = query.filter(text(key.parent.name + '==' + str(getattr(db_object, key.parent.name))))
+            value = getattr(db_object, key.parent.name)
+            if value:
+                query = query.filter(text(key.parent.name + '==' + str(value)))
         item = query.first()
 
         if item:
