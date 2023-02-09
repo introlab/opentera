@@ -7,6 +7,7 @@ import sqlalchemy.sql.sqltypes
 from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, text
+from sqlalchemy.inspection import inspect as sqlinspector
 from sqlalchemy.orm import Session
 from functools import wraps
 
@@ -62,6 +63,12 @@ class BaseMixin(object):
         if ignore_fields is None:
             ignore_fields = []
         pr = {}
+        # Add relationships in ignore_fields by default
+        for relation in sqlinspector(self.__class__).relationships.items():
+            if relation[0] not in ignore_fields:
+                # print('-- Ignoring ' + relation[0] + ' in to_json()')
+                ignore_fields.append(relation[0])
+
         for name in dir(self):
             if (self.is_valid_property_name(name) and name not in ignore_fields) or name == 'deleted_at':
                 value = getattr(self, name)
