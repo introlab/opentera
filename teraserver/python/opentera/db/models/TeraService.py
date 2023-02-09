@@ -30,6 +30,17 @@ class TeraService(BaseModel, SoftDeleteMixin):
     service_projects = relationship('TeraServiceProject', cascade='delete')
     service_sites = relationship('TeraServiceSite', cascade='delete')
 
+    service_created_sessions = relationship("TeraSession", cascade='delete', back_populates='session_creator_service',
+                                            passive_deletes=True)
+
+    service_assets = relationship("TeraAsset", cascade='delete', foreign_keys="TeraAsset.id_service",
+                                  back_populates='asset_service', passive_deletes=True)
+
+    service_owned_assets = relationship("TeraAsset", cascade='delete', foreign_keys="TeraAsset.asset_service_uuid",
+                                        back_populates='asset_service_owner', passive_deletes=True)
+
+    service_tests = relationship("TeraTest", cascade='delete', back_populates='test_service', passive_deletes=True)
+
     def __init__(self):
         pass
 

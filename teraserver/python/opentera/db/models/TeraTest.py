@@ -33,10 +33,10 @@ class TeraTest(BaseModel, SoftDeleteMixin):
     test_summary = Column(String, nullable=True)  # This contains a json formatted summary for results display
 
     test_session = relationship("TeraSession", back_populates='session_tests')
-    test_device = relationship("TeraDevice")
-    test_user = relationship("TeraUser")
-    test_participant = relationship("TeraParticipant")
-    test_service = relationship("TeraService")
+    test_device = relationship("TeraDevice", back_populates='device_tests')
+    test_user = relationship("TeraUser", back_populates='user_tests')
+    test_participant = relationship("TeraParticipant", back_populates='participant_tests')
+    test_service = relationship("TeraService", back_populates='service_tests')
     test_test_type = relationship('TeraTestType')
 
     def from_json(self, json_data, ignore_fields=None):

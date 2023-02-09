@@ -57,6 +57,12 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
 
     participant_service_config = relationship("TeraServiceConfig", cascade='delete', passive_deletes=True)
 
+    participant_assets = relationship("TeraAsset", cascade='delete', back_populates='asset_participant',
+                                      passive_deletes=True)
+
+    participant_tests = relationship("TeraTest", cascade='delete',
+                                     back_populates='test_participant', passive_deletes=True)
+
     authenticated = False
     fullAccess = False
 

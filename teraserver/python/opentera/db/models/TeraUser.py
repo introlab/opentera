@@ -45,6 +45,14 @@ class TeraUser(BaseModel, SoftDeleteMixin):
     user_sessions = relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users",
                                  passive_deletes=True)
 
+    user_created_sessions = relationship("TeraSession", cascade='delete', back_populates='session_creator_user',
+                                         passive_deletes=True)
+
+    user_service_config = relationship("TeraServiceConfig", cascade='delete', passive_deletes=True)
+
+    user_assets = relationship("TeraAsset", cascade='delete', back_populates='asset_user', passive_deletes=True)
+    user_tests = relationship("TeraTest", cascade='delete', back_populates='test_user', passive_deletes=True)
+
     authenticated = False
 
     def to_json(self, ignore_fields=None, minimal=False):

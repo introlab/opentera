@@ -38,8 +38,8 @@ class TeraAsset(BaseModel, SoftDeleteMixin):
 
     asset_session = relationship("TeraSession", back_populates='session_assets')
     asset_device = relationship("TeraDevice", back_populates='device_assets')
-    asset_user = relationship("TeraUser")
-    asset_participant = relationship("TeraParticipant")
+    asset_user = relationship("TeraUser", back_populates='user_assets')
+    asset_participant = relationship("TeraParticipant", back_populates='participant_assets')
     asset_service = relationship("TeraService", foreign_keys="TeraAsset.id_service")
     asset_service_owner = relationship("TeraService", foreign_keys="TeraAsset.asset_service_uuid")
 

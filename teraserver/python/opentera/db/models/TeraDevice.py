@@ -40,7 +40,14 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
                                    passive_deletes=True)
     device_type = relationship('TeraDeviceType')
     device_subtype = relationship('TeraDeviceSubType')
-    device_assets = relationship('TeraAsset', passive_deletes=True, back_populates='asset_device', lazy='select')
+    device_created_sessions = relationship("TeraSession", cascade='delete', back_populates='session_creator_device',
+                                           passive_deletes=True)
+
+    device_service_config = relationship("TeraServiceConfig", cascade='delete', passive_deletes=True)
+
+    device_assets = relationship("TeraAsset", cascade='delete', back_populates='asset_device', passive_deletes=True)
+
+    device_tests = relationship("TeraTest", cascade='delete', back_populates='test_device', passive_deletes=True)
 
     authenticated = False
 
