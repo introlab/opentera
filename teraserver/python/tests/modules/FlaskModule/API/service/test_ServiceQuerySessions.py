@@ -1,6 +1,7 @@
 from BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 from datetime import datetime, timedelta
+from opentera.db.models.TeraSession import TeraSession
 
 
 class ServiceQuerySessionsTest(BaseServiceAPITest):
@@ -329,7 +330,8 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code)
             self.assertEqual(response.headers['Content-Type'], 'application/json')
-            self.assertEqual(1, len(response.json))
+            count = len(TeraSession.get_sessions_for_device(device_id=1, limit=2, offset=7))
+            self.assertEqual(count, len(response.json))
 
     def test_get_endpoint_query_for_device_with_status(self):
         with self._flask_app.app_context():
@@ -338,7 +340,8 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code)
             self.assertEqual(response.headers['Content-Type'], 'application/json')
-            self.assertEqual(3, len(response.json))
+            count = len(TeraSession.get_sessions_for_device(device_id=1, status=0))
+            self.assertEqual(count, len(response.json))
 
             for data_item in response.json:
                 self.assertEqual(0, data_item['session_status'])
@@ -350,7 +353,9 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code)
             self.assertEqual(response.headers['Content-Type'], 'application/json')
-            self.assertEqual(1, len(response.json))
+            count = len(TeraSession.get_sessions_for_device(device_id=1, limit=2,
+                                                            offset=2, status=0))
+            self.assertEqual(count, len(response.json))
 
             for data_item in response.json:
                 self.assertEqual(0, data_item['session_status'])
@@ -378,7 +383,9 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code)
             self.assertEqual(response.headers['Content-Type'], 'application/json')
-            self.assertEqual(2, len(response.json))
+            count = len(TeraSession.get_sessions_for_device(device_id=1, start_date=datetime.fromisoformat(start_date),
+                                                            end_date=datetime.fromisoformat(end_date)))
+            self.assertEqual(count, len(response.json))
 
     def test_get_endpoint_query_for_device_with_start_date(self):
         with self._flask_app.app_context():
@@ -388,7 +395,8 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code)
             self.assertEqual(response.headers['Content-Type'], 'application/json')
-            self.assertEqual(3, len(response.json))
+            count = len(TeraSession.get_sessions_for_device(device_id=1, start_date=datetime.fromisoformat(start_date)))
+            self.assertEqual(count, len(response.json))
 
     def test_get_endpoint_query_for_device_with_end_date(self):
         with self._flask_app.app_context():
@@ -398,7 +406,9 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code)
             self.assertEqual(response.headers['Content-Type'], 'application/json')
-            self.assertEqual(5, len(response.json))
+
+            count = len(TeraSession.get_sessions_for_device(device_id=1, end_date=datetime.fromisoformat(end_date)))
+            self.assertEqual(count, len(response.json))
 
     def test_post_and_delete_endpoint(self):
         with self._flask_app.app_context():
@@ -417,7 +427,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
 
             self.assertEqual(400, response.status_code, msg="Missing id_session")  # Missing id_session
 
-            json_data['session']['id_session'] = 0 # New session
+            json_data['session']['id_session'] = 0  # New session
 
             # Get participants uuids
             from opentera.db.models.TeraParticipant import TeraParticipant
@@ -430,7 +440,8 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                           json=json_data, endpoint=self.test_endpoint)
 
-            self.assertEqual(403, response.status_code, msg="Post denied for user")  # Forbidden for that user to post that
+            # Forbidden for that user to post that
+            self.assertEqual(403, response.status_code, msg="Post denied for user")
 
             json_data['session']['session_participants_uuids'] = [p1_uuid, p2_uuid]
             response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,

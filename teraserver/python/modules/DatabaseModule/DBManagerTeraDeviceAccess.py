@@ -14,7 +14,7 @@ class DBManagerTeraDeviceAccess:
 
     def query_session(self, session_id: int) -> TeraSession | None:
         requested_session = TeraSession.get_session_by_id(session_id)
-        if self.device.id_device not in [ses_device.id_device for ses_device in requested_session.session_devices] and \
+        if requested_session and self.device.id_device not in [ses_device.id_device for ses_device in requested_session.session_devices] and \
                 requested_session.id_creator_device != self.device.id_device:
             return None
         return requested_session
