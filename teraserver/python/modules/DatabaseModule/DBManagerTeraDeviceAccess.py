@@ -25,7 +25,6 @@ class DBManagerTeraDeviceAccess:
         #             sessions = [TeraSession.get_session_by_id(session_id)]
         #             return sessions
 
-
     def query_existing_session(self, session_name: str, session_type_id: int, session_date: datetime,
                                participant_uuids: list):
         sessions = TeraSession.query.filter(TeraSession.id_creator_device == self.device.id_device).\

@@ -15,10 +15,11 @@ from opentera.redis.RedisVars import RedisVars
 get_parser = api.parser()
 get_parser.add_argument('id_asset', type=int, help='Specific ID of asset to query information.')
 get_parser.add_argument('asset_uuid', type=str, help='Specific UUID of asset to query information.')
-get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all assets')
+get_parser.add_argument('id_device', type=int, help='ID of the device from which to request all accessible assets')
 get_parser.add_argument('id_session', type=int, help='ID of session from which to request all assets')
-get_parser.add_argument('id_participant', type=int, help='ID of participant from which to request all assets')
-get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all assets.')
+get_parser.add_argument('id_participant', type=int, help='ID of participant from which to request all accessible'
+                                                         ' assets')
+get_parser.add_argument('id_user', type=int, help='ID of the user from which to request all accessible assets.')
 get_parser.add_argument('service_uuid', type=str, help='Query all assets associated with that service uuid')
 get_parser.add_argument('id_creator_service', type=int, help='ID of the service from which to request all created '
                                                              'assets.')

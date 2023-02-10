@@ -129,12 +129,14 @@ class TeraAsset(BaseModel, SoftDeleteMixin):
 
     @staticmethod
     def get_assets_for_device(device_id: int, with_deleted: bool = False):
+        # This returns all assets that the device has access to
         from opentera.db.models.TeraSession import TeraSession
         return TeraAsset.query.join(TeraSession).execution_options(include_deleted=with_deleted)\
             .filter(or_(TeraSession.session_devices.any(id_device=device_id), TeraAsset.id_device == device_id)).all()
 
     @staticmethod
     def get_assets_for_user(user_id: int, with_deleted: bool = False):
+        # This return all assets that the user has access to
         from opentera.db.models.TeraSession import TeraSession
         return TeraAsset.query.join(TeraSession).execution_options(include_deleted=with_deleted)\
             .filter(or_(TeraSession.session_users.any(id_user=user_id), TeraAsset.id_user == user_id)).all()
@@ -145,6 +147,7 @@ class TeraAsset(BaseModel, SoftDeleteMixin):
 
     @staticmethod
     def get_assets_for_participant(part_id: int, with_deleted: bool = False):
+        # This returns all assets that the participant has access
         from opentera.db.models.TeraSession import TeraSession
         return TeraAsset.query.join(TeraSession).execution_options(include_deleted=with_deleted).\
             filter(or_(TeraSession.session_participants.any(id_participant=part_id),
