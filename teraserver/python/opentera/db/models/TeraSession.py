@@ -1,6 +1,6 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, TIMESTAMP, or_
 from sqlalchemy.orm import relationship
 
 from enum import Enum
@@ -281,9 +281,9 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                                      start_date: datetime.date = None, end_date: datetime.date = None,
                                      filters: dict = None, with_deleted: bool = False):
         from opentera.db.models.TeraParticipant import TeraParticipant
-        # TODO: Also include sessions created by that participant
         query = TeraSession.query.execution_options(include_deleted=with_deleted)\
-            .join(TeraSession.session_participants).filter(TeraParticipant.id_participant == part_id)
+            .join(TeraSession.session_participants).filter(or_(TeraParticipant.id_participant == part_id,
+                                                               TeraSession.id_creator_participant == part_id))
 
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
@@ -302,9 +302,9 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                               start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None,
                               with_deleted: bool = False):
         from opentera.db.models.TeraUser import TeraUser
-        # TODO: Also include sessions created by that user
         query = TeraSession.query.execution_options(include_deleted=with_deleted)\
-            .join(TeraSession.session_users).filter(TeraUser.id_user == user_id)
+            .join(TeraSession.session_users).filter(or_(TeraUser.id_user == user_id,
+                                                        TeraSession.id_creator_user == user_id))
 
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
@@ -323,9 +323,9 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                                 start_date: datetime.date = None, end_date: datetime.date = None, filters: dict = None,
                                 with_deleted: bool = False):
         from opentera.db.models.TeraDevice import TeraDevice
-        # TODO: Also include sessions created by that device
         query = TeraSession.query.execution_options(include_deleted=with_deleted)\
-            .join(TeraSession.session_devices).filter(TeraDevice.id_device == device_id)
+            .join(TeraSession.session_devices).filter(or_(TeraDevice.id_device == device_id,
+                                                          TeraSession.id_creator_device == device_id))
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
         query = query.order_by(TeraSession.id_session.desc())
