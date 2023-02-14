@@ -1,7 +1,9 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.models.TeraSession import TeraSession
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 from enum import Enum, unique
 from flask_babel import gettext
 
@@ -155,6 +157,11 @@ class TeraSessionType(BaseModel, SoftDeleteMixin):
             name = gettext('Protocol')
 
         return name
+
+    def can_delete(self) -> IntegrityError | bool:
+        if TeraSession.get_count(filters={'id_session_type': self.id_session_type}) > 0:
+            return IntegrityError('Still have sessions with that type', self.id_session_type, 't_sessions')
+        return True
 
     @classmethod
     def update(cls, id_st: int, values: dict):

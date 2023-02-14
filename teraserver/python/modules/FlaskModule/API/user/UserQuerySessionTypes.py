@@ -61,6 +61,8 @@ class UserQuerySessionTypes(Resource):
         try:
             sessions_types_list = []
             for st in session_types:
+                if st is None:
+                    continue
                 if args['list'] is None:
                     st_json = st.to_json()
                     sessions_types_list.append(st_json)
