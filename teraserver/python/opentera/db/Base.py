@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, text
 from sqlalchemy.inspection import inspect as sqlinspector
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from functools import wraps
 
@@ -189,7 +190,17 @@ class BaseMixin(object):
             return db_object
 
     @classmethod
+    def can_delete(cls, id_todel) -> IntegrityError | bool:
+        return True  # Can delete by default
+
+    @classmethod
     def delete(cls, id_todel):
+        can_be_deleted = cls.can_delete(id_todel)
+        if type(can_be_deleted) is bool:
+            if not can_be_deleted:
+                return
+        if type(can_be_deleted) is IntegrityError:
+            raise can_be_deleted
         delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
         if delete_obj:
             if getattr(delete_obj, 'soft_delete', None):
@@ -208,8 +219,6 @@ class BaseMixin(object):
             cls.commit()
         else:
             print(cls.__name__ + ' with id ' + str(id_to_undelete) + ' cannot undelete.')
-
-
 
     # @classmethod
     # def handle_include_deleted_flag(cls, include_deleted=False):

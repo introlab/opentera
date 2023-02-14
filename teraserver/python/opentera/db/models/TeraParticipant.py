@@ -2,8 +2,13 @@ from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from opentera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraTest import TeraTest
 
 import uuid
 import jwt
@@ -370,3 +375,20 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         if participant.participant_token_enabled and participant.participant_enabled:
             participant.create_token()
         TeraParticipant.db().session.commit()
+
+    @classmethod
+    def can_delete(cls, id_todel) -> IntegrityError | bool:
+        # Safety check - can't delete participants with sessions
+        if TeraSessionParticipants.get_session_count_for_participant(id_todel) > 0:
+            return IntegrityError('Participant still has sessions', id_todel, 't_sessions_participants')
+
+        if TeraSession.get_count(filters={'id_creator_participant': id_todel}) > 0:
+            return IntegrityError('Participant still has created sessions', id_todel, 't_sessions')
+
+        if TeraAsset.get_count(filters={'id_participant': id_todel}) > 0:
+            return IntegrityError('Participant still has created assets', id_todel, 't_assets')
+
+        if TeraTest.get_count(filters={'id_participant': id_todel}) > 0:
+            return IntegrityError('Participant still has created tests', id_todel, 't_tests')
+
+        return True
