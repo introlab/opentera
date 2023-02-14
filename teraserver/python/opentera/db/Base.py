@@ -189,19 +189,18 @@ class BaseMixin(object):
             cls.commit()
             return db_object
 
-    @classmethod
-    def can_delete(cls, id_todel) -> IntegrityError | bool:
+    def can_delete(self) -> IntegrityError | bool:
         return True  # Can delete by default
 
     @classmethod
     def delete(cls, id_todel):
-        can_be_deleted = cls.can_delete(id_todel)
+        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
+        can_be_deleted = delete_obj.can_delete()
         if type(can_be_deleted) is bool:
             if not can_be_deleted:
                 return
         if type(can_be_deleted) is IntegrityError:
             raise can_be_deleted
-        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
         if delete_obj:
             if getattr(delete_obj, 'soft_delete', None):
                 delete_obj.soft_delete()

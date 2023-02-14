@@ -89,10 +89,13 @@ class UserQueryParticipantGroup(Resource):
     def post(self):
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
-        if 'group' not in request.json:
+        if 'group' not in request.json and 'participant_group' not in request.json:
             return gettext('Missing group'), 400
 
-        json_group = request.json['group']
+        if 'group' in request.json:
+            json_group = request.json['group']
+        else:
+            json_group = request.json['participant_group']
 
         # Validate if we have an id
         if 'id_participant_group' not in json_group or 'id_project' not in json_group:
@@ -131,7 +134,6 @@ class UserQueryParticipantGroup(Resource):
                                              'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
-        # TODO: Publish update to everyone who is subscribed to sites update...
         update_group = TeraParticipantGroup.get_participant_group_by_id(json_group['id_participant_group'])
 
         return jsonify([update_group.to_json()])

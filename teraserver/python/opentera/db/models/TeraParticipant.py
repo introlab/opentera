@@ -376,19 +376,18 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
             participant.create_token()
         TeraParticipant.db().session.commit()
 
-    @classmethod
-    def can_delete(cls, id_todel) -> IntegrityError | bool:
+    def can_delete(self) -> IntegrityError | bool:
         # Safety check - can't delete participants with sessions
-        if TeraSessionParticipants.get_session_count_for_participant(id_todel) > 0:
-            return IntegrityError('Participant still has sessions', id_todel, 't_sessions_participants')
+        if TeraSessionParticipants.get_session_count_for_participant(self.id_participant) > 0:
+            return IntegrityError('Participant still has sessions', self.id_participant, 't_sessions_participants')
 
-        if TeraSession.get_count(filters={'id_creator_participant': id_todel}) > 0:
-            return IntegrityError('Participant still has created sessions', id_todel, 't_sessions')
+        if TeraSession.get_count(filters={'id_creator_participant': self.id_participant}) > 0:
+            return IntegrityError('Participant still has created sessions', self.id_participant, 't_sessions')
 
-        if TeraAsset.get_count(filters={'id_participant': id_todel}) > 0:
-            return IntegrityError('Participant still has created assets', id_todel, 't_assets')
+        if TeraAsset.get_count(filters={'id_participant': self.id_participant}) > 0:
+            return IntegrityError('Participant still has created assets', self.id_participant, 't_assets')
 
-        if TeraTest.get_count(filters={'id_participant': id_todel}) > 0:
-            return IntegrityError('Participant still has created tests', id_todel, 't_tests')
+        if TeraTest.get_count(filters={'id_participant': self.id_participant}) > 0:
+            return IntegrityError('Participant still has created tests', self.id_participant, 't_tests')
 
         return True

@@ -246,22 +246,21 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
 
         super().update(update_id=update_id, values=values)
 
-    @classmethod
-    def can_delete(cls, id_todel):
+    def can_delete(self):
         # Safety check - can't delete participants with sessions
-        if TeraDeviceParticipant.get_count(filters={'id_device': id_todel}) > 0:
-            return IntegrityError('Device still associated to participant(s)', id_todel, 't_devices_participants')
+        if TeraDeviceParticipant.get_count(filters={'id_device': self.id_device}) > 0:
+            return IntegrityError('Device still associated to participant(s)', self.id_device, 't_devices_participants')
 
-        if TeraSessionDevices.get_count(filters={'id_device': id_todel}) > 0:
-            return IntegrityError('Device still has sessions', id_todel, 't_sessions_devices')
+        if TeraSessionDevices.get_count(filters={'id_device': self.id_device}) > 0:
+            return IntegrityError('Device still has sessions', self.id_device, 't_sessions_devices')
 
-        if TeraSession.get_count(filters={'id_creator_device': id_todel}) > 0:
-            return IntegrityError('Device still has created sessions', id_todel, 't_sessions')
+        if TeraSession.get_count(filters={'id_creator_device': self.id_device}) > 0:
+            return IntegrityError('Device still has created sessions', self.id_device, 't_sessions')
 
-        if TeraAsset.get_count(filters={'id_device': id_todel}) > 0:
-            return IntegrityError('Device still has created assets', id_todel, 't_assets')
+        if TeraAsset.get_count(filters={'id_device': self.id_device}) > 0:
+            return IntegrityError('Device still has created assets', self.id_device, 't_assets')
 
-        if TeraTest.get_count(filters={'id_device': id_todel}) > 0:
-            return IntegrityError('Device still has created tests', id_todel, 't_tests')
+        if TeraTest.get_count(filters={'id_device': self.id_device}) > 0:
+            return IntegrityError('Device still has created tests', self.id_device, 't_tests')
 
         return True

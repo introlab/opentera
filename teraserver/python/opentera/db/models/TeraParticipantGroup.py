@@ -1,5 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.models.TeraProject import TeraProject
@@ -14,7 +15,7 @@ class TeraParticipantGroup(BaseModel, SoftDeleteMixin):
 
     participant_group_project = relationship('TeraProject', back_populates='project_participants_groups')
     participant_group_participants = relationship("TeraParticipant", back_populates='participant_participant_group',
-                                                  passive_deletes=True)
+                                                  passive_deletes=True, cascade='delete')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -75,3 +76,12 @@ class TeraParticipantGroup(BaseModel, SoftDeleteMixin):
                 for participant in updated_group.participant_group_participants:
                     participant.id_project = values['id_project']
         super().update(update_id=update_id, values=values)
+
+    def can_delete(self) -> IntegrityError | bool:
+        for participant in self.participant_group_participants:
+            can_be_deleted = participant.can_delete()
+            if (type(can_be_deleted) is bool and not can_be_deleted) or (type(can_be_deleted) == IntegrityError):
+                if not can_be_deleted or type(can_be_deleted) == IntegrityError:
+                    return IntegrityError('Participant group still has participant(s)', self.id_participant_group,
+                                          't_participants')
+        return True
