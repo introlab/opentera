@@ -2,13 +2,18 @@ from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.models.TeraDeviceType import TeraDeviceType
 from opentera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.db.models.TeraSessionDevices import TeraSessionDevices
+from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 
 import uuid
 import jwt
-import time
 import datetime
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraDevice(BaseModel, SoftDeleteMixin):
@@ -240,3 +245,23 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
             del values['device_subtype']
 
         super().update(update_id=update_id, values=values)
+
+    @classmethod
+    def can_delete(cls, id_todel):
+        # Safety check - can't delete participants with sessions
+        if TeraDeviceParticipant.get_count(filters={'id_device': id_todel}) > 0:
+            return IntegrityError('Device still associated to participant(s)', id_todel, 't_devices_participants')
+
+        if TeraSessionDevices.get_count(filters={'id_device': id_todel}) > 0:
+            return IntegrityError('Device still has sessions', id_todel, 't_sessions_devices')
+
+        if TeraSession.get_count(filters={'id_creator_device': id_todel}) > 0:
+            return IntegrityError('Device still has created sessions', id_todel, 't_sessions')
+
+        if TeraAsset.get_count(filters={'id_device': id_todel}) > 0:
+            return IntegrityError('Device still has created assets', id_todel, 't_assets')
+
+        if TeraTest.get_count(filters={'id_device': id_todel}) > 0:
+            return IntegrityError('Device still has created tests', id_todel, 't_tests')
+
+        return True

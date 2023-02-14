@@ -244,6 +244,9 @@ class UserQueryDevices(Resource):
     def post(self):
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
+        if 'device' not in request.json:
+            return gettext('Missing device'), 400
+
         json_device = request.json['device']
 
         # Validate if we have an id
@@ -419,7 +422,7 @@ class UserQueryDevices(Resource):
 
                 self.module.logger.log_error(self.module.module_name,
                                              UserQueryDevices.__name__,
-                                             'delete', 500, 'Database error', str(e))
+                                             'delete', 500, 'Integrity error', str(e))
 
                 # Causes that could make an integrity error when deleting:
                 # - Associated with sessions
@@ -434,8 +437,16 @@ class UserQueryDevices(Resource):
                 if 't_sessions_id_creator' in str(e.args):
                     return gettext('Can\'t delete device: please remove all sessions created by that device before '
                                    'deleting.'), 500
-                return gettext('Can\'t delete device: please delete all assets created by that device before deleting.'
-                               ), 500
+                if 't_assets' in str(e.args):
+                    return gettext('Can\'t delete device: please delete all assets created by that device before '
+                                   'deleting.'), 500
+                if 't_tests' in str(e.args):
+                    return gettext('Can\'t delete device: please delete all tests created by that device before '
+                                   'deleting.'), 500
+
+                return gettext('Can\'t delete device: please remove all related sessions, assets and tests before '
+                               'deleting.'), 500
+
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
