@@ -1,7 +1,8 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraProject(BaseModel, SoftDeleteMixin):
@@ -137,6 +138,15 @@ class TeraProject(BaseModel, SoftDeleteMixin):
             return TeraProject.query.execution_options(include_deleted=with_deleted)\
                 .filter_by(**filter_args).all()
         return None
+
+    def can_delete(self) -> IntegrityError | bool:
+        for participant in self.project_participants:
+            can_be_deleted = participant.can_delete()
+            if (type(can_be_deleted) is bool and not can_be_deleted) or (type(can_be_deleted) == IntegrityError):
+                if not can_be_deleted or type(can_be_deleted) == IntegrityError:
+                    return IntegrityError('Still have participants with session', self.id_project,
+                                          't_participants')
+        return True
 
     @classmethod
     def insert(cls, project):

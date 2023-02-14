@@ -121,11 +121,16 @@ class UserQueryProjects(Resource):
     def post(self):
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
+        if 'project' not in request.json:
+            return gettext('Missing project'), 400
+
         json_project = request.json['project']
 
         # Validate if we have an id
-        if 'id_project' not in json_project or 'id_site' not in json_project:
-            return gettext('Missing id_project or id_site arguments'), 400
+        if 'id_project' not in json_project:
+            return gettext('Missing id_project'), 400
+        if json_project['id_project'] == 0 and 'id_site' not in json_project:
+            return gettext('Missing id_site arguments'), 400
 
         # Check if current user can modify the posted kit
         # User can modify or add a project if it is the project admin of that kit
@@ -136,6 +141,11 @@ class UserQueryProjects(Resource):
         # Only site admins can create new projects
         if json_project['id_project'] == 0 and \
                 json_project['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True):
+            return gettext('Forbidden'), 403
+
+        # Only site admins can update projects
+        if json_project['id_project'] > 0 and \
+                json_project['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True):
             return gettext('Forbidden'), 403
 
         update_session_types = False
@@ -151,6 +161,11 @@ class UserQueryProjects(Resource):
                 # We have some session types not accessible
                 return gettext('No access to a session type for at least one of it'), 403
 
+            if 'site_id' not in json_project:
+                # If we are here, the project has a site since it is an update (otherwise, site id is required)
+                project = TeraProject.get_project_by_id(json_project['id_project'])
+                if project:
+                    json_project['id_site'] = project.id_site
             site_session_types = TeraSessionTypeSite.get_sessions_types_for_site(site_id=json_project['id_site'])
             site_session_types_ids = [st.id_session_type for st in site_session_types]
 
@@ -160,6 +175,7 @@ class UserQueryProjects(Resource):
             update_session_types = True
 
         # Do the update!
+        new_project = None
         if json_project['id_project'] > 0:
             # Already existing
             try:
