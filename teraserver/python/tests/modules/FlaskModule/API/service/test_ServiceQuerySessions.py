@@ -2,6 +2,7 @@ from BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 from datetime import datetime, timedelta
 from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraParticipant import TeraParticipant
 
 
 class ServiceQuerySessionsTest(BaseServiceAPITest):
@@ -430,7 +431,6 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
             json_data['session']['id_session'] = 0  # New session
 
             # Get participants uuids
-            from opentera.db.models.TeraParticipant import TeraParticipant
             p1_uuid = TeraParticipant.get_participant_by_id(1).participant_uuid
             p2_uuid = TeraParticipant.get_participant_by_id(2).participant_uuid
             p3_uuid = TeraParticipant.get_participant_by_id(3).participant_uuid

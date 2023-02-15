@@ -1,4 +1,5 @@
 from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from datetime import datetime, timedelta
 
 
@@ -363,84 +364,128 @@ class UserQuerySessionsTest(BaseAPITest):
 
         self.assertEqual(6, len(json_data))
 
+    def _checkJson(self, json_data, minimal=False):
+        self.assertGreater(len(json_data), 0)
+        self.assertTrue(json_data.__contains__('id_session'))
+        self.assertTrue(json_data.__contains__('id_creator_device'))
+        self.assertTrue(json_data.__contains__('id_creator_participant'))
+        self.assertTrue(json_data.__contains__('id_creator_service'))
+        self.assertTrue(json_data.__contains__('id_creator_user'))
+        self.assertTrue(json_data.__contains__('id_session_type'))
+        self.assertTrue(json_data.__contains__('session_name'))
+        self.assertTrue(json_data.__contains__('session_status'))
+        self.assertTrue(json_data.__contains__('session_uuid'))
+
+        if not minimal:
+            self.assertTrue(json_data.__contains__('session_comments'))
+            self.assertTrue(json_data.__contains__('session_duration'))
+            # self.assertTrue(json_data.__contains__('session_has_device_data'))
+            self.assertTrue(json_data.__contains__('session_participants'))
+            self.assertTrue(json_data.__contains__('session_users'))
+            self.assertTrue(json_data.__contains__('session_start_datetime'))
+            self.assertTrue(json_data.__contains__('session_parameters'))
+
+
+class TeraSessionPostTest(BaseUserAPITest):
+
+    test_endpoint = '/api/user/sessions'
+
+    def setUp(self):
+        super().setUp()
+
+    def tearDown(self):
+        super().tearDown()
+
     def test_post_and_delete(self):
-        # New with minimal infos
-        json_data = {
-            'session': {
-                'session_name': 'Test Session',
-                'session_start_datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
-                'id_session_type': 1,
-                'session_status': 2
+        with self._flask_app.app_context():
+            # New with minimal infos
+            json_data = {
+                'session': {
+                    'session_name': 'Test Session',
+                    'session_start_datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
+                    'id_session_type': 1,
+                    'session_status': 2
+                }
             }
-        }
 
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(400, response.status_code, msg="Missing id_session")  # Missing id_session
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
 
-        json_data['session']['id_session'] = 0
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(400, response.status_code, msg="Missing participants")  # Missing participants
+            self.assertEqual(400, response.status_code, msg="Missing id_session")  # Missing id_session
 
-        json_data['session']['session_participants_ids'] = [1, 2]
-        response = self._post_with_http_auth(username='user4', password='user4', payload=json_data)
-        self.assertEqual(403, response.status_code, msg="Post denied for user")  # Forbidden for that user to post that
+            json_data['session']['id_session'] = 0
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing participants")  # Missing participants
 
-        json_data['session']['session_users_ids'] = [1]
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(200, response.status_code, msg="Post new")  # All ok now!
+            json_data['session']['session_participants_ids'] = [1, 2]
+            response = self._post_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                      json=json_data)
 
-        json_data = response.json()[0]
-        self._checkJson(json_data)
-        current_id = json_data['id_session']
+            self.assertEqual(403, response.status_code, msg="Post denied for user")
 
-        json_data = {
-            'session': {
-                'id_session': current_id,
-                'session_status': 2,
-                'session_name': 'Test Session 2'
+            json_data['session']['session_users_ids'] = [1]
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post new")  # All ok now!
+
+            json_data = response.json[0]
+            self._checkJson(json_data)
+            current_id = json_data['id_session']
+
+            json_data = {
+                'session': {
+                    'id_session': current_id,
+                    'session_status': 2,
+                    'session_name': 'Test Session 2'
+                }
             }
-        }
 
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(200, response.status_code, msg="Post update")
-        json_data = response.json()[0]
-        self._checkJson(json_data)
-        self.assertEqual(json_data['session_name'], 'Test Session 2')
-        self.assertEqual(json_data['session_status'], 2)
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post update")
+            json_data = response.json[0]
+            self._checkJson(json_data)
+            self.assertEqual(json_data['session_name'], 'Test Session 2')
+            self.assertEqual(json_data['session_status'], 2)
 
-        # Change participants
-        json_data = {
-            'session': {
-                'id_session': current_id,
-                'session_participants_ids': [2, 3]
+            # Change participants
+            json_data = {
+                'session': {
+                    'id_session': current_id,
+                    'session_participants_ids': [2, 3]
+                }
             }
-        }
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(200, response.status_code, msg="Remove participants")
-        json_data = response.json()[0]
-        self._checkJson(json_data)
-        self.assertEqual(len(json_data['session_participants']), 2)
-        # self.assertEqual(json_data['session_participants'][0]['id_participant'], 2)
-        # self.assertEqual(json_data['session_participants'][1]['id_participant'], 3)
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Remove participants")
+            json_data = response.json[0]
+            self._checkJson(json_data)
+            self.assertEqual(len(json_data['session_participants']), 2)
+            # self.assertEqual(json_data['session_participants'][0]['id_participant'], 2)
+            # self.assertEqual(json_data['session_participants'][1]['id_participant'], 3)
 
-        # Add parameters
-        json_data = {
-            'session': {
-                'id_session': current_id,
-                'session_parameters': 'ParametersXYZJSONString'
+            # Add parameters
+            json_data = {
+                'session': {
+                    'id_session': current_id,
+                    'session_parameters': 'ParametersXYZJSONString'
+                }
             }
-        }
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(200, response.status_code, msg="Adding Parameters")
-        response_data = response.json()[0]
-        self._checkJson(response_data)
-        self.assertEqual(json_data['session']['session_parameters'], response_data['session_parameters'])
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Adding Parameters")
+            response_data = response.json[0]
+            self._checkJson(response_data)
+            self.assertEqual(json_data['session']['session_parameters'], response_data['session_parameters'])
 
-        response = self._delete_with_http_auth(username='user4', password='user4', id_to_del=current_id)
-        self.assertEqual(403, response.status_code, msg="Delete denied")
+            response = self._delete_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                        params={'id': current_id})
+            self.assertEqual(403, response.status_code, msg="Delete denied")
 
-        response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=current_id)
-        self.assertEqual(200, response.status_code, msg="Delete OK")
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': current_id})
+            self.assertEqual(200, response.status_code, msg="Delete OK")
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
@@ -462,3 +507,7 @@ class UserQuerySessionsTest(BaseAPITest):
             self.assertTrue(json_data.__contains__('session_users'))
             self.assertTrue(json_data.__contains__('session_start_datetime'))
             self.assertTrue(json_data.__contains__('session_parameters'))
+
+
+# TODO Test with inaccessible sessions, participants, users, devices...
+
