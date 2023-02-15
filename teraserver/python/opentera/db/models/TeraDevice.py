@@ -246,7 +246,7 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
 
         super().update(update_id=update_id, values=values)
 
-    def can_delete(self):
+    def delete_check_integrity(self) -> IntegrityError | None:
         # Safety check - can't delete participants with sessions
         if TeraDeviceParticipant.get_count(filters={'id_device': self.id_device}) > 0:
             return IntegrityError('Device still associated to participant(s)', self.id_device, 't_devices_participants')
@@ -263,4 +263,4 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
         if TeraTest.get_count(filters={'id_device': self.id_device}) > 0:
             return IntegrityError('Device still has created tests', self.id_device, 't_tests')
 
-        return True
+        return None

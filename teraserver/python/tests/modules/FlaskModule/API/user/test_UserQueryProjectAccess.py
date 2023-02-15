@@ -29,7 +29,6 @@ class UserQueryProjectAccessTest(BaseAPITest):
         self.assertEqual(response.status_code, 400)
 
     def test_query_specific_user(self):
-
         # Query specific user
         response = self._request_with_http_auth(username='admin', password='admin', payload='id_user=2')
         self.assertEqual(response.status_code, 200)

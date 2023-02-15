@@ -108,6 +108,9 @@ class UserQuerySites(Resource):
     @user_multi_auth.login_required
     def post(self):
         user_access = DBManager.userAccess(current_user)
+        if 'site' not in request.json:
+            return gettext('Missing site'), 400
+
         # Using request.json instead of parser, since parser messes up the json!
         json_site = request.json['site']
 
@@ -118,6 +121,9 @@ class UserQuerySites(Resource):
         # Check if current user can modify the posted site
         if json_site['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True) and \
                 json_site['id_site'] > 0:
+            return gettext('Forbidden'), 403
+
+        if json_site['id_site'] == 0 and not current_user.user_superadmin:
             return gettext('Forbidden'), 403
 
         # Do the update!

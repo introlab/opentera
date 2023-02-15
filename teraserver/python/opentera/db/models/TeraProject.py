@@ -139,14 +139,12 @@ class TeraProject(BaseModel, SoftDeleteMixin):
                 .filter_by(**filter_args).all()
         return None
 
-    def can_delete(self) -> IntegrityError | bool:
+    def delete_check_integrity(self) -> IntegrityError | None:
         for participant in self.project_participants:
-            can_be_deleted = participant.can_delete()
-            if (type(can_be_deleted) is bool and not can_be_deleted) or (type(can_be_deleted) == IntegrityError):
-                if not can_be_deleted or type(can_be_deleted) == IntegrityError:
-                    return IntegrityError('Still have participants with session', self.id_project,
-                                          't_participants')
-        return True
+            cannot_be_deleted_exception = participant.delete_check_integrity()
+            if cannot_be_deleted_exception:
+                return IntegrityError('Still have participants with session', self.id_project, 't_participants')
+        return None
 
     @classmethod
     def insert(cls, project):

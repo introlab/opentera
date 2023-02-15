@@ -158,10 +158,10 @@ class TeraSessionType(BaseModel, SoftDeleteMixin):
 
         return name
 
-    def can_delete(self) -> IntegrityError | bool:
+    def delete_check_integrity(self) -> IntegrityError | None:
         if TeraSession.get_count(filters={'id_session_type': self.id_session_type}) > 0:
             return IntegrityError('Still have sessions with that type', self.id_session_type, 't_sessions')
-        return True
+        return None
 
     @classmethod
     def update(cls, id_st: int, values: dict):
