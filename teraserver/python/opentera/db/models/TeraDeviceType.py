@@ -68,7 +68,9 @@ class TeraDeviceType(BaseModel):
         return TeraDeviceType.query.filter_by(device_type_key=dev_key).first()
 
     def delete_check_integrity(self) -> IntegrityError | None:
-        if len(self.device_type_devices) > 0:
+        # More efficient that relationships
+        from opentera.db.models.TeraDevice import TeraDevice  # Here to prevent circular import
+        if TeraDevice.get_count(filters={'id_device_type': self.id_device_type}) > 0:
             return IntegrityError('Device Type still has associated devices', self.id_device_type, 't_devices')
         return None
 
