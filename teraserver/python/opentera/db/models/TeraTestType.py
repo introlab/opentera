@@ -1,7 +1,9 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from opentera.db.models.TeraTest import TeraTest
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 import uuid
 
 
@@ -136,6 +138,11 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
             urls['test_type_web_editor_url'] = base_url + '/api/testtypes/web/edit'
 
         return urls
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        if TeraTest.get_count(filters={'id_test_type': self.id_test_type}) > 0:
+            return IntegrityError('Test Type still has associated tests', self.id_test_type, 't_tests')
+        return None
 
     @classmethod
     def insert(cls, test_type):

@@ -1,4 +1,6 @@
 from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
+from opentera.db.models.TeraTest import TeraTest
+import datetime
 
 
 class UserQueryTestTypesTest(BaseUserAPITest):
@@ -122,7 +124,6 @@ class UserQueryTestTypesTest(BaseUserAPITest):
             # New with minimal infos
             json_data = {
                 'test_type': {
-                    'id_service': None,
                     'test_type_name': 'Test'
                 }
             }
@@ -156,7 +157,7 @@ class UserQueryTestTypesTest(BaseUserAPITest):
             json_data['test_type']['test_type_sites'] = [{'id_site': 1}]
             response = self._post_with_user_http_auth(username='user4', password='user4', json=json_data,
                                                       client=self.test_client)
-            self.assertEqual(response.status_code, 403, msg="Post denied for user")  # Forbidden for that user to post that
+            self.assertEqual(response.status_code, 403, msg="Post denied for user")
 
             response = self._post_with_user_http_auth(username='siteadmin', password='siteadmin', json=json_data,
                                                       client=self.test_client)
@@ -197,10 +198,23 @@ class UserQueryTestTypesTest(BaseUserAPITest):
             reply_data = response.json
             self.assertEqual(len(reply_data), 1)
 
-            response = self._delete_with_user_http_auth(username='user4', password='user4', params="id="+str(current_id),
-                                                        client=self.test_client)
+            response = self._delete_with_user_http_auth(username='user4', password='user4',
+                                                        params="id="+str(current_id), client=self.test_client)
             self.assertEqual(response.status_code, 403, msg="Delete denied")
 
+            # Create a test of that type
+            test = TeraTest()
+            test.id_test_type = current_id
+            test.test_name = 'Test Test'
+            test.test_datetime = datetime.datetime.now()
+            test.id_session = 1
+            TeraTest.insert(test)
+
+            response = self._delete_with_user_http_auth(username='admin', password='admin',
+                                                        params="id=" + str(current_id), client=self.test_client)
+            self.assertEqual(response.status_code, 500, msg="Has associated tests")
+
+            TeraTest.delete(test.id_test)
             response = self._delete_with_user_http_auth(username='siteadmin', password='siteadmin',
                                                         params="id="+str(current_id), client=self.test_client)
             self.assertEqual(response.status_code, 200, msg="Delete OK")

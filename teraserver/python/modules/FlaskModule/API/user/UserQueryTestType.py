@@ -336,7 +336,7 @@ class UserQueryTestTypes(Resource):
             self.module.logger.log_error(self.module.module_name,
                                          UserQueryTestTypes.__name__,
                                          'delete', 500, 'Database error', e)
-            return gettext('Can\'t delete test type: please delete all tests of that type before deleting.'), 400
+            return gettext('Can\'t delete test type: please delete all tests of that type before deleting.'), 500
         except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())

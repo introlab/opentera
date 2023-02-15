@@ -90,11 +90,15 @@ class UserQueryDeviceTypes(Resource):
     @user_multi_auth.login_required
     def post(self):
         user_access = DBManager.userAccess(current_user)
+
+        if 'device_type' not in request.json:
+            return gettext('Missing device type'), 400
+
         # Using request.json instead of parser, since parser messes up the json!
         json_device_type = request.json['device_type']
 
         # Validate if we have an id
-        if 'id_device_type' not in json_device_type:
+        if 'id_device_type' not in json_device_type or json_device_type['id_device_type'] is None:
             return gettext('Missing id_device_type'), 400
 
         if not current_user.user_superadmin:

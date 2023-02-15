@@ -376,7 +376,7 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
             participant.create_token()
         TeraParticipant.db().session.commit()
 
-    def can_delete(self) -> IntegrityError | bool:
+    def delete_check_integrity(self) -> IntegrityError | None:
         # Safety check - can't delete participants with sessions
         if TeraSessionParticipants.get_session_count_for_participant(self.id_participant) > 0:
             return IntegrityError('Participant still has sessions', self.id_participant, 't_sessions_participants')
@@ -390,4 +390,4 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         if TeraTest.get_count(filters={'id_participant': self.id_participant}) > 0:
             return IntegrityError('Participant still has created tests', self.id_participant, 't_tests')
 
-        return True
+        return None

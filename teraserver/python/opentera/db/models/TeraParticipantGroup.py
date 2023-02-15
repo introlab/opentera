@@ -77,11 +77,10 @@ class TeraParticipantGroup(BaseModel, SoftDeleteMixin):
                     participant.id_project = values['id_project']
         super().update(update_id=update_id, values=values)
 
-    def can_delete(self) -> IntegrityError | bool:
+    def delete_check_integrity(self) -> IntegrityError | None:
         for participant in self.participant_group_participants:
-            can_be_deleted = participant.can_delete()
-            if (type(can_be_deleted) is bool and not can_be_deleted) or (type(can_be_deleted) == IntegrityError):
-                if not can_be_deleted or type(can_be_deleted) == IntegrityError:
-                    return IntegrityError('Participant group still has participant(s)', self.id_participant_group,
-                                          't_participants')
-        return True
+            cannot_be_deleted_exception = participant.delete_check_integrity()
+            if cannot_be_deleted_exception:
+                return IntegrityError('Participant group still has participant(s)', self.id_participant_group,
+                                      't_participants')
+        return None

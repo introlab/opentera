@@ -296,4 +296,3 @@ class UserQueryProjectsTest(BaseUserAPITest):
             self.assertTrue(json_data.__contains__('project_role'))
             self.assertFalse(json_data.__contains__('project_participant_group_count'))
             self.assertFalse(json_data.__contains__('project_participant_count'))
-

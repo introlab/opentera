@@ -1,7 +1,8 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Sequence
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraSite(BaseModel, SoftDeleteMixin):
@@ -59,13 +60,13 @@ class TeraSite(BaseModel, SoftDeleteMixin):
     def get_site_by_id(site_id: int, with_deleted: bool = False):
         return TeraSite.query.execution_options(include_deleted=with_deleted).filter_by(id_site=site_id).first()
 
-    # @staticmethod
-    # def query_data(filter_args):
-    #     if isinstance(filter_args, tuple):
-    #         return TeraSite.query.filter_by(*filter_args).all()
-    #     if isinstance(filter_args, dict):
-    #         return TeraSite.query.filter_by(**filter_args).all()
-    #     return None
+    def delete_check_integrity(self) -> IntegrityError | None:
+        for project in self.site_projects:
+            cannot_be_deleted_exception = project.delete_check_integrity()
+            if cannot_be_deleted_exception:
+                return IntegrityError('Still have projects with participants with sessions', self.id_site,
+                                      't_projects')
+        return None
 
     @classmethod
     def insert(cls, site):
