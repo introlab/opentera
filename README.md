@@ -38,6 +38,9 @@ You are welcome to participate in this effort. Leave us comments or report [Issu
 
 * Dominic Létourneau, ing. M.Sc.A., IntRoLab, Université de Sherbrooke (@doumdi)
 * Simon Brière, ing. M.Sc.A., CDRV, Université de Sherbrooke (@sbriere)
+* François Michaud, ing. Ph.D., IntRoLab, Université de Sherbrooke
+* Michel Tousignant, pht, Ph.D., CDRV, Université de Sherbrooke
+
 
 ## Contributors
 
