@@ -170,7 +170,7 @@ class BaseMixin(object):
         if len(update_values) != len(values):
             raise SQLAlchemyError('Invalid values passed to update')
 
-        if cls.get_primary_key_name() in update_values:
+        if cls.get_primary_key_name() in update_values and update_id != update_values[cls.get_primary_key_name()]:
             raise SQLAlchemyError(f'Primary key cannot be updated ({cls.get_primary_key_name()})')
 
         # with Session(cls.db().engine) as session:
