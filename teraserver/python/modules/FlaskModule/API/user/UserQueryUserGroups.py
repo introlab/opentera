@@ -128,12 +128,18 @@ class UserQueryUserGroups(Resource):
     def post(self):
         user_access = DBManager.userAccess(current_user)
 
+        if 'user_group' not in request.json:
+            return gettext('Missing user_group'), 400
+
         # Using request.json instead of parser, since parser messes up the json!
         json_user_group = request.json['user_group']
 
         # Validate if we have an id_user_group
         if 'id_user_group' not in json_user_group:
             return gettext('Missing id_user_group'), 400
+
+        if 'user_group_name' not in json_user_group and json_user_group['id_user_group'] == 0:
+            return gettext('Missing user group name'), 400
 
         # Check if current user has at least an accessible site as admin
         current_user_sites = user_access.get_accessible_sites(admin_only=True)

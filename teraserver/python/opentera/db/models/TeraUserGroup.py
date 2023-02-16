@@ -1,7 +1,8 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Sequence
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraUserGroup(BaseModel, SoftDeleteMixin):
@@ -167,3 +168,7 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
 
             TeraUserGroup.db().session.commit()
 
+    def delete_check_integrity(self) -> IntegrityError | None:
+        if len(self.user_group_users) > 0:
+            return IntegrityError('User group still has associated users', self.id_user_group, 't_users')
+        return None

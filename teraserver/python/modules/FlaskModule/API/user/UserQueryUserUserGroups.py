@@ -85,6 +85,9 @@ class UserQueryUserUserGroups(Resource):
     def post(self):
         user_access = DBManager.userAccess(current_user)
 
+        if not 'user_user_group' in request.json:
+            return gettext('Missing user user group'), 400
+
         # Using request.json instead of parser, since parser messes up the json!
         json_user_groups = request.json['user_user_group']
 
