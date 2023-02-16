@@ -49,8 +49,11 @@ class UserRefreshToken(Resource):
                 port = request.headers['X_EXTERNALPORT']
 
             # Verify if user already logged in with a websocket
-            rpc = RedisRPCClient(self.module.config.redis_config)
-            online_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
+            online_users = []
+            if not self.test:
+                rpc = RedisRPCClient(self.module.config.redis_config)
+                online_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
+
             if current_user.user_uuid not in online_users:
                 # User is online and a websocket is required
                 # self.module.logger.log_warning(self.module.module_name,

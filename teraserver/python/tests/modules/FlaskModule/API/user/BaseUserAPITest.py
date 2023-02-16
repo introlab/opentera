@@ -123,7 +123,8 @@ class BaseUserAPITest(unittest.TestCase):
             if not LoginModule.redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
                 LoginModule.redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_token_key)
             else:
-                self.service_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
+                self.service_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey)\
+                    .decode('utf-8')
 
             # User (dynamic)
             if not LoginModule.redis_client.exists(RedisVars.RedisVar_UserTokenAPIKey):

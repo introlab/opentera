@@ -239,6 +239,8 @@ class TeraServiceConfig(BaseModel, SoftDeleteMixin):
 
                 config.set_config_for_specific_id(specific_id=values['id_specific'],
                                                   config=values['service_config_config'])
+
+                del values['id_specific']
             else:
                 # We have a global config...
                 config = TeraServiceConfig.get_service_config_by_id(values['id_service_config'])

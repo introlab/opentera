@@ -10,10 +10,6 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
     id_user_group = Column(Integer, Sequence('id_usergroup_sequence'), primary_key=True, autoincrement=True)
     user_group_name = Column(String, nullable=False, unique=False)
 
-    # user_group_services_access = relationship("TeraServiceAccess",
-    #                                           back_populates="service_access_user_group",
-    #                                           passive_deletes=True)
-
     user_group_services_roles = relationship("TeraServiceRole", secondary="t_services_access",
                                              back_populates="service_role_user_groups",
                                              passive_deletes=True)

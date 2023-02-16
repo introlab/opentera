@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, text
 from sqlalchemy.inspection import inspect as sqlinspector
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 from functools import wraps
 
@@ -166,10 +166,16 @@ class BaseMixin(object):
 
     @classmethod
     def update(cls, update_id: int, values: dict):
-        values = cls.clean_values(values)
+        update_values = cls.clean_values(values)
+        if len(update_values) != len(values):
+            raise SQLAlchemyError('Invalid values passed to update')
+
+        if cls.get_primary_key_name() in update_values and update_id != update_values[cls.get_primary_key_name()]:
+            raise SQLAlchemyError(f'Primary key cannot be updated ({cls.get_primary_key_name()})')
+
         # with Session(cls.db().engine) as session:
         update_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()
-        update_obj.from_json(values)
+        update_obj.from_json(update_values)
         cls.db().session.commit()
 
     @classmethod
