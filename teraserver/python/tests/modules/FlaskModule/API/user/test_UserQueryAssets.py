@@ -2,7 +2,6 @@ from BaseUserAPITest import BaseUserAPITest
 
 
 class UserQueryAssetsTest(BaseUserAPITest):
-    login_endpoint = '/api/user/login'
     test_endpoint = '/api/user/assets'
 
     def setUp(self):

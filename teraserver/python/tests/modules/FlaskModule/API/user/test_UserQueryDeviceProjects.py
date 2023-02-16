@@ -1,406 +1,472 @@
-from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
+from BaseUserAPITest import BaseUserAPITest
 
 
-class UserQueryDeviceProjectsTest(BaseAPITest):
-    login_endpoint = '/api/user/login'
+class UserQueryDeviceProjectsTest(BaseUserAPITest):
     test_endpoint = '/api/user/deviceprojects'
 
     def setUp(self):
-        pass
+        super().setUp()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
-    def test_no_auth(self):
-        response = self._request_with_no_auth()
-        self.assertEqual(response.status_code, 401)
+    def test_get_endpoint_no_auth(self):
+        with self._flask_app.app_context():
+            with self._flask_app.app_context():
+                response = self.test_client.get(self.test_endpoint)
+                self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_invalid_http_auth(self):
+        with self._flask_app.app_context():
+            with self._flask_app.app_context():
+                response = self._get_with_user_http_auth(self.test_client)
+                self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            with self._flask_app.app_context():
+                response = self._get_with_user_token_auth(self.test_client)
+                self.assertEqual(401, response.status_code)
 
     def test_post_no_auth(self):
-        response = self._post_with_no_auth()
-        self.assertEqual(response.status_code, 401)
+        with self._flask_app.app_context():
+            response = self.test_client.post(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
 
     def test_delete_no_auth(self):
-        response = self._delete_with_no_auth(id_to_del=0)
-        self.assertEqual(response.status_code, 401)
+        with self._flask_app.app_context():
+            params = {'id': 0}
+            response = self.test_client.delete(self.test_endpoint, query_string=params)
+            self.assertEqual(401, response.status_code)
 
     def test_query_no_params_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin')
-        self.assertEqual(response.status_code, 400)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin')
+            self.assertEqual(400, response.status_code)
 
     def test_query_as_user(self):
-        response = self._request_with_http_auth(username='user', password='user', payload="")
-        self.assertEqual(response.status_code, 400)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user')
+            self.assertEqual(400, response.status_code)
 
     def test_query_project_as_admin(self):
-        params = {'id_project': 10}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_project': 10}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            json_data = response.json
+            self.assertEqual(len(json_data), 0)
 
-        params = {'id_project': 1}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+            params = {'id_project': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 2)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            for data_item in json_data:
+                self._checkJson(json_data=data_item)
 
     def test_query_project_with_devices_as_admin(self):
-        params = {'id_project': 1, 'with_devices': 1}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        with self._flask_app.app_context():
+            params = {'id_project': 1, 'with_devices': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 2)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
 
     def test_query_device_as_admin(self):
-        params = {'id_device': 30}  # Invalid service
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_device': 30}  # Invalid service
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 0)
 
-        params = {'id_device': 2}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+            params = {'id_device': 2}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 1)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
 
     def test_query_device_with_projects_as_admin(self):
-        params = {'id_device': 1, 'with_projects': 1}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 3)
+        with self._flask_app.app_context():
+            params = {'id_device': 1, 'with_projects': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 3)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
 
     def test_query_device_with_projects_and_with_sites_as_admin(self):
-        params = {'id_device': 3, 'with_projects': 1, 'with_sites': 1}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 3)
+        with self._flask_app.app_context():
+            params = {'id_device': 3, 'with_projects': 1, 'with_sites': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 3)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertTrue(data_item.__contains__('id_site'))
-            self.assertTrue(data_item.__contains__('site_name'))
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertTrue(data_item.__contains__('id_site'))
+                self.assertTrue(data_item.__contains__('site_name'))
 
     def test_query_list_as_admin(self):
-        params = {'id_project': 1, 'list': 1}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        with self._flask_app.app_context():
+            params = {'id_project': 1, 'list': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item, minimal=True)
+            self.assertEqual(len(response.json), 2)
+
+            for data_item in response.json:
+                self._checkJson(json_data=data_item, minimal=True)
 
     def test_query_project_as_user(self):
-        params = {'id_project': 10}
-        response = self._request_with_http_auth(username='user', password='user', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_project': 10}
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 0)
 
-        params = {'id_project': 1}
-        response = self._request_with_http_auth(username='user4', password='user4', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+            params = {'id_project': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 0)
 
-        params = {'id_project': 1}
-        response = self._request_with_http_auth(username='user', password='user', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+            params = {'id_project': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user', params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 2)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
 
     def test_query_project_with_devices_as_user(self):
-        params = {'id_project': 1, 'with_devices': 1}
-        response = self._request_with_http_auth(username='user', password='user', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        with self._flask_app.app_context():
+            params = {'id_project': 1, 'with_devices': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user', params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 2)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
 
     def test_query_device_as_user(self):
-        params = {'id_device': 30}  # Invalid
-        response = self._request_with_http_auth(username='user', password='user', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_device': 30}  # Invalid
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user', params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 0)
 
-        params = {'id_device': 1}
-        response = self._request_with_http_auth(username='user4', password='user4', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+            params = {'id_device': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4', params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 0)
 
-        params = {'id_device': 2}
-        response = self._request_with_http_auth(username='user', password='user', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+            params = {'id_device': 2}
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user', params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 1)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
 
     def test_query_device_with_projects_as_user(self):
-        params = {'id_device': 1, 'with_projects': 1}
-        response = self._request_with_http_auth(username='user', password='user', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        with self._flask_app.app_context():
+            params = {'id_device': 1, 'with_projects': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user', params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 2)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
 
     def test_query_list_as_user(self):
-        params = {'id_device': 2, 'list': 1}
+        with self._flask_app.app_context():
+            params = {'id_device': 2, 'list': 1}
 
-        response = self._request_with_http_auth(username='user4', password='user4', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 0)
 
-        response = self._request_with_http_auth(username='user', password='user', payload=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user', params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertEqual(len(response.json), 1)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item, minimal=True)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item, minimal=True)
 
     def test_post_device(self):
-        # New with minimal infos
-        json_data = {}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing everything")  # Missing
+        with self._flask_app.app_context():
+            # New with minimal infos
+            json_data = {}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing everything")  # Missing
 
-        json_data = {'device': {}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing id_service")
+            json_data = {'device': {}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing id_service")
 
-        json_data = {'device': {'id_device': 1}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing projects")
+            json_data = {'device': {'id_device': 1}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing projects")
 
-        json_data = {'device': {'id_device': 1, 'projects': []}}
-        response = self._post_with_http_auth(username='user', password='user', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Only project/site admins can change things here")
+            json_data = {'device': {'id_device': 1, 'projects': []}}
+            response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="Only project/site admins can change things here")
 
-        json_data = {'device': {'id_device': 2, 'projects': []}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Remove from all projects OK")
+            json_data = {'device': {'id_device': 2, 'projects': []}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Remove from all projects OK")
 
-        params = {'id_device': 2}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)  # Everything was deleted!
+            params = {'id_device': 2}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            json_data = response.json
+            self.assertEqual(len(json_data), 0)  # Everything was deleted!
 
-        json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1},
-                                                             {'id_project': 2},
-                                                             {'id_project': 3}]}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="One project not part of device site")
+            json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1},
+                                                                 {'id_project': 2},
+                                                                 {'id_project': 3}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="One project not part of device site")
 
-        json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1},
-                                                             {'id_project': 2}]}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Add all projects OK")
+            json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1},
+                                                                 {'id_project': 2}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Add all projects OK")
 
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)  # Everything was added
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            json_data = response.json
+            self.assertEqual(len(json_data), 2)  # Everything was added
 
-        json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1}]}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Remove one project")
+            json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Remove one project")
 
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            json_data = response.json
+            self.assertEqual(len(json_data), 1)
 
-        # Reassign all devices to participants (initial state)
-        json_data = {'device_participant': [{'id_device': 1, 'id_participant': 1},
-                                            {'id_device': 1, 'id_participant': 2},
-                                            {'id_device': 2, 'id_participant': 2}]}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
-                                             endpoint='/api/user/deviceparticipants')
-        self.assertEqual(response.status_code, 200)
+            # Reassign all devices to participants (initial state)
+            json_data = {'device_participant': [{'id_device': 1, 'id_participant': 1},
+                                                {'id_device': 1, 'id_participant': 2},
+                                                {'id_device': 2, 'id_participant': 2}]}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data,
+                                                      endpoint='/api/user/deviceparticipants')
+            self.assertEqual(200, response.status_code)
 
     def test_post_project(self):
-        # Project update
-        json_data = {'project': {}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing id_project")
+        with self._flask_app.app_context():
+            # Project update
+            json_data = {'project': {}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing id_project")
 
-        json_data = {'project': {'id_project': 1}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing devices")
+            json_data = {'project': {'id_project': 1}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing devices")
 
-        json_data = {'project': {'id_project': 1, 'devices': []}}
-        response = self._post_with_http_auth(username='user', password='user', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Only site admins can change things here")
+            json_data = {'project': {'id_project': 1, 'devices': []}}
+            response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="Only site admins can change things here")
 
-        json_data = {'project': {'id_project': 1, 'devices': []}}
-        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Remove all devices OK")
+            json_data = {'project': {'id_project': 1, 'devices': []}}
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Remove all devices OK")
 
-        params = {'id_project': 1}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)  # Everything was deleted!
+            params = {'id_project': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            json_data = response.json
+            self.assertEqual(len(json_data), 0)  # Everything was deleted!
 
-        json_data = {'project': {'id_project': 1, 'devices': [{'id_device': 1},
-                                                              {'id_device': 2},
-                                                              {'id_device': 3}]}}
-        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="One device not allowed - not part of the site project!")
+            json_data = {'project': {'id_project': 1, 'devices': [{'id_device': 1},
+                                                                  {'id_device': 2},
+                                                                  {'id_device': 3}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="One device not allowed - not part of the site project!")
 
-        json_data = {'project': {'id_project': 1, 'devices': [{'id_device': 1},
-                                                              {'id_device': 2}]}}
-        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="New device association OK")
+            json_data = {'project': {'id_project': 1, 'devices': [{'id_device': 1},
+                                                                  {'id_device': 2}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="New device association OK")
 
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)  # Everything was added
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            json_data = response.json
+            self.assertEqual(len(json_data), 2)  # Everything was added
 
-        json_data = {'project': {'id_project': 1, 'devices': [{'id_device': 1}]}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Remove 1 device")
+            json_data = {'project': {'id_project': 1, 'devices': [{'id_device': 1}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Remove 1 device")
 
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            json_data = response.json
+            self.assertEqual(len(json_data), 1)
 
-        json_data = {'project': {'id_project': 1, 'devices': [{'id_device': 1},
-                                                              {'id_device': 2}]}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Back to initial state")
+            json_data = {'project': {'id_project': 1, 'devices': [{'id_device': 1},
+                                                                  {'id_device': 2}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Back to initial state")
 
-        # Reassign all devices to participants (initial state)
-        json_data = {'device_participant': [{'id_device': 1, 'id_participant': 1},
-                                            {'id_device': 1, 'id_participant': 2},
-                                            {'id_device': 2, 'id_participant': 2}]}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
-                                             endpoint='/api/user/deviceparticipants')
-        self.assertEqual(response.status_code, 200)
+            # Reassign all devices to participants (initial state)
+            json_data = {'device_participant': [{'id_device': 1, 'id_participant': 1},
+                                                {'id_device': 1, 'id_participant': 2},
+                                                {'id_device': 2, 'id_participant': 2}]}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data,
+                                                      endpoint='/api/user/deviceparticipants')
+            self.assertEqual(200, response.status_code)
 
     def test_post_device_project_and_delete(self):
-        # Device-Project update
-        json_data = {'device_project': {}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Badly formatted request")
+        with self._flask_app.app_context():
+            # Device-Project update
+            json_data = {'device_project': {}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Badly formatted request")
 
-        json_data = {'device_project': {'id_project': 1}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Badly formatted request")
+            json_data = {'device_project': {'id_project': 1}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Badly formatted request")
 
-        json_data = {'device_project': {'id_project': 1, 'id_device': 1}}
-        response = self._post_with_http_auth(username='user', password='user', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Only site admins can change things here")
+            json_data = {'device_project': {'id_project': 1, 'id_device': 1}}
+            response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="Only site admins can change things here")
 
-        json_data = {'device_project': {'id_project': 1, 'id_device': 3}}
-        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Add new association not OK - device not part of the site")
+            json_data = {'device_project': {'id_project': 1, 'id_device': 3}}
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="Add new association not OK - device not part of the site")
 
-        params = {'id_project': 1}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
+            params = {'id_project': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            json_data = response.json
 
-        current_id = None
-        for dp in json_data:
-            if dp['id_device'] == 2:
-                current_id = dp['id_device_project']
-                break
-        self.assertFalse(current_id is None)
+            current_id = None
+            for dp in json_data:
+                if dp['id_device'] == 2:
+                    current_id = dp['id_device_project']
+                    break
+            self.assertFalse(current_id is None)
 
-        # Delete current association before adding it
-        response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=current_id)
-        self.assertEqual(response.status_code, 200, msg="Current association deleted")
+            # Delete current association before adding it
+            params = {'id': current_id}
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params=params)
+            self.assertEqual(200, response.status_code, msg="Current association deleted")
 
-        json_data = {'device_project': {'id_project': 1, 'id_device': 2}}
-        response = self._post_with_http_auth(username='siteadmin', password='siteadmin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Add new association OK")
+            json_data = {'device_project': {'id_project': 1, 'id_device': 2}}
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Add new association OK")
 
-        params = {'id_project': 1}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+            params = {'id_project': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            json_data = response.json
+            self.assertEqual(len(json_data), 2)
 
-        current_id = None
-        for dp in json_data:
-            if dp['id_device'] == 1:
-                current_id = dp['id_device_project']
-                break
-        self.assertFalse(current_id is None)
+            current_id = None
+            for dp in json_data:
+                if dp['id_device'] == 1:
+                    current_id = dp['id_device_project']
+                    break
+            self.assertFalse(current_id is None)
+            params = {'id': current_id}
+            response = self._delete_with_user_http_auth(self.test_client, username='user', password='user',
+                                                        params=params)
+            self.assertEqual(403, response.status_code, msg="Delete denied")
 
-        response = self._delete_with_http_auth(username='user', password='user', id_to_del=current_id)
-        self.assertEqual(response.status_code, 403, msg="Delete denied")
+            params = {'id': current_id}
+            response = self._delete_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                        params=params)
+            self.assertEqual(200, response.status_code, msg="Delete OK")
 
-        response = self._delete_with_http_auth(username='siteadmin', password='siteadmin', id_to_del=current_id)
-        self.assertEqual(response.status_code, 200, msg="Delete OK")
+            params = {'id_project': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            json_data = response.json
+            self.assertEqual(len(json_data), 1)
 
-        params = {'id_project': 1}
-        response = self._request_with_http_auth(username='admin', password='admin', payload=params)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+            json_data = {'device': {'id_device': 1, 'projects': [{'id_project': 1},
+                                                                 {'id_project': 2}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Back to initial state")
 
-        json_data = {'device': {'id_device': 1, 'projects': [{'id_project': 1},
-                                                             {'id_project': 2}]}}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Back to initial state")
-
-        # Reassign all devices to participants (initial state)
-        json_data = {'device_participant': [{'id_device': 1, 'id_participant': 1},
-                                            {'id_device': 1, 'id_participant': 2},
-                                            {'id_device': 2, 'id_participant': 2}]}
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data,
-                                             endpoint='/api/user/deviceparticipants')
-        self.assertEqual(response.status_code, 200)
+            # Reassign all devices to participants (initial state)
+            json_data = {'device_participant': [{'id_device': 1, 'id_participant': 1},
+                                                {'id_device': 1, 'id_participant': 2},
+                                                {'id_device': 2, 'id_participant': 2}]}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data,
+                                                      endpoint='/api/user/deviceparticipants')
+            self.assertEqual(200, response.status_code)
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
