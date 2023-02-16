@@ -184,7 +184,8 @@ class UserQueryDeviceProjectsTest(BaseUserAPITest):
             self.assertEqual(len(response.json), 0)
 
             params = {'id_device': 1}
-            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4', params=params)
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params=params)
             self.assertEqual(200, response.status_code)
             self.assertEqual('application/json', response.headers['Content-Type'])
             self.assertEqual(len(response.json), 0)
