@@ -1,99 +1,110 @@
-from requests import get
-import json
-from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
+from BaseParticipantAPITest import BaseParticipantAPITest
+from opentera.db.models.TeraAsset import TeraAsset
 
 
-class ParticipantQueryAssetsTest(BaseAPITest):
+class ParticipantQueryAssetsTest(BaseParticipantAPITest):
     login_endpoint = '/api/participant/login'
     test_endpoint = '/api/participant/assets'
     participant_static_token = None
     participant_dynamic_token = None
 
     def setUp(self):
-        # Get participant static token
-        params = {'id_participant': 1}
-        response = self._request_with_http_auth('admin', 'admin', params, '/api/user/participants')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertTrue(json_data[0].__contains__('participant_token'))
-        self.participant_static_token = json_data[0]['participant_token']
-
-        # Get participant dynamic token
-        params = {}
-        response = self._request_with_http_auth('participant1', 'opentera', params, '/api/participant/login')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertTrue(json_data.__contains__('participant_token'))
-        self.participant_dynamic_token = json_data['participant_token']
+        super().setUp()
+        with self._flask_app.app_context():
+            # Get participant static token
+            response = self._get_with_participant_http_auth(self.test_client, username='participant1',
+                                                            password='opentera', endpoint=self.login_endpoint)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('participant_token' in response.json)
+            self.participant_dynamic_token = response.json['participant_token']
+            self.assertTrue('base_token' in response.json)
+            self.participant_static_token = response.json['base_token']
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
-    def test_no_auth(self):
-        response = self._request_with_no_auth()
-        self.assertEqual(401, response.status_code)
+    def test_query_invalid_http_auth(self):
+        with self._flask_app.app_context():
+            response = self._get_with_participant_http_auth(self.test_client, username='invalid', password='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_query_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            response = self._get_with_participant_token_auth(self.test_client, token='invalid')
+            self.assertEqual(401, response.status_code)
 
     def test_static_token(self):
-        response = self._request_with_token_auth(self.participant_static_token, 'id_asset=1&with_urls=True')
-        self.assertEqual(response.status_code, 403)
+        with self._flask_app.app_context():
+            params = {'id_asset': 1, 'with_urls': True}
+            response = self._get_with_participant_token_auth(self.test_client,
+                                                             token=self.participant_static_token, params=params)
+            self.assertEqual(403, response.status_code)
 
     def test_query_assets_get_id(self):
-        response = self._request_with_token_auth(self.participant_dynamic_token, 'id_asset=1&with_urls=True')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertTrue(len(json_data), 1)
-        self._checkJson(json_data=json_data[0])
+        with self._flask_app.app_context():
+            params = {'id_asset': 1, 'with_urls': True}
+            response = self._get_with_participant_token_auth(self.test_client,
+                                                             token=self.participant_dynamic_token, params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(len(response.json), 1)
+            self._checkJson(json_data=response.json[0])
 
     def test_query_assets_get_id_forbidden(self):
-        response = self._request_with_token_auth(self.participant_dynamic_token, 'id_asset=2')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_asset': 2}
+            response = self._get_with_participant_token_auth(self.test_client,
+                                                             token=self.participant_dynamic_token, params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(len(response.json), 0)
 
     def test_query_assets_get_uuid(self):
-        response = self._request_with_token_auth(self.participant_dynamic_token, 'id_asset=1')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        asset_uuid = json_data[0]['asset_uuid']
-        response = self._request_with_token_auth(self.participant_dynamic_token, 'asset_uuid=' + asset_uuid)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self._checkJson(json_data=json_data[0], minimal=True)
+        with self._flask_app.app_context():
+            params = {'id_asset': 1}
+
+            response = self._get_with_participant_token_auth(self.test_client,
+                                                             token=self.participant_dynamic_token, params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(len(response.json), 1)
+            asset_uuid = response.json[0]['asset_uuid']
+
+            params = {'asset_uuid': asset_uuid}
+
+            response = self._get_with_participant_token_auth(self.test_client,
+                                                             token=self.participant_dynamic_token, params=params)
+
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(len(response.json), 1)
+            self._checkJson(json_data=response.json[0], minimal=True)
 
     def test_query_assets_get_uuid_forbidden(self):
-        params = {'id_asset': 2}
-        response = self._request_with_http_auth('admin', 'admin', params, '/api/user/assets')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        self.assertTrue(json_data[0].__contains__('asset_uuid'))
-        asset_uuid = json_data[0]['asset_uuid']
-        response = self._request_with_token_auth(self.participant_dynamic_token, 'asset_uuid=' + asset_uuid)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+        with self._flask_app.app_context():
+            asset = TeraAsset.query.filter_by(id_asset=2).first()
+            self.assertIsNotNone(asset)
+            params = {'asset_uuid': asset.asset_uuid}
+            response = self._get_with_participant_token_auth(self.test_client, token=self.participant_dynamic_token,
+                                                             params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(len(response.json), 0)
 
     def test_query_assets_all(self):
-        response = self._request_with_token_auth(self.participant_dynamic_token)
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        for asset_info in json_data:
-            self._checkJson(json_data=asset_info, minimal=True)
+        with self._flask_app.app_context():
+            response = self._get_with_participant_token_auth(self.test_client, token=self.participant_dynamic_token)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(len(response.json), 1)
+            for asset_info in response.json:
+                self._checkJson(json_data=asset_info, minimal=True)
 
     def test_query_assets_all_token_only(self):
-        payload = {'with_only_token': True}
-        response = self._request_with_token_auth(token=self.participant_dynamic_token, payload=payload)
-        self.assertEqual(response.status_code, 200)
-
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-        for data_item in json_data:
-            self.assertFalse(data_item.__contains__("asset_name"))
-            self.assertTrue(data_item.__contains__("asset_uuid"))
-            self.assertTrue(data_item.__contains__("access_token"))
+        with self._flask_app.app_context():
+            params = {'with_only_token': True}
+            response = self._get_with_participant_token_auth(self.test_client, token=self.participant_dynamic_token,
+                                                             params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(len(response.json), 1)
+            for data_item in response.json:
+                self.assertFalse(data_item.__contains__("asset_name"))
+                self.assertTrue(data_item.__contains__("asset_uuid"))
+                self.assertTrue(data_item.__contains__("access_token"))
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

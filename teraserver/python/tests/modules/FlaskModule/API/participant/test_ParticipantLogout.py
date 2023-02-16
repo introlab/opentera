@@ -5,6 +5,7 @@ from opentera.db.models.TeraParticipant import TeraParticipant
 class ParticipantLogoutTest(BaseParticipantAPITest):
 
     test_endpoint = '/api/participant/logout'
+    login_endpoint = '/api/participant/login'
 
     def setUp(self):
         super().setUp()
@@ -19,17 +20,17 @@ class ParticipantLogoutTest(BaseParticipantAPITest):
             password = 'opentera'
 
             login_response = self._get_with_participant_http_auth(
-                self.test_client, username, password, params={}, endpoint='/api/participant/login')
+                self.test_client, username, password, params={}, endpoint=self.login_endpoint)
 
-            self.assertEqual(login_response.status_code, 200)
-            self.assertEqual(login_response.headers['Content-Type'], 'application/json')
+            self.assertEqual(200, login_response.status_code)
+            self.assertEqual('application/json', login_response.headers['Content-Type'])
             self.assertGreater(len(login_response.json), 0)
 
             logout_response = self._get_with_participant_http_auth(
                 self.test_client, username, password, params={}, endpoint=self.test_endpoint)
 
-            self.assertEqual(logout_response.headers['Content-Type'], 'application/json')
-            self.assertEqual(logout_response.status_code, 200)
+            self.assertEqual('application/json', logout_response.headers['Content-Type'])
+            self.assertEqual(200, logout_response.status_code)
 
     def test_logout_invalid_participant_httpauth(self):
         with self._flask_app.app_context():
@@ -37,14 +38,14 @@ class ParticipantLogoutTest(BaseParticipantAPITest):
             password = 'invalid'
 
             login_response = self._get_with_participant_http_auth(
-                self.test_client, username, password, params={}, endpoint='/api/participant/login')
+                self.test_client, username, password, params={}, endpoint=self.login_endpoint)
 
-            self.assertEqual(login_response.status_code, 401)
+            self.assertEqual(401, login_response.status_code)
 
             logout_response = self._get_with_participant_http_auth(
                 self.test_client, username, password, params={}, endpoint=self.test_endpoint)
 
-            self.assertEqual(logout_response.status_code, 401)
+            self.assertEqual(401, logout_response.status_code)
 
     def test_logout_valid_token_auth(self):
         with self._flask_app.app_context():
@@ -54,15 +55,15 @@ class ParticipantLogoutTest(BaseParticipantAPITest):
                     continue
 
                 login_response = self._get_with_participant_token_auth(
-                    self.test_client, token=participant.participant_token, endpoint='/api/participant/login')
+                    self.test_client, token=participant.participant_token, endpoint=self.login_endpoint)
                 if not participant.participant_enabled:
-                    self.assertEqual(login_response.status_code, 401)
+                    self.assertEqual(401, login_response.status_code)
                     continue
 
-                self.assertEqual(login_response.status_code, 200)
+                self.assertEqual(200, login_response.status_code)
 
                 logout_response = self._get_with_participant_token_auth(
                     self.test_client, token=participant.participant_token, endpoint=self.test_endpoint)
 
-                self.assertEqual(logout_response.headers['Content-Type'], 'application/json')
-                self.assertEqual(logout_response.status_code, 200)
+                self.assertEqual('application/json', logout_response.headers['Content-Type'])
+                self.assertEqual(200, logout_response.status_code)
