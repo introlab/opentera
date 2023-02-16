@@ -1,4 +1,5 @@
 from BaseUserAPITest import BaseUserAPITest
+from opentera.utils.TeraVersions import TeraVersions
 
 
 class UserQueryVersionsTest(BaseUserAPITest):
@@ -6,6 +7,14 @@ class UserQueryVersionsTest(BaseUserAPITest):
 
     def setUp(self):
         super().setUp()
+
+        with self._flask_app.app_context():
+            # Set versions
+            versions = TeraVersions()
+
+            # Will update clients versions (hard coded in TeraVersions)
+            versions.load_from_db()
+            versions.save_to_db()
 
     def tearDown(self):
         super().tearDown()
