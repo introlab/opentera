@@ -190,6 +190,15 @@ class BaseUserAPITest(unittest.TestCase):
         headers = {'Authorization': _basic_auth_str(username, password)}
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
+    def _post_file_with_user_http_auth(self, client: FlaskClient, files: dict, username: str = '', password: str = '',
+                                       params: dict = None, endpoint: str = None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        headers = {'Authorization': _basic_auth_str(username, password)}
+        return client.post(endpoint, headers=headers, query_string=params, data=files)
+
     def _delete_with_user_token_auth(self, client: FlaskClient, token: str = '',
                                      params: dict = None, endpoint: str = None):
         if params is None:
