@@ -2,8 +2,14 @@ from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from sqlalchemy import Column, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraSessionUsers import TeraSessionUsers
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraAsset import TeraAsset
+
 
 from passlib.hash import bcrypt
 import uuid
@@ -80,7 +86,6 @@ class TeraUser(BaseModel, SoftDeleteMixin):
     def get_token(self, token_key: str, expiration=3600):
         import time
         import jwt
-        import random
 
         # Creating token with user info
         now = time.time()
@@ -253,9 +258,23 @@ class TeraUser(BaseModel, SoftDeleteMixin):
 
         super().insert(user)
 
+    def delete_check_integrity(self) -> IntegrityError | None:
+        if TeraSessionUsers.get_session_count_for_user(self.id_user) > 0:
+            return IntegrityError('User still has sessions', self.id_user, 't_sessions_users')
+
+        if TeraSession.get_count(filters={'id_creator_user': self.id_user}) > 0:
+            return IntegrityError('User still has created sessions', self.id_user, 't_sessions')
+
+        if TeraAsset.get_count(filters={'id_user': self.id_user}) > 0:
+            return IntegrityError('User still has created assets', self.id_user, 't_assets')
+
+        if TeraTest.get_count(filters={'id_user': self.id_user}) > 0:
+            return IntegrityError('User still has created tests', self.id_user, 't_tests')
+
+        return None
+
     @staticmethod
     def create_defaults(test=False):
-        from opentera.db.models.TeraUserGroup import TeraUserGroup
         # Admin
         admin = TeraUser()
         admin.user_enabled = True

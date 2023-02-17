@@ -177,8 +177,8 @@ class ServiceQueryTests(Resource):
                 else:
                     test_name = test_type.test_name
                 test_name += ' #' + \
-                             str(TeraTest.count_with_filters({'id_session': test_info['id_session'],
-                                                              'id_test_type': test_info['id_test_type']})+1)
+                             str(TeraTest.get_count(filters={'id_session': test_info['id_session'],
+                                                             'id_test_type': test_info['id_test_type']})+1)
                 test_info['test_name'] = test_name
 
         # Check if the service can create/update that test

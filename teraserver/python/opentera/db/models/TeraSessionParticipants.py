@@ -16,7 +16,7 @@ class TeraSessionParticipants(BaseModel, SoftDeleteMixin, SoftInsertMixin):
 
     @staticmethod
     def get_session_count_for_participant(id_participant: int, with_deleted: bool = False) -> int:
-        return TeraSessionParticipants.count_with_filters({'id_participant': id_participant}, with_deleted=with_deleted)
+        return TeraSessionParticipants.get_count(filters={'id_participant': id_participant}, with_deleted=with_deleted)
 
     @classmethod
     def update(cls, update_id: int, values: dict):

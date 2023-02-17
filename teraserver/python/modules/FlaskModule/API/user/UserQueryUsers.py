@@ -1,4 +1,4 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
@@ -87,6 +87,7 @@ class UserQueryUsers(Resource):
 
         if users:
             users_list = []
+            status_users = []
             if args['with_status']:
                 # Query users status
                 rpc = RedisRPCClient(self.module.config.redis_config)
@@ -166,6 +167,9 @@ class UserQueryUsers(Resource):
     def post(self):
         user_access = DBManager.userAccess(current_user)
 
+        if 'user' not in request.json:
+            return gettext('Missing user'), 400
+
         # Using request.json instead of parser, since parser messes up the json!
         json_user = request.json['user']
 
@@ -200,7 +204,8 @@ class UserQueryUsers(Resource):
                     site_roles = update_user.get_sites_roles()
                     user_sites_ids = [site.id_site for site in site_roles]
                     # if json_user['id_user'] not in user_access.get_accessible_users_ids(admin_only=True):
-                    if len(set(user_sites_ids).intersection(user_access.get_accessible_sites_ids(admin_only=True))) == 0:
+                    if len(set(user_sites_ids).intersection(
+                            user_access.get_accessible_sites_ids(admin_only=True))) == 0:
                         return gettext('Forbidden'), 403
         else:
             # New user can be created by superadmins and by site admins, when user groups are specified
@@ -349,6 +354,7 @@ class UserQueryUsers(Resource):
                 # - Associated sessions in which the user is part of
                 # - Sessions that the user created
                 # - Assets that the user created
+                # - Tests that the user created
                 self.module.logger.log_error(self.module.module_name,
                                              UserQueryUsers.__name__,
                                              'delete', 500, 'Database error', str(e))
@@ -358,8 +364,14 @@ class UserQueryUsers(Resource):
                 if 't_sessions_id_creator' in str(e.args):
                     return gettext('Can\'t delete user: please remove all sessions created by this user before '
                                    'deleting.'), 500
-                return gettext('Can\'t delete user: please delete all assets created by this user before deleting.')\
-                    , 500
+                if 't_tests' in str(e.args):
+                    return gettext('Can\'t delete user: please remove all tests created by this user before '
+                                   'deleting.'), 500
+                if 't_assets' in str(e.args):
+                    return gettext('Can\'t delete user: please remove all assets created by this user before '
+                                   'deleting.'), 500
+                return \
+                    gettext('Can\'t delete user: please delete all assets created by this user before deleting.'), 500
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
@@ -376,4 +388,3 @@ class UserQueryUsers(Resource):
             user_to_del.commit()
 
         return '', 200
-

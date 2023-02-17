@@ -141,10 +141,12 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
             admin_access = TeraServiceAccess()
             admin_role = TeraServiceRole.get_specific_service_role_for_site(service_id=opentera_service_id,
                                                                             site_id=TeraSite
-                                                                            .get_site_by_sitename('Default Site').id_site,
+                                                                            .get_site_by_sitename('Default Site')
+                                                                            .id_site,
                                                                             rolename='admin')
             admin_access.id_service_role = admin_role.id_service_role
-            admin_access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Admins - Default Site').id_user_group
+            admin_access.id_user_group = \
+                TeraUserGroup.get_user_group_by_group_name('Admins - Default Site').id_user_group
             TeraUserGroup.db().session.add(admin_access)
 
             access = TeraServiceAccess()

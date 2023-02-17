@@ -174,13 +174,6 @@ class BaseMixin(object):
         return cls.db().session.query(cls).filter_by(**filters).all()
 
     @classmethod
-    def count_with_filters(cls, filters=None):
-        if filters is None:
-            filters = dict()
-
-        return cls.db().session.query(cls).filter_by(**filters).count()
-
-    @classmethod
     def get_json_schema(cls) -> dict:
         # Get model prefix (name)
         model_name = cls.get_model_name()
