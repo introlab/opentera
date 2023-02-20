@@ -37,10 +37,11 @@ class TeraSession(BaseModel, SoftDeleteMixin):
     session_parameters = Column(String, nullable=True)
 
     session_participants = relationship("TeraParticipant", secondary="t_sessions_participants",
-                                        back_populates="participant_sessions")
-    session_users = relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions")
+                                        back_populates="participant_sessions", lazy="joined")
+    session_users = relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions",
+                                 lazy="joined")
     session_devices = relationship("TeraDevice", secondary="t_sessions_devices",
-                                   back_populates="device_sessions")
+                                   back_populates="device_sessions", lazy="joined")
 
     session_creator_user = relationship('TeraUser')
     session_creator_device = relationship('TeraDevice')
@@ -112,7 +113,6 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         from opentera.db.models.TeraTest import TeraTest
         rval['session_assets_count'] = TeraAsset.get_count({'id_session': self.id_session})
         rval['session_tests_count'] = TeraTest.get_count({'id_session': self.id_session})
-        # rval['session_has_device_data'] = len(TeraDeviceData.get_data_for_session(self.id_session)) > 0
         return rval
 
     def to_json_create_event(self):
