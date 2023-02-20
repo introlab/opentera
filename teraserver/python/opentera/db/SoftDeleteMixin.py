@@ -80,7 +80,7 @@ def generate_soft_delete_mixin_class(
                         if deleted_field_name in relation[1].entity.columns.keys():
                             model_class = _self.get_class_from_tablename(relation[1].secondary.name)
                             if model_class:
-                                related_items = model_class.query.filter(text(primary_key_name + '==' +
+                                related_items = model_class.query.filter(text(primary_key_name + "=" +
                                                                               str(getattr(_self, primary_key_name)))
                                                                          ).all()
                                 for item in related_items:
@@ -100,7 +100,7 @@ def generate_soft_delete_mixin_class(
                         if deleted_field_name in relation[1].entity.columns.keys():
                             # Cascade undelete - must manually query to get deleted rows
                             related_items = relation[1].entity.class_.query.execution_options(include_deleted=True).\
-                                filter(text(primary_key_name + '==' + str(getattr(_self, primary_key_name)))).all()
+                                filter(text(primary_key_name + '=' + str(getattr(_self, primary_key_name)))).all()
                             for item in related_items:
                                 item_undeleter = getattr(item, undelete_method_name)
                                 item_undeleter()
@@ -109,7 +109,7 @@ def generate_soft_delete_mixin_class(
                         if deleted_field_name in relation[1].entity.columns.keys():
                             model_class = _self.get_class_from_tablename(relation[1].secondary.name)
                             if model_class:
-                                related_items = model_class.query.filter(text(primary_key_name + '==' +
+                                related_items = model_class.query.filter(text(primary_key_name + '=' +
                                                                               str(getattr(_self, primary_key_name)))
                                                                          ).execution_options(include_deleted=True).all()
                                 for item in related_items:
