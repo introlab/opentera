@@ -1,102 +1,135 @@
-from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
-
-import datetime
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 
 
-class UserQueryStatsTest(BaseAPITest):
-    login_endpoint = '/api/user/login'
+class UserQueryStatsTest(BaseUserAPITest):
     test_endpoint = '/api/user/stats'
 
     def setUp(self):
-        pass
+        super().setUp()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
     def test_no_auth(self):
-        response = self._request_with_no_auth()
-        self.assertEqual(response.status_code, 401)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client)
+            self.assertEqual(401, response.status_code)
+
+    def test_post_no_auth(self):
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client)
+            self.assertEqual(405, response.status_code)
+
+    def test_delete_no_auth(self):
+        with self._flask_app.app_context():
+            response = self._delete_with_user_http_auth(self.test_client)
+            self.assertEqual(405, response.status_code)
 
     def test_query_no_params_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin')
-        self.assertEqual(response.status_code, 400)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin')
+            self.assertEqual(400, response.status_code)
 
     def test_query_user_group_stats(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_user_group=1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_user_group': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreater(len(response.json), 0)
 
-        response = self._request_with_http_auth(username='user4', password='user4', payload='id_user_group=1')
-        self.assertEqual(response.status_code, 403)
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params=params)
+            self.assertEqual(403, response.status_code)
 
     def test_query_user_stats(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_user=1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_user': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreater(len(response.json), 0)
 
-        response = self._request_with_http_auth(username='user4', password='user4', payload='id_user=1')
-        self.assertEqual(response.status_code, 403)
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params=params)
+            self.assertEqual(403, response.status_code)
 
     def test_query_site_stats(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_site=1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_site': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreater(len(response.json), 0)
 
-        response = self._request_with_http_auth(username='user4', password='user4', payload='id_site=1')
-        self.assertEqual(response.status_code, 403)
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params=params)
+            self.assertEqual(403, response.status_code)
 
     def test_query_project_stats(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_project=1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_project': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreater(len(response.json), 0)
 
-        response = self._request_with_http_auth(username='user4', password='user4', payload='id_project=1')
-        self.assertEqual(response.status_code, 403)
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params=params)
+            self.assertEqual(403, response.status_code)
 
     def test_query_participant_group_stats(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_group=1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_group': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreater(len(response.json), 0)
 
-        response = self._request_with_http_auth(username='user4', password='user4', payload='id_group=1')
-        self.assertEqual(response.status_code, 403)
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params=params)
+            self.assertEqual(403, response.status_code)
 
     def test_query_session_stats(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_session=1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_session': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreater(len(response.json), 0)
 
-        response = self._request_with_http_auth(username='user4', password='user4', payload='id_session=1')
-        self.assertEqual(response.status_code, 403)
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params=params)
+            self.assertEqual(403, response.status_code)
 
     def test_query_participant_stats(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_participant=1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_participant': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreater(len(response.json), 0)
 
-        response = self._request_with_http_auth(username='user4', password='user4', payload='id_participant=1')
-        self.assertEqual(response.status_code, 403)
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params=params)
+            self.assertEqual(403, response.status_code)
 
     def test_query_device_stats(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_device=1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            params = {'id_device': 1}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreater(len(response.json), 0)
 
-        response = self._request_with_http_auth(username='user4', password='user4', payload='id_device=1')
-        self.assertEqual(response.status_code, 403)
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params=params)
+            self.assertEqual(403, response.status_code)
