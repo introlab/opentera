@@ -10,7 +10,7 @@ import datetime
 
 
 class UserQueryDevicesTest(BaseUserAPITest):
-    login_endpoint = '/api/user/login'
+    test_endpoint = '/api/user/devices'
 
     def setUp(self):
         super().setUp()
