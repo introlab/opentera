@@ -36,6 +36,7 @@ authorizations = {
 # Flask application
 flask_app = Flask("VideoRehabService")
 
+
 # Translations
 def get_locale():
     # if a user is logged in, use the locale from the user settings

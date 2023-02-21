@@ -98,6 +98,9 @@ class UserQueryDeviceSubTypes(Resource):
     @user_multi_auth.login_required
     def post(self):
         user_access = DBManager.userAccess(current_user)
+        if 'device_subtype' not in request.json:
+            return gettext('Missing device_subtype'), 400
+
         # Using request.json instead of parser, since parser messes up the json!
         json_device_subtype = request.json['device_subtype']
 
@@ -159,12 +162,12 @@ class UserQueryDeviceSubTypes(Resource):
         id_todel = args['id']
 
         # Check if current user can delete
+        if not user_access.user.user_superadmin:
+            return gettext('Forbidden'), 403
+
         todel = TeraDeviceSubType.get_device_subtype(id_todel)
         if not todel:
             return gettext('Device subtype not found'), 400
-        
-        if not user_access.user.user_superadmin:
-            return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:

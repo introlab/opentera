@@ -286,8 +286,7 @@ class UserQueryDeviceSitesTest(BaseUserAPITest):
                                                                  {'id_project': 2}
                                                                  ]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                      json=json_data,
-                                                 endpoint='/api/user/deviceprojects')
+                                                      json=json_data, endpoint='/api/user/deviceprojects')
             self.assertEqual(200, response.status_code)
 
     def test_post_site(self):
@@ -355,20 +354,17 @@ class UserQueryDeviceSitesTest(BaseUserAPITest):
             json_data = {'device': {'id_device': 1, 'projects': [{'id_project': 1},
                                                                  {'id_project': 2}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                      json=json_data,
-                                                 endpoint='/api/user/devices/projects')
+                                                      json=json_data, endpoint='/api/user/devices/projects')
             self.assertEqual(200, response.status_code)
 
             json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                      json=json_data,
-                                                 endpoint='/api/user/devices/projects')
+                                                      json=json_data, endpoint='/api/user/devices/projects')
             self.assertEqual(200, response.status_code)
 
             json_data = {'device_participant': {'id_device': 2, 'id_participant': 1}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                      json=json_data,
-                                                 endpoint='/api/user/devices/participants')
+                                                      json=json_data, endpoint='/api/user/devices/participants')
             self.assertEqual(200, response.status_code)
 
     def test_post_device_site_and_delete(self):
