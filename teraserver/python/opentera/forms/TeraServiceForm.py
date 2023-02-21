@@ -7,7 +7,7 @@ from flask_babel import gettext
 class TeraServiceForm:
 
     @staticmethod
-    def get_service_form(user_access: DBManagerTeraUserAccess):
+    def get_service_form():
         form = TeraForm("service")
 
         # Building lists

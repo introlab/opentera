@@ -39,7 +39,7 @@ class TeraServiceConfigForm:
         return form_dict
 
     @staticmethod
-    def get_service_config_config_form(user_access: DBManagerTeraUserAccess, service_key: str):
+    def get_service_config_config_form(service_key: str):
         form = TeraForm("service_config_config")
 
         if service_key == 'VideoRehabService':

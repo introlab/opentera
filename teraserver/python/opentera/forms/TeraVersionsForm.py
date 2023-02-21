@@ -7,7 +7,7 @@ from opentera.utils.TeraVersions import TeraVersions
 class TeraVersionsForm:
 
     @staticmethod
-    def get_versions_form(user_access: DBManagerTeraUserAccess):
+    def get_versions_form():
         form = TeraForm("versions")
 
         # Building lists
@@ -37,7 +37,6 @@ class TeraVersionsForm:
         versions_dict = versions.to_dict()
 
         # One section per client.
-        # TODO - Right way?
         for client_string in versions_dict['clients']:
             # Create a section for each client
             client = versions_dict['clients'][client_string]

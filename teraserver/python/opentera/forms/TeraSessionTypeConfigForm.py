@@ -7,7 +7,7 @@ from opentera.db.models.TeraSessionType import TeraSessionType
 class TeraSessionTypeConfigForm:
 
     @staticmethod
-    def get_session_type_config_form(user_access: DBManagerTeraUserAccess, id_session_type: int):
+    def get_session_type_config_form(id_session_type: int):
 
         form = TeraForm("session_type_config")
 

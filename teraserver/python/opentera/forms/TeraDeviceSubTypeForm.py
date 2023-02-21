@@ -7,7 +7,7 @@ from flask_babel import gettext
 class TeraDeviceSubTypeForm:
 
     @staticmethod
-    def get_device_subtype_form(user_access: DBManagerTeraUserAccess):
+    def get_device_subtype_form():
         form = TeraForm("device_subtype")
 
         # Building lists

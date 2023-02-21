@@ -80,8 +80,8 @@ class TeraFormValue:
 class TeraFormItem:
 
     def __init__(self, item_id: str, item_label: str, item_type: str, item_required: bool = False,
-                 item_values: list = None, item_default: str = None, item_condition: TeraFormItemCondition = None,
-                 item_options=None):
+                 item_values: list | None = None, item_default: str | None | bool = None,
+                 item_condition: TeraFormItemCondition | None = None, item_options=None):
         if item_options is None:
             item_options = {}
         self.id = item_id
@@ -130,4 +130,3 @@ class TeraFormItem:
                 item[option] = self.options[option]
 
         return item
-
