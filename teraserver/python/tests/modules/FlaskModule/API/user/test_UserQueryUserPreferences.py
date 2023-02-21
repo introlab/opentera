@@ -150,7 +150,8 @@ class UserQueryUserPreferencesTest(BaseUserAPITest):
 
             # Delete prefs
             json_data['user_preference']['user_preference_preference'] = ''
-            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
             self.assertEqual(200, response.status_code, msg="Post delete self prefs")
 
             # Check everything was deleted
