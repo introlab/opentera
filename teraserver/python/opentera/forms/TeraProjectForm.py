@@ -6,13 +6,12 @@ from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAcce
 class TeraProjectForm:
 
     @staticmethod
-    def get_project_form(user_access: DBManagerTeraUserAccess):
+    def get_project_form(accessible_sites: list):
         form = TeraForm("project")
 
         # Building lists
-        sites = user_access.get_accessible_sites()
         sites_list = []
-        for site in sites:
+        for site in accessible_sites:
             sites_list.append(TeraFormValue(value_id=site.id_site, value=site.site_name))
 
         # Sections

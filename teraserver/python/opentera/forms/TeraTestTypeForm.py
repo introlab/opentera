@@ -6,11 +6,10 @@ from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAcce
 class TeraTestTypeForm:
 
     @staticmethod
-    def get_test_type_form(user_access: DBManagerTeraUserAccess):
+    def get_test_type_form(services):
         form = TeraForm("test_type")
 
         # Building lists
-        services = user_access.get_accessible_services()
         services_list = []
         for service in services:
             services_list.append(TeraFormValue(value_id=service.id_service, value=service.service_name))

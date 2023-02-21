@@ -2,8 +2,6 @@ from BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipant import TeraParticipant
-from opentera.db.models.TeraService import TeraService
-from opentera.db.models.TeraServerSettings import TeraServerSettings
 from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 import uuid
 
