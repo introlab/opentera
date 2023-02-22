@@ -1,6 +1,6 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, TIMESTAMP, or_
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, TIMESTAMP, or_, not_
 from sqlalchemy.orm import relationship
 
 from enum import Enum
@@ -72,7 +72,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                 try:
                     params = json.loads(rval['session_parameters'])
                     rval['session_parameters'] = params
-                except ValueError as e:
+                except ValueError:
                     pass
 
             # Append list of participants ids and names
@@ -339,6 +339,21 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         return query.all()
 
     @staticmethod
+    def get_sessions_for_project(project_id: int, with_deleted: bool = False):
+        # Only "hard" link to a project is with the participant
+        from opentera.db.models.TeraParticipant import TeraParticipant
+        # Check for sessions created by a participant
+        sessions = TeraSession.query.join(TeraSession.session_creator_participant).\
+            filter(TeraParticipant.id_project == project_id).execution_options(include_deleted=with_deleted).all()
+        created_ids = [session.id_session for session in sessions]
+        # Then extend with sessions participant did not create but is part of
+        sessions.extend(TeraSession.query.join(TeraSession.session_participants)
+                        .filter(TeraParticipant.id_project == project_id)
+                        .filter(not_(TeraSession.id_session.in_(created_ids)))
+                        .execution_options(include_deleted=with_deleted).all())
+        return sessions
+
+    @staticmethod
     def get_sessions_for_type(session_type_id: int, with_deleted: bool = False):
         return TeraSession.query.execution_options(include_deleted=with_deleted)\
             .filter_by(id_session_type=session_type_id).all()
@@ -410,33 +425,6 @@ class TeraSession(BaseModel, SoftDeleteMixin):
             update({'session_status': TeraSessionStatus.STATUS_TERMINATED.value})
 
         TeraSession.db().session.commit()
-
-    # THIS SHOULD NOT BE USED ANYMORE, AS DELETES CAN'T OCCUR IF THERE'S STILL ASSOCIATED SESSIONS
-    # @staticmethod
-    # def delete_orphaned_sessions(commit_changes=True):
-    #     from opentera.db.models.TeraDeviceData import TeraDeviceData
-    #     orphans_parts = TeraSession.query.outerjoin(TeraSession.session_participants).filter(
-    #         TeraSession.session_participants == None).all()
-    #
-    #     orphans_users = TeraSession.query.outerjoin(TeraSession.session_users).filter(
-    #         TeraSession.session_users == None).all()
-    #
-    #     orphans = list(set(orphans_parts + orphans_users))  # Keep unique sessions only!
-    #
-    #     if orphans:
-    #         for orphan in orphans:
-    #             TeraDeviceData.delete_files_for_session(orphan.id_session)
-    #             db.session.delete(orphan)
-    #             # TeraSession.delete(orphan.id_session)
-    #
-    #     if commit_changes:
-    #         db.session.commit()
-
-    # @classmethod
-    # def delete(cls, id_todel):
-    #     delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
-    #     delete_obj.soft_delete()
-    #     cls.db().session.commit()
 
     @classmethod
     def insert(cls, session):

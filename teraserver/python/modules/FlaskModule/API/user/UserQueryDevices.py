@@ -142,8 +142,13 @@ class UserQueryDevices(Resource):
 
             if has_with_status:
                 # Query status
-                rpc = RedisRPCClient(self.module.config.redis_config)
-                status_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_devices')
+                if not self.test:
+                    rpc = RedisRPCClient(self.module.config.redis_config)
+                    status_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_devices')
+                else:
+                    status_devices = {}
+                    for device in devices:
+                        status_devices[device.device_uuid] = {'busy': False, 'online': True}
 
             for device in devices:
                 if device is not None:

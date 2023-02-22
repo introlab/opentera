@@ -1,5 +1,13 @@
 from BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
+import datetime
 
 
 class UserQueryTestTypeProjectTest(BaseUserAPITest):
@@ -318,42 +326,80 @@ class UserQueryTestTypeProjectTest(BaseUserAPITest):
 
     def test_post_project(self):
         with self._flask_app.app_context():
+            # Create test types and associate in the db for this test
+            json_testtype = {
+                'test_type_name': 'Test Type',
+                'id_service': 1
+            }
+            testtype1 = TeraTestType()
+            testtype1.from_json(json_testtype)
+            TeraTestType.insert(testtype1)
+
+            testtype2 = TeraTestType()
+            testtype2.from_json(json_testtype)
+            TeraTestType.insert(testtype2)
+
+            tts1 = TeraTestTypeSite()
+            tts1.id_test_type = testtype1.id_test_type
+            tts1.id_site = 1
+            TeraTestTypeSite.insert(tts1)
+
+            tts2 = TeraTestTypeSite()
+            tts2.id_test_type = testtype2.id_test_type
+            tts2.id_site = 1
+            TeraTestTypeSite.insert(tts2)
+
+            ttp1 = TeraTestTypeProject()
+            ttp1.id_test_type = testtype1.id_test_type
+            ttp1.id_project = 2
+            TeraTestTypeProject.insert(ttp1)
+
+            ttp2 = TeraTestTypeProject()
+            ttp2.id_test_type = testtype2.id_test_type
+            ttp2.id_project = 2
+            TeraTestTypeProject.insert(ttp2)
+
             # Project update
+            json_data = {}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing project")
+
             json_data = {'project': {}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(400, response.status_code, msg="Missing id_project")
 
-            json_data = {'project': {'id_project': 1}}
+            json_data = {'project': {'id_project': 2}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(400, response.status_code, msg="Missing test types")
 
-            json_data = {'project': {'id_project': 1, 'testtypes': []}}
+            json_data = {'project': {'id_project': 2, 'testtypes': []}}
             response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
                                                       json=json_data)
             self.assertEqual(403, response.status_code, msg="Only project admins can change things here")
 
-            json_data = {'project': {'id_project': 1, 'testtypes': []}}
-            response = self._post_with_user_http_auth(self.test_client, username='user3', password='user3',
+            json_data = {'project': {'id_project': 2, 'testtypes': []}}
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove all test types OK")
 
-            params = {'id_project': 1}
+            params = {'id_project': 2}
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertEqual(0, len(response.json))  # Everything was deleted!
 
-            json_data = {'project': {'id_project': 1, 'testtypes': [{'id_test_type': 1},
-                                                                    {'id_test_type': 2},
+            json_data = {'project': {'id_project': 2, 'testtypes': [{'id_test_type': testtype1.id_test_type},
+                                                                    {'id_test_type': testtype2.id_test_type},
                                                                     {'id_test_type': 3}]}}
             response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                       json=json_data)
             self.assertEqual(403, response.status_code, msg="One test type not allowed - not part of the site project!")
 
-            json_data = {'project': {'id_project': 1, 'testtypes': [{'id_test_type': 1},
-                                                                    {'id_test_type': 2}]}}
+            json_data = {'project': {'id_project': 2, 'testtypes': [{'id_test_type': testtype1.id_test_type},
+                                                                    {'id_test_type': testtype2.id_test_type}]}}
             response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="New test type association OK")
@@ -363,7 +409,7 @@ class UserQueryTestTypeProjectTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(2, len(response.json))  # Everything was added
 
-            json_data = {'project': {'id_project': 1, 'testtypes': [{'id_test_type': 1}]}}
+            json_data = {'project': {'id_project': 2, 'testtypes': [{'id_test_type': testtype1.id_test_type}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove 1 type")
@@ -373,11 +419,11 @@ class UserQueryTestTypeProjectTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(1, len(response.json))
 
-            json_data = {'project': {'id_project': 1, 'testtypes': [{'id_test_type': 1},
-                                                                    {'id_test_type': 2}]}}
-            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                      json=json_data)
-            self.assertEqual(200, response.status_code, msg="Back to initial state")
+            # Delete all created for that test
+            TeraTestTypeSite.delete(tts1.id_test_type_site)
+            TeraTestTypeSite.delete(tts2.id_test_type_site)
+            TeraTestType.delete(testtype1.id_test_type)
+            TeraTestType.delete(testtype2.id_test_type)
 
     def test_post_test_type_project_and_delete(self):
         with self._flask_app.app_context():
@@ -423,9 +469,75 @@ class UserQueryTestTypeProjectTest(BaseUserAPITest):
                                                         params={'id': current_id})
             self.assertEqual(403, response.status_code, msg="Delete denied")
 
+            # Create a test of that type for a session
+            project = TeraProject.get_project_by_id(2)
+            json_data = {
+                'id_participant': 0,
+                'id_project': project.id_project,
+                'participant_name': 'Test Participant'
+            }
+
+            participant = TeraParticipant()
+            participant.from_json(json_data)
+            TeraParticipant.insert(participant)
+
+            json_session = {'id_session_type': 1,
+                            'session_name': 'Session',
+                            'session_start_datetime': datetime.datetime.now(),
+                            'session_status': 0,
+                            'id_creator_participant': participant.id_participant
+                            }
+            session = TeraSession()
+            session.from_json(json_session)
+            TeraSession.insert(session)
+
+            json_session = {'id_session_type': 1,
+                            'session_name': 'Session 2',
+                            'session_start_datetime': datetime.datetime.now(),
+                            'session_status': 0
+                            }
+            session2 = TeraSession()
+            session2.from_json(json_session)
+            TeraSession.insert(session2)
+
+            ses_participant = TeraSessionParticipants()
+            ses_participant.id_participant = participant.id_participant
+            ses_participant.id_session = session2.id_session
+            TeraSessionParticipants.insert(ses_participant)
+
+            json_test = {'id_test_type': 2,
+                         'id_session': session.id_session,
+                         'test_name': 'Test Participant',
+                         'test_datetime': datetime.datetime.now()
+                         }
+            new_test = TeraTest()
+            new_test.from_json(json_test)
+            TeraTest.insert(new_test)
+
+            json_test['id_session'] = session2.id_session
+            new_test2 = TeraTest()
+            new_test2.from_json(json_test)
+            TeraTest.insert(new_test2)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                        params={'id': current_id})
+            self.assertEqual(500, response.status_code, msg="Has tests of that type, can't delete")
+
+            TeraTest.delete(new_test.id_test)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                        params={'id': current_id})
+            self.assertEqual(500, response.status_code, msg="Has tests of that type, can't delete")
+
+            TeraSession.delete(session.id_session)
+            TeraTest.delete(new_test2.id_test)
+
             response = self._delete_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                         params={'id': current_id})
             self.assertEqual(200, response.status_code, msg="Delete OK")
+
+            TeraSession.delete(session2.id_session)
+            TeraParticipant.delete(participant.id_participant)
 
             params = {'id_project': 2}
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',

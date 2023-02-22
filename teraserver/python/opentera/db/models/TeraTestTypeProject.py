@@ -1,7 +1,9 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraSession import TeraSession
+from sqlalchemy import Column, ForeignKey, Integer, Sequence
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
@@ -122,6 +124,15 @@ class TeraTestTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         inserted_obj = super().insert(ttp)
         TeraTestTypeProject.check_integrity(inserted_obj)
         return inserted_obj
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        session_ids = [session.id_session for session in TeraSession.get_sessions_for_project(self.id_project)]
+        test_count = TeraTest.query.filter(TeraTest.id_session.in_(session_ids))\
+            .filter(TeraTest.id_test_type == self.id_test_type).count()
+
+        if test_count > 0:
+            return IntegrityError('Test type has tests in this project', self.id_test_type, 't_tests')
+        return None
 
     # @classmethod
     # def update(cls, update_id: int, values: dict):

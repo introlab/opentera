@@ -14,10 +14,7 @@ import redis
 import uuid
 from flask_babel import Babel
 from flask import Flask
-from opentera.db.models.TeraParticipant import TeraParticipant
-from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name
-import opentera.messages.python as messages
-from datetime import datetime
+from opentera.modules.BaseModule import ModuleNames
 
 
 class FakeFlaskModule(BaseModule):

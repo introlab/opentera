@@ -30,8 +30,12 @@ class UserQueryOnlineParticipants(Resource):
 
         try:
             accessible_participants = user_access.get_accessible_participants_uuids()
-            rpc = RedisRPCClient(self.flaskModule.config.redis_config)
-            status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+
+            if not self.test:
+                rpc = RedisRPCClient(self.flaskModule.config.redis_config)
+                status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+            else:
+                status_participants = {accessible_participants[0]: {'online': True, 'busy': False}}
 
             participants_uuids = [participant_uuid for participant_uuid in status_participants]
             # Filter participants that are available to the query

@@ -30,8 +30,11 @@ class UserQueryOnlineDevices(Resource):
 
         try:
             accessible_devices = user_access.get_accessible_devices_uuids()
-            rpc = RedisRPCClient(self.flaskModule.config.redis_config)
-            status_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_devices')
+            if not self.test:
+                rpc = RedisRPCClient(self.flaskModule.config.redis_config)
+                status_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_devices')
+            else:
+                status_devices = {accessible_devices[0]: {'online': True, 'busy': False}}
 
             devices_uuids = [device_uuid for device_uuid in status_devices]
             # Filter devices that are available to the query

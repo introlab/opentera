@@ -119,7 +119,8 @@ class TeraTestTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         if delete_obj:
             projects = TeraTestTypeProject.get_projects_for_test_type(delete_obj.id_test_type)
             for tt_project in projects:
-                TeraTestTypeProject.delete(tt_project.id_test_type_project)
+                if tt_project.test_type_project_project.id_site == delete_obj.id_site:
+                    TeraTestTypeProject.delete(tt_project.id_test_type_project)
 
             # Ok, delete it
             super().delete(id_todel)

@@ -129,8 +129,13 @@ class UserQueryParticipants(Resource):
                 status_participants = {}
 
                 # Query status
-                rpc = RedisRPCClient(self.module.config.redis_config)
-                status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+                if not self.test:
+                    rpc = RedisRPCClient(self.module.config.redis_config)
+                    status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+                else:
+                    status_participants = {}
+                    for participant in participants:
+                        status_participants[participant.participant_uuid] = {'busy': False, 'online': True}
 
                 for participant in participants:
                     if args['enabled'] is not None:
@@ -309,8 +314,11 @@ class UserQueryParticipants(Resource):
         update_participant_json = update_participant.to_json()
 
         # Query status
-        rpc = RedisRPCClient(self.module.config.redis_config)
-        status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+        if not self.test:
+            rpc = RedisRPCClient(self.module.config.redis_config)
+            status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+        else:
+            status_participants = {update_participant.participant_uuid: {'online': False, 'busy': False}}
         if update_participant.participant_uuid in status_participants:
             update_participant_json['participant_busy'] = \
                 status_participants[update_participant.participant_uuid]['busy']

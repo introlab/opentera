@@ -29,8 +29,12 @@ class UserQueryOnlineUsers(Resource):
 
         try:
             accessible_users = user_access.get_accessible_users_uuids()
-            rpc = RedisRPCClient(self.flaskModule.config.redis_config)
-            status_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_users')
+
+            if not self.test:
+                rpc = RedisRPCClient(self.flaskModule.config.redis_config)
+                status_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_users')
+            else:
+                status_users = {accessible_users[0]: {'online': True, 'busy': False}}
 
             users_uuids = [user_uuid for user_uuid in status_users]
             # Filter users that are available to the query

@@ -1,4 +1,6 @@
 from BaseUserAPITest import BaseUserAPITest
+from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 
 
 class UserQuerySessionTypeSitesTest(BaseUserAPITest):
@@ -254,6 +256,25 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
 
     def test_post_test_type(self):
         with self._flask_app.app_context():
+            # Create test types and associate in the db for this test
+            json_testtype = {
+                'test_type_name': 'Test Type',
+                'id_service': 1
+            }
+            testtype1 = TeraTestType()
+            testtype1.from_json(json_testtype)
+            TeraTestType.insert(testtype1)
+
+            tts1 = TeraTestTypeSite()
+            tts1.id_test_type = testtype1.id_test_type
+            tts1.id_site = 1
+            TeraTestTypeSite.insert(tts1)
+
+            tts2 = TeraTestTypeSite()
+            tts2.id_test_type = testtype1.id_test_type
+            tts2.id_site = 2
+            TeraTestTypeSite.insert(tts2)
+
             # New with minimal infos
             json_data = {}
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
@@ -266,12 +287,12 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 400, msg="Missing id_test_type")
 
-            json_data = {'test_type': {'id_test_type': 4}}
+            json_data = {'test_type': {'id_test_type': testtype1.id_test_type}}
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 400, msg="Missing sites")
 
-            json_data = {'test_type': {'id_test_type': 1, 'sites': []}}
+            json_data = {'test_type': {'id_test_type': testtype1.id_test_type, 'sites': []}}
             response = self._post_with_user_http_auth(username='user', password='user', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 403, msg="Only site admins can change things here")
@@ -280,27 +301,27 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 200, msg="Remove from all accessible sites OK")
 
-            params = {'id_test_type': 1}
+            params = {'id_test_type': testtype1.id_test_type}
             response = self._get_with_user_http_auth(username='admin', password='admin', params=params,
                                                      client=self.test_client)
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 1)  # One should remain in the "top secret" site
 
-            json_data = {'test_type': {'id_test_type': 1, 'sites': []}}
+            json_data = {'test_type': {'id_test_type': testtype1.id_test_type, 'sites': []}}
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 200, msg="Remove from all accessible sites OK")
 
-            params = {'id_test_type': 1}
+            params = {'id_test_type': testtype1.id_test_type}
             response = self._get_with_user_http_auth(username='admin', password='admin', params=params,
                                                      client=self.test_client)
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 0)  # None remaining now
 
-            json_data = {'test_type': {'id_test_type': 1, 'sites': [{'id_site': 1},
-                                                                    {'id_site': 2}]}}
+            json_data = {'test_type': {'id_test_type': testtype1.id_test_type, 'sites': [{'id_site': 1},
+                                                                                         {'id_site': 2}]}}
             response = self._post_with_user_http_auth(username='siteadmin', password='siteadmin', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 403, msg="No access to site 2")
@@ -315,7 +336,7 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
             json_data = response.json
             self.assertEqual(len(json_data), 2)  # Everything was added
 
-            json_data = {'test_type': {'id_test_type': 1, 'sites': [{'id_site': 1}]}}
+            json_data = {'test_type': {'id_test_type': testtype1.id_test_type, 'sites': [{'id_site': 1}]}}
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 200, msg="Remove one site")
@@ -326,50 +347,68 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
             json_data = response.json
             self.assertEqual(len(json_data), 1)
 
-            json_data = {'test_type': {'id_test_type': 1, 'sites': [{'id_site': 1},
-                                                                    {'id_site': 2}]}}
+            json_data = {'test_type': {'id_test_type': testtype1.id_test_type, 'sites': [{'id_site': 1},
+                                                                                         {'id_site': 2}]}}
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 200, msg="Add all sites OK")
 
-            # Recreate default associations - projects
-            # Not useful in current test structure
-            # json_data = {'test_type_project': [{'id_test_type': 1, 'id_project': 1}]}
-            # response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
-            #            client=self.test_client, endpoint='/api/user/testtypes/projects')
-            # self.assertEqual(response.status_code, 200)
+            TeraTestType.delete(testtype1.id_test_type)
 
     def test_post_site(self):
         with self._flask_app.app_context():
+            # Create test types and associate in the db for this test
+            json_testtype = {
+                'test_type_name': 'Test Type',
+                'id_service': 1
+            }
+            testtype1 = TeraTestType()
+            testtype1.from_json(json_testtype)
+            TeraTestType.insert(testtype1)
+
+            testtype2 = TeraTestType()
+            testtype2.from_json(json_testtype)
+            TeraTestType.insert(testtype2)
+
+            tts1 = TeraTestTypeSite()
+            tts1.id_test_type = testtype1.id_test_type
+            tts1.id_site = 2
+            TeraTestTypeSite.insert(tts1)
+
+            tts2 = TeraTestTypeSite()
+            tts2.id_test_type = testtype2.id_test_type
+            tts2.id_site = 2
+            TeraTestTypeSite.insert(tts2)
+
             # Site update
             json_data = {'site': {}}
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 400, msg="Missing id_site")
 
-            json_data = {'site': {'id_site': 1}}
+            json_data = {'site': {'id_site': 2}}
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 400, msg="Missing services")
 
-            json_data = {'site': {'id_site': 1, 'testtypes': []}}
+            json_data = {'site': {'id_site': 2, 'testtypes': []}}
             response = self._post_with_user_http_auth(username='user', password='user', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 403, msg="Only site admins can change things here")
 
-            response = self._post_with_user_http_auth(username='siteadmin', password='siteadmin', json=json_data,
+            response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
-            self.assertEqual(response.status_code, 200, msg="Remove all services OK")
+            self.assertEqual(response.status_code, 200, msg="Remove all test types OK")
 
-            params = {'id_site': 1}
+            params = {'id_site': 2}
             response = self._get_with_user_http_auth(username='admin', password='admin', params=params,
                                                      client=self.test_client)
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 0)  # Everything was deleted!
 
-            json_data = {'site': {'id_site': 1, 'testtypes': [{'id_test_type': 1},
-                                                              {'id_test_type': 2}
+            json_data = {'site': {'id_site': 2, 'testtypes': [{'id_test_type': testtype1.id_test_type},
+                                                              {'id_test_type': testtype2.id_test_type}
                                                               ]}}
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
@@ -381,7 +420,7 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
             json_data = response.json
             self.assertEqual(len(json_data), 2)  # Everything was added
 
-            json_data = {'site': {'id_site': 1, 'testtypes': [{'id_test_type': 2}]}}
+            json_data = {'site': {'id_site': 2, 'testtypes': [{'id_test_type': testtype2.id_test_type}]}}
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 200, msg="Remove 1 test type")
@@ -392,21 +431,17 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
             json_data = response.json
             self.assertEqual(len(json_data), 1)
 
-            json_data = {'site': {'id_site': 1, 'testtypes': [{'id_test_type': 1},
-                                                              {'id_test_type': 2}
+            json_data = {'site': {'id_site': 2, 'testtypes': [{'id_test_type': 1},
+                                                              {'id_test_type': 2},
+                                                              {'id_test_type': 3}
                                                               ]}}
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 200, msg="Back to defaults")
 
-            # Recreate default associations - projects
-            # Not useful in current test structure
-            # json_data = {'test_type_project': [{'id_test_type': 1, 'id_project': 1},
-            #                                    {'id_test_type': 2, 'id_project': 1}
-            #                                    ]}
-            # response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
-            #                                  client=self.test_client, endpoint='/api/user/testtypes/projects')
-            # self.assertEqual(response.status_code, 200)
+            # Delete all created for that test
+            TeraTestType.delete(testtype1.id_test_type)
+            TeraTestType.delete(testtype2.id_test_type)
 
     def test_post_test_type_site_and_delete(self):
         with self._flask_app.app_context():
@@ -438,7 +473,8 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
                                                      client=self.test_client)
             self.assertEqual(response.status_code, 200)
             json_data = response.json
-            self.assertEqual(len(json_data), 3)
+            target_count = len(TeraTestTypeSite.get_tests_types_for_site(2))
+            self.assertEqual(len(json_data), target_count)
 
             current_id = None
             for sp in json_data:
@@ -447,7 +483,8 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
                     break
             self.assertFalse(current_id is None)
 
-            response = self._delete_with_user_http_auth(username='user', password='user', params='id=' + str(current_id),
+            response = self._delete_with_user_http_auth(username='user', password='user',
+                                                        params='id=' + str(current_id),
                                                         client=self.test_client)
             self.assertEqual(response.status_code, 403, msg="Delete denied")
 
