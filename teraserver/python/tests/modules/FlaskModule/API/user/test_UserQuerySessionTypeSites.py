@@ -15,6 +15,16 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
             response = self.test_client.get(self.test_endpoint)
             self.assertEqual(401, response.status_code)
 
+    def test_post_endpoint_no_auth(self):
+        with self._flask_app.app_context():
+            response = self.test_client.post(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
+
+    def test_post_delete_no_auth(self):
+        with self._flask_app.app_context():
+            response = self.test_client.delete(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
+
     def test_get_endpoint_invalid_http_auth(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='invalid', password='invalid')
