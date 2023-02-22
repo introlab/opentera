@@ -91,7 +91,8 @@ class UserQueryUsers(Resource):
             if args['with_status']:
                 # Query users status
                 rpc = RedisRPCClient(self.module.config.redis_config)
-                status_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_users')
+                if not self.test:
+                    status_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_users')
 
             for user in users:
                 if user is not None:
