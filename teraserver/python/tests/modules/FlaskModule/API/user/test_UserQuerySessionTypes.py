@@ -8,7 +8,6 @@ import datetime
 
 
 class UserQuerySessionTypesTest(BaseUserAPITest):
-    login_endpoint = '/api/user/login'
     test_endpoint = '/api/user/sessiontypes'
 
     def setUp(self):
