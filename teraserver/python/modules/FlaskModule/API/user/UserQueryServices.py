@@ -127,9 +127,6 @@ class UserQueryServices(Resource):
         if 'id_service' not in json_service:
             return gettext('Missing id_service'), 400
 
-        if 'service_key' not in json_service:
-            return gettext('Missing service_key'), 400
-
         # Check if that service is in the accessible service list, even for super admins since system services are not
         # modifiables
         if json_service['id_service'] not in user_access.get_accessible_services_ids() \
@@ -167,6 +164,9 @@ class UserQueryServices(Resource):
                 return gettext('Invalid config json schema'), 400
         else:
             # New
+            if 'service_key' not in json_service:
+                return gettext('Missing service_key'), 400
+
             try:
                 new_service = TeraService()
                 new_service.from_json(json_service)
