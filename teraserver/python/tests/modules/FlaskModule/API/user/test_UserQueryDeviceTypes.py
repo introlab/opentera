@@ -121,7 +121,7 @@ class UserQueryDeviceTypesTest(BaseUserAPITest):
         self.assertEqual(response.status_code, 200)
         new_id.append(response.json[0]['id_device_type'])
 
-        # update the key to a already created key- Fail expected
+        # update the key to an already created key - Fail expected
         params = {'device_type': {'device_type_name': 'New_Device_Type',
                                   'id_device_type': new_id[1],
                                   'device_type_key': 'new_device'}}
@@ -143,7 +143,7 @@ class UserQueryDeviceTypesTest(BaseUserAPITest):
         response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=params)
         self.assertEqual(response.status_code, 200)
 
-        # Update the name of an unexisting device
+        # Update the name of a non-existing device
         params = {'device_type': {'device_type_name': 'NEW_DEVICE_TYPE',
                                   'id_device_type': new_id[1]+1,
                                   'device_type_key': 'new_device_3'}}
