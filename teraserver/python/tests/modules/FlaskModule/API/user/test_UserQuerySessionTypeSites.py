@@ -1,6 +1,12 @@
 from BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraSite import TeraSite
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+import datetime
 
 
 class UserQuerySessionTypeSitesTest(BaseUserAPITest):
@@ -450,6 +456,59 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
             response = self._delete_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                         params=params)
             self.assertEqual(403, response.status_code, msg="Delete still denied")
+
+            # Try to add a seesion of that type and check that we can't delete it!
+            project = TeraSite.get_site_by_id(2).site_projects[0]
+            stp1 = TeraSessionTypeProject()
+            stp1.id_session_type = 3
+            stp1.id_project = project.id_project
+            TeraSessionTypeProject.insert(stp1)
+
+            json_data = {
+                'id_participant': 0,
+                'id_project': project.id_project,
+                'participant_name': 'Test Participant'
+            }
+
+            participant = TeraParticipant()
+            participant.from_json(json_data)
+            TeraParticipant.insert(participant)
+
+            json_session = {'id_session_type': 3,
+                            'session_name': 'Session',
+                            'session_start_datetime': datetime.datetime.now(),
+                            'session_status': 0,
+                            'id_creator_participant': participant.id_participant
+                            }
+            session = TeraSession()
+            session.from_json(json_session)
+            TeraSession.insert(session)
+
+            json_session = {'id_session_type': 3,
+                            'session_name': 'Session 2',
+                            'session_start_datetime': datetime.datetime.now(),
+                            'session_status': 0
+                            }
+            session2 = TeraSession()
+            session2.from_json(json_session)
+            TeraSession.insert(session2)
+
+            ses_participant = TeraSessionParticipants()
+            ses_participant.id_participant = participant.id_participant
+            ses_participant.id_session = session2.id_session
+            TeraSessionParticipants.insert(ses_participant)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': current_id})
+            self.assertEqual(500, response.status_code, msg="Has tests of that type, can't delete")
+
+            TeraSession.delete(session.id_session)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': current_id})
+            self.assertEqual(500, response.status_code, msg="Has tests of that type, can't delete")
+
+            TeraSession.delete(session2.id_session)
 
             response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                         params=params)

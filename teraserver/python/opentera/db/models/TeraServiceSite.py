@@ -1,8 +1,9 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, Sequence
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraServiceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
@@ -111,7 +112,8 @@ class TeraServiceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         if delete_obj:
             projects = TeraServiceProject.get_projects_for_service(delete_obj.id_service)
             for service_project in projects:
-                TeraServiceProject.delete(service_project.id_service_project)
+                if service_project.service_project_project.id_site == delete_obj.id_site:
+                    TeraServiceProject.delete(service_project.id_service_project)
 
             from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
             session_types = TeraSessionTypeSite.get_session_type_site_for_site_and_service(
@@ -121,6 +123,24 @@ class TeraServiceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
 
             # Ok, delete it
             super().delete(id_todel)
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        from opentera.db.models.TeraServiceProject import TeraServiceProject
+        projects = TeraServiceProject.get_projects_for_service(self.id_service)
+        for service_project in projects:
+            if service_project.service_project_project.id_site == self.id_site:
+                if service_project.delete_check_integrity():
+                    return IntegrityError('Still have sessions with that service', self.id_service,
+                                          't_sessions')
+
+        from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+        session_types = TeraSessionTypeSite.get_session_type_site_for_site_and_service(
+            site_id=self.id_site, service_id=self.id_service)
+        for session_type in session_types:
+            if session_type.delete_check_integrity():
+                return IntegrityError('Still have sessions with a related session type', self.id_service,
+                                      't_sessions_types')
+        return None
 
     @classmethod
     def update(cls, update_id: int, values: dict):

@@ -1,8 +1,10 @@
 from opentera.db.Base import BaseModel
+from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, Sequence
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
@@ -164,6 +166,17 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     #     super().update(update_id, values)
     #     sts = TeraSessionTypeSite.get_session_type_site_by_id(update_id)
     #     sts.check_integrity()
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        for project in self.session_type_site_site.site_projects:
+            ses_type_project = TeraSessionTypeProject.get_session_type_project_for_session_type_project(
+                project.id_project, self.id_session_type)
+            if ses_type_project:
+                cannot_be_deleted_exception = ses_type_project.delete_check_integrity()
+                if cannot_be_deleted_exception:
+                    return IntegrityError('Still have sessions of that type in the site', self.id_session_type,
+                                          't_sessions')
+        return None
 
     @classmethod
     def update(cls, update_id: int, values: dict):
