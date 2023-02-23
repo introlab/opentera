@@ -147,7 +147,8 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         if delete_obj:
             projects = TeraSessionTypeProject.get_projects_for_session_type(delete_obj.id_session_type)
             for st_project in projects:
-                TeraSessionTypeProject.delete(st_project.id_session_type_project)
+                if st_project.session_type_project_project.id_site == delete_obj.id_site:
+                    TeraSessionTypeProject.delete(st_project.id_session_type_project)
 
             # Ok, delete it
             super().delete(id_todel)

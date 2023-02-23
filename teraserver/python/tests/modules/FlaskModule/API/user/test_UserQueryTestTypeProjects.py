@@ -419,7 +419,7 @@ class UserQueryTestTypeProjectTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(1, len(response.json))
 
-            # Delete all created for that
+            # Delete all created for that test
             TeraTestTypeSite.delete(tts1.id_test_type_site)
             TeraTestTypeSite.delete(tts2.id_test_type_site)
             TeraTestType.delete(testtype1.id_test_type)

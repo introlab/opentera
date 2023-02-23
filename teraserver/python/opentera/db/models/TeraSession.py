@@ -147,7 +147,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
             for i in range(8):
                 base_session = TeraSession()
                 base_session.session_creator_user = session_user
-                ses_type = random.randint(1, 4)
+                ses_type = random.randint(1, 3)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
                 base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=i)
@@ -175,7 +175,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
             for i in range(8):
                 base_session = TeraSession()
                 base_session.session_creator_device = TeraDevice.get_device_by_id(1)
-                ses_type = random.randint(1, 4)
+                ses_type = random.randint(1, 3)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
                 base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=i)
@@ -195,7 +195,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
             for i in range(8):
                 base_session = TeraSession()
                 base_session.session_creator_participant = TeraParticipant.get_participant_by_id(1)
-                ses_type = random.randint(1, 4)
+                ses_type = random.randint(1, 3)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
                 base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=i)
@@ -223,7 +223,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
             for i in range(4):
                 base_session = TeraSession()
                 base_session.session_creator_service = session_service
-                ses_type = random.randint(1, 4)
+                ses_type = random.randint(1, 3)
                 base_session.session_session_type = TeraSessionType.get_session_type_by_id(ses_type)
                 base_session.session_name = "Séance #" + str(i + 1)
                 base_session.session_start_datetime = datetime.now() - timedelta(days=i)
@@ -339,18 +339,24 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         return query.all()
 
     @staticmethod
-    def get_sessions_for_project(project_id: int, with_deleted: bool = False):
+    def get_sessions_for_project(project_id: int, session_type_id: int | None = None, with_deleted: bool = False):
         # Only "hard" link to a project is with the participant
         from opentera.db.models.TeraParticipant import TeraParticipant
         # Check for sessions created by a participant
-        sessions = TeraSession.query.join(TeraSession.session_creator_participant).\
-            filter(TeraParticipant.id_project == project_id).execution_options(include_deleted=with_deleted).all()
+        query = TeraSession.query.join(TeraSession.session_creator_participant).\
+            filter(TeraParticipant.id_project == project_id).execution_options(include_deleted=with_deleted)
+        if session_type_id:
+            query = query.filter(TeraSession.id_session_type == session_type_id)
+
+        sessions = query.all()
         created_ids = [session.id_session for session in sessions]
         # Then extend with sessions participant did not create but is part of
-        sessions.extend(TeraSession.query.join(TeraSession.session_participants)
-                        .filter(TeraParticipant.id_project == project_id)
-                        .filter(not_(TeraSession.id_session.in_(created_ids)))
-                        .execution_options(include_deleted=with_deleted).all())
+        query = TeraSession.query.join(TeraSession.session_participants)\
+            .filter(TeraParticipant.id_project == project_id).filter(not_(TeraSession.id_session.in_(created_ids)))\
+            .execution_options(include_deleted=with_deleted)
+        if session_type_id:
+            query = query.filter(TeraSession.id_session_type == session_type_id)
+        sessions.extend(query.all())
         return sessions
 
     @staticmethod

@@ -1,7 +1,8 @@
 from opentera.db.Base import BaseModel
+from opentera.db.models.TeraSession import TeraSession
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, Sequence
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
@@ -120,6 +121,13 @@ class TeraSessionTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                     .session_type_service.id_service
                 new_service_project.id_project = obj_to_check.session_type_project_project.id_project
                 TeraServiceProject.insert(new_service_project)
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        sessions = TeraSession.get_sessions_for_project(project_id=self.id_project,
+                                                        session_type_id=self.id_session_type)
+        if len(sessions) > 0:
+            return IntegrityError('Session type has sessions in this project', self.id_session_type, 't_sessions')
+        return None
 
     @classmethod
     def insert(cls, stp):
