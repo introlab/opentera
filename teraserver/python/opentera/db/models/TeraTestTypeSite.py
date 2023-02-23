@@ -1,8 +1,10 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
+from sqlalchemy import Column, ForeignKey, Integer, Sequence
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraTestTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
@@ -136,6 +138,16 @@ class TeraTestTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     #     super().update(update_id, values)
     #     tts = TeraTestTypeSite.get_test_type_site_by_id(update_id)
     #     tts.check_integrity()
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        for project in self.test_type_site_site.site_projects:
+            test_type_project = TeraTestTypeProject.get_test_type_project_for_test_type_project(project.id_project,
+                                                                                                self.id_test_type)
+            if test_type_project:
+                cannot_be_deleted_exception = test_type_project.delete_check_integrity()
+                if cannot_be_deleted_exception:
+                    return IntegrityError('Still have test of that type in the site', self.id_test_type, 't_tests')
+        return None
 
     @classmethod
     def update(cls, update_id: int, values: dict):

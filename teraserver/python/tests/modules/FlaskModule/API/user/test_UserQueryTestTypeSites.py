@@ -1,16 +1,17 @@
 from BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
+from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraSite import TeraSite
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+import datetime
 
 
-class UserQuerySessionTypeSitesTest(BaseUserAPITest):
+class UserQueryTestTypeSitesTest(BaseUserAPITest):
     test_endpoint = '/api/user/testtypes/sites'
-
-    def setUp(self):
-        super().setUp()
-
-    def tearDown(self):
-        super().tearDown()
 
     def test_no_auth(self):
         with self._flask_app.app_context():
@@ -492,9 +493,80 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
                                                         params='id=' + str(current_id), client=self.test_client)
             self.assertEqual(response.status_code, 403, msg="Delete still denied")
 
+            # Try to add a test of that type and check that we can't delete it!
+            project = TeraSite.get_site_by_id(2).site_projects[0]
+            ttp1 = TeraTestTypeProject()
+            ttp1.id_test_type = 2
+            ttp1.id_project = project.id_project
+            TeraTestTypeProject.insert(ttp1)
+
+            json_data = {
+                'id_participant': 0,
+                'id_project': project.id_project,
+                'participant_name': 'Test Participant'
+            }
+
+            participant = TeraParticipant()
+            participant.from_json(json_data)
+            TeraParticipant.insert(participant)
+
+            json_session = {'id_session_type': 1,
+                            'session_name': 'Session',
+                            'session_start_datetime': datetime.datetime.now(),
+                            'session_status': 0,
+                            'id_creator_participant': participant.id_participant
+                            }
+            session = TeraSession()
+            session.from_json(json_session)
+            TeraSession.insert(session)
+
+            json_session = {'id_session_type': 1,
+                            'session_name': 'Session 2',
+                            'session_start_datetime': datetime.datetime.now(),
+                            'session_status': 0
+                            }
+            session2 = TeraSession()
+            session2.from_json(json_session)
+            TeraSession.insert(session2)
+
+            ses_participant = TeraSessionParticipants()
+            ses_participant.id_participant = participant.id_participant
+            ses_participant.id_session = session2.id_session
+            TeraSessionParticipants.insert(ses_participant)
+
+            json_test = {'id_test_type': 2,
+                         'id_session': session.id_session,
+                         'test_name': 'Test Participant',
+                         'test_datetime': datetime.datetime.now()
+                         }
+            new_test = TeraTest()
+            new_test.from_json(json_test)
+            TeraTest.insert(new_test)
+
+            json_test['id_session'] = session2.id_session
+            new_test2 = TeraTest()
+            new_test2.from_json(json_test)
+            TeraTest.insert(new_test2)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': current_id})
+            self.assertEqual(500, response.status_code, msg="Has tests of that type, can't delete")
+
+            TeraTest.delete(new_test.id_test)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': current_id})
+            self.assertEqual(500, response.status_code, msg="Has tests of that type, can't delete")
+
+            TeraSession.delete(session.id_session)
+            TeraTest.delete(new_test2.id_test)
+
             response = self._delete_with_user_http_auth(username='admin', password='admin',
                                                         params='id=' + str(current_id), client=self.test_client)
             self.assertEqual(response.status_code, 200, msg="Delete OK")
+
+            TeraSession.delete(session2.id_session)
+            TeraParticipant.delete(participant.id_participant)
 
             params = {'id_site': 2}
             response = self._get_with_user_http_auth(username='admin', password='admin', params=params,

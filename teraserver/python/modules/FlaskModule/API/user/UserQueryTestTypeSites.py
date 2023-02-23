@@ -242,6 +242,14 @@ class UserQueryTestTypeSites(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraTestTypeSite.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Associated site still have sessions with tests of that type
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryTestTypeSites.__name__,
+                                         'delete', 500, 'Database error', str(e))
+            return gettext('Can\'t delete test type from site: please delete all tests of that type in the site '
+                           'before deleting.'), 500
         except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())
