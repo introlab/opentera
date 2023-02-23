@@ -37,113 +37,103 @@ class UserQueryProjectsTest(BaseUserAPITest):
     def test_query_specific_project_as_admin(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_project=1')
-            self.assertEqual(response.status_code, 200)
-            json_data = response.json
-            self.assertEqual(len(json_data), 1)
-            self._checkJson(json_data=json_data[0], minimal=False)
-            id_project = json_data[0]['id_project']
-            name = json_data[0]['project_name']
+                                                     params={'id_project': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(1, len(response.json))
+            self._checkJson(json_data=response.json[0], minimal=False)
+            id_project = response.json[0]['id_project']
+            name = response.json[0]['project_name']
 
             # by name
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='name=' + name)
-            self.assertEqual(response.status_code, 200)
-            json_data = response.json
-            self.assertEqual(len(json_data), 1)
-            self._checkJson(json_data=json_data[0], minimal=False)
-            self.assertEqual(json_data[0]['id_project'], id_project)
+                                                     params={'name': name})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(1, len(response.json))
+            self._checkJson(json_data=response.json[0], minimal=False)
+            self.assertEqual(response.json[0]['id_project'], id_project)
 
             # with minimal infos
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_project=1&list=1')
-            self.assertEqual(response.status_code, 200)
-            json_data = response.json
-            self.assertEqual(len(json_data), 1)
-            self._checkJson(json_data=json_data[0], minimal=True)
+                                                     params={'id_project': 1, 'list': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(1, len(response.json))
+            self._checkJson(json_data=response.json[0], minimal=True)
 
     def test_query_specific_project_as_user(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
-                                                     params='id_project=1')
-            self.assertEqual(response.status_code, 200)
+                                                     params={'id_project': 1})
+            self.assertEqual(200, response.status_code)
             json_data = response.json
             self.assertEqual(json_data, [])
 
             response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
-                                                     params='id_project=1')
-            self.assertEqual(response.status_code, 200)
-            json_data = response.json
-            self.assertEqual(len(json_data), 1)
-            self._checkJson(json_data=json_data[0], minimal=False)
-            id_project = json_data[0]['id_project']
-            name = json_data[0]['project_name']
+                                                     params={'id_project': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(1, len(response.json))
+            self._checkJson(json_data=response.json[0], minimal=False)
+            id_project = response.json[0]['id_project']
+            name = response.json[0]['project_name']
 
             # by name
             response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
-                                                     params='name=' + name)
-            self.assertEqual(response.status_code, 200)
-            json_data = response.json
-            self.assertEqual(len(json_data), 1)
-            self._checkJson(json_data=json_data[0], minimal=False)
-            self.assertEqual(json_data[0]['id_project'], id_project)
+                                                     params={'name': name})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(1, len(response.json))
+            self._checkJson(json_data=response.json[0], minimal=False)
+            self.assertEqual(response.json[0]['id_project'], id_project)
 
             # with minimal infos
             response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
-                                                     params='id_project=1&list=1')
-            self.assertEqual(response.status_code, 200)
-            json_data = response.json
-            self.assertEqual(len(json_data), 1)
-            self._checkJson(json_data=json_data[0], minimal=True)
+                                                     params={'id_project': 1, 'list': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(1, len(response.json))
+            self._checkJson(json_data=response.json[0], minimal=True)
 
     def test_query_specific_site(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
-                                                     params='id_site=1')
-            self.assertEqual(response.status_code, 200)
+                                                     params={'id_site': 1})
+            self.assertEqual(200, response.status_code)
             json_data = response.json
             self.assertEqual(json_data, [])
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_site=1')
-            self.assertEqual(response.status_code, 200)
-            json_data = response.json
+                                                     params={'id_site': 1})
+            self.assertEqual(200, response.status_code)
             target_count = TeraProject.get_count(filters={'id_site': 1})
-            self.assertEqual(target_count, len(json_data))
-            for part_data in json_data:
+            self.assertEqual(target_count, len(response.json))
+            for part_data in response.json:
                 self._checkJson(json_data=part_data, minimal=False)
 
     def test_query_specific_service(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_service=3')
-            self.assertEqual(response.status_code, 200)
-            json_data = response.json
+                                                     params={'id_service': 3})
+            self.assertEqual(200, response.status_code)
             target_count = len(TeraServiceProject.get_projects_for_service(3))
-            self.assertEqual(target_count, len(json_data))
-            for part_data in json_data:
+            self.assertEqual(target_count, len(response.json))
+            for part_data in response.json:
                 self._checkJson(json_data=part_data, minimal=False)
 
     def test_query_specific_user_uuid(self):
         with self._flask_app.app_context():
             user = TeraUser.get_user_by_username('admin')
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='user_uuid=' + user.user_uuid)
-            self.assertEqual(response.status_code, 200)
-            json_data = response.json
+                                                     params={'user_uuid': user.user_uuid})
+            self.assertEqual(200, response.status_code)
             target_count = len(user.get_projects_roles())
-            self.assertEqual(target_count, len(json_data))
-            for part_data in json_data:
+            self.assertEqual(target_count, len(response.json))
+            for part_data in response.json:
                 self._checkJson(json_data=part_data, minimal=False)
 
             user = TeraUser.get_user_by_username('user3')
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='user_uuid=' + user.user_uuid)
-            self.assertEqual(response.status_code, 200)
-            json_data = response.json
+                                                     params={'user_uuid': user.user_uuid})
+            self.assertEqual(200, response.status_code)
             target_count = len(user.get_projects_roles())
-            self.assertEqual(target_count, len(json_data))
-            for part_data in json_data:
+            self.assertEqual(target_count, len(response.json))
+            for part_data in response.json:
                 self._checkJson(json_data=part_data, minimal=False)
 
     def test_post_and_delete(self):
@@ -153,7 +143,7 @@ class UserQueryProjectsTest(BaseUserAPITest):
             }
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
-            self.assertEqual(response.status_code, 400, msg="Missing project struct")
+            self.assertEqual(400, response.status_code, msg="Missing project struct")
 
             json_data = {
                 'project': {
@@ -162,25 +152,25 @@ class UserQueryProjectsTest(BaseUserAPITest):
             }
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
-            self.assertEqual(response.status_code, 400, msg="Missing id_project")
+            self.assertEqual(400, response.status_code, msg="Missing id_project")
 
             json_data['project']['id_project'] = 0
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
-            self.assertEqual(response.status_code, 400, msg="Missing id_site")
+            self.assertEqual(400, response.status_code, msg="Missing id_site")
 
             json_data['project']['id_site'] = 1
             response = self._post_with_user_http_auth(self.test_client, username='user4', password='user4',
                                                       json=json_data)
-            self.assertEqual(response.status_code, 403, msg="No access to site")
+            self.assertEqual(403, response.status_code, msg="No access to site")
 
             response = self._post_with_user_http_auth(self.test_client, username='user3', password='user3',
                                                       json=json_data)
-            self.assertEqual(response.status_code, 403, msg="Not site admin")
+            self.assertEqual(403, response.status_code, msg="Not site admin")
 
             response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                       json=json_data)
-            self.assertEqual(response.status_code, 200, msg="Post OK")
+            self.assertEqual(200, response.status_code, msg="Post OK")
             part_data = response.json[0]
             project_id = part_data['id_project']
 
@@ -194,12 +184,12 @@ class UserQueryProjectsTest(BaseUserAPITest):
             }
             response = self._post_with_user_http_auth(self.test_client, username='user3', password='user3',
                                                       json=json_data)
-            self.assertEqual(response.status_code, 403, msg="No access to site")
+            self.assertEqual(403, response.status_code, msg="No access to site")
 
             del json_data['project']['id_site']
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
-            self.assertEqual(response.status_code, 200, msg="Update completed")
+            self.assertEqual(200, response.status_code, msg="Update completed")
             part_data = response.json[0]
             self.assertEqual(part_data['project_name'], 'New Project Name')
 
@@ -211,7 +201,7 @@ class UserQueryProjectsTest(BaseUserAPITest):
             }
             response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                       json=json_data)
-            self.assertEqual(response.status_code, 403, msg="No access to at least one session type")
+            self.assertEqual(403, response.status_code, msg="No access to at least one session type")
 
             st = TeraSessionType()
             st.from_json({'session_type_name': 'Test session type',
@@ -228,7 +218,7 @@ class UserQueryProjectsTest(BaseUserAPITest):
             }
             response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                       json=json_data)
-            self.assertEqual(response.status_code, 403, msg="At least one session type not associated to site")
+            self.assertEqual(403, response.status_code, msg="At least one session type not associated to site")
 
             sts = TeraSessionTypeSite()
             sts.id_session_type = st.id_session_type
@@ -237,7 +227,7 @@ class UserQueryProjectsTest(BaseUserAPITest):
 
             response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                       json=json_data)
-            self.assertEqual(response.status_code, 200, msg="Update OK")
+            self.assertEqual(200, response.status_code, msg="Update OK")
 
             # Test delete
             part1 = TeraParticipant()
@@ -265,19 +255,19 @@ class UserQueryProjectsTest(BaseUserAPITest):
             TeraSession.delete(part2_session.id_session)
             response = self._delete_with_user_http_auth(self.test_client, username='user4', password='user4',
                                                         params={'id': project_id})
-            self.assertEqual(response.status_code, 403, msg="Can't delete, forbidden")
+            self.assertEqual(403, response.status_code, msg="Can't delete, forbidden")
 
             id_part1 = part1.id_participant
             id_part2 = part2.id_participant
             response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                         params={'id': project_id})
-            self.assertEqual(response.status_code, 200, msg="Delete OK")
+            self.assertEqual(200, response.status_code, msg="Delete OK")
 
             # Check that all participants were also deleted
             self.assertEqual(TeraParticipant.get_participant_by_id(id_part1), None)
             self.assertEqual(TeraParticipant.get_participant_by_id(id_part2), None)
 
-            # Check that all session type assocation were delete
+            # Check that all session type association were delete
             self.assertEqual(len(TeraSessionTypeProject.get_sessions_types_for_project(project_id)), 0)
 
     def _checkJson(self, json_data, minimal=False):
