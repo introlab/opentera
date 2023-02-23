@@ -1,209 +1,261 @@
-from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
-import datetime
+from BaseUserAPITest import BaseUserAPITest
 
 
-class UserQueryServicesTest(BaseAPITest):
-    login_endpoint = '/api/user/login'
+class UserQueryServicesTest(BaseUserAPITest):
     test_endpoint = '/api/user/services'
 
     def setUp(self):
-        pass
+        super().setUp()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
-    def test_no_auth(self):
-        response = self._request_with_no_auth()
-        self.assertEqual(response.status_code, 401)
+    def test_get_no_auth(self):
+        with self._flask_app.app_context():
+            response = self.test_client.get(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
 
     def test_post_no_auth(self):
-        response = self._post_with_no_auth()
-        self.assertEqual(response.status_code, 401)
+        with self._flask_app.app_context():
+            response = self.test_client.post(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
 
     def test_delete_no_auth(self):
-        response = self._delete_with_no_auth(id_to_del=0)
-        self.assertEqual(response.status_code, 401)
+        with self._flask_app.app_context():
+            response = self.test_client.delete(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_invalid_http_auth(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='invalid', password='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_token_auth(self.test_client, token='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_post_endpoint_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            response = self._post_with_user_token_auth(self.test_client, token='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_post_endpoint_invalid_http_auth(self):
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client, username='invalid', password='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_delete_endpoint_invalid_http_auth(self):
+        with self._flask_app.app_context():
+            response = self._delete_with_user_http_auth(self.test_client, username='invalid', password='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_delete_endpoint_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            response = self._delete_with_user_token_auth(self.test_client, token='invalid')
+            self.assertEqual(401, response.status_code)
 
     def test_query_no_params_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertEqual(len(json_data), 5)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin')
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(len(response.json), 5)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
 
     def test_query_as_user(self):
-        response = self._request_with_http_auth(username='user', password='user', payload="")
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user')
+            self.assertGreater(len(response.json), 0)
 
     def test_query_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 1)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin')
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreater(len(response.json), 1)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            # Logger service should not be here since a system service!
-            # self.assertNotEqual(data_item['id_service'], 2)
-            # ... but not allowed when requesting as superadmin!
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                # Logger service should not be here since a system service!
+                # self.assertNotEqual(data_item['id_service'], 2)
+                # ... but not allowed when requesting as superadmin!
 
     def test_query_list_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="list=1")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'list': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreater(len(response.json), 0)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item, minimal=True)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item, minimal=True)
 
     def test_query_specific_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=1")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)  # OpenTera service is a system service, and should not be returned here!
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_service': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            # OpenTera service is a system service, and should not be returned here!
+            self.assertEqual(len(response.json), 0)
 
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_service=4")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_service': 4})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(len(response.json), 1)
 
-        service_uuid = None
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['id_service'], 4)
-            service_uuid = data_item['service_uuid']
+            service_uuid = None
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertEqual(data_item['id_service'], 4)
+                service_uuid = data_item['service_uuid']
 
-        # Now try to query with service uuid
-        response = self._request_with_http_auth(username='admin', password='admin', payload="uuid=" + service_uuid)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+            # Now try to query with service uuid
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'uuid': service_uuid})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(len(response.json), 1)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['id_service'], 4)
-            self.assertEqual(data_item['service_uuid'], service_uuid)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertEqual(data_item['id_service'], 4)
+                self.assertEqual(data_item['service_uuid'], service_uuid)
 
     def test_query_services_for_project_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_project=1")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_project': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(len(response.json), 2)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
 
     def test_query_services_for_site_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_site=1")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 3)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_site': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(len(response.json), 3)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
 
     def test_query_by_key_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="key=VideoRehabService")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'key': 'VideoRehabService'})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(len(response.json), 1)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['service_key'], 'VideoRehabService')
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertEqual(data_item['service_key'], 'VideoRehabService')
 
     def test_query_with_config_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="with_config=1&list=1")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreaterEqual(len(json_data), 1)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'with_config': 1, 'list': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            json_data = response.json
+            self.assertGreaterEqual(len(json_data), 1)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item, minimal=True)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item, minimal=True)
 
     def test_post_and_delete(self):
-        # New with minimal infos
-        json_data = {
-            'service': {
-                    "service_clientendpoint": "/",
-                    "service_enabled": True,
-                    "service_endpoint": "/test",
-                    "service_hostname": "localhost",
-                    "service_name": "Test",
-                    "service_port": 0,
-                    "service_config_schema": "{"
+        with self._flask_app.app_context():
+            # New with minimal infos
+            json_data = {
+                'service': {
+                        "service_clientendpoint": "/",
+                        "service_enabled": True,
+                        "service_endpoint": "/test",
+                        "service_hostname": "localhost",
+                        "service_name": "Test",
+                        "service_port": 0,
+                        "service_config_schema": "{"
+                }
             }
-        }
 
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing id_service")  # Missing id_service
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(response.status_code, 400, msg="Missing id_service")  # Missing id_service
 
-        json_data['service']['id_service'] = 0
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 500, msg="Missing service_key")
+            json_data['service']['id_service'] = 0
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing service_key")
 
-        json_data['service']['service_key'] = 'Test'
-        # response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        # self.assertEqual(response.status_code, 400, msg="Invalid insert service_config_schema")
+            json_data['service']['service_key'] = 'Test'
+            # response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+            # json=json_data)
+            # self.assertEqual(response.status_code, 400, msg="Invalid insert service_config_schema")
 
-        del json_data['service']['service_config_schema'] # Will use default value
-        response = self._post_with_http_auth(username='user4', password='user4', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Post denied for user")  # Forbidden for that user to post that
+            del json_data['service']['service_config_schema']  # Will use default value
+            response = self._post_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="Post denied for user")
 
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post new")  # All ok now!
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post new")  # All ok now!
 
-        json_data = response.json()[0]
-        self._checkJson(json_data)
-        current_id = json_data['id_service']
+            json_data = response.json[0]
+            self._checkJson(json_data)
+            current_id = json_data['id_service']
 
-        json_data = {
-            'service': {
-                'id_service': current_id,
-                'service_enabled': False,
-                'service_system': False,
-                "service_name": "Test2",
-                'service_config_schema': '{Test'
+            json_data = {
+                'service': {
+                    'id_service': current_id,
+                    'service_enabled': False,
+                    'service_system': False,
+                    'service_name': 'Test2',
+                    'service_key': 'service_key',
+                    'service_config_schema': '{Test'
+                }
             }
-        }
-        # response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        # self.assertEqual(response.status_code, 403, msg="Post update with service_system that shouldn't be here")
+            # response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+            # json=json_data)
+            # self.assertEqual(403, response.status_code, msg="Post update with service_system that shouldn't be here")
 
-        # del json_data['service']['service_system']
-        # response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        # self.assertEqual(response.status_code, 400, msg="Post update with invalid config schema")
+            # del json_data['service']['service_system']
+            # response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+            # json=json_data)
+            # self.assertEqual(response.status_code, 400, msg="Post update with invalid config schema")
 
-        del json_data['service']['service_config_schema']
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post update OK")
-        json_data = response.json()[0]
-        self._checkJson(json_data)
-        self.assertEqual(json_data['service_enabled'], False)
-        self.assertEqual(json_data['service_name'], 'Test2')
+            del json_data['service']['service_config_schema']
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post update OK")
+            json_data = response.json[0]
+            self._checkJson(json_data)
+            self.assertEqual(json_data['service_enabled'], False)
+            self.assertEqual(json_data['service_name'], 'Test2')
 
-        # Check that default service roles (admin, user) were created
-        self.assertTrue(json_data.__contains__('service_roles'))
-        self.assertEqual(len(json_data['service_roles']), 2)
-        self.assertEqual(json_data['service_roles'][0]['service_role_name'], 'admin')
-        self.assertEqual(json_data['service_roles'][1]['service_role_name'], 'user')
+            # Check that default service roles (admin, user) were created
+            self.assertTrue(json_data.__contains__('service_roles'))
+            self.assertEqual(len(json_data['service_roles']), 2)
+            self.assertEqual(json_data['service_roles'][0]['service_role_name'], 'admin')
+            self.assertEqual(json_data['service_roles'][1]['service_role_name'], 'user')
 
-        response = self._delete_with_http_auth(username='user4', password='user4', id_to_del=current_id)
-        self.assertEqual(response.status_code, 403, msg="Delete denied")
+            params = {'id': current_id}
+            response = self._delete_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                        params=params)
+            self.assertEqual(403, response.status_code, msg="Delete denied")
 
-        response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=current_id)
-        self.assertEqual(response.status_code, 200, msg="Delete OK")
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params=params)
+            self.assertEqual(200, response.status_code, msg="Delete OK")
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

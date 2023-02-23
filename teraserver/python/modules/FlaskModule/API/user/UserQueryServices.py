@@ -127,6 +127,9 @@ class UserQueryServices(Resource):
         if 'id_service' not in json_service:
             return gettext('Missing id_service'), 400
 
+        if 'service_key' not in json_service:
+            return gettext('Missing service_key'), 400
+
         # Check if that service is in the accessible service list, even for super admins since system services are not
         # modifiables
         if json_service['id_service'] not in user_access.get_accessible_services_ids() \
