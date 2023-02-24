@@ -1,35 +1,36 @@
 import unittest
 from datetime import datetime
 from services.LoggingService.libloggingservice.db.DBManager import DBManager
-from services.LoggingService.FlaskModule import flask_app
 from services.LoggingService.ConfigManager import ConfigManager
 from services.LoggingService.libloggingservice.db.models.LogEntry import LogEntry
 from services.LoggingService.libloggingservice.db.models.LoginEntry import LoginEntry
 import uuid
+from flask import Flask
 
 
 class LoggingServiceDBManagerTest(unittest.TestCase):
     def setUp(self):
-        with flask_app.app_context():
+        self.flask_app = Flask('LoggingServiceDBManagerTest')
+        with self.flask_app.app_context():
             self.config = ConfigManager()
             self.config.create_defaults()
-            self.dbman = DBManager(test=True)
+            self.dbman = DBManager(app=self.flask_app, test=True)
             self.dbman.open_local({}, False, True)
             self.dbman.create_defaults(self.config, test=True)
 
     def tearDown(self):
-        with flask_app.app_context():
+        with self.flask_app.app_context():
             self.dbman.db.session.rollback()
 
     def test_create_defaults_should_create_one_log_entry_and_no_login_entry(self):
-        with flask_app.app_context():
+        with self.flask_app.app_context():
             log_entries = LogEntry.query.all()
             self.assertEqual(len(log_entries), 1)
             login_entries = LoginEntry.query.all()
             self.assertEqual(len(login_entries), 0)
 
     def test_insert_update_delete_log_entry(self):
-        with flask_app.app_context():
+        with self.flask_app.app_context():
             entry = LogEntry()
             entry.log_level = 1
             entry.sender = 'test_insert_log_entry'
@@ -49,7 +50,7 @@ class LoggingServiceDBManagerTest(unittest.TestCase):
             self.assertIsNone(LogEntry.get_log_entry_by_id(entry.id_log_entry))
 
     def test_insert_update_delete_login_entry(self):
-        with flask_app.app_context():
+        with self.flask_app.app_context():
             login_entry = LoginEntry()
             login_entry.login_timestamp = datetime.now()
             login_entry.login_log_level = 1
@@ -70,7 +71,3 @@ class LoggingServiceDBManagerTest(unittest.TestCase):
             # Delete
             LoginEntry.delete(login_entry.id_login_event)
             self.assertIsNone(LoginEntry.get_login_entry_by_id(login_entry.id_login_event))
-
-
-
-

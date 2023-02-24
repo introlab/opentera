@@ -13,18 +13,18 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
         super().tearDown()
 
     def test_get_endpoint_with_invalid_token(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             response = self._get_with_service_token_auth(self.test_client, token="invalid")
             self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_with_valid_token_but_not_admin(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             token = self._generate_fake_user_token(name='FakeUser', superadmin=False, expiration=3600)
             response = self._get_with_service_token_auth(self.test_client, token=token)
             self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_with_valid_token_and_admin(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
 
             all_entries = []
@@ -45,7 +45,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
                 LogEntry.delete(entry.id_log_entry)
 
     def test_get_endpoint_with_valid_token_and_admin_with_start_end_dates(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
             # Make sure everything is in the future, so we can filter with known dates
             all_entries = []
@@ -85,7 +85,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
                 LogEntry.delete(entry.id_log_entry)
 
     def test_get_endpoint_with_valid_token_and_admin_with_offset(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
 
             all_entries = []
@@ -111,7 +111,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
                 LogEntry.delete(entry.id_log_entry)
 
     def test_get_endpoint_with_valid_token_and_admin_with_limit(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
 
             all_entries = []
@@ -138,7 +138,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
                 LogEntry.delete(entry.id_log_entry)
 
     def test_get_endpoint_with_valid_token_and_admin_and_log_level(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
 
             all_entries = []
@@ -167,7 +167,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
                 LogEntry.delete(entry.id_log_entry)
 
     def test_get_endpoint_stats_with_valid_token_and_admin(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
 
             all_entries = []

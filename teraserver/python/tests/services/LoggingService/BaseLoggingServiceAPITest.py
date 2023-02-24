@@ -1,11 +1,11 @@
 import unittest
 from services.LoggingService.libloggingservice.db.DBManager import DBManager
 from services.LoggingService.ConfigManager import ConfigManager
+import services.LoggingService.Globals as Globals
 from flask.testing import FlaskClient
 import uuid
 import random
 from string import digits, ascii_lowercase, ascii_uppercase
-import services.LoggingService.Globals as Globals
 from FakeLoggingService import FakeLoggingService
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 
@@ -33,26 +33,26 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._config = BaseLoggingServiceAPITest.getConfig()
-
         # Instance of Fake service API will create a new flask_app
-        Globals.service = FakeLoggingService()
-
-        cls._db_man: DBManager = DBManager(app=Globals.service.flask_app, test=True)
-
+        cls._service = FakeLoggingService()
+        # API Need this variable to be set
+        Globals.service = cls._service
+        cls._db_man: DBManager = DBManager(app=cls._service.flask_app, test=True)
         # Cheating using same db as FakeService
-        cls._db_man.db = Globals.service.db_manager.db
+        cls._db_man.db = cls._service.db_manager.db
 
-        with BaseLoggingServiceAPITest.app_context():
+        with cls._service.flask_app.app_context():
             # Creating default users / tests. Time-consuming, only once per test file.
             cls._db_man.create_defaults(cls._config, test=True)
 
-    @classmethod
-    def app_context(cls):
-        return Globals.service.flask_app.app_context()
+    def app_context(self):
+        self.assertIsNotNone(self._service)
+        self.assertIsNotNone(self._service.flask_app)
+        return self._service.flask_app.app_context()
 
     @classmethod
     def tearDownClass(cls):
-        with BaseLoggingServiceAPITest.app_context():
+        with cls._service.flask_app.app_context():
             cls._db_man.db.session.remove()
 
     @classmethod
@@ -62,16 +62,17 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         return config
 
     def setUp(self):
-        self.test_client = Globals.service.flask_app.test_client()
+        self.assertIsNotNone(self._service)
+        self.assertIsNotNone(self._service.flask_app)
+        self.test_client = self._service.flask_app.test_client()
 
     def tearDown(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             # Make sure pending queries are rollbacked.
             self._db_man.db.session.rollback()
 
-    def _generate_fake_user_token(self, name='FakeUser', user_uuid=str(uuid.uuid4()),
-                                  superadmin=False, expiration=3600):
-
+    @staticmethod
+    def _generate_fake_user_token(name='FakeUser', user_uuid=str(uuid.uuid4()), superadmin=False, expiration=3600):
         import time
         import jwt
         import random
