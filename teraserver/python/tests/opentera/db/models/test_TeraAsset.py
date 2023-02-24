@@ -7,13 +7,12 @@ from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipant import TeraParticipant
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
-from modules.FlaskModule.FlaskModule import flask_app
 
 
 class TeraAssetTest(BaseModelsTest):
 
     def test_defaults(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for asset in TeraAsset.query.all():
                 self.assertGreater(len(asset.asset_name), 0)
                 self.assertIsNotNone(asset.asset_session)
@@ -21,7 +20,7 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertIsNotNone(asset.asset_uuid)
 
     def test_json_full_and_minimal(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             assets = TeraAsset.query.all()
             self.assertGreater(len(assets), 0)
             for minimal in [False, True]:
@@ -60,7 +59,7 @@ class TeraAssetTest(BaseModelsTest):
                     self.assertFalse('deleted_at' in json)
 
     def test_from_json(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for asset in TeraAsset.query.all():
                 json = asset.to_json()
                 new_asset = TeraAsset()
@@ -74,7 +73,7 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertEqual(new_asset.id_session, asset.id_session)
 
     def test_ids_uuids_get_methods(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             asset_ids = [asset.id_asset for asset in TeraAsset.query.all()]
             self.db.session.expire_all()  # Clear cache
             for asset_id in asset_ids:
@@ -88,7 +87,7 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertEqual(test_asset.asset_uuid, asset_uuid)
 
     def test_get_assets_created_by_device(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             devices = [{'id_device': device.id_device, 'assets_count': len(device.device_assets)}
                        for device in TeraDevice.query.all()]
             self.db.session.expire_all()  # Clear cache
@@ -97,7 +96,7 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertEqual(len(assets), device['assets_count'])
 
     def test_get_assets_created_by_user(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             users = [{'id_user': user.id_user, 'assets_count': len(user.user_assets)}
                      for user in TeraUser.query.all()]
             self.db.session.expire_all()  # Clear cache
@@ -106,7 +105,7 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertEqual(len(assets), user['assets_count'])
 
     def test_get_assets_created_by_participant(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             parts = [{'id_participant': part.id_participant, 'assets_count': len(part.participant_assets)}
                      for part in TeraParticipant.query.all()]
             self.db.session.expire_all()  # Clear cache
@@ -115,7 +114,7 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertEqual(len(assets), part['assets_count'])
 
     def test_get_assets_created_by_service(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             services = [{'id_service': service.id_service, 'assets_count': len(service.service_assets)}
                         for service in TeraService.query.all()]
             self.db.session.expire_all()  # Clear cache
@@ -124,7 +123,7 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertEqual(len(assets), service['assets_count'])
 
     def test_get_assets_owned_by_service(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             services = [{'uuid_service': service.service_uuid, 'assets_count': len(service.service_owned_assets)}
                         for service in TeraService.query.all()]
             self.db.session.expire_all()
@@ -133,7 +132,7 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertEqual(len(assets), service['assets_count'])
 
     def test_get_assets_accessible_for_user(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             users = []
             id_sessions = []
             for user in TeraUser.query.all():
@@ -154,7 +153,7 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertEqual(len(assets), user['assets_count'])
 
     def test_get_assets_accessible_for_device(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             devices = []
             id_sessions = []
             for device in TeraDevice.query.all():
@@ -175,7 +174,7 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertEqual(len(assets), device['assets_count'])
 
     def test_get_assets_accessible_for_participant(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             parts = []
             id_sessions = []
             for part in TeraParticipant.query.all():
@@ -196,7 +195,7 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertEqual(len(assets), part['assets_count'])
 
     def test_get_access_token(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             asset_uuids = [asset.asset_uuid for asset in TeraAsset.query.all()]
             token_key = 'test123456'
             requester_uuid = TeraUser.get_user_by_id(2).user_uuid
@@ -216,7 +215,7 @@ class TeraAssetTest(BaseModelsTest):
             self.assertEqual(requester_uuid, decoded['requester_uuid'])
 
     def test_insert_with_minimal_config(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Create a new item
             asset = TeraAsset()
             asset.asset_name = 'Test asset'
@@ -236,7 +235,7 @@ class TeraAssetTest(BaseModelsTest):
             TeraAsset.delete(asset.id_asset)
 
     def test_update(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             asset: TeraAsset = TeraAsset.get_asset_by_id(1)
             self.assertIsNotNone(asset)
             update_info = {'asset_name': 'New asset name', 'asset_type': 'Unknown'}
@@ -249,7 +248,7 @@ class TeraAssetTest(BaseModelsTest):
             self.assertEqual('Unknown', asset.asset_type)
 
     def test_delete(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Create new
             asset = TeraAsset()
             asset.asset_name = 'Test asset'

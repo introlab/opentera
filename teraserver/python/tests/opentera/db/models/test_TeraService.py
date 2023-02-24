@@ -1,13 +1,12 @@
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraService import TeraService
 
 
 class TeraServiceTest(BaseModelsTest):
 
     def test_nullable_args(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
             new_service.service_name = 'Name'
             new_service.service_key = 'Key'
@@ -52,7 +51,7 @@ class TeraServiceTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_nullable_bool1(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             #testing bool service_enabled
             new_service = TeraService()
             new_service.service_name = 'Name'
@@ -69,7 +68,7 @@ class TeraServiceTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_nullable_bool2(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # testing bool service_system
             new_service = TeraService()
             new_service.service_name = 'Name'
@@ -86,7 +85,7 @@ class TeraServiceTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_nullable_bool3(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # testing bool service_editable_config
             new_service = TeraService()
             new_service.service_name = 'Name'
@@ -103,7 +102,7 @@ class TeraServiceTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_unique_args_uuid(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
             same_service = TeraService()
 
@@ -134,7 +133,7 @@ class TeraServiceTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_unique_args_service_key(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
             same_service = TeraService()
 
@@ -165,7 +164,7 @@ class TeraServiceTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_service_port_integer(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
             new_service.service_uuid = 'uuid'
             new_service.service_name = 'Name'
@@ -181,7 +180,7 @@ class TeraServiceTest(BaseModelsTest):
             self.assertRaises(exc.StatementError, self.db.session.commit)
 
     def test_service_system_integer(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
             new_service.service_uuid = 'uuid'
             new_service.service_name = 'Name'
@@ -197,7 +196,7 @@ class TeraServiceTest(BaseModelsTest):
             self.assertRaises(exc.StatementError, self.db.session.commit)
 
     def test_service_editable_config_integer(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
             new_service.service_uuid = 'uuid'
             new_service.service_name = 'Name'
@@ -213,7 +212,7 @@ class TeraServiceTest(BaseModelsTest):
             self.assertRaises(exc.StatementError, self.db.session.commit)
 
     def test_service_to_json(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
             new_service.service_uuid = 'UUID'
             new_service.service_key = 'KEY'
@@ -258,7 +257,7 @@ class TeraServiceTest(BaseModelsTest):
             self.assertEqual(json_data['service_projects'], [])
 
     def test_service_get_token(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
             token = new_service.get_token(token_key='A key')
             token1 = new_service.get_token(token_key='123456')
@@ -268,7 +267,7 @@ class TeraServiceTest(BaseModelsTest):
             self.assertIsNotNone(token2)
 
     def test_service_get_functions(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
             new_service.service_uuid = 'uuid'
             new_service.service_name = 'Name'
@@ -300,13 +299,13 @@ class TeraServiceTest(BaseModelsTest):
             self.assertIsNone(id_none)
 
     def test_service_get_openteraserver_service(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             openteraservice = TeraService.get_openteraserver_service()
             self.assertEqual(openteraservice.service_key, openteraservice.service_key)
 
     def test_service_insert(self):
         import uuid
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
             # new_service.service_uuid = str(uuid.uuid4())
             new_service.service_name = 'Name'
@@ -331,7 +330,7 @@ class TeraServiceTest(BaseModelsTest):
         #
         """
         return
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
             new_service.service_uuid = 'Definitely longer than a 36 characters string'
             new_service.service_name = 'Name'
@@ -355,7 +354,7 @@ class TeraServiceTest(BaseModelsTest):
         # attempts to do this will fail - not with SQLite.
         """
         return
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service = TeraService()
 
             new_service.service_uuid = 'uuid'

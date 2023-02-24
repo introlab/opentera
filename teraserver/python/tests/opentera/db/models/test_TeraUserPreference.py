@@ -3,13 +3,12 @@ from opentera.db.models.TeraUserPreference import TeraUserPreference
 from opentera.db.models.TeraUser import TeraUser
 import json
 from sqlalchemy import exc
-from modules.FlaskModule.FlaskModule import flask_app
 
 
 class TeraUserPreferenceTest(BaseModelsTest):
 
     def test_default_user_preference_for_openteraplus(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             preference: TeraUserPreference = TeraUserPreference.get_user_preferences_for_app('openteraplus')
             self.assertIsNotNone(preference)
             self.assertEqual(preference.user_preference_app_tag, 'openteraplus')
@@ -19,7 +18,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
             self.assertTrue('notification_sounds' in json_user_preferences)
 
     def test_default_user_preference_for_anotherapp(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             preference: TeraUserPreference = TeraUserPreference.get_user_preferences_for_app('anotherapp')
             self.assertIsNotNone(preference)
             self.assertEqual(preference.user_preference_app_tag, 'anotherapp')
@@ -29,7 +28,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
             self.assertTrue('auto_save' in json_user_preferences)
 
     def test_default_user_preference_for_openteraplus_multiple(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             preferences: list[TeraUserPreference] = \
                 TeraUserPreference.query.filter_by(user_preference_app_tag='openteraplus').all()
             self.assertEqual(2, len(preferences))
@@ -56,7 +55,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
                 preferences[1])
 
     def test_user_preference_null_id_user(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             preference: TeraUserPreference = TeraUserPreference()
             preference.user_preference_app_tag = 'myapp'
             preference.user_preference_preference = json.dumps({'my_super_key': 'my_super_value'})
@@ -64,7 +63,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_user_preference_null_app_tag(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             preference: TeraUserPreference = TeraUserPreference()
             preference.id_user = 1  # admin
             preference.user_preference_preference = json.dumps({'my_super_key': 'my_super_value'})
@@ -72,7 +71,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_user_preference_null_preference(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             preference: TeraUserPreference = TeraUserPreference()
             preference.id_user = 1  # admin
             preference.user_preference_app_tag = 'myapp'
@@ -80,7 +79,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_to_json(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             preference: TeraUserPreference = TeraUserPreference()
             preference.id_user_preference = 0
             preference.id_user = 1  # admin
@@ -106,7 +105,7 @@ class TeraUserPreferenceTest(BaseModelsTest):
             pass
 
     def test_insert_or_update_or_delete_user_preference(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Insert
             TeraUserPreference.insert_or_update_or_delete_user_preference(user_id=1, app_tag='newapp',
                                                                           prefs={'key': 'value'})

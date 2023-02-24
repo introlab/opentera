@@ -1,18 +1,17 @@
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraDeviceType import TeraDeviceType
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
-from modules.FlaskModule.FlaskModule import flask_app
 
 
 class TeraDeviceTest(BaseModelsTest):
 
     def test_defaults(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             devices = TeraDevice.query.all()
             self.assertGreater(len(devices), 0)
 
     def test_json_full_and_minimal(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             devices = TeraDevice.query.all()
             self.assertGreater(len(devices), 0)
             for minimal in [False, True]:
@@ -42,7 +41,7 @@ class TeraDeviceTest(BaseModelsTest):
                     self.assertFalse('deleted_at' in json)
 
     def test_insert_with_minimal_config(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Create a new device
             device = TeraDevice()
             device.device_name = 'Test device'
@@ -62,7 +61,7 @@ class TeraDeviceTest(BaseModelsTest):
             TeraDevice.delete(device.id_device)
 
     def test_update(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             device: TeraDevice = TeraDevice.get_device_by_id(1)
             self.assertIsNotNone(device)
             update_info = {'device_notes': 'Test notes'}
@@ -74,7 +73,7 @@ class TeraDeviceTest(BaseModelsTest):
             self.assertEqual('Test notes', device.device_notes)
 
     def test_delete(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Create a new device
             device = TeraDevice()
             device.device_name = 'Test device'
@@ -89,7 +88,7 @@ class TeraDeviceTest(BaseModelsTest):
             self.assertIsNone(TeraDevice.get_device_by_id(id_device))
 
     def test_soft_delete(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Create a new device
             device = TeraDevice()
             device.device_name = 'Test device'

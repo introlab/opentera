@@ -2,13 +2,12 @@ from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSession import TeraSession, TeraSessionStatus
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
-from modules.FlaskModule.FlaskModule import flask_app
 
 
 class TeraSessionTest(BaseModelsTest):
 
     def test_session_defaults(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             for session in TeraSession.query.all():
                 my_list = [session.id_creator_device, session.id_creator_participant,
                            session.id_creator_service, session.id_creator_user]
@@ -19,7 +18,7 @@ class TeraSessionTest(BaseModelsTest):
         from datetime import datetime
         from modules.DatabaseModule.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
 
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             session = TeraSession()
 
             device = TeraDevice.get_device_by_id(1)
@@ -41,7 +40,7 @@ class TeraSessionTest(BaseModelsTest):
                 TeraSession.insert(session)
 
     def test_session_from_json(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             pass
             #
             # session = {'session': {'id_session': 0,

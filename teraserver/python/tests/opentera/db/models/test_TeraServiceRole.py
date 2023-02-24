@@ -1,13 +1,12 @@
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 
 
 class TeraServiceRoleTest(BaseModelsTest):
 
     def test_nullable_args(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service_role = TeraServiceRole()
             new_service_role.id_service = 1
             new_service_role.service_role_name = None
@@ -24,7 +23,7 @@ class TeraServiceRoleTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_relationships(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service_role = TeraServiceRole()
             new_service_role.id_service = 10
             new_service_role.service_role_name = 'Role Name'
@@ -32,7 +31,7 @@ class TeraServiceRoleTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_service_role_to_json(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service_role = TeraServiceRole()
             new_service_role.id_service = 1
             new_service_role.id_project = 1
@@ -54,7 +53,7 @@ class TeraServiceRoleTest(BaseModelsTest):
             pass
 
     def test_get_service_role(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service_role = TeraServiceRole()
             new_service_role.id_service = 1
             new_service_role.id_project = 1
@@ -68,7 +67,7 @@ class TeraServiceRoleTest(BaseModelsTest):
             self.assertEqual(same_service_role[-1], new_service_role)
 
     def test_get_service_roles_for_site(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service_role = TeraServiceRole()
             self.db.session.rollback()
             new_service_role.id_service = 1
@@ -85,7 +84,7 @@ class TeraServiceRoleTest(BaseModelsTest):
             self.assertEqual(same_service_role[-1], new_service_role)
 
     def test_get_specific_service_role_for_site(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service_role = TeraServiceRole()
             new_service_role.id_service = 1
             new_service_role.id_project = 1
@@ -100,7 +99,7 @@ class TeraServiceRoleTest(BaseModelsTest):
             # when the class is the but not the test alone
 
     def test_get_service_roles_for_project(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service_role = TeraServiceRole()
             new_service_role.id_service = 1
             new_service_role.id_project = 1
@@ -115,7 +114,7 @@ class TeraServiceRoleTest(BaseModelsTest):
             self.assertEqual(same_service_role[-1], new_service_role)
 
     def test_get_specific_service_role_for_project(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service_role = TeraServiceRole()
             new_service_role.id_service = 1
             new_service_role.id_project = 1
@@ -129,7 +128,7 @@ class TeraServiceRoleTest(BaseModelsTest):
             self.assertEqual(same_service_role.service_role_name, new_service_role.service_role_name)
 
     def test_get_service_role_by_id(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_service_role = TeraServiceRole()
             new_service_role.id_service = 1
             new_service_role.id_project = 1

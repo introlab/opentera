@@ -1,5 +1,4 @@
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraUserGroup import TeraUserGroup
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from opentera.db.models.TeraProject import TeraProject
@@ -11,12 +10,12 @@ from sqlalchemy.exc import SQLAlchemyError
 
 class TeraUserGroupTest(BaseModelsTest):
     def test_defaults(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             groups = TeraUserGroup.query.all()
             self.assertGreater(len(groups), 0)
 
     def test_to_json_full_and_minimal(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             groups = TeraUserGroup.query.all()
             self.assertGreater(len(groups), 0)
             for group in groups:
@@ -30,7 +29,7 @@ class TeraUserGroupTest(BaseModelsTest):
                     self.assertFalse('user_group_projects_access' in json_out)
 
     def test_from_json(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             groups = TeraUserGroup.query.all()
             self.assertGreater(len(groups), 0)
             for group in groups:
@@ -41,7 +40,7 @@ class TeraUserGroupTest(BaseModelsTest):
                 self.assertEqual(new_group.user_group_name, group.user_group_name)
 
     def test_to_json_create_event(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             groups = TeraUserGroup.query.all()
             self.assertGreater(len(groups), 0)
             for group in groups:
@@ -50,7 +49,7 @@ class TeraUserGroupTest(BaseModelsTest):
                 self.assertEqual(to_json_minimal, to_json_create_event)
 
     def test_to_json_update_event(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             groups = TeraUserGroup.query.all()
             self.assertGreater(len(groups), 0)
             for group in groups:
@@ -59,7 +58,7 @@ class TeraUserGroupTest(BaseModelsTest):
                 self.assertEqual(to_json_minimal, to_json_update_event)
 
     def test_to_json_delete_event(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             groups = TeraUserGroup.query.all()
             self.assertGreater(len(groups), 0)
             for group in groups:
@@ -70,7 +69,7 @@ class TeraUserGroupTest(BaseModelsTest):
                 self.assertTrue('id_user_group' in to_json_delete_event)
 
     def test_get_projects_roles(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             groups = TeraUserGroup.query.all()
             self.assertGreater(len(groups), 0)
             for group in groups:
@@ -91,7 +90,7 @@ class TeraUserGroupTest(BaseModelsTest):
                             self.assertEqual(role['project_role'], 'admin')
 
     def test_get_sites_roles(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             groups = TeraUserGroup.query.all()
             self.assertGreater(len(groups), 0)
             for group in groups:
@@ -108,7 +107,7 @@ class TeraUserGroupTest(BaseModelsTest):
                         self.assertEqual(role['site_role'], 'user')
 
     def test_get_user_group_by_group_name(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             groups = TeraUserGroup.query.all()
             self.assertGreater(len(groups), 0)
             for group in groups:
@@ -119,7 +118,7 @@ class TeraUserGroupTest(BaseModelsTest):
                 self.assertTrue(group_by_name.deleted_at is None)
 
     # def test_get_user_group_by_group_name_with_deleted(self):
-    #     with flask_app.app_context():
+    #     with self._flask_app.app_context():
     #         groups = TeraUserGroup.query.all()
     #         self.assertGreater(len(groups), 0)
     #         # Delete all groups
@@ -155,7 +154,7 @@ class TeraUserGroupTest(BaseModelsTest):
     #             # self.assertIsNone(test_group.deleted_at)
 
     def test_get_user_group_by_id(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             groups = TeraUserGroup.query.all()
             self.assertGreater(len(groups), 0)
             for group in groups:
@@ -166,12 +165,12 @@ class TeraUserGroupTest(BaseModelsTest):
                 self.assertTrue(group_by_id.deleted_at is None)
 
     def test_insert_with_missing_non_nullable_properties(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_group = TeraUserGroup()
             self.assertRaises(SQLAlchemyError, TeraUserGroup.insert, new_group)
 
     def test_insert_with_invalid_user(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_group = TeraUserGroup()
             new_group.user_group_name = 'Test group'
             new_user = TeraUser()
@@ -179,7 +178,7 @@ class TeraUserGroupTest(BaseModelsTest):
             self.assertRaises(SQLAlchemyError, TeraUserGroup.insert, new_group)
 
     def test_insert_with_invalid_service_roles(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_group = TeraUserGroup()
             new_group.user_group_name = 'Test group'
             new_service_role = TeraServiceRole()
@@ -187,7 +186,7 @@ class TeraUserGroupTest(BaseModelsTest):
             self.assertRaises(SQLAlchemyError, TeraUserGroup.insert, new_group)
 
     def test_insert_with_empty_users_and_roles(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_group = TeraUserGroup()
             new_group.user_group_name = 'Test group'
             new_group.user_group_users = []
@@ -202,8 +201,8 @@ class TeraUserGroupTest(BaseModelsTest):
             self.assertIsNone(TeraUserGroup.get_user_group_by_id(id_user_group))
 
     def test_update_with_modified_id_user_group(self):
-        with flask_app.app_context():
-            with flask_app.app_context():
+        with self._flask_app.app_context():
+            with self._flask_app.app_context():
                 groups = TeraUserGroup.query.all()
                 self.assertGreater(len(groups), 0)
                 for group in groups:
@@ -214,8 +213,8 @@ class TeraUserGroupTest(BaseModelsTest):
                     TeraUserGroup.db().session.rollback()
 
     def test_update_with_invalid_fields(self):
-        with flask_app.app_context():
-            with flask_app.app_context():
+        with self._flask_app.app_context():
+            with self._flask_app.app_context():
                 groups = TeraUserGroup.query.all()
                 self.assertGreater(len(groups), 0)
                 for group in groups:
@@ -229,7 +228,7 @@ class TeraUserGroupTest(BaseModelsTest):
                     TeraUserGroup.db().session.rollback()
 
     def test_hard_delete(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             pass
 
     # def test_soft_delete(self):
