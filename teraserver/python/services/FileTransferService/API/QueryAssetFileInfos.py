@@ -48,7 +48,7 @@ class QueryAssetFileInfos(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
-        self.parser = reqparse.RequestParser()
+        self.test = kwargs.get('test', False)
 
     @api.expect(get_parser, validate=True)
     @api.doc(description='Query informations about stored file',
@@ -66,7 +66,7 @@ class QueryAssetFileInfos(Resource):
         asset = AssetFileData.get_asset_for_uuid(uuid_asset=args['asset_uuid'])
 
         if not asset:
-            return gettext('No asset found'), 400
+            return gettext('No asset found'), 404
 
         return asset.to_json()
 
@@ -123,7 +123,7 @@ class QueryAssetFileInfos(Resource):
             asset = AssetFileData.get_asset_for_uuid(asset_json['asset_uuid'])
 
             if not asset:
-                return gettext('Unknown asset'), 400
+                return gettext('No asset found'), 404
 
             asset.asset_original_filename = asset_json['asset_original_filename']
             asset.commit()

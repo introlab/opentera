@@ -4,6 +4,7 @@ from modules.DatabaseModule.DBManager import DBManager
 from services.FileTransferService.ConfigManager import ConfigManager
 from opentera.modules.BaseModule import BaseModule
 from opentera.services.ServiceOpenTera import ServiceOpenTera
+from opentera.services.ServiceOpenTeraWithAssets import ServiceOpenTeraWithAssets
 from opentera.redis.RedisVars import RedisVars
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 from modules.LoginModule.LoginModule import LoginModule
@@ -13,6 +14,7 @@ from flask_babel import Babel
 import redis
 import uuid
 from io import BytesIO
+import opentera.messages.python as messages
 
 
 class FakeFlaskModule(BaseModule):
@@ -26,16 +28,17 @@ class FakeFlaskModule(BaseModule):
 
         self.babel = Babel(self.flask_app)
 
-        flask_app.debug = False
-        flask_app.testing = True
-        flask_app.secret_key = str(uuid.uuid4())  # Normally service UUID
-        flask_app.config.update({'SESSION_TYPE': 'redis'})
+        self.flask_app.debug = False
+        self.flask_app.testing = True
+        self.flask_app.secret_key = str(uuid.uuid4())  # Normally service UUID
+        self.flask_app.config.update({'SESSION_TYPE': 'redis'})
         redis_url = redis.from_url('redis://%(username)s:%(password)s@%(hostname)s:%(port)s/%(db)s'
                                    % self.config.redis_config)
 
-        flask_app.config.update({'SESSION_REDIS': redis_url})
-        flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
-        flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        self.flask_app.config.update({'SESSION_REDIS': redis_url})
+        self.flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
+        self.flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        self.flask_app.config.update({'UPLOAD_FOLDER': '.'})
         self.file_transfer_api_namespace = self.api.namespace('file', description='FileTransferService API')
         self.service_api_namespace = self.api.namespace('service', description='Fake TeraServer service API')
         self.setup_fake_file_transfer_api(flask_app)
@@ -60,7 +63,7 @@ class FakeFlaskModule(BaseModule):
             FlaskModule.init_service_api(self, self.service_api_namespace, kwargs)
 
 
-class FakeFileTransferService(ServiceOpenTera):
+class FakeFileTransferService(ServiceOpenTeraWithAssets):
     """
         The only thing we want here is a way to simulate communication with the base server.
         We will simulate the service API with the database.
@@ -195,6 +198,9 @@ class FakeFileTransferService(ServiceOpenTera):
             request_headers = {'Authorization': 'OpenTera ' + self.service_token}
             answer = self.test_client.delete(api_url, headers=request_headers, query_string=params)
             return FakeFileTransferService.convert_to_standard_request_response(answer)
+
+    def asset_event_received(self, event: messages.DatabaseEvent):
+        pass
 
 
 if __name__ == '__main__':

@@ -31,7 +31,7 @@ class QueryAssetFile(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
-        self.parser = reqparse.RequestParser()
+        self.test = kwargs.get('test', False)
 
     @api.expect(get_parser, validate=True)
     @api.doc(description='Download asset',
@@ -47,6 +47,8 @@ class QueryAssetFile(Resource):
 
         # Ok, all is fine, we can provide the requested file
         asset = AssetFileData.get_asset_for_uuid(uuid_asset=args['asset_uuid'])
+        if asset is None:
+            return gettext('No asset found'), 404
 
         src_dir = flask_app.config['UPLOAD_FOLDER']
 

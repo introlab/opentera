@@ -89,3 +89,29 @@ class FileTransferAssetFileTest(BaseFileTransferServiceAPITest):
             self.assertGreater(len(service_token), 0)
             response = self._get_with_service_token_auth(self.test_client, token=service_token)
             self.assertEqual(response.status_code, 400)
+
+    def test_get_endpoint_with_user_token_as_admin_with_asset_uuid_and_good_access_token(self):
+        with self.app_context():
+            user: TeraUser = TeraUser.get_user_by_username('admin')
+            service = TeraService.get_service_by_key('FileTransferService')
+            self.assertIsNotNone(user)
+            self.assertIsNotNone(service)
+            admin_token = user.get_token(ServiceAccessManager.api_user_token_key)
+            self.assertIsNotNone(admin_token)
+            self.assertGreater(len(admin_token), 0)
+
+            for asset in TeraAsset.query.all():
+                params = {
+                    'access_token': TeraAsset.get_access_token([asset.asset_uuid],
+                                                               ServiceAccessManager.api_service_token_key,
+                                                               user.user_uuid),
+                    'asset_uuid': asset.asset_uuid
+                }
+                response = self._get_with_service_token_auth(self.test_client, token=admin_token, params=params)
+
+                # Not from FileTransferService ?
+                if asset.asset_service_uuid != service.service_uuid:
+                    self.assertEqual(response.status_code, 404)
+                    continue
+
+                self.assertEqual(response.status_code, 200)

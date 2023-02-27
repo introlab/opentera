@@ -2,6 +2,7 @@ import unittest
 from services.FileTransferService.libfiletransferservice.db.DBManager import DBManager
 from services.FileTransferService.ConfigManager import ConfigManager
 import services.FileTransferService.Globals as Globals
+from services.FileTransferService.FlaskModule import flask_app
 from flask.testing import FlaskClient
 import uuid
 import random
@@ -35,8 +36,12 @@ class BaseFileTransferServiceAPITest(unittest.TestCase):
         cls._config = BaseFileTransferServiceAPITest.getConfig()
         # Instance of Fake service API will create a new flask_app
         cls._service = FakeFileTransferService()
-        # API Need this variable to be set
+
+        # API Need those variables to be set
         Globals.service = cls._service
+        flask_app.config.update({'UPLOAD_FOLDER': '.'})
+
+        # Initialize DBManager with custom flask app
         cls._db_man: DBManager = DBManager(app=cls._service.flask_app, test=True)
         # Cheating using same db as FakeService
         cls._db_man.db = cls._service.db_manager.db
