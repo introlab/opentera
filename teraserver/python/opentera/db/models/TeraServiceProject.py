@@ -1,7 +1,14 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
+from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraAsset import TeraAsset
+from sqlalchemy import Column, ForeignKey, Integer, Sequence, or_
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
@@ -120,9 +127,29 @@ class TeraServiceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         if delete_obj:
             TeraServiceProject.delete(delete_obj.id_service_project)
 
+    def delete_check_integrity(self) -> IntegrityError | None:
+        # This check will be quite long to process with lot of sessions and data...
+        session_types_ids = \
+            [st.id_session_type for st in TeraSessionType.get_session_types_for_service(self.id_service)]
+
+        sessions = TeraSession.get_sessions_for_project(self.id_project)
+        for session in sessions:
+            if session.id_session_type in session_types_ids:
+                return IntegrityError('Service has sessions of related session type in this project', self.id_service,
+                                      't_sessions')
+            if TeraTest.query.join(TeraTestType).filter(TeraTest.id_session == session.id_session).\
+                    filter(or_(TeraTest.id_service == self.id_service, TeraTestType.id_service == self.id_service))\
+                    .count() > 0:
+                return IntegrityError('Service has tests of related test type in this project', self.id_service,
+                                      't_tests')
+            if TeraAsset.query.filter_by(id_session=session.id_session).\
+                filter(or_(TeraAsset.asset_service_uuid == self.service_project_service.service_uuid,
+                           TeraAsset.id_service == self.id_service)).count() > 0:
+                return IntegrityError('Service has related assets in this project', self.id_service, 't_assets')
+        return None
+
     @classmethod
     def delete(cls, id_todel):
-        from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
         # Delete all session type association to that project
         delete_obj: TeraServiceProject = TeraServiceProject.query.filter_by(id_service_project=id_todel).first()
 
@@ -131,6 +158,11 @@ class TeraServiceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                 project_id=delete_obj.id_project, service_id=delete_obj.id_service)
             for session_type in session_types:
                 TeraSessionTypeProject.delete(session_type.id_session_type_project)
+
+            test_types = TeraTestTypeProject.get_test_type_project_for_project_and_service(
+                project_id=delete_obj.id_project, service_id=delete_obj.id_service)
+            for test_type in test_types:
+                TeraTestTypeProject.delete(test_type.id_test_type_project)
 
             # Ok, delete it
             super().delete(id_todel)

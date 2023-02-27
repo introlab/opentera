@@ -293,5 +293,24 @@ class UserQueryServiceProjects(Resource):
                                          UserQueryServiceProjects.__name__,
                                          'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Associated project have sessions using that service
+            # - Associated project have tests using that service
+            # - Associated project has assets using that service
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryServiceProjects.__name__,
+                                         'delete', 500, 'Integrity error - ', str(e))
+
+            if 't_sessions' in str(e.args):
+                return gettext('Can\'t delete service-project: please remove all sessions involving a session type '
+                               'using this project beforehand.'), 500
+            if 't_assets' in str(e.args):
+                return gettext('Can\'t delete service-project: please remove all related assets beforehand.'), 500
+            if 't_tests' in str(e.args):
+                return gettext('Can\'t delete service-project: please remove all related tests beforehand.'), 500
+
+            return gettext('Can\'t delete service-project: please remove all related sessions, assets and tests before '
+                           'deleting.'), 500
 
         return '', 200

@@ -1,4 +1,17 @@
 from BaseUserAPITest import BaseUserAPITest
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraSite import TeraSite
+from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
+from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraServiceSite import TeraServiceSite
+from opentera.db.models.TeraServiceProject import TeraServiceProject
+from opentera.db.models.TeraSession import TeraSession
+import datetime
 
 
 class UserQueryServiceProjectsTest(BaseUserAPITest):
@@ -384,16 +397,6 @@ class UserQueryServiceProjectsTest(BaseUserAPITest):
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json))  # Back to the default state
 
-        # Recreate default associations - session types
-        # json_data = {'session_type_project': [{'id_session_type': 1, 'id_project': 1},
-        #                                       {'id_session_type': 2, 'id_project': 1},
-        #                                       {'id_session_type': 3, 'id_project': 1},
-        #                                       {'id_session_type': 4, 'id_project': 1},
-        #                                       {'id_session_type': 5, 'id_project': 1}]}
-        # response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data,
-        #                                           endpoint='/api/user/sessiontypeprojects')
-        # self.assertEqual(200, response.status_code)
-
     def test_post_service_project_and_delete(self):
         with self._flask_app.app_context():
             # Service-Project update
@@ -460,6 +463,119 @@ class UserQueryServiceProjectsTest(BaseUserAPITest):
                                                       json=json_data,
                                                       endpoint='/api/user/sessiontypeprojects')
             self.assertEqual(200, response.status_code)
+
+    def test_service_project_delete_exceptions(self):
+        with self._flask_app.app_context():
+            # Create 3 sessions: one with asset, one with test and one of the session type of the service
+            participant = TeraParticipant.get_participant_by_id(4)  # Participant in Secret Site
+            site: TeraSite = TeraSite.get_site_by_id(2)
+            project = site.site_projects[0]
+            test_type = TeraTestType.get_test_type_by_key("PRE")
+            service = TeraService.get_service_by_key("VideoRehabService")
+
+            ss = TeraServiceSite()
+            ss.id_site = site.id_site
+            ss.id_service = service.id_service
+            TeraServiceSite.insert(ss)
+
+            sp = TeraServiceProject()
+            sp.id_project = project.id_project
+            sp.id_service = service.id_service
+            TeraServiceProject.insert(sp)
+
+            sts = TeraSessionTypeSite()
+            sts.id_site = site.id_site
+            sts.id_session_type = 1  # Videorehab
+            TeraSessionTypeSite.insert(sts)
+
+            stp1 = TeraSessionTypeProject()
+            stp1.id_project = project.id_project
+            stp1.id_session_type = 1
+            TeraSessionTypeProject.insert(stp1)
+
+            stp2 = TeraSessionTypeProject()
+            stp2.id_project = project.id_project
+            stp2.id_session_type = 4
+            TeraSessionTypeProject.insert(stp2)
+
+            ttp = TeraTestTypeProject()
+            ttp.id_project = project.id_project
+            ttp.id_test_type = test_type.id_test_type
+            TeraTestTypeProject.insert(ttp)
+
+            json_session = {'id_session_type': 1,
+                            'session_name': 'Session of session type',
+                            'session_start_datetime': datetime.datetime.now(),
+                            'session_status': 0,
+                            'id_creator_participant': participant.id_participant
+                            }
+            session1 = TeraSession()
+            session1.from_json(json_session)
+            TeraSession.insert(session1)
+
+            json_session = {'id_session_type': 4,
+                            'session_name': 'Session wite test',
+                            'session_start_datetime': datetime.datetime.now(),
+                            'session_status': 0,
+                            'id_creator_participant': participant.id_participant
+                            }
+
+            session2 = TeraSession()
+            session2.from_json(json_session)
+            TeraSession.insert(session2)
+
+            json_session = {'id_session_type': 4,
+                            'session_name': 'Session wite asset',
+                            'session_start_datetime': datetime.datetime.now(),
+                            'session_status': 0,
+                            'id_creator_participant': participant.id_participant
+                            }
+
+            session3 = TeraSession()
+            session3.from_json(json_session)
+            TeraSession.insert(session3)
+
+            json_test = {'id_test_type': test_type.id_test_type,
+                         'id_session': session2.id_session,
+                         'test_name': 'Test Test',
+                         'test_datetime': datetime.datetime.now()
+                         }
+            test = TeraTest()
+            test.from_json(json_test)
+            TeraTest.insert(test)
+
+            json_asset = {'id_session': session3.id_session,
+                          'asset_name': "Test asset",
+                          'asset_service_uuid': service.service_uuid,
+                          'asset_type': "Test",
+                          'test_datetime': datetime.datetime.now()
+                          }
+            asset = TeraAsset()
+            asset.from_json(json_asset)
+            TeraAsset.insert(asset)
+
+            # All set... let's test!
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': sp.id_service_project})
+            self.assertEqual(500, response.status_code, msg='Session of session type')
+            TeraSession.delete(session1.id_session)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': sp.id_service_project})
+            self.assertEqual(500, response.status_code, msg='Test of test type')
+            TeraSession.delete(session2.id_session)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': sp.id_service_project})
+            self.assertEqual(500, response.status_code, msg='Asset of service')
+            TeraSession.delete(session3.id_session)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': sp.id_service_project})
+            self.assertEqual(200, response.status_code, msg='All OK now!')
+
+            # Back to initial state
+            TeraServiceSite.delete(ss.id_service_site)
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
