@@ -1,6 +1,7 @@
 import unittest
 from services.FileTransferService.libfiletransferservice.db.DBManager import DBManager
 from services.FileTransferService.ConfigManager import ConfigManager
+from opentera.config.ConfigManager import ConfigManager as ConfigManagerServer
 import services.FileTransferService.Globals as Globals
 from services.FileTransferService.FlaskModule import flask_app
 from flask.testing import FlaskClient
@@ -9,6 +10,8 @@ import random
 from string import digits, ascii_lowercase, ascii_uppercase
 from FakeFileTransferService import FakeFileTransferService
 from opentera.services.ServiceAccessManager import ServiceAccessManager
+from opentera.db.models.TeraService import TeraService
+from modules.LoginModule.LoginModule import LoginModule
 
 
 def infinite_jti_sequence():
@@ -46,6 +49,11 @@ class BaseFileTransferServiceAPITest(unittest.TestCase):
         # Cheating using same db as FakeService
         cls._db_man.db = cls._service.db_manager.db
 
+        # This is needed for Logins and tokens
+        config_server = ConfigManagerServer()
+        config_server.create_defaults()
+        cls._login_module = LoginModule(config_server, cls._service.flask_app)
+
         with cls._service.flask_app.app_context():
             # Creating default users / tests. Time-consuming, only once per test file.
             cls._db_man.create_defaults(cls._config, test=True)
@@ -71,6 +79,9 @@ class BaseFileTransferServiceAPITest(unittest.TestCase):
         self.assertIsNotNone(self._service.flask_app)
         self.test_client = self._service.flask_app.test_client()
         self.assertIsNotNone(self.test_client)
+        with self.app_context():
+            service = TeraService.get_service_by_key('FileTransferService')
+            Globals.service.service_info = service.to_json(minimal=False)
 
     def tearDown(self):
         with self.app_context():
@@ -101,7 +112,7 @@ class BaseFileTransferServiceAPITest(unittest.TestCase):
 
         return jwt.encode(payload, token_key, algorithm='HS256')
 
-    def _get_with_service_token_auth(self, client: FlaskClient, token=None, params=None, endpoint=None):
+    def _get_with_token_auth(self, client: FlaskClient, token=None, params=None, endpoint=None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -113,8 +124,8 @@ class BaseFileTransferServiceAPITest(unittest.TestCase):
 
         return client.get(endpoint, headers=headers, query_string=params)
 
-    def _post_with_service_token_auth(self, client: FlaskClient, token: str = '', json: dict = None,
-                                      params: dict = None, endpoint: str = None):
+    def _post_with_token_auth(self, client: FlaskClient, token: str = '', json: dict = None,
+                              params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -122,8 +133,19 @@ class BaseFileTransferServiceAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
-    def _delete_with_service_token_auth(self, client: FlaskClient, token: str = '',
-                                        params: dict = None, endpoint: str = None):
+    def _post_file_with_token_auth(self, client: FlaskClient, token: str = '', files: dict = None,
+                                   params: dict = None, endpoint: str = None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        headers = {'Authorization': 'OpenTera ' + token}
+
+        return client.post(endpoint, headers=headers, query_string=params, data=files,
+                           content_type='multipart/form-data')
+
+    def _delete_with_token_auth(self, client: FlaskClient, token: str = '',
+                                params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:

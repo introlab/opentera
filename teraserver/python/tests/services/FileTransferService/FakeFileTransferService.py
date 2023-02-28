@@ -21,6 +21,9 @@ class FakeFlaskModule(BaseModule):
     def __init__(self,  config: ConfigManager, flask_app):
         BaseModule.__init__(self, 'FakeFlaskModule', config)
 
+        # Will allow for user api to work
+        self.config.server_config = {'hostname': '127.0.0.1', 'port': 40075}
+
         self.flask_app = flask_app
         self.api = CustomAPI(self.flask_app, version='1.0.0', title='FileTransferService API',
                              description='FakeFileTransferService API Documentation', doc='/doc', prefix='/api',
@@ -41,8 +44,15 @@ class FakeFlaskModule(BaseModule):
         self.flask_app.config.update({'UPLOAD_FOLDER': '.'})
         self.file_transfer_api_namespace = self.api.namespace('file', description='FileTransferService API')
         self.service_api_namespace = self.api.namespace('service', description='Fake TeraServer service API')
+        self.user_api_namespace = self.api.namespace('user', description='Fake TeraServer user API')
+        self.participant_api_namespace = self.api.namespace('participant',
+                                                            description='Fake TeraServer participant API')
+        self.device_api_namespace = self.api.namespace('device', description='Fake TeraServer device API')
         self.setup_fake_file_transfer_api(flask_app)
         self.setup_fake_service_api(flask_app)
+        self.setup_fake_user_api(flask_app)
+        self.setup_fake_participant_api(flask_app)
+        self.setup_fake_device_api(flask_app)
 
     def setup_fake_file_transfer_api(self, flask_app):
         from services.FileTransferService.FlaskModule import FlaskModule
@@ -55,12 +65,42 @@ class FakeFlaskModule(BaseModule):
     def setup_fake_service_api(self, flask_app):
         from modules.FlaskModule.FlaskModule import FlaskModule
         with flask_app.app_context():
-            # Setup Fake Service API
+            # Setup Fake API
             kwargs = {'flaskModule': self,
                       'test': True}
 
-            # The trick is to initialize main server api to thew newly created namespace
+            # The trick is to initialize main server api to the newly created namespace
             FlaskModule.init_service_api(self, self.service_api_namespace, kwargs)
+
+    def setup_fake_user_api(self, flask_app):
+        from modules.FlaskModule.FlaskModule import FlaskModule
+        with flask_app.app_context():
+            # Setup Fake API
+            kwargs = {'flaskModule': self,
+                      'test': True}
+
+            # The trick is to initialize main server api to the newly created namespace
+            FlaskModule.init_user_api(self, self.user_api_namespace, kwargs)
+
+    def setup_fake_participant_api(self, flask_app):
+        from modules.FlaskModule.FlaskModule import FlaskModule
+        with flask_app.app_context():
+            # Setup Fake API
+            kwargs = {'flaskModule': self,
+                      'test': True}
+
+            # The trick is to initialize main server api to the newly created namespace
+            FlaskModule.init_participant_api(self, self.participant_api_namespace, kwargs)
+
+    def setup_fake_device_api(self, flask_app):
+        from modules.FlaskModule.FlaskModule import FlaskModule
+        with flask_app.app_context():
+            # Setup Fake API
+            kwargs = {'flaskModule': self,
+                      'test': True}
+
+            # The trick is to initialize main server api to the newly created namespace
+            FlaskModule.init_device_api(self, self.device_api_namespace, kwargs)
 
 
 class FakeFileTransferService(ServiceOpenTeraWithAssets):
@@ -150,8 +190,9 @@ class FakeFileTransferService(ServiceOpenTeraWithAssets):
             TeraServerSettings.ServerDeviceTokenKey)
         self.redis.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey, ServiceAccessManager.api_device_static_token_key)
 
-        # Device Token Key (dynamic)
-        ServiceAccessManager.api_device_token_key = 'test_api_device_token_key'
+        # Device Token Key (dynamic = static)
+        ServiceAccessManager.api_device_token_key = TeraServerSettings.get_server_setting_value(
+            TeraServerSettings.ServerDeviceTokenKey)
         self.redis.set(RedisVars.RedisVar_DeviceTokenAPIKey, ServiceAccessManager.api_device_token_key)
 
         # Service Token Key (dynamic)
@@ -178,24 +219,30 @@ class FakeFileTransferService(ServiceOpenTeraWithAssets):
         result.raw = BytesIO(flask_response.data)
         return result
 
-    def post_to_opentera(self, api_url: str, json_data: dict) -> Response:
+    def post_to_opentera(self, api_url: str, json_data: dict, token=None) -> Response:
         with self.flask_app.app_context():
             # Synchronous call to OpenTera fake backend
-            request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+            if not token:
+                token = self.service_token
+            request_headers = {'Authorization': 'OpenTera ' + token}
             answer = self.test_client.post(api_url, headers=request_headers, json=json_data)
             return FakeFileTransferService.convert_to_standard_request_response(answer)
 
-    def get_from_opentera(self, api_url: str, params: dict) -> Response:
+    def get_from_opentera(self, api_url: str, params: dict, token=None) -> Response:
         with self.flask_app.app_context():
             # Synchronous call to OpenTera fake backend
-            request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+            if not token:
+                token = self.service_token
+            request_headers = {'Authorization': 'OpenTera ' + token}
             answer = self.test_client.get(api_url, headers=request_headers, query_string=params)
             return FakeFileTransferService.convert_to_standard_request_response(answer)
 
-    def delete_from_opentera(self, api_url: str, params: dict) -> Response:
+    def delete_from_opentera(self, api_url: str, params: dict, token=None) -> Response:
         with self.flask_app.app_context():
             # Synchronous call to OpenTera fake backend
-            request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+            if not token:
+                token = self.service_token
+            request_headers = {'Authorization': 'OpenTera ' + token}
             answer = self.test_client.delete(api_url, headers=request_headers, query_string=params)
             return FakeFileTransferService.convert_to_standard_request_response(answer)
 

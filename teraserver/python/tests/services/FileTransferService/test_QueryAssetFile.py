@@ -18,17 +18,17 @@ class FileTransferAssetFileTest(BaseFileTransferServiceAPITest):
 
     def test_get_endpoint_with_invalid_token(self):
         with self.app_context():
-            response = self._get_with_service_token_auth(self.test_client, token="invalid")
+            response = self._get_with_token_auth(self.test_client, token="invalid")
             self.assertEqual(response.status_code, 403)
 
     def test_post_endpoint_with_invalid_token(self):
         with self.app_context():
-            response = self._post_with_service_token_auth(self.test_client, token="invalid")
+            response = self._post_with_token_auth(self.test_client, token="invalid")
             self.assertEqual(response.status_code, 403)
 
     def test_delete_endpoint_with_invalid_token(self):
         with self.app_context():
-            response = self._delete_with_service_token_auth(self.test_client, token="invalid")
+            response = self._delete_with_token_auth(self.test_client, token="invalid")
             self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_with_user_admin_token_no_params(self):
@@ -37,7 +37,7 @@ class FileTransferAssetFileTest(BaseFileTransferServiceAPITest):
             self.assertIsNotNone(user)
             admin_token = user.get_token(ServiceAccessManager.api_user_token_key)
             self.assertGreater(len(admin_token), 0)
-            response = self._get_with_service_token_auth(self.test_client, token=admin_token)
+            response = self._get_with_token_auth(self.test_client, token=admin_token)
             self.assertEqual(response.status_code, 400)
 
     def test_get_endpoint_with_participant_static_token_no_params(self):
@@ -47,7 +47,7 @@ class FileTransferAssetFileTest(BaseFileTransferServiceAPITest):
                 if participant.participant_enabled and participant.participant_token:
                     self.assertIsNotNone(participant.participant_token)
                     self.assertGreater(len(participant.participant_token), 0)
-                    response = self._get_with_service_token_auth(self.test_client, token=participant.participant_token)
+                    response = self._get_with_token_auth(self.test_client, token=participant.participant_token)
                     self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_with_participant_dynamic_token_no_params(self):
@@ -58,7 +58,7 @@ class FileTransferAssetFileTest(BaseFileTransferServiceAPITest):
                     participant_token = participant.dynamic_token(ServiceAccessManager.api_participant_token_key)
                     self.assertIsNotNone(participant_token)
                     self.assertGreater(len(participant_token), 0)
-                    response = self._get_with_service_token_auth(self.test_client, token=participant_token)
+                    response = self._get_with_token_auth(self.test_client, token=participant_token)
                     self.assertEqual(response.status_code, 400)
 
     def test_get_endpoint_with_device_static_token_no_params(self):
@@ -69,8 +69,8 @@ class FileTransferAssetFileTest(BaseFileTransferServiceAPITest):
                     device_token = device.device_token
                     self.assertIsNotNone(device_token)
                     self.assertGreater(len(device_token), 0)
-                    response = self._get_with_service_token_auth(self.test_client, token=device_token)
-                    self.assertEqual(response.status_code, 403)
+                    response = self._get_with_token_auth(self.test_client, token=device_token)
+                    self.assertEqual(response.status_code, 400)
 
     def test_get_endpoint_with_device_dynamic_token_no_params(self):
         with self.app_context():
@@ -87,7 +87,7 @@ class FileTransferAssetFileTest(BaseFileTransferServiceAPITest):
             self.assertIsNotNone(service)
             service_token = service.get_token(ServiceAccessManager.api_service_token_key)
             self.assertGreater(len(service_token), 0)
-            response = self._get_with_service_token_auth(self.test_client, token=service_token)
+            response = self._get_with_token_auth(self.test_client, token=service_token)
             self.assertEqual(response.status_code, 400)
 
     def test_get_endpoint_with_user_token_as_admin_with_asset_uuid_and_good_access_token(self):
@@ -107,7 +107,7 @@ class FileTransferAssetFileTest(BaseFileTransferServiceAPITest):
                                                                user.user_uuid),
                     'asset_uuid': asset.asset_uuid
                 }
-                response = self._get_with_service_token_auth(self.test_client, token=admin_token, params=params)
+                response = self._get_with_token_auth(self.test_client, token=admin_token, params=params)
 
                 # Not from FileTransferService ?
                 if asset.asset_service_uuid != service.service_uuid:

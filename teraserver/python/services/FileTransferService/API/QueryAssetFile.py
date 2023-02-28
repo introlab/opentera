@@ -19,7 +19,7 @@ get_parser.add_argument('access_token', type=str, required=True, help='Access to
 get_parser.add_argument('asset_uuid', type=str, required=True, help='UUID of the asset to download')
 
 delete_parser = api.parser()
-delete_parser.add_argument('uuid', type=str, help='UUID of the asset do delete')
+delete_parser.add_argument('uuid', type=str, required=True, help='UUID of the asset do delete')
 delete_parser.add_argument('access_token', type=str, required=True, help='Access token proving that the requested '
                                                                          'asset can be deleted.')
 
@@ -84,8 +84,13 @@ class QueryAssetFile(Resource):
 
         # Check if session is accessible for the requester
         if current_login_type == LoginType.SERVICE_LOGIN:
-            response = current_service_client.do_get_request_to_backend('/api/service/sessions?id_session=' +
-                                                                        str(asset_json['id_session']))
+            if self.test:
+                response = Globals.service.get_from_opentera('/api/service/sessions',
+                                                             params={'id_session': asset_json['id_session']},
+                                                             token=current_service_client.service_token)
+            else:
+                response = current_service_client.do_get_request_to_backend('/api/service/sessions?id_session=' +
+                                                                            str(asset_json['id_session']))
         else:
             response = Globals.service.get_from_opentera('/api/service/sessions',
                                                          {'id_session': asset_json['id_session']})
@@ -133,7 +138,10 @@ class QueryAssetFile(Resource):
             if 'id_device' not in asset_json and 'id_participant' not in asset_json \
                     and 'id_user' not in asset_json and 'id_service' not in asset_json:
                 return gettext('Missing at least one ID creator'), 400
-            asset_json['id_service'] = current_service_client.get_service_infos()['id_service']
+            if self.test:
+                asset_json['id_service'] = 1
+            else:
+                asset_json['id_service'] = current_service_client.get_service_infos()['id_service']
         else:
             # Prevent creating an asset for someone else
             if current_login_type == LoginType.USER_LOGIN:
