@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-26 14:21-0500\n"
+"POT-Creation-Date: 2023-02-28 08:49-0500\n"
 "PO-Revision-Date: 2021-01-19 16:16-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,57 +18,58 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.11.0\n"
 
-#: API/QueryAssetFile.py:46 API/QueryAssetFile.py:234
+#: API/QueryAssetFile.py:46 API/QueryAssetFile.py:236
 msgid "Access denied to asset"
 msgstr ""
 
-#: API/QueryAssetFile.py:63
+#: API/QueryAssetFile.py:51 API/QueryAssetFileInfos.py:69
+#: API/QueryAssetFileInfos.py:126
+msgid "No asset found"
+msgstr ""
+
+#: API/QueryAssetFile.py:65
 msgid "Wrong content type"
 msgstr ""
 
-#: API/QueryAssetFile.py:66
+#: API/QueryAssetFile.py:68
 msgid "Missing file asset information"
 msgstr ""
 
-#: API/QueryAssetFile.py:69
+#: API/QueryAssetFile.py:71
 msgid "Missing uploaded file"
 msgstr ""
 
-#: API/QueryAssetFile.py:74
+#: API/QueryAssetFile.py:76
 msgid "Missing filename"
 msgstr ""
 
-#: API/QueryAssetFile.py:80
+#: API/QueryAssetFile.py:82
 msgid "Invalid file_asset format"
 msgstr ""
 
-#: API/QueryAssetFile.py:83
+#: API/QueryAssetFile.py:85
 msgid "Missing required field(s) in asset descriptor"
 msgstr ""
 
-#: API/QueryAssetFile.py:94 API/QueryAssetFile.py:114 API/QueryAssetFile.py:121
-#: API/QueryAssetFile.py:128
+#: API/QueryAssetFile.py:96 API/QueryAssetFile.py:116 API/QueryAssetFile.py:123
+#: API/QueryAssetFile.py:130
 msgid "Session access is forbidden"
 msgstr ""
 
-#: API/QueryAssetFile.py:135
+#: API/QueryAssetFile.py:137
 msgid "Missing at least one ID creator"
 msgstr ""
 
-#: API/QueryAssetFile.py:168
+#: API/QueryAssetFile.py:170
 msgid "Unable to create asset"
 msgstr ""
 
-#: API/QueryAssetFile.py:239
+#: API/QueryAssetFile.py:241
 msgid "Unable to delete asset"
 msgstr ""
 
 #: API/QueryAssetFileInfos.py:63
 msgid "Access denied for that asset"
-msgstr ""
-
-#: API/QueryAssetFileInfos.py:69
-msgid "No asset found"
 msgstr ""
 
 #: API/QueryAssetFileInfos.py:83
@@ -101,10 +102,6 @@ msgstr ""
 
 #: API/QueryAssetFileInfos.py:121
 msgid "Only original filename can be changed from here"
-msgstr ""
-
-#: API/QueryAssetFileInfos.py:126
-msgid "Unknown asset"
 msgstr ""
 
 #~ msgid "Votre séance débutera bientôt. Merci de patienter!"
@@ -358,5 +355,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Error occured when deleting file asset"
+#~ msgstr ""
+
+#~ msgid "Unknown asset"
 #~ msgstr ""
 

@@ -248,7 +248,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQueryDisconnect,           '/disconnect', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryUserPreferences,      '/users/preferences', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryVersions,             '/versions', resource_class_kwargs=kwargs)
-        namespace.add_resource(UserQueryUndelete,             '/undelete', resource_class_kwargs=kwargs)
+        # namespace.add_resource(UserQueryUndelete,             '/undelete', resource_class_kwargs=kwargs)
         # api.add_namespace(user_api_ns)
 
     @staticmethod

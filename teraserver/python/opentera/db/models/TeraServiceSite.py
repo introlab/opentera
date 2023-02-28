@@ -132,14 +132,6 @@ class TeraServiceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                 if service_project.delete_check_integrity():
                     return IntegrityError('Still have sessions with that service', self.id_service,
                                           't_sessions')
-
-        from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
-        session_types = TeraSessionTypeSite.get_session_type_site_for_site_and_service(
-            site_id=self.id_site, service_id=self.id_service)
-        for session_type in session_types:
-            if session_type.delete_check_integrity():
-                return IntegrityError('Still have sessions with a related session type', self.id_service,
-                                      't_sessions_types')
         return None
 
     @classmethod
