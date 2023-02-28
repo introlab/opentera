@@ -1,17 +1,15 @@
 import os
 from datetime import datetime
-
 import json
 from werkzeug.utils import secure_filename
 from flask import request, send_file
 from flask_babel import gettext
-from flask_restx import Resource, reqparse
+from flask_restx import Resource
 from services.FileTransferService.FlaskModule import file_api_ns as api
 from opentera.services.ServiceAccessManager import ServiceAccessManager, current_service_client, \
     current_login_type, current_user_client, current_device_client, current_participant_client, LoginType
 from services.FileTransferService.FlaskModule import flask_app
 from services.FileTransferService.libfiletransferservice.db.models.AssetFileData import AssetFileData
-
 import services.FileTransferService.Globals as Globals
 
 # Parser definition(s)
