@@ -55,9 +55,9 @@ class ParticipantLogin(Resource):
             # Get login informations for log
             login_infos = UserAgentParser.parse_request_for_login_infos(request)
             if current_participant.fullAccess:
-                login_type = messages.LoginEvent.LOGIN_TYPE_TOKEN
-            else:
                 login_type = messages.LoginEvent.LOGIN_TYPE_PASSWORD
+            else:
+                login_type = messages.LoginEvent.LOGIN_TYPE_TOKEN
 
             # Verify if participant already logged in
             rpc = RedisRPCClient(self.module.config.redis_config)
