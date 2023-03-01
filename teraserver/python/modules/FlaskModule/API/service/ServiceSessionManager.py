@@ -93,17 +93,17 @@ class ServiceSessionManager(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(session_manager_schema)
     @api.doc(description='Manage a specific session',
              responses={200: 'Success',
                         400: 'Required parameter is missing',
                         500: 'Internal server error',
                         501: 'Not implemented',
-                        403: 'Logged user doesn\'t have enough permission'})
+                        403: 'Service doesn\'t have enough permission'},
+             params={'token': 'Secret token'})
+    @api.expect(session_manager_schema)
+    @LoginModule.service_token_or_certificate_required
     def post(self):
         args = post_parser.parse_args()
-
         service_access = DBManager.serviceAccess(current_service)
 
         # Using request.json instead of parser, since parser messes up the json!

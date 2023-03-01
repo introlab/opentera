@@ -1,13 +1,12 @@
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
 from opentera.db.models.TeraProject import TeraProject
-from modules.FlaskModule.FlaskModule import flask_app
 
 
 class TeraProjectTest(BaseModelsTest):
 
     def test_nullable_args(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_project = TeraProject()
             new_project.id_site = 1
             new_project.project_name = None
@@ -24,7 +23,7 @@ class TeraProjectTest(BaseModelsTest):
         pass
 
     def test_to_json(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_project = TeraProject()
             new_project.id_site = 1
             new_project.project_name = 'test_to_json'
@@ -43,7 +42,7 @@ class TeraProjectTest(BaseModelsTest):
             self.assertEqual(project_test['site_name'], project.project_site.site_name)
 
     def test_to_json_create_event(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_project = TeraProject()
             new_project.id_site = 1
             new_project.project_name = 'test_to_json_create_event'
@@ -53,7 +52,7 @@ class TeraProjectTest(BaseModelsTest):
             self._check_json(new_project, project_test=new_project_json, minimal=True)
 
     def test_to_json_update_event(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_project = TeraProject()
             new_project.id_site = 1
             new_project.project_name = 'test_to_json_update_event'
@@ -63,7 +62,7 @@ class TeraProjectTest(BaseModelsTest):
             self._check_json(new_project, project_test=new_project_json, minimal=True)
 
     def test_to_json_delete_event(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_project = TeraProject()
             new_project.id_site = 1
             new_project.project_name = 'test_to_json_delete_event'
@@ -73,7 +72,7 @@ class TeraProjectTest(BaseModelsTest):
             self.assertGreaterEqual(new_project_json['id_project'], 1)
 
     def test_get_users_ids_in_project(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_project = TeraProject()
             new_project.id_site = 1
             new_project.project_name = 'test_get_users_ids_in_project'
@@ -83,7 +82,7 @@ class TeraProjectTest(BaseModelsTest):
             self.assertIsNotNone(users_ids)
 
     def test_get_users_ids_in_project(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_project = TeraProject()
             new_project.id_site = 1
             new_project.project_name = 'test_get_users_ids_in_project'
@@ -93,7 +92,7 @@ class TeraProjectTest(BaseModelsTest):
             self.assertIsNotNone(users)
 
     def test_get_project_by_projectname(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_project = TeraProject()
             new_project.id_site = 1
             new_project.project_name = 'test_get_project_by_projectname'
@@ -103,7 +102,7 @@ class TeraProjectTest(BaseModelsTest):
             self.assertEqual(same_project, new_project)
 
     def test_get_project_by_id(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_project = TeraProject()
             new_project.id_site = 1
             new_project.project_name = 'test_get_project_by_id'
@@ -113,7 +112,7 @@ class TeraProjectTest(BaseModelsTest):
             self.assertEqual(same_project, new_project)
 
     def test_insert_and_delete(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_project = TeraProject()
             new_project.id_site = 1
             new_project.project_name = 'test_insert_and_delete'

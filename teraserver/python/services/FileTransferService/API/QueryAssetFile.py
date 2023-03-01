@@ -1,17 +1,15 @@
 import os
 from datetime import datetime
-
 import json
 from werkzeug.utils import secure_filename
 from flask import request, send_file
 from flask_babel import gettext
-from flask_restx import Resource, reqparse
+from flask_restx import Resource
 from services.FileTransferService.FlaskModule import file_api_ns as api
 from opentera.services.ServiceAccessManager import ServiceAccessManager, current_service_client, \
     current_login_type, current_user_client, current_device_client, current_participant_client, LoginType
 from services.FileTransferService.FlaskModule import flask_app
 from services.FileTransferService.libfiletransferservice.db.models.AssetFileData import AssetFileData
-
 import services.FileTransferService.Globals as Globals
 
 # Parser definition(s)
@@ -21,7 +19,7 @@ get_parser.add_argument('access_token', type=str, required=True, help='Access to
 get_parser.add_argument('asset_uuid', type=str, required=True, help='UUID of the asset to download')
 
 delete_parser = api.parser()
-delete_parser.add_argument('uuid', type=str, help='UUID of the asset do delete')
+delete_parser.add_argument('uuid', type=str, required=True, help='UUID of the asset do delete')
 delete_parser.add_argument('access_token', type=str, required=True, help='Access token proving that the requested '
                                                                          'asset can be deleted.')
 
@@ -31,7 +29,7 @@ class QueryAssetFile(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
-        self.parser = reqparse.RequestParser()
+        self.test = kwargs.get('test', False)
 
     @api.expect(get_parser, validate=True)
     @api.doc(description='Download asset',
@@ -47,6 +45,8 @@ class QueryAssetFile(Resource):
 
         # Ok, all is fine, we can provide the requested file
         asset = AssetFileData.get_asset_for_uuid(uuid_asset=args['asset_uuid'])
+        if asset is None:
+            return gettext('No asset found'), 404
 
         src_dir = flask_app.config['UPLOAD_FOLDER']
 
@@ -84,8 +84,13 @@ class QueryAssetFile(Resource):
 
         # Check if session is accessible for the requester
         if current_login_type == LoginType.SERVICE_LOGIN:
-            response = current_service_client.do_get_request_to_backend('/api/service/sessions?id_session=' +
-                                                                        str(asset_json['id_session']))
+            if self.test:
+                response = Globals.service.get_from_opentera('/api/service/sessions',
+                                                             params={'id_session': asset_json['id_session']},
+                                                             token=current_service_client.service_token)
+            else:
+                response = current_service_client.do_get_request_to_backend('/api/service/sessions?id_session=' +
+                                                                            str(asset_json['id_session']))
         else:
             response = Globals.service.get_from_opentera('/api/service/sessions',
                                                          {'id_session': asset_json['id_session']})
@@ -133,7 +138,10 @@ class QueryAssetFile(Resource):
             if 'id_device' not in asset_json and 'id_participant' not in asset_json \
                     and 'id_user' not in asset_json and 'id_service' not in asset_json:
                 return gettext('Missing at least one ID creator'), 400
-            asset_json['id_service'] = current_service_client.get_service_infos()['id_service']
+            if self.test:
+                asset_json['id_service'] = 1
+            else:
+                asset_json['id_service'] = current_service_client.get_service_infos()['id_service']
         else:
             # Prevent creating an asset for someone else
             if current_login_type == LoginType.USER_LOGIN:

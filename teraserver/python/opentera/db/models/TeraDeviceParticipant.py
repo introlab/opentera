@@ -1,15 +1,17 @@
 from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 
-class TeraDeviceParticipant(BaseModel):
+class TeraDeviceParticipant(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_devices_participants'
     id_device_participant = Column(Integer, Sequence('id_device_participant_sequence'), primary_key=True,
-                                      autoincrement=True)
+                                   autoincrement=True)
     id_device = Column(Integer, ForeignKey("t_devices.id_device"), nullable=False)
     id_participant = Column(Integer, ForeignKey("t_participants.id_participant", ondelete='cascade'),
-                               nullable=False)
+                            nullable=False)
 
     device_participant_participant = relationship("TeraParticipant", viewonly=True)
     device_participant_device = relationship("TeraDevice", viewonly=True)
@@ -53,17 +55,26 @@ class TeraDeviceParticipant(BaseModel):
             TeraDeviceParticipant.db().session.commit()
 
     @staticmethod
-    def get_device_participant_by_id(device_participant_id: int):
-        return TeraDeviceParticipant.query.filter_by(id_device_participant=device_participant_id).first()
+    def get_device_participant_by_id(device_participant_id: int, with_deleted: bool = False):
+        return TeraDeviceParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_device_participant=device_participant_id).first()
 
     @staticmethod
-    def query_devices_for_participant(participant_id: int):
-        return TeraDeviceParticipant.query.filter_by(id_participant=participant_id).all()
+    def query_devices_for_participant(participant_id: int, with_deleted: bool = False):
+        return TeraDeviceParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_participant=participant_id).all()
 
     @staticmethod
-    def query_participants_for_device(device_id: int):
-        return TeraDeviceParticipant.query.filter_by(id_device=device_id).all()
+    def query_participants_for_device(device_id: int, with_deleted: bool = False):
+        return TeraDeviceParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_device=device_id).all()
 
     @staticmethod
-    def query_device_participant_for_participant_device(device_id: int, participant_id: int):
-        return TeraDeviceParticipant.query.filter_by(id_device=device_id, id_participant=participant_id).first()
+    def query_device_participant_for_participant_device(device_id: int, participant_id: int,
+                                                        with_deleted: bool = False):
+        return TeraDeviceParticipant.query.filter_by(id_device=device_id, id_participant=participant_id)\
+            .execution_options(include_deleted=with_deleted).first()
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        return

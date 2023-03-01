@@ -26,9 +26,7 @@ get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_se
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ids only)')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session_type_project', type=str, location='json',
-#                          help='Device type - project association to create / update', required=True)
+post_parser = api.parser()
 post_schema = api.schema_model('user_session_type_project', {'properties': TeraSessionTypeProject.get_json_schema(),
                                                              'type': 'object',
                                                              'location': 'json'})
@@ -46,19 +44,17 @@ class UserQuerySessionTypeProjects(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get devices types that are associated with a project. Only one "ID" parameter required and '
                          'supported at once.',
              responses={200: 'Success - returns list of devices-types - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'})
+                        500: 'Error when getting association'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         session_type_projects = []
         # If we have no arguments, return error
@@ -114,16 +110,16 @@ class UserQuerySessionTypeProjects(Resource):
                                          'get', 500, 'InvalidRequestError', e)
             return '', 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update session-type - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (session type must be accessible from project '
                              'access)',
                         400: 'Badly formed JSON or missing fields(id_project or id_session_type) in the JSON body',
-                        500: 'Internal error occured when saving association'})
+                        500: 'Internal error occurred when saving association'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
         user_access = DBManager.userAccess(current_user)
 
         accessible_projects_ids = user_access.get_accessible_projects_ids(admin_only=True)
@@ -212,20 +208,21 @@ class UserQuerySessionTypeProjects(Resource):
             # Do the update!
             if int(json_st['id_session_type_project']) > 0:
                 # Already existing
-                try:
-                    TeraSessionTypeProject.update(int(json_st['id_session_type_project']), json_st)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQuerySessionTypeProjects.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # try:
+                #     TeraSessionTypeProject.update(int(json_st['id_session_type_project']), json_st)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQuerySessionTypeProjects.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_stp = TeraSessionTypeProject()
                     new_stp.from_json(json_st)
-                    TeraSessionTypeProject.insert(new_stp)
+                    new_stp = TeraSessionTypeProject.insert(new_stp)
                     # Update ID for further use
                     json_st['id_session_type_project'] = new_stp.id_session_type_project
                 except exc.SQLAlchemyError as e:
@@ -238,17 +235,16 @@ class UserQuerySessionTypeProjects(Resource):
 
         return json_stp
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific session-type - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (no access to session-type or project)',
-                        400: 'Association not found (invalid id?)'})
+                        400: 'Association not found (invalid id?)'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete
@@ -262,6 +258,14 @@ class UserQuerySessionTypeProjects(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraSessionTypeProject.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Associated project still have sessions of that type
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessionTypeProjects.__name__,
+                                         'delete', 500, 'Database error', str(e))
+            return gettext('Can\'t delete session type from project: please delete all sessions of that type in the '
+                           'project before deleting.'), 500
         except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())

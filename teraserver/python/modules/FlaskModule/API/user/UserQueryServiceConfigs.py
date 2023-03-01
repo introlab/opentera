@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraServiceConfig import TeraServiceConfig
@@ -26,9 +26,7 @@ get_parser.add_argument('with_empty', type=inputs.boolean, help='Also include em
                                                                 'config.')
 get_parser.add_argument('list', type=inputs.boolean, help='Also includes a list of all available specifics configs.')
 
-
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
+post_parser = api.parser()
 post_schema = api.schema_model('service_config', {'properties': TeraServiceConfig.get_json_schema(),
                                                   'type': 'object',
                                                   'location': 'json'})
@@ -44,21 +42,18 @@ class UserQueryServiceConfig(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get service configuration. id_service can be combined with id_user, id_participant or '
                          'id_device, if required. If no id_user, id_participant and id_device specified, will return '
                          'config the current user.',
              responses={200: 'Success - returns list of configurations',
                         400: 'No parameters specified - id_service is at least required',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         if args['service_key'] and not args['id_service']:
             from opentera.db.models.TeraService import TeraService
@@ -108,7 +103,6 @@ class UserQueryServiceConfig(Resource):
                                          'get', 500, 'InvalidRequestError', e)
             return '', 500
 
-    @user_multi_auth.login_required
     @api.doc(description='Create / update service config. id_service_config must be set to "0" to create a new '
                          'config. A config can be created/modified if the user has admin access to the user, device or '
                          'participant',
@@ -116,12 +110,11 @@ class UserQueryServiceConfig(Resource):
                         403: 'Logged user can\'t create/update the specified session',
                         400: 'Badly formed JSON or missing fields(service_config, id_service_config, id_service) in the'
                              ' JSON body',
-                        500: 'Internal error when saving service config'})
+                        500: 'Internal error when saving service config'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'service_config' not in request.json:
@@ -227,20 +220,17 @@ class UserQueryServiceConfig(Resource):
         else:
             return [update_config.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific session',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete config (must have admin access to the related object - user,'
                              'device or participant, or be its own config)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

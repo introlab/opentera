@@ -5,6 +5,9 @@ from flask import session
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 
+# Parser definition(s)
+get_parser = api.parser()
+
 
 class UserLogout(Resource):
     def __init__(self, _api, *args, **kwargs):
@@ -12,7 +15,8 @@ class UserLogout(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @api.doc(description='Logout from the server')
+    @api.doc(description='Logout from the server', params={'token': 'Secret token'})
+    @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
         if current_user:

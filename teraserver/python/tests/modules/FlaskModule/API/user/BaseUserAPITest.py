@@ -14,10 +14,7 @@ import redis
 import uuid
 from flask_babel import Babel
 from flask import Flask
-from opentera.db.models.TeraParticipant import TeraParticipant
-from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name
-import opentera.messages.python as messages
-from datetime import datetime
+from opentera.modules.BaseModule import ModuleNames
 
 
 class FakeFlaskModule(BaseModule):
@@ -40,6 +37,7 @@ class FakeFlaskModule(BaseModule):
         self.flask_app.config.update({'SESSION_REDIS': redis_url})
         self.flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         self.flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        self.flask_app.config.update({'PROPAGATE_EXCEPTIONS': True})
 
         additional_args = {'test': True,
                            'user_manager_module': user_manager_module,
@@ -122,7 +120,8 @@ class BaseUserAPITest(unittest.TestCase):
             if not LoginModule.redis_client.exists(RedisVars.RedisVar_ServiceTokenAPIKey):
                 LoginModule.redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, self.service_token_key)
             else:
-                self.service_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey).decode('utf-8')
+                self.service_token_key = LoginModule.redis_client.get(RedisVars.RedisVar_ServiceTokenAPIKey)\
+                    .decode('utf-8')
 
             # User (dynamic)
             if not LoginModule.redis_client.exists(RedisVars.RedisVar_UserTokenAPIKey):
@@ -187,6 +186,15 @@ class BaseUserAPITest(unittest.TestCase):
             endpoint = self.test_endpoint
         headers = {'Authorization': _basic_auth_str(username, password)}
         return client.post(endpoint, headers=headers, query_string=params, json=json)
+
+    def _post_file_with_user_http_auth(self, client: FlaskClient, files: dict, username: str = '', password: str = '',
+                                       params: dict = None, endpoint: str = None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        headers = {'Authorization': _basic_auth_str(username, password)}
+        return client.post(endpoint, headers=headers, query_string=params, data=files)
 
     def _delete_with_user_token_auth(self, client: FlaskClient, token: str = '',
                                      params: dict = None, endpoint: str = None):

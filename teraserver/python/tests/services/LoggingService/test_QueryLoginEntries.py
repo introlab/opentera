@@ -14,18 +14,18 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
         super().tearDown()
 
     def test_get_endpoint_with_invalid_token(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             response = self._get_with_service_token_auth(self.test_client, token="invalid")
             self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_with_invalid_token_but_not_admin(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             token = self._generate_fake_user_token(name='FakeUser', superadmin=False, expiration=3600)
             response = self._get_with_service_token_auth(self.test_client, token=token)
             self.assertEqual(response.status_code, 403)
 
     def test_get_endpoint_with_valid_token_and_all_enabled_users(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             from services.LoggingService.Globals import service
 
             # Will get only enabled user uuids
@@ -68,7 +68,7 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                     self.assertIsNone(LoginEntry.get_login_entry_by_id(entry.id_login_event))
 
     def test_get_endpoint_with_valid_token_with_user_with_start_date_with_end_date(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             from services.LoggingService.Globals import service
 
             # Will get only enabled user uuids
@@ -120,7 +120,7 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 LoginEntry.delete(a_week_ago_entry.id_login_event)
 
     def test_get_endpoint_with_valid_token_with_user_with_limit(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             from services.LoggingService.Globals import service
 
             # Will get only enabled user uuids
@@ -149,7 +149,7 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                     LoginEntry.delete(entry.id_login_event)
 
     def test_get_endpoint_with_valid_token_with_user_with_offset(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             from services.LoggingService.Globals import service
 
             # Will get only enabled user uuids
@@ -178,7 +178,7 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                     LoginEntry.delete(entry.id_login_event)
 
     def test_get_endpoint_with_valid_token_with_admin_with_specific_user_uuid(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             from services.LoggingService.Globals import service
 
             # Will get only enabled users
@@ -216,7 +216,7 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 LoginEntry.delete(entry.id_login_event)
 
     def test_get_endpoint_with_valid_token_with_admin_with_specific_user_uuid_with_stats(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             from services.LoggingService.Globals import service
 
             # Will get only enabled users
@@ -258,7 +258,7 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 LoginEntry.delete(entry.id_login_event)
 
     def test_get_endpoint_with_valid_token_with_admin_with_specific_user_uuid_with_names(self):
-        with BaseLoggingServiceAPITest.app_context():
+        with self.app_context():
             from services.LoggingService.Globals import service
 
             # Will get only enabled users

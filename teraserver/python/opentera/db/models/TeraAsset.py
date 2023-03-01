@@ -1,4 +1,5 @@
 from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 import uuid
 # from enum import Enum, unique
 from sqlalchemy import or_
@@ -17,7 +18,7 @@ from sqlalchemy.orm import relationship
 #         return self.name, self.value
 
 
-class TeraAsset(BaseModel):
+class TeraAsset(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_assets'
     id_asset = Column(Integer, Sequence('id_asset_sequence'), primary_key=True, autoincrement=True)
     id_session = Column(Integer, ForeignKey("t_sessions.id_session", ondelete='cascade'), nullable=False)
@@ -37,8 +38,8 @@ class TeraAsset(BaseModel):
 
     asset_session = relationship("TeraSession", back_populates='session_assets')
     asset_device = relationship("TeraDevice", back_populates='device_assets')
-    asset_user = relationship("TeraUser")
-    asset_participant = relationship("TeraParticipant")
+    asset_user = relationship("TeraUser", back_populates='user_assets')
+    asset_participant = relationship("TeraParticipant", back_populates='participant_assets')
     asset_service = relationship("TeraService", foreign_keys="TeraAsset.id_service")
     asset_service_owner = relationship("TeraService", foreign_keys="TeraAsset.asset_service_uuid")
 
@@ -119,54 +120,60 @@ class TeraAsset(BaseModel):
             TeraAsset.insert(new_asset)
 
     @staticmethod
-    def get_asset_by_id(asset_id: int):
-        return TeraAsset.query.filter_by(id_asset=asset_id).first()
+    def get_asset_by_id(asset_id: int, with_deleted: bool = False):
+        return TeraAsset.query.filter_by(id_asset=asset_id).execution_options(include_deleted=with_deleted).first()
 
     @staticmethod
-    def get_asset_by_uuid(asset_uuid: str):
-        return TeraAsset.query.filter_by(asset_uuid=asset_uuid).first()
+    def get_asset_by_uuid(asset_uuid: str, with_deleted: bool = False):
+        return TeraAsset.query.filter_by(asset_uuid=asset_uuid).execution_options(include_deleted=with_deleted).first()
 
     @staticmethod
-    def get_assets_for_device(device_id: int):
+    def get_assets_for_device(device_id: int, with_deleted: bool = False):
+        # This returns all assets that the device has access to
         from opentera.db.models.TeraSession import TeraSession
-        return TeraAsset.query.join(TeraSession).filter(or_(TeraSession.session_devices.any(
-            id_device=device_id), TeraAsset.id_device == device_id)).all()
+        return TeraAsset.query.join(TeraSession).execution_options(include_deleted=with_deleted)\
+            .filter(or_(TeraSession.session_devices.any(id_device=device_id), TeraAsset.id_device == device_id)).all()
 
     @staticmethod
-    def get_assets_for_user(user_id: int):
+    def get_assets_for_user(user_id: int, with_deleted: bool = False):
+        # This return all assets that the user has access to
         from opentera.db.models.TeraSession import TeraSession
-        return TeraAsset.query.join(TeraSession).filter(or_(TeraSession.session_users.any(
-            id_user=user_id), TeraAsset.id_user == user_id)).all()
+        return TeraAsset.query.join(TeraSession).execution_options(include_deleted=with_deleted)\
+            .filter(or_(TeraSession.session_users.any(id_user=user_id), TeraAsset.id_user == user_id)).all()
 
     @staticmethod
-    def get_assets_for_session(session_id: int):
-        return TeraAsset.query.filter_by(id_session=session_id).all()
+    def get_assets_for_session(session_id: int, with_deleted: bool = False):
+        return TeraAsset.query.execution_options(include_deleted=with_deleted).filter_by(id_session=session_id).all()
 
     @staticmethod
-    def get_assets_for_participant(part_id: int):
+    def get_assets_for_participant(part_id: int, with_deleted: bool = False):
+        # This returns all assets that the participant has access
         from opentera.db.models.TeraSession import TeraSession
-        return TeraAsset.query.join(TeraSession).filter(or_(TeraSession.session_participants.any(
-            id_participant=part_id), TeraAsset.id_participant == part_id)).all()
+        return TeraAsset.query.join(TeraSession).execution_options(include_deleted=with_deleted).\
+            filter(or_(TeraSession.session_participants.any(id_participant=part_id),
+                       TeraAsset.id_participant == part_id)).all()
 
     @staticmethod
-    def get_assets_owned_by_service(service_uuid: str):
-        return TeraAsset.query.filter_by(asset_service_uuid=service_uuid).all()
+    def get_assets_owned_by_service(service_uuid: str, with_deleted: bool = False):
+        return TeraAsset.query.execution_options(include_deleted=with_deleted).\
+            filter_by(asset_service_uuid=service_uuid).all()
 
     @staticmethod
-    def get_assets_created_by_service(service_id: int):
-        return TeraAsset.query.filter_by(id_service=service_id).all()
+    def get_assets_created_by_service(service_id: int, with_deleted: bool = False):
+        return TeraAsset.query.execution_options(include_deleted=with_deleted).filter_by(id_service=service_id).all()
 
     @staticmethod
-    def get_assets_created_by_user(user_id: int):
-        return TeraAsset.query.filter_by(id_user=user_id).all()
+    def get_assets_created_by_user(user_id: int, with_deleted: bool = False):
+        return TeraAsset.query.execution_options(include_deleted=with_deleted).filter_by(id_user=user_id).all()
 
     @staticmethod
-    def get_assets_created_by_participant(participant_id: int):
-        return TeraAsset.query.filter_by(id_participant=participant_id).all()
+    def get_assets_created_by_participant(participant_id: int, with_deleted: bool = False):
+        return TeraAsset.query.execution_options(include_deleted=with_deleted).\
+            filter_by(id_participant=participant_id).all()
 
     @staticmethod
-    def get_assets_created_by_device(device_id: int):
-        return TeraAsset.query.filter_by(id_device=device_id).all()
+    def get_assets_created_by_device(device_id: int, with_deleted: bool = False):
+        return TeraAsset.query.execution_options(include_deleted=with_deleted).filter_by(id_device=device_id).all()
 
     @staticmethod
     def get_access_token(asset_uuids: list, token_key: str, requester_uuid: str, expiration=3600):

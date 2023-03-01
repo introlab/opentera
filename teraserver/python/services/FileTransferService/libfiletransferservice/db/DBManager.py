@@ -26,11 +26,13 @@ class DBManager:
         'type': ''
     }"""
 
-    def __init__(self):
+    def __init__(self, app=flask_app, test: bool = False):
         self.db = SQLAlchemy()
         self.db_uri = None
+        self.app = app
+        self.test = test
 
-    def create_defaults(self, config: ConfigManager):
+    def create_defaults(self, config: ConfigManager, test: bool = False):
         pass
 
     def open(self, db_infos, echo=False):
@@ -43,11 +45,11 @@ class DBManager:
         })
 
         # Create db engine
-        self.db.init_app(flask_app)
-        self.db.app = flask_app
+        self.db.init_app(self.app)
+        self.db.app = self.app
         BaseModel.set_db(self.db)
 
-        with flask_app.app_context():
+        with self.app.app_context():
             # Init tables
             BaseModel.create_all()
 
@@ -68,7 +70,7 @@ class DBManager:
         self.db.app = flask_app
         BaseModel.set_db(self.db)
 
-        with flask_app.app_context():
+        with self.app.app_context():
             # Init tables
             BaseModel.create_all()
 

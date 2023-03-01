@@ -36,15 +36,15 @@ class ServiceQueryAccess(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
 
-    @api.expect(get_parser)
     @api.doc(description='Return access information.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
-
         service_access = DBManager.serviceAccess(current_service)
         args = get_parser.parse_args()
 
@@ -115,7 +115,7 @@ class ServiceQueryAccess(Resource):
             if args['with_sites']:
                 if not args['with_names']:
                     result['sites'] = [{'id': id_site} for id_site in
-                                        user_access.get_accessible_sites_ids(admin_only=args['admin'])]
+                                       user_access.get_accessible_sites_ids(admin_only=args['admin'])]
                 else:
                     sites = user_access.get_accessible_sites(admin_only=args['admin'])
                     result['sites'] = [{'id': site.id_site, 'name': site.site_name} for site in sites]

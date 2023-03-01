@@ -5,6 +5,7 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraServiceSite import TeraServiceSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
+from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError, IntegrityError
 from sqlalchemy import exc
@@ -23,10 +24,7 @@ get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include tes
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session_type', type=str, location='json', help='Session type to create / update',
-#                          required=True)
-
+post_parser = api.parser()
 post_schema = api.schema_model('user_test_type', {'properties': TeraTestType.get_json_schema(), 'type': 'object',
                                                   'location': 'json'})
 
@@ -41,17 +39,15 @@ class UserQueryTestTypes(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get test type information. If no id_test_type specified, returns all available test types',
              responses={200: 'Success - returns list of test types',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         if args['id_test_type']:
             test_types = [user_access.query_test_type(args['id_test_type'])]
@@ -115,15 +111,16 @@ class UserQueryTestTypes(Resource):
                                          'get', 500, 'InvalidRequestError')
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update test type. id_test_type must be set to "0" to create a new '
                          'type. A test type can be created/modified if the user has access to a related test type'
                          'project.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified test type',
                         400: 'Badly formed JSON or missing field in the JSON body',
-                        500: 'Internal error when saving test type'})
+                        500: 'Internal error when saving test type'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
@@ -260,7 +257,7 @@ class UserQueryTestTypes(Resource):
 
             # Ensure that the newly added session types sites have a correct service site association, if required
             for tts in update_test_type.test_type_test_type_sites:
-                tts.check_integrity()
+                TeraTestTypeSite.check_integrity(tts)
 
         # Update test type projects, if needed
         if update_tt_projects:
@@ -298,25 +295,23 @@ class UserQueryTestTypes(Resource):
             # Ensure that the newly added test types projects have a correct service project association, if required
             for ttp in update_test_type.test_type_test_type_projects:
                 try:
-                    ttp.check_integrity()
+                    TeraTestTypeProject.check_integrity(ttp)
                 except IntegrityError:
                     return gettext('Test type has a a service not associated to its site'), 400
 
         return [update_test_type.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific test type',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete test type (no admin access to project related to that type '
                              'or tests of that type exists in the system somewhere)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete
@@ -341,7 +336,7 @@ class UserQueryTestTypes(Resource):
             self.module.logger.log_error(self.module.module_name,
                                          UserQueryTestTypes.__name__,
                                          'delete', 500, 'Database error', e)
-            return gettext('Can\'t delete test type: please delete all tests of that type before deleting.'), 400
+            return gettext('Can\'t delete test type: please delete all tests of that type before deleting.'), 500
         except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())

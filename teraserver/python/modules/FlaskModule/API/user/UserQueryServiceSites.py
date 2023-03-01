@@ -21,12 +21,10 @@ get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_se
                                                                 'don\'t have any association with that service')
 get_parser.add_argument('with_services', type=inputs.boolean, help='Used with id_site. Also return services that '
                                                                    'don\'t have any association with that site')
-get_parser.add_argument('with_roles', type=inputs.boolean, help='Used with id_site. Returns detailled information on'
+get_parser.add_argument('with_roles', type=inputs.boolean, help='Used with id_site. Returns detailed information on'
                                                                 'each role for this service.')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('service_project', type=str, location='json',
-#                          help='Service - project association to create / update', required=True)
+post_parser = api.parser()
 post_schema = api.schema_model('service_site', {'properties': TeraServiceSite.get_json_schema(),
                                                 'type': 'object',
                                                 'location': 'json'})
@@ -44,19 +42,17 @@ class UserQueryServiceSites(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get services that are associated with a site. Only one "ID" parameter required and '
                          'supported at once.',
              responses={200: 'Success - returns list of services - sites association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'})
+                        500: 'Error when getting association'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         service_sites = []
         # If we have no arguments, return error
@@ -115,17 +111,17 @@ class UserQueryServiceSites(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update service - site association. If a "service" json is received, the list of '
                          '"sites" is replaced. If a "site" json is received, the list of "services" is replaced.'
                          'If a "service_site" is received, each of the item in the list is added.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only super admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',
-                        500: 'Internal error occured when saving association'})
+                        500: 'Internal error occurred when saving association'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
         user_access = DBManager.userAccess(current_user)
 
         # Only super admins can change service - site associations
@@ -149,7 +145,15 @@ class UserQueryServiceSites(Resource):
             # Also filter sites already there
             received_sites_ids = set(received_sites_ids).difference(current_sites_ids)
             for site_id in todel_ids:
+                if TeraServiceSite.get_service_site_for_service_site(site_id=site_id, service_id=id_service)\
+                        .delete_check_integrity():
+                    return gettext(
+                                'Can\'t delete service from site: please delete all sessions using that service in the '
+                                'site before deleting.'), 500
+
+            for site_id in todel_ids:
                 TeraServiceSite.delete_with_ids(service_id=id_service, site_id=site_id)
+
             # Build projects association to add
             json_sss = [{'id_service': id_service, 'id_site': site_id} for site_id in received_sites_ids]
         elif 'site' in request.json:
@@ -168,6 +172,12 @@ class UserQueryServiceSites(Resource):
             todel_ids = set(current_services_ids).difference(received_services_ids)
             # Also filter services already there
             received_services_ids = set(received_services_ids).difference(current_services_ids)
+            for service_id in todel_ids:
+                if TeraServiceSite.get_service_site_for_service_site(site_id=id_site, service_id=service_id) \
+                        .delete_check_integrity():
+                    return gettext(
+                        'Can\'t delete service from site: please delete all sessions using that service in the '
+                        'site before deleting.'), 500
             for service_id in todel_ids:
                 TeraServiceSite.delete_with_ids(service_id=service_id, site_id=id_site)
             # Build sites association to add
@@ -202,20 +212,21 @@ class UserQueryServiceSites(Resource):
             # Do the update!
             if int(json_ss['id_service_site']) > 0:
                 # Already existing
-                try:
-                    TeraServiceSite.update(int(json_ss['id_service_site']), json_ss)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQueryServiceSites.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # try:
+                #     TeraServiceSite.update(int(json_ss['id_service_site']), json_ss)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQueryServiceSites.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_ss = TeraServiceSite()
                     new_ss.from_json(json_ss)
-                    TeraServiceSite.insert(new_ss)
+                    new_ss = TeraServiceSite.insert(new_ss)
                     # Update ID for further use
                     json_ss['id_service_site'] = new_ss.id_service_site
                 except exc.SQLAlchemyError as e:
@@ -228,20 +239,20 @@ class UserQueryServiceSites(Resource):
 
         return json_sss
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific service - site association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (only super admins can)',
-                        500: 'Association not found or database error.'})
+                        500: 'Association not found or database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
         user_access = DBManager.userAccess(current_user)
 
         if not current_user.user_superadmin:
             return gettext('Forbidden'), 403
 
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         ss = TeraServiceSite.get_service_site_by_id(id_todel)

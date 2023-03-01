@@ -35,17 +35,15 @@ class UserQueryUserStats(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get stats for the specified item.',
              responses={200: 'Success',
                         400: 'Missing parameter - one id must be specified.',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        parser = get_parser
-
-        args = parser.parse_args()
-
+        args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
         if args['id_user_group']:
@@ -110,7 +108,7 @@ class UserQueryUserStats(Resource):
     @staticmethod
     def get_user_stats(user_access: DBManagerTeraUserAccess, item_id: int) -> dict:
         from opentera.db.models.TeraSession import TeraSession
-        total_created_sessions = TeraSession.count_with_filters({'id_creator_user': item_id})
+        total_created_sessions = TeraSession.get_count(filters={'id_creator_user': item_id})
         user_sessions = TeraSession.get_sessions_for_user(item_id)
         sessions_participants = set()
         for ses in user_sessions:
@@ -142,10 +140,10 @@ class UserQueryUserStats(Resource):
         sessions_total = 0
         # devices = []
         for project in site_projects:
-            site_groups_total += TeraParticipantGroup.count_with_filters({'id_project': project.id_project})
-            participants_total += TeraParticipant.count_with_filters({'id_project': project.id_project})
-            participants_enabled += TeraParticipant.count_with_filters({'id_project': project.id_project,
-                                                                        'participant_enabled': True})
+            site_groups_total += TeraParticipantGroup.get_count(filters={'id_project': project.id_project})
+            participants_total += TeraParticipant.get_count(filters={'id_project': project.id_project})
+            participants_enabled += TeraParticipant.get_count(filters={'id_project': project.id_project,
+                                                                       'participant_enabled': True})
 
             for part in project.project_participants:
                 sessions_total += TeraSessionParticipants.get_session_count_for_participant(
@@ -159,7 +157,7 @@ class UserQueryUserStats(Resource):
                  'participants_total_count': participants_total,
                  'participants_enabled_count': participants_enabled,
                  'sessions_total_count': sessions_total,
-                 'devices_total_count': TeraDeviceSite.count_with_filters({'id_site': item_id})
+                 'devices_total_count': TeraDeviceSite.get_count(filters={'id_site': item_id})
                  }
         # Add participants information?
         participants = []

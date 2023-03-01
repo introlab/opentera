@@ -14,7 +14,7 @@ class TeraSessionForm:
         form = TeraForm("session")
 
         # If not allowed to access that session or new session, will return all accessibles lists
-        if specific_session_id and not user_access.query_session(specific_session_id):  # specific_session_id not in user_access.get_accessible_sessions_ids():
+        if specific_session_id and not user_access.query_session(specific_session_id):
             specific_session_id = None
 
         session_info = None

@@ -1,4 +1,5 @@
 from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -6,21 +7,20 @@ import json
 import jsonschema
 
 
-class TeraServiceConfig(BaseModel):
+class TeraServiceConfig(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_services_configs'
     id_service_config = Column(Integer, Sequence('id_service_config_sequence'), primary_key=True,
-                                  autoincrement=True)
+                               autoincrement=True)
     id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=False)
     id_user = Column(Integer, ForeignKey('t_users.id_user', ondelete='cascade'), nullable=True)
-    id_participant = Column(Integer, ForeignKey('t_participants.id_participant', ondelete='cascade'),
-                               nullable=True)
+    id_participant = Column(Integer, ForeignKey('t_participants.id_participant', ondelete='cascade'), nullable=True)
     id_device = Column(Integer, ForeignKey('t_devices.id_device', ondelete='cascade'), nullable=True)
     service_config_config = Column(String, nullable=False, default='{}')
 
-    service_config_service = relationship("TeraService")
-    service_config_user = relationship("TeraUser")
-    service_config_participant = relationship('TeraParticipant')
-    service_config_device = relationship('TeraDevice')
+    service_config_service = relationship("TeraService", viewonly=True)
+    service_config_user = relationship("TeraUser", viewonly=True)
+    service_config_participant = relationship('TeraParticipant', viewonly=True)
+    service_config_device = relationship('TeraDevice', viewonly=True)
     service_config_specifics = relationship('TeraServiceConfigSpecific', cascade='delete')
 
     def to_json(self, ignore_fields=None, minimal=False, specific_id=None):
@@ -73,24 +73,30 @@ class TeraServiceConfig(BaseModel):
                 self.set_global_config(json_values['service_config_config'])
 
     @staticmethod
-    def get_service_config_by_id(s_id: int):
-        return TeraServiceConfig.query.filter_by(id_service_config=s_id).first()
+    def get_service_config_by_id(s_id: int, with_deleted: bool = False):
+        return TeraServiceConfig.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service_config=s_id).first()
 
     @staticmethod
-    def get_service_config_for_service(service_id: int):
-        return TeraServiceConfig.query.filter_by(id_service=service_id).all()
+    def get_service_config_for_service(service_id: int, with_deleted: bool = False):
+        return TeraServiceConfig.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=service_id).all()
 
     @staticmethod
-    def get_service_config_for_service_for_user(service_id: int, user_id: int):
-        return TeraServiceConfig.query.filter_by(id_service=service_id, id_user=user_id).first()
+    def get_service_config_for_service_for_user(service_id: int, user_id: int, with_deleted: bool = False):
+        return TeraServiceConfig.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=service_id, id_user=user_id).first()
 
     @staticmethod
-    def get_service_config_for_service_for_participant(service_id: int, participant_id: int):
-        return TeraServiceConfig.query.filter_by(id_service=service_id, id_participant=participant_id).first()
+    def get_service_config_for_service_for_participant(service_id: int, participant_id: int,
+                                                       with_deleted: bool = False):
+        return TeraServiceConfig.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=service_id, id_participant=participant_id).first()
 
     @staticmethod
-    def get_service_config_for_service_for_device(service_id: int, device_id: int):
-        return TeraServiceConfig.query.filter_by(id_service=service_id, id_device=device_id).first()
+    def get_service_config_for_service_for_device(service_id: int, device_id: int, with_deleted: bool = False):
+        return TeraServiceConfig.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=service_id, id_device=device_id).first()
 
     def has_specific_config_for_specific_id(self, specific_id: int) -> bool:
         for specific in self.service_config_specifics:
@@ -233,6 +239,8 @@ class TeraServiceConfig(BaseModel):
 
                 config.set_config_for_specific_id(specific_id=values['id_specific'],
                                                   config=values['service_config_config'])
+
+                del values['id_specific']
             else:
                 # We have a global config...
                 config = TeraServiceConfig.get_service_config_by_id(values['id_service_config'])

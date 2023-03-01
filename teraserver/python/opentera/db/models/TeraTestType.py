@@ -1,10 +1,13 @@
 from opentera.db.Base import BaseModel
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.models.TeraTest import TeraTest
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 import uuid
 
 
-class TeraTestType(BaseModel):
+class TeraTestType(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_tests_types'
     id_test_type = Column(Integer, Sequence('id_test_type_sequence'), primary_key=True, autoincrement=True)
     id_service = Column(Integer, ForeignKey("t_services.id_service", ondelete='cascade'), nullable=False)
@@ -77,20 +80,24 @@ class TeraTestType(BaseModel):
             TeraTestType.db().session.commit()
 
     @staticmethod
-    def get_test_type_by_id(test_type_id: int):
-        return TeraTestType.query.filter_by(id_test_type=test_type_id).first()
+    def get_test_type_by_id(test_type_id: int, with_deleted: bool = False):
+        return TeraTestType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_test_type=test_type_id).first()
 
     @staticmethod
-    def get_test_type_by_key(tt_key: int):
-        return TeraTestType.query.filter_by(test_type_key=tt_key).first()
+    def get_test_type_by_key(tt_key: int, with_deleted: bool = False):
+        return TeraTestType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(test_type_key=tt_key).first()
 
     @staticmethod
-    def get_test_type_by_uuid(tt_uuid: int):
-        return TeraTestType.query.filter_by(test_type_uuid=tt_uuid).first()
+    def get_test_type_by_uuid(tt_uuid: int, with_deleted: bool = False):
+        return TeraTestType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(test_type_uuid=tt_uuid).first()
 
     @staticmethod
-    def get_test_types_for_service(id_service: int):
-        return TeraTestType.query.filter_by(id_service=id_service).all()
+    def get_test_types_for_service(id_service: int, with_deleted: bool = False):
+        return TeraTestType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_access_token(test_type_uuids: list, token_key: str, requester_uuid: str, can_edit: bool, expiration=3600):
@@ -131,6 +138,11 @@ class TeraTestType(BaseModel):
             urls['test_type_web_editor_url'] = base_url + '/api/testtypes/web/edit'
 
         return urls
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        if TeraTest.get_count(filters={'id_test_type': self.id_test_type}) > 0:
+            return IntegrityError('Test Type still has associated tests', self.id_test_type, 't_tests')
+        return None
 
     @classmethod
     def insert(cls, test_type):

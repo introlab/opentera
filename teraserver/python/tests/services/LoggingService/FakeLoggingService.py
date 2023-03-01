@@ -125,31 +125,34 @@ class FakeLoggingService(ServiceOpenTera):
                                  password=self.config_man.redis_config['password'],
                                  client_name=self.__class__.__name__)
 
-        # Initialize service from redis, posing as LoggingService
-        # Update Service Access information
-        ServiceAccessManager.api_user_token_key = 'test'
+        # Initialize service from redis, posing as FileTransferService
+        # User token key (dynamic)
+        ServiceAccessManager.api_user_token_key = 'test_api_user_token_key'
         self.redis.set(RedisVars.RedisVar_UserTokenAPIKey,
                        ServiceAccessManager.api_user_token_key)
 
-        # Participant token key from DB
-        ServiceAccessManager.api_participant_token_key = TeraServerSettings.get_server_setting_value(
+        # Participant token key from DB (static)
+        ServiceAccessManager.api_participant_static_token_key = TeraServerSettings.get_server_setting_value(
             TeraServerSettings.ServerParticipantTokenKey)
-        self.redis.set(RedisVars.RedisVar_ParticipantTokenAPIKey,
-                       ServiceAccessManager.api_participant_token_key)
-
-        ServiceAccessManager.api_participant_static_token_key = 'test'
         self.redis.set(RedisVars.RedisVar_ParticipantStaticTokenAPIKey,
                        ServiceAccessManager.api_participant_static_token_key)
 
-        # Device Token Key from DB
-        ServiceAccessManager.api_device_token_key = TeraServerSettings.get_server_setting_value(
-            TeraServerSettings.ServerDeviceTokenKey)
+        # Participant token key (dynamic)
+        ServiceAccessManager.api_participant_token_key = 'test_api_participant_token_key'
+        self.redis.set(RedisVars.RedisVar_ParticipantTokenAPIKey,
+                       ServiceAccessManager.api_participant_token_key)
 
+        # Device Token Key from DB (static)
+        ServiceAccessManager.api_device_static_token_key = TeraServerSettings.get_server_setting_value(
+            TeraServerSettings.ServerDeviceTokenKey)
+        self.redis.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey, ServiceAccessManager.api_device_static_token_key)
+
+        # Device Token Key (dynamic)
+        ServiceAccessManager.api_device_token_key = 'test_api_device_token_key'
         self.redis.set(RedisVars.RedisVar_DeviceTokenAPIKey, ServiceAccessManager.api_device_token_key)
 
-        ServiceAccessManager.api_device_static_token_key = 'test'
-        self.redis.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey, ServiceAccessManager.api_device_static_token_key)
-        ServiceAccessManager.api_service_token_key = 'test'
+        # Service Token Key (dynamic)
+        ServiceAccessManager.api_service_token_key = 'test_api_service_token_key'
         self.redis.set(RedisVars.RedisVar_ServiceTokenAPIKey, ServiceAccessManager.api_service_token_key)
         ServiceAccessManager.config_man = self.config_man
 

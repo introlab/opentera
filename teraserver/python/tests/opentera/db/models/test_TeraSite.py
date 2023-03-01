@@ -1,20 +1,19 @@
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraSite import TeraSite
 
 
 class TeraSiteTest(BaseModelsTest):
 
     def test_nullable_args(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_site = TeraSite()
             new_site.site_name = None
             self.db.session.add(new_site)
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_unique_args(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_site1 = TeraSite()
             same_site1 = TeraSite()
             new_site1.site_name = None
@@ -24,7 +23,7 @@ class TeraSiteTest(BaseModelsTest):
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
     def test_to_json(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_site = TeraSite()
             new_site.site_name = 'Site Name'
             self.db.session.add(new_site)
@@ -38,7 +37,7 @@ class TeraSiteTest(BaseModelsTest):
             # Minimal doesnt change ignore fields
 
     def test_to_json_create_event(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_site = TeraSite()
             new_site.site_name = 'test_to_json_create_event'
             self.db.session.add(new_site)
@@ -49,7 +48,7 @@ class TeraSiteTest(BaseModelsTest):
             self.assertGreaterEqual(new_site_json['id_site'], 1)
 
     def test_to_json_update_event(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_site = TeraSite()
             new_site.site_name = 'test_to_json_update_event'
             self.db.session.add(new_site)
@@ -60,7 +59,7 @@ class TeraSiteTest(BaseModelsTest):
             self.assertGreaterEqual(new_site_json['id_site'], 1)
 
     def test_to_json_delete_event(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_site = TeraSite()
             new_site.site_name = 'test_to_json_delete_event'
             self.db.session.add(new_site)
@@ -69,7 +68,7 @@ class TeraSiteTest(BaseModelsTest):
             self.assertGreaterEqual(new_site_json_delete['id_site'], 1)
 
     def test_get_site_by_sitename(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             self.db.session.rollback()
             new_site = TeraSite()
             new_site.site_name = 'test_get_site_by_sitename'
@@ -78,7 +77,7 @@ class TeraSiteTest(BaseModelsTest):
             self.assertEqual(new_site, same_site)
 
     def test_get_site_by_id(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_site = TeraSite()
             new_site.site_name = 'test_get_site_by_id'
             self.db.session.add(new_site)
@@ -87,7 +86,7 @@ class TeraSiteTest(BaseModelsTest):
             self.assertEqual(new_site, same_site)
 
     def test_insert_and_delete(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             new_site = TeraSite()
             new_site.site_name = 'test_insert_and_delete'
             TeraSite.insert(site=new_site)

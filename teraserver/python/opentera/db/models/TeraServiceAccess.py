@@ -1,25 +1,32 @@
 from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 
 
-class TeraServiceAccess(BaseModel):
+class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_services_access'
     id_service_access = Column(Integer, Sequence('id_service_project_role_sequence'), primary_key=True,
-                                  autoincrement=True)
+                               autoincrement=True)
     id_user_group = Column(Integer, ForeignKey('t_users_groups.id_user_group', ondelete='cascade'),
-                              nullable=True)
+                           nullable=True)
     id_device = Column(Integer, ForeignKey('t_devices.id_device', ondelete='cascade'), nullable=True)
-    id_participant_group = Column(Integer, ForeignKey('t_participants_groups.id_participant_group',
-                                                               ondelete='cascade'), nullable=True)
+    id_participant_group = Column(Integer, ForeignKey('t_participants_groups.id_participant_group', ondelete='cascade'),
+                                  nullable=True)
     id_service_role = Column(Integer, ForeignKey('t_services_roles.id_service_role', ondelete='cascade'),
-                                nullable=False)
+                             nullable=False)
 
-    service_access_role = relationship("TeraServiceRole")
-    service_access_user_group = relationship("TeraUserGroup", back_populates='user_group_services_access')
-    service_access_device = relationship("TeraDevice")
-    service_access_participant_group = relationship("TeraParticipantGroup")
+    service_access_role = relationship("TeraServiceRole", viewonly=True)
+    service_access_user_group = relationship("TeraUserGroup", viewonly=True)
+    service_access_device = relationship("TeraDevice", viewonly=True)
+    service_access_participant_group = relationship("TeraParticipantGroup", viewonly=True)
+
+    # service_access_role = relationship("TeraServiceRole")
+    # service_access_user_group = relationship("TeraUserGroup", back_populates='user_group_services_access')
+    # service_access_device = relationship("TeraDevice")
+    # service_access_participant_group = relationship("TeraParticipantGroup")
 
     def __init__(self):
         pass
@@ -74,8 +81,9 @@ class TeraServiceAccess(BaseModel):
         return json_val
 
     @staticmethod
-    def get_service_access_by_id(service_access_id: int):
-        return TeraServiceAccess.query.filter_by(id_service_access=service_access_id).first()
+    def get_service_access_by_id(service_access_id: int, with_deleted: bool = False):
+        return TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service_access=service_access_id).first()
 
     @staticmethod
     def update_service_access_for_user_group_for_site(id_service: int, id_user_group: int, id_service_role: int,
@@ -90,7 +98,7 @@ class TeraServiceAccess(BaseModel):
                                                                               id_site=id_site)
 
         if access is None:
-            # No access already present for that user - create new one
+            # No access already present for that user group - create new one
             access = TeraServiceAccess()
             access.id_user_group = id_user_group
             access.id_service_role = id_service_role
@@ -124,30 +132,33 @@ class TeraServiceAccess(BaseModel):
         return access
 
     @staticmethod
-    def get_service_access_for_user_group(id_service: int, id_user_group: int):
-        return TeraServiceAccess.query.filter_by(id_user_group=id_user_group).join(TeraServiceRole)\
+    def get_service_access_for_user_group(id_service: int, id_user_group: int, with_deleted: bool = False):
+        return TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user_group=id_user_group).join(TeraServiceRole)\
             .filter_by(id_service=id_service).all()
 
     @staticmethod
-    def get_service_access_for_project(id_service: int, id_project: int):
-        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
-                                                                       id_project=id_project).all()
+    def get_service_access_for_project(id_service: int, id_project: int, with_deleted: bool = False):
+        return TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
+            .join(TeraServiceRole).filter_by(id_service=id_service, id_project=id_project).all()
 
     @staticmethod
-    def get_service_access_for_site(id_service: int, id_site: int):
-        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
-                                                                       id_site=id_site).all()
+    def get_service_access_for_site(id_service: int, id_site: int, with_deleted: bool = False):
+        return TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
+            .join(TeraServiceRole).filter_by(id_service=id_service, id_site=id_site).all()
 
     @staticmethod
-    def get_service_access_for_user_group_for_site(id_service: int, id_user_group: int, id_site: int):
-        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
-                                                                       id_site=id_site).filter(
+    def get_service_access_for_user_group_for_site(id_service: int, id_user_group: int, id_site: int,
+                                                   with_deleted: bool = False):
+        return TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
+            .join(TeraServiceRole).filter_by(id_service=id_service, id_site=id_site).filter(
             TeraServiceAccess.id_user_group == id_user_group).first()
 
     @staticmethod
-    def get_service_access_for_user_group_for_project(id_service: int, id_user_group: int, id_project: int):
-        return TeraServiceAccess.query.join(TeraServiceRole).filter_by(id_service=id_service,
-                                                                       id_project=id_project).filter(
+    def get_service_access_for_user_group_for_project(id_service: int, id_user_group: int, id_project: int,
+                                                      with_deleted: bool = False):
+        return TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
+            .join(TeraServiceRole).filter_by(id_service=id_service, id_project=id_project).filter(
             TeraServiceAccess.id_user_group == id_user_group).first()
 
     @staticmethod

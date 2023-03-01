@@ -2,7 +2,7 @@ from flask import jsonify, request, session
 from flask_restx import Resource, reqparse
 from flask_babel import gettext
 from opentera.db.models.TeraSessionEvent import TeraSessionEvent
-from modules.LoginModule.LoginModule import LoginModule
+from modules.LoginModule.LoginModule import LoginModule, current_device
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy import exc
 from modules.FlaskModule.FlaskModule import device_api_ns as api
@@ -10,7 +10,6 @@ from opentera.db.models.TeraDevice import TeraDevice
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
 get_parser.add_argument('id_session', type=int, help='Session ID', required=True)
 
 post_parser = api.parser()
@@ -23,43 +22,24 @@ class DeviceQuerySessionEvents(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.device_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Get session events',
-             responses={403: 'Forbidden for security reasons.'})
+             responses={403: 'Forbidden for security reasons.'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @LoginModule.device_token_or_certificate_required
     def get(self):
-
-        # current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
-        # device_access = DBManager.deviceAccess(current_device)
-        # args = get_parser.parse_args()
-        #
-        # sessions_events = []
-        #
-        # parent_session = device_access.query_session(args['id_session'])
-        # if not parent_session:
-        #     return '', 403
-        #
-        # sessions_events = TeraSessionEvent.get_events_for_session(args['id_session'])
-        #
-        # try:
-        #     events_list = []
-        #     for event in sessions_events:
-        #         event_json = event.to_json(minimal=False)
-        #         events_list.append(event_json)
-        #
-        #     return jsonify(events_list)
-        #
-        # except InvalidRequestError:
-        #     return '', 500
         return gettext('Forbidden for security reasons'), 403
 
+    @api.doc(description='Update/Create session events',
+             responses={200: 'Success',
+                        400: 'Required parameter is missing',
+                        500: 'Internal server error',
+                        501: 'Not implemented',
+                        403: 'Logged device doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
+    @api.expect(post_parser)
     @LoginModule.device_token_or_certificate_required
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('session_event', type=str, location='json', help='Event to create / update',
-                            required=True)
-
-        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
         device_access = DBManager.deviceAccess(current_device)
 
         # Using request.json instead of parser, since parser messes up the json!

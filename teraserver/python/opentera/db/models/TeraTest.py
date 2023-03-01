@@ -1,6 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from enum import Enum
 import uuid
 import json
@@ -12,7 +13,7 @@ class TeraTestStatus(Enum):
     TEST_COMPLETED = 2
 
 
-class TeraTest(BaseModel):
+class TeraTest(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_tests'
     id_test = Column(Integer, Sequence('id_test_sequence'), primary_key=True, autoincrement=True)
     id_test_type = Column(Integer, ForeignKey('t_tests_types.id_test_type'), nullable=False)
@@ -32,10 +33,10 @@ class TeraTest(BaseModel):
     test_summary = Column(String, nullable=True)  # This contains a json formatted summary for results display
 
     test_session = relationship("TeraSession", back_populates='session_tests')
-    test_device = relationship("TeraDevice")
-    test_user = relationship("TeraUser")
-    test_participant = relationship("TeraParticipant")
-    test_service = relationship("TeraService")
+    test_device = relationship("TeraDevice", back_populates='device_tests')
+    test_user = relationship("TeraUser", back_populates='user_tests')
+    test_participant = relationship("TeraParticipant", back_populates='participant_tests')
+    test_service = relationship("TeraService", back_populates='service_tests')
     test_test_type = relationship('TeraTestType')
 
     def from_json(self, json_data, ignore_fields=None):
@@ -120,32 +121,37 @@ class TeraTest(BaseModel):
             TeraTest.db().session.commit()
 
     @staticmethod
-    def get_test_by_id(test_id: int):
-        return TeraTest.query.filter_by(id_test=test_id).first()
+    def get_test_by_id(test_id: int, with_deleted: bool = False):
+        return TeraTest.query.execution_options(include_deleted=with_deleted).filter_by(id_test=test_id).first()
 
     @staticmethod
-    def get_test_by_uuid(test_uuid: str):
-        return TeraTest.query.filter_by(test_uuid=test_uuid).first()
+    def get_test_by_uuid(test_uuid: str, with_deleted: bool = False):
+        return TeraTest.query.execution_options(include_deleted=with_deleted).filter_by(test_uuid=test_uuid).first()
 
     @staticmethod
-    def get_tests_for_device(device_id: int):
-        return TeraTest.query.filter_by(id_device=device_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
+    def get_tests_for_device(device_id: int, with_deleted: bool = False):
+        return TeraTest.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_device=device_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
 
     @staticmethod
-    def get_tests_for_user(user_id: int):
-        return TeraTest.query.filter_by(id_user=user_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
+    def get_tests_for_user(user_id: int, with_deleted: bool = False):
+        return TeraTest.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user=user_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
 
     @staticmethod
-    def get_tests_for_session(session_id: int):
-        return TeraTest.query.filter_by(id_session=session_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
+    def get_tests_for_session(session_id: int, with_deleted: bool = False):
+        return TeraTest.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_session=session_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
 
     @staticmethod
-    def get_tests_for_participant(part_id: int):
-        return TeraTest.query.filter_by(id_participant=part_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
+    def get_tests_for_participant(part_id: int, with_deleted: bool = False):
+        return TeraTest.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_participant=part_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
 
     @staticmethod
-    def get_tests_for_service(service_id: int):
-        return TeraTest.query.filter_by(id_service=service_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
+    def get_tests_for_service(service_id: int, with_deleted: bool = False):
+        return TeraTest.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=service_id).order_by(TeraTest.id_test_type.asc(), TeraTest.test_datetime.asc()).all()
 
     @staticmethod
     def get_access_token(test_uuids: list, token_key: str, requester_uuid: str, expiration=3600):

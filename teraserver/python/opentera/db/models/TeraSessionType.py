@@ -1,11 +1,14 @@
 from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.models.TeraSession import TeraSession
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 from enum import Enum, unique
 from flask_babel import gettext
 
 
-class TeraSessionType(BaseModel):
+class TeraSessionType(BaseModel, SoftDeleteMixin):
     @unique
     class SessionCategoryEnum(Enum):
         SERVICE = 1
@@ -17,8 +20,7 @@ class TeraSessionType(BaseModel):
             return self.name, self.value
 
     __tablename__ = 't_sessions_types'
-    id_session_type = Column(Integer, Sequence('id_session_type_sequence'), primary_key=True,
-                                autoincrement=True)
+    id_session_type = Column(Integer, Sequence('id_session_type_sequence'), primary_key=True, autoincrement=True)
     id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=True)
     session_type_name = Column(String, nullable=False, unique=False)
     session_type_online = Column(Boolean, nullable=False)
@@ -30,7 +32,7 @@ class TeraSessionType(BaseModel):
     session_type_session_type_sites = relationship("TeraSessionTypeSite", viewonly=True)
 
     session_type_projects = relationship("TeraProject", secondary="t_sessions_types_projects",
-                                            back_populates="project_session_types")
+                                         back_populates="project_session_types")
     session_type_sites = relationship("TeraSite", secondary="t_sessions_types_sites")
 
     session_type_service = relationship("TeraService")
@@ -133,12 +135,14 @@ class TeraSessionType(BaseModel):
         TeraSessionType.db().session.commit()
 
     @staticmethod
-    def get_session_type_by_id(ses_type_id: int):
-        return TeraSessionType.query.filter_by(id_session_type=ses_type_id).first()
+    def get_session_type_by_id(ses_type_id: int, with_deleted: bool = False):
+        return TeraSessionType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_session_type=ses_type_id).first()
 
     @staticmethod
-    def get_session_types_for_service(id_service: int):
-        return TeraSessionType.query.filter_by(id_service=id_service).all()
+    def get_session_types_for_service(id_service: int, with_deleted: bool = False):
+        return TeraSessionType.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=id_service).all()
 
     @staticmethod
     def get_category_name(category: SessionCategoryEnum):
@@ -153,6 +157,11 @@ class TeraSessionType(BaseModel):
             name = gettext('Protocol')
 
         return name
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        if TeraSession.get_count(filters={'id_session_type': self.id_session_type}) > 0:
+            return IntegrityError('Still have sessions with that type', self.id_session_type, 't_sessions')
+        return None
 
     @classmethod
     def update(cls, id_st: int, values: dict):

@@ -5,6 +5,7 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraDevice import TeraDevice
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -25,8 +26,7 @@ get_parser.add_argument('start_date', type=inputs.date, help='Start date, sessio
 get_parser.add_argument('end_date', type=inputs.date, help='End date, sessions after that date will be ignored')
 get_parser.add_argument('with_session_type', type=inputs.boolean, help='Include session type informations')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
+post_parser = api.parser()
 post_schema = api.schema_model('user_session', {'properties': TeraSession.get_json_schema(),
                                                 'type': 'object',
                                                 'location': 'json'})
@@ -42,18 +42,16 @@ class UserQuerySessions(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get sessions information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of sessions',
                         400: 'No parameters specified at least one id must be used',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         sessions = []
         # Can't query sessions, unless we have a parameter!
@@ -104,7 +102,6 @@ class UserQuerySessions(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
     @api.doc(description='Create / update session. id_session must be set to "0" to create a new '
                          'session. A session can be created/modified if the user has access to all participants and '
                          'users in the session.',
@@ -112,12 +109,11 @@ class UserQuerySessions(Resource):
                         403: 'Logged user can\'t create/update the specified session',
                         400: 'Badly formed JSON or missing fields(session, id_session, session_participants_ids and/or '
                              'session_users_ids[for new sessions]) in the JSON body',
-                        500: 'Internal error when saving session'})
+                        500: 'Internal error when saving session'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-        from opentera.db.models.TeraDevice import TeraDevice
-
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:
@@ -137,17 +133,22 @@ class UserQuerySessions(Resource):
             # New session - check if we have a participant or users list
             if 'session_participants_ids' not in json_session and 'session_users_ids' not in json_session:
                 return gettext('Missing session participants and users'), 400
-            if 'session_participants_ids' in json_session:
-                session_parts_ids = json_session['session_participants_ids']
-            if 'session_users_ids' in json_session:
-                session_users_ids = json_session['session_users_ids']
-            if 'session_devices_ids' in json_session:
-                session_devices_ids = json_session['session_devices_ids']
+
         else:
-            # Query the session
-            ses_to_update = TeraSession.get_session_by_id(json_session['id_session'])
-            session_parts_ids = [part.id_participant for part in ses_to_update.session_participants]
-            session_users_ids = [user.id_user for user in ses_to_update.session_users]
+            # Query the session to update
+            ses_to_update = user_access.query_session(json_session['id_session'])
+            if not ses_to_update:
+                return gettext('No access to session.'), 403
+
+        if 'session_participants_ids' in json_session:
+            session_parts_ids = json_session['session_participants_ids']
+            del json_session['session_participants_ids']
+        if 'session_users_ids' in json_session:
+            session_users_ids = json_session['session_users_ids']
+            del json_session['session_users_ids']
+        if 'session_devices_ids' in json_session:
+            session_devices_ids = json_session['session_devices_ids']
+            del json_session['session_devices_ids']
 
         accessibles_part_ids = user_access.get_accessible_participants_ids()
         if set(session_parts_ids).difference(accessibles_part_ids):
@@ -195,19 +196,19 @@ class UserQuerySessions(Resource):
         update_session = TeraSession.get_session_by_id(json_session['id_session'])
 
         # Manage session participants
-        if 'session_participants_ids' in json_session:
+        if len(session_parts_ids) > 0:
             update_session.session_participants = [TeraParticipant.get_participant_by_id(part_id)
-                                                   for part_id in json_session['session_participants_ids']]
+                                                   for part_id in session_parts_ids]
 
         # Manage session users
-        if 'session_users_ids' in json_session:
+        if len(session_users_ids) > 0:
             update_session.session_users = [TeraUser.get_user_by_id(user_id)
-                                            for user_id in json_session['session_users_ids']]
+                                            for user_id in session_users_ids]
 
         # Manage session devices
-        if 'session_devices_ids' in json_session:
+        if len(session_devices_ids) > 0:
             update_session.session_devices = [TeraDevice.get_device_by_id(device_id)
-                                              for device_id in json_session['session_devices_ids']]
+                                              for device_id in session_devices_ids]
 
         if session_users_ids or session_parts_ids or session_devices_ids:
             # Commit the changes
@@ -220,19 +221,17 @@ class UserQuerySessions(Resource):
 
         return [update_session.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific session',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete session (must have access to all participants and users in the '
                              'session to delete)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

@@ -1,4 +1,5 @@
 from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
 from flask_babel import gettext
@@ -6,7 +7,7 @@ from flask_babel import gettext
 import uuid
 
 
-class TeraService(BaseModel):
+class TeraService(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_services'
 
     id_service = Column(Integer, Sequence('id_service_sequence'), primary_key=True, autoincrement=True)
@@ -28,6 +29,17 @@ class TeraService(BaseModel):
     service_roles = relationship('TeraServiceRole', cascade='delete')
     service_projects = relationship('TeraServiceProject', cascade='delete')
     service_sites = relationship('TeraServiceSite', cascade='delete')
+
+    service_created_sessions = relationship("TeraSession", cascade='delete', back_populates='session_creator_service',
+                                            passive_deletes=True)
+
+    service_assets = relationship("TeraAsset", cascade='delete', foreign_keys="TeraAsset.id_service",
+                                  back_populates='asset_service', passive_deletes=True)
+
+    service_owned_assets = relationship("TeraAsset", cascade='delete', foreign_keys="TeraAsset.asset_service_uuid",
+                                        back_populates='asset_service_owner', passive_deletes=True)
+
+    service_tests = relationship("TeraTest", cascade='delete', back_populates='test_service', passive_deletes=True)
 
     def __init__(self):
         pass
@@ -86,8 +98,8 @@ class TeraService(BaseModel):
         return jwt.encode(payload, token_key, algorithm='HS256')
 
     @staticmethod
-    def get_service_by_key(key: str):
-        service = TeraService.query.filter_by(service_key=key).first()
+    def get_service_by_key(key: str, with_deleted: bool = False):
+        service = TeraService.query.execution_options(include_deleted=with_deleted).filter_by(service_key=key).first()
 
         if service:
             return service
@@ -95,8 +107,9 @@ class TeraService(BaseModel):
         return None
 
     @staticmethod
-    def get_service_by_uuid(p_uuid: str):
-        service = TeraService.query.filter_by(service_uuid=p_uuid).first()
+    def get_service_by_uuid(p_uuid: str, with_deleted: bool = False):
+        service = TeraService.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(service_uuid=p_uuid).first()
 
         if service:
             return service
@@ -104,12 +117,12 @@ class TeraService(BaseModel):
         return None
 
     @staticmethod
-    def get_service_by_name(name: str):
-        return TeraService.query.filter_by(service_name=name).first()
+    def get_service_by_name(name: str, with_deleted: bool = False):
+        return TeraService.query.execution_options(include_deleted=with_deleted).filter_by(service_name=name).first()
 
     @staticmethod
-    def get_service_by_id(s_id: int):
-        return TeraService.query.filter_by(id_service=s_id).first()
+    def get_service_by_id(s_id: int, with_deleted: bool = False):
+        return TeraService.query.execution_options(include_deleted=with_deleted).filter_by(id_service=s_id).first()
 
     @staticmethod
     def get_openteraserver_service():

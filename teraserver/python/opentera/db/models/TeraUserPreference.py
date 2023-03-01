@@ -5,8 +5,7 @@ from sqlalchemy.orm import relationship
 
 class TeraUserPreference(BaseModel):
     __tablename__ = 't_users_preferences'
-    id_user_preference = Column(Integer, Sequence('id_userpreference_sequence'), primary_key=True,
-                                   autoincrement=True)
+    id_user_preference = Column(Integer, Sequence('id_userpreference_sequence'), primary_key=True, autoincrement=True)
     id_user = Column(Integer, ForeignKey('t_users.id_user', ondelete='cascade'), nullable=False)
     user_preference_app_tag = Column(String, nullable=False)
     user_preference_preference = Column(String, nullable=False)
@@ -89,7 +88,7 @@ class TeraUserPreference(BaseModel):
             if prefs is None or prefs == '':
                 TeraUserPreference.db().session.delete(existing_pref)
             else:
-                # Updage pref
+                # Update pref
                 existing_pref.user_preference_preference = prefs
         else:
             # Insert

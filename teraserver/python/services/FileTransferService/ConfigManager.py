@@ -34,6 +34,7 @@ class ConfigManager(ServiceConfigManager, FileTransferConfig, DBConfig):
         self.service_config['hostname'] = '127.0.0.1'
         self.service_config['port'] = 4041
         self.service_config['debug_mode'] = True
+        self.service_config['ServiceUUID'] = 'invalid'
 
         # Default backend configuration
         self.backend_config['hostname'] = '127.0.0.1'

@@ -26,9 +26,7 @@ get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_te
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information '
                                                           '(ids only)')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session_type_project', type=str, location='json',
-#                          help='Device type - project association to create / update', required=True)
+post_parser = api.parser()
 post_schema = api.schema_model('user_test_type_project', {'properties': TeraTestTypeProject.get_json_schema(),
                                                           'type': 'object',
                                                           'location': 'json'})
@@ -46,19 +44,17 @@ class UserQueryTestTypeProjects(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get test types that are associated with a project. Only one "ID" parameter required and '
                          'supported at once.',
              responses={200: 'Success - returns list of test-types - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'})
+                        500: 'Error when getting association'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         test_type_projects = []
         # If we have no arguments, return error
@@ -113,13 +109,14 @@ class UserQueryTestTypeProjects(Resource):
                                          'get', 500, 'InvalidRequestError', e)
             return '', 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update test-type - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (project admin access required)',
                         400: 'Badly formed JSON or missing fields in the JSON body',
-                        500: 'Internal error occured when saving association'})
+                        500: 'Internal error occurred when saving association'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
         user_access = DBManager.userAccess(current_user)
 
@@ -214,21 +211,22 @@ class UserQueryTestTypeProjects(Resource):
 
             # Do the update!
             if int(json_tt['id_test_type_project']) > 0:
-                # Already existing
-                try:
-                    TeraTestTypeProject.update(int(json_tt['id_test_type_project']), json_tt)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQueryTestTypeProjects.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # # Already existing
+                # try:
+                #     TeraTestTypeProject.update(int(json_tt['id_test_type_project']), json_tt)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQueryTestTypeProjects.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_ttp = TeraTestTypeProject()
                     new_ttp.from_json(json_tt)
-                    TeraTestTypeProject.insert(new_ttp)
+                    new_ttp = TeraTestTypeProject.insert(new_ttp)
                     # Update ID for further use
                     json_tt['id_test_type_project'] = new_ttp.id_test_type_project
                 except exc.SQLAlchemyError as e:
@@ -241,17 +239,16 @@ class UserQueryTestTypeProjects(Resource):
 
         return json_ttp
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific test-type - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (no access to test-type or project)',
-                        400: 'Association not found (invalid id?)'})
+                        400: 'Association not found (invalid id?)'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete
@@ -266,6 +263,14 @@ class UserQueryTestTypeProjects(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraTestTypeProject.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Associated project still have sessions with tests of that type
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQueryTestTypeProjects.__name__,
+                                         'delete', 500, 'Database error', str(e))
+            return gettext('Can\'t delete test type from project: please delete all tests of that type in the project '
+                           'before deleting.'), 500
         except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())

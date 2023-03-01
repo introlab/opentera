@@ -1,6 +1,6 @@
 # Flask
 from flask import Flask, request, g, url_for
-from flask_restx import Api
+from flask_restx import Api, Namespace
 from flask_babel import Babel
 
 # OpenTera
@@ -20,7 +20,6 @@ import os
 
 # Flask application
 flask_app = Flask("FileTransferService")
-
 
 
 def get_locale():
@@ -178,7 +177,7 @@ class FlaskModule(BaseModule):
         # self.session = Session(flask_app)
 
         # Init API
-        self.init_api()
+        FlaskModule.init_api(self, file_api_ns)
 
         # Init Views
         self.init_views()
@@ -225,14 +224,17 @@ class FlaskModule(BaseModule):
         print('FileTransferService.FlaskModule - Received message ', pattern, channel, message)
         pass
 
-    def init_api(self):
+    @staticmethod
+    def init_api(module: object, namespace: Namespace, additional_args: dict = dict()):
         # Default arguments
-        kwargs = {'flaskModule': self}
-        from API.QueryAssetFileInfos import QueryAssetFileInfos
-        from API.QueryAssetFile import QueryAssetFile
+        kwargs = {'flaskModule': module}
+        kwargs |= additional_args
 
-        file_api_ns.add_resource(QueryAssetFileInfos, '/assets/infos', resource_class_kwargs=kwargs)
-        file_api_ns.add_resource(QueryAssetFile,      '/assets', resource_class_kwargs=kwargs)
+        from services.FileTransferService.API.QueryAssetFileInfos import QueryAssetFileInfos
+        from services.FileTransferService.API.QueryAssetFile import QueryAssetFile
+
+        namespace.add_resource(QueryAssetFileInfos, '/assets/infos', resource_class_kwargs=kwargs)
+        namespace.add_resource(QueryAssetFile,      '/assets', resource_class_kwargs=kwargs)
 
     def init_views(self):
         # Default arguments

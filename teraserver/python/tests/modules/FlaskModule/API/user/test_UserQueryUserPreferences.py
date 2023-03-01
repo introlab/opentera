@@ -1,162 +1,201 @@
-from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
-import datetime
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
+from opentera.db.models.TeraUser import TeraUser
 
 
-class UserQueryUserPreferencesTest(BaseAPITest):
-    login_endpoint = '/api/user/login'
+class UserQueryUserPreferencesTest(BaseUserAPITest):
     test_endpoint = '/api/user/users/preferences'
 
     def setUp(self):
-        pass
+        super().setUp()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
     def test_no_auth(self):
-        response = self._request_with_no_auth()
-        self.assertEqual(response.status_code, 401)
+        with self._flask_app.app_context():
+            response = self.test_client.get(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
 
     def test_post_no_auth(self):
-        response = self._post_with_no_auth()
-        self.assertEqual(response.status_code, 401)
+        with self._flask_app.app_context():
+            response = self.test_client.post(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
+
+    def test_delete_no_auth(self):
+        with self._flask_app.app_context():
+            response = self.test_client.delete(self.test_endpoint)
+            self.assertEqual(405, response.status_code)
+
+    def test_get_endpoint_invalid_http_auth(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='invalid', password='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_token_auth(self.test_client, token='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_post_endpoint_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            response = self._post_with_user_token_auth(self.test_client, token='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_post_endpoint_invalid_http_auth(self):
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client, username='invalid', password='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_delete_endpoint_invalid_http_auth(self):
+        with self._flask_app.app_context():
+            response = self._delete_with_user_http_auth(self.test_client, username='invalid', password='invalid')
+            self.assertEqual(405, response.status_code)
+
+    def test_delete_endpoint_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            response = self._delete_with_user_token_auth(self.test_client, token='invalid')
+            self.assertEqual(405, response.status_code)
 
     def test_query_no_params_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin')
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(2, len(response.json))
+            for pref in response.json:
+                self._checkJson(pref)
 
-    def test_query_as_user(self):
-        response = self._request_with_http_auth(username='user', password='user', payload="id_user=1")
-        json_data = response.json()
-        self.assertGreater(len(json_data), 0)
+    def test_query_as_user_with_non_accessible_user(self):
+        with self._flask_app.app_context():
+            params = {'id_user': 1}  # admin
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user', params=params)
+            self.assertEqual(403, response.status_code)
 
-    def test_query_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+    def test_query_as_user_with_self_user(self):
+        with self._flask_app.app_context():
+            user = TeraUser.get_user_by_username('user')
+            params = {'id_user': user.id_user}
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user',
+                                                     params=params)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['id_user'], 1)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            for pref in response.json:
+                self._checkJson(pref)
 
-    def test_query_specific_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=2")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+    def test_query_all_as_admin(self):
+        with self._flask_app.app_context():
+            for user in TeraUser.query.all():
+                params = {'id_user': user.id_user}
+                response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                         params=params)
+                self.assertEqual(200, response.status_code)
+                self.assertTrue(response.is_json)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['id_user'], 2)
+                for data_item in response.json:
+                    self._checkJson(json_data=data_item)
 
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=2")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+    def test_query_all_with_specific_tag_as_admin(self):
+        with self._flask_app.app_context():
+            for user in TeraUser.query.all():
+                params = {'id_user': user.id_user,
+                          'app_tag': 'openteraplus'}
+                response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                         params=params)
+                self.assertEqual(200, response.status_code)
+                self.assertTrue(response.is_json)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['id_user'], 2)
-            self.assertEqual(data_item['user_preference_app_tag'], 'openteraplus')
-
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=1&"
-                                                                                            "app_tag=openteraplus")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['id_user'], 1)
-            self.assertEqual(data_item['user_preference_app_tag'], 'openteraplus')
+                for data_item in response.json:
+                    self._checkJson(json_data=data_item)
+                    self.assertEqual('openteraplus', data_item['user_preference_app_tag'])
 
     def test_post_and_delete(self):
-        # New with minimal infos
-        json_data = {
-            'user_preference': {
-                "id_user": 2,
-                "user_preference_preference": "{err"
+        with self._flask_app.app_context():
+            # New with minimal infos
+            json_data = {
+                'user_preference': {
+                    "id_user": 2,
+                    "user_preference_preference": "{err"
+                }
             }
-        }
 
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing app_tag")  # Missing app+tag
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin', password='admin', json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing app_tag")  # Missing app+tag
 
-        json_data['user_preference']['user_preference_app_tag'] = 'testapp'
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="JSON format error")
+            json_data['user_preference']['user_preference_app_tag'] = 'testapp'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="JSON format error")
 
-        json_data['user_preference']['user_preference_preference'] = '{"TestParam": 1234}'
-        response = self._post_with_http_auth(username='user4', password='user4', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Post denied for user")  # Forbidden for that user to post that
+            json_data['user_preference']['user_preference_preference'] = '{"TestParam": 1234}'
+            response = self._post_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="Post denied for user")  # Forbidden
 
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post new")  # All ok now!
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post new")  # All ok now!
 
-        json_data = response.json()
-        self._checkJson(json_data)
-        self.assertEqual(json_data['user_preference_preference'], '{"TestParam": 1234}')
+            self._checkJson(response.json)
+            self.assertEqual(response.json['user_preference_preference'], '{"TestParam": 1234}')
 
-        json_data = {
-            'user_preference': {
-                "id_user": 2,
-                'user_preference_app_tag': 'testapp',
-                'user_preference_preference': '{"TestParam": 4567}'
+            json_data = {
+                'user_preference': {
+                    "id_user": 2,
+                    'user_preference_app_tag': 'testapp',
+                    'user_preference_preference': '{"TestParam": 4567}'
+                }
             }
-        }
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post update")
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post update")
+            self._checkJson(response.json)
+            self.assertEqual(response.json['user_preference_preference'], '{"TestParam": 4567}')
 
-        json_data = response.json()
-        self._checkJson(json_data)
-        self.assertEqual(json_data['user_preference_preference'], '{"TestParam": 4567}')
-
-        json_data = {
-            'user_preference': {
-                "id_user": 2,
-                'user_preference_app_tag': 'testapp'
+            json_data = {
+                'user_preference': {
+                    "id_user": 2,
+                    'user_preference_app_tag': 'testapp'
+                }
             }
-        }
-        # Delete prefs
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post delete prefs")
+            # Delete prefs
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post delete prefs")
 
-        # Check everything was deleted
-        response = self._request_with_http_auth(username='admin', password='admin', payload="id_user=2&"
-                                                                                            "app_tag=testapp")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+            # Check everything was deleted
+            params = {'id_user': 2, 'app_tag': 'testapp'}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(len(response.json), 0)
 
-        # Try to update self preferences
-        json_data = {
-            'user_preference': {
-                'user_preference_app_tag': 'testapp',
-                'user_preference_preference': '{"TestParam": "TEST"}'
+            # Try to update self preferences
+            json_data = {
+                'user_preference': {
+                    'user_preference_app_tag': 'testapp',
+                    'user_preference_preference': '{"TestParam": "TEST"}'
+                }
             }
-        }
 
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post self new")
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post self new")
 
-        # Delete prefs
-        json_data['user_preference']['user_preference_preference'] = ''
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post delete self prefs")
+            # Delete prefs
+            json_data['user_preference']['user_preference_preference'] = ''
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post delete self prefs")
 
-        # Check everything was deleted
-        response = self._request_with_http_auth(username='admin', password='admin', payload="app_tag=testapp")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+            # Check everything was deleted
+            params = {'app_tag': 'testapp'}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code, 200)
+            self.assertTrue(response.is_json)
+            self.assertEqual(len(response.json), 0)
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
@@ -164,4 +203,3 @@ class UserQueryUserPreferencesTest(BaseAPITest):
         self.assertTrue(json_data.__contains__('id_user_preference'))
         self.assertTrue(json_data.__contains__('user_preference_app_tag'))
         self.assertTrue(json_data.__contains__('user_preference_preference'))
-

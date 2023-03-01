@@ -33,7 +33,8 @@ class UserQueryDisconnect(Resource):
                         400: 'No parameters specified, at least one id / uuid must be used',
                         403: 'Forbidden access. Please check that the user has access to'
                              ' the requested id/uuid.',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):

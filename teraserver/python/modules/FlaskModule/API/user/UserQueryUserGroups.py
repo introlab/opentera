@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
@@ -18,8 +18,7 @@ get_parser.add_argument('id_user', type=int, help='ID of the user to get all use
 get_parser.add_argument('id_site', type=int, help='ID of the site to get all user groups with access in that site')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('user_group', type=str, location='json', help='User group to create / update', required=True)
+post_parser = api.parser()
 post_schema = api.schema_model('user_group', {'properties': TeraUserGroup.get_json_schema(),
                                               'type': 'object',
                                               'location': 'json'})
@@ -71,16 +70,14 @@ class UserQueryUserGroups(Resource):
             sites_list.append(site_access_json)
         return sites_list
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get user group information. If no id specified, returns all accessible users groups',
              responses={200: 'Success',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        parser = get_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         user_access = DBManager.userAccess(current_user)
 
@@ -119,19 +116,20 @@ class UserQueryUserGroups(Resource):
             return jsonify(user_groups_list)
         return [], 200
 
-    @user_multi_auth.login_required
-    # @api.expect(post_parser)
-    @api.expect(post_schema)
     @api.doc(description='Create / update user group. id_user_group must be set to "0" to create a new user group. User'
                          ' groups can be modified has a site admin role.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified user group',
                         400: 'Badly formed JSON or missing field(id_user_group) in the JSON body',
-                        500: 'Internal error when saving user group'})
+                        500: 'Internal error when saving user group'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-
         user_access = DBManager.userAccess(current_user)
+
+        if 'user_group' not in request.json:
+            return gettext('Missing user_group'), 400
 
         # Using request.json instead of parser, since parser messes up the json!
         json_user_group = request.json['user_group']
@@ -139,6 +137,9 @@ class UserQueryUserGroups(Resource):
         # Validate if we have an id_user_group
         if 'id_user_group' not in json_user_group:
             return gettext('Missing id_user_group'), 400
+
+        if 'user_group_name' not in json_user_group and json_user_group['id_user_group'] == 0:
+            return gettext('Missing user group name'), 400
 
         # Check if current user has at least an accessible site as admin
         current_user_sites = user_access.get_accessible_sites(admin_only=True)
@@ -267,19 +268,17 @@ class UserQueryUserGroups(Resource):
                 user_access=user_access, user_group_id=json_user_group['id_user_group'])
         return [json_user_group]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific user group',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete user group (only a site admin that includes that user group in '
                              'their site can delete)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

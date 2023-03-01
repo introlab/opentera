@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
@@ -17,8 +17,7 @@ get_parser.add_argument('with_empty', type=inputs.boolean, help="Used with id_us
                                                                 "user is not part of. Used with id_user_group, also "
                                                                 "returns users not part of that user group.")
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('user_group', type=str, location='json', help='User group to create / update', required=True)
+post_parser = api.parser()
 post_schema = api.schema_model('user_user_group', {'properties': TeraUserUserGroup.get_json_schema(),
                                                    'type': 'object',
                                                    'location': 'json'})
@@ -34,17 +33,14 @@ class UserQueryUserUserGroups(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get user - user group information. At least one "id" field must be specified',
              responses={200: 'Success',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        parser = get_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-        args = parser.parse_args()
-
+        args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
         user_user_groups = []
@@ -77,19 +73,20 @@ class UserQueryUserUserGroups(Resource):
                 user_user_groups_list.append(uug_json)
         return user_user_groups_list
 
-    @user_multi_auth.login_required
-    # @api.expect(post_parser)
-    @api.expect(post_schema)
     @api.doc(description='Create / update user - user group relationship, creating it if it doesn\'t exist, updating it'
                          ' otherwise.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified user group',
                         400: 'Badly formed JSON or missing field(id_user_group) in the JSON body',
-                        500: 'Internal error when saving user group'})
+                        500: 'Internal error when saving user group'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-
         user_access = DBManager.userAccess(current_user)
+
+        if not 'user_user_group' in request.json:
+            return gettext('Missing user user group'), 400
 
         # Using request.json instead of parser, since parser messes up the json!
         json_user_groups = request.json['user_user_group']
@@ -129,7 +126,7 @@ class UserQueryUserUserGroups(Resource):
                 try:
                     new_uug = TeraUserUserGroup()
                     new_uug.from_json(json_user_group)
-                    TeraUserUserGroup.insert(new_uug)
+                    new_uug = TeraUserUserGroup.insert(new_uug)
                     # Update ID User Group for further use
                     json_user_group['id_user_user_group'] = new_uug.id_user_user_group
                 except exc.SQLAlchemyError as e:
@@ -142,19 +139,17 @@ class UserQueryUserUserGroups(Resource):
 
         return json_user_groups
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific user - user group relationship',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete user group (only a site admin that includes that user group in '
                              'their site can delete)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

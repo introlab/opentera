@@ -32,11 +32,11 @@ class ServiceQueryDisconnect(Resource):
                         400: 'No parameters specified at least one id / uuid must be used',
                         403: 'Forbidden access. Please check that the service has access to'
                              ' the requested id/uuid.',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
-
         args = get_parser.parse_args()
         service_access: DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
 

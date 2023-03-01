@@ -1,7 +1,7 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSessionEvent import TeraSessionEvent
@@ -13,9 +13,7 @@ from sqlalchemy import exc
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query events for', required=True)
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session_event', type=str, location='json', help='Session event to create / update',
-#                          required=True)
+post_parser = api.parser()
 post_schema = api.schema_model('user_session_event', {'properties': TeraSessionEvent.get_json_schema(),
                                                       'type': 'object',
                                                       'location': 'json'})
@@ -31,19 +29,16 @@ class UserQuerySessionEvents(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get events for a specific session',
              responses={200: 'Success - returns list of events',
                         400: 'Required parameter is missing (id_session)',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         sessions_events = []
         # Can't query sessions event, unless we have a parameter - id_session
@@ -66,18 +61,16 @@ class UserQuerySessionEvents(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update session events. id_session_event must be set to "0" to create a new '
                          'event. An event can be created/modified if the user has access to the session.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified event',
                         400: 'Badly formed JSON or missing fields(id_session_event or id_session) in the JSON body',
-                        500: 'Internal error when saving device'})
+                        500: 'Internal error when saving device'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_event' not in request.json:
@@ -130,18 +123,16 @@ class UserQuerySessionEvents(Resource):
 
         return jsonify([update_event.to_json()])
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific session event',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete event (no access to that session)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

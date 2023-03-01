@@ -270,7 +270,7 @@ class ServiceAccessManager:
             return True
 
     @staticmethod
-    def validate_device_token(token: str, allow_dynamic_tokens:bool, allow_static_tokens:bool) -> bool:
+    def validate_device_token(token: str, allow_dynamic_tokens: bool, allow_static_tokens: bool) -> bool:
         if allow_dynamic_tokens:  # Check for dynamic device token
             try:
                 token_dict = jwt.decode(token, ServiceAccessManager.api_device_token_key, algorithms='HS256')

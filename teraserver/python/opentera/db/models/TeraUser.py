@@ -1,8 +1,15 @@
 from opentera.db.Base import BaseModel
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from sqlalchemy import Column, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraSessionUsers import TeraSessionUsers
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraAsset import TeraAsset
+
 
 from passlib.hash import bcrypt
 import uuid
@@ -22,7 +29,7 @@ def infinite_jti_sequence():
 user_jti_generator = infinite_jti_sequence()
 
 
-class TeraUser(BaseModel):
+class TeraUser(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_users'
     id_user = Column(Integer, Sequence('id_user_sequence'), primary_key=True, autoincrement=True)
     user_username = Column(String(50), nullable=False, unique=True)
@@ -40,9 +47,17 @@ class TeraUser(BaseModel):
     # user_sites_access = relationship('TeraSiteAccess', cascade="all,delete")
     # user_projects_access = relationship("TeraProjectAccess", cascade="all,delete")
     user_user_groups = relationship("TeraUserGroup", secondary="t_users_users_groups",
-                                       back_populates="user_group_users", lazy='joined')
+                                    back_populates="user_group_users", lazy='joined')
     user_sessions = relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users",
-                                    passive_deletes=True)
+                                 passive_deletes=True)
+
+    user_created_sessions = relationship("TeraSession", cascade='delete', back_populates='session_creator_user',
+                                         passive_deletes=True)
+
+    user_service_config = relationship("TeraServiceConfig", cascade='delete', passive_deletes=True)
+
+    user_assets = relationship("TeraAsset", cascade='delete', back_populates='asset_user', passive_deletes=True)
+    user_tests = relationship("TeraTest", cascade='delete', back_populates='test_user', passive_deletes=True)
 
     authenticated = False
 
@@ -71,7 +86,6 @@ class TeraUser(BaseModel):
     def get_token(self, token_key: str, expiration=3600):
         import time
         import jwt
-        import random
 
         # Creating token with user info
         now = time.time()
@@ -188,22 +202,22 @@ class TeraUser(BaseModel):
         return None
 
     @staticmethod
-    def get_user_by_username(username):
-        return TeraUser.query.filter_by(user_username=username).first()
+    def get_user_by_username(username, with_deleted: bool = False):
+        return TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(user_username=username).first()
 
     @staticmethod
-    def get_user_by_uuid(u_uuid):
-        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
+    def get_user_by_uuid(u_uuid, with_deleted: bool = False):
+        user = TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(user_uuid=u_uuid).first()
         return user
 
     @staticmethod
-    def get_user_by_id(id_user):
-        user = TeraUser.query.filter_by(id_user=id_user).first()
+    def get_user_by_id(id_user, with_deleted: bool = False):
+        user = TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(id_user=id_user).first()
         return user
 
     @staticmethod
-    def get_superadmins():
-        return TeraUser.query.filter_by(user_superadmin=True).all()
+    def get_superadmins(with_deleted: bool = False):
+        return TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(user_superadmin=True).all()
 
     @classmethod
     def update(cls, id_user: int, values: dict):
@@ -244,9 +258,23 @@ class TeraUser(BaseModel):
 
         super().insert(user)
 
+    def delete_check_integrity(self) -> IntegrityError | None:
+        if TeraSessionUsers.get_session_count_for_user(self.id_user) > 0:
+            return IntegrityError('User still has sessions', self.id_user, 't_sessions_users')
+
+        if TeraSession.get_count(filters={'id_creator_user': self.id_user}) > 0:
+            return IntegrityError('User still has created sessions', self.id_user, 't_sessions')
+
+        if TeraAsset.get_count(filters={'id_user': self.id_user}) > 0:
+            return IntegrityError('User still has created assets', self.id_user, 't_assets')
+
+        if TeraTest.get_count(filters={'id_user': self.id_user}) > 0:
+            return IntegrityError('User still has created tests', self.id_user, 't_tests')
+
+        return None
+
     @staticmethod
     def create_defaults(test=False):
-        from opentera.db.models.TeraUserGroup import TeraUserGroup
         # Admin
         admin = TeraUser()
         admin.user_enabled = True

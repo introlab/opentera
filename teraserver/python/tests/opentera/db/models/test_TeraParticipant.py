@@ -2,13 +2,12 @@ from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 import uuid
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
-from modules.FlaskModule.FlaskModule import flask_app
 
 
 class TeraParticipantTest(BaseModelsTest):
 
     def test_token(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             return
             participantGroup = TeraParticipantGroup()
             participantGroup.participant_group_name = 'participants'
@@ -36,7 +35,7 @@ class TeraParticipantTest(BaseModelsTest):
             self.assertEqual(loadedParticipant.participant_uuid, participant.participant_uuid)
 
     def test_json(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             return
             participant = TeraParticipant.get_participant_by_name('Participant #1')
 

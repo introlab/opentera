@@ -1,6 +1,6 @@
 from flask import session, request
 from flask_restx import Resource
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraService import TeraService
@@ -84,19 +84,17 @@ class UserSessionManager(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(session_manager_schema)
     @api.doc(description='Manage a specific session',
              responses={200: 'Success',
                         400: 'Required parameter is missing',
                         500: 'Internal server error',
                         501: 'Not implemented',
-                        403: 'Logged user doesn\'t have enough permission'})
+                        403: 'Logged user doesn\'t have enough permission'},
+             params={'token': 'Secret token'})
+    @api.expect(session_manager_schema)
+    @user_multi_auth.login_required
     def post(self):
         args = post_parser.parse_args()
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -209,54 +207,9 @@ class UserSessionManager(Resource):
         # - Service will return id_session and status code as a result to the RPC call and this will be the reply of
         #   this query
         if answer:
-            # Update UserManager module
             # MANAGED IN SERVICES
-            # if 'session' in answer:
-            #     if 'session_uuid' in answer['session']:
-            #         session_uuid = answer['session']['session_uuid']
-            #
-            #         dest_topic_name = create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME)
-            #         tera_message = self.module.create_tera_message(dest=dest_topic_name)
-            #         if json_session_manager['action'] == 'start' or json_session_manager['action'] == 'invite':
-            #             join_session_msg = messages.JoinSessionEvent()
-            #             join_session_msg.session_uuid = session_uuid
-            #             join_session_msg.session_users.extend(answer['session']['session_users'])
-            #             join_session_msg.session_participants.extend(answer['session']['session_participants'])
-            #             join_session_msg.session_devices.extend(answer['session']['session_devices'])
-            #             any_message = messages.Any()
-            #             any_message.Pack(join_session_msg)
-            #             tera_message.data.extend([any_message])
-            #             self.module.publish(dest_topic_name, tera_message.SerializeToString())
-            #
-            #         if json_session_manager['action'] == 'stop':
-            #             stop_session_msg = messages.StopSessionEvent()
-            #             stop_session_msg.session_uuid = session_uuid
-            #             any_message = messages.Any()
-            #             any_message.Pack(stop_session_msg)
-            #             tera_message.data.extend([any_message])
-            #             self.module.publish(dest_topic_name, tera_message.SerializeToString())
-            #
-            #         if json_session_manager['action'] == 'remove':
-            #             leave_session_msg = messages.LeaveSessionEvent()
-            #             leave_session_msg.session_uuid = session_uuid
-            #             if 'session_users' in json_session_manager:
-            #                 leave_session_msg.leaving_users.extend(json_session_manager['session_users'])
-            #             if 'session_participants' in json_session_manager:
-            #                 leave_session_msg.leaving_participants.extend(json_session_manager['session_participants'])
-            #             if 'session_devices' in json_session_manager:
-            #                 leave_session_msg.leaving_devices.extend(json_session_manager['session_devices'])
-            #             any_message = messages.Any()
-            #             any_message.Pack(leave_session_msg)
-            #             tera_message.data.extend([any_message])
-            #             self.module.publish(dest_topic_name, tera_message.SerializeToString())
-
             return answer, 200
         else:
-            # Test and debug for now
-            # if json_session_manager['action'] == 'start':
-            #     return {'status': 'started', 'id_session': 1}, 200
-            # if json_session_manager['action'] == 'stop':
-            #     return {'status': 'stopped', 'id_session': 1}, 200
             return gettext('No answer from service.'), 500
 
 

@@ -1,7 +1,7 @@
 from flask import session
 from flask_restx import Resource
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from opentera.db.models.TeraUser import TeraUser
@@ -19,20 +19,22 @@ class UserQueryOnlineDevices(Resource):
         self.flaskModule = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get online devices uuids.',
-             responses={200: 'Success'})
+             responses={200: 'Success'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
-        parser = get_parser
-        args = parser.parse_args()
+        args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
         try:
             accessible_devices = user_access.get_accessible_devices_uuids()
-            rpc = RedisRPCClient(self.flaskModule.config.redis_config)
-            status_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_devices')
+            if not self.test:
+                rpc = RedisRPCClient(self.flaskModule.config.redis_config)
+                status_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_devices')
+            else:
+                status_devices = {accessible_devices[0]: {'online': True, 'busy': False}}
 
             devices_uuids = [device_uuid for device_uuid in status_devices]
             # Filter devices that are available to the query
@@ -56,10 +58,4 @@ class UserQueryOnlineDevices(Resource):
                                          UserQueryOnlineDevices.__name__,
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Internal server error when making RPC call.'), 500
-
-    # def post(self):
-    #     return '', 501
-    #
-    # def delete(self):
-    #     return '', 501
 

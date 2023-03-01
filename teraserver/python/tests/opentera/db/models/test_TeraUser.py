@@ -3,17 +3,16 @@ from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
-from modules.FlaskModule.FlaskModule import flask_app
 
 
 class TeraUserTest(BaseModelsTest):
 
     def test_empty(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             pass
 
     def test_superadmin(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Superadmin should have access to everything.
             admin = TeraUser.get_user_by_username('admin')
             self.assertNotEqual(admin, None, 'admin user not None')
@@ -30,7 +29,7 @@ class TeraUserTest(BaseModelsTest):
             self.assertEqual(len(projects), TeraProject.get_count())
 
     def test_siteadmin(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             # Site admin should have access to the site
             siteadmin = TeraUser.get_user_by_username('siteadmin')
             self.assertNotEqual(siteadmin, None, 'siteadmin user not None')
@@ -49,7 +48,7 @@ class TeraUserTest(BaseModelsTest):
             self.assertEqual(len(projects), 2)
 
     def test_multisite_user(self):
-        with flask_app.app_context():
+        with self._flask_app.app_context():
             multi = TeraUser.get_user_by_username('user2')
             self.assertNotEqual(multi, None, 'user2 user not None')
             self.assertEqual(True, isinstance(multi, TeraUser), 'user2 user is a TeraUser')

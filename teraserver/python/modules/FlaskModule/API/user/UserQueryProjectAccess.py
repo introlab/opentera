@@ -2,11 +2,12 @@ from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraServiceRole import TeraServiceRole
+from opentera.db.models.TeraProject import TeraProject
 from modules.DatabaseModule.DBManager import DBManager
 import modules.Globals as Globals
 
@@ -26,9 +27,7 @@ get_parser.add_argument('with_empty', type=inputs.boolean, help='Used with id_us
                                                                 ' id_project. also return user groups that don\'t have '
                                                                 'any access to the project')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('project_access', type=str, location='json',
-#                          help='Project access to create / update', required=True)
+post_parser = api.parser()
 post_schema = api.schema_model('user_project_access', {
     'properties': {
         'project_access': {
@@ -65,19 +64,16 @@ class UserQueryProjectAccess(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get user roles for projects. Only one ID parameter required and supported at once.',
              responses={200: 'Success - returns list of users roles in projects',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error occured when loading project roles'})
+                        500: 'Error occured when loading project roles'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        from opentera.db.models.TeraProject import TeraProject
-        parser = get_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         access = None
         # If we have no arguments, return bad request
@@ -171,15 +167,15 @@ class UserQueryProjectAccess(Resource):
         # No access, but still fine
         return [], 200
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update project access for an user.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify this project or user access (project admin access required)',
                         400: 'Badly formed JSON or missing fields(id_user_group or id_project) in the JSON body',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_projects = request.json['project_access']
@@ -251,20 +247,17 @@ class UserQueryProjectAccess(Resource):
 
         return jsonify(json_rval)
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific project access',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete project access(only user who is admin in that project can '
                              'remove it)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         project_access = TeraServiceAccess.get_service_access_by_id(id_todel)

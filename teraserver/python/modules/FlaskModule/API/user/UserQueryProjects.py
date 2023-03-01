@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -22,8 +22,7 @@ get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get
 get_parser.add_argument('name', type=str, help='Project to query by name')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('project', type=str, location='json', help='Project to create / update', required=True)
+post_parser = api.parser()
 post_schema = api.schema_model('user_project', {'properties': TeraProject.get_json_schema(),
                                                 'type': 'object',
                                                 'location': 'json'})
@@ -39,17 +38,15 @@ class UserQueryProjects(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get projects information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of participants',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        parser = get_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         projects = []
         # If we have no arguments, return all accessible projects
@@ -111,26 +108,29 @@ class UserQueryProjects(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update projects. id_project must be set to "0" to create a new '
                          'project. A project can be created/modified if the user has admin rights to the '
                          'related site.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified project',
                         400: 'Badly formed JSON or missing fields(id_site or id_project) in the JSON body',
-                        500: 'Internal error occured when saving project'})
+                        500: 'Internal error occured when saving project'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
+        if 'project' not in request.json:
+            return gettext('Missing project'), 400
+
         json_project = request.json['project']
 
         # Validate if we have an id
-        if 'id_project' not in json_project or 'id_site' not in json_project:
-            return gettext('Missing id_project or id_site arguments'), 400
+        if 'id_project' not in json_project:
+            return gettext('Missing id_project'), 400
+        if json_project['id_project'] == 0 and 'id_site' not in json_project:
+            return gettext('Missing id_site arguments'), 400
 
         # Check if current user can modify the posted kit
         # User can modify or add a project if it is the project admin of that kit
@@ -141,6 +141,11 @@ class UserQueryProjects(Resource):
         # Only site admins can create new projects
         if json_project['id_project'] == 0 and \
                 json_project['id_site'] not in user_access.get_accessible_sites_ids(admin_only=True):
+            return gettext('Forbidden'), 403
+
+        # Only site admins can update projects
+        if json_project['id_project'] > 0 and \
+                json_project['id_project'] not in user_access.get_accessible_projects_ids(admin_only=True):
             return gettext('Forbidden'), 403
 
         update_session_types = False
@@ -156,6 +161,11 @@ class UserQueryProjects(Resource):
                 # We have some session types not accessible
                 return gettext('No access to a session type for at least one of it'), 403
 
+            if 'site_id' not in json_project:
+                # If we are here, the project has a site since it is an update (otherwise, site id is required)
+                project = TeraProject.get_project_by_id(json_project['id_project'])
+                if project:
+                    json_project['id_site'] = project.id_site
             site_session_types = TeraSessionTypeSite.get_sessions_types_for_site(site_id=json_project['id_site'])
             site_session_types_ids = [st.id_session_type for st in site_session_types]
 
@@ -165,6 +175,7 @@ class UserQueryProjects(Resource):
             update_session_types = True
 
         # Do the update!
+        new_project = None
         if json_project['id_project'] > 0:
             # Already existing
             try:
@@ -220,18 +231,16 @@ class UserQueryProjects(Resource):
 
         return [update_project.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific project',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete project (only site admin can delete)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete

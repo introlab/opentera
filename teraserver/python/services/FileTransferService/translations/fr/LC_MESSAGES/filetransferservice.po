@@ -7,107 +7,103 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-26 13:30-0500\n"
-"PO-Revision-Date: 2021-10-26 09:19-0400\n"
+"POT-Creation-Date: 2023-02-28 08:03-0500\n"
+"PO-Revision-Date: 2023-02-28 08:22-0500\n"
 "Last-Translator: \n"
-"Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.11.0\n"
+"X-Generator: Poedit 3.2.2\n"
 
-#: API/QueryAssetFile.py:46 API/QueryAssetFile.py:234
+#: API/QueryAssetFile.py:46 API/QueryAssetFile.py:236
 msgid "Access denied to asset"
-msgstr ""
+msgstr "Accès refusé à la ressource"
 
-#: API/QueryAssetFile.py:63
+#: API/QueryAssetFile.py:51 API/QueryAssetFileInfos.py:69
+#: API/QueryAssetFileInfos.py:126
+msgid "No asset found"
+msgstr "Aucune ressource trouvée"
+
+#: API/QueryAssetFile.py:65
 msgid "Wrong content type"
-msgstr ""
+msgstr "Mauvais type de contenu"
 
-#: API/QueryAssetFile.py:66
+#: API/QueryAssetFile.py:68
 msgid "Missing file asset information"
-msgstr ""
+msgstr "Informations manquantes sur le fichier de la ressource"
 
-#: API/QueryAssetFile.py:69
+#: API/QueryAssetFile.py:71
 msgid "Missing uploaded file"
-msgstr ""
+msgstr "Fichier à recevoir manquant"
 
-#: API/QueryAssetFile.py:74
+#: API/QueryAssetFile.py:76
 msgid "Missing filename"
-msgstr ""
+msgstr "Nom de fichier manquant"
 
-#: API/QueryAssetFile.py:80
+#: API/QueryAssetFile.py:82
 msgid "Invalid file_asset format"
-msgstr ""
+msgstr "Format de file_asset invalide"
 
-#: API/QueryAssetFile.py:83
+#: API/QueryAssetFile.py:85
 msgid "Missing required field(s) in asset descriptor"
-msgstr ""
+msgstr "Champ(s) obligatoire(s) manquant(s) dans la description de la ressource"
 
-#: API/QueryAssetFile.py:94 API/QueryAssetFile.py:114 API/QueryAssetFile.py:121
-#: API/QueryAssetFile.py:128
+#: API/QueryAssetFile.py:96 API/QueryAssetFile.py:116 API/QueryAssetFile.py:123
+#: API/QueryAssetFile.py:130
 msgid "Session access is forbidden"
-msgstr ""
+msgstr "L'accès à la séance est interdit"
 
-#: API/QueryAssetFile.py:135
+#: API/QueryAssetFile.py:137
 msgid "Missing at least one ID creator"
-msgstr ""
+msgstr "Au moins un ID de créateur est manquant"
 
-#: API/QueryAssetFile.py:168
-#, fuzzy
+#: API/QueryAssetFile.py:170
 msgid "Unable to create asset"
-msgstr "Impossible de se connecter"
+msgstr "Impossible de créer la ressource"
 
-#: API/QueryAssetFile.py:239
+#: API/QueryAssetFile.py:241
 msgid "Unable to delete asset"
-msgstr ""
+msgstr "Impossible de supprimer la ressource"
 
 #: API/QueryAssetFileInfos.py:63
 msgid "Access denied for that asset"
-msgstr ""
-
-#: API/QueryAssetFileInfos.py:69
-msgid "No asset found"
-msgstr ""
+msgstr "Accès refusé à cette ressource"
 
 #: API/QueryAssetFileInfos.py:83
 msgid "Badly formatted request"
-msgstr ""
+msgstr "Requête mal formattée"
 
 #: API/QueryAssetFileInfos.py:91
 msgid "Missing access token for at least one requested asset"
-msgstr ""
+msgstr "Au moins au jeton d'accès pour la ressource est manquant"
 
 #: API/QueryAssetFileInfos.py:93
 msgid "Missing asset UUID for at least one requested asset"
-msgstr ""
+msgstr "Le UUID est manquant pour au moins une ressource"
 
 #: API/QueryAssetFileInfos.py:97
 msgid "Access denied for at least one requested asset"
-msgstr ""
+msgstr "Accès refusé pour au moins une ressource"
 
 #: API/QueryAssetFileInfos.py:109
 msgid "Missing access token"
-msgstr ""
+msgstr "Jeton d'accès manquant"
 
 #: API/QueryAssetFileInfos.py:112
 msgid "Missing asset uuid"
-msgstr ""
+msgstr "L'UUID de la ressource est manquant"
 
 #: API/QueryAssetFileInfos.py:117
 msgid "Forbidden"
-msgstr ""
+msgstr "Accès refusé"
 
 #: API/QueryAssetFileInfos.py:121
 msgid "Only original filename can be changed from here"
-msgstr ""
-
-#: API/QueryAssetFileInfos.py:126
-#, fuzzy
-msgid "Unknown asset"
-msgstr "Séance inconnue"
+msgstr "Seul le nom du fichier original peut être modifié ici"
 
 #~ msgid "User: "
 #~ msgstr "Utilisateur:"
@@ -152,22 +148,13 @@ msgstr "Séance inconnue"
 #~ msgstr "Erreur lors de la mise à jour de la séance"
 
 #~ msgid "Error creating user left session event"
-#~ msgstr ""
-#~ "Erreur lors de la création de "
-#~ "l'événement \"Utilisateur a quitté la "
-#~ "séance\""
+#~ msgstr "Erreur lors de la création de l'événement \"Utilisateur a quitté la séance\""
 
 #~ msgid "Error creating participant left session event"
-#~ msgstr ""
-#~ "Erreur lors de la création de "
-#~ "l'événement \"Participant a quitté la "
-#~ "séance\""
+#~ msgstr "Erreur lors de la création de l'événement \"Participant a quitté la séance\""
 
 #~ msgid "Error creating device left session event"
-#~ msgstr ""
-#~ "Erreur lors de la création de "
-#~ "l'événement \"Appareil a quitté la "
-#~ "séance\""
+#~ msgstr "Erreur lors de la création de l'événement \"Appareil a quitté la séance\""
 
 #~ msgid "Cannot create refused session event"
 #~ msgstr "Erreur lors de la création de l'événement \"Invitation refusée\""
@@ -202,16 +189,8 @@ msgstr "Séance inconnue"
 #~ msgid "Unsupported browser detected"
 #~ msgstr "Navigateur non-supporté détecté"
 
-#~ msgid ""
-#~ "Your browser is not supported. Session"
-#~ " might or might not work, but "
-#~ "it is recommended to user another "
-#~ "browser."
-#~ msgstr ""
-#~ "Votre navigateur Internet n'est pas "
-#~ "supporté. La séance peut quand même "
-#~ "fonctionner correctement, mais il est "
-#~ "recommandé d'utiliser un autre navigateur."
+#~ msgid "Your browser is not supported. Session might or might not work, but it is recommended to user another browser."
+#~ msgstr "Votre navigateur Internet n'est pas supporté. La séance peut quand même fonctionner correctement, mais il est recommandé d'utiliser un autre navigateur."
 
 #~ msgid "Your browser"
 #~ msgstr "Votre navigateur"
@@ -219,20 +198,11 @@ msgstr "Séance inconnue"
 #~ msgid "Supported browsers"
 #~ msgstr "Navigateurs compatibles"
 
-#~ msgid ""
-#~ "Your access might have been disabled "
-#~ "or you might be already logged in"
-#~ " on another device"
-#~ msgstr ""
-#~ "Votre accès peut avoir été désactivé "
-#~ "ou vous êtes peut-être déjà "
-#~ "connecté sur un autre appareil"
+#~ msgid "Your access might have been disabled or you might be already logged in on another device"
+#~ msgstr "Votre accès peut avoir été désactivé ou vous êtes peut-être déjà connecté sur un autre appareil"
 
 #~ msgid "Your session is now over. You may now logout or close this page."
-#~ msgstr ""
-#~ "La séance est maintenant terminée. Vous"
-#~ " pouvez vous déconnecter ou fermer "
-#~ "cette page."
+#~ msgstr "La séance est maintenant terminée. Vous pouvez vous déconnecter ou fermer cette page."
 
 #~ msgid "Error"
 #~ msgstr "Erreur"
@@ -297,9 +267,5 @@ msgstr "Séance inconnue"
 #~ msgid "Devices"
 #~ msgstr "Appareils"
 
-#~ msgid "Unable to determine asset type. Please specify manually"
-#~ msgstr ""
-
-#~ msgid "Error occured when deleting file asset"
-#~ msgstr ""
-
+#~ msgid "Unknown asset"
+#~ msgstr "Séance inconnue"

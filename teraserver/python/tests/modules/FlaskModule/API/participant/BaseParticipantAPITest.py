@@ -40,12 +40,14 @@ class FakeFlaskModule(BaseModule):
         self.flask_app.config.update({'SESSION_REDIS': redis_url})
         self.flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         self.flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        self.flask_app.config.update({'PROPAGATE_EXCEPTIONS': True})
 
         additional_args = {'test': True,
                            'user_manager_module': user_manager_module,
                            'flaskModule': self}
 
         FlaskModule.init_participant_api(self, self.namespace, additional_args)
+
     def send_user_disconnect_module_message(self, user_uuid: str):
         print('FakeFlaskModule : send_user_disconnect_module_message')
         pass
@@ -57,6 +59,7 @@ class FakeFlaskModule(BaseModule):
     def send_device_disconnect_module_message(self, device_uuid: str):
         print('FakeFlaskModule : send_device_disconnect_module_message')
         pass
+
 
 class BaseParticipantAPITest(unittest.TestCase):
     test_endpoint: str = ''

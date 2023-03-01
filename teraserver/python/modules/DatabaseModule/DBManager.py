@@ -43,6 +43,7 @@ from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
 from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraSessionDevices import TeraSessionDevices
 from opentera.db.Base import BaseModel
 
 from opentera.config.ConfigManager import ConfigManager
@@ -94,7 +95,12 @@ class DBManager (BaseModule):
 
         @event.listens_for(cls, 'after_update')
         def base_model_updated(mapper, connection, target):
-            # print(mapper, connection, target, event_name)
+            # Handle soft deletion
+            # if getattr(target, 'soft_delete', None):
+            #     if target.deleted_at:
+            #         # Updated target with a deleted date - trigger the deleted handler instead
+            #         base_model_deleted(mapper, connection, target)
+            #         return
             json_update_event = target.to_json_update_event()
             if json_update_event:
                 database_event = messages.DatabaseEvent()
