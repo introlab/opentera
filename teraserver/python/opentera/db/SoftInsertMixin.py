@@ -18,9 +18,9 @@ class SoftInsertMixin:
             # query = query.filter(key == getattr(db_object, key.parent.name))
             value = getattr(db_object, key.parent.name)
             if value:
-                query = query.filter(text(key.parent.name + '==' + str(value)))
+                query = query.filter(text(key.parent.name + '=' + str(value)))
             else:
-                query = query.filter(text(key.parent.name + '==NULL'))
+                query = query.filter(text(key.parent.name + '=NULL'))
         item = query.first()
 
         if item:
