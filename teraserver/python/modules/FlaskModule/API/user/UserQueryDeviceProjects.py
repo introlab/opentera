@@ -294,14 +294,14 @@ class UserQueryDeviceProjects(Resource):
             # - Associated with sessions in this project
             # - Associated with participants in this project
             if 't_participants' in str(e.args):
-                return gettext('Can\'t remove device from project: '
-                               'please delete all participants with device before deleting.'), 500
+                return gettext('Can\'t delete device from project: '
+                               'please remove all participants with device before deleting.'), 500
             if 't_sessions' in str(e.args):
                 return gettext('Can\'t delete device from project: '
                                'please remove all sessions in this project referring to that device '
                                'before deleting.'), 500
 
-            return gettext('Can\'t remove device from project. '
+            return gettext('Can\'t delete device from project. '
                            'Please remove all participants associated with the device or all sessions in the project '
                            'referring to the device before deleting.'), 500
 
