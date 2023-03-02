@@ -113,7 +113,7 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                                   self.id_device_project, 't_participants')
 
         # Find sessions with matching device and project
-        device_sessions = TeraSession.get_sessions_for_device(self.device_id)
+        device_sessions = TeraSession.get_sessions_for_device(self.id_device)
         device_project_sessions = [ses.id_session for ses in device_sessions
                                    if ses.get_associated_project_id() == self.id_project]
 
