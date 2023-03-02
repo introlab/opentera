@@ -3,6 +3,7 @@ from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
@@ -99,6 +100,28 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
 
         # Ok, delete it
         super().delete(id_todel)
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+        from opentera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraSession import TeraSession
+
+        if TeraDeviceParticipant.query.join(TeraParticipant).\
+            filter(TeraParticipant.id_project == self.id_project).\
+                filter(TeraDeviceParticipant.id_device == self.id_device).count():
+            return IntegrityError('Project still has participant associated to the device',
+                                  self.id_device_project, 't_participants')
+
+        # Find sessions with matching device and project
+        device_sessions = TeraSession.get_sessions_for_device(self.device_id)
+        device_project_sessions = [ses.id_session for ses in device_sessions
+                                   if ses.get_associated_project_id() == self.id_project]
+
+        if len(device_project_sessions) > 0:
+            return IntegrityError('Device still has sessions in this project',
+                                  self.id_device_project, 't_sessions')
+
+        return None
 
     @classmethod
     def update(cls, update_id: int, values: dict):
