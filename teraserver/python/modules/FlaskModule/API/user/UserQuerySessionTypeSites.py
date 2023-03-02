@@ -135,6 +135,15 @@ class UserQuerySessionTypeSites(Resource):
             # Also filter sites already there
             received_sites_ids = set(received_sites_ids).difference(current_sites_ids)
             for site_id in todel_ids:
+                if site_id in accessible_sites_ids:
+                    if TeraSessionTypeSite.\
+                            get_session_type_site_for_session_type_and_site(site_id=site_id,
+                                                                            session_type_id=id_session_type)\
+                            .delete_check_integrity():
+                        return gettext(
+                                    'Can\'t delete session type from site: please delete all sessions using that type '
+                                    'in that site before deleting.'), 500
+            for site_id in todel_ids:
                 if site_id in accessible_sites_ids:  # Don't remove from the list if not site admin for that site!
                     TeraSessionTypeSite.delete_with_ids(session_type_id=id_session_type, site_id=site_id)
             # Build sites association to add
@@ -159,6 +168,14 @@ class UserQuerySessionTypeSites(Resource):
             todel_ids = set(current_session_types_ids).difference(received_st_ids)
             # Also filter session types already there
             received_st_ids = set(received_st_ids).difference(current_session_types_ids)
+            for sts_id in todel_ids:
+                if TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(site_id=id_site,
+                                                                                       session_type_id=sts_id)\
+                        .delete_check_integrity():
+                    return gettext(
+                                'Can\'t delete session type from site: please delete all sessions using that type '
+                                'in that site before deleting.'), 500
+
             for sts_id in todel_ids:
                 TeraSessionTypeSite.delete_with_ids(session_type_id=sts_id, site_id=id_site)
             # Build sites association to add

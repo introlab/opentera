@@ -147,6 +147,15 @@ class UserQueryTestTypeProjects(Resource):
             received_proj_ids = set(received_proj_ids).difference(current_projects_ids)
 
             for proj_id in todel_ids:
+                if proj_id in accessible_projects_ids:
+                    if TeraTestTypeProject.get_test_type_project_for_test_type_project(test_type_id=id_test_type,
+                                                                                       project_id=proj_id)\
+                            .delete_check_integrity():
+                        return gettext(
+                            'Can\'t remove test type from project: please delete all tests using that type '
+                            'in that project before deleting.'), 500
+
+            for proj_id in todel_ids:
                 if proj_id in accessible_projects_ids:  # Don't remove from the list if not admin for that project!
                     TeraTestTypeProject.delete_with_ids(test_type_id=id_test_type, project_id=proj_id)
             # Build projects association to add
@@ -171,6 +180,14 @@ class UserQueryTestTypeProjects(Resource):
             todel_ids = set(current_test_types_ids).difference(received_tt_ids)
             # Also filter types already there
             received_tt_ids = set(received_tt_ids).difference(current_test_types_ids)
+            for tt_id in todel_ids:
+                if TeraTestTypeProject.get_test_type_project_for_test_type_project(test_type_id=tt_id,
+                                                                                   project_id=id_project)\
+                        .delete_check_integrity():
+                    return gettext(
+                        'Can\'t remove test type from project: please delete all tests using that type '
+                        'in that project before deleting.'), 500
+
             for tt_id in todel_ids:
                 TeraTestTypeProject.delete_with_ids(test_type_id=tt_id, project_id=id_project)
             # Build associations to add

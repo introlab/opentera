@@ -132,6 +132,16 @@ class UserQueryTestTypeSites(Resource):
             todel_ids = set(current_sites_ids).difference(received_sites_ids)
             # Also filter sites already there
             received_sites_ids = set(received_sites_ids).difference(current_sites_ids)
+
+            for site_id in todel_ids:
+                if site_id in accessible_sites_ids:
+                    if TeraTestTypeSite.get_test_type_site_for_test_type_and_site(test_type_id=id_test_type,
+                                                                                  site_id=site_id)\
+                            .delete_check_integrity():
+                        return gettext(
+                            'Can\'t remove test type from site: please delete all tests using that type '
+                            'in that site before deleting.'), 500
+
             for site_id in todel_ids:
                 if site_id in accessible_sites_ids:  # Don't remove from the list if not site admin for that site!
                     TeraTestTypeSite.delete_with_ids(test_type_id=id_test_type, site_id=site_id)
@@ -157,6 +167,15 @@ class UserQueryTestTypeSites(Resource):
             todel_ids = set(current_test_types_ids).difference(received_tt_ids)
             # Also filter types already there
             received_tt_ids = set(received_tt_ids).difference(current_test_types_ids)
+
+            for tts_id in todel_ids:
+                if TeraTestTypeSite.get_test_type_site_for_test_type_and_site(test_type_id=tts_id,
+                                                                              site_id=id_site)\
+                        .delete_check_integrity():
+                    return gettext(
+                        'Can\'t remove test type from site: please delete all tests using that type '
+                        'in that site before deleting.'), 500
+
             for tts_id in todel_ids:
                 TeraTestTypeSite.delete_with_ids(test_type_id=tts_id, site_id=id_site)
             # Build sites association to add

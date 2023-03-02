@@ -143,6 +143,14 @@ class UserQuerySessionTypeProjects(Resource):
             # Also filter projects already there
             received_proj_ids = set(received_proj_ids).difference(current_projects_ids)
             for proj_id in todel_ids:
+                if TeraSessionTypeProject.get_session_type_project_for_session_type_project(project_id=proj_id,
+                                                                                            session_type_id=id_session_type)\
+                        .delete_check_integrity():
+                    return gettext(
+                                'Can\'t delete session type from project: please delete all sessions using that type '
+                                'in that project before deleting.'), 500
+
+            for proj_id in todel_ids:
                 if proj_id in accessible_projects_ids:  # Don't remove from the list if not admin for that project!
                     TeraSessionTypeProject.delete_with_ids(session_type_id=id_session_type, project_id=proj_id)
             # Build projects association to add
@@ -167,6 +175,13 @@ class UserQuerySessionTypeProjects(Resource):
             todel_ids = set(current_session_types_ids).difference(received_st_ids)
             # Also filter session types already there
             received_st_ids = set(received_st_ids).difference(current_session_types_ids)
+            for st_id in todel_ids:
+                if TeraSessionTypeProject.get_session_type_project_for_session_type_project(project_id=id_project,
+                                                                                            session_type_id=st_id)\
+                        .delete_check_integrity():
+                    return gettext(
+                                'Can\'t delete session type from project: please delete all sessions using that type '
+                                'in that project before deleting.'), 500
             for st_id in todel_ids:
                 TeraSessionTypeProject.delete_with_ids(session_type_id=st_id, project_id=id_project)
             # Build associations to add
