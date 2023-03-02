@@ -1,4 +1,5 @@
 from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
+from opentera.db.models.TeraDevice import TeraDevice
 
 
 class UserQueryDeviceSubTypesTest(BaseUserAPITest):
@@ -135,21 +136,38 @@ class UserQueryDeviceSubTypesTest(BaseUserAPITest):
         self.assertEqual(response.status_code, 403)
 
     def test_query_delete_as_admin(self):
-        params = {'device_subtype': {'device_subtype_name': 'New_Device_Subtype', 'id_device_subtype': 0,
-                                     'id_device_type': 2}}
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=params)
-        self.assertEqual(response.status_code, 200)
-        new_id = response.json[0]['id_device_subtype']
-        self._checkJson(json_data=response.json)
+        with self._flask_app.app_context():
+            params = {'device_subtype': {'device_subtype_name': 'New_Device_Subtype', 'id_device_subtype': 0,
+                                         'id_device_type': 2}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=params)
+            self.assertEqual(response.status_code, 200)
+            new_id = response.json[0]['id_device_subtype']
+            self._checkJson(json_data=response.json)
 
-        # Delete without param
-        response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin')
-        self.assertEqual(response.status_code, 400)
+            # Delete without param
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin')
+            self.assertEqual(response.status_code, 400)
 
-        # Deleting the new device type
-        response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                    params={'id': new_id})
-        self.assertEqual(response.status_code, 200)
+            # Create a new device of that subtype
+            json_device = {
+                'id_device': 0,
+                'id_device_subtype': new_id,
+                'id_device_type': 1,
+                'device_name': 'Test Device'
+            }
+            device = TeraDevice()
+            device.from_json(json_device)
+            TeraDevice.insert(device)
+
+            # Deleting the new device type
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': new_id})
+            self.assertEqual(response.status_code, 500, msg='Device of that subtype exists')
+            TeraDevice.delete(device.id_device)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': new_id})
+            self.assertEqual(response.status_code, 200)
 
     def test_query_delete_as_user(self):
         params = {'device_subtype': {'device_subtype_name': 'New_Device_Subtype', 'id_device_subtype': 0,

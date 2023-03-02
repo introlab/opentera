@@ -261,9 +261,8 @@ class UserQuerySessionTypeProjects(Resource):
         except exc.IntegrityError as e:
             # Causes that could make an integrity error when deleting:
             # - Associated project still have sessions of that type
-            self.module.logger.log_error(self.module.module_name,
-                                         UserQuerySessionTypeProjects.__name__,
-                                         'delete', 500, 'Database error', str(e))
+            self.module.logger.log_warning(self.module.module_name, UserQuerySessionTypeProjects.__name__, 'delete',
+                                           500, 'Integrity error', str(e))
             return gettext('Can\'t delete session type from project: please delete all sessions of that type in the '
                            'project before deleting.'), 500
         except exc.SQLAlchemyError as e:

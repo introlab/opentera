@@ -257,9 +257,8 @@ class UserQueryProjects(Resource):
             # Causes that could make an integrity error when deleting:
             # - Associated participant groups with participants with sessions
             # - Associated participants with sessions
-            self.module.logger.log_error(self.module.module_name,
-                                         UserQueryProjects.__name__,
-                                         'delete', 500, 'Database error', str(e))
+            self.module.logger.log_warning(self.module.module_name, UserQueryProjects.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
             return gettext('Can\'t delete project: please delete all participants with sessions before deleting.'), 500
         except exc.SQLAlchemyError as e:
             import sys

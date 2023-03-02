@@ -363,9 +363,8 @@ class UserQueryParticipants(Resource):
             # - Tests by that participant
             # In all case, deleting associated sessions will clear that all, since a participant cannot create sessions
             # or assets not for itself.
-            self.module.logger.log_error(self.module.module_name,
-                                         UserQueryParticipants.__name__,
-                                         'delete', 500, 'Integrity error - ', str(e))
+            self.module.logger.log_warning(self.module.module_name, UserQueryParticipants.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
 
             if 't_sessions_participants' in str(e.args):
                 return gettext('Can\'t delete participant: please remove all related sessions beforehand.'), 500

@@ -172,6 +172,13 @@ class UserQueryDeviceSubTypes(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraDeviceSubType.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Associated devices with that subtype
+            self.module.logger.log_warning(self.module.module_name, UserQueryDeviceSubTypes.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
+            return gettext('Can\'t delete device subtype: please delete all devices of that subtype before deleting.'
+                           ), 500
         except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())

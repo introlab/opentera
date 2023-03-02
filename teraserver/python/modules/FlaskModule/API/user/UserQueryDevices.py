@@ -425,9 +425,8 @@ class UserQueryDevices(Resource):
                 TeraDevice.delete(id_todel=id_todel)
             except exc.IntegrityError as e:
 
-                self.module.logger.log_error(self.module.module_name,
-                                             UserQueryDevices.__name__,
-                                             'delete', 500, 'Integrity error', str(e))
+                self.module.logger.log_warning(self.module.module_name, UserQueryDevices.__name__, 'delete', 500,
+                                               'Integrity error', str(e))
 
                 # Causes that could make an integrity error when deleting:
                 # - Associated with sessions

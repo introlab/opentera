@@ -333,9 +333,8 @@ class UserQueryTestTypes(Resource):
         except exc.IntegrityError as e:
             # Causes that could make an integrity error when deleting:
             # - Associated tests of that test type
-            self.module.logger.log_error(self.module.module_name,
-                                         UserQueryTestTypes.__name__,
-                                         'delete', 500, 'Database error', e)
+            self.module.logger.log_warning(self.module.module_name, UserQueryTestTypes.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
             return gettext('Can\'t delete test type: please delete all tests of that type before deleting.'), 500
         except exc.SQLAlchemyError as e:
             import sys

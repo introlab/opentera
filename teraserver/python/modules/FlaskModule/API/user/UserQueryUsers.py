@@ -360,9 +360,8 @@ class UserQueryUsers(Resource):
                 # - Sessions that the user created
                 # - Assets that the user created
                 # - Tests that the user created
-                self.module.logger.log_error(self.module.module_name,
-                                             UserQueryUsers.__name__,
-                                             'delete', 500, 'Database error', str(e))
+                self.module.logger.log_warning(self.module.module_name, UserQueryUsers.__name__, 'delete', 500,
+                                               'Integrity error', str(e))
                 if 't_sessions_users' in str(e.args):
                     return gettext('Can\'t delete user: please remove all sessions that this user is part of before '
                                    'deleting.'), 500

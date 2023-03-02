@@ -164,9 +164,8 @@ class UserQueryParticipantGroup(Resource):
         except exc.IntegrityError as e:
             # Causes that could make an integrity error when deleting a participant:
             # - Participants with associated sessions
-            self.module.logger.log_error(self.module.module_name,
-                                         UserQueryParticipantGroup.__name__,
-                                         'delete', 500, 'Database error', str(e))
+            self.module.logger.log_warning(self.module.module_name, UserQueryParticipantGroup.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
 
             return gettext('Can\'t delete participant group: please delete all sessions from all '
                            'participants before deleting.'), 500

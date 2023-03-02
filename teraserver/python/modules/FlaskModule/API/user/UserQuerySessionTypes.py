@@ -329,9 +329,8 @@ class UserQuerySessionTypes(Resource):
         except exc.IntegrityError as e:
             # Causes that could make an integrity error when deleting:
             # - Associated sessions of that session type
-            self.module.logger.log_error(self.module.module_name,
-                                         UserQuerySessionTypes.__name__,
-                                         'delete', 500, 'Database error', e)
+            self.module.logger.log_warning(self.module.module_name, UserQuerySessionTypes.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
             return gettext('Can\'t delete session type: please delete all sessions with that type before deleting.'
                            ), 500
         except exc.SQLAlchemyError as e:

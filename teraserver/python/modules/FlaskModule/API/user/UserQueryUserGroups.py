@@ -295,9 +295,8 @@ class UserQueryUserGroups(Resource):
         except exc.IntegrityError as e:
             # Causes that could make an integrity error when deleting:
             # - Associated users with that user group
-            self.module.logger.log_error(self.module.module_name,
-                                         UserQueryUserGroups.__name__,
-                                         'delete', 500, 'Database error', str(e))
+            self.module.logger.log_warning(self.module.module_name, UserQueryUserGroups.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
             return gettext('Can\'t delete user group: please delete all users part of that user group before deleting.'
                            ), 500
         except exc.SQLAlchemyError as e:

@@ -298,9 +298,8 @@ class UserQueryServiceProjects(Resource):
             # - Associated project have sessions using that service
             # - Associated project have tests using that service
             # - Associated project has assets using that service
-            self.module.logger.log_error(self.module.module_name,
-                                         UserQueryServiceProjects.__name__,
-                                         'delete', 500, 'Integrity error - ', str(e))
+            self.module.logger.log_warning(self.module.module_name, UserQueryServiceProjects.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
 
             if 't_sessions' in str(e.args):
                 return gettext('Can\'t delete service-project: please remove all sessions involving a session type '

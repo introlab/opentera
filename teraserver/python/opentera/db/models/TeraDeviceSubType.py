@@ -1,6 +1,8 @@
 from opentera.db.Base import BaseModel
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
+from opentera.db.models.TeraDevice import TeraDevice
 
 
 class TeraDeviceSubType(BaseModel):
@@ -58,3 +60,8 @@ class TeraDeviceSubType(BaseModel):
     def get_device_subtypes_for_type(dev_type: int):
         return TeraDeviceSubType.query.filter_by(id_device_type=dev_type).all()
 
+    def delete_check_integrity(self) -> IntegrityError | None:
+        if (TeraDevice.get_count(filters={'id_device_subtype': self.id_device_subtype})) > 0:
+            return IntegrityError('Device subtype still have devices with that subtype', self.id_device_subtype,
+                                  't_devices')
+        return None
