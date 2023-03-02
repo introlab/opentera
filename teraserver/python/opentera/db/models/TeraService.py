@@ -1,8 +1,8 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Sequence, Boolean
 from sqlalchemy.orm import relationship
-from flask_babel import gettext
+from sqlalchemy.exc import IntegrityError
 
 import uuid
 
@@ -225,6 +225,13 @@ class TeraService(BaseModel, SoftDeleteMixin):
         new_role.id_service = service.id_service
         new_role.service_role_name = 'user'
         TeraServiceRole.insert(new_role)
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        for service_site in self.service_sites:
+            if service_site.delete_check_integrity():
+                return IntegrityError('Have sessions, assets or tests using that service', self.id_service,
+                                      't_sessions')
+        return None
 
     @classmethod
     def update(cls, update_id: int, values: dict):

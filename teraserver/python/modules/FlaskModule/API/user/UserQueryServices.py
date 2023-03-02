@@ -241,6 +241,15 @@ class UserQueryServices(Resource):
         # If we are here, we are allowed to delete. Do so.
         try:
             TeraService.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Sessions of that service exists
+            # - Tests of that service exists
+            # - Assets of that service exists
+            self.module.logger.log_warning(self.module.module_name, UserQueryServices.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
+            return gettext('Can\'t delete service: please delete all sessions, assets and tests related to '
+                           'that service beforehand.'), 500
         except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())

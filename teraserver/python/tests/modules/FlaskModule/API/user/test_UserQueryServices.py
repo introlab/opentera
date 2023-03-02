@@ -1,4 +1,18 @@
 from BaseUserAPITest import BaseUserAPITest
+from opentera.db.models.TeraServiceSite import TeraServiceSite
+from opentera.db.models.TeraServiceProject import TeraServiceProject
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
+from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraSite import TeraSite
+from opentera.db.models.TeraParticipant import TeraParticipant
+import datetime
 
 
 class UserQueryServicesTest(BaseUserAPITest):
@@ -213,6 +227,7 @@ class UserQueryServicesTest(BaseUserAPITest):
             json_data = response.json[0]
             self._checkJson(json_data)
             current_id = json_data['id_service']
+            current_uuid = json_data['service_uuid']
 
             json_data = {
                 'service': {
@@ -253,9 +268,108 @@ class UserQueryServicesTest(BaseUserAPITest):
                                                         params=params)
             self.assertEqual(403, response.status_code, msg="Delete denied")
 
+            # Create a session of that service
+            participant = TeraParticipant.get_participant_by_id(4)  # Participant in Secret Site
+            site: TeraSite = TeraSite.get_site_by_id(2)
+            project = site.site_projects[0]
+
+            ss = TeraServiceSite()
+            ss.id_site = site.id_site
+            ss.id_service = current_id
+            TeraServiceSite.insert(ss)
+
+            sp = TeraServiceProject()
+            sp.id_project = project.id_project
+            sp.id_service = current_id
+            TeraServiceProject.insert(sp)
+
+            st = TeraSessionType()
+            st.id_service = current_id
+            st.session_type_category = 1
+            st.session_type_online = True
+            st.session_type_name = 'Test Session Type'
+            st.session_type_color = 'black'
+            TeraSessionType.insert(st)
+
+            sts = TeraSessionTypeSite()
+            sts.id_site = site.id_site
+            sts.id_session_type = st.id_session_type
+            TeraSessionTypeSite.insert(sts)
+
+            stp1 = TeraSessionTypeProject()
+            stp1.id_project = project.id_project
+            stp1.id_session_type = st.id_session_type
+            TeraSessionTypeProject.insert(stp1)
+
+            tt = TeraTestType()
+            tt.id_service = current_id
+            tt.test_type_name = 'Test Type Test'
+            tt.test_type_key = 'TEST'
+            tt.test_type_has_web_format = False
+            tt.test_type_has_json_format = False
+            tt.test_type_has_web_editor = False
+            TeraTestType.insert(tt)
+
+            tts = TeraTestTypeSite()
+            tts.id_test_type = tt.id_test_type
+            tts.id_site = site.id_site
+            TeraTestTypeSite.insert(tts)
+
+            ttp = TeraTestTypeProject()
+            ttp.id_project = project.id_project
+            ttp.id_test_type = tt.id_test_type
+            TeraTestTypeProject.insert(ttp)
+
+            json_session = {'id_session_type': st.id_session_type,
+                            'session_name': 'Session of session type',
+                            'session_start_datetime': datetime.datetime.now(),
+                            'session_status': 0,
+                            'id_creator_participant': participant.id_participant
+                            }
+            session1 = TeraSession()
+            session1.from_json(json_session)
+            TeraSession.insert(session1)
+
+            json_test = {'id_test_type': tt.id_test_type,
+                         'id_session': session1.id_session,
+                         'test_name': 'Test Test',
+                         'test_datetime': datetime.datetime.now()
+                         }
+            test = TeraTest()
+            test.from_json(json_test)
+            TeraTest.insert(test)
+
+            json_asset = {'id_session': session1.id_session,
+                          'asset_name': "Test asset",
+                          'asset_service_uuid': current_uuid,
+                          'asset_type': "Test",
+                          'test_datetime': datetime.datetime.now()
+                          }
+            asset = TeraAsset()
+            asset.from_json(json_asset)
+            TeraAsset.insert(asset)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params=params)
+            self.assertEqual(500, response.status_code, msg="Can't delete: assets")
+            TeraAsset.delete(asset.id_asset)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params=params)
+            self.assertEqual(500, response.status_code, msg="Can't delete: tests")
+            TeraTest.delete(test.id_test)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params=params)
+            self.assertEqual(500, response.status_code, msg="Can't delete: sessions")
+            TeraSession.delete(session1.id_session)
+
             response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                         params=params)
             self.assertEqual(200, response.status_code, msg="Delete OK")
+
+            TeraTestType.delete(tt.id_test_type)
+            TeraSessionType.delete(st.id_session_type)
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
