@@ -129,6 +129,11 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         from opentera.db.models.TeraDeviceSite import TeraDeviceSite
         from opentera.db.models.TeraProject import TeraProject
         project = TeraProject.get_project_by_id(project_id=dp.id_project)
+
+        if not project:
+            raise IntegrityError(params='Project not found',
+                                 orig='TeraDeviceProject.insert', statement='insert')
+
         device_site = TeraDeviceSite.get_device_site_id_for_device_and_site(site_id=project.id_site,
                                                                             device_id=dp.id_device)
 
