@@ -124,5 +124,20 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         return None
 
     @classmethod
+    def insert(cls, dp):
+        # Check if that site of that project has the site associated to it
+        from opentera.db.models.TeraDeviceSite import TeraDeviceSite
+        from opentera.db.models.TeraProject import TeraProject
+        project = TeraProject.get_project_by_id(project_id=dp.id_project)
+        device_site = TeraDeviceSite.get_device_site_id_for_device_and_site(site_id=project.id_site,
+                                                                            device_id=dp.id_device)
+
+        if not device_site:
+            raise IntegrityError(params='Device not associated to project site',
+                                 orig='TeraDeviceProject.insert', statement='insert')
+        inserted_obj = super().insert(dp)
+        return inserted_obj
+
+    @classmethod
     def update(cls, update_id: int, values: dict):
         return
