@@ -1,4 +1,5 @@
 from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
+from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 
 
 class UserQueryDeviceSitesTest(BaseUserAPITest):
@@ -247,47 +248,38 @@ class UserQueryDeviceSitesTest(BaseUserAPITest):
             json_data = {'device': {'id_device': 2, 'sites': []}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
-            self.assertEqual(200, response.status_code, msg="Remove from all projects OK")
+            self.assertEqual(500, response.status_code, msg="Can't remove: has participants associated")
 
-            params = {'id_device': 2}
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params=params)
-            self.assertEqual(200, response.status_code)
-            self.assertEqual(len(response.json), 0)  # Everything was deleted!
+            json_data = {'device': {'id_device': 3, 'sites': [{'id_site': 1}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="New association")
+            self.assertEqual(1, TeraDeviceSite.get_count(filters={'id_device': 3}))
 
-            json_data = {'device': {'id_device': 2, 'sites': [{'id_site': 1},
+            json_data = {'device': {'id_device': 3, 'sites': []}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Nothing left!")
+            self.assertEqual(0, TeraDeviceSite.get_count(filters={'id_device': 3}))  # Everything was deleted!
+
+            json_data = {'device': {'id_device': 3, 'sites': [{'id_site': 1},
                                                               {'id_site': 2}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Add all sites OK")
+            self.assertEqual(2, TeraDeviceSite.get_count(filters={'id_device': 3}))  # Everything was added!
 
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params=params)
-            self.assertEqual(200, response.status_code)
-            self.assertEqual(len(response.json), 2)  # Everything was added
-
-            json_data = {'device': {'id_device': 2, 'sites': [{'id_site': 2}]}}
+            json_data = {'device': {'id_device': 3, 'sites': [{'id_site': 2}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove one site")
+            self.assertEqual(1, TeraDeviceSite.get_count(filters={'id_device': 3}))
 
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params=params)
-            self.assertEqual(200, response.status_code)
-            self.assertEqual(len(response.json), 1)
-
-            json_data = {'device': {'id_device': 2, 'sites': [{'id_site': 1}]}}
+            json_data = {'device': {'id_device': 3, 'sites': []}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
-            self.assertEqual(200, response.status_code, msg="Add all sites OK")
-
-            # Recreate default associations - projects
-            json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1},
-                                                                 {'id_project': 2}
-                                                                 ]}}
-            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                      json=json_data, endpoint='/api/user/deviceprojects')
-            self.assertEqual(200, response.status_code)
+            self.assertEqual(200, response.status_code, msg="Back to start")
+            self.assertEqual(0, TeraDeviceSite.get_count(filters={'id_device': 3}))
 
     def test_post_site(self):
         with self._flask_app.app_context():
@@ -313,59 +305,37 @@ class UserQueryDeviceSitesTest(BaseUserAPITest):
 
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
-            self.assertEqual(200, response.status_code, msg="Remove all services OK")
+            self.assertEqual(500, response.status_code, msg="Can't remove: associated to a participant!")
 
-            params = {'id_site': 1}
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params=params)
-            self.assertEqual(200, response.status_code)
-            self.assertEqual(len(response.json), 0)  # Everything was deleted!
+            ds = TeraDeviceSite()
+            ds.id_device = 3
+            ds.id_site = 2
+            TeraDeviceSite.insert(ds)
 
-            json_data = {'site': {'id_site': 1, 'devices': [{'id_device': 1},
-                                                            {'id_device': 2}
+            json_data = {'site': {'id_site': 2, 'devices': []}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Removed OK")
+            self.assertEqual(0, TeraDeviceSite.get_count(filters={'id_site': 2}))  # Everything was deleted!
+
+            json_data = {'site': {'id_site': 2, 'devices': [{'id_device': 2},
+                                                            {'id_device': 3}
                                                             ]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Add all devices OK")
+            self.assertEqual(2, TeraDeviceSite.get_count(filters={'id_site': 2}))  # Everything was added
 
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params=params)
-            self.assertEqual(200, response.status_code)
-            self.assertEqual(len(response.json), 2)  # Everything was added
-
-            json_data = {'site': {'id_site': 1, 'devices': [{'id_device': 2}]}}
+            json_data = {'site': {'id_site': 2, 'devices': [{'id_device': 3}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove 1 device")
+            self.assertEqual(2, TeraDeviceSite.get_count(filters={'id_site': 1}))
 
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params=params)
-            self.assertEqual(200, response.status_code)
-            self.assertEqual(len(response.json), 1)
-
-            json_data = {'site': {'id_site': 1, 'devices': [{'id_device': 1},
-                                                            {'id_device': 2}
-                                                            ]}}
+            json_data = {'site': {'id_site': 2, 'devices': [{'id_device': 1}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Back to defaults")
-
-            # Recreate default associations - projects
-            json_data = {'device': {'id_device': 1, 'projects': [{'id_project': 1},
-                                                                 {'id_project': 2}]}}
-            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                      json=json_data, endpoint='/api/user/devices/projects')
-            self.assertEqual(200, response.status_code)
-
-            json_data = {'device': {'id_device': 2, 'projects': [{'id_project': 1}]}}
-            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                      json=json_data, endpoint='/api/user/devices/projects')
-            self.assertEqual(200, response.status_code)
-
-            json_data = {'device_participant': {'id_device': 2, 'id_participant': 1}}
-            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                      json=json_data, endpoint='/api/user/devices/participants')
-            self.assertEqual(200, response.status_code)
 
     def test_post_device_site_and_delete(self):
         with self._flask_app.app_context():
