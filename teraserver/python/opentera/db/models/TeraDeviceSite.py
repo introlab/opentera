@@ -3,6 +3,7 @@ from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraDeviceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
@@ -107,6 +108,23 @@ class TeraDeviceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
 
             # Ok, delete it
             super().delete(id_todel, autocommit=autocommit)
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        from opentera.db.models.TeraDeviceProject import TeraDeviceProject
+        from opentera.db.models.TeraProject import TeraProject
+
+        # Will check if device is part of a project in the site
+        specific_device_projects = TeraDeviceProject.query.join(TeraProject).\
+            filter(TeraDeviceProject.id_device == self.id_device).filter(TeraProject.id_site == self.id_site).all()
+
+        # Check integrity of device_projects
+        for device_project in specific_device_projects:
+            integrity_check = device_project.delete_check_integrity()
+            if integrity_check is not None:
+                return integrity_check
+
+        # Everything is good
+        return None
 
     @classmethod
     def update(cls, update_id: int, values: dict):
