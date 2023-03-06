@@ -31,6 +31,13 @@ class TeraDeviceSiteTest(BaseModelsTest):
                     self.assertGreater(len(json_data), 0)
                     self._check_json(json_data, with_minimal=minimal)
 
+    def test_insert_with_invalid_device_and_site(self):
+        with self._flask_app.app_context():
+            device_site: TeraDeviceSite = TeraDeviceSite()
+            device_site.id_device = None
+            device_site.id_site = None
+            self.assertRaises(IntegrityError, TeraDeviceSite.insert, device_site)
+
     def test_insert_and_delete_with_no_associated_project(self):
         with self._flask_app.app_context():
             # Create a Device and add it to every site
