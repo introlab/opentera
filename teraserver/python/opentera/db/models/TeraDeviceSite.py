@@ -98,16 +98,23 @@ class TeraDeviceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     @classmethod
     def delete(cls, id_todel, autocommit: bool = True):
         from opentera.db.models.TeraDeviceProject import TeraDeviceProject
-        # Delete all association with projects for that site
+
         delete_obj = TeraDeviceSite.query.filter_by(id_device_site=id_todel).first()
-
         if delete_obj:
-            projects = TeraDeviceProject.get_projects_for_device(delete_obj.id_device)
-            for device_project in projects:
-                TeraDeviceProject.delete(device_project.id_device_project, autocommit=autocommit)
+            # Needed for device-project deletion later
+            id_site = delete_obj.id_site
+            id_device = delete_obj.id_device
+            # Ok, delete it (will check integrity)
+            super().delete(id_todel, autocommit)
 
-            # Ok, delete it
-            super().delete(id_todel, autocommit=autocommit)
+            # Delete all association with projects for that site
+            from opentera.db.models.TeraProject import TeraProject
+            specific_device_projects = TeraDeviceProject.query.join(TeraProject). \
+                filter(TeraDeviceProject.id_device == id_device).\
+                filter(TeraProject.id_site == id_site).all()
+
+            for device_project in specific_device_projects:
+                TeraDeviceProject.delete(device_project.id_device_project, autocommit=autocommit)
 
     def delete_check_integrity(self) -> IntegrityError | None:
         from opentera.db.models.TeraDeviceProject import TeraDeviceProject

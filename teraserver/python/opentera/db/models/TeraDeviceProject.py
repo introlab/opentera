@@ -81,25 +81,25 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         if delete_obj:
             TeraDeviceProject.delete(delete_obj.id_device_project, autocommit=autocommit)
 
-    @classmethod
-    def delete(cls, id_todel, autocommit: bool = True):
-        from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
-
-        delete_obj: TeraDeviceProject = TeraDeviceProject.query.filter_by(id_device_project=id_todel).first()
-
-        if delete_obj:
-            # Delete participants association with that device
-            associated_participants = TeraDeviceParticipant.query_participants_for_device(
-                device_id=delete_obj.device_project_device.id_device)
-            for part in associated_participants:
-                if part.device_participant_participant.participant_project.id_project == delete_obj.id_project:
-                    device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
-                        device_id=delete_obj.device_project_device.id_device, participant_id=part.id_participant)
-                    if device_part:
-                        TeraDeviceParticipant.delete(device_part.id_device_participant, autocommit=autocommit)
-
-        # Ok, delete it
-        super().delete(id_todel, autocommit=autocommit)
+    # @classmethod
+    # def delete(cls, id_todel, autocommit: bool = True):
+    #     from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+    #
+    #     delete_obj: TeraDeviceProject = TeraDeviceProject.query.filter_by(id_device_project=id_todel).first()
+    #
+    #     if delete_obj:
+    #         # Delete participants association with that device
+    #         associated_participants = TeraDeviceParticipant.query_participants_for_device(
+    #             device_id=delete_obj.device_project_device.id_device)
+    #         for part in associated_participants:
+    #             if part.device_participant_participant.participant_project.id_project == delete_obj.id_project:
+    #                 device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
+    #                     device_id=delete_obj.device_project_device.id_device, participant_id=part.id_participant)
+    #                 if device_part:
+    #                     TeraDeviceParticipant.delete(device_part.id_device_participant, autocommit=autocommit)
+    #
+    #     # Ok, delete it
+    #     super().delete(id_todel, autocommit=autocommit)
 
     def delete_check_integrity(self) -> IntegrityError | None:
         from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
