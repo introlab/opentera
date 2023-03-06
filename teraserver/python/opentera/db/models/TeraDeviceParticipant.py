@@ -3,6 +3,7 @@ from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraDeviceParticipant(BaseModel, SoftDeleteMixin, SoftInsertMixin):
@@ -78,3 +79,23 @@ class TeraDeviceParticipant(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     @classmethod
     def update(cls, update_id: int, values: dict):
         return
+
+    @classmethod
+    def insert(cls, dp):
+        # Check if that the participant is associated with the same project as the device
+        from opentera.db.models.TeraDeviceProject import TeraDeviceProject
+        from opentera.db.models.TeraParticipant import TeraParticipant
+
+        participant = TeraParticipant.get_participant_by_id(dp.id_participant)
+        if not participant:
+            raise IntegrityError(params='Participant not found',
+                                 orig='TeraDeviceParticipant.insert', statement='insert')
+
+        device_project = TeraDeviceProject.get_device_project_id_for_device_and_project(dp.id_device,
+                                                                                        participant.id_project)
+
+        if not device_project:
+            raise IntegrityError(params='Device not associated to project',
+                                 orig='TeraDeviceParticipant.insert', statement='insert')
+        inserted_obj = super().insert(dp)
+        return inserted_obj
