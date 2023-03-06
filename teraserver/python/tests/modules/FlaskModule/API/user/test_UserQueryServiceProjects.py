@@ -326,6 +326,9 @@ class UserQueryServiceProjectsTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove one project")
+            self.assertIsNotNone(TeraServiceProject.get_service_project_for_service_project(project_id=2, service_id=3))
+            self.assertIsNotNone(TeraServiceProject.get_service_project_for_service_project(project_id=1, service_id=3))
+            self.assertIsNone(TeraServiceProject.get_service_project_for_service_project(project_id=3, service_id=3))
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
@@ -344,58 +347,65 @@ class UserQueryServiceProjectsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
 
     def test_post_project(self):
-        # Project update
-        json_data = {'project': {}}
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                  json=json_data)
-        self.assertEqual(400, response.status_code, msg="Missing id_project")
+        with self._flask_app.app_context():
+            # Project update
+            json_data = {'project': {}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing id_project")
 
-        json_data = {'project': {'id_project': 2}}
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                  json=json_data)
-        self.assertEqual(400, response.status_code, msg="Missing services")
+            json_data = {'project': {'id_project': 2}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing services")
 
-        json_data = {'project': {'id_project': 2, 'services': []}}
-        response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
-                                                  json=json_data)
-        self.assertEqual(403, response.status_code, msg="Only site admins can change things here")
+            json_data = {'project': {'id_project': 2, 'services': []}}
+            response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="Only site admins can change things here")
 
-        json_data = {'project': {'id_project': 2, 'services': []}}
-        response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
-                                                  json=json_data)
-        self.assertEqual(200, response.status_code, msg="Remove all services OK")
+            json_data = {'project': {'id_project': 2, 'services': []}}
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Remove all services OK")
 
-        params = {'id_project': 2}
-        response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', params=params)
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(0, len(response.json))  # Everything was deleted!
+            params = {'id_project': 2}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(0, len(response.json))  # Everything was deleted!
 
-        json_data = {'project': {'id_project': 2, 'services': [{'id_service': 2},
-                                                               {'id_service': 3},
-                                                               {'id_service': 4},
-                                                               {'id_service': 5}]}}
-        response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
-                                                  json=json_data)
-        self.assertEqual(403, response.status_code, msg="One service not allowed - not part of the site project!")
+            json_data = {'project': {'id_project': 2, 'services': [{'id_service': 2},
+                                                                   {'id_service': 3},
+                                                                   {'id_service': 4},
+                                                                   {'id_service': 5}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="One service not allowed - not part of the site project!")
 
-        json_data = {'project': {'id_project': 2, 'services': [{'id_service': 2},
-                                                               {'id_service': 3},
-                                                               {'id_service': 5}]}}
-        response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
-                                                  json=json_data)
-        self.assertEqual(200, response.status_code, msg="New service association OK")
+            json_data = {'project': {'id_project': 2, 'services': [{'id_service': 2},
+                                                                   {'id_service': 3},
+                                                                   {'id_service': 5}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="New service association OK")
+            self.assertIsNone(TeraServiceProject.get_service_project_for_service_project(project_id=2, service_id=4))
+            self.assertIsNotNone(TeraServiceProject.get_service_project_for_service_project(project_id=2, service_id=2))
+            self.assertIsNotNone(TeraServiceProject.get_service_project_for_service_project(project_id=2, service_id=3))
+            self.assertIsNotNone(TeraServiceProject.get_service_project_for_service_project(project_id=2, service_id=5))
 
-        response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', params=params)
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(3, len(response.json))  # Everything was added
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(3, len(response.json))  # Everything was added
 
-        json_data = {'project': {'id_project': 2, 'services': [{'id_service': 3}]}}
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
-        self.assertEqual(200, response.status_code, msg="Remove 1 service")
+            json_data = {'project': {'id_project': 2, 'services': [{'id_service': 3}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Remove 1 service")
 
-        response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', params=params)
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.json))  # Back to the default state
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(1, len(response.json))  # Back to the default state
 
     def test_post_service_project_and_delete(self):
         with self._flask_app.app_context():

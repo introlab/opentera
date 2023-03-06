@@ -99,11 +99,11 @@ class TeraSessionTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             filter(TeraSessionTypeProject.id_project == project_id).all()
 
     @staticmethod
-    def delete_with_ids(session_type_id: int, project_id: int):
+    def delete_with_ids(session_type_id: int, project_id: int, autocommit: bool = True):
         delete_obj: TeraSessionTypeProject = TeraSessionTypeProject.query.filter_by(id_session_type=session_type_id,
                                                                                     id_project=project_id).first()
         if delete_obj:
-            TeraSessionTypeProject.delete(delete_obj.id_session_type_project)
+            TeraSessionTypeProject.delete(delete_obj.id_session_type_project, autocommit=autocommit)
 
     @staticmethod
     def check_integrity(obj_to_check):

@@ -137,8 +137,16 @@ class UserQueryDeviceSites(Resource):
             todel_ids = set(current_sites_ids).difference(received_sites_ids)
             # Also filter sites already there
             received_sites_ids = set(received_sites_ids).difference(current_sites_ids)
-            for site_id in todel_ids:
-                TeraDeviceSite.delete_with_ids(device_id=id_device, site_id=site_id)
+            try:
+                for site_id in todel_ids:
+                    TeraDeviceSite.delete_with_ids(device_id=id_device, site_id=site_id, autocommit=False)
+                TeraDeviceSite.commit()
+            except exc.IntegrityError as e:
+
+                self.module.logger.log_warning(self.module.module_name, UserQueryDeviceSites.__name__, 'delete', 500,
+                                               'Integrity error', str(e))
+                return gettext('Can\'t delete device from site. Please remove all participants associated with the '
+                               'device or all sessions in the site referring to the device before deleting.'), 500
             # Build sites association to add
             json_dss = [{'id_device': id_device, 'id_site': site_id} for site_id in received_sites_ids]
         elif 'site' in request.json:
@@ -157,8 +165,15 @@ class UserQueryDeviceSites(Resource):
             todel_ids = set(current_devices_ids).difference(received_devices_ids)
             # Also filter devices already there
             received_devices_ids = set(received_devices_ids).difference(current_devices_ids)
-            for device_id in todel_ids:
-                TeraDeviceSite.delete_with_ids(device_id=device_id, site_id=id_site)
+            try:
+                for device_id in todel_ids:
+                    TeraDeviceSite.delete_with_ids(device_id=device_id, site_id=id_site, autocommit=False)
+            except exc.IntegrityError as e:
+
+                self.module.logger.log_warning(self.module.module_name, UserQueryDeviceSites.__name__, 'delete', 500,
+                                               'Integrity error', str(e))
+                return gettext('Can\'t delete device from site. Please remove all participants associated with the '
+                               'device or all sessions in the site referring to the device before deleting.'), 500
             # Build sites association to add
             json_dss = [{'id_device': device_id, 'id_site': id_site} for device_id in received_devices_ids]
         elif 'device_site' in request.json:

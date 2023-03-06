@@ -312,6 +312,12 @@ class UserQueryTestTypeProjectTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove one project")
+            self.assertIsNone(TeraTestTypeProject.get_test_type_project_for_test_type_project(project_id=3,
+                                                                                              test_type_id=1))
+            self.assertIsNone(TeraTestTypeProject.get_test_type_project_for_test_type_project(project_id=2,
+                                                                                              test_type_id=1))
+            self.assertIsNotNone(TeraTestTypeProject.get_test_type_project_for_test_type_project(project_id=1,
+                                                                                                 test_type_id=1))
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
@@ -413,6 +419,12 @@ class UserQueryTestTypeProjectTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove 1 type")
+            self.assertIsNotNone(TeraTestTypeProject.
+                                 get_test_type_project_for_test_type_project(project_id=2,
+                                                                             test_type_id=testtype1.id_test_type))
+            self.assertIsNone(TeraTestTypeProject.
+                              get_test_type_project_for_test_type_project(project_id=2,
+                                                                          test_type_id=testtype2.id_test_type))
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)

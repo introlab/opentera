@@ -299,6 +299,9 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove one site")
 
+            self.assertIsNone(TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(
+                session_type_id=4, site_id=2))
+
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
@@ -387,6 +390,9 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove 1 session type")
+
+            self.assertIsNone(TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(
+                session_type_id=sestype1.id_session_type, site_id=2))
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)

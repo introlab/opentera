@@ -341,6 +341,11 @@ class UserQueryTestTypeSitesTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 200, msg="Remove one site")
+            self.assertIsNone(TeraTestTypeSite.
+                              get_test_type_site_for_test_type_and_site(site_id=2, test_type_id=testtype1.id_test_type))
+            self.assertIsNotNone(TeraTestTypeSite.
+                                 get_test_type_site_for_test_type_and_site(site_id=1,
+                                                                           test_type_id=testtype1.id_test_type))
 
             response = self._get_with_user_http_auth(username='admin', password='admin', params=params,
                                                      client=self.test_client)
@@ -425,6 +430,11 @@ class UserQueryTestTypeSitesTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(username='admin', password='admin', json=json_data,
                                                       client=self.test_client)
             self.assertEqual(response.status_code, 200, msg="Remove 1 test type")
+            self.assertIsNone(TeraTestTypeSite.
+                              get_test_type_site_for_test_type_and_site(site_id=2, test_type_id=testtype1.id_test_type))
+            self.assertIsNotNone(TeraTestTypeSite.
+                                 get_test_type_site_for_test_type_and_site(site_id=2,
+                                                                           test_type_id=testtype2.id_test_type))
 
             response = self._get_with_user_http_auth(username='admin', password='admin', params=params,
                                                      client=self.test_client)

@@ -199,7 +199,7 @@ class BaseMixin(object):
         return None  # Can delete by default
 
     @classmethod
-    def delete(cls, id_todel):
+    def delete(cls, id_todel, autocommit: bool = True):
         delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
         cannot_be_deleted_exception = delete_obj.delete_check_integrity()
         if cannot_be_deleted_exception:
@@ -209,7 +209,8 @@ class BaseMixin(object):
                 delete_obj.soft_delete()
             else:
                 cls.db().session.delete(delete_obj)
-            cls.commit()
+            if autocommit:
+                cls.commit()
 
     @classmethod
     def undelete(cls, id_to_undelete):

@@ -156,8 +156,21 @@ class UserQueryServiceProjects(Resource):
             todel_ids = set(current_projects_ids).difference(received_projects_ids)
             # Also filter projects already there
             received_projects_ids = set(received_projects_ids).difference(current_projects_ids)
-            for proj_id in todel_ids:
-                TeraServiceProject.delete_with_ids(service_id=id_service, project_id=proj_id)
+            try:
+                for proj_id in todel_ids:
+                    TeraServiceProject.delete_with_ids(service_id=id_service, project_id=proj_id, autocommit=False)
+                TeraServiceProject.commit()
+            except exc.IntegrityError as e:
+                # Causes that could make an integrity error when deleting:
+                # - Associated project have sessions using that service
+                # - Associated project have tests using that service
+                # - Associated project has assets using that service
+                self.module.logger.log_warning(self.module.module_name, UserQueryServiceProjects.__name__, 'delete',
+                                               500, 'Integrity error', str(e))
+                return gettext(
+                    'Can\'t delete service-project: please remove all related sessions, assets and tests before '
+                    'deleting.'), 500
+
             # Build projects association to add
             json_sps = [{'id_service': id_service, 'id_project': project_id} for project_id in received_projects_ids]
         elif 'project' in request.json:
@@ -184,8 +197,22 @@ class UserQueryServiceProjects(Resource):
             # Also filter services already there
             received_services_ids = set(received_services_ids).difference(current_services_ids)
 
-            for service_id in todel_ids:
-                TeraServiceProject.delete_with_ids(service_id=service_id, project_id=id_project)
+            try:
+                for service_id in todel_ids:
+                    TeraServiceProject.delete_with_ids(service_id=service_id, project_id=id_project, autocommit=False)
+                TeraServiceProject.commit()
+            except exc.IntegrityError as e:
+                # Causes that could make an integrity error when deleting:
+                # - Associated project have sessions using that service
+                # - Associated project have tests using that service
+                # - Associated project has assets using that service
+                self.module.logger.log_warning(self.module.module_name, UserQueryServiceProjects.__name__, 'delete',
+                                               500, 'Integrity error', str(e))
+                return gettext(
+                    'Can\'t delete service-project: please remove all related sessions, assets and tests before '
+                    'deleting.'), 500
+
+
             # Build projects association to add
             json_sps = [{'id_service': service_id, 'id_project': id_project} for service_id in received_services_ids]
         elif 'service_project' in request.json:

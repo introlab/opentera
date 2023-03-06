@@ -134,14 +134,14 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                 TeraServiceSite.insert(new_service_site)
 
     @staticmethod
-    def delete_with_ids(session_type_id: int, site_id: int):
+    def delete_with_ids(session_type_id: int, site_id: int, autocommit: bool = True):
         delete_obj: TeraSessionTypeSite = TeraSessionTypeSite.query.filter_by(id_session_type=session_type_id,
                                                                               id_site=site_id).first()
         if delete_obj:
-            TeraSessionTypeSite.delete(delete_obj.id_session_type_site)
+            TeraSessionTypeSite.delete(delete_obj.id_session_type_site, autocommit=autocommit)
 
     @classmethod
-    def delete(cls, id_todel):
+    def delete(cls, id_todel, autocommit: bool = True):
         from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
         # Delete all association with projects for that site
         delete_obj = TeraSessionTypeSite.query.filter_by(id_session_type_site=id_todel).first()
@@ -150,10 +150,10 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             projects = TeraSessionTypeProject.get_projects_for_session_type(delete_obj.id_session_type)
             for st_project in projects:
                 if st_project.session_type_project_project.id_site == delete_obj.id_site:
-                    TeraSessionTypeProject.delete(st_project.id_session_type_project)
+                    TeraSessionTypeProject.delete(st_project.id_session_type_project, autocommit=autocommit)
 
             # Ok, delete it
-            super().delete(id_todel)
+            super().delete(id_todel, autocommit=autocommit)
 
     @classmethod
     def insert(cls, sts):

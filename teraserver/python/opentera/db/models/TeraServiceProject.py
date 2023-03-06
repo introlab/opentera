@@ -122,10 +122,10 @@ class TeraServiceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         return
 
     @staticmethod
-    def delete_with_ids(service_id: int, project_id: int):
+    def delete_with_ids(service_id: int, project_id: int, autocommit: bool = True):
         delete_obj = TeraServiceProject.query.filter_by(id_service=service_id, id_project=project_id).first()
         if delete_obj:
-            TeraServiceProject.delete(delete_obj.id_service_project)
+            TeraServiceProject.delete(delete_obj.id_service_project, autocommit=autocommit)
 
     def delete_check_integrity(self) -> IntegrityError | None:
         # This check will be quite long to process with lot of sessions and data...
@@ -149,7 +149,7 @@ class TeraServiceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         return None
 
     @classmethod
-    def delete(cls, id_todel):
+    def delete(cls, id_todel, autocommit: bool = True):
         # Delete all session type association to that project
         delete_obj: TeraServiceProject = TeraServiceProject.query.filter_by(id_service_project=id_todel).first()
 
@@ -157,12 +157,12 @@ class TeraServiceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             session_types = TeraSessionTypeProject.get_session_type_project_for_project_and_service(
                 project_id=delete_obj.id_project, service_id=delete_obj.id_service)
             for session_type in session_types:
-                TeraSessionTypeProject.delete(session_type.id_session_type_project)
+                TeraSessionTypeProject.delete(session_type.id_session_type_project, autocommit=autocommit)
 
             test_types = TeraTestTypeProject.get_test_type_project_for_project_and_service(
                 project_id=delete_obj.id_project, service_id=delete_obj.id_service)
             for test_type in test_types:
-                TeraTestTypeProject.delete(test_type.id_test_type_project)
+                TeraTestTypeProject.delete(test_type.id_test_type_project, autocommit=autocommit)
 
             # Ok, delete it
-            super().delete(id_todel)
+            super().delete(id_todel, autocommit=autocommit)

@@ -312,6 +312,10 @@ class UserQuerySessionTypeProjectTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove one project")
+            self.assertIsNotNone(TeraSessionTypeProject.get_session_type_project_for_session_type_project(
+                session_type_id=5, project_id=1))
+            self.assertIsNone(TeraSessionTypeProject.get_session_type_project_for_session_type_project(
+                session_type_id=5, project_id=2))
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
@@ -405,6 +409,10 @@ class UserQuerySessionTypeProjectTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove 1 type")
+            self.assertIsNotNone(TeraSessionTypeProject.get_session_type_project_for_session_type_project(
+                session_type_id= sestype1.id_session_type, project_id=2))
+            self.assertIsNone(TeraSessionTypeProject.get_session_type_project_for_session_type_project(
+                session_type_id=sestype2.id_session_type, project_id=2))
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)

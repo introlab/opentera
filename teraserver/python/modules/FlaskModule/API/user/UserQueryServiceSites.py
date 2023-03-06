@@ -144,15 +144,17 @@ class UserQueryServiceSites(Resource):
             todel_ids = set(current_sites_ids).difference(received_sites_ids)
             # Also filter sites already there
             received_sites_ids = set(received_sites_ids).difference(current_sites_ids)
-            for site_id in todel_ids:
-                if TeraServiceSite.get_service_site_for_service_site(site_id=site_id, service_id=id_service)\
-                        .delete_check_integrity():
-                    return gettext(
-                                'Can\'t delete service from site: please delete all sessions using that service in the '
-                                'site before deleting.'), 500
 
-            for site_id in todel_ids:
-                TeraServiceSite.delete_with_ids(service_id=id_service, site_id=site_id)
+            try:
+                for site_id in todel_ids:
+                    TeraServiceSite.delete_with_ids(service_id=id_service, site_id=site_id, autocommit=False)
+                TeraServiceSite.commit()
+            except exc.IntegrityError as e:
+                self.module.logger.log_warning(self.module.module_name, UserQueryServiceSites.__name__, 'delete', 500,
+                                               'Integrity error', str(e))
+                return gettext(
+                    'Can\'t delete service from site: please delete all sessions, assets and tests related to '
+                    'that service beforehand.'), 500
 
             # Build projects association to add
             json_sss = [{'id_service': id_service, 'id_site': site_id} for site_id in received_sites_ids]
@@ -172,14 +174,18 @@ class UserQueryServiceSites(Resource):
             todel_ids = set(current_services_ids).difference(received_services_ids)
             # Also filter services already there
             received_services_ids = set(received_services_ids).difference(current_services_ids)
-            for service_id in todel_ids:
-                if TeraServiceSite.get_service_site_for_service_site(site_id=id_site, service_id=service_id) \
-                        .delete_check_integrity():
-                    return gettext(
-                        'Can\'t delete service from site: please delete all sessions using that service in the '
-                        'site before deleting.'), 500
-            for service_id in todel_ids:
-                TeraServiceSite.delete_with_ids(service_id=service_id, site_id=id_site)
+
+            try:
+                for service_id in todel_ids:
+                    TeraServiceSite.delete_with_ids(service_id=service_id, site_id=id_site, autocommit=False)
+                TeraServiceSite.commit()
+            except exc.IntegrityError as e:
+                self.module.logger.log_warning(self.module.module_name, UserQueryServiceSites.__name__, 'delete', 500,
+                                               'Integrity error', str(e))
+                return gettext(
+                    'Can\'t delete service from site: please delete all sessions, assets and tests related to '
+                    'that service beforehand.'), 500
+
             # Build sites association to add
             json_sss = [{'id_service': service_id, 'id_site': id_site} for service_id in received_services_ids]
         elif 'service_site' in request.json:

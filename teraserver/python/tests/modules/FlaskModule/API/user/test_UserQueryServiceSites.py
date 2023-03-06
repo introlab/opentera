@@ -176,7 +176,8 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
-            self.assertEqual(2, len(response.json))
+            target_count = TeraServiceSite.get_count(filters={'id_site': 1})
+            self.assertEqual(target_count, len(response.json))
 
             for data_item in response.json:
                 self._checkJson(json_data=data_item)
@@ -188,7 +189,8 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
-            self.assertEqual(3, len(response.json))
+            target_count = TeraServiceSite.get_count(filters={'id_site': 1})
+            self.assertEqual(target_count, len(response.json))
 
             for data_item in response.json:
                 self._checkJson(json_data=data_item)
@@ -309,6 +311,8 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove one site")
+            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2, service_id=4))
+            self.assertIsNotNone(TeraServiceSite.get_service_site_for_service_site(site_id=1, service_id=4))
 
             response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin',
                                                      params=params)
@@ -423,6 +427,10 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove 1 service")
+            self.assertIsNotNone(TeraServiceSite.get_service_site_for_service_site(site_id=2, service_id=3))
+            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2, service_id=4))
+            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2, service_id=2))
+            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2, service_id=5))
 
             response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin',
                                                      params=params)

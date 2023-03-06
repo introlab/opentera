@@ -134,18 +134,22 @@ class UserQuerySessionTypeSites(Resource):
             todel_ids = set(current_sites_ids).difference(received_sites_ids)
             # Also filter sites already there
             received_sites_ids = set(received_sites_ids).difference(current_sites_ids)
-            for site_id in todel_ids:
-                if site_id in accessible_sites_ids:
-                    if TeraSessionTypeSite.\
-                            get_session_type_site_for_session_type_and_site(site_id=site_id,
-                                                                            session_type_id=id_session_type)\
-                            .delete_check_integrity():
-                        return gettext(
-                                    'Can\'t delete session type from site: please delete all sessions using that type '
-                                    'in that site before deleting.'), 500
-            for site_id in todel_ids:
-                if site_id in accessible_sites_ids:  # Don't remove from the list if not site admin for that site!
-                    TeraSessionTypeSite.delete_with_ids(session_type_id=id_session_type, site_id=site_id)
+
+            try:
+                for site_id in todel_ids:
+                    if site_id in accessible_sites_ids:  # Don't remove from the list if not site admin for that site!
+                        TeraSessionTypeSite.delete_with_ids(session_type_id=id_session_type, site_id=site_id,
+                                                            autocommit=False)
+                TeraSessionTypeSite.commit()
+            except exc.IntegrityError as e:
+                # Causes that could make an integrity error when deleting:
+                # - Associated site still have sessions of that type
+                self.module.logger.log_warning(self.module.module_name, UserQuerySessionTypeSites.__name__, 'delete',
+                                               500, 'Integrity error', str(e))
+
+                return gettext('Can\'t delete session type from site: please delete all sessions of that type in the '
+                               'site before deleting.'), 500
+
             # Build sites association to add
             json_sts = [{'id_session_type': id_session_type, 'id_site': site_id} for site_id in received_sites_ids]
         elif 'site' in request.json:
@@ -168,16 +172,19 @@ class UserQuerySessionTypeSites(Resource):
             todel_ids = set(current_session_types_ids).difference(received_st_ids)
             # Also filter session types already there
             received_st_ids = set(received_st_ids).difference(current_session_types_ids)
-            for sts_id in todel_ids:
-                if TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(site_id=id_site,
-                                                                                       session_type_id=sts_id)\
-                        .delete_check_integrity():
-                    return gettext(
-                                'Can\'t delete session type from site: please delete all sessions using that type '
-                                'in that site before deleting.'), 500
+            try:
+                for sts_id in todel_ids:
+                    TeraSessionTypeSite.delete_with_ids(session_type_id=sts_id, site_id=id_site, autocommit=False)
+                TeraSessionTypeSite.commit()
+            except exc.IntegrityError as e:
+                # Causes that could make an integrity error when deleting:
+                # - Associated site still have sessions of that type
+                self.module.logger.log_warning(self.module.module_name, UserQuerySessionTypeSites.__name__, 'delete',
+                                               500, 'Integrity error', str(e))
 
-            for sts_id in todel_ids:
-                TeraSessionTypeSite.delete_with_ids(session_type_id=sts_id, site_id=id_site)
+                return gettext('Can\'t delete session type from site: please delete all sessions of that type in the '
+                               'site before deleting.'), 500
+
             # Build sites association to add
             json_sts = [{'id_session_type': sts_id, 'id_site': id_site} for sts_id in received_st_ids]
         elif 'session_type_site' in request.json:

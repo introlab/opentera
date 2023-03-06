@@ -158,11 +158,20 @@ class UserQueryDeviceProjects(Resource):
 
             # Also filter projects already there
             received_projects_ids = set(received_projects_ids).difference(current_projects_ids)
-            for proj_id in todel_ids:
-                project = TeraProject.get_project_by_id(proj_id)
-                if user_access.get_site_role(project.id_site) != 'admin':
-                    return gettext('Access denied'), 403
-                TeraDeviceProject.delete_with_ids(device_id=id_device, project_id=proj_id)
+            try:
+                for proj_id in todel_ids:
+                    project = TeraProject.get_project_by_id(proj_id)
+                    if user_access.get_site_role(project.id_site) != 'admin':
+                        return gettext('Access denied'), 403
+                    TeraDeviceProject.delete_with_ids(device_id=id_device, project_id=proj_id, autocommit=False)
+                TeraDeviceProject.commit()
+            except exc.IntegrityError as e:
+
+                self.module.logger.log_warning(self.module.module_name, UserQueryDeviceProjects.__name__, 'delete', 500,
+                                               'Integrity error', str(e))
+                return gettext('Can\'t delete device from project. Please remove all participants associated with the '
+                               'device or all sessions in the project referring to the device before deleting.'), 500
+
             # Build projects association to add
             json_dps = [{'id_device': id_device, 'id_project': project_id} for project_id in received_projects_ids]
         elif 'project' in request.json:
@@ -188,8 +197,16 @@ class UserQueryDeviceProjects(Resource):
             # Also filter devices already there
             received_devices_ids = set(received_devices_ids).difference(current_devices_ids)
 
-            for device_id in todel_ids:
-                TeraDeviceProject.delete_with_ids(device_id=device_id, project_id=id_project)
+            try:
+                for device_id in todel_ids:
+                    TeraDeviceProject.delete_with_ids(device_id=device_id, project_id=id_project, autocommit=False)
+                TeraDeviceProject.commit()
+            except exc.IntegrityError as e:
+
+                self.module.logger.log_warning(self.module.module_name, UserQueryDeviceProjects.__name__, 'delete', 500,
+                                               'Integrity error', str(e))
+                return gettext('Can\'t delete device from project. Please remove all participants associated with the '
+                               'device or all sessions in the project referring to the device before deleting.'), 500
             # Build projects association to add
             json_dps = [{'id_device': device_id, 'id_project': id_project} for device_id in received_devices_ids]
         elif 'device_project' in request.json:

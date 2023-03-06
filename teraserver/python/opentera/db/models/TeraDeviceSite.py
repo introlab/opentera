@@ -89,13 +89,13 @@ class TeraDeviceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             .filter_by(id_device=device_id).all()
 
     @staticmethod
-    def delete_with_ids(device_id: int, site_id: int):
+    def delete_with_ids(device_id: int, site_id: int, autocommit: bool = True):
         delete_obj: TeraDeviceSite = TeraDeviceSite.query.filter_by(id_device=device_id, id_site=site_id).first()
         if delete_obj:
-            TeraDeviceSite.delete(delete_obj.id_device_site)
+            TeraDeviceSite.delete(delete_obj.id_device_site, autocommit=autocommit)
 
     @classmethod
-    def delete(cls, id_todel):
+    def delete(cls, id_todel, autocommit: bool = True):
         from opentera.db.models.TeraDeviceProject import TeraDeviceProject
         # Delete all association with projects for that site
         delete_obj = TeraDeviceSite.query.filter_by(id_device_site=id_todel).first()
@@ -103,10 +103,10 @@ class TeraDeviceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         if delete_obj:
             projects = TeraDeviceProject.get_projects_for_device(delete_obj.id_device)
             for device_project in projects:
-                TeraDeviceProject.delete(device_project.id_device_project)
+                TeraDeviceProject.delete(device_project.id_device_project, autocommit=autocommit)
 
             # Ok, delete it
-            super().delete(id_todel)
+            super().delete(id_todel, autocommit=autocommit)
 
     @classmethod
     def update(cls, update_id: int, values: dict):

@@ -76,13 +76,13 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             .filter_by(id_device=device_id).all()
 
     @staticmethod
-    def delete_with_ids(device_id: int, project_id: int):
+    def delete_with_ids(device_id: int, project_id: int, autocommit: bool = True):
         delete_obj = TeraDeviceProject.query.filter_by(id_device=device_id, id_project=project_id).first()
         if delete_obj:
-            TeraDeviceProject.delete(delete_obj.id_device_project)
+            TeraDeviceProject.delete(delete_obj.id_device_project, autocommit=autocommit)
 
     @classmethod
-    def delete(cls, id_todel):
+    def delete(cls, id_todel, autocommit: bool = True):
         from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 
         delete_obj: TeraDeviceProject = TeraDeviceProject.query.filter_by(id_device_project=id_todel).first()
@@ -96,10 +96,10 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                     device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
                         device_id=delete_obj.device_project_device.id_device, participant_id=part.id_participant)
                     if device_part:
-                        TeraDeviceParticipant.delete(device_part.id_device_participant)
+                        TeraDeviceParticipant.delete(device_part.id_device_participant, autocommit=autocommit)
 
         # Ok, delete it
-        super().delete(id_todel)
+        super().delete(id_todel, autocommit=autocommit)
 
     def delete_check_integrity(self) -> IntegrityError | None:
         from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
@@ -113,7 +113,7 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                                   self.id_device_project, 't_participants')
 
         # Find sessions with matching device and project
-        device_sessions = TeraSession.get_sessions_for_device(self.device_id)
+        device_sessions = TeraSession.get_sessions_for_device(self.id_device)
         device_project_sessions = [ses.id_session for ses in device_sessions
                                    if ses.get_associated_project_id() == self.id_project]
 

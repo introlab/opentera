@@ -98,13 +98,13 @@ class TeraServiceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                     TeraServiceSite.db().session.commit()
 
     @staticmethod
-    def delete_with_ids(service_id: int, site_id: int):
+    def delete_with_ids(service_id: int, site_id: int, autocommit: bool = True):
         delete_obj = TeraServiceSite.query.filter_by(id_service=service_id, id_site=site_id).first()
         if delete_obj:
-            TeraServiceSite.delete(delete_obj.id_service_site)
+            TeraServiceSite.delete(delete_obj.id_service_site, autocommit=autocommit)
 
     @classmethod
-    def delete(cls, id_todel):
+    def delete(cls, id_todel, autocommit: bool = True):
         from opentera.db.models.TeraServiceProject import TeraServiceProject
         # Delete all association with projects for that site
         delete_obj = TeraServiceSite.query.filter_by(id_service_site=id_todel).first()
@@ -113,16 +113,16 @@ class TeraServiceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             projects = TeraServiceProject.get_projects_for_service(delete_obj.id_service)
             for service_project in projects:
                 if service_project.service_project_project.id_site == delete_obj.id_site:
-                    TeraServiceProject.delete(service_project.id_service_project)
+                    TeraServiceProject.delete(service_project.id_service_project, autocommit=autocommit)
 
             from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
             session_types = TeraSessionTypeSite.get_session_type_site_for_site_and_service(
                 site_id=delete_obj.id_site, service_id=delete_obj.id_service)
             for session_type in session_types:
-                TeraSessionTypeSite.delete(session_type.id_session_type_site)
+                TeraSessionTypeSite.delete(session_type.id_session_type_site, autocommit=autocommit)
 
             # Ok, delete it
-            super().delete(id_todel)
+            super().delete(id_todel, autocommit=autocommit)
 
     def delete_check_integrity(self) -> IntegrityError | None:
         from opentera.db.models.TeraServiceProject import TeraServiceProject
