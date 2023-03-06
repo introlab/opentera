@@ -48,6 +48,32 @@ class TeraDeviceProjectTest(BaseModelsTest):
             id_device = device.id_device
             TeraDevice.delete(id_device)
 
+    def test_insert_invalid_with_invalid_project(self):
+        with self._flask_app.app_context():
+            # Create new device not part of any project or site
+            device: TeraDevice = TeraDevice()
+            device.device_name = 'Test Device'
+            device.device_type = TeraDeviceType.get_device_type_by_key('capteur')
+            TeraDevice.insert(device)
+            self.assertIsNotNone(device.id_device)
+
+            device_project: TeraDeviceProject = TeraDeviceProject()
+            device_project.id_device = device.id_device
+            device_project.id_project = None
+            self.assertRaises(IntegrityError, TeraDeviceProject.insert, device_project)
+
+            # Delete device
+            id_device = device.id_device
+            TeraDevice.delete(id_device)
+
+    def test_insert_invalid_with_invalid_device(self):
+        with self._flask_app.app_context():
+            for project in TeraProject.query.all():
+                device_project: TeraDeviceProject = TeraDeviceProject()
+                device_project.id_device = None
+                device_project.id_project = project.id_project
+                self.assertRaises(IntegrityError, TeraDeviceProject.insert, device_project)
+
     def test_insert_with_device_associated_to_site(self):
         with self._flask_app.app_context():
             # Create new device not part of any project or site
