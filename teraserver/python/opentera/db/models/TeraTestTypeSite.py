@@ -133,12 +133,6 @@ class TeraTestTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         TeraTestTypeSite.check_integrity(inserted_obj)
         return inserted_obj
 
-    # @classmethod
-    # def update(cls, update_id: int, values: dict):
-    #     super().update(update_id, values)
-    #     tts = TeraTestTypeSite.get_test_type_site_by_id(update_id)
-    #     tts.check_integrity()
-
     def delete_check_integrity(self) -> IntegrityError | None:
         for project in self.test_type_site_site.site_projects:
             test_type_project = TeraTestTypeProject.get_test_type_project_for_test_type_project(project.id_project,

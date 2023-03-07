@@ -437,7 +437,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         session.session_uuid = str(uuid.uuid4())
 
         if type(session.session_parameters) is dict:
-            # Dumps dictionnary into json
+            # Dumps dictionary into json
             session.session_parameters = json.dumps(session.session_parameters)
 
         super().insert(session)

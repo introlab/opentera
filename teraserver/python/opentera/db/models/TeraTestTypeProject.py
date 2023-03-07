@@ -134,23 +134,6 @@ class TeraTestTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             return IntegrityError('Test type has tests in this project', self.id_test_type, 't_tests')
         return None
 
-    # @classmethod
-    # def update(cls, update_id: int, values: dict):
-    #     values = cls.clean_values(values)
-    #     ttp = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
-    #     ttp.from_json(values)
-    #     # Check if that site of that project has the site associated to the test type
-    #     from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
-    #     tt_site = TeraTestTypeSite.get_test_type_site_for_test_type_and_site(
-    #         site_id=ttp.test_type_project_project.id_site, test_type_id=ttp.id_test_type)
-    #     if not tt_site:
-    #         raise IntegrityError(params='Test type not associated to project site',
-    #                              orig='TeraTestTypeProject.update', statement='update')
-    #
-    #     ttp = TeraTestTypeProject.get_test_type_project_by_id(update_id)
-    #     ttp.check_integrity()
-    #     cls.commit()
-
     @classmethod
     def update(cls, update_id: int, values: dict):
         return

@@ -1,21 +1,9 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 import uuid
-# from enum import Enum, unique
 from sqlalchemy import or_
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, TIMESTAMP
 from sqlalchemy.orm import relationship
-
-# @unique
-# class AssetType(Enum):
-#     RAW_FILE = 1
-#     RAW_DATA = 2
-#     RESULT_FILE = 3
-#     PROCESSED_DATA = 4
-#     REPORT = 5
-#
-#     def describe(self):
-#         return self.name, self.value
 
 
 class TeraAsset(BaseModel, SoftDeleteMixin):

@@ -85,17 +85,6 @@ class TeraUserUserGroup(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         return TeraUserUserGroup.query.execution_options(include_deleted=with_deleted)\
             .filter_by(id_user=user_id, id_user_group=user_group_id).first()
 
-    # @staticmethod
-    # def insert_user_user_group(id_user_group: int, id_user: int):
-    #     new_uug = TeraUserUserGroup()
-    #     new_uug.id_user_group = id_user_group
-    #     new_uug.id_user = id_user
-    #
-    #     TeraUserUserGroup.db().session.add(new_uug)
-    #     TeraUserUserGroup.db().session.commit()
-    #
-    #     return new_uug
-
     @classmethod
     def update(cls, update_id: int, values: dict):
         return

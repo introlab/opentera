@@ -161,12 +161,6 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         TeraSessionTypeSite.check_integrity(inserted_obj)
         return inserted_obj
 
-    # @classmethod
-    # def update(cls, update_id: int, values: dict):
-    #     super().update(update_id, values)
-    #     sts = TeraSessionTypeSite.get_session_type_site_by_id(update_id)
-    #     sts.check_integrity()
-
     def delete_check_integrity(self) -> IntegrityError | None:
         for project in self.session_type_site_site.site_projects:
             ses_type_project = TeraSessionTypeProject.get_session_type_project_for_session_type_project(

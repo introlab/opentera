@@ -145,22 +145,6 @@ class TeraSessionTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         TeraSessionTypeProject.check_integrity(inserted_obj)
         return inserted_obj
 
-    # @classmethod
-    # def update(cls, update_id: int, values: dict):
-    #     values = cls.clean_values(values)
-    #     stp = cls.query.filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()  # .update(values)
-    #     stp.from_json(values)
-    #     # Check if that site of that project has the site associated to the session type
-    #     from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
-    #     st_site = TeraSessionTypeSite.get_session_type_site_for_session_type_and_site(
-    #         site_id=stp.session_type_project_project.id_site, session_type_id=stp.id_session_type)
-    #     if not st_site:
-    #         raise IntegrityError(params='Session type not associated to project site',
-    #                              orig='TeraSessionTypeProject.update', statement='update')
-    #
-    #     stp = TeraSessionTypeProject.get_session_type_project_by_id(update_id)
-    #     stp.check_integrity()
-    #     cls.commit()
     @classmethod
     def update(cls, update_id: int, values: dict):
         return

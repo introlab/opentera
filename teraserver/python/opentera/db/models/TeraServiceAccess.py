@@ -23,11 +23,6 @@ class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     service_access_device = relationship("TeraDevice", viewonly=True)
     service_access_participant_group = relationship("TeraParticipantGroup", viewonly=True)
 
-    # service_access_role = relationship("TeraServiceRole")
-    # service_access_user_group = relationship("TeraUserGroup", back_populates='user_group_services_access')
-    # service_access_device = relationship("TeraDevice")
-    # service_access_participant_group = relationship("TeraParticipantGroup")
-
     def __init__(self):
         pass
 
