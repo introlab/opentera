@@ -1,10 +1,13 @@
 from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
-from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraSessionDevices import TeraSessionDevices
 from opentera.db.models.TeraTest import TeraTest
 from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraDeviceSite import TeraDeviceSite
+from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+from opentera.db.models.TeraDeviceProject import TeraDeviceProject
+from sqlalchemy.exc import IntegrityError
 
 import datetime
 
@@ -375,7 +378,19 @@ class UserQueryDevicesTest(BaseUserAPITest):
             # Create associated items
             dev_part = TeraDeviceParticipant()
             dev_part.from_json({'id_device': device_id, 'id_participant': 1})
-            TeraDeviceParticipant.insert(dev_part)
+            self.assertRaises(IntegrityError, TeraDeviceParticipant.insert, dev_part)
+
+            dev_site = TeraDeviceSite()
+            dev_site.id_device = device_id
+            dev_site.id_site = 1
+            TeraDeviceSite.insert(dev_site)
+
+            dev_proj = TeraDeviceProject()
+            dev_proj.id_device = device_id
+            dev_proj.id_project = 1
+            TeraDeviceProject.insert(dev_proj)
+
+            dev_part = TeraDeviceParticipant.insert(dev_part)
 
             json_session = {'id_session_type': 1,
                             'session_name': 'Session #1',
