@@ -1,3 +1,1 @@
-opentera==1.1.3
-Babel==2.9.1
-werkzeug==2.0.3
+opentera
