@@ -3,8 +3,6 @@
 Python package for OpenTera micro-service architecture. 
 External microservices can use this package as a base.
 
-This is a beta release and is not meant for production at this stage. 
-
 # GitHub
 * https://github.com/introlab/opentera
 
