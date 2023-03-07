@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-02-28 08:49-0500\n"
+"POT-Creation-Date: 2023-03-07 08:35-0500\n"
 "PO-Revision-Date: 2021-01-19 16:16-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,89 +18,89 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.11.0\n"
 
-#: API/QueryAssetFile.py:46 API/QueryAssetFile.py:236
+#: API/QueryAssetFile.py:44 API/QueryAssetFile.py:242
 msgid "Access denied to asset"
 msgstr ""
 
-#: API/QueryAssetFile.py:51 API/QueryAssetFileInfos.py:69
-#: API/QueryAssetFileInfos.py:126
+#: API/QueryAssetFile.py:49 API/QueryAssetFileInfos.py:55
+#: API/QueryAssetFileInfos.py:112
 msgid "No asset found"
 msgstr ""
 
-#: API/QueryAssetFile.py:65
+#: API/QueryAssetFile.py:63
 msgid "Wrong content type"
 msgstr ""
 
-#: API/QueryAssetFile.py:68
+#: API/QueryAssetFile.py:66
 msgid "Missing file asset information"
 msgstr ""
 
-#: API/QueryAssetFile.py:71
+#: API/QueryAssetFile.py:69
 msgid "Missing uploaded file"
 msgstr ""
 
-#: API/QueryAssetFile.py:76
+#: API/QueryAssetFile.py:74
 msgid "Missing filename"
 msgstr ""
 
-#: API/QueryAssetFile.py:82
+#: API/QueryAssetFile.py:80
 msgid "Invalid file_asset format"
 msgstr ""
 
-#: API/QueryAssetFile.py:85
+#: API/QueryAssetFile.py:83
 msgid "Missing required field(s) in asset descriptor"
 msgstr ""
 
-#: API/QueryAssetFile.py:96 API/QueryAssetFile.py:116 API/QueryAssetFile.py:123
-#: API/QueryAssetFile.py:130
+#: API/QueryAssetFile.py:99 API/QueryAssetFile.py:119 API/QueryAssetFile.py:126
+#: API/QueryAssetFile.py:133
 msgid "Session access is forbidden"
 msgstr ""
 
-#: API/QueryAssetFile.py:137
+#: API/QueryAssetFile.py:140
 msgid "Missing at least one ID creator"
 msgstr ""
 
-#: API/QueryAssetFile.py:170
+#: API/QueryAssetFile.py:176
 msgid "Unable to create asset"
 msgstr ""
 
-#: API/QueryAssetFile.py:241
+#: API/QueryAssetFile.py:247
 msgid "Unable to delete asset"
 msgstr ""
 
-#: API/QueryAssetFileInfos.py:63
+#: API/QueryAssetFileInfos.py:49
 msgid "Access denied for that asset"
 msgstr ""
 
-#: API/QueryAssetFileInfos.py:83
+#: API/QueryAssetFileInfos.py:69
 msgid "Badly formatted request"
 msgstr ""
 
-#: API/QueryAssetFileInfos.py:91
+#: API/QueryAssetFileInfos.py:77
 msgid "Missing access token for at least one requested asset"
 msgstr ""
 
-#: API/QueryAssetFileInfos.py:93
+#: API/QueryAssetFileInfos.py:79
 msgid "Missing asset UUID for at least one requested asset"
 msgstr ""
 
-#: API/QueryAssetFileInfos.py:97
+#: API/QueryAssetFileInfos.py:83
 msgid "Access denied for at least one requested asset"
 msgstr ""
 
-#: API/QueryAssetFileInfos.py:109
+#: API/QueryAssetFileInfos.py:95
 msgid "Missing access token"
 msgstr ""
 
-#: API/QueryAssetFileInfos.py:112
+#: API/QueryAssetFileInfos.py:98
 msgid "Missing asset uuid"
 msgstr ""
 
-#: API/QueryAssetFileInfos.py:117
+#: API/QueryAssetFileInfos.py:103
 msgid "Forbidden"
 msgstr ""
 
-#: API/QueryAssetFileInfos.py:121
+#: API/QueryAssetFileInfos.py:107
 msgid "Only original filename can be changed from here"
 msgstr ""
 
