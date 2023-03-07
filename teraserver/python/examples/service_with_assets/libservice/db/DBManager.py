@@ -1,8 +1,8 @@
 # Using same base as TeraServer
 # FIXME: Uncomment on OpenTera package 1.2.0 release
-# from opentera.db.Base import BaseModel
+from opentera.db.Base import BaseModel
 # FIXME: Comment on OpenTera package 1.2.0 release
-from libservice.db.Base import BaseModel
+# from libservice.db.Base import BaseModel
 from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy.engine.reflection import Inspector
