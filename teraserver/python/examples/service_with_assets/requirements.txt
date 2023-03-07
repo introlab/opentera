@@ -1,1 +1,1 @@
-opentera==1.2.0
+opentera
