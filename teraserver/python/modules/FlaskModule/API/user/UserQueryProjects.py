@@ -9,6 +9,7 @@ from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from modules.DatabaseModule.DBManager import DBManager
 from flask_babel import gettext
 
@@ -161,7 +162,7 @@ class UserQueryProjects(Resource):
                 # We have some session types not accessible
                 return gettext('No access to a session type for at least one of it'), 403
 
-            if 'site_id' not in json_project:
+            if 'id_site' not in json_project:
                 # If we are here, the project has a site since it is an update (otherwise, site id is required)
                 project = TeraProject.get_project_by_id(json_project['id_project'])
                 if project:
@@ -228,6 +229,12 @@ class UserQueryProjects(Resource):
 
             # Commit the changes we made!
             update_project.commit()
+
+            # Ensure services are associated to session type
+            for ses_type in update_project.project_session_types:
+                session_type_project = TeraSessionTypeProject.get_session_type_project_for_session_type_project(
+                    update_project.id_project, ses_type.id_session_type)
+                TeraSessionTypeProject.check_integrity(session_type_project)
 
         return [update_project.to_json()]
 
