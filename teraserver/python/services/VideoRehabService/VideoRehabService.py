@@ -55,25 +55,28 @@ if __name__ == '__main__':
         exit(1)
 
     # Global redis client
-    Globals.redis_client = RedisClient(Globals.config_man.redis_config)
-    Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
-    Globals.api_device_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
-    Globals.api_device_static_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
-    Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
-    Globals.api_participant_static_token_key = \
-        Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantStaticTokenAPIKey)
+    # Globals.redis_client = RedisClient(Globals.config_man.redis_config)
+    # Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
+    # Globals.api_device_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
+    # Globals.api_device_static_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
+    # Globals.api_participant_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
+    # Globals.api_participant_static_token_key = \
+    #     Globals.redis_client.redisGet(RedisVars.RedisVar_ParticipantStaticTokenAPIKey)
 
     # Update Service Access information
-    ServiceAccessManager.api_user_token_key = Globals.api_user_token_key
-    ServiceAccessManager.api_participant_token_key = Globals.api_participant_token_key
-    ServiceAccessManager.api_participant_static_token_key = Globals.api_participant_static_token_key
-    ServiceAccessManager.api_device_token_key = Globals.api_device_token_key
-    ServiceAccessManager.api_device_static_token_key = Globals.api_device_static_token_key
-    ServiceAccessManager.config_man = Globals.config_man
+    # ServiceAccessManager.api_user_token_key = Globals.api_user_token_key
+    # ServiceAccessManager.api_participant_token_key = Globals.api_participant_token_key
+    # ServiceAccessManager.api_participant_static_token_key = Globals.api_participant_static_token_key
+    # ServiceAccessManager.api_device_token_key = Globals.api_device_token_key
+    # ServiceAccessManager.api_device_static_token_key = Globals.api_device_static_token_key
+    # ServiceAccessManager.config_man = Globals.config_man
 
     # Get service UUID
-    service_info = Globals.redis_client.redisGet(RedisVars.RedisVar_ServicePrefixKey +
-                                                 Globals.config_man.service_config['name'])
+    redis_client = RedisClient(Globals.config_man.redis_config)
+    service_info = redis_client.redisGet(RedisVars.RedisVar_ServicePrefixKey +
+                                         Globals.config_man.service_config['name'])
+    redis_client = None
+
     import sys
 
     if service_info is None:

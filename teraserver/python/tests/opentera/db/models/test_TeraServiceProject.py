@@ -4,4 +4,5 @@ from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 class TeraServiceProjectTest(BaseModelsTest):
 
     def test_defaults(self):
-        pass
+        with self._flask_app.app_context():
+            pass

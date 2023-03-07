@@ -1,19 +1,22 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 from datetime import datetime
 import json
 import jsonschema
 
 
-class TeraServiceConfigSpecific(db.Model, BaseModel):
+class TeraServiceConfigSpecific(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_services_configs_specifics'
-    id_service_config_specific = db.Column(db.Integer, db.Sequence('id_service_config_specific_sequence'),
-                                           primary_key=True, autoincrement=True)
-    id_service_config = db.Column(db.Integer, db.ForeignKey('t_services_configs.id_service_config', ondelete='cascade'),
-                                  nullable=False)
-    service_config_specific_id = db.Column(db.String, nullable=False)
-    service_config_specific_config = db.Column(db.String, nullable=False)
+    id_service_config_specific = Column(Integer, Sequence('id_service_config_specific_sequence'),
+                                        primary_key=True, autoincrement=True)
+    id_service_config = Column(Integer, ForeignKey('t_services_configs.id_service_config', ondelete='cascade'),
+                               nullable=False)
+    service_config_specific_id = Column(String, nullable=False)
+    service_config_specific_config = Column(String, nullable=False)
 
-    service_config_specific_service_config = db.relationship("TeraServiceConfig", viewonly=True)
+    service_config_specific_service_config = relationship("TeraServiceConfig", viewonly=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -29,12 +32,14 @@ class TeraServiceConfigSpecific(db.Model, BaseModel):
         return json_config
 
     @staticmethod
-    def get_service_config_specific_by_id(s_id: int):
-        return TeraServiceConfigSpecific.query.filter_by(id_service_config_specific=s_id).first()
+    def get_service_config_specific_by_id(s_id: int, with_deleted: bool = False):
+        return TeraServiceConfigSpecific.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service_config_specific=s_id).first()
 
     @staticmethod
-    def get_service_config_specifics_for_service_config(service_config_id: int):
-        return TeraServiceConfigSpecific.query.filter_by(id_service_config=service_config_id).all()
+    def get_service_config_specifics_for_service_config(service_config_id: int, with_deleted: bool = False):
+        return TeraServiceConfigSpecific.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service_config=service_config_id).all()
 
     def get_last_update_datetime(self) -> datetime:
         return datetime.fromtimestamp(self.version_id/1000)
@@ -58,5 +63,5 @@ class TeraServiceConfigSpecific(db.Model, BaseModel):
             new_specific_config.id_service_config = service_config_id
             new_specific_config.service_config_specific_id = specific_id
             new_specific_config.service_config_specific_config = config
-            db.session.add(new_specific_config)
-        db.session.commit()
+            TeraServiceConfigSpecific.db().session.add(new_specific_config)
+        TeraServiceConfigSpecific.db().session.commit()

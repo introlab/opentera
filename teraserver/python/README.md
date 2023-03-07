@@ -3,8 +3,6 @@
 Python package for OpenTera micro-service architecture. 
 External microservices can use this package as a base.
 
-This is a beta release and is not meant for production at this stage. 
-
 # GitHub
 * https://github.com/introlab/opentera
 
@@ -28,6 +26,8 @@ OpenTera is based or uses the following Open Source technologies :
 # Authors
 * Dominic Létourneau, ing. M.Sc.A., IntRoLab, Université de Sherbrooke (@doumdi)
 * Simon Brière, ing. M.Sc.A., CDRV, Université de Sherbrooke (@sbriere)
+* François Michaud, ing. Ph.D., IntRoLab, Université de Sherbrooke
+* Michel Tousignant, pht, Ph.D., CDRV, Université de Sherbrooke
 
 # Contributors
 * Philippe Arsenault

@@ -1,18 +1,17 @@
-from services.FileTransferService.libfiletransferservice.db.Base import db
+
 from opentera.db.Base import BaseModel
 from sqlalchemy import exc
+from sqlalchemy import Column, ForeignKey, Sequence, Integer, String, BigInteger, TIMESTAMP
 import os
 
 
-class AssetFileData(db.Model, BaseModel):
+class AssetFileData(BaseModel):
     __tablename__ = "t_asset_file_data"
-    id_asset_file_data = db.Column(db.Integer, db.Sequence('id_asset_file_data_sequence'),
-                                   primary_key=True, autoincrement=True)
-
-    asset_uuid = db.Column(db.String(36), nullable=False, unique=True)
-    asset_original_filename = db.Column(db.String, nullable=False)
-    asset_file_size = db.Column(db.BigInteger, nullable=False)
-    # asset_md5 = db.Column(db.String, nullable=False)  # Not used now
+    id_asset_file_data = Column(Integer, Sequence('id_asset_file_data_sequence'), primary_key=True, autoincrement=True)
+    asset_uuid = Column(String(36), nullable=False, unique=True)
+    asset_original_filename = Column(String, nullable=False)
+    asset_file_size = Column(BigInteger, nullable=False)
+    # asset_md5 = Column(String, nullable=False)  # Not used now
 
     @staticmethod
     def get_asset_for_uuid(uuid_asset: str):
@@ -35,7 +34,7 @@ class AssetFileData(db.Model, BaseModel):
 
         # Delete self from database
         try:
-            db.session.delete(self)
+            self.db().session.delete(self)
             self.commit()
         except exc.SQLAlchemyError:
             return False

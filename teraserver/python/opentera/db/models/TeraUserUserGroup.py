@@ -1,16 +1,18 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 
-class TeraUserUserGroup(db.Model, BaseModel):
+class TeraUserUserGroup(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_users_users_groups'
-    id_user_user_group = db.Column(db.Integer, db.Sequence('id_user_user_group_sequence'), primary_key=True,
-                                   autoincrement=True)
-    id_user = db.Column(db.Integer, db.ForeignKey("t_users.id_user", ondelete='cascade'), nullable=False)
-    id_user_group = db.Column(db.Integer, db.ForeignKey("t_users_groups.id_user_group"),
-                              nullable=False)
+    id_user_user_group = Column(Integer, Sequence('id_user_user_group_sequence'), primary_key=True, autoincrement=True)
+    id_user = Column(Integer, ForeignKey("t_users.id_user", ondelete='cascade'), nullable=False)
+    id_user_group = Column(Integer, ForeignKey("t_users_groups.id_user_group", ondelete='cascade'), nullable=False)
 
-    user_user_group_user = db.relationship("TeraUser", viewonly=True)
-    user_user_group_user_group = db.relationship("TeraUserGroup", viewonly=True)  # Fun variable name!
+    user_user_group_user = relationship("TeraUser", viewonly=True)
+    user_user_group_user_group = relationship("TeraUserGroup", viewonly=True)  # Fun variable name!
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['user_user_group_user', 'user_user_group_user_group'])
@@ -39,53 +41,61 @@ class TeraUserUserGroup(db.Model, BaseModel):
             user_ug = TeraUserUserGroup()
             user_ug.id_user = user1.id_user
             user_ug.id_user_group = group3.id_user_group
-            db.session.add(user_ug)
+            TeraUserUserGroup.db().session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
             user_ug.id_user = user2.id_user
             user_ug.id_user_group = group1.id_user_group
-            db.session.add(user_ug)
+            TeraUserUserGroup.db().session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
             user_ug.id_user = user3.id_user
             user_ug.id_user_group = group4.id_user_group
-            db.session.add(user_ug)
+            TeraUserUserGroup.db().session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
             user_ug.id_user = user3.id_user
             user_ug.id_user_group = group3.id_user_group
-            db.session.add(user_ug)
+            TeraUserUserGroup.db().session.add(user_ug)
 
             user_ug = TeraUserUserGroup()
             user_ug.id_user = user4.id_user
             user_ug.id_user_group = group2.id_user_group
-            db.session.add(user_ug)
+            TeraUserUserGroup.db().session.add(user_ug)
 
-            db.session.commit()
-
-    @staticmethod
-    def get_user_user_group_by_id(user_user_group_id: int):
-        return TeraUserUserGroup.query.filter_by(id_user_user_group=user_user_group_id).first()
+            TeraUserUserGroup.db().session.commit()
 
     @staticmethod
-    def query_users_for_user_group(user_group_id: int):
-        return TeraUserUserGroup.query.filter_by(id_user_group=user_group_id).all()
+    def get_user_user_group_by_id(user_user_group_id: int, with_deleted: bool = False):
+        return TeraUserUserGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user_user_group=user_user_group_id).first()
 
     @staticmethod
-    def query_users_groups_for_user(user_id: int):
-        return TeraUserUserGroup.query.filter_by(id_user=user_id).all()
+    def query_users_for_user_group(user_group_id: int, with_deleted: bool = False):
+        return TeraUserUserGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user_group=user_group_id).all()
 
     @staticmethod
-    def query_user_user_group_for_user_user_group(user_id: int, user_group_id: int):
-        return TeraUserUserGroup.query.filter_by(id_user=user_id, id_user_group=user_group_id).first()
+    def query_users_groups_for_user(user_id: int, with_deleted: bool = False):
+        return TeraUserUserGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user=user_id).all()
 
     @staticmethod
-    def insert_user_user_group(id_user_group: int, id_user: int):
-        new_uug = TeraUserUserGroup()
-        new_uug.id_user_group = id_user_group
-        new_uug.id_user = id_user
+    def query_user_user_group_for_user_user_group(user_id: int, user_group_id: int, with_deleted: bool = False):
+        return TeraUserUserGroup.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user=user_id, id_user_group=user_group_id).first()
 
-        db.session.add(new_uug)
-        db.session.commit()
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        return
 
-        return new_uug
+    @classmethod
+    def insert(cls, db_object):
+        existing_uug = TeraUserUserGroup.query_user_user_group_for_user_user_group(db_object.id_user,
+                                                                                   db_object.id_user_group)
+        # Avoid duplicates
+        if existing_uug:
+            return existing_uug
+
+        # Insert new uug, SoftInsertMixin will take care of restoring it if it was soft-deleted
+        return super().insert(db_object)

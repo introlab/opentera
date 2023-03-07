@@ -3,6 +3,10 @@ from flask_restx import Resource, reqparse
 from flask_babel import gettext
 from flask import session
 from modules.FlaskModule.FlaskModule import user_api_ns as api
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
+
+# Parser definition(s)
+get_parser = api.parser()
 
 
 class UserLogout(Resource):
@@ -11,9 +15,16 @@ class UserLogout(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @api.doc(description='Logout from the server')
+    @api.doc(description='Logout from the server', params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        print('logout user')
-        logout_user()
-        session.clear()
-        return gettext("User logged out."), 200
+        if current_user:
+            print('logout user')
+            logout_user()
+            session.clear()
+            self.module.send_user_disconnect_module_message(current_user.user_uuid)
+            return gettext("User logged out."), 200
+        else:
+            return gettext("User not logged in"), 403
+

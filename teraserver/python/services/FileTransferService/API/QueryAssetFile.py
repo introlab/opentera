@@ -1,17 +1,15 @@
 import os
 from datetime import datetime
-
 import json
 from werkzeug.utils import secure_filename
 from flask import request, send_file
 from flask_babel import gettext
-from flask_restx import Resource, reqparse
+from flask_restx import Resource
 from services.FileTransferService.FlaskModule import file_api_ns as api
 from opentera.services.ServiceAccessManager import ServiceAccessManager, current_service_client, \
     current_login_type, current_user_client, current_device_client, current_participant_client, LoginType
 from services.FileTransferService.FlaskModule import flask_app
 from services.FileTransferService.libfiletransferservice.db.models.AssetFileData import AssetFileData
-
 import services.FileTransferService.Globals as Globals
 
 # Parser definition(s)
@@ -21,7 +19,7 @@ get_parser.add_argument('access_token', type=str, required=True, help='Access to
 get_parser.add_argument('asset_uuid', type=str, required=True, help='UUID of the asset to download')
 
 delete_parser = api.parser()
-delete_parser.add_argument('uuid', type=str, help='UUID of the asset do delete')
+delete_parser.add_argument('uuid', type=str, required=True, help='UUID of the asset do delete')
 delete_parser.add_argument('access_token', type=str, required=True, help='Access token proving that the requested '
                                                                          'asset can be deleted.')
 
@@ -31,7 +29,7 @@ class QueryAssetFile(Resource):
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
-        self.parser = reqparse.RequestParser()
+        self.test = kwargs.get('test', False)
 
     @api.expect(get_parser, validate=True)
     @api.doc(description='Download asset',
@@ -47,11 +45,13 @@ class QueryAssetFile(Resource):
 
         # Ok, all is fine, we can provide the requested file
         asset = AssetFileData.get_asset_for_uuid(uuid_asset=args['asset_uuid'])
+        if asset is None:
+            return gettext('No asset found'), 404
 
         src_dir = flask_app.config['UPLOAD_FOLDER']
 
         filename = asset.asset_original_filename
-        return send_file(src_dir + '/' + str(asset.asset_uuid), as_attachment=True, attachment_filename=filename)
+        return send_file(src_dir + '/' + str(asset.asset_uuid), as_attachment=True, download_name=filename)
 
     @api.doc(description='Upload a new file asset to the service',
              responses={200: 'Success - Return informations about file assets',
@@ -84,8 +84,13 @@ class QueryAssetFile(Resource):
 
         # Check if session is accessible for the requester
         if current_login_type == LoginType.SERVICE_LOGIN:
-            response = current_service_client.do_get_request_to_backend('/api/service/sessions?id_session=' +
-                                                                        str(asset_json['id_session']))
+            if self.test:
+                response = Globals.service.get_from_opentera('/api/service/sessions',
+                                                             params={'id_session': asset_json['id_session']},
+                                                             token=current_service_client.service_token)
+            else:
+                response = current_service_client.do_get_request_to_backend('/api/service/sessions?id_session=' +
+                                                                            str(asset_json['id_session']))
         else:
             response = Globals.service.get_from_opentera('/api/service/sessions',
                                                          {'id_session': asset_json['id_session']})
@@ -133,7 +138,10 @@ class QueryAssetFile(Resource):
             if 'id_device' not in asset_json and 'id_participant' not in asset_json \
                     and 'id_user' not in asset_json and 'id_service' not in asset_json:
                 return gettext('Missing at least one ID creator'), 400
-            asset_json['id_service'] = current_service_client.get_service_infos()['id_service']
+            if self.test:
+                asset_json['id_service'] = 1
+            else:
+                asset_json['id_service'] = current_service_client.get_service_infos()['id_service']
         else:
             # Prevent creating an asset for someone else
             if current_login_type == LoginType.USER_LOGIN:
@@ -218,74 +226,6 @@ class QueryAssetFile(Resource):
         full_json['access_token'] = access_token
         return full_json
 
-        #
-        # if not args['asset_uuid']:
-        #     return 'No asset_uuid specified', 400
-        #
-        # # Verify headers
-        # if request.content_type == 'application/octet-stream':
-        #     if 'X-Filename' not in request.headers:
-        #         return 'No file specified', 400
-        #
-        #     # Save file on disk
-        #     # TODO - Create another uuid for asset for filename?
-        #     # TODO - Handle write errors
-        #     fo = open(os.path.join(flask_app.config['UPLOAD_FOLDER'], args['asset_uuid'], "wb"))
-        #     fo.write(request.data)
-        #     fo.close()
-        #
-        #     # Create DB entry
-        #     file_asset = AssetFileData()
-        #     file_asset.asset_uuid = args['asset_uuid']
-        #     file_asset.asset_creator_service_uuid = current_service_client.service_uuid
-        #     file_asset.asset_original_filename = secure_filename(request.headers['X-Filename'])
-        #     file_asset.asset_file_size = len(request.data)
-        #     file_asset.asset_saved_date = datetime.now()
-        #     file_asset.asset_md5 = hashlib.md5(request.data).hexdigest()
-        #     db.session.add(file_asset)
-        #     db.commit()
-        #
-        #     return file_asset.to_json()
-        # elif request.content_type.__contains__('multipart/form-data'):
-        #     # TODO should have only one file
-        #     # check if the post request has the file part
-        #     if 'file' not in request.files:
-        #         return 'No file specified', 400
-        #
-        #     file = request.files['file']
-        #
-        #     # if user does not select file, browser also
-        #     # submit an empty part without filename
-        #     if file.filename == '':
-        #         return 'No filename specified', 400
-        #
-        #     if file:
-        #         filename = secure_filename(file.filename)
-        #
-        #         # Saving file
-        #         file.save(os.path.join(flask_app.config['UPLOAD_FOLDER'], args['asset_uuid']))
-        #         file_size = file.stream.tell()
-        #
-        #         # Reset stream
-        #         file.stream.seek(0)
-        #
-        #         # Create DB entry
-        #         file_asset = AssetFileData()
-        #         file_asset.asset_uuid = args['asset_uuid']
-        #         file_asset.asset_creator_service_uuid = current_service_client.service_uuid
-        #         file_asset.asset_original_filename = filename
-        #         file_asset.asset_file_size = file_size
-        #         file_asset.asset_saved_date = datetime.now()
-        #         # TODO avoid using a lot of RAM for md5?
-        #         file_asset.asset_md5 = hashlib.md5(file.stream.read()).hexdigest()
-        #         db.session.add(file_asset)
-        #         db.session.commit()
-        #         file.close()
-        #
-        #         return file_asset.to_json()
-        #
-        # return 'Unauthorized (invalid content type)', 403
-
     @api.expect(delete_parser, validate=True)
     @api.doc(description='Delete asset',
              responses={200: 'Success - asset deleted',
@@ -305,15 +245,5 @@ class QueryAssetFile(Resource):
         response = Globals.service.delete_from_opentera('/api/service/assets', {'uuid': uuid_todel})
         if response.status_code != 200:
             return gettext('Unable to delete asset') + ': ' + response.text, response.status_code
-
-        # Local asset information will be deleted when receiving asset deletion event (in asset_event_received)
-        # Delete local asset information - not needed anymore
-        # asset = AssetFileData.get_asset_for_uuid(uuid_asset=uuid_todel)
-        # if not asset:
-        #     return gettext('Access denied to asset'), 403
-        #
-        # # If we are here, we are allowed to delete. Do so.
-        # if not asset.delete_file_asset(flask_app.config['UPLOAD_FOLDER']):
-        #     return gettext('Error occured when deleting file asset'), 500
 
         return '', 200

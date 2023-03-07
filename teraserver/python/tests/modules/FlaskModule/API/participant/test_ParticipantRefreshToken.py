@@ -1,78 +1,60 @@
-import unittest
-import os
-from requests import get
-import json
+from BaseParticipantAPITest import BaseParticipantAPITest
 
 
-class ParticipantRefreshTokenTest(unittest.TestCase):
-
-    host = '127.0.0.1'
-    port = 40075
+class ParticipantRefreshTokenTest(BaseParticipantAPITest):
+    test_endpoint = '/api/participant/refresh_token'
     login_endpoint = '/api/participant/login'
-    refresh_token_endpoint = '/api/participant/refresh_token'
 
     def setUp(self):
-        pass
+        super().setUp()
 
     def tearDown(self):
-        pass
-
-    def _make_url(self, hostname, port, endpoint):
-        return 'https://' + hostname + ':' + str(port) + endpoint
-
-    def _http_auth(self, username, password):
-        url = self._make_url(self.host, self.port, self.login_endpoint)
-        return get(url=url, verify=False, auth=(username, password))
-
-    def _token_auth(self, token):
-        url = self._make_url(self.host, self.port, self.login_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
-
-    def _refresh_token(self, token):
-        url = self._make_url(self.host, self.port, self.refresh_token_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
+        super().tearDown()
 
     def test_valid_refresh_token(self):
-        # Get the token from http auth
-        httpauth_response = self._http_auth('participant1', 'opentera')
-        self.assertEqual(httpauth_response.status_code, 200)
-        self.assertEqual(httpauth_response.headers['Content-Type'], 'application/json')
-        json_data = httpauth_response.json()
-        self.assertGreater(len(json_data), 0)
-        self.assertTrue('participant_token' in json_data)
-        login_token = json_data['participant_token']
-        self.assertGreater(len(login_token), 0)
+        with self._flask_app.app_context():
+            # Get the token from http auth
+            httpauth_response = self._get_with_participant_http_auth(self.test_client, username='participant1',
+                                                                     password='opentera', endpoint=self.login_endpoint)
+            self.assertEqual(200, httpauth_response.status_code)
+            self.assertEqual('application/json', httpauth_response.headers['Content-Type'])
 
-        # Try to refresh token
-        response = self._refresh_token(login_token)
-        self.assertEqual(response.status_code, 200)
-        refresh_info = response.json()
-        self.assertTrue('refresh_token' in refresh_info)
+            self.assertGreater(len(httpauth_response.json), 0)
+            self.assertTrue('participant_token' in httpauth_response.json)
+            login_token = httpauth_response.json['participant_token']
+            self.assertGreater(len(login_token), 0)
+
+            # Try to refresh token
+            response = self._get_with_participant_token_auth(self.test_client, token=login_token)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('refresh_token' in response.json)
+            self.assertGreater(len(response.json['refresh_token']), 0)
 
     def test_invalid_refresh_token(self):
-        # Try to refresh token
-        response = self._refresh_token('')
-        self.assertEqual(response.status_code, 401)
+        with self._flask_app.app_context():
+            # Try to refresh token
+            response = self._get_with_participant_token_auth(self.test_client, token='')
+            self.assertEqual(401, response.status_code)
 
     def test_invalid_refresh_token_from_disabled_token(self):
-        # Get the token from http auth
-        httpauth_response = self._http_auth('participant1', 'opentera')
-        self.assertEqual(httpauth_response.status_code, 200)
-        self.assertEqual(httpauth_response.headers['Content-Type'], 'application/json')
-        json_data = httpauth_response.json()
-        self.assertGreater(len(json_data), 0)
-        self.assertTrue('participant_token' in json_data)
-        login_token = json_data['participant_token']
-        self.assertGreater(len(login_token), 0)
+        with self._flask_app.app_context():
+            # Get the token from http auth
+            httpauth_response = self._get_with_participant_http_auth(self.test_client, username='participant1',
+                                                                     password='opentera', endpoint=self.login_endpoint)
+            self.assertEqual(200, httpauth_response.status_code)
+            self.assertEqual('application/json', httpauth_response.headers['Content-Type'])
 
-        # Try to refresh token, should work
-        response = self._refresh_token(login_token)
-        self.assertEqual(response.status_code, 200)
-        refresh_info = response.json()
-        self.assertTrue('refresh_token' in refresh_info)
+            self.assertGreater(len(httpauth_response.json), 0)
+            self.assertTrue('participant_token' in httpauth_response.json)
+            login_token = httpauth_response.json['participant_token']
+            self.assertGreater(len(login_token), 0)
 
-        # Try to refresh same login token, should not work because it is disabled
-        response = self._refresh_token(login_token)
-        self.assertEqual(response.status_code, 401)
+            # Try to refresh token, should work
+            response = self._get_with_participant_token_auth(self.test_client, token=login_token)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('refresh_token' in response.json)
+            self.assertGreater(len(response.json['refresh_token']), 0)
+
+            # Try to refresh same login token, should not work because it is disabled
+            response = self._get_with_participant_token_auth(self.test_client, token=login_token)
+            self.assertEqual(401, response.status_code)

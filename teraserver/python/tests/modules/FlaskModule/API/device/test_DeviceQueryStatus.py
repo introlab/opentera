@@ -1,122 +1,93 @@
-from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
+from BaseDeviceAPITest import BaseDeviceAPITest
+from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraSession import TeraSession
+from modules.DatabaseModule.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
 from datetime import datetime
-from websocket import create_connection
-import ssl
+import uuid
+import json
 
 
-class DeviceQueryStatusTest(BaseAPITest):
-    login_endpoint = '/api/device/login'
+class DeviceQueryStatusTest(BaseDeviceAPITest):
     test_endpoint = '/api/device/status'
-    devices = []
 
     def setUp(self):
-        # Query all enabled devices
-        params = {}
-        response = self._request_with_http_auth('admin', 'admin', params, '/api/user/devices')
-        self.assertEqual(response.status_code, 200)
-        self.devices = response.json()
-        self.assertGreater(len(self.devices), 0)
+        super().setUp()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
-    def _login_device(self, token: str, should_fail=False):
-        result = self._login_with_token(token)
-        if should_fail:
-            self.assertNotEqual(200, result.status_code)
-        else:
-            self.assertEqual(200, result.status_code)
-        return result.json()
+    def test_get_endpoint_with_invalid_token(self):
+        with self._flask_app.app_context():
+            response = self._get_with_device_token_auth(self.test_client, token='Invalid')
+            self.assertEqual(response.status_code, 405)
 
-    def test_send_status_with_no_payload_should_fail(self):
-        for dev in self.devices:
-            self.assertTrue('device_onlineable' in dev)
-            self.assertTrue('device_enabled' in dev)
-            self.assertTrue('device_token' in dev)
+    def test_post_endpoint_with_no_payload_and_device_offline_should_fail(self):
+        with self._flask_app.app_context():
+            for device in TeraDevice.query.all():
+                if device.device_onlineable and device.device_enabled:
+                    self._simulate_device_offline(device)
+                response = self._post_with_device_token_auth(self.test_client, token=device.device_token, json={})
+                if not device.device_enabled:
+                    self.assertEqual(response.status_code, 401)
+                    continue
 
-            if dev['device_enabled']:
-                answer = self._post_with_token(dev['device_token'], payload=None)
-                self.assertEqual(400, answer.status_code)
+                if not device.device_onlineable:
+                    self.assertEqual(response.status_code, 403)
+                    continue
 
-    def test_malformed_status_should_fail(self):
-        for dev in self.devices:
-            self.assertTrue('device_onlineable' in dev)
-            self.assertTrue('device_enabled' in dev)
-            self.assertTrue('device_token' in dev)
+                self.assertEqual(response.status_code, 400)
 
-            if dev['device_enabled']:
-                device_status = {
-                    'wrong_status': {'field': True},
-                    'timestamp': datetime.now().timestamp()
-                }
-                answer = self._post_with_token(dev['device_token'], payload=device_status)
-                self.assertEqual(400, answer.status_code)
+    def test_post_endpoint_with_valid_payload_and_device_offline_should_fail(self):
+        with self._flask_app.app_context():
+            for device in TeraDevice.query.all():
+                if device.device_onlineable and device.device_enabled:
+                    self._simulate_device_offline(device)
+                schema = {'status': '{}', 'timestamp': int(datetime.now().timestamp())}
+                response = self._post_with_device_token_auth(self.test_client, token=device.device_token, json=schema)
+                if not device.device_enabled:
+                    self.assertEqual(response.status_code, 401)
+                    continue
 
-    def test_send_status_with_disabled_devices_should_fail(self):
-        for dev in self.devices:
-            self.assertTrue('device_onlineable' in dev)
-            self.assertTrue('device_enabled' in dev)
-            self.assertTrue('device_token' in dev)
+                if not device.device_onlineable:
+                    self.assertEqual(response.status_code, 403)
+                    continue
 
-            if not dev['device_enabled']:
-                device_status = {
-                    'status': {'field': True},
-                    'timestamp': datetime.now().timestamp()
-                }
-                answer = self._post_with_token(dev['device_token'], payload=device_status)
-                self.assertEqual(401, answer.status_code)
+                self.assertEqual(response.status_code, 403)
 
-    def test_send_status_with_offline_devices_should_fail(self):
-        for dev in self.devices:
-            self.assertTrue('device_token' in dev)
+    def test_post_endpoint_with_invalid_payload_and_device_online_should_fail(self):
+        with self._flask_app.app_context():
+            for device in TeraDevice.query.all():
+                if device.device_onlineable and device.device_enabled:
+                    self._simulate_device_online(device)
+                schema = {'wrong_status': '{}', 'timestamp': int(datetime.now().timestamp())}
+                response = self._post_with_device_token_auth(self.test_client, token=device.device_token, json=schema)
+                if not device.device_enabled:
+                    self.assertEqual(response.status_code, 401)
+                    continue
 
-            if dev['device_onlineable'] and dev['device_enabled']:
-                device_status = {
-                    'status': {'field': True},
-                    'timestamp': datetime.now().timestamp()
-                }
-                answer = self._post_with_token(dev['device_token'], payload=device_status)
-                self.assertNotEqual(200, answer.status_code)
+                if not device.device_onlineable:
+                    self.assertEqual(response.status_code, 403)
+                    continue
 
-    def test_send_status_with_wrong_payload_online_device_should_fail(self):
-        for dev in self.devices:
-            self.assertTrue('device_token' in dev)
+                self.assertEqual(response.status_code, 400)
 
-            if dev['device_onlineable'] and dev['device_enabled']:
-                login_info = self._login_device(dev['device_token'])
-                self.assertTrue('websocket_url' in login_info)
-                # Connect websocket, not verifying ssl
-                ws = create_connection(login_info['websocket_url'], sslopt={'cert_reqs': ssl.CERT_NONE})
-                self.assertTrue(ws.connected)
+                if device.device_onlineable and device.device_enabled:
+                    self._simulate_device_offline(device)
 
-                device_status = {
-                    'wrong_status': {'field': True},
-                    'timestamp': datetime.now().timestamp()
-                }
-                answer = self._post_with_token(dev['device_token'], payload=device_status)
-                self.assertEqual(400, answer.status_code)
+    def test_post_endpoint_with_valid_payload_and_device_online_should_work(self):
+        with self._flask_app.app_context():
+            for device in TeraDevice.query.all():
+                if device.device_onlineable and device.device_enabled:
+                    self._simulate_device_online(device)
+                schema = {'status': {'key': True}, 'timestamp': int(datetime.now().timestamp())}
+                response = self._post_with_device_token_auth(self.test_client, token=device.device_token, json=schema)
+                if not device.device_enabled:
+                    self.assertEqual(response.status_code, 401)
+                    continue
 
-    def test_send_status_with_good_payload_online_device_should_work(self):
-        for dev in self.devices:
-            self.assertTrue('device_token' in dev)
+                if not device.device_onlineable:
+                    self.assertEqual(response.status_code, 403)
+                    continue
 
-            if dev['device_onlineable'] and dev['device_enabled']:
-                login_info = self._login_device(dev['device_token'])
-                self.assertTrue('websocket_url' in login_info)
-                # Connect websocket, not verifying ssl
-                ws = create_connection(login_info['websocket_url'], sslopt={'cert_reqs': ssl.CERT_NONE})
-                self.assertTrue(ws.connected)
-
-                device_status = {
-                    'status': {'field': True},
-                    'timestamp': datetime.now().timestamp()
-                }
-
-                answer = self._post_with_token(dev['device_token'], payload=device_status)
-                self.assertEqual(200, answer.status_code)
-                result = answer.json()
-                uuid = result['uuid']
-                self.assertEqual(dev['device_uuid'], uuid)
-                del result['uuid']
-                # self.assertEqual(result, device_status)
-                ws.close()
+                self.assertEqual(response.status_code, 200)
+                self._simulate_device_offline(device)

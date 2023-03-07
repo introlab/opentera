@@ -34,11 +34,6 @@ function doParticipantLogin(backend_url, backend_port, participant_token){
           	type: "GET",
           	url: 'https://' + backend_url + ':' + backend_port + '/api/participant/login',
           	success: function(response, status, request){
-                clearInterval(timerId);
-                timerId=-1;
-
-                // Get websocket url
-                sessionStorage.setItem("websocket_url", response["websocket_url"]);
 
                 // Set flag to indicate participant login
                 sessionStorage.setItem("is_participant", true);
@@ -46,8 +41,26 @@ function doParticipantLogin(backend_url, backend_port, participant_token){
                 // Set token
                 sessionStorage.setItem("participant_token", participant_token)
 
-                // Connect websocket
-                webSocketConnect();
+                // Clear timer
+                clearInterval(timerId);
+                timerId=-1;
+
+                console.log("websocket_url", response['websocket_url'])
+                if (response['websocket_url'])
+                {
+                    // Get websocket url
+                    sessionStorage.setItem("websocket_url", response["websocket_url"]);
+
+                    // Connect websocket
+                    webSocketConnect();
+                }
+                else
+                {
+                    console.log("Will call doParticipantForcedLogout");
+                    // Token is stored, this will have the effect of disconnecting the websocket
+                    // from another login attempt
+                    doParticipantForcedLogout(backend_url, backend_port);
+                }
             },
           beforeSend: function (xhr) {
             xhr.setRequestHeader('Authorization', 'OpenTera ' + participant_token);
@@ -78,6 +91,17 @@ function doParticipantLogout(backend_url, backend_port){
     // Important: OpenTera.js must be included for this to work.
     doGetRequest(backend_url, backend_port, '/api/participant/logout', sessionStorage.getItem('participant_token'),
     participantLogoutSuccess, participantLogoutError);
+}
+
+function doParticipantForcedLogout(backend_url, backend_port){
+    // Important: OpenTera.js must be included for this to work.
+    doGetRequest(backend_url, backend_port, '/api/participant/logout', sessionStorage.getItem('participant_token'),
+    participantForcedLogoutSuccess, participantForcedLogoutSuccess);
+}
+
+function participantForcedLogoutSuccess(response, status, request){
+    // Will retry connecting
+    window.location.replace("participant?token=" + sessionStorage.getItem("participant_token"));
 }
 
 function participantLogoutSuccess(response, status, request){

@@ -6,7 +6,8 @@ var currentConfig = {'currentVideoSourceIndex': -1,
                      'currentAudioSourceIndex': -1,
                      'currentVideoSource2Index': -1,
                      'currentAudioSource2Index': -1,
-                     'video1Mirror': true};
+                     'video1Mirror': true,
+                     'screenAudio': false};
 
 function connectSharedObject() {
     let baseUrl = "ws://localhost:12345";
@@ -52,6 +53,8 @@ function setupSharedObjectCallbacks(channel){
         channel.objects.SharedObject.startRecordingRequested.connect(startRecordingRequest);
     if (channel.objects.SharedObject.stopRecordingRequested !== undefined)
         channel.objects.SharedObject.stopRecordingRequested.connect(stopRecordingRequest);
+    if (channel.objects.SharedObject.pauseRecordingRequested !== undefined)
+        channel.objects.SharedObject.pauseRecordingRequested.connect(pauseRecordingRequest);
 
     //Request settings from client
     channel.objects.SharedObject.getAllSettings(function(settings) {
@@ -107,4 +110,15 @@ function stopRecordingRequest(){
     streamRecorder = null;
     setRecordingStatus(true,1,false);
     broadcastRecordingStatus(false);
+}
+
+function pauseRecordingRequest(){
+    if (!streamRecorder)
+        return;
+
+    streamRecorder.pauseRecording();
+    let isPaused = streamRecorder.paused;
+    setRecordingStatus(true,1,!isPaused);
+    broadcastRecordingStatus(!isPaused);
+
 }

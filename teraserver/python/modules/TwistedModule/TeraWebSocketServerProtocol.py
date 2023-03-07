@@ -14,6 +14,7 @@ from google.protobuf.json_format import MessageToJson
 from google.protobuf.json_format import Parse, ParseError
 from google.protobuf.message import DecodeError
 
+
 # Twisted
 from twisted.internet import defer
 
@@ -26,9 +27,6 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
         self.logger = LoggingClient(config, 'LoggingClient_' + self.__class__.__name__)
         self.event_manager = None
         self.registered_events = set()  # Collection of unique elements
-
-    # def __del__(self):
-    #     print("****- Deleting TeraWebSocketServerProtocol")
 
     def onOpen(self):
         print(type(self).__name__, 'TeraWebSocketServerProtocol - onOpen')
@@ -59,35 +57,30 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
     def onServerConnectionDropTimeout(self):
         print('TeraWebSocketServerProtocol - onServerConnectionDropTimeout', self)
 
-    def redis_tera_message_received(self, pattern, channel, message):
-        print('TeraWebSocketServerProtocol - redis_tera_message_received', pattern, channel, message)
-        #
-        # # TODO Should  be removed completely? We are using events
-        # # Forward as JSON to websocket
-        # try:
-        #     tera_module_message = messages.TeraModuleMessage()
-        #     if isinstance(message, str):
-        #         ret = tera_module_message.ParseFromString(message.encode('utf-8'))
-        #     elif isinstance(message, bytes):
-        #         ret = tera_module_message.ParseFromString(message)
-        #
-        #     # Conversion to generic message
-        #     tera_message = messages.TeraMessage()
-        #     tera_message.message.Pack(tera_module_message)
-        #
-        #     # Converting to JSON
-        #     json = MessageToJson(tera_message, including_default_value_fields=True)
-        #
-        #     # Send to websocket (not in binary form)
-        #     self.sendMessage(json.encode('utf-8'), False)
-        #
-        # except DecodeError as d:
-        #     print('TeraWebSocketServerProtocol - DecodeError ', pattern, channel, message, d)
-        # except ParseError as e:
-        #     print('TeraWebSocketServerProtocol - Failure in redisMessageReceived', e)
+    def redis_tera_module_message_received(self, pattern, channel, message):
+        # print('TeraWebSocketServerProtocol - redis_tera_module_message_received', pattern, channel, message)
+        try:
+            tera_module_message = messages.TeraModuleMessage()
+            if isinstance(message, str):
+                ret = tera_module_message.ParseFromString(message.encode('utf-8'))
+            elif isinstance(message, bytes):
+                ret = tera_module_message.ParseFromString(message)
+
+            for any_message in tera_module_message.data:
+                # Look for server command
+                server_command = messages.ServerCommand()
+
+                if any_message.Unpack(server_command):
+                    if server_command.type == messages.ServerCommand.CMD_CLIENT_DISCONNECT:
+                        self.sendClose(4000, 'CMD_CLIENT_DISCONNECT')
+
+        except DecodeError as d:
+            print('TeraWebSocketServerProtocol - DecodeError ', pattern, channel, message, d)
+        except ParseError as e:
+            print('TeraWebSocketServerProtocol - Failure in redisMessageReceived', e)
 
     def redis_event_message_received(self, pattern, channel, message):
-        print('TeraWebSocketServerProtocol - redis_event_message_received', pattern, channel, message)
+        # print('TeraWebSocketServerProtocol - redis_event_message_received', pattern, channel, message)
         # Forward as JSON to websocket
         try:
             event_message = messages.TeraEvent()
@@ -146,5 +139,3 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
         event_message.header.time = datetime.datetime.now().timestamp()
         event_message.header.topic = topic
         return event_message
-
-

@@ -1,46 +1,58 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.models.TeraDeviceType import TeraDeviceType
 from opentera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.db.models.TeraSessionDevices import TeraSessionDevices
+from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 
 import uuid
 import jwt
-import time
 import datetime
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
-class TeraDevice(db.Model, BaseModel):
+class TeraDevice(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_devices'
-    id_device = db.Column(db.Integer, db.Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
-    # id_site = db.Column(db.Integer, db.ForeignKey("t_sites.id_site", ondelete='cascade'), nullable=True)
-    # id_session_type = db.Column(db.Integer, db.ForeignKey("t_sessions_types.id_session_type",
-    #                                                       ondelete='set null'), nullable=True)
-    device_uuid = db.Column(db.String(36), nullable=False, unique=True)
-    device_name = db.Column(db.String, nullable=False)
-    id_device_type = db.Column(db.Integer, db.ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
-                               nullable=False)
-    id_device_subtype = db.Column(db.Integer, db.ForeignKey('t_devices_subtypes.id_device_subtype',
-                                                            ondelete='set null'), nullable=True)
-    device_token = db.Column(db.String, nullable=True, unique=True)
-    device_certificate = db.Column(db.String, nullable=True)
-    device_enabled = db.Column(db.Boolean, nullable=False, default=False)
-    device_onlineable = db.Column(db.Boolean, nullable=False, default=False)
-    device_config = db.Column(db.String, nullable=True)
-    device_infos = db.Column(db.String, nullable=True)
-    device_notes = db.Column(db.String, nullable=True)
-    device_lastonline = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+    id_device = Column(Integer, Sequence('id_device_sequence'), primary_key=True, autoincrement=True)
 
-    device_sites = db.relationship("TeraSite", secondary='t_devices_sites', back_populates='site_devices')
-    # device_projects = db.relationship('TeraDeviceProject', cascade='delete')
-    device_projects = db.relationship("TeraProject", secondary="t_devices_projects",
-                                      back_populates="project_devices", lazy='joined')
-    # device_session_types = db.relationship("TeraSessionTypeDeviceType")
-    device_participants = db.relationship("TeraParticipant",  secondary="t_devices_participants",
-                                          back_populates="participant_devices", passive_deletes=True)
-    device_sessions = db.relationship("TeraSession", secondary="t_sessions_devices", back_populates="session_devices",
-                                      passive_deletes=True)
-    device_type = db.relationship('TeraDeviceType')
-    device_subtype = db.relationship('TeraDeviceSubType')
-    device_assets = db.relationship('TeraAsset', passive_deletes=True, back_populates='asset_device', lazy='select')
+    device_uuid = Column(String(36), nullable=False, unique=True)
+    device_name = Column(String, nullable=False)
+    id_device_type = Column(Integer, ForeignKey('t_devices_types.id_device_type', ondelete='cascade'), nullable=False)
+    id_device_subtype = Column(Integer, ForeignKey('t_devices_subtypes.id_device_subtype',
+                                                   ondelete='set null'), nullable=True)
+    device_token = Column(String, nullable=True, unique=True)
+    device_certificate = Column(String, nullable=True)
+    device_enabled = Column(Boolean, nullable=False, default=False)
+    device_onlineable = Column(Boolean, nullable=False, default=False)
+    device_config = Column(String, nullable=True)
+    device_infos = Column(String, nullable=True)
+    device_notes = Column(String, nullable=True)
+    device_lastonline = Column(TIMESTAMP(timezone=True), nullable=True)
+
+    device_sites = relationship("TeraSite", secondary='t_devices_sites', back_populates='site_devices')
+    # device_projects = relationship('TeraDeviceProject', cascade='delete')
+    device_projects = relationship("TeraProject", secondary="t_devices_projects",
+                                   back_populates="project_devices", lazy='joined')
+    # device_session_types = relationship("TeraSessionTypeDeviceType")
+    device_participants = relationship("TeraParticipant",  secondary="t_devices_participants",
+                                       back_populates="participant_devices", passive_deletes=True)
+    device_sessions = relationship("TeraSession", secondary="t_sessions_devices", back_populates="session_devices",
+                                   passive_deletes=True)
+    device_type = relationship('TeraDeviceType')
+    device_subtype = relationship('TeraDeviceSubType')
+    device_created_sessions = relationship("TeraSession", cascade='delete', back_populates='session_creator_device',
+                                           passive_deletes=True)
+
+    device_service_config = relationship("TeraServiceConfig", cascade='delete', passive_deletes=True)
+
+    device_assets = relationship("TeraAsset", cascade='delete', back_populates='asset_device', passive_deletes=True)
+
+    device_tests = relationship("TeraTest", cascade='delete', back_populates='test_device', passive_deletes=True)
 
     authenticated = False
 
@@ -113,11 +125,11 @@ class TeraDevice(db.Model, BaseModel):
 
     def update_last_online(self):
         self.device_lastonline = datetime.datetime.now()
-        db.session.commit()
+        TeraDevice.db().session.commit()
 
     @staticmethod
-    def get_device_by_token(token):
-        device = TeraDevice.query.filter_by(device_token=token).first()
+    def get_device_by_token(token, with_deleted: bool = False):
+        device = TeraDevice.query.execution_options(include_deleted=with_deleted).filter_by(device_token=token).first()
 
         if device:
             # Validate token, key loaded from DB
@@ -135,35 +147,23 @@ class TeraDevice(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_device_by_uuid(dev_uuid):
-        device = TeraDevice.query.filter_by(device_uuid=dev_uuid).first()
+    def get_device_by_certificate(certificate, with_deleted: bool = False):
+        return TeraDevice.query.execution_options(include_deleted=with_deleted).\
+            filter_by(device_certificate=certificate).first()
+
+    @staticmethod
+    def get_device_by_uuid(dev_uuid, with_deleted: bool = False):
+        device = TeraDevice.query.execution_options(include_deleted=with_deleted).\
+            filter_by(device_uuid=dev_uuid).first()
         return device
 
     @staticmethod
-    def get_device_by_name(name):
-        return TeraDevice.query.filter_by(device_name=name).first()
+    def get_device_by_name(name, with_deleted: bool = False):
+        return TeraDevice.query.execution_options(include_deleted=with_deleted).filter_by(device_name=name).first()
 
     @staticmethod
-    def get_device_by_id(device_id):
-        return TeraDevice.query.filter_by(id_device=device_id).first()
-
-    # @staticmethod
-    # # Available device = device not assigned to any participant
-    # def get_available_devices(ignore_disabled=True):
-    #     if ignore_disabled:
-    #         return TeraDevice.query.outerjoin(TeraDevice.device_participants)\
-    #             .filter(TeraDevice.device_participants is None).all()
-    #     else:
-    #         return TeraDevice.query.filter_by(device_enabled=True).outerjoin(TeraDevice.device_participants).\
-    #             filter(TeraDevice.device_participants is None).all()
-    #
-    # @staticmethod
-    # # Unavailable device = device assigned to at least one participant
-    # def get_unavailable_devices(ignore_disabled=True):
-    #     if ignore_disabled:
-    #         return TeraDevice.query.join(TeraDevice.device_participants).all()
-    #     else:
-    #         return TeraDevice.query.filter_by(device_enabled=True).join(TeraDevice.device_participants).all()
+    def get_device_by_id(device_id, with_deleted: bool = False):
+        return TeraDevice.query.execution_options(include_deleted=with_deleted).filter_by(id_device=device_id).first()
 
     @staticmethod
     def create_defaults(test=False):
@@ -178,7 +178,7 @@ class TeraDevice(db.Model, BaseModel):
             device.device_onlineable = True
             # device.device_site = TeraSite.get_site_by_sitename('Default Site')
             # device.device_participants = [TeraParticipant.get_participant_by_id(1)]
-            db.session.add(device)
+            TeraDevice.db().session.add(device)
 
             device2 = TeraDevice()
             device2.device_name = 'Kit Télé #1'
@@ -190,7 +190,7 @@ class TeraDevice(db.Model, BaseModel):
             # device2.device_sites = [TeraSite.get_site_by_sitename('Default Site')]
             # device2.device_participants = [TeraParticipant.get_participant_by_id(1),
             #                               TeraParticipant.get_participant_by_id(2)]
-            db.session.add(device2)
+            TeraDevice.db().session.add(device2)
 
             device3 = TeraDevice()
             device3.device_name = 'Robot A'
@@ -201,16 +201,16 @@ class TeraDevice(db.Model, BaseModel):
             device3.device_onlineable = True
             # device3.device_sites = [TeraSite.get_site_by_sitename('Default Site')]
             # device3.device_participants = [TeraParticipant.get_participant_by_id(2)]
-            db.session.add(device3)
+            TeraDevice.db().session.add(device3)
 
-            db.session.commit()
+            TeraDevice.db().session.commit()
 
             # Must create token after devices are created since token contains id_device!
             device.create_token()
             device2.create_token()
             device3.create_token()
 
-            db.session.commit()
+            TeraDevice.db().session.commit()
 
     @classmethod
     def insert(cls, device):
@@ -227,7 +227,7 @@ class TeraDevice(db.Model, BaseModel):
         super().insert(device)
         # Create token
         device.create_token()
-        db.session.commit()
+        TeraDevice.db().session.commit()
 
     @classmethod
     def update(cls, update_id: int, values: dict):
@@ -246,9 +246,21 @@ class TeraDevice(db.Model, BaseModel):
 
         super().update(update_id=update_id, values=values)
 
-    @classmethod
-    def delete(cls, id_todel):
-        super().delete(id_todel)
+    def delete_check_integrity(self) -> IntegrityError | None:
+        # Safety check - can't delete participants with sessions
+        if TeraDeviceParticipant.get_count(filters={'id_device': self.id_device}) > 0:
+            return IntegrityError('Device still associated to participant(s)', self.id_device, 't_devices_participants')
 
-        # from opentera.db.models.TeraDeviceData import TeraDeviceData
-        # TeraDeviceData.delete_files_for_device(id_todel)
+        if TeraSessionDevices.get_count(filters={'id_device': self.id_device}) > 0:
+            return IntegrityError('Device still has sessions', self.id_device, 't_sessions_devices')
+
+        if TeraSession.get_count(filters={'id_creator_device': self.id_device}) > 0:
+            return IntegrityError('Device still has created sessions', self.id_device, 't_sessions')
+
+        if TeraAsset.get_count(filters={'id_device': self.id_device}) > 0:
+            return IntegrityError('Device still has created assets', self.id_device, 't_assets')
+
+        if TeraTest.get_count(filters={'id_device': self.id_device}) > 0:
+            return IntegrityError('Device still has created tests', self.id_device, 't_tests')
+
+        return None

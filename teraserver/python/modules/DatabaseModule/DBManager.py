@@ -1,12 +1,11 @@
-from flask_sqlalchemy import event
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.reflection import Inspector
 from sqlite3 import Connection as SQLite3Connection
 
 from twisted.internet import task, reactor
 import datetime
-
-from opentera.db.Base import db
 import opentera.messages.python as messages
 
 # Must include all Database objects here to be properly initialized and created if needed
@@ -44,6 +43,8 @@ from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
 from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraSessionDevices import TeraSessionDevices
+from opentera.db.Base import BaseModel
 
 from opentera.config.ConfigManager import ConfigManager
 from modules.FlaskModule.FlaskModule import flask_app
@@ -69,11 +70,13 @@ class DBManager (BaseModule):
         'type': ''
     }"""
 
-    def __init__(self, config: ConfigManager):
+    def __init__(self, config: ConfigManager, app=flask_app):
 
         BaseModule.__init__(self, ModuleNames.DATABASE_MODULE_NAME.value, config)
 
+        self.db = SQLAlchemy()
         self.db_uri = None
+        self.app = app
 
         # Database cleanup task set to run at next midnight
         self.cleanup_database_task = self.start_cleanup_task()
@@ -92,7 +95,12 @@ class DBManager (BaseModule):
 
         @event.listens_for(cls, 'after_update')
         def base_model_updated(mapper, connection, target):
-            # print(mapper, connection, target, event_name)
+            # Handle soft deletion
+            # if getattr(target, 'soft_delete', None):
+            #     if target.deleted_at:
+            #         # Updated target with a deleted date - trigger the deleted handler instead
+            #         base_model_deleted(mapper, connection, target)
+            #         return
             json_update_event = target.to_json_update_event()
             if json_update_event:
                 database_event = messages.DatabaseEvent()
@@ -109,7 +117,7 @@ class DBManager (BaseModule):
                 # Specific topic for each class
                 self.publish(event_message.header.topic, event_message.SerializeToString())
 
-        # Send the event before we delete so we can trace it...
+        # Send the event before we delete, so we can trace it...
         @event.listens_for(cls, 'after_delete')
         def base_model_deleted(mapper, connection, target):
             # print(mapper, connection, target, event_name)
@@ -169,99 +177,100 @@ class DBManager (BaseModule):
         return access
 
     def create_defaults(self, config: ConfigManager, test=False):
-        if TeraServerSettings.get_count() == 0:
-            print('No server settings - creating defaults')
-            TeraServerSettings.create_defaults(test)
+        with self.app.app_context():
+            if TeraServerSettings.get_count() == 0:
+                print('No server settings - creating defaults')
+                TeraServerSettings.create_defaults(test)
 
-        if TeraService.get_count() == 0:
-            print("No services - creating defaults")
-            TeraService.create_defaults(test)
+            if TeraService.get_count() == 0:
+                print("No services - creating defaults")
+                TeraService.create_defaults(test)
 
-        if TeraServiceRole.get_count() == 0:
-            print("No service roles - creating defaults for each service")
-            TeraServiceRole.create_defaults(test)
+            if TeraServiceRole.get_count() == 0:
+                print("No service roles - creating defaults for each service")
+                TeraServiceRole.create_defaults(test)
 
-        if TeraSite.get_count() == 0:
-            print('No sites - creating defaults')
-            TeraSite.create_defaults(test)
+            if TeraSite.get_count() == 0:
+                print('No sites - creating defaults')
+                TeraSite.create_defaults(test)
 
-        if TeraProject.get_count() == 0:
-            print("No projects - creating defaults")
-            TeraProject.create_defaults(test)
+            if TeraProject.get_count() == 0:
+                print("No projects - creating defaults")
+                TeraProject.create_defaults(test)
 
-        if TeraDeviceType.get_count() == 0:
-            print('No device types - creating defaults')
-            TeraDeviceType.create_defaults(test)
+            if TeraDeviceType.get_count() == 0:
+                print('No device types - creating defaults')
+                TeraDeviceType.create_defaults(test)
 
-        if TeraServiceProject.get_count() == 0:
-            print('No service - project association - creating defaults')
-            TeraServiceProject.create_defaults(test)
+            if TeraServiceProject.get_count() == 0:
+                print('No service - project association - creating defaults')
+                TeraServiceProject.create_defaults(test)
 
-        if TeraServiceSite.get_count() == 0:
-            print('No service - site association - creating defaults')
-            TeraServiceSite.create_defaults(test)
+            if TeraServiceSite.get_count() == 0:
+                print('No service - site association - creating defaults')
+                TeraServiceSite.create_defaults(test)
 
-        if TeraParticipantGroup.get_count() == 0:
-            print("No participant groups - creating defaults")
-            TeraParticipantGroup.create_defaults(test)
+            if TeraParticipantGroup.get_count() == 0:
+                print("No participant groups - creating defaults")
+                TeraParticipantGroup.create_defaults(test)
 
-        if TeraUserGroup.get_count() == 0:
-            print("No user groups - creating defaults")
-            TeraUserGroup.create_defaults(test)
+            if TeraUserGroup.get_count() == 0:
+                print("No user groups - creating defaults")
+                TeraUserGroup.create_defaults(test)
 
-        if TeraParticipant.get_count() == 0:
-            print("No participant - creating defaults")
-            TeraParticipant.create_defaults(test)
+            if TeraParticipant.get_count() == 0:
+                print("No participant - creating defaults")
+                TeraParticipant.create_defaults(test)
 
-        if TeraUser.get_count() == 0:
-            print('No users - creating defaults')
-            TeraUser.create_defaults(test)
-            TeraUserUserGroup.create_defaults(test)
-            TeraUserPreference.create_defaults(test)
+            if TeraUser.get_count() == 0:
+                print('No users - creating defaults')
+                TeraUser.create_defaults(test)
+                TeraUserUserGroup.create_defaults(test)
+                TeraUserPreference.create_defaults(test)
 
-        if TeraDevice.get_count() == 0:
-            print('No device - creating defaults')
-            TeraDevice.create_defaults(test)
-            TeraDeviceProject.create_defaults(test)
-            TeraDeviceParticipant.create_defaults(test)
-            TeraServiceAccess.create_defaults(test)
-            TeraDeviceSubType.create_defaults(test)
+            if TeraDevice.get_count() == 0:
+                print('No device - creating defaults')
+                TeraDevice.create_defaults(test)
+                TeraDeviceProject.create_defaults(test)
+                TeraDeviceParticipant.create_defaults(test)
+                TeraServiceAccess.create_defaults(test)
+                TeraDeviceSubType.create_defaults(test)
 
-        if TeraDeviceSite.get_count() == 0:
-            print('No device-site association - creating defaults')
-            TeraDeviceSite.create_defaults(test)
+            if TeraDeviceSite.get_count() == 0:
+                print('No device-site association - creating defaults')
+                TeraDeviceSite.create_defaults(test)
 
-        if TeraSessionType.get_count() == 0:
-            print("No session type - creating defaults")
-            TeraSessionType.create_defaults(test)
-            TeraSessionTypeProject.create_defaults(test)
+            if TeraSessionType.get_count() == 0:
+                print("No session type - creating defaults")
+                TeraSessionType.create_defaults(test)
+                TeraSessionTypeProject.create_defaults(test)
 
-        if TeraSessionTypeSite.get_count() == 0:
-            TeraSessionTypeSite.create_defaults(test)
+            if TeraSessionTypeSite.get_count() == 0:
+                TeraSessionTypeSite.create_defaults(test)
 
-        if TeraSession.get_count() == 0:
-            print('No session - creating defaults')
-            TeraSession.create_defaults(test)
-            TeraSessionEvent.create_defaults(test)
-            # TeraAsset.create_defaults(test)
+            if TeraSession.get_count() == 0:
+                print('No session - creating defaults')
+                TeraSession.create_defaults(test)
+                TeraSessionEvent.create_defaults(test)
+                # TeraAsset.create_defaults(test)
 
-        if TeraAsset.get_count() == 0:
-            print('No assets - creating defaults')
-            TeraAsset.create_defaults(test)
+            if TeraAsset.get_count() == 0:
+                print('No assets - creating defaults')
+                TeraAsset.create_defaults(test)
 
-        if TeraServiceConfig.get_count() == 0:
-            print('No service config - creating defaults')
-            TeraServiceConfig.create_defaults(test)
+            if TeraServiceConfig.get_count() == 0:
+                print('No service config - creating defaults')
+                TeraServiceConfig.create_defaults(test)
 
-        if TeraTestType.get_count() == 0:
-            print('No test types - creating defaults')
-            TeraTestType.create_defaults(test)
-            TeraTestTypeSite.create_defaults(test)
-            TeraTestTypeProject.create_defaults(test)
+            if TeraTestType.get_count() == 0:
+                print('No test types - creating defaults')
+                TeraTestType.create_defaults(test)
+                TeraTestTypeSite.create_defaults(test)
+                TeraTestTypeProject.create_defaults(test)
 
-        if TeraTest.get_count() == 0:
-            print('No test - creating defaults')
-            TeraTest.create_defaults(test)
+            if TeraTest.get_count() == 0:
+                print('No test - creating defaults')
+                TeraTest.create_defaults(test)
 
     def setup_events(self):
         # TODO Add events that need to be sent through redis
@@ -272,34 +281,36 @@ class DBManager (BaseModule):
             self.setup_events_for_class(EventNameClassMap[name], name)
 
     def open(self, echo=False):
+
         self.db_uri = 'postgresql://%(username)s:%(password)s@%(url)s:%(port)s/%(name)s' % self.config.db_config
 
-        flask_app.config.update({
+        self.app.config.update({
             'SQLALCHEMY_DATABASE_URI': self.db_uri,
             'SQLALCHEMY_TRACK_MODIFICATIONS': False,
             'SQLALCHEMY_ECHO': echo
         })
 
         # Create db engine
-        db.init_app(flask_app)
-        db.app = flask_app
+        self.db.init_app(self.app)
+        self.db.app = self.app
+        BaseModel.set_db(self.db)
 
         # Init tables
-        # db.drop_all()
-        inspector = Inspector.from_engine(db.engine)
-        tables = inspector.get_table_names()
-        # tables = db.engine.table_names()
-        if not tables:
-            # Create all tables
-            db.create_all()
-            # New database - stamp with current revision version
-            self.stamp_db()
-        else:
-            # Apply any database upgrade, if needed
-            self.upgrade_db()
+        with self.app.app_context():
+            inspector = Inspector.from_engine(self.db.engine)
+            tables = inspector.get_table_names()
+            # tables = db.engine.table_names()
+            if not tables:
+                # Create all tables
+                BaseModel.create_all()
+                # New database - stamp with current revision version
+                self.stamp_db()
+            else:
+                # Apply any database upgrade, if needed
+                self.upgrade_db()
 
-        # Now ready for events
-        self.setup_events()
+            # Now ready for events
+            self.setup_events()
 
     def open_local(self, db_infos, echo=False, ram=True):
         # self.db_uri = 'sqlite:///%(filename)s' % db_infos
@@ -310,7 +321,7 @@ class DBManager (BaseModule):
         else:
             self.db_uri = 'sqlite:///%(filename)s' % db_infos
 
-        flask_app.config.update({
+        self.app.config.update({
             'SQLALCHEMY_DATABASE_URI': self.db_uri,
             'SQLALCHEMY_TRACK_MODIFICATIONS': False,
             'SQLALCHEMY_ECHO': echo,
@@ -318,24 +329,26 @@ class DBManager (BaseModule):
         })
 
         # Create db engine
-        db.init_app(flask_app)
-        db.app = flask_app
+        self.db.init_app(self.app)
+        self.db.app = self.app
+        BaseModel.set_db(self.db)
 
-        # Init tables
-        inspector = Inspector.from_engine(db.engine)
-        tables = inspector.get_table_names()
-        # tables = db.engine.table_names()
-        if not tables:
-            # Create all tables
-            db.create_all()
-            # New database - stamp with current revision version
-            self.stamp_db()
-        else:
-            # Apply any database upgrade, if needed
-            self.upgrade_db()
+        with self.app.app_context():
+            # Init tables
+            inspector = Inspector.from_engine(self.db.engine)
+            tables = inspector.get_table_names()
 
-        # Now ready for events
-        self.setup_events()
+            if not tables:
+                # Create all tables
+                BaseModel.create_all()
+                # New database - stamp with current revision version
+                self.stamp_db()
+            else:
+                # Apply any database upgrade, if needed
+                self.upgrade_db()
+
+            # Now ready for events
+            self.setup_events()
 
     def init_alembic(self):
         import sys
@@ -484,3 +497,19 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
 #     # Publish
 #     db_man.publish(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
 #                    tera_message.SerializeToString())
+
+
+if __name__ == '__main__':
+    with flask_app.app_context():
+        config = ConfigManager()
+        config.create_defaults()
+        manager = DBManager(config)
+        print(manager)
+        manager.open_local(dict(), echo=True, ram=True)
+        manager.create_defaults(config, test=True)
+        user = TeraUser()
+        user.query.all()
+        test = TeraUser.query.all()
+        print(test)
+
+

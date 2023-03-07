@@ -79,7 +79,6 @@ def init_shared_variables(config):
 
     # Create redis client
     import redis
-
     redis_client = redis.Redis(host=config.redis_config['hostname'],
                                port=config.redis_config['port'],
                                db=config.redis_config['db'],
@@ -95,7 +94,8 @@ def init_shared_variables(config):
     redis_client.set(RedisVars.RedisVar_ServiceTokenAPIKey, service_token_key)
 
     # Set DEVICE
-    # TODO - Verify static / dynamic tokens for devices
+    # Dynamic tokens for device are not implemented, for ServiceAccessManager to work, we just set the
+    # Dynamic and Static key to the same value
     redis_client.set(RedisVars.RedisVar_DeviceTokenAPIKey, TeraServerSettings.get_server_setting_value(
         TeraServerSettings.ServerDeviceTokenKey))
     redis_client.set(RedisVars.RedisVar_DeviceStaticTokenAPIKey, TeraServerSettings.get_server_setting_value(
@@ -193,8 +193,9 @@ if __name__ == '__main__':
 
         # Echo will be set by "debug_mode" flag
         if args.enable_tests:
-            # In RAM SQLITE DB for tests
-            Globals.db_man.open_local(None, echo=True, ram=True)
+            # In RAM SQLITE DB for tests, change to ram=False and enter full path in db_infos to use a file
+            db_infos = {'filename': ''}
+            Globals.db_man.open_local(db_infos, echo=True, ram=True)
 
             # Create default values, if required
             Globals.db_man.create_defaults(config=config_man, test=True)
@@ -210,45 +211,46 @@ if __name__ == '__main__':
 
     # Other modules are imported here so globals are initialized first (this is ugly)
     from modules.LoginModule.LoginModule import LoginModule
-    from modules.FlaskModule.FlaskModule import FlaskModule
+    from modules.FlaskModule.FlaskModule import FlaskModule, flask_app
     from modules.TwistedModule.TwistedModule import TwistedModule
     from modules.ServiceLauncherModule.ServiceLauncherModule import ServiceLauncherModule
     from modules.UserManagerModule.UserManagerModule import UserManagerModule
 
-    # Create Redis variables shared with services
-    init_shared_variables(config=config_man)
+    with flask_app.app_context():
+        # Create Redis variables shared with services
+        init_shared_variables(config=config_man)
 
-    # Initialize enabled services
-    init_services(config=config_man)
+        # Initialize enabled services
+        init_services(config=config_man)
 
-    # Main Flask module
-    flask_module = FlaskModule(config_man)
+        # Main Flask module
+        flask_module = FlaskModule(config_man)
 
-    # LOGIN MANAGER, must be initialized after Flask
-    #################################################
-    login_module = LoginModule(config_man)
+        # LOGIN MANAGER, must be initialized after Flask
+        #################################################
+        Globals.login_module = LoginModule(config_man)
 
-    # Twisted will run flask, must be initialized after Flask
-    #########################################################
-    twisted_module = TwistedModule(config_man)
+        # Twisted will run flask, must be initialized after Flask
+        #########################################################
+        twisted_module = TwistedModule(config_man)
 
-    user_manager_module = UserManagerModule(config_man)
+        user_manager_module = UserManagerModule(config_man)
 
-    service_launcher = ServiceLauncherModule(config_man, system_only=args.enable_tests, enable_tests=args.enable_tests)
+        service_launcher = ServiceLauncherModule(config_man, system_only=True, enable_tests=args.enable_tests)
 
-    # This is blocking, running event loop
-    twisted_module.run()
+        # This is blocking, running event loop
+        twisted_module.run()
 
-    # Cleaning up
-    service_launcher.terminate_processes()
+        # Cleaning up
+        service_launcher.terminate_processes()
 
-    # Flush redis database
-    import redis
+        # Flush redis database
+        import redis
 
-    redis_client = redis.Redis(host=config_man.redis_config['hostname'],
-                               port=config_man.redis_config['port'],
-                               db=config_man.redis_config['db'],
-                               username=config_man.redis_config['username'],
-                               password=config_man.redis_config['password'])
+        redis_client = redis.Redis(host=config_man.redis_config['hostname'],
+                                   port=config_man.redis_config['port'],
+                                   db=config_man.redis_config['db'],
+                                   username=config_man.redis_config['username'],
+                                   password=config_man.redis_config['password'])
 
-    redis_client.flushdb()
+        redis_client.flushdb()

@@ -29,15 +29,13 @@ class ServiceOpenTera(RedisClient):
 
         # Store config
         self.config = config_man.service_config
+        self.config_man = config_man
 
         # Take values from config_man
         # Values are checked when config is loaded...
         self.backend_hostname = config_man.backend_config['hostname']
         self.backend_port = config_man.backend_config['port']
         self.service_uuid = config_man.service_config['ServiceUUID']
-
-        # Create service token for service api requests
-        self.service_token = self.service_generate_token()
 
         # Update Service Access information
         ServiceAccessManager.api_user_token_key = \
@@ -52,7 +50,10 @@ class ServiceOpenTera(RedisClient):
             self.redisGet(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
         ServiceAccessManager.api_service_token_key = \
             self.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
-        ServiceAccessManager.config_man = config_man
+        ServiceAccessManager.service = self
+
+        # Create service token for service api requests
+        self.service_token = self.service_generate_token()
 
     def redisConnectionMade(self):
         print('*** ServiceOpenTera.redisConnectionMade for', self.config['name'])
@@ -163,6 +164,7 @@ class ServiceOpenTera(RedisClient):
         return post(url=url, verify=False, headers=request_headers, json=json_data)
 
     def get_from_opentera(self, api_url: str, params: dict) -> Response:
+        from flask import jsonify, Response
         # Synchronous call to OpenTera backend
         url = "https://" + self.backend_hostname + ':' + str(self.backend_port) + api_url
         request_headers = {'Authorization': 'OpenTera ' + self.service_token}

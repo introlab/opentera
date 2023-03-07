@@ -1,6 +1,6 @@
 # Flask
 from flask import Flask, request, g, url_for
-from flask_restx import Api
+from flask_restx import Api, Namespace
 from flask_babel import Babel
 
 # OpenTera
@@ -21,8 +21,28 @@ import os
 # Flask application
 flask_app = Flask("FileTransferService")
 
+
+def get_locale():
+    # if a user is logged in, use the locale from the user settings
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.locale
+    # otherwise try to guess the language from the user accept
+    # header the browser transmits.  We support fr/en in this
+    # example.  The best match wins.
+    return request.accept_languages.best_match(['fr', 'en'])
+
+
+def get_timezone():
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.timezone
+
+
 # Translations
-babel = Babel(flask_app, default_domain='filetransferservice')
+babel = Babel(flask_app, locale_selector=get_locale,
+              timezone_selector=get_timezone,
+              default_domain='filetransferservice')
 
 
 class MyHTTPChannel(HTTPChannel):
@@ -64,25 +84,6 @@ class MySite(Site):
 
     def __init__(self, resource, requestFactory=None, *args, **kwargs):
         super().__init__(resource, requestFactory, *args, **kwargs)
-
-
-@babel.localeselector
-def get_locale():
-    # if a user is logged in, use the locale from the user settings
-    user = getattr(g, 'user', None)
-    if user is not None:
-        return user.locale
-    # otherwise try to guess the language from the user accept
-    # header the browser transmits.  We support fr/en in this
-    # example.  The best match wins.
-    return request.accept_languages.best_match(['fr', 'en'])
-
-
-@babel.timezoneselector
-def get_timezone():
-    user = getattr(g, 'user', None)
-    if user is not None:
-        return user.timezone
 
 
 # Simple fix for API documentation used with reverse proxy
@@ -176,7 +177,7 @@ class FlaskModule(BaseModule):
         # self.session = Session(flask_app)
 
         # Init API
-        self.init_api()
+        FlaskModule.init_api(self, file_api_ns)
 
         # Init Views
         self.init_views()
@@ -223,14 +224,17 @@ class FlaskModule(BaseModule):
         print('FileTransferService.FlaskModule - Received message ', pattern, channel, message)
         pass
 
-    def init_api(self):
+    @staticmethod
+    def init_api(module: object, namespace: Namespace, additional_args: dict = dict()):
         # Default arguments
-        kwargs = {'flaskModule': self}
-        from API.QueryAssetFileInfos import QueryAssetFileInfos
-        from API.QueryAssetFile import QueryAssetFile
+        kwargs = {'flaskModule': module}
+        kwargs |= additional_args
 
-        file_api_ns.add_resource(QueryAssetFileInfos, '/assets/infos', resource_class_kwargs=kwargs)
-        file_api_ns.add_resource(QueryAssetFile,      '/assets', resource_class_kwargs=kwargs)
+        from services.FileTransferService.API.QueryAssetFileInfos import QueryAssetFileInfos
+        from services.FileTransferService.API.QueryAssetFile import QueryAssetFile
+
+        namespace.add_resource(QueryAssetFileInfos, '/assets/infos', resource_class_kwargs=kwargs)
+        namespace.add_resource(QueryAssetFile,      '/assets', resource_class_kwargs=kwargs)
 
     def init_views(self):
         # Default arguments

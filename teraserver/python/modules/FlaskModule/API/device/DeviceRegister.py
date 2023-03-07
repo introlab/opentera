@@ -11,7 +11,6 @@ from cryptography.x509.oid import NameOID
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 
-from opentera.db.Base import db
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraDeviceType import TeraDeviceType
 from opentera.db.models.TeraSessionType import TeraSessionType
@@ -20,7 +19,7 @@ import uuid
 from modules.FlaskModule.FlaskModule import flask_app
 from sqlalchemy.exc import SQLAlchemyError
 
-limiter = Limiter(flask_app, key_func=get_remote_address)
+limiter = Limiter(get_remote_address, app=flask_app, storage_uri="memory://")
 
 
 class DeviceRegister(Resource):
@@ -29,7 +28,8 @@ class DeviceRegister(Resource):
     Will return the certificate with newly created device UUID, but disabled.
     Administrators will need to put the device in a site and enable it before use.
     """
-    decorators = [limiter.limit("10/minute", error_message='Rate Limited')]
+    decorators = [limiter.limit("1/second", error_message='Rate Limited',
+                                exempt_when=lambda: flask_app.testing is True)]
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
@@ -38,13 +38,20 @@ class DeviceRegister(Resource):
 
         self.ca_info = dict()
 
-        # Load CA private key
-        self.ca_info['private_key'] = load_private_pem_key(self.module.config.server_config['ssl_path'] + '/'
-                                                           + self.module.config.server_config['ca_private_key'])
+        if not self.test:
+            # Load CA private key
+            self.ca_info['private_key'] = load_private_pem_key(self.module.config.server_config['ssl_path'] + '/'
+                                                               + self.module.config.server_config['ca_private_key'])
 
-        # Load CA certificate
-        self.ca_info['certificate'] = load_pem_certificate(self.module.config.server_config['ssl_path'] + '/'
-                                                           + self.module.config.server_config['ca_certificate'])
+            # Load CA certificate
+            self.ca_info['certificate'] = load_pem_certificate(self.module.config.server_config['ssl_path'] + '/'
+                                                               + self.module.config.server_config['ca_certificate'])
+        else:
+            # Generate temporary CA certificate and key for tests
+            from opentera.crypto.crypto_utils import generate_ca_certificate
+            info = generate_ca_certificate()
+            self.ca_info['private_key'] = info['private_key']
+            self.ca_info['certificate'] = info['certificate']
 
     def create_device(self, name, device_json=None):
         # Create TeraDevice
@@ -65,9 +72,13 @@ class DeviceRegister(Resource):
 
         return device
 
+    @api.doc(description='Register a device with certificate or token request. This endpoint is rate limited. '
+                         'Use application/octet-stream to send CSR or application/json Content-Type for token '
+                         'generation.',
+             responses={200: 'Success, will return registration information. Devices must then be enabled by admin.',
+                        400: 'Missing parameter(s)',
+                        500: 'Internal server error'})
     def post(self):
-        print(request)
-
         # We should receive a certificate signing request (base64) in an octet-stream
         if request.content_type == 'application/octet-stream':
             # try:

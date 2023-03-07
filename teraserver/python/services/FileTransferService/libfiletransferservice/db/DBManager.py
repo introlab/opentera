@@ -1,5 +1,6 @@
 # Using same base as TeraServer
-from services.FileTransferService.libfiletransferservice.db.Base import db
+from opentera.db.Base import BaseModel
+from flask_sqlalchemy import SQLAlchemy
 
 # Must include all Database objects here to be properly initialized and created if needed
 # All at once to make sure all files are registered.
@@ -25,10 +26,13 @@ class DBManager:
         'type': ''
     }"""
 
-    def __init__(self):
+    def __init__(self, app=flask_app, test: bool = False):
+        self.db = SQLAlchemy()
         self.db_uri = None
+        self.app = app
+        self.test = test
 
-    def create_defaults(self, config: ConfigManager):
+    def create_defaults(self, config: ConfigManager, test: bool = False):
         pass
 
     def open(self, db_infos, echo=False):
@@ -41,15 +45,16 @@ class DBManager:
         })
 
         # Create db engine
-        db.init_app(flask_app)
-        db.app = flask_app
+        self.db.init_app(self.app)
+        self.db.app = self.app
+        BaseModel.set_db(self.db)
 
-        # Init tables
-        # db.drop_all()
-        db.create_all()
+        with self.app.app_context():
+            # Init tables
+            BaseModel.create_all()
 
-        # Apply any database upgrade, if needed
-        self.upgrade_db()
+            # Apply any database upgrade, if needed
+            self.upgrade_db()
 
     def open_local(self, db_infos, echo=False):
         self.db_uri = 'sqlite://'
@@ -61,14 +66,16 @@ class DBManager:
         })
 
         # Create db engine
-        db.init_app(flask_app)
-        db.app = flask_app
+        self.db.init_app(flask_app)
+        self.db.app = flask_app
+        BaseModel.set_db(self.db)
 
-        db.drop_all()
-        db.create_all()
+        with self.app.app_context():
+            # Init tables
+            BaseModel.create_all()
 
-        # Apply any database upgrade, if needed
-        self.upgrade_db()
+            # Apply any database upgrade, if needed
+            self.upgrade_db()
 
     def upgrade_db(self):
         # TODO ALEMBIC UPGRADES...
@@ -78,3 +85,11 @@ class DBManager:
         # TODO ALEMBIC UPGRADES
         pass
 
+
+if __name__ == '__main__':
+    config = ConfigManager()
+    config.create_defaults()
+    manager = DBManager()
+    manager.open_local({}, echo=True)
+    manager.create_defaults(config)
+    print('test')

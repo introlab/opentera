@@ -1,9 +1,10 @@
 from flask import session, request
 from flask_restx import Resource, reqparse, inputs
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from opentera.db.models.TeraServiceSite import TeraServiceSite
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError, IntegrityError
@@ -17,10 +18,7 @@ get_parser.add_argument('id_project', type=int, help='ID of the project to get s
 get_parser.add_argument('id_site', type=int, help='ID of the site to get session types for')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('session_type', type=str, location='json', help='Session type to create / update',
-#                          required=True)
-
+post_parser = api.parser()
 post_schema = api.schema_model('user_session_type', {'properties': TeraSessionType.get_json_schema(),
                                                      'type': 'object',
                                                      'location': 'json'})
@@ -36,19 +34,16 @@ class UserQuerySessionTypes(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get session type information. If no id_session_type specified, returns all available '
                          'session types',
              responses={200: 'Success - returns list of session types',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         if args['id_session_type']:
             session_types = [user_access.query_session_type_by_id(args['id_session_type'])]
@@ -66,6 +61,8 @@ class UserQuerySessionTypes(Resource):
         try:
             sessions_types_list = []
             for st in session_types:
+                if st is None:
+                    continue
                 if args['list'] is None:
                     st_json = st.to_json()
                     sessions_types_list.append(st_json)
@@ -81,17 +78,17 @@ class UserQuerySessionTypes(Resource):
                                          'get', 500, 'InvalidRequestError')
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update session type. id_session_type must be set to "0" to create a new '
                          'type. A session type can be created/modified if the user has access to a related session type'
                          'project.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified session type',
                         400: 'Badly formed JSON or missing field(id_session_type) in the JSON body',
-                        500: 'Internal error when saving session type'})
+                        500: 'Internal error when saving session type'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_type' not in request.json:
@@ -243,7 +240,7 @@ class UserQuerySessionTypes(Resource):
 
             # Ensure that the newly added session types sites have a correct service site association, if required
             for sts in update_session_type.session_type_session_type_sites:
-                sts.check_integrity()
+                TeraSessionTypeSite.check_integrity(sts)
 
         # Update session type projects, if needed
         if update_st_projects:
@@ -290,26 +287,23 @@ class UserQuerySessionTypes(Resource):
             # Ensure that the newly added session types projects have a correct service project association, if required
             for stp in update_session_type.session_type_session_type_projects:
                 try:
-                    stp.check_integrity()
+                    TeraSessionTypeProject.check_integrity(stp)
                 except IntegrityError:
                     return gettext('Session type has a a service not associated to its site'), 400
 
         return [update_session_type.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific session type',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete session type (no admin access to project related to that type '
                              'or sessions of that type exists in the system somewhere)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, help='ID to delete', required=True)
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete
@@ -335,9 +329,8 @@ class UserQuerySessionTypes(Resource):
         except exc.IntegrityError as e:
             # Causes that could make an integrity error when deleting:
             # - Associated sessions of that session type
-            self.module.logger.log_error(self.module.module_name,
-                                         UserQuerySessionTypes.__name__,
-                                         'delete', 500, 'Database error', e)
+            self.module.logger.log_warning(self.module.module_name, UserQuerySessionTypes.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
             return gettext('Can\'t delete session type: please delete all sessions with that type before deleting.'
                            ), 500
         except exc.SQLAlchemyError as e:

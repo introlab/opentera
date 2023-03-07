@@ -1,31 +1,45 @@
-from opentera.db.Base import db, BaseModel
-from flask_babel import gettext
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from sqlalchemy import Column, Integer, String, Sequence, Boolean
+from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 import uuid
 
 
-class TeraService(db.Model, BaseModel):
+class TeraService(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_services'
 
-    id_service = db.Column(db.Integer, db.Sequence('id_service_sequence'), primary_key=True, autoincrement=True)
-    service_uuid = db.Column(db.String(36), nullable=False, unique=True)
-    service_name = db.Column(db.String, nullable=False)
-    service_key = db.Column(db.String, nullable=False, unique=True)
-    service_hostname = db.Column(db.String, nullable=False)
-    service_port = db.Column(db.Integer, nullable=False)
-    service_endpoint = db.Column(db.String, nullable=False)
-    service_clientendpoint = db.Column(db.String, nullable=False)
-    service_endpoint_user = db.Column(db.String, nullable=True)
-    service_endpoint_participant = db.Column(db.String, nullable=True)
-    service_endpoint_device = db.Column(db.String, nullable=True)
-    service_enabled = db.Column(db.Boolean, nullable=False, default=False)
-    service_system = db.Column(db.Boolean, nullable=False, default=False)
-    service_editable_config = db.Column(db.Boolean, nullable=False, default=False)
-    service_default_config = db.Column(db.String, nullable=True, default='{}')
+    id_service = Column(Integer, Sequence('id_service_sequence'), primary_key=True, autoincrement=True)
+    service_uuid = Column(String(36), nullable=False, unique=True)
+    service_name = Column(String, nullable=False)
+    service_key = Column(String, nullable=False, unique=True)
+    service_hostname = Column(String, nullable=False)
+    service_port = Column(Integer, nullable=False)
+    service_endpoint = Column(String, nullable=False)
+    service_clientendpoint = Column(String, nullable=False)
+    service_endpoint_user = Column(String, nullable=True)
+    service_endpoint_participant = Column(String, nullable=True)
+    service_endpoint_device = Column(String, nullable=True)
+    service_enabled = Column(Boolean, nullable=False, default=False)
+    service_system = Column(Boolean, nullable=False, default=False)
+    service_editable_config = Column(Boolean, nullable=False, default=False)
+    service_default_config = Column(String, nullable=True, default='{}')
 
-    service_roles = db.relationship('TeraServiceRole', cascade='delete')
-    service_projects = db.relationship('TeraServiceProject', cascade='delete')
-    service_sites = db.relationship('TeraServiceSite', cascade='delete')
+    service_roles = relationship('TeraServiceRole', cascade='delete')
+    service_projects = relationship('TeraServiceProject', cascade='delete')
+    service_sites = relationship('TeraServiceSite', cascade='delete')
+
+    service_created_sessions = relationship("TeraSession", cascade='delete', back_populates='session_creator_service',
+                                            passive_deletes=True)
+
+    service_assets = relationship("TeraAsset", cascade='delete', foreign_keys="TeraAsset.id_service",
+                                  back_populates='asset_service', passive_deletes=True)
+
+    service_owned_assets = relationship("TeraAsset", cascade='delete', foreign_keys="TeraAsset.asset_service_uuid",
+                                        back_populates='asset_service_owner', passive_deletes=True)
+
+    service_tests = relationship("TeraTest", cascade='delete', back_populates='test_service', passive_deletes=True)
 
     def __init__(self):
         pass
@@ -84,8 +98,8 @@ class TeraService(db.Model, BaseModel):
         return jwt.encode(payload, token_key, algorithm='HS256')
 
     @staticmethod
-    def get_service_by_key(key: str):
-        service = TeraService.query.filter_by(service_key=key).first()
+    def get_service_by_key(key: str, with_deleted: bool = False):
+        service = TeraService.query.execution_options(include_deleted=with_deleted).filter_by(service_key=key).first()
 
         if service:
             return service
@@ -93,8 +107,9 @@ class TeraService(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_service_by_uuid(p_uuid: str):
-        service = TeraService.query.filter_by(service_uuid=p_uuid).first()
+    def get_service_by_uuid(p_uuid: str, with_deleted: bool = False):
+        service = TeraService.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(service_uuid=p_uuid).first()
 
         if service:
             return service
@@ -102,12 +117,12 @@ class TeraService(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_service_by_name(name: str):
-        return TeraService.query.filter_by(service_name=name).first()
+    def get_service_by_name(name: str, with_deleted: bool = False):
+        return TeraService.query.execution_options(include_deleted=with_deleted).filter_by(service_name=name).first()
 
     @staticmethod
-    def get_service_by_id(s_id: int):
-        return TeraService.query.filter_by(id_service=s_id).first()
+    def get_service_by_id(s_id: int, with_deleted: bool = False):
+        return TeraService.query.execution_options(include_deleted=with_deleted).filter_by(id_service=s_id).first()
 
     @staticmethod
     def get_openteraserver_service():
@@ -129,7 +144,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_enabled = True
         new_service.service_system = True
         new_service.service_editable_config = True
-        db.session.add(new_service)
+        TeraService.db().session.add(new_service)
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
@@ -141,7 +156,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_clientendpoint = '/log'
         new_service.service_enabled = True
         new_service.service_system = True
-        db.session.add(new_service)
+        TeraService.db().session.add(new_service)
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
@@ -153,7 +168,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_clientendpoint = '/file'
         new_service.service_enabled = True
         new_service.service_system = True
-        db.session.add(new_service)
+        TeraService.db().session.add(new_service)
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
@@ -164,7 +179,7 @@ class TeraService(db.Model, BaseModel):
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/bureau'
         new_service.service_enabled = True
-        db.session.add(new_service)
+        TeraService.db().session.add(new_service)
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
@@ -180,7 +195,7 @@ class TeraService(db.Model, BaseModel):
         # new_service.service_endpoint_device = '/device'
         new_service.service_enabled = True
         new_service.service_editable_config = True
-        db.session.add(new_service)
+        TeraService.db().session.add(new_service)
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
@@ -191,9 +206,8 @@ class TeraService(db.Model, BaseModel):
         new_service.service_endpoint = '/'
         new_service.service_clientendpoint = '/robot'
         new_service.service_enabled = True
-        db.session.add(new_service)
-
-        db.session.commit()
+        TeraService.db().session.add(new_service)
+        TeraService.db().session.commit()
 
     @classmethod
     def insert(cls, service):
@@ -205,14 +219,19 @@ class TeraService(db.Model, BaseModel):
         new_role = TeraServiceRole()
         new_role.id_service = service.id_service
         new_role.service_role_name = 'admin'
-        db.session.add(new_role)
+        TeraServiceRole.insert(new_role)
 
         new_role = TeraServiceRole()
         new_role.id_service = service.id_service
         new_role.service_role_name = 'user'
-        db.session.add(new_role)
+        TeraServiceRole.insert(new_role)
 
-        db.session.commit()
+    def delete_check_integrity(self) -> IntegrityError | None:
+        for service_site in self.service_sites:
+            if service_site.delete_check_integrity():
+                return IntegrityError('Have sessions, assets or tests using that service', self.id_service,
+                                      't_sessions')
+        return None
 
     @classmethod
     def update(cls, update_id: int, values: dict):

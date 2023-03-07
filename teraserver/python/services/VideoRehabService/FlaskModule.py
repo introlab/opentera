@@ -36,8 +36,27 @@ authorizations = {
 # Flask application
 flask_app = Flask("VideoRehabService")
 
+
 # Translations
-babel = Babel(flask_app, default_domain='videorehabservice')
+def get_locale():
+    # if a user is logged in, use the locale from the user settings
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.locale
+    # otherwise try to guess the language from the user accept
+    # header the browser transmits.  We support fr/en in this
+    # example.  The best match wins.
+    lang = request.accept_languages.best_match(['fr', 'en'])
+    return lang
+
+
+def get_timezone():
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.timezone
+
+
+babel = Babel(flask_app, locale_selector=get_locale, timezone_selector=get_timezone, default_domain='videorehabservice')
 
 
 class MyHTTPChannel(HTTPChannel):
@@ -79,26 +98,6 @@ class MySite(Site):
 
     def __init__(self, resource, requestFactory=None, *args, **kwargs):
         super().__init__(resource, requestFactory, *args, **kwargs)
-
-
-@babel.localeselector
-def get_locale():
-    # if a user is logged in, use the locale from the user settings
-    user = getattr(g, 'user', None)
-    if user is not None:
-        return user.locale
-    # otherwise try to guess the language from the user accept
-    # header the browser transmits.  We support fr/en in this
-    # example.  The best match wins.
-    lang = request.accept_languages.best_match(['fr', 'en'])
-    return lang
-
-
-@babel.timezoneselector
-def get_timezone():
-    user = getattr(g, 'user', None)
-    if user is not None:
-        return user.timezone
 
 
 # Simple fix for API documentation used with reverse proxy

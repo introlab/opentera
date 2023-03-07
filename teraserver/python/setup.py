@@ -5,11 +5,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 with open("env/requirements.txt", "r", encoding="utf-8") as f:
     requirements = f.readlines()
-    requirements.append('protobuf==3.18.1')
+    requirements.append('protobuf==3.20.3')
 
 setuptools.setup(
     name="opentera",
-    version="1.1.3",
+    version="1.2.0",
     author="Dominic Létourneau, Simon Brière",
     author_email="dominic.letourneau@usherbrooke.ca, simon.briere@usherbrooke.ca",
     description="OpenTera base package",
@@ -23,5 +23,5 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.8',
 )

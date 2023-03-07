@@ -1,6 +1,14 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from opentera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraTest import TeraTest
 
 import uuid
 import jwt
@@ -20,34 +28,45 @@ def infinite_jti_sequence():
 participant_jti_generator = infinite_jti_sequence()
 
 
-class TeraParticipant(db.Model, BaseModel):
+class TeraParticipant(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_participants'
-    id_participant = db.Column(db.Integer, db.Sequence('id_participant_sequence'), primary_key=True, autoincrement=True)
-    participant_uuid = db.Column(db.String(36), nullable=False, unique=True)
-    participant_name = db.Column(db.String, nullable=False)
-    participant_username = db.Column(db.String(50), nullable=True)
-    participant_email = db.Column(db.String, nullable=True)
-    participant_password = db.Column(db.String, nullable=True)
-    participant_token_enabled = db.Column(db.Boolean, nullable=False, default=False)
-    participant_token = db.Column(db.String, nullable=True, unique=True)
-    participant_lastonline = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
-    participant_enabled = db.Column(db.Boolean, nullable=False, default=True)
-    participant_login_enabled = db.Column(db.Boolean, nullable=False, default=False)
-    id_participant_group = db.Column(db.Integer, db.ForeignKey('t_participants_groups.id_participant_group',
-                                                               ondelete='cascade'), nullable=True)
+    id_participant = Column(Integer, Sequence('id_participant_sequence'), primary_key=True, autoincrement=True)
+    participant_uuid = Column(String(36), nullable=False, unique=True)
+    participant_name = Column(String, nullable=False)
+    participant_username = Column(String(50), nullable=True)
+    participant_email = Column(String, nullable=True)
+    participant_password = Column(String, nullable=True)
+    participant_token_enabled = Column(Boolean, nullable=False, default=False)
+    participant_token = Column(String, nullable=True, unique=True)
+    participant_lastonline = Column(TIMESTAMP(timezone=True), nullable=True)
+    participant_enabled = Column(Boolean, nullable=False, default=True)
+    participant_login_enabled = Column(Boolean, nullable=False, default=False)
+    id_participant_group = Column(Integer, ForeignKey('t_participants_groups.id_participant_group', ondelete='cascade'),
+                                  nullable=True)
 
-    id_project = db.Column(db.Integer, db.ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
+    id_project = Column(Integer, ForeignKey('t_projects.id_project', ondelete='cascade'), nullable=False)
 
-    participant_devices = db.relationship("TeraDevice", secondary="t_devices_participants",
-                                          back_populates="device_participants", viewonly=True)
+    participant_devices = relationship("TeraDevice", secondary="t_devices_participants",
+                                       back_populates="device_participants", viewonly=True)
 
-    participant_sessions = db.relationship("TeraSession", secondary="t_sessions_participants",
-                                           back_populates="session_participants", passive_deletes=True)
+    participant_sessions = relationship("TeraSession", secondary="t_sessions_participants",
+                                        back_populates="session_participants", passive_deletes=True)
 
-    participant_participant_group = db.relationship("TeraParticipantGroup",
-                                                    back_populates='participant_group_participants')
+    participant_participant_group = relationship("TeraParticipantGroup",
+                                                 back_populates='participant_group_participants')
 
-    participant_project = db.relationship("TeraProject", back_populates='project_participants', lazy='joined')
+    participant_project = relationship("TeraProject", back_populates='project_participants', lazy='joined')
+
+    participant_created_sessions = relationship("TeraSession", cascade='delete',
+                                                back_populates='session_creator_participant', passive_deletes=True)
+
+    participant_service_config = relationship("TeraServiceConfig", cascade='delete', passive_deletes=True)
+
+    participant_assets = relationship("TeraAsset", cascade='delete', back_populates='asset_participant',
+                                      passive_deletes=True)
+
+    participant_tests = relationship("TeraTest", cascade='delete',
+                                     back_populates='test_participant', passive_deletes=True)
 
     authenticated = False
     fullAccess = False
@@ -95,7 +114,7 @@ class TeraParticipant(db.Model, BaseModel):
 
     def update_last_online(self):
         self.participant_lastonline = datetime.datetime.now()
-        db.session.commit()
+        TeraParticipant.db().session.commit()
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -103,7 +122,8 @@ class TeraParticipant(db.Model, BaseModel):
 
         ignore_fields.extend(['authenticated', 'participant_devices',
                               'participant_sessions', 'participant_password',
-                              'participant_project', 'participant_participant_group', 'fullAccess'
+                              'participant_project', 'participant_participant_group', 'fullAccess',
+                              'participant_created_sessions', 'participant_service_config'
                               ])
         if minimal:
             ignore_fields.extend(['participant_username', 'participant_lastonline',
@@ -183,8 +203,9 @@ class TeraParticipant(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_participant_by_token(token):
-        participant = TeraParticipant.query.filter_by(participant_token=token).first()
+    def get_participant_by_token(token, with_deleted: bool = False):
+        participant = TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(participant_token=token).first()
 
         if participant and participant.participant_enabled and participant.participant_token_enabled:
             # Validate token
@@ -200,8 +221,9 @@ class TeraParticipant(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_participant_by_uuid(p_uuid):
-        participant = TeraParticipant.query.filter_by(participant_uuid=p_uuid).first()
+    def get_participant_by_uuid(p_uuid, with_deleted: bool = False):
+        participant = TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(participant_uuid=p_uuid).first()
 
         if participant:
             return participant
@@ -209,20 +231,24 @@ class TeraParticipant(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_participant_by_username(username):
-        return TeraParticipant.query.filter_by(participant_username=username).first()
+    def get_participant_by_username(username, with_deleted: bool = False):
+        return TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(participant_username=username).first()
 
     @staticmethod
-    def get_participant_by_email(email: str):
-        return TeraParticipant.query.filter_by(participant_email=email).first()
+    def get_participant_by_email(email: str, with_deleted: bool = False):
+        return TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(participant_email=email).first()
 
     @staticmethod
-    def get_participant_by_name(name):
-        return TeraParticipant.query.filter_by(participant_name=name).first()
+    def get_participant_by_name(name, with_deleted: bool = False):
+        return TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(participant_name=name).first()
 
     @staticmethod
-    def get_participant_by_id(part_id: int):
-        return TeraParticipant.query.filter_by(id_participant=part_id).first()
+    def get_participant_by_id(part_id: int, with_deleted: bool = False):
+        return TeraParticipant.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_participant=part_id).first()
 
     @staticmethod
     def is_participant_username_available(username: str) -> bool:
@@ -253,7 +279,7 @@ class TeraParticipant(db.Model, BaseModel):
             participant1.participant_login_enabled = True
             participant1.participant_token_enabled = True
 
-            db.session.add(participant1)
+            TeraParticipant.db().session.add(participant1)
 
             participant2 = TeraParticipant()
             participant2.participant_name = 'Participant #2'
@@ -262,7 +288,7 @@ class TeraParticipant(db.Model, BaseModel):
             participant2.participant_participant_group = None
             participant2.participant_project = project1
 
-            db.session.add(participant2)
+            TeraParticipant.db().session.add(participant2)
 
             participant2 = TeraParticipant()
             participant2.participant_name = 'Participant #3'
@@ -273,7 +299,7 @@ class TeraParticipant(db.Model, BaseModel):
             participant2.participant_project = project1
 
             # participant2.create_token()
-            db.session.add(participant2)
+            TeraParticipant.db().session.add(participant2)
 
             participant2 = TeraParticipant()
             participant2.participant_name = 'Secret Participant'
@@ -284,14 +310,14 @@ class TeraParticipant(db.Model, BaseModel):
             participant2.participant_project = project2
 
             # participant2.create_token()
-            db.session.add(participant2)
+            TeraParticipant.db().session.add(participant2)
 
-            db.session.commit()
+            TeraParticipant.db().session.commit()
 
             # Create token with added participants, since we need to have the id_participant field set
             participant1.create_token()
             participant2.create_token()
-            db.session.commit()
+            TeraParticipant.db().session.commit()
 
     @classmethod
     def update(cls, update_id: int, values: dict):
@@ -325,7 +351,7 @@ class TeraParticipant(db.Model, BaseModel):
                     values['participant_token'] = None  # Remove token
                 else:
                     values['participant_token'] = update_participant.create_token()  # Generate new token
-                    db.session.rollback()  # Don't save token here
+                    TeraParticipant.db().session.rollback()  # Don't save token here
 
         super().update(update_id, values)
 
@@ -348,13 +374,20 @@ class TeraParticipant(db.Model, BaseModel):
         # Token must be created after being inserted, since we need to have a valid ID participant into it
         if participant.participant_token_enabled and participant.participant_enabled:
             participant.create_token()
-        db.session.commit()
+        TeraParticipant.db().session.commit()
 
-    @classmethod
-    def delete(cls, id_todel: int):
-        super().delete(id_todel)
-        # Check if we need to delete orphan sessions (sessions that have no more participants left
-        # from opentera.db.models.TeraSession import TeraSession
-        # TeraSession.delete_orphaned_sessions(False)
-        #
-        # db.session.commit()
+    def delete_check_integrity(self) -> IntegrityError | None:
+        # Safety check - can't delete participants with sessions
+        if TeraSessionParticipants.get_session_count_for_participant(self.id_participant) > 0:
+            return IntegrityError('Participant still has sessions', self.id_participant, 't_sessions_participants')
+
+        if TeraSession.get_count(filters={'id_creator_participant': self.id_participant}) > 0:
+            return IntegrityError('Participant still has created sessions', self.id_participant, 't_sessions')
+
+        if TeraAsset.get_count(filters={'id_participant': self.id_participant}) > 0:
+            return IntegrityError('Participant still has created assets', self.id_participant, 't_assets')
+
+        if TeraTest.get_count(filters={'id_participant': self.id_participant}) > 0:
+            return IntegrityError('Participant still has created tests', self.id_participant, 't_tests')
+
+        return None

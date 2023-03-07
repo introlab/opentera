@@ -7,15 +7,8 @@ from opentera.db.models.TeraSessionType import TeraSessionType
 class TeraSessionTypeForm:
 
     @staticmethod
-    def get_session_type_form(user_access: DBManagerTeraUserAccess):
+    def get_session_type_form(services: list):
         form = TeraForm("session_type")
-
-        # Building lists
-        # projects = user_access.get_accessible_projects()
-        # project_list = []
-        # for project in projects:
-        #     project_list.append(TeraFormValue(value_id=project.id_project, value=project.project_name + ' [' +
-        #                                                                          project.project_site.site_name +
 
         # Building lists
         categories = TeraSessionType.SessionCategoryEnum
@@ -24,7 +17,6 @@ class TeraSessionTypeForm:
             name = gettext(TeraSessionType.get_category_name(category))
             categories_list.append(TeraFormValue(value_id=category.value, value=name))
 
-        services = user_access.get_accessible_services()
         services_list = []
         for service in services:
             services_list.append(TeraFormValue(value_id=service.id_service, value=service.service_name))

@@ -1,5 +1,4 @@
 from sqlalchemy import true
-from typing import List
 
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraUserGroup import TeraUserGroup
@@ -539,9 +538,8 @@ class DBManagerTeraUserAccess:
 
     def query_devices_by_type(self, id_type_device: int):
         accessibles_devices = self.get_accessible_devices_ids()
-        devices = TeraDevice.query.filter_by(id_device_type=id_type_device).filter(TeraDevice
-                                                                                .id_device.in_(accessibles_devices)) \
-            .order_by(TeraDevice.device_name.asc()).all()
+        devices = TeraDevice.query.filter_by(id_device_type=id_type_device)\
+            .filter(TeraDevice.id_device.in_(accessibles_devices)).order_by(TeraDevice.device_name.asc()).all()
         return devices
 
     def query_devices_by_subtype(self, id_device_subtype: int):
@@ -792,7 +790,8 @@ class DBManagerTeraUserAccess:
 
     def query_device_participants_by_type(self, id_device_type: int, participant_id: int):
         device_parts = TeraDeviceParticipant.query.join(TeraDevice) \
-            .filter(TeraDevice.id_device_type == id_device_type, TeraDeviceParticipant.id_participant == participant_id) \
+            .filter(TeraDevice.id_device_type == id_device_type,
+                    TeraDeviceParticipant.id_participant == participant_id) \
             .order_by(TeraDeviceParticipant.id_device_participant.asc()).all()
         return device_parts
 
@@ -1207,7 +1206,7 @@ class DBManagerTeraUserAccess:
                               if (admin_only and proj_role['project_role'] == 'admin') or not admin_only]:
                 users.add(user)
 
-        return users
+        return sorted(users, key=lambda suser: suser.user_firstname)
 
     def query_service_configs(self, service_id: int = None, user_id: int = None, device_id: int = None,
                               participant_id: int = None, include_services_without_config: bool = False):

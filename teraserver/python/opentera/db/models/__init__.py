@@ -2,6 +2,7 @@ from .TeraAsset import TeraAsset
 from .TeraDevice import TeraDevice
 from .TeraDeviceParticipant import TeraDeviceParticipant
 from .TeraDeviceProject import TeraDeviceProject
+from .TeraDeviceSite import TeraDeviceSite
 from .TeraDeviceSubType import TeraDeviceSubType
 from .TeraDeviceType import TeraDeviceType
 from .TeraParticipant import TeraParticipant
@@ -20,12 +21,14 @@ from .TeraSessionDevices import TeraSessionDevices
 from .TeraSessionEvent import TeraSessionEvent
 from .TeraSessionParticipants import TeraSessionParticipants
 from .TeraSessionType import TeraSessionType
-from .TeraSessionTypeSite import TeraSessionTypeSite
 from .TeraSessionTypeProject import TeraSessionTypeProject
+from .TeraSessionTypeSite import TeraSessionTypeSite
 from .TeraSessionUsers import TeraSessionUsers
 from .TeraSite import TeraSite
 from .TeraTest import TeraTest
 from .TeraTestType import TeraTestType
+from .TeraTestTypeProject import TeraTestTypeProject
+from .TeraTestTypeSite import TeraTestTypeSite
 from .TeraUser import TeraUser
 from .TeraUserGroup import TeraUserGroup
 from .TeraUserUserGroup import TeraUserUserGroup
@@ -56,6 +59,7 @@ __all__ = ['TeraAsset',
            'TeraDevice',
            'TeraDeviceParticipant',
            'TeraDeviceProject',
+           'TeraDeviceSite',
            'TeraDeviceSubType',
            'TeraDeviceType',
            'TeraParticipant',

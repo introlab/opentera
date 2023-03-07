@@ -1,15 +1,13 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import LoginModule
+from modules.LoginModule.LoginModule import LoginModule, current_device
 from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
-post_parser = api.parser()
 
 
 class DeviceQueryParticipants(Resource):
@@ -19,24 +17,23 @@ class DeviceQueryParticipants(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.device_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Return participant information, if allowed.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented',
-                        403: 'Logged device doesn\'t have permission to access the requested data'})
+                        403: 'Logged device doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @LoginModule.device_token_or_certificate_required
     def get(self):
-
-        device = TeraDevice.get_device_by_uuid(session['_user_id'])
         args = get_parser.parse_args()
 
         # Device must have device_onlineable flag
-        if device and device.device_onlineable:
+        if current_device and current_device.device_onlineable:
             response = {'participants_info': []}
 
             # Get all participants
-            for participant in device.device_participants:
+            for participant in current_device.device_participants:
                 response['participants_info'].append(participant.to_json(minimal=False))
 
             return response

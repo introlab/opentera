@@ -14,6 +14,7 @@ from sqlalchemy import exc
 get_parser = api.parser()
 get_parser.add_argument('id_session', type=int, help='ID of the session to query events for', required=True)
 
+post_parser = api.parser()
 post_schema = api.schema_model('session_event', {'properties': TeraSessionEvent.get_json_schema(),
                                                  'type': 'object', 'location': 'json'})
 
@@ -28,17 +29,16 @@ class ServiceQuerySessionEvents(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Get events for a specific session',
              responses={200: 'Success - returns list of events',
                         400: 'Required parameter is missing (id_session)',
-                        500: 'Database error'})
+                        403: 'Service doesn\'t have permission to access the requested data',
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @LoginModule.service_token_or_certificate_required
     def get(self):
-        parser = get_parser
-
-        args = parser.parse_args()
-
+        args = get_parser.parse_args()
         sessions_events = []
 
         # Can't query sessions event, unless we have a parameter - id_session
@@ -61,14 +61,15 @@ class ServiceQuerySessionEvents(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update session events. id_session_event must be set to "0" to create a new '
                          'event. An event can be created/modified if the user has access to the session.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified event',
                         400: 'Badly formed JSON or missing fields(id_session_event or id_session) in the JSON body',
-                        500: 'Internal error when saving device'})
+                        500: 'Internal error when saving device'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @LoginModule.service_token_or_certificate_required
     def post(self):
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_event' not in request.json:
@@ -128,7 +129,8 @@ class ServiceQuerySessionEvents(Resource):
     # @api.doc(description='Delete a specific session event',
     #          responses={200: 'Success',
     #                     403: 'Logged user can\'t delete event (no access to that session)',
-    #                     500: 'Database error.'})
+    #                     500: 'Database error.'},
+    #                     params={'token': 'Secret token'})
     # def delete(self):
     #     parser = delete_parser
     #

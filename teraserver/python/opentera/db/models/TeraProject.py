@@ -1,26 +1,38 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence
+from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
-class TeraProject(db.Model, BaseModel):
+class TeraProject(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_projects'
-    id_project = db.Column(db.Integer, db.Sequence('id_project_sequence'), primary_key=True, autoincrement=True)
-    id_site = db.Column(db.Integer, db.ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
-    project_name = db.Column(db.String, nullable=False, unique=False)
+    id_project = Column(Integer, Sequence('id_project_sequence'), primary_key=True, autoincrement=True)
+    id_site = Column(Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
+    project_name = Column(String, nullable=False, unique=False)
 
-    project_site = db.relationship("TeraSite", back_populates='site_projects')
-    project_participants = db.relationship("TeraParticipant", back_populates='participant_project',
-                                           passive_deletes=True)
-    project_participants_groups = db.relationship("TeraParticipantGroup", passive_deletes=True)
-    project_devices = db.relationship("TeraDevice", secondary="t_devices_projects", back_populates="device_projects")
-    project_session_types = db.relationship("TeraSessionType", secondary="t_sessions_types_projects",
-                                            back_populates="session_type_projects")
+    project_site = relationship("TeraSite", back_populates='site_projects')
+    project_participants = relationship("TeraParticipant", cascade='delete', back_populates='participant_project',
+                                        passive_deletes=True)
+    project_participants_groups = relationship("TeraParticipantGroup", cascade='delete', passive_deletes=True)
+    project_devices = relationship("TeraDevice", secondary="t_devices_projects", back_populates="device_projects")
+    project_session_types = relationship("TeraSessionType", secondary="t_sessions_types_projects",
+                                         back_populates="session_type_projects")
+
+    project_services = relationship("TeraService", secondary="t_services_projects", viewonly=True)
+
+    project_services_roles = relationship("TeraServiceRole", cascade='delete', passive_deletes=True)
+
+    project_tests_types = relationship("TeraTestType", secondary="t_tests_types_projects", viewonly=True)
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
 
         ignore_fields.extend(['project_site', 'project_participants', 'project_participants_groups', 'project_devices',
-                              'project_session_types'])
+                              'project_session_types', 'project_services', 'project_services_roles',
+                              'project_tests_types'])
+
         rval = super().to_json(ignore_fields=ignore_fields)
 
         # Add sitename
@@ -39,9 +51,9 @@ class TeraProject(db.Model, BaseModel):
         # Minimal information, delete can not be filtered
         return {'id_project': self.id_project}
 
-    def get_users_ids_in_project(self):
+    def get_users_ids_in_project(self, with_deleted: bool = False):
         # Get all users who has a role in the project
-        users = self.get_users_in_project()
+        users = self.get_users_in_project(with_deleted=with_deleted)
         users_ids = []
 
         for user in users:
@@ -49,13 +61,14 @@ class TeraProject(db.Model, BaseModel):
 
         return users_ids
 
-    def get_users_in_project(self, include_superadmins=False, include_site_access=False):
+    def get_users_in_project(self, include_superadmins=False, include_site_access=False, with_deleted: bool = False):
         import modules.Globals as Globals
         from opentera.db.models.TeraServiceAccess import TeraServiceAccess
         from opentera.db.models.TeraUser import TeraUser
         # Get all users who have a role in the project
         project_access = TeraServiceAccess.get_service_access_for_project(id_service=Globals.opentera_service_id,
-                                                                          id_project=self.id_project)
+                                                                          id_project=self.id_project,
+                                                                          with_deleted=with_deleted)
 
         users = []
         for access in project_access:
@@ -69,7 +82,8 @@ class TeraProject(db.Model, BaseModel):
         # Also appends users with site access but no direct access to project
         if include_site_access:
             site_access = TeraServiceAccess.get_service_access_for_site(id_service=Globals.opentera_service_id,
-                                                                        id_site=self.id_site)
+                                                                        id_site=self.id_site,
+                                                                        with_deleted=with_deleted)
             for access in site_access:
                 if access.service_access_role.service_role_name == 'admin':
                     if access.service_access_user_group:
@@ -106,27 +120,31 @@ class TeraProject(db.Model, BaseModel):
             TeraProject.insert(secret_project)
 
     @staticmethod
-    def get_project_by_projectname(projectname):
-        return TeraProject.query.filter_by(project_name=projectname).first()
+    def get_project_by_projectname(projectname, with_deleted: bool = False):
+        return TeraProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(project_name=projectname).first()
 
     @staticmethod
-    def get_project_by_id(project_id):
-        return TeraProject.query.filter_by(id_project=project_id).first()
+    def get_project_by_id(project_id, with_deleted: bool = False):
+        return TeraProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_project=project_id).first()
 
     @staticmethod
-    def query_data(filter_args):
+    def query_data(filter_args, with_deleted: bool = False):
         if isinstance(filter_args, tuple):
-            return TeraProject.query.filter_by(*filter_args).all()
+            return TeraProject.query.execution_options(include_deleted=with_deleted)\
+                .filter_by(*filter_args).all()
         if isinstance(filter_args, dict):
-            return TeraProject.query.filter_by(**filter_args).all()
+            return TeraProject.query.execution_options(include_deleted=with_deleted)\
+                .filter_by(**filter_args).all()
         return None
 
-    @classmethod
-    def delete(cls, id_todel):
-        super().delete(id_todel)
-
-        # from opentera.db.models.TeraSession import TeraSession
-        # TeraSession.delete_orphaned_sessions()
+    def delete_check_integrity(self) -> IntegrityError | None:
+        for participant in self.project_participants:
+            cannot_be_deleted_exception = participant.delete_check_integrity()
+            if cannot_be_deleted_exception:
+                return IntegrityError('Still have participants with session', self.id_project, 't_participants')
+        return None
 
     @classmethod
     def insert(cls, project):
@@ -141,12 +159,12 @@ class TeraProject(db.Model, BaseModel):
         access_role.id_service = opentera_service_id
         access_role.id_project = project.id_project
         access_role.service_role_name = 'admin'
-        db.session.add(access_role)
+        TeraProject.db().session.add(access_role)
 
         access_role = TeraServiceRole()
         access_role.id_service = opentera_service_id
         access_role.id_project = project.id_project
         access_role.service_role_name = 'user'
-        db.session.add(access_role)
+        TeraProject.db().session.add(access_role)
 
-        db.session.commit()
+        TeraProject.db().session.commit()

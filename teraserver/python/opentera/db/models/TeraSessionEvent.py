@@ -1,4 +1,7 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 
 from enum import Enum, unique
 from datetime import datetime, timedelta
@@ -6,7 +9,7 @@ import random
 from sqlalchemy import asc
 
 
-class TeraSessionEvent(db.Model, BaseModel):
+class TeraSessionEvent(BaseModel, SoftDeleteMixin):
     @unique
     class SessionEventTypes(Enum):
         GENERAL_ERROR = 0
@@ -37,15 +40,15 @@ class TeraSessionEvent(db.Model, BaseModel):
         CUSTOM_EVENT10 = 109
 
     __tablename__ = 't_sessions_events'
-    id_session_event = db.Column(db.Integer, db.Sequence('id_session_events_sequence'), primary_key=True,
+    id_session_event = Column(Integer, Sequence('id_session_events_sequence'), primary_key=True,
                                  autoincrement=True)
-    id_session = db.Column(db.Integer, db.ForeignKey('t_sessions.id_session', ondelete='cascade'), nullable=False)
-    id_session_event_type = db.Column(db.Integer, nullable=False)
-    session_event_datetime = db.Column(db.TIMESTAMP(timezone=True), nullable=False)
-    session_event_text = db.Column(db.String, nullable=True)
-    session_event_context = db.Column(db.String, nullable=True)
+    id_session = Column(Integer, ForeignKey('t_sessions.id_session', ondelete='cascade'), nullable=False)
+    id_session_event_type = Column(Integer, nullable=False)
+    session_event_datetime = Column(TIMESTAMP(timezone=True), nullable=False)
+    session_event_text = Column(String, nullable=True)
+    session_event_context = Column(String, nullable=True)
 
-    session_event_session = db.relationship('TeraSession', back_populates='session_events')
+    session_event_session = relationship('TeraSession', back_populates='session_events')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -73,15 +76,29 @@ class TeraSessionEvent(db.Model, BaseModel):
                     minutes=random.randint(0, 45))
                 event.session_event_context = 'Défaut'
                 event.session_event_text = str(TeraSessionEvent.SessionEventTypes(i))
-                db.session.add(event)
-            db.session.commit()
+                TeraSessionEvent.db().session.add(event)
+
+            base_session = TeraSession.query.filter_by(id_creator_participant=1).first()
+            for i in range(12):
+                event = TeraSessionEvent()
+                event.session_event_session = base_session
+                event.id_session_event_type = i
+                event.session_event_datetime = datetime.now() - timedelta(hours=random.randint(0, 10)) - timedelta(
+                    minutes=random.randint(0, 45))
+                event.session_event_context = 'Défaut'
+                event.session_event_text = str(TeraSessionEvent.SessionEventTypes(i))
+                TeraSessionEvent.db().session.add(event)
+
+            TeraSessionEvent.db().session.commit()
 
     @staticmethod
-    def get_session_event_by_id(event_id: int):
-        return TeraSessionEvent.query.filter_by(id_session_event=event_id).first()
+    def get_session_event_by_id(event_id: int, with_deleted: bool = False):
+        return TeraSessionEvent.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_session_event=event_id).first()
 
     @staticmethod
-    def get_events_for_session(id_session: int):
+    def get_events_for_session(id_session: int, with_deleted: bool = False):
         from .TeraSession import TeraSession
-        return db.session.query(TeraSessionEvent).join(TeraSessionEvent.session_event_session)\
+        return TeraSessionEvent.db().session.query(TeraSessionEvent).execution_options(include_deleted=with_deleted)\
+            .join(TeraSessionEvent.session_event_session)\
             .filter(TeraSession.id_session == id_session).order_by(asc(TeraSessionEvent.session_event_datetime)).all()

@@ -1,60 +1,96 @@
-import unittest
-import os
-from requests import get
-import json
+from BaseDeviceAPITest import BaseDeviceAPITest
+from opentera.db.models.TeraDevice import TeraDevice
 
 
-class DeviceQueryDevicesTest(unittest.TestCase):
-
-    host = '127.0.0.1'
-    port = 40075
-    device_login_endpoint = '/api/device/login'
-    device_logout_endpoint = '/api/device/logout'
-    device_query_devices_endpoint = '/api/device/devices'
-    user_device_endpoint = '/api/user/devices'
-    all_devices = None
+class DeviceQueryDevicesTest(BaseDeviceAPITest):
+    test_endpoint = '/api/device/devices'
 
     def setUp(self):
-        # Use admin account to get device information (and tokens)
-        response = self._http_auth_devices('admin', 'admin')
-        self.assertEqual(response.status_code, 200)
-        self.all_devices = json.loads(response.text)
-        self.assertGreater(len(self.all_devices), 0)
+        super().setUp()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
-    def _make_url(self, hostname, port, endpoint):
-        return 'https://' + hostname + ':' + str(port) + endpoint
+    def test_get_endpoint_no_auth(self):
+        with self._flask_app.app_context():
+            response = self.test_client.get(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
 
-    def _http_auth_devices(self, username, password):
-        url = self._make_url(self.host, self.port, self.user_device_endpoint)
-        return get(url=url, verify=False, auth=(username, password))
+    def test_get_endpoint_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            response = self._get_with_device_token_auth(self.test_client, token='Invalid token')
+            self.assertEqual(401, response.status_code)
 
-    def _token_auth(self, token):
-        url = self._make_url(self.host, self.port, self.device_login_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
+    def test_get_endpoint_from_all_devices(self):
+        with self._flask_app.app_context():
+            for device in TeraDevice.query.all():
+                response = self._get_with_device_token_auth(self.test_client, token=device.device_token)
+                if not device.device_enabled:
+                    self.assertEqual(401, response.status_code)
+                    # Next device
+                    continue
 
-    def _token_auth_logout(self, token):
-        url = self._make_url(self.host, self.port, self.device_logout_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
+                self.assertEqual(200, response.status_code)
+                self.assertTrue('device_info' in response.json)
+                self.assertTrue('participants_info' in response.json)
+                self.assertTrue('session_types_info' in response.json)
 
-    def _token_auth_query_devices(self, token):
-        url = self._make_url(self.host, self.port, self.device_query_devices_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
+                minimal_fields = ['device_enabled', 'device_name', 'device_uuid', 'id_device', 'id_device_subtype',
+                                  'id_device_type']
+                for field in minimal_fields:
+                    self.assertTrue(field in response.json['device_info'])
 
-    def test_query_devices_get(self):
-        for device in self.all_devices:
-            response = self._token_auth_query_devices(device['device_token'])
-            if device['device_enabled']:
-                self.assertEqual(response.status_code, 200)
-                info = json.loads(response.text)
-                self.assertTrue(info.__contains__('device_info'))
-                self.assertTrue(info.__contains__('participants_info'))
-                self.assertTrue(info.__contains__('session_types_info'))
-                self.assertEqual(device['id_device'], info['device_info']['id_device'])
-            else:
-                self.assertEqual(response.status_code, 401)
+                ignore_fields = ['device_projects', 'device_participants', 'device_sessions', 'device_certificate',
+                                 'device_type', 'device_subtype', 'authenticated', 'device_assets', 'device_sites',
+                                 'device_onlineable', 'device_config', 'device_notes', 'device_lastonline',
+                                 'device_infos', 'device_token']
+                for field in ignore_fields:
+                    self.assertFalse(field in response.json['device_info'])
+
+    def test_post_endpoint_from_all_devices_without_id_device(self):
+        with self._flask_app.app_context():
+            for device in TeraDevice.query.all():
+                schema = {
+                    'device':  {
+                        # 'id_device': 32,
+                        'device_config': 'Config string'
+                        }
+                }
+                result = self._post_with_device_token_auth(self.test_client, token=device.device_token, json=schema)
+                if not device.device_enabled:
+                    self.assertEqual(result.status_code, 401)
+                    continue
+
+                self.assertEqual(result.status_code, 200)
+                self.assertEqual(schema['device']['device_config'], result.json[0]['device_config'])
+                # TODO why return an array
+                self.assertEqual(device.id_device, result.json[0]['id_device'])
+
+    def test_post_endpoint_from_all_devices_with_wrong_id_device(self):
+        with self._flask_app.app_context():
+            for device in TeraDevice.query.all():
+                schema = {
+                    'device': {
+                        'id_device': 9999999999,
+                        'device_config': 'Config string'
+                    }
+                }
+                result = self._post_with_device_token_auth(self.test_client, token=device.device_token, json=schema)
+                if not device.device_enabled:
+                    self.assertEqual(result.status_code, 401)
+                    continue
+
+                # Should not be able to change another device id
+                self.assertEqual(result.status_code, 403)
+
+    def test_post_endpoint_from_all_devices_with_empty_schema(self):
+        with self._flask_app.app_context():
+            for device in TeraDevice.query.all():
+                schema = {
+                }
+                result = self._post_with_device_token_auth(self.test_client, token=device.device_token, json=schema)
+                if not device.device_enabled:
+                    self.assertEqual(result.status_code, 401)
+                    continue
+
+                self.assertEqual(result.status_code, 400)

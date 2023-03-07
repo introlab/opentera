@@ -1,84 +1,85 @@
-import unittest
-import os
-from requests import get
-import json
+from BaseParticipantAPITest import BaseParticipantAPITest
+from opentera.db.models.TeraParticipant import TeraParticipant
 
 
-class ParticipantLoginTest(unittest.TestCase):
-
-    host = '127.0.0.1'
-    port = 40075
-    login_endpoint = '/api/participant/login'
+class ParticipantLoginTest(BaseParticipantAPITest):
+    test_endpoint = '/api/participant/login'
 
     def setUp(self):
-        pass
+        super().setUp()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
-    def _make_url(self, hostname, port, endpoint):
-        return 'https://' + hostname + ':' + str(port) + endpoint
+    def test_get_endpoint_no_auth(self):
+        with self._flask_app.app_context():
+            response = self.test_client.get(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
 
-    def _http_auth(self, username, password):
-        url = self._make_url(self.host, self.port, self.login_endpoint)
-        return get(url=url, verify=False, auth=(username, password))
+    def test_get_endpoint_login_valid_participant_http_auth(self):
+        with self._flask_app.app_context():
+            # Using default participant information
+            response = self._get_with_participant_http_auth(self.test_client, 'participant1', 'opentera')
 
-    def _token_auth(self, token):
-        url = self._make_url(self.host, self.port, self.login_endpoint)
-        request_headers = {'Authorization': 'OpenTera ' + token}
-        return get(url=url, verify=False, headers=request_headers)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertGreater(len(response.json), 0)
 
-    def test_login_valid_participant_httpauth(self):
-        # Using default participant information
-        backend_response = self._http_auth('participant1', 'opentera')
-        self.assertEqual(backend_response.status_code, 200)
-        self.assertEqual(backend_response.headers['Content-Type'], 'application/json')
-        json_data = backend_response.json()
-        self.assertGreater(len(json_data), 0)
+            # Validate fields in json response
+            self.assertTrue('websocket_url' in response.json)
+            self.assertTrue('participant_uuid' in response.json)
+            self.assertTrue('participant_token' in response.json)
+            self.assertTrue('base_token' in response.json)
+            self.assertGreater(len(response.json['websocket_url']), 0)
+            self.assertGreater(len(response.json['participant_uuid']), 0)
+            self.assertGreater(len(response.json['participant_token']), 0)
+            self.assertGreater(len(response.json['base_token']), 0)
 
-        # Validate fields in json response
-        self.assertTrue(json_data.__contains__('websocket_url'))
-        self.assertTrue(json_data.__contains__('participant_uuid'))
-        self.assertTrue(json_data.__contains__('participant_token'))
-        self.assertTrue(json_data.__contains__('base_token'))
-        self.assertGreater(len(json_data['websocket_url']), 0)
-        self.assertGreater(len(json_data['participant_uuid']), 0)
-        self.assertGreater(len(json_data['participant_token']), 0)
-        self.assertGreater(len(json_data['base_token']), 0)
+    def test_get_endpoint_login_invalid_participant_httpauth(self):
+        with self._flask_app.app_context():
+            # Using default participant information
+            response = self._get_with_participant_http_auth(self.test_client, 'invalid', 'invalid')
+            self.assertEqual(401, response.status_code)
 
-    def test_login_invalid_participant_httpauth(self):
-        backend_response = self._http_auth('invalid', 'invalid')
-        self.assertEqual(backend_response.status_code, 401)
+    def test_get_endpoint_login_valid_token_auth(self):
+        with self._flask_app.app_context():
+            for participant in TeraParticipant.query.all():
+                if participant.participant_token is None:
+                    continue
 
-    def test_login_valid_token_auth(self):
+                response = self._get_with_participant_token_auth(self.test_client, token=participant.participant_token)
+                if not participant.participant_enabled:
+                    self.assertEqual(401, response.status_code)
+                    continue
+
+                self.assertEqual(200, response.status_code)
+                self.assertTrue('websocket_url' in response.json)
+                self.assertTrue('participant_uuid' in response.json)
+                self.assertTrue('participant_name' in response.json)
+                self.assertTrue('base_token' in response.json)
+                self.assertGreater(len(response.json['websocket_url']), 0)
+                self.assertGreater(len(response.json['participant_uuid']), 0)
+                self.assertGreater(len(response.json['participant_name']), 0)
+                self.assertGreater(len(response.json['base_token']), 0)
+
+    def test_get_endpoint_login_base_token_auth(self):
         # Get the token from http auth
-        httpauth_response = self._http_auth('participant1', 'opentera')
-        self.assertEqual(httpauth_response.status_code, 200)
-        self.assertEqual(httpauth_response.headers['Content-Type'], 'application/json')
-        json_data = httpauth_response.json()
-        self.assertGreater(len(json_data), 0)
+        with self._flask_app.app_context():
+            # Using default participant information
+            response = self._get_with_participant_http_auth(self.test_client, 'participant1', 'opentera')
 
-        # Try to login with token
-        token = json_data['participant_token']
-        self.assertGreater(len(token), 0)
-        tokenauth_response = self._token_auth(token)
-        self.assertEqual(tokenauth_response.status_code, 200)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertGreater(len(response.json), 0)
+            self.assertTrue('base_token' in response.json)
+            base_token = response.json['base_token']
+            self.assertGreater(len(base_token), 0)
 
-    def test_login_base_token_auth(self):
-        # Get the token from http auth
-        httpauth_response = self._http_auth('participant1', 'opentera')
-        self.assertEqual(httpauth_response.status_code, 200)
-        self.assertEqual(httpauth_response.headers['Content-Type'], 'application/json')
-        json_data = httpauth_response.json()
-        self.assertGreater(len(json_data), 0)
-
-        # Try to login with token
-        token = json_data['base_token']
-        self.assertGreater(len(token), 0)
-        tokenauth_response = self._token_auth(token)
-        self.assertEqual(tokenauth_response.status_code, 200)
-        json_data = tokenauth_response.json()
-        self.assertTrue('base_token' in json_data)
-        self.assertFalse('participant_token' in json_data)  # participant_token not there, since token login
-        self.assertGreater(len(json_data['base_token']), 0)
-        # self.assertIsNone(json_data['participant_token'])
+            # Now try to login with token
+            response = self._get_with_participant_token_auth(self.test_client, token=base_token)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(response.headers['Content-Type'], 'application/json')
+            self.assertGreater(len(response.json), 0)
+            self.assertTrue('base_token' in response.json)
+            self.assertFalse('participant_token' in response.json)  # participant_token not there, since token login
+            self.assertGreater(len(response.json['base_token']), 0)

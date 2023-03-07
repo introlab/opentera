@@ -11,7 +11,8 @@
 		"video2": "Source Vidéo Secondaire",
 		"audio2": "Source Audio Secondaire",
 		"mirror": "Image Miroir",
-		"none": "Aucune"
+		"none": "Aucune",
+		"screenaudio": "Partager audio écran"
 	},
 	"chronosDialog": {
 		"title": "Chronomètres",

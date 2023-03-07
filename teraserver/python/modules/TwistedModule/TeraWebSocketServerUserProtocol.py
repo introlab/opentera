@@ -45,6 +45,11 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
             ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
 
+            # Events from FlaskModule
+            ret = yield self.subscribe_pattern_with_callback(
+                create_module_event_topic_from_name(
+                    ModuleNames.TWISTED_MODULE_NAME, self.user.user_uuid), self.redis_tera_module_message_received)
+
             # Specific events from DatabaseModule
             # We are specific otherwise we receive every database event
             from opentera.db.models import EventNameClassMap
@@ -141,6 +146,12 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
             ret = yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                 self.redis_event_message_received)
+
+            # Events from FlaskModule
+            ret = yield self.unsubscribe_pattern_with_callback(
+                create_module_event_topic_from_name(
+                    ModuleNames.TWISTED_MODULE_NAME, self.user.user_uuid),
+                self.redis_tera_module_message_received)
 
             # Specific events from DatabaseModule
             # We are specific otherwise we receive every database event

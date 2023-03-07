@@ -35,7 +35,7 @@ post_schema = api.schema_model('user_session', {'properties': TeraSession.get_js
                                                 'type': 'object',
                                                 'location': 'json'})
 
-# delete_parser = reqparse.RequestParser()
+# delete_parser =  api.parser()
 # delete_parser.add_argument('id', type=int, help='Session ID to delete', required=True)
 
 
@@ -47,16 +47,16 @@ class ServiceQuerySessions(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.service_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Return sessions information.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged service doesn\'t have permission to access the requested data'})
+                        403: 'Service doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @LoginModule.service_token_or_certificate_required
     def get(self):
-        parser = get_parser
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         service_access = DBManager.serviceAccess(current_service)
 
@@ -121,17 +121,17 @@ class ServiceQuerySessions(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @LoginModule.service_token_or_certificate_required
     @api.doc(description='Create / update session. id_session must be set to "0" to create a new '
                          'session.',
              responses={200: 'Success',
                         403: 'Service can\'t create/update the specified session',
                         400: 'Badly formed JSON or missing fields(session, id_session, session_participants_ids and/or '
                              'session_users_ids[for new sessions]) in the JSON body',
-                        500: 'Internal error when saving session'})
+                        500: 'Internal error when saving session'},
+             params={'token': 'Secret token'})
     @api.expect(post_schema)
+    @LoginModule.service_token_or_certificate_required
     def post(self):
-
         if 'session' not in request.json:
             return gettext('Missing session'), 400
 
@@ -254,12 +254,13 @@ class ServiceQuerySessions(Resource):
 
         return [update_session.to_json()]
 
-    # @LoginModule.service_token_or_certificate_required
-    # @api.expect(delete_parser)
     # @api.doc(description='Delete a specific session',
     #          responses={200: 'Success',
     #                     403: 'Service can\'t delete session',
-    #                     500: 'Database error.'})
+    #                     500: 'Database error.'},
+    #          params={'token': 'Secret token'})
+    # @api.expect(delete_parser)
+    # @LoginModule.service_token_or_certificate_required
     # def delete(self):
     #     parser = delete_parser
     #

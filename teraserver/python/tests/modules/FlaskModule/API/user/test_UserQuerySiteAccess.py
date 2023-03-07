@@ -1,314 +1,348 @@
-from tests.modules.FlaskModule.API.BaseAPITest import BaseAPITest
-import datetime
+from BaseUserAPITest import BaseUserAPITest
 
 
-class UserQuerySiteAccessTest(BaseAPITest):
-    login_endpoint = '/api/user/login'
+class UserQuerySiteAccessTest(BaseUserAPITest):
     test_endpoint = '/api/user/siteaccess'
 
     def setUp(self):
-        pass
+        super().setUp()
 
     def tearDown(self):
-        pass
+        super().tearDown()
 
     def test_no_auth(self):
-        response = self._request_with_no_auth()
-        self.assertEqual(response.status_code, 401)
+        with self._flask_app.app_context():
+            response = self.test_client.get(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
 
     def test_post_no_auth(self):
-        response = self._post_with_no_auth()
-        self.assertEqual(response.status_code, 401)
+        with self._flask_app.app_context():
+            response = self.test_client.post(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
 
     def test_delete_no_auth(self):
-        response = self._delete_with_no_auth(id_to_del=0)
-        self.assertEqual(response.status_code, 401)
+        with self._flask_app.app_context():
+            response = self.test_client.delete(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_invalid_http_auth(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='invalid', password='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_token_auth(self.test_client, token='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_post_endpoint_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            response = self._post_with_user_token_auth(self.test_client, token='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_post_endpoint_invalid_http_auth(self):
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client, username='invalid', password='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_delete_endpoint_invalid_http_auth(self):
+        with self._flask_app.app_context():
+            response = self._delete_with_user_http_auth(self.test_client, username='invalid', password='invalid')
+            self.assertEqual(401, response.status_code)
+
+    def test_delete_endpoint_invalid_token_auth(self):
+        with self._flask_app.app_context():
+            response = self._delete_with_user_token_auth(self.test_client, token='invalid')
+            self.assertEqual(401, response.status_code)
 
     def test_query_no_params_as_admin(self):
-        response = self._request_with_http_auth(username='admin', password='admin')
-        self.assertEqual(response.status_code, 400)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin')
+            self.assertEqual(400, response.status_code)
 
     def test_query_specific_user(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_user': 2})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(1, len(response.json))
 
-        # Query specific user
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_user=2')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
-
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['site_access_role'], 'admin')
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertEqual(data_item['site_access_role'], 'admin')
 
     def test_query_specific_user_admins(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_user': 2, 'admins': True})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(1, len(response.json))
 
-        # Query specific user
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_user=2&admins=true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertEqual(data_item['site_access_role'], 'admin')
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['site_access_role'], 'admin')
-
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_user=3&admins=true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_user': 3, 'admins': True})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(0, len(response.json))
 
     def test_query_specific_user_group(self):
-        # Query specific user_group
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_user_group=1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_user_group': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(1, len(response.json))
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['id_site'], 1)
-            self.assertEqual(data_item['site_access_role'], 'user')
-            self.assertEqual(data_item['site_access_inherited'], True)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertEqual(1, data_item['id_site'])
+                self.assertEqual(data_item['site_access_role'], 'user')
+                self.assertTrue(data_item['site_access_inherited'])
 
     def test_query_specific_user_group_admins(self):
-        # Query specific user_group
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_user_group=1'
-                                                                                            '&admins=true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 0)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_user_group': 1, 'admins': True})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(0, len(response.json))
 
     def test_query_specific_user_group_by_users(self):
-        # Now query with by_user flags
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_user_group=2&by_users='
-                                                                                            'true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_user_group': 2, 'by_users': True})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(1, len(response.json))
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['site_access_role'], 'user')
-            self.assertEqual(data_item['site_access_inherited'], True)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertEqual(data_item['site_access_role'], 'user')
+                self.assertTrue(data_item['site_access_inherited'])
 
     def test_query_specific_user_group_by_users_with_sites(self):
-        # Now query with by_user flags
-        response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload='id_user_group=3&by_users='
-                                                        'true&with_empty=true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_user_group': 3, 'by_users': True, 'with_empty': True})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(4, len(response.json))
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            if data_item['id_site'] == 1:
-                self.assertEqual(data_item['site_access_role'], 'admin')
-                self.assertEqual(data_item['site_access_inherited'], False)
-            else:
-                self.assertEqual(data_item['site_access_role'], None)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                if data_item['id_site'] == 1:
+                    self.assertEqual(data_item['site_access_role'], 'admin')
+                    self.assertFalse(data_item['site_access_inherited'])
+                else:
+                    self.assertIsNone(data_item['site_access_role'])
 
     def test_query_specific_user_group_by_users_with_sites_admins(self):
-        # Now query with by_user flags
-        response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload='id_user_group=2&by_users='
-                                                        'true&with_empty=true&admins=true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        with self._flask_app.app_context():
+            params = {'id_user_group': 2, 'by_users': True, 'with_empty': True, 'admins': True}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(2, len(response.json))
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertEqual(data_item['site_access_role'], None)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertIsNone(data_item['site_access_role'])
 
     def test_query_specific_user_group_with_sites_admins(self):
-        # Now query with by_user flags
-        response = self._request_with_http_auth(username='admin', password='admin',
-                                                payload='id_user_group=3&with_empty=true&admins=true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        with self._flask_app.app_context():
+            params = {'id_user_group': 3, 'with_empty': True, 'admins': True}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            if data_item['id_site'] == 1:
-                self.assertEqual(data_item['site_access_role'], 'admin')
-            else:
-                self.assertEqual(data_item['site_access_role'], None)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(2, len(response.json))
+
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                if data_item['id_site'] == 1:
+                    self.assertEqual(data_item['site_access_role'], 'admin')
+                else:
+                    self.assertIsNone(data_item['site_access_role'])
 
     def test_query_specific_site(self):
-        # Query specific site
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_site=1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 4)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_site': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(4, len(response.json))
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertTrue(data_item.__contains__('id_user_group'))
-            if "site_access_inherited" in data_item:
-                self.assertEqual(data_item['site_access_role'], 'user')
-                self.assertEqual(data_item['site_access_inherited'], True)
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertTrue(data_item.__contains__('id_user_group'))
+                if "site_access_inherited" in data_item:
+                    self.assertEqual(data_item['site_access_role'], 'user')
+                    self.assertTrue(data_item['site_access_inherited'])
 
     def test_query_specific_site_admins(self):
-        # Query specific site
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_site=1&admins=true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 1)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_site': 1, 'admins': True})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(1, len(response.json))
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertTrue(data_item.__contains__('id_user_group'))
-            self.assertEqual(data_item['site_access_role'], 'admin')
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertTrue(data_item.__contains__('id_user_group'))
+                self.assertEqual(data_item['site_access_role'], 'admin')
 
     def test_query_specific_site_by_users(self):
-        # Query specific site
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_site=1&by_users=true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreaterEqual(len(json_data), 4)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_site': 1, 'by_users': True})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreaterEqual(4, len(response.json))
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertTrue(data_item.__contains__('id_user'))
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertTrue(data_item.__contains__('id_user'))
 
     def test_query_specific_site_by_users_admins(self):
-        # Query specific site
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_site=1&by_users=true'
-                                                                                            '&admins=true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertEqual(len(json_data), 2)
+        with self._flask_app.app_context():
+            params = {'id_site': 1, 'by_users': True, 'admins': True}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(2, len(response.json))
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertTrue(data_item.__contains__('id_user'))
-            self.assertTrue(data_item.__contains__('user_name'))
-            self.assertTrue(data_item.__contains__('user_enabled'))
-            self.assertEqual(data_item['site_access_role'], 'admin')
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertTrue(data_item.__contains__('id_user'))
+                self.assertTrue(data_item.__contains__('user_name'))
+                self.assertTrue(data_item.__contains__('user_enabled'))
+                self.assertEqual(data_item['site_access_role'], 'admin')
 
     def test_query_specific_site_by_users_with_user_groups(self):
-        # Query specific site
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_site=2&by_users=true'
-                                                                                            '&with_empty=true'
-                                                                                            '&with_usergroups=true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreaterEqual(len(json_data), 4)
+        with self._flask_app.app_context():
+            params = {'id_site': 2, 'by_users': True, 'with_empty': True, 'with_usergroups': True}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreaterEqual(4, len(response.json))
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertTrue(data_item.__contains__('id_user'))
-            self.assertEqual(data_item['site_access_role'], None)
-            self.assertEqual(data_item['site_access_inherited'], None)
-            self.assertTrue(data_item.__contains__('user_groups'))
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertTrue(data_item.__contains__('id_user'))
+                self.assertIsNone(data_item['site_access_role'])
+                self.assertIsNone(data_item['site_access_inherited'])
+                self.assertTrue(data_item.__contains__('user_groups'))
 
     def test_query_specific_site_by_users_with_user_groups_admins(self):
-        # Query specific site
-        response = self._request_with_http_auth(username='admin', password='admin', payload='id_site=2&by_users=true'
-                                                                                            '&with_empty=true'
-                                                                                            '&with_usergroups=true'
-                                                                                            '&admins=true')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        json_data = response.json()
-        self.assertGreaterEqual(len(json_data), 4)
+        with self._flask_app.app_context():
+            params = {'id_site': 2, 'by_users': True, 'with_empty': True, 'with_usergroups': True, 'admins': True}
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertGreaterEqual(len(response.json), 4)
 
-        for data_item in json_data:
-            self._checkJson(json_data=data_item)
-            self.assertTrue(data_item.__contains__('id_user'))
-            self.assertEqual(data_item['site_access_role'], None)
-            self.assertTrue(data_item.__contains__('user_groups'))
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+                self.assertTrue(data_item.__contains__('id_user'))
+                self.assertIsNone(data_item['site_access_role'])
+                self.assertTrue(data_item.__contains__('user_groups'))
 
     def test_post_and_delete(self):
-        # New with minimal infos
-        json_data = {
-            'site_access': {
-                'site_access_role': 'admin'
+        with self._flask_app.app_context():
+            json_data = {
+                'site_access': {
+                    'site_access_role': 'admin'
+                }
             }
-        }
 
-        response = self._post_with_http_auth(username='user', password='user', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing id_usergroup")  # Missing id_usergroup
+            response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing id_usergroup")  # Missing id_usergroup
 
-        json_data['site_access']['id_user_group'] = str(2)
-        response = self._post_with_http_auth(username='user', password='user', payload=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing id_site")  # Missing id_site
+            json_data['site_access']['id_user_group'] = 2
+            response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Missing id_site")  # Missing id_site
 
-        json_data['site_access']['id_site'] = str(1)
-        response = self._post_with_http_auth(username='user4', password='user4', payload=json_data)
-        self.assertEqual(response.status_code, 403, msg="Post denied for user")  # Forbidden for that user to post that
+            json_data['site_access']['id_site'] = 1
+            response = self._post_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                      json=json_data)
+            # Forbidden for that user to post that
+            self.assertEqual(403, response.status_code, msg="Post denied for user")
 
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post new")  # All ok now!
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post new")
+            self.assertGreater(len(response.json), 0)
+            json_data = response.json[0]
+            self._checkJson(json_data)
+            self.assertEqual(json_data['site_access_role'], 'admin')
 
-        json_data = response.json()[0]
-        self._checkJson(json_data)
-        current_id = json_data['id_site_access']
-        self.assertEqual(json_data['site_access_role'], 'admin')
-
-        json_data = {
-            'site_access': {
-                'site_access_role': 'user',
-                'id_user_group': 2,
-                'id_site': 1
+            json_data = {
+                'site_access': {
+                    'site_access_role': 'user',
+                    'id_user_group': 2,
+                    'id_site': 1
+                }
             }
-        }
 
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post update")
-        # Setting user role, but that usergroup already inherits that access, so no return value!
-        self.assertEqual(len(response.json()), 0)
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post update")
+            # Setting user role, but that usergroup already inherits that access, so no return value!
+            self.assertEqual(0, len(response.json))
 
-        json_data = {
-            'site_access': {
-                'site_access_role': 'admin',
-                'id_user_group': 5, # No access usergroup
-                'id_site': 1
+            json_data = {
+                'site_access': {
+                    'site_access_role': 'admin',
+                    'id_user_group': 5,  # No access usergroup
+                    'id_site': 1
+                }
             }
-        }
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post new, take 2")
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post new, take 2")
+            self.assertGreater(len(response.json), 0)
+            json_data = response.json[0]
+            self._checkJson(json_data)
+            current_id = json_data['id_site_access']
+            self.assertEqual(json_data['site_access_role'], 'admin')
 
-        json_data = response.json()[0]
-        self._checkJson(json_data)
-        current_id = json_data['id_site_access']
-        self.assertEqual(json_data['site_access_role'], 'admin')
-
-        json_data = {
-            'site_access': {
-                'site_access_role': 'user',
-                'id_user_group': 5,
-                'id_site': 1
+            json_data = {
+                'site_access': {
+                    'site_access_role': 'user',
+                    'id_user_group': 5,
+                    'id_site': 1
+                }
             }
-        }
-        response = self._post_with_http_auth(username='admin', password='admin', payload=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post update, take 2")
-        json_data = response.json()[0]
-        self._checkJson(json_data)
-        self.assertEqual(json_data['site_access_role'], 'user')
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post update, take 2")
+            self.assertGreater(len(response.json), 0)
+            json_data = response.json[0]
+            self._checkJson(json_data)
+            self.assertEqual(json_data['site_access_role'], 'user')
 
-        # Delete
-        response = self._delete_with_http_auth(username='user4', password='user4', id_to_del=current_id)
-        self.assertEqual(response.status_code, 403, msg="Delete denied")
+            # Delete
+            params = {'id': current_id}
+            response = self._delete_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                        params=params)
+            self.assertEqual(403, response.status_code, msg="Delete denied")
 
-        response = self._delete_with_http_auth(username='admin', password='admin', id_to_del=current_id)
-        self.assertEqual(response.status_code, 200, msg="Delete OK")
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params=params)
+            self.assertEqual(200, response.status_code, msg="Delete OK")
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

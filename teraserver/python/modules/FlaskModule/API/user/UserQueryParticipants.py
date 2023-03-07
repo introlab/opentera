@@ -1,8 +1,7 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse, inputs
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from modules.LoginModule.LoginModule import user_multi_auth
-from opentera.db.models.TeraUser import TeraUser
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraSession import TeraSession
 from modules.DatabaseModule.DBManager import DBManager
@@ -39,7 +38,7 @@ get_parser.add_argument('no_group', type=inputs.boolean,
 # get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
 #                                                                  'for each participant')
 
-# post_parser = reqparse.RequestParser()
+post_parser = api.parser()
 post_schema = api.schema_model('user_participant', {'properties': TeraParticipant.get_json_schema(),
                                                     'type': 'object',
                                                     'location': 'json'})
@@ -55,19 +54,16 @@ class UserQueryParticipants(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get participants information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of participants',
                         400: 'No parameters specified at least one id must be used',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         participants = []
         if args['id']:
@@ -133,8 +129,13 @@ class UserQueryParticipants(Resource):
                 status_participants = {}
 
                 # Query status
-                rpc = RedisRPCClient(self.module.config.redis_config)
-                status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+                if not self.test:
+                    rpc = RedisRPCClient(self.module.config.redis_config)
+                    status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+                else:
+                    status_participants = {}
+                    for participant in participants:
+                        status_participants[participant.participant_uuid] = {'busy': False, 'online': True}
 
                 for participant in participants:
                     if args['enabled'] is not None:
@@ -201,8 +202,6 @@ class UserQueryParticipants(Resource):
                                          'get', 500, 'Database error', str(e))
             return '', 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update participants. id_participant must be set to "0" to create a new '
                          'participant. A participant can be created/modified if the user has admin rights to the '
                          'project.',
@@ -210,9 +209,11 @@ class UserQueryParticipants(Resource):
                         403: 'Logged user can\'t create/update the specified participant',
                         400: 'Badly formed JSON or missing fields(id_participant or id_project/id_group [only one of '
                              'them]) in the JSON body, or mismatch between id_project and participant group project',
-                        500: 'Internal error when saving device'})
+                        500: 'Internal error when saving participant'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'participant' not in request.json:
@@ -252,16 +253,17 @@ class UserQueryParticipants(Resource):
                 return gettext('No admin access to group'), 403
 
         # If we have both an id_group and an id_project, make sure that the id_project in the group matches
-        if 'id_project' in json_participant and 'id_participant_group' in json_participant:
+        if 'id_participant_group' in json_participant:
             if json_participant['id_participant_group'] is not None and json_participant['id_participant_group'] > 0:
                 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
                 participant_group = TeraParticipantGroup.get_participant_group_by_id(
                     json_participant['id_participant_group'])
                 if participant_group is None:
                     return gettext('Participant group not found.'), 400
-                if participant_group.id_project != json_participant['id_project'] \
-                        and json_participant['id_project'] > 0:
-                    return gettext('Mismatch between id_project and group\'s project'), 400
+                if 'id_project' in json_participant:
+                    if participant_group.id_project != json_participant['id_project'] \
+                            and json_participant['id_project'] > 0:
+                        return gettext('Mismatch between id_project and group\'s project'), 400
                 # Force id_project to group project.
                 json_participant['id_project'] = participant_group.id_project
 
@@ -312,8 +314,11 @@ class UserQueryParticipants(Resource):
         update_participant_json = update_participant.to_json()
 
         # Query status
-        rpc = RedisRPCClient(self.module.config.redis_config)
-        status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+        if not self.test:
+            rpc = RedisRPCClient(self.module.config.redis_config)
+            status_participants = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_participants')
+        else:
+            status_participants = {update_participant.participant_uuid: {'online': False, 'busy': False}}
         if update_participant.participant_uuid in status_participants:
             update_participant_json['participant_busy'] = \
                 status_participants[update_participant.participant_uuid]['busy']
@@ -325,24 +330,24 @@ class UserQueryParticipants(Resource):
 
         return jsonify([update_participant_json])
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific participant',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete participant (only project admin can delete)',
-                        500: 'Database error.'})
+                        500: 'Database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete
         # Only project admins can delete a participant
         part = TeraParticipant.get_participant_by_id(id_todel)
+
+        if not part:
+            return gettext('Forbidden'), 403
 
         if user_access.get_project_role(part.participant_project.id_project) != 'admin':
             return gettext('Forbidden'), 403
@@ -355,12 +360,24 @@ class UserQueryParticipants(Resource):
             # - Associated sessions
             # - Sessions from which the participant is the creator
             # - Assets by that participant
+            # - Tests by that participant
             # In all case, deleting associated sessions will clear that all, since a participant cannot create sessions
             # or assets not for itself.
-            self.module.logger.log_error(self.module.module_name,
-                                         UserQueryParticipants.__name__,
-                                         'delete', 500, 'Database error', str(e))
-            return gettext('Can\'t delete participant: please delete all sessions before deleting.'), 500
+            self.module.logger.log_warning(self.module.module_name, UserQueryParticipants.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
+
+            if 't_sessions_participants' in str(e.args):
+                return gettext('Can\'t delete participant: please remove all related sessions beforehand.'), 500
+            if 't_sessions' in str(e.args):
+                return gettext('Can\'t delete participant: please remove all sessions created by this participant '
+                               'beforehand.'), 500
+            if 't_assets' in str(e.args):
+                return gettext('Can\'t delete participant: please remove all related assets beforehand.'), 500
+            if 't_tests' in str(e.args):
+                return gettext('Can\'t delete participant: please remove all related tests beforehand.'), 500
+
+            return gettext('Can\'t delete participant: please remove all related sessions, assets and tests before '
+                           'deleting.'), 500
         except exc.SQLAlchemyError as e:
             import sys
             print(sys.exc_info())

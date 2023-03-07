@@ -4,7 +4,7 @@ from flask_babel import gettext
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraParticipant import TeraParticipant
 from modules.DatabaseModule.DBManager import DBManager
-from modules.LoginModule.LoginModule import LoginModule
+from modules.LoginModule.LoginModule import LoginModule, current_device
 from sqlalchemy import exc
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
@@ -12,13 +12,10 @@ import datetime
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
 get_parser.add_argument('id_session', type=int, help='Session ID')
 get_parser.add_argument('list', type=inputs.boolean, help='List all sessions')
 
 post_parser = api.parser()
-post_parser.add_argument('token', type=str, help='Secret Token')
-post_parser.add_argument('session', type=str, location='json', help='Session to create / update', required=True)
 
 session_schema = api.schema_model('device_session', {
     'properties': {
@@ -66,55 +63,25 @@ class DeviceQuerySessions(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.device_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Get session',
-             responses={403: 'Forbidden for security reasons.'})
+             responses={403: 'Forbidden for security reasons.'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @LoginModule.device_token_or_certificate_required
     def get(self):
-
-        # current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
-        # device_access = DBManager.deviceAccess(current_device)
-        # args = get_parser.parse_args(strict=True)
-        #
-        # # Get all sessions
-        # sessions = device_access.get_accessible_sessions()
-        #
-        # # Can't query sessions, unless we have a parameter!
-        # if not any(args.values()):
-        #     return '', 400
-        #
-        # elif args['id_session']:
-        #     sessions = device_access.query_session(session_id=args['id_session'])
-        # try:
-        #     sessions_list = []
-        #     for ses in sessions:
-        #         if args['list'] is None:
-        #             session_json = ses.to_json()
-        #             sessions_list.append(session_json)
-        #         else:
-        #             session_json = ses.to_json(minimal=True)
-        #             sessions_list.append(session_json)
-        #
-        #     return sessions_list
-        #
-        # except InvalidRequestError:
-        #     return '', 500
         return gettext('Forbidden for security reasons'), 403
 
-    @LoginModule.device_token_or_certificate_required
-    @api.expect(session_schema, validate=True)
     @api.doc(description='Update/Create session',
              responses={200: 'Success',
                         400: 'Required parameter is missing',
                         500: 'Internal server error',
                         501: 'Not implemented',
-                        403: 'Logged device doesn\'t have permission to access the requested data'})
+                        403: 'Logged device doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
+    @api.expect(session_schema)
+    @LoginModule.device_token_or_certificate_required
     def post(self):
-        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
-        # current_device = TeraDevice.get_device_by_id(4) #  For tests only
-
-        args = post_parser.parse_args()
-
+        # args = post_parser.parse_args()
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:
             return gettext('Missing arguments'), 400
@@ -167,7 +134,7 @@ class DeviceQuerySessions(Resource):
         else:
             # Existing session - check if we can access it
             if json_session['id_session'] not in device_access.get_accessible_sessions_ids():
-                return gettext('Unauthorized', 403)
+                return gettext('Unauthorized'), 403
 
         # Do the update!
         if json_session['id_session'] > 0:
@@ -198,6 +165,8 @@ class DeviceQuerySessions(Resource):
 
                 for p_uuid in participants:
                     participant = TeraParticipant.get_participant_by_uuid(p_uuid)
+                    if participant is None:
+                        return gettext('Invalid participant uuid'), 400
                     new_ses.session_participants.append(participant)
 
                 if len(participants) > 0:

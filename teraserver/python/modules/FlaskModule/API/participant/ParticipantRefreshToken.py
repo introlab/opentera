@@ -1,8 +1,10 @@
 from flask import session, request
 from flask_restx import Resource
-from modules.LoginModule.LoginModule import participant_token_auth
+from modules.LoginModule.LoginModule import participant_token_auth, current_participant
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from modules.LoginModule.LoginModule import LoginModule
+from opentera.redis.RedisVars import RedisVars
+from opentera.db.models.TeraParticipant import TeraParticipant
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -15,21 +17,19 @@ class ParticipantRefreshToken(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @participant_token_auth.login_required(role='full')
-    @api.expect(get_parser)
     @api.doc(description='Refresh token, old token needs to be passed in request headers.',
              responses={200: 'Success',
-                        500: 'Server error'})
+                        500: 'Server error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @participant_token_auth.login_required(role='full')
     def get(self):
         # If we have made it this far, token passed in headers was valid.
         # Get user token key from redis
-        from opentera.redis.RedisVars import RedisVars
+
         token_key = self.module.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
 
         # Get token for user
-        from opentera.db.models.TeraParticipant import TeraParticipant
-        current_participant = TeraParticipant.get_participant_by_uuid(session['_user_id'])
-
         # Put old token in disabled tokens
         scheme, old_token = request.headers['Authorization'].split(None, 1)
         if len(old_token) > 0:

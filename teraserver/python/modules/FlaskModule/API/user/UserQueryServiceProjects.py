@@ -27,9 +27,7 @@ get_parser.add_argument('with_roles', type=inputs.boolean, help='Used with id_pr
 get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_service. Also return site information '
                                                                 'of the returned projects.')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('service_project', type=str, location='json',
-#                          help='Service - project association to create / update', required=True)
+post_parser = api.parser()
 post_schema = api.schema_model('service_project', {'properties': TeraServiceProject.get_json_schema(),
                                                    'type': 'object',
                                                    'location': 'json'})
@@ -47,20 +45,17 @@ class UserQueryServiceProjects(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get services that are associated with a project. Only one "ID" parameter required and '
                          'supported at once.',
              responses={200: 'Success - returns list of services - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'})
+                        500: 'Error when getting association'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        # current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         service_projects = []
         # If we have no arguments, return error
@@ -127,17 +122,17 @@ class UserQueryServiceProjects(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create/update service - project association. If a "service" json is received, the list of '
                          '"projects" is replaced. If a "project" json is received, the list of "services" is replaced.'
                          'If a "service_project" is received, each of the item in the list is added.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only site admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',
-                        500: 'Internal error occured when saving association'})
+                        500: 'Internal error occurred when saving association'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -161,8 +156,21 @@ class UserQueryServiceProjects(Resource):
             todel_ids = set(current_projects_ids).difference(received_projects_ids)
             # Also filter projects already there
             received_projects_ids = set(received_projects_ids).difference(current_projects_ids)
-            for proj_id in todel_ids:
-                TeraServiceProject.delete_with_ids(service_id=id_service, project_id=proj_id)
+            try:
+                for proj_id in todel_ids:
+                    TeraServiceProject.delete_with_ids(service_id=id_service, project_id=proj_id, autocommit=False)
+                TeraServiceProject.commit()
+            except exc.IntegrityError as e:
+                # Causes that could make an integrity error when deleting:
+                # - Associated project have sessions using that service
+                # - Associated project have tests using that service
+                # - Associated project has assets using that service
+                self.module.logger.log_warning(self.module.module_name, UserQueryServiceProjects.__name__, 'delete',
+                                               500, 'Integrity error', str(e))
+                return gettext(
+                    'Can\'t delete service-project: please remove all related sessions, assets and tests before '
+                    'deleting.'), 500
+
             # Build projects association to add
             json_sps = [{'id_service': id_service, 'id_project': project_id} for project_id in received_projects_ids]
         elif 'project' in request.json:
@@ -189,8 +197,22 @@ class UserQueryServiceProjects(Resource):
             # Also filter services already there
             received_services_ids = set(received_services_ids).difference(current_services_ids)
 
-            for service_id in todel_ids:
-                TeraServiceProject.delete_with_ids(service_id=service_id, project_id=id_project)
+            try:
+                for service_id in todel_ids:
+                    TeraServiceProject.delete_with_ids(service_id=service_id, project_id=id_project, autocommit=False)
+                TeraServiceProject.commit()
+            except exc.IntegrityError as e:
+                # Causes that could make an integrity error when deleting:
+                # - Associated project have sessions using that service
+                # - Associated project have tests using that service
+                # - Associated project has assets using that service
+                self.module.logger.log_warning(self.module.module_name, UserQueryServiceProjects.__name__, 'delete',
+                                               500, 'Integrity error', str(e))
+                return gettext(
+                    'Can\'t delete service-project: please remove all related sessions, assets and tests before '
+                    'deleting.'), 500
+
+
             # Build projects association to add
             json_sps = [{'id_service': service_id, 'id_project': id_project} for service_id in received_services_ids]
         elif 'service_project' in request.json:
@@ -238,21 +260,22 @@ class UserQueryServiceProjects(Resource):
 
             # Do the update!
             if int(json_sp['id_service_project']) > 0:
-                # Already existing
-                try:
-                    TeraServiceProject.update(int(json_sp['id_service_project']), json_sp)
-                except exc.SQLAlchemyError as e:
-                    import sys
-                    print(sys.exc_info())
-                    self.module.logger.log_error(self.module.module_name,
-                                                 UserQueryServiceProjects.__name__,
-                                                 'post', 500, 'Database error', str(e))
-                    return gettext('Database error'), 500
+                # # Already existing
+                # try:
+                #     TeraServiceProject.update(int(json_sp['id_service_project']), json_sp)
+                # except exc.SQLAlchemyError as e:
+                #     import sys
+                #     print(sys.exc_info())
+                #     self.module.logger.log_error(self.module.module_name,
+                #                                  UserQueryServiceProjects.__name__,
+                #                                  'post', 500, 'Database error', str(e))
+                #     return gettext('Database error'), 500
+                pass
             else:
                 try:
                     new_sp = TeraServiceProject()
                     new_sp.from_json(json_sp)
-                    TeraServiceProject.insert(new_sp)
+                    new_sp = TeraServiceProject.insert(new_sp)
                     # Update ID for further use
                     json_sp['id_service_project'] = new_sp.id_service_project
                 except exc.SQLAlchemyError as e:
@@ -267,17 +290,16 @@ class UserQueryServiceProjects(Resource):
 
         return jsonify(update_sp)
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific service - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (not site admin of the associated project)',
-                        500: 'Association not found or database error.'})
+                        500: 'Association not found or database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete
@@ -298,5 +320,23 @@ class UserQueryServiceProjects(Resource):
                                          UserQueryServiceProjects.__name__,
                                          'delete', 500, 'Database error', str(e))
             return gettext('Database error'), 500
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Associated project have sessions using that service
+            # - Associated project have tests using that service
+            # - Associated project has assets using that service
+            self.module.logger.log_warning(self.module.module_name, UserQueryServiceProjects.__name__, 'delete', 500,
+                                           'Integrity error', str(e))
+
+            if 't_sessions' in str(e.args):
+                return gettext('Can\'t delete service-project: please remove all sessions involving a session type '
+                               'using this project beforehand.'), 500
+            if 't_assets' in str(e.args):
+                return gettext('Can\'t delete service-project: please remove all related assets beforehand.'), 500
+            if 't_tests' in str(e.args):
+                return gettext('Can\'t delete service-project: please remove all related tests beforehand.'), 500
+
+            return gettext('Can\'t delete service-project: please remove all related sessions, assets and tests before '
+                           'deleting.'), 500
 
         return '', 200

@@ -1,6 +1,6 @@
 from flask import jsonify, session, request
 from flask_restx import Resource, reqparse, inputs
-from modules.LoginModule.LoginModule import user_multi_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDevice import TeraDevice
@@ -40,8 +40,8 @@ get_parser.add_argument('with_sites', type=inputs.boolean, help='Flag that indic
 get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
                                                                  'for each device')
 
-# post_parser = reqparse.RequestParser()
-# post_parser.add_argument('device', type=str, location='json', help='Device to create / update', required=True)
+
+post_parser = api.parser()
 post_schema = api.schema_model('user_device', {'properties': TeraDevice.get_json_schema(),
                                                'type': 'object',
                                                'location': 'json'})
@@ -53,11 +53,16 @@ delete_parser.add_argument('id', type=int, help='Device ID to delete', required=
 class UserQueryDevices(Resource):
 
     @staticmethod
-    def _value_counter(args):
+    def _value_counter(args, ids_only=False):
         res = 0
-        for value in args.values():
-            if value is not None:
-                res += 1
+        if not ids_only:
+            for value in args.values():
+                if value is not None:
+                    res += 1
+        else:
+            for key in args.keys():
+                if (key.startswith('id_') or key.find('uuid') >= 0 or key == 'name') and args[key] is not None:
+                    res += 1
         return res
 
     def __init__(self, _api, *args, **kwargs):
@@ -65,21 +70,18 @@ class UserQueryDevices(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @user_multi_auth.login_required
-    @api.expect(get_parser)
     @api.doc(description='Get devices information. Only one of the ID parameter is supported at once. If no ID is '
                          'specified, returns all accessible devices for the logged user.',
              responses={200: 'Success - returns list of devices',
                         400: 'User Error : Too Many IDs',
                         403: 'Forbidden access',
-                        500: 'Database error'})
+                        500: 'Database error'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @user_multi_auth.login_required
     def get(self):
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        parser = get_parser
-
-        args = parser.parse_args()
+        args = get_parser.parse_args()
 
         if args['id']:
             args['id_device'] = args['id']
@@ -100,7 +102,7 @@ class UserQueryDevices(Resource):
                 devices = user_access.query_devices_by_type(id_device_type)
             else:
                 devices = user_access.get_accessible_devices()
-        elif self._value_counter(args=args) == 1:
+        elif self._value_counter(args=args, ids_only=True) == 1:
             if args['id_device']:
                 if args['id_device'] in user_access.get_accessible_devices_ids():
                     devices = [TeraDevice.get_device_by_id(args['id_device'])]
@@ -140,8 +142,13 @@ class UserQueryDevices(Resource):
 
             if has_with_status:
                 # Query status
-                rpc = RedisRPCClient(self.module.config.redis_config)
-                status_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_devices')
+                if not self.test:
+                    rpc = RedisRPCClient(self.module.config.redis_config)
+                    status_devices = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'status_devices')
+                else:
+                    status_devices = {}
+                    for device in devices:
+                        status_devices[device.device_uuid] = {'busy': False, 'online': True}
 
             for device in devices:
                 if device is not None:
@@ -229,20 +236,22 @@ class UserQueryDevices(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return '', 500
 
-    @user_multi_auth.login_required
-    @api.expect(post_schema)
     @api.doc(description='Create / update devices. id_device must be set to "0" to create a new device. Only '
                          'superadmins can create new devices, site admin can update and project admin can modify config'
                          ' and notes.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified device',
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
-                        500: 'Internal error occured when saving device'})
+                        500: 'Internal error occurred when saving device'},
+             params={'token': 'Secret token'})
+    @api.expect(post_schema)
+    @user_multi_auth.login_required
     def post(self):
-        # parser = post_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
+        if 'device' not in request.json:
+            return gettext('Missing device'), 400
+
         json_device = request.json['device']
 
         # Validate if we have an id
@@ -382,19 +391,17 @@ class UserQueryDevices(Resource):
 
         return [update_device.to_json()]
 
-    @user_multi_auth.login_required
-    @api.expect(delete_parser)
     @api.doc(description='Delete a specific device',
              responses={200: 'Success',
                         400: 'Wrong ID/ No ID',
                         403: 'Logged user can\'t delete device (can delete if superadmin)',
-                        500: 'Device not found or database error.'})
+                        500: 'Device not found or database error.'},
+             params={'token': 'Secret token'})
+    @api.expect(delete_parser)
+    @user_multi_auth.login_required
     def delete(self):
-        parser = delete_parser
-        current_user = TeraUser.get_user_by_uuid(session['_user_id'])
         user_access = DBManager.userAccess(current_user)
-
-        args = parser.parse_args()
+        args = delete_parser.parse_args()
         id_todel = args['id']
 
         # Check if current user can delete
@@ -418,9 +425,8 @@ class UserQueryDevices(Resource):
                 TeraDevice.delete(id_todel=id_todel)
             except exc.IntegrityError as e:
 
-                self.module.logger.log_error(self.module.module_name,
-                                             UserQueryDevices.__name__,
-                                             'delete', 500, 'Database error', str(e))
+                self.module.logger.log_warning(self.module.module_name, UserQueryDevices.__name__, 'delete', 500,
+                                               'Integrity error', str(e))
 
                 # Causes that could make an integrity error when deleting:
                 # - Associated with sessions
@@ -435,8 +441,16 @@ class UserQueryDevices(Resource):
                 if 't_sessions_id_creator' in str(e.args):
                     return gettext('Can\'t delete device: please remove all sessions created by that device before '
                                    'deleting.'), 500
-                return gettext('Can\'t delete device: please delete all assets created by that device before deleting.'
-                               ), 500
+                if 't_assets' in str(e.args):
+                    return gettext('Can\'t delete device: please delete all assets created by that device before '
+                                   'deleting.'), 500
+                if 't_tests' in str(e.args):
+                    return gettext('Can\'t delete device: please delete all tests created by that device before '
+                                   'deleting.'), 500
+
+                return gettext('Can\'t delete device: please remove all related sessions, assets and tests before '
+                               'deleting.'), 500
+
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())

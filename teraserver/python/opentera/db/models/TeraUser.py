@@ -1,6 +1,15 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from sqlalchemy import Column, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraSessionUsers import TeraSessionUsers
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraAsset import TeraAsset
+
 
 from passlib.hash import bcrypt
 import uuid
@@ -20,27 +29,35 @@ def infinite_jti_sequence():
 user_jti_generator = infinite_jti_sequence()
 
 
-class TeraUser(db.Model, BaseModel):
+class TeraUser(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_users'
-    id_user = db.Column(db.Integer, db.Sequence('id_user_sequence'), primary_key=True, autoincrement=True)
-    user_username = db.Column(db.String(50), nullable=False, unique=True)
-    user_uuid = db.Column(db.String(36), nullable=False, unique=True)
-    user_email = db.Column(db.String, nullable=True)
-    user_firstname = db.Column(db.String, nullable=False)
-    user_lastname = db.Column(db.String, nullable=False)
-    user_password = db.Column(db.String, nullable=False)
-    user_enabled = db.Column(db.Boolean, nullable=False)
-    user_profile = db.Column(db.String, nullable=False)  # Used to store "extra" informations, if needed.
-    user_notes = db.Column(db.String, nullable=True)
-    user_lastonline = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
-    user_superadmin = db.Column(db.Boolean, nullable=False, default=False)
+    id_user = Column(Integer, Sequence('id_user_sequence'), primary_key=True, autoincrement=True)
+    user_username = Column(String(50), nullable=False, unique=True)
+    user_uuid = Column(String(36), nullable=False, unique=True)
+    user_email = Column(String, nullable=True)
+    user_firstname = Column(String, nullable=False)
+    user_lastname = Column(String, nullable=False)
+    user_password = Column(String, nullable=False)
+    user_enabled = Column(Boolean, nullable=False)
+    user_profile = Column(String, nullable=False)  # Used to store "extra" informations, if needed.
+    user_notes = Column(String, nullable=True)
+    user_lastonline = Column(TIMESTAMP(timezone=True), nullable=True)
+    user_superadmin = Column(Boolean, nullable=False, default=False)
 
-    # user_sites_access = db.relationship('TeraSiteAccess', cascade="all,delete")
-    # user_projects_access = db.relationship("TeraProjectAccess", cascade="all,delete")
-    user_user_groups = db.relationship("TeraUserGroup", secondary="t_users_users_groups",
-                                       back_populates="user_group_users", lazy='joined')
-    user_sessions = db.relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users",
-                                    passive_deletes=True)
+    # user_sites_access = relationship('TeraSiteAccess', cascade="all,delete")
+    # user_projects_access = relationship("TeraProjectAccess", cascade="all,delete")
+    user_user_groups = relationship("TeraUserGroup", secondary="t_users_users_groups",
+                                    back_populates="user_group_users", lazy='joined')
+    user_sessions = relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users",
+                                 passive_deletes=True)
+
+    user_created_sessions = relationship("TeraSession", cascade='delete', back_populates='session_creator_user',
+                                         passive_deletes=True)
+
+    user_service_config = relationship("TeraServiceConfig", cascade='delete', passive_deletes=True)
+
+    user_assets = relationship("TeraAsset", cascade='delete', back_populates='asset_user', passive_deletes=True)
+    user_tests = relationship("TeraTest", cascade='delete', back_populates='test_user', passive_deletes=True)
 
     authenticated = False
 
@@ -69,7 +86,6 @@ class TeraUser(db.Model, BaseModel):
     def get_token(self, token_key: str, expiration=3600):
         import time
         import jwt
-        import random
 
         # Creating token with user info
         now = time.time()
@@ -104,7 +120,7 @@ class TeraUser(db.Model, BaseModel):
 
     def update_last_online(self):
         self.user_lastonline = datetime.datetime.now()
-        db.session.commit()
+        TeraUser.db().session.commit()
 
     def __str__(self):
         return '<TeraUser ' + str(self.user_username) + ', ' + str(self.user_email) + ' >'
@@ -186,22 +202,22 @@ class TeraUser(db.Model, BaseModel):
         return None
 
     @staticmethod
-    def get_user_by_username(username):
-        return TeraUser.query.filter_by(user_username=username).first()
+    def get_user_by_username(username, with_deleted: bool = False):
+        return TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(user_username=username).first()
 
     @staticmethod
-    def get_user_by_uuid(u_uuid):
-        user = TeraUser.query.filter_by(user_uuid=u_uuid).first()
+    def get_user_by_uuid(u_uuid, with_deleted: bool = False):
+        user = TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(user_uuid=u_uuid).first()
         return user
 
     @staticmethod
-    def get_user_by_id(id_user):
-        user = TeraUser.query.filter_by(id_user=id_user).first()
+    def get_user_by_id(id_user, with_deleted: bool = False):
+        user = TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(id_user=id_user).first()
         return user
 
     @staticmethod
-    def get_superadmins():
-        return TeraUser.query.filter_by(user_superadmin=True).all()
+    def get_superadmins(with_deleted: bool = False):
+        return TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(user_superadmin=True).all()
 
     @classmethod
     def update(cls, id_user: int, values: dict):
@@ -242,9 +258,23 @@ class TeraUser(db.Model, BaseModel):
 
         super().insert(user)
 
+    def delete_check_integrity(self) -> IntegrityError | None:
+        if TeraSessionUsers.get_session_count_for_user(self.id_user) > 0:
+            return IntegrityError('User still has sessions', self.id_user, 't_sessions_users')
+
+        if TeraSession.get_count(filters={'id_creator_user': self.id_user}) > 0:
+            return IntegrityError('User still has created sessions', self.id_user, 't_sessions')
+
+        if TeraAsset.get_count(filters={'id_user': self.id_user}) > 0:
+            return IntegrityError('User still has created assets', self.id_user, 't_assets')
+
+        if TeraTest.get_count(filters={'id_user': self.id_user}) > 0:
+            return IntegrityError('User still has created tests', self.id_user, 't_tests')
+
+        return None
+
     @staticmethod
     def create_defaults(test=False):
-        from opentera.db.models.TeraUserGroup import TeraUserGroup
         # Admin
         admin = TeraUser()
         admin.user_enabled = True
@@ -255,7 +285,7 @@ class TeraUser(db.Model, BaseModel):
         admin.user_superadmin = True
         admin.user_username = "admin"
         admin.user_uuid = str(uuid.uuid4())
-        db.session.add(admin)
+        TeraUser.db().session.add(admin)
 
         if test:
             # Site admin
@@ -269,7 +299,7 @@ class TeraUser(db.Model, BaseModel):
             admin.user_username = "siteadmin"
             admin.user_uuid = str(uuid.uuid4())
             # admin.user_user_group = TeraUserGroup.get_user_group_by_group_name("Admins - Default Site")
-            db.session.add(admin)
+            TeraUser.db().session.add(admin)
 
             # Site User
             user = TeraUser()
@@ -282,7 +312,7 @@ class TeraUser(db.Model, BaseModel):
             user.user_username = "user"
             user.user_uuid = str(uuid.uuid4())
             # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Project 1")
-            db.session.add(user)
+            TeraUser.db().session.add(user)
 
             # Site User
             user = TeraUser()
@@ -295,7 +325,7 @@ class TeraUser(db.Model, BaseModel):
             user.user_username = "user2"
             user.user_uuid = str(uuid.uuid4())
             # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
-            db.session.add(user)
+            TeraUser.db().session.add(user)
 
             # Project admin
             user = TeraUser()
@@ -308,7 +338,7 @@ class TeraUser(db.Model, BaseModel):
             user.user_username = "user3"
             user.user_uuid = str(uuid.uuid4())
             # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
-            db.session.add(user)
+            TeraUser.db().session.add(user)
 
             # No access user!
             user = TeraUser()
@@ -321,6 +351,6 @@ class TeraUser(db.Model, BaseModel):
             user.user_username = "user4"
             user.user_uuid = str(uuid.uuid4())
             # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
-            db.session.add(user)
+            TeraUser.db().session.add(user)
 
-        db.session.commit()
+        TeraUser.db().session.commit()

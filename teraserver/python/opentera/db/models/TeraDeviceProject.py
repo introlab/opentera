@@ -1,15 +1,20 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
+from opentera.db.SoftInsertMixin import SoftInsertMixin
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
 
 
-class TeraDeviceProject(db.Model, BaseModel):
+class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_devices_projects'
-    id_device_project = db.Column(db.Integer, db.Sequence('id_device_project_sequence'), primary_key=True,
-                                  autoincrement=True)
-    id_device = db.Column(db.Integer, db.ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
-    id_project = db.Column(db.Integer, db.ForeignKey("t_projects.id_project", ondelete='cascade'), nullable=False)
+    id_device_project = Column(Integer, Sequence('id_device_project_sequence'), primary_key=True,
+                               autoincrement=True)
+    id_device = Column(Integer, ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=False)
+    id_project = Column(Integer, ForeignKey("t_projects.id_project", ondelete='cascade'), nullable=False)
 
-    device_project_project = db.relationship("TeraProject", viewonly=True)
-    device_project_device = db.relationship("TeraDevice", viewonly=True)
+    device_project_project = relationship("TeraProject", viewonly=True)
+    device_project_device = relationship("TeraDevice", viewonly=True)
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['device_project_project', 'device_project_device'])
@@ -36,72 +41,88 @@ class TeraDeviceProject(db.Model, BaseModel):
             dev_proj = TeraDeviceProject()
             dev_proj.id_device = device1.id_device
             dev_proj.id_project = project1.id_project
-            db.session.add(dev_proj)
+            TeraDeviceProject.db().session.add(dev_proj)
 
             dev_proj = TeraDeviceProject()
             dev_proj.id_device = device2.id_device
             dev_proj.id_project = project1.id_project
-            db.session.add(dev_proj)
+            TeraDeviceProject.db().session.add(dev_proj)
 
             dev_proj = TeraDeviceProject()
             dev_proj.id_device = device1.id_device
             dev_proj.id_project = project3.id_project
-            db.session.add(dev_proj)
+            TeraDeviceProject.db().session.add(dev_proj)
 
-            db.session.commit()
-
-    @staticmethod
-    def get_device_project_by_id(device_project_id: int):
-        return TeraDeviceProject.query.filter_by(id_device_project=device_project_id).first()
+            TeraDeviceProject.db().session.commit()
 
     @staticmethod
-    def get_device_project_id_for_device_and_project(device_id: int, project_id: int):
-        return TeraDeviceProject.query.filter_by(id_project=project_id, id_device=device_id).first()
+    def get_device_project_by_id(device_project_id: int, with_deleted: bool = False):
+        return TeraDeviceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_device_project=device_project_id).first()
 
     @staticmethod
-    def get_devices_for_project(project_id: int):
-        return TeraDeviceProject.query.filter_by(id_project=project_id).all()
+    def get_device_project_id_for_device_and_project(device_id: int, project_id: int, with_deleted: bool = False):
+        return TeraDeviceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_project=project_id, id_device=device_id).first()
 
     @staticmethod
-    def get_projects_for_device(device_id: int):
-        return TeraDeviceProject.query.filter_by(id_device=device_id).all()
+    def get_devices_for_project(project_id: int, with_deleted: bool = False):
+        return TeraDeviceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_project=project_id).all()
 
     @staticmethod
-    def delete_with_ids(device_id: int, project_id: int):
+    def get_projects_for_device(device_id: int, with_deleted: bool = False):
+        return TeraDeviceProject.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_device=device_id).all()
+
+    @staticmethod
+    def delete_with_ids(device_id: int, project_id: int, autocommit: bool = True):
         delete_obj = TeraDeviceProject.query.filter_by(id_device=device_id, id_project=project_id).first()
         if delete_obj:
-            TeraDeviceProject.delete(delete_obj.id_device_project)
+            TeraDeviceProject.delete(delete_obj.id_device_project, autocommit=autocommit)
+
+    def delete_check_integrity(self) -> IntegrityError | None:
+        from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+        from opentera.db.models.TeraParticipant import TeraParticipant
+        from opentera.db.models.TeraSession import TeraSession
+
+        if TeraDeviceParticipant.query.join(TeraParticipant).\
+            filter(TeraParticipant.id_project == self.id_project).\
+                filter(TeraDeviceParticipant.id_device == self.id_device).count():
+            return IntegrityError('Project still has participant associated to the device',
+                                  self.id_device_project, 't_participants')
+
+        # Find sessions with matching device and project
+        device_sessions = TeraSession.get_sessions_for_device(self.id_device)
+        device_project_sessions = [ses.id_session for ses in device_sessions
+                                   if ses.get_associated_project_id() == self.id_project]
+
+        if len(device_project_sessions) > 0:
+            return IntegrityError('Device still has sessions in this project',
+                                  self.id_device_project, 't_sessions')
+
+        return None
 
     @classmethod
-    def delete(cls, id_todel):
-        from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+    def insert(cls, dp):
+        # Check if that site of that project has the site associated to it
+        from opentera.db.models.TeraDeviceSite import TeraDeviceSite
+        from opentera.db.models.TeraProject import TeraProject
+        project = TeraProject.get_project_by_id(project_id=dp.id_project)
 
-        delete_obj: TeraDeviceProject = TeraDeviceProject.query.filter_by(id_device_project=id_todel).first()
+        if not project:
+            raise IntegrityError(params='Project not found',
+                                 orig='TeraDeviceProject.insert', statement='insert')
 
-        if delete_obj:
-            # Delete participants association with that device
-            associated_participants = TeraDeviceParticipant.query_participants_for_device(
-                device_id=delete_obj.device_project_device.id_device)
-            for part in associated_participants:
-                if part.device_participant_participant.participant_project.id_project == delete_obj.id_project:
-                    device_part = TeraDeviceParticipant.query_device_participant_for_participant_device(
-                        device_id=delete_obj.device_project_device.id_device, participant_id=part.id_participant)
-                    if device_part:
-                        TeraDeviceParticipant.delete(device_part.id_device_participant)
+        device_site = TeraDeviceSite.get_device_site_id_for_device_and_site(site_id=project.id_site,
+                                                                            device_id=dp.id_device)
 
-        # Ok, delete it
-        super().delete(id_todel)
+        if not device_site:
+            raise IntegrityError(params='Device not associated to project site',
+                                 orig='TeraDeviceProject.insert', statement='insert')
+        inserted_obj = super().insert(dp)
+        return inserted_obj
 
-    # @staticmethod
-    # def query_sites_for_device(device_id: int) -> list:
-    #     from opentera.db.models.TeraProject import TeraProject
-    #     return TeraDeviceProject.query.filter_by(id_device=device_id).join(TeraDeviceProject.device_project_project)\
-    #         .join(TeraProject.project_site).all()
-    #     # TeraSite.query.join(TeraSite.site_projects).join(TeraDeviceProject.device_project_project)\
-    #     # .filter(id_device=device_id).all()
-
-    # @staticmethod
-    # def query_devices_for_site(site_id: int) -> list:
-    #     from opentera.db.models.TeraDevice import TeraDevice
-    #     return TeraDeviceProject.query.join(TeraDeviceProject.device_project_project).filter_by(id_site=site_id).all()
-    #     # return TeraDevice.query.join(TeraDevice.device_projects).filter_by(id_site=site_id).all()
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        return

@@ -1,16 +1,18 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence
+from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
+from opentera.db.models.TeraDevice import TeraDevice
 
 
-class TeraDeviceSubType(db.Model, BaseModel):
+class TeraDeviceSubType(BaseModel):
 
     __tablename__ = 't_devices_subtypes'
-    id_device_subtype = db.Column(db.Integer, db.Sequence('id_device_subtype_sequence'), primary_key=True,
-                                  autoincrement=True)
-    id_device_type = db.Column(db.Integer, db.ForeignKey('t_devices_types.id_device_type', ondelete='cascade'),
-                               nullable=False)
-    device_subtype_name = db.Column(db.String, nullable=False)
+    id_device_subtype = Column(Integer, Sequence('id_device_subtype_sequence'), primary_key=True, autoincrement=True)
+    id_device_type = Column(Integer, ForeignKey('t_devices_types.id_device_type', ondelete='cascade'), nullable=False)
+    device_subtype_name = Column(String, nullable=False)
 
-    device_subtype_type = db.relationship("TeraDeviceType")
+    device_subtype_type = relationship("TeraDeviceType")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -33,14 +35,14 @@ class TeraDeviceSubType(db.Model, BaseModel):
             subtype = TeraDeviceSubType()
             subtype.device_subtype_type = bureau
             subtype.device_subtype_name = 'Bureau modèle #1'
-            db.session.add(subtype)
+            TeraDeviceSubType.db().session.add(subtype)
 
             subtype = TeraDeviceSubType()
             subtype.device_subtype_type = bureau
             subtype.device_subtype_name = 'Bureau modèle #2'
-            db.session.add(subtype)
+            TeraDeviceSubType.db().session.add(subtype)
 
-            db.session.commit()
+            TeraDeviceSubType.db().session.commit()
 
     @staticmethod
     def get_devices_subtypes():
@@ -58,3 +60,8 @@ class TeraDeviceSubType(db.Model, BaseModel):
     def get_device_subtypes_for_type(dev_type: int):
         return TeraDeviceSubType.query.filter_by(id_device_type=dev_type).all()
 
+    def delete_check_integrity(self) -> IntegrityError | None:
+        if (TeraDevice.get_count(filters={'id_device_subtype': self.id_device_subtype})) > 0:
+            return IntegrityError('Device subtype still have devices with that subtype', self.id_device_subtype,
+                                  't_devices')
+        return None

@@ -1,16 +1,17 @@
-from opentera.db.Base import db, BaseModel
+from opentera.db.Base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy.orm import relationship
 import string
 from string import digits, ascii_lowercase, ascii_uppercase
 import random
 import uuid
 
 
-class TeraServerSettings(db.Model, BaseModel):
+class TeraServerSettings(BaseModel):
     __tablename__ = 't_server_settings'
-    id_server_settings = db.Column(db.Integer, db.Sequence('id_server_settings_sequence'), primary_key=True,
-                                   autoincrement=True)
-    server_settings_name = db.Column(db.String, nullable=False, unique=True)
-    server_settings_value = db.Column(db.String, nullable=False, unique=False)
+    id_server_settings = Column(Integer, Sequence('id_server_settings_sequence'), primary_key=True, autoincrement=True)
+    server_settings_name = Column(String, nullable=False, unique=True)
+    server_settings_value = Column(String, nullable=False, unique=False)
 
     # Constants
     ServerDeviceTokenKey = "TokenEncryptionKey"
@@ -48,7 +49,8 @@ class TeraServerSettings(db.Model, BaseModel):
 
     @staticmethod
     def get_server_setting(setting_name: string):
-        return TeraServerSettings.query.filter_by(server_settings_name=setting_name).first()
+        return TeraServerSettings.query.filter_by(
+            server_settings_name=setting_name).first()
 
     @staticmethod
     def set_server_setting(setting_name: string, setting_value: string):
@@ -64,6 +66,6 @@ class TeraServerSettings(db.Model, BaseModel):
             current_setting.id_server_settings = None
             current_setting.server_settings_name = setting_name
             current_setting.server_settings_value = setting_value
-            db.session.add(current_setting)
+            TeraServerSettings.db().session.add(current_setting)
         # Store object
         current_setting.commit()

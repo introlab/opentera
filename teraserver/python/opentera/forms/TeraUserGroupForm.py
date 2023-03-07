@@ -7,7 +7,7 @@ from flask_babel import gettext
 class TeraUserGroupForm:
 
     @staticmethod
-    def get_user_group_form(user_access: DBManagerTeraUserAccess):
+    def get_user_group_form():
         form = TeraForm("user_group")
 
         # Building lists

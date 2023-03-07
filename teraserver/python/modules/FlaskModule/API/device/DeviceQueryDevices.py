@@ -3,15 +3,13 @@ from flask_restx import Resource, reqparse
 from flask_babel import gettext
 from sqlalchemy import exc
 
-from modules.LoginModule.LoginModule import LoginModule
+from modules.LoginModule.LoginModule import LoginModule, current_device
 from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
-
 post_parser = api.parser()
 
 
@@ -22,22 +20,21 @@ class DeviceQueryDevices(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @LoginModule.device_token_or_certificate_required
-    @api.expect(get_parser)
     @api.doc(description='Return device information.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented',
-                        403: 'Logged device doesn\'t have permission to access the requested data'})
+                        403: 'Logged device doesn\'t have permission to access the requested data'},
+             params={'token': 'Secret token'})
+    @api.expect(get_parser)
+    @LoginModule.device_token_or_certificate_required
     def get(self):
-
-        device = TeraDevice.get_device_by_uuid(session['_user_id'])
         args = get_parser.parse_args()
 
         # Reply device information
-        response = {'device_info': device.to_json(minimal=True)}
+        response = {'device_info': current_device.to_json(minimal=True)}
 
-        device_access = DBManager.deviceAccess(device)
+        device_access = DBManager.deviceAccess(current_device)
 
         # Reply participant information
         participants = device_access.get_accessible_participants()
@@ -59,15 +56,18 @@ class DeviceQueryDevices(Resource):
         # Return reply as json object
         return response
 
-    @LoginModule.device_token_or_certificate_required
     @api.doc(description='Update a device. A device can only update its own data. For now, only device_config can be '
                          'updated with that API.',
              responses={200: 'Success',
                         403: 'Logged device can\'t update the specified device',
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
-                        500: 'Internal error occured when saving device'})
+                        500: 'Internal error occurred when saving device'},
+             params={'token': 'Secret token'})
+    @LoginModule.device_token_or_certificate_required
     def post(self):
-        current_device = TeraDevice.get_device_by_uuid(session['_user_id'])
+        if 'device' not in request.json:
+            return gettext('Missing device schema'), 400
+
         json_device = request.json['device']
 
         # Validate if we have an id
