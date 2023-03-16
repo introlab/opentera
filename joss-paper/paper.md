@@ -31,8 +31,8 @@ bibliography: paper.bib
 ---
 
 # Summary
-OpenTera is a micro-services based framework primarily developed to support tele-health research projects.
-The framework allows the creation of backend services in Python based on key technologies and open source projects :
+OpenTera is a micro-services based framework primarily developed to support tele-health research projects and real world deployment.
+The framework allows the creation of backend services that are written in Python and based on key technologies and open source projects :
 Redis[@redis], Flask[@Flask], SqlAlchemy[@SqlAlchemy], Twisted[@Twisted], NGINX[@NGINX], EasyWebRTC[@EasyWebRTC].
 
 It is developed as a low cost, secure and easy to deploy alternative to existing proprietary or open source solutions.
@@ -71,6 +71,23 @@ From our research experience, common features between the different tele-health 
 
 To address those common features, OpenTera was designed with an architecture based as much as possible on recognized standards and best practices.
 
+List similar projects
+
+Most of the recent cloud tele-health applications provided by external companies is subscription based and do not offer the flexibility we need. Each vendor offers its cloud based approch for its products and services.
+
+We sometimes have data collections from dozens of participants and users and paying the subscription fee would be prohibitive.
+
+We do not want to be dependant on services that can be changed over time and we need control on the data we collect.
+
+There is many open-source solution that we can integrate that would fit our research needs.
+
+The trade-off we decided to make is to invest in our engineering team to support custom made applications and providing support to clinicians on the field.
+
+We also offer support to external clinics, in exchange to a minimal fee for technical support.
+
+This might not be possible for all research teams to have such a system and sometimes chosing a commercially available and supported platform might be the solution.
+
+Thus, “free software” is a matter of liberty, not price. To understand the concept, you should think of “free” as in “free speech,” not as in “free beer.” We sometimes call it “libre software,” borrowing the French or Spanish word for “free” as in freedom, to show we do not mean the software is gratis.
 
 
 
@@ -78,8 +95,8 @@ Library to ease development of new micro-services available on PyPi[@pypi_opente
 
 
 # Related projects
-Table \autoref{tab:opentera-related-projects} shows related open-source projects that are currently under developement and implementing new services
-or software libraries that are related to the OpenTera main project.
+Table \autoref{tab:opentera-related-projects} shows related open-source projects that are currently under active developement and implementing new services
+or software libraries.
 
 Table: OpenTera Related Projects \label{tab:opentera-related-projects}
 
@@ -90,6 +107,8 @@ Table: OpenTera Related Projects \label{tab:opentera-related-projects}
 | opentera-webrtc-teleop-frontend | Robot teleoperation front-end made with Vue.js[@vuejs].|
 | opentera-webrtc-ros             | OpenTera robot device client and ROS integration for remote control and monitoring of mobile robots.|
 | openteraplus                    | Qt Frontend to manage OpenTera configuration. Includes a chrome web engine for WebRTC sessions.|
+
+
 
 
 
