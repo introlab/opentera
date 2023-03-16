@@ -42,7 +42,7 @@ Our goal is to have full control of the system and the produced data, alleviatin
 It can run on embedded devices such as raspberry Pis, local servers or cloud infrastructure.
 
 The project contains the base server (TeraServer) offering a REST API [@REST], useful to manage users,
-participants, devices, sites, sessions, and supports multiple authentication methods.
+participants, devices, sites, projects, sessions, and supports multiple authentication methods.
 
 TeraServer also manages authorizations for users, participants and devices, allowing us to have a precise control
 of accessible information, which is required for security reasons.
@@ -59,6 +59,8 @@ Applications of the OpenTera framework are not limited to research projects, and
 
 The project have been deployed for robot tele-operation during COVID[@panchea_opentera_2022] and is currently used for multiple rehabilitation projects since 2021.
 
+The project has been open sourced to make it available to a larger audience, but was developed internally since 2013.
+
 # Statement of need
 
 From our research experience, common features between the different tele-health projects we participated emerged:
@@ -67,36 +69,52 @@ From our research experience, common features between the different tele-health 
 * Ecological data capture. The need to collect data not only in a laboratory or controlled environment, but also in the home or institution.
 * Project adaptability. The need to develop projects specific dashboards while reusing as much as possible of what was done before to reduce development time.
 * Security. The need to store and transfer data in a secure and controlled way.
-* Uniformity. The need to have an "all-in-one" integrated solution avoiding the use of multiple windows and tools and focusing attention on the current task.
+* Uniformity. The need to have an "all-in-one" integrated solution avoiding the use of multiple windows and tools and focusing attention on the current tele-health task.
 
 To address those common features, OpenTera was designed with an architecture based as much as possible on recognized standards and best practices.
 
-List similar projects
 
-Most of the recent cloud tele-health applications provided by external companies is subscription based and do not offer the flexibility we need. Each vendor offers its cloud based approch for its products and services.
+There is many open-source solution that we can integrate that would fit our research needs but not fits our requirement completely.
 
-We sometimes have data collections from dozens of participants and users and paying the subscription fee would be prohibitive.
+- Ease of use through a web browser (for participants) is mandatory. Use participant's mobile or desktop devices. Avoid complicated installation of apps and login / password / registration.
+- Use unique link to authenticate, automate the start of sessions with clinicians.
+- Explain Asynchronous / Synchonous sessions.
+
+- Applications are hard to install in healthcare applications and distribution over the web is easier. 
+- Network access is complicated, need to minimize non standard ports for easier access.
+- Need central a secured place to put assets.
+
+https://www.computerworld.com/article/3596891/10-open-source-videoconferencing-tools-for-business.html
+
+TODO: Need to chose features to compare
+
+There are several open source videoconferencing systems that could be used in tele-health scenarios. The table \ref{tab:open-source-videoconferencing} summarizes the important features and compares to what is developed in OpenTera.
+
+Table: VideoConferencing Solutions Comparison \label{tab:open-source-videoconferencing}
+
+|Project              | Audio | Video | Chat |Max Group | Devices| Organized Data | Rehab Tools | Usage Stats  | Security | Planning     | Web |
+|---------------------|-------|-------|------|----------|--------|----------------|-------------|--------------|----------|--------------|-----|
+| Jitsi               |
+| Big Blue Button     |
+| OpenMeetings        |
+| NextCloud Talk      |
+| Jami                |
+| OpenVidu            |
+| OpenTera            |
+
+
+Most of the recent commercial cloud tele-health applications provided is subscription based and do not offer the flexibility we need. Each vendor offers its own approch tailored for its products and services.
+
+We often have data collections from dozens of participants and users and paying the subscription fee would be prohibitive.
 
 We do not want to be dependant on services that can be changed over time and we need control on the data we collect.
-
-There is many open-source solution that we can integrate that would fit our research needs.
-
-The trade-off we decided to make is to invest in our engineering team to support custom made applications and providing support to clinicians on the field.
-
-We also offer support to external clinics, in exchange to a minimal fee for technical support.
-
-This might not be possible for all research teams to have such a system and sometimes chosing a commercially available and supported platform might be the solution.
-
-Thus, “free software” is a matter of liberty, not price. To understand the concept, you should think of “free” as in “free speech,” not as in “free beer.” We sometimes call it “libre software,” borrowing the French or Spanish word for “free” as in freedom, to show we do not mean the software is gratis.
-
 
 
 Library to ease development of new micro-services available on PyPi[@pypi_opentera].
 
 
 # Related projects
-Table \autoref{tab:opentera-related-projects} shows related open-source projects that are currently under active developement and implementing new services
-or software libraries.
+Table \autoref{tab:opentera-related-projects} shows related open-source projects that are currently under active developement and implementing new OpenTera services or underlying libraries.
 
 Table: OpenTera Related Projects \label{tab:opentera-related-projects}
 
@@ -107,9 +125,6 @@ Table: OpenTera Related Projects \label{tab:opentera-related-projects}
 | opentera-webrtc-teleop-frontend | Robot teleoperation front-end made with Vue.js[@vuejs].|
 | opentera-webrtc-ros             | OpenTera robot device client and ROS integration for remote control and monitoring of mobile robots.|
 | openteraplus                    | Qt Frontend to manage OpenTera configuration. Includes a chrome web engine for WebRTC sessions.|
-
-
-
 
 
 # Acknowledgements
