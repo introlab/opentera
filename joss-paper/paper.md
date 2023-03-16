@@ -76,13 +76,17 @@ To address those common features, OpenTera was designed with an architecture bas
 
 There is many open-source solution that we can integrate that would fit our research needs but not fits our requirement completely.
 
-- Ease of use through a web browser (for participants) is mandatory. Use participant's mobile or desktop devices. Avoid complicated installation of apps and login / password / registration.
+- Ease of use through a web browser (for participants) is mandatory. Use participant's mobile or desktop devices. Avoid complicated installation of apps and login / password / registration. 
+- Avoid long list of "friends" for communication where we need to click the right person and start a conference.
 - Use unique link to authenticate, automate the start of sessions with clinicians.
 - Explain Asynchronous / Synchonous sessions.
 
 - Applications are hard to install in healthcare applications and distribution over the web is easier. 
 - Network access is complicated, need to minimize non standard ports for easier access.
-- Need central a secured place to put assets.
+- Need central and secured place to put assets and manage backups.
+- Not duplicating the Electronic Health/Medical Record (EHR/EMR) and avoid storing sensitive information if possible.
+- Integration of research surveys
+- Actimetry device integration
 
 https://www.computerworld.com/article/3596891/10-open-source-videoconferencing-tools-for-business.html
 
@@ -90,7 +94,7 @@ TODO: Need to chose features to compare
 
 There are several open source videoconferencing systems that could be used in tele-health scenarios. The table \ref{tab:open-source-videoconferencing} summarizes the important features and compares to what is developed in OpenTera.
 
-Table: VideoConferencing Solutions Comparison \label{tab:open-source-videoconferencing}
+Table: Open Source VideoConferencing Solutions Comparison \label{tab:open-source-videoconferencing}
 
 |Project              | Audio | Video | Chat |Max Group | Devices| Organized Data | Rehab Tools | Usage Stats  | Security | Planning     | Web |
 |---------------------|-------|-------|------|----------|--------|----------------|-------------|--------------|----------|--------------|-----|
@@ -101,6 +105,21 @@ Table: VideoConferencing Solutions Comparison \label{tab:open-source-videoconfer
 | Jami                |
 | OpenVidu            |
 | OpenTera            |
+
+TODO:  Maybe we should focus on open source rehab solutions
+https://www.goodfirms.co/telemedicine-software/
+
+
+- OpenRehab : Des applications (style app store) sur différents rehab
+- VERA : 
+- RemoVRT
+- RAPAEL
+- REHAB 
+- https://openfeasyo.org/
+- Intelehealth
+
+- Serious games
+Focus on live sessions with clinician.
 
 
 Most of the recent commercial cloud tele-health applications provided is subscription based and do not offer the flexibility we need. Each vendor offers its own approch tailored for its products and services.
