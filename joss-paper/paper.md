@@ -7,6 +7,9 @@ tags:
   - Rehabilitation
   - Robotics
   - Telepresence
+  - Serious Games
+  - Exergames
+  
 authors:
   - name: Dominic Létourneau
     orcid: 0000-0001-7825-7533
@@ -107,6 +110,9 @@ fit those needs completely and would require customization at some level that ca
 - Not duplicating the Electronic Health/Medical Record (EHR/EMR) and avoid storing sensitive information if possible.
 - Integration of research surveys
 - Actimetry device integration
+- Long term availablity, not often the case with proprietary solutions.
+- Customization, still require technical knowledge.
+- Need more than tele-consultation (videoconference) with chat and file sharing.
 
 https://www.computerworld.com/article/3596891/10-open-source-videoconferencing-tools-for-business.html
 
@@ -128,23 +134,47 @@ Table: Open Source VideoConferencing Solutions Comparison \label{tab:open-source
 
 TODO:  Maybe we should focus on open source rehab solutions
 https://www.goodfirms.co/telemedicine-software/
+https://blog.containerize.com/top-5-open-source-video-conferencing-software-of-2021/
 
 
-- [OpenRehab](https://github.com/RegoResearch/OpenRehab) : Des applications (style app store) sur différents rehab
-- VERA :
-- RemoVRT
-- RAPAEL
+Talk about HIPPAA Compliance ?
+
+
+
+[VSee](https://vsee.com/)
+- HIPAA
+- 
+
+- [OpenRehab](https://openrehab.org/)
+  - Web Site with a listing of rehabilitation tools for : Upper Limb, Mobility, Fitness, Cognition, Balance.
+
+  - [VERA](https://www.cmrehabnetwork.nhs.uk/uploadedfiles/documents/Development%20of%20VERA%20Ganesh%20Bavikatte%20Jo%20Haworth%20Nic%20Branscombe%20Charlotte%20Lawrence.pdf):
+    - Open ??? Did not find any web site / source repository.
+
+
 - REHAB
-- https://openfeasyo.org/
+- [OPEN FEASYO](https://openfeasyo.org/)
+  - Games : https://github.com/openfeasyo/OpenFeasyo using EMG sensors.
+  - 
+  - 
+- 
 - [Intelehealth](https://github.com/Intelehealth)
+- 
+- 
 - [OpenPT]()
-- [PhysiTrack]()
+- [PhysiTrack](https://www.physitrack.fr/)
+  - Subscription based
+  - Exercices
+
 - [RehApp]()
 - [RehabMe](https://github.com/djvolz/RehabMe) -->DEPRECATED
 - [PhysioCam]()
 
 
-- Serious games
+- Serious games : Games with an additional purpose other than its original objective which is the seeking of enjoyment. For instance, rehabilitation of upper limbs.
+  
+- Exergames : Games that involve physical exertion and are thought of as a form of exercise.
+  
 Focus on live sessions with clinician.
 
 
