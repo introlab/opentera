@@ -12,7 +12,7 @@ authors:
     orcid: 0000-0001-7825-7533
     affiliation: 1
   - name: Simon Brière
-    orcid: 0000-0000-0000-0000
+    orcid: 0009-0000-1224-8001
     affiliation: 2
   - name: François Michaud
     orcid: 0000-0002-3639-7770
@@ -31,7 +31,30 @@ bibliography: paper.bib
 ---
 
 # Summary
-OpenTera is a micro-services based framework primarily developed to support tele-health research projects and real world deployment.
+OpenTera is a micro-services based framework primarily developed to support tele-health research projects and real world
+deployment. This project is based on many years of experience linking at-home participants to remote users (such as 
+clinicians) with audio-video-data connections and in-the-field sensor (such as biometrics, activities and robotics 
+devices).
+
+Most telehealth based research projects requires a common data structure: data collect sites, projects, participants 
+and sessions including various recorded data types (from sensors or other sources). Those projects also require many common low-level features: user 
+authentification based on various access roles, ability to add new features based on specific projects needs, 
+ease of use for the participant and secure data hosting. Some common features are also shared between research projects: videoconferencing 
+with specific health related features (angles measurement, timers, etc.), surveys data collection, data analysis and 
+export.
+
+Since many of the available solutions are either costly, features limited, proprietary (e.g. can't be easily adapted for
+research purpose and raw data is harder to access) or hard to deploy in a tele-health context, OpenTera was built to 
+allow for extensability over the various projects needs and to provide research project full control over their data and 
+hosting.
+
+Applications of the OpenTera framework are not limited to research projects, and can also be applied in a clinical 
+environment, where clinicians have to communicate with patients. Such fields include but are not limited to: 
+tele-rehabilibation (physical, social, mental), robotic tele-operation and remote activity monitoring.
+
+The project has been open sourced to make it available to a larger audience, but was developed internally since 2013.
+
+#### ---- Ideas - remove if not needed ----
 The framework allows the creation of backend services that are written in Python and based on key technologies and open source projects :
 Redis[@redis], Flask[@Flask], SqlAlchemy[@SqlAlchemy], Twisted[@Twisted], NGINX[@NGINX], EasyWebRTC[@EasyWebRTC].
 
@@ -51,15 +74,9 @@ OpenTera also have some base services : VideoRehab, Logging and FileTransfer.
 
 Those base services allow WebRTC sessions from the web along with appropriate logging and file transfer possiblities.
 
-
 The project is inspired by years of experience with tele-rehabilitation research with deployments in participant's home where we want to offer simple and effective way for participants and clinicians to communicate and do tele-rehabilitation sessions.
 
-
-Applications of the OpenTera framework are not limited to research projects, and could also be applied in a clinical environment, where clinicians have to communicate with patients. Such fields include but are not limited to: tele-rehabilibation (physical, social, mental), robotic tele-operation and remote activity monitoring.
-
 The project have been deployed for robot tele-operation during COVID[@panchea_opentera_2022] and is currently used for multiple rehabilitation projects since 2021.
-
-The project has been open sourced to make it available to a larger audience, but was developed internally since 2013.
 
 # Statement of need
 
@@ -70,11 +87,14 @@ From our research experience, common features between the different tele-health 
 * Project adaptability. The need to develop projects specific dashboards while reusing as much as possible of what was done before to reduce development time.
 * Security. The need to store and transfer data in a secure and controlled way.
 * Uniformity. The need to have an "all-in-one" integrated solution avoiding the use of multiple windows and tools and focusing attention on the current tele-health task.
+* Ease of use. The need to have an easy to use solution for the user and the participant at all steps of the process (authentification, data collection, data management)
 
 To address those common features, OpenTera was designed with an architecture based as much as possible on recognized standards and best practices.
 
+There are many open-source solutions that can be integrated and could solve the identified needs, but none of those would 
+fit those needs completely and would require customization at some level that can quickly gets limitative or complicated.
 
-There is many open-source solution that we can integrate that would fit our research needs but not fits our requirement completely.
+
 
 - Ease of use through a web browser (for participants) is mandatory. Use participant's mobile or desktop devices. Avoid complicated installation of apps and login / password / registration. 
 - Avoid long list of "friends" for communication where we need to click the right person and start a conference.
