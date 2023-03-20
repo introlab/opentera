@@ -32,24 +32,24 @@ bibliography: paper.bib
 
 # Summary
 OpenTera is a micro-services based framework primarily developed to support tele-health research projects and real world
-deployment. This project is based on many years of experience linking at-home participants to remote users (such as 
-clinicians) with audio-video-data connections and in-the-field sensor (such as biometrics, activities and robotics 
+deployment. This project is based on many years of experience linking at-home participants to remote users (such as
+clinicians) with audio-video-data connections and in-the-field sensor (such as biometrics, activities and robotics
 devices).
 
-Most telehealth based research projects requires a common data structure: data collect sites, projects, participants 
-and sessions including various recorded data types (from sensors or other sources). Those projects also require many common low-level features: user 
-authentification based on various access roles, ability to add new features based on specific projects needs, 
-ease of use for the participant and secure data hosting. Some common features are also shared between research projects: videoconferencing 
-with specific health related features (angles measurement, timers, etc.), surveys data collection, data analysis and 
+Most telehealth based research projects requires a common data structure: data collect sites, projects, participants
+and sessions including various recorded data types (from sensors or other sources). Those projects also require many common low-level features: user
+authentification based on various access roles, ability to add new features based on specific projects needs,
+ease of use for the participant and secure data hosting. Some common features are also shared between research projects: videoconferencing
+with specific health related features (angles measurement, timers, etc.), surveys data collection, data analysis and
 export.
 
 Since many of the available solutions are either costly, features limited, proprietary (e.g. can't be easily adapted for
-research purpose and raw data is harder to access) or hard to deploy in a tele-health context, OpenTera was built to 
-allow for extensability over the various projects needs and to provide research project full control over their data and 
+research purpose and raw data is harder to access) or hard to deploy in a tele-health context, OpenTera was built to
+allow for extensability over the various projects needs and to provide research project full control over their data and
 hosting.
 
-Applications of the OpenTera framework are not limited to research projects, and can also be applied in a clinical 
-environment, where clinicians have to communicate with patients. Such fields include but are not limited to: 
+Applications of the OpenTera framework are not limited to research projects, and can also be applied in a clinical
+environment, where clinicians have to communicate with patients. Such fields include but are not limited to:
 tele-rehabilibation (physical, social, mental), robotic tele-operation and remote activity monitoring.
 
 The project has been open sourced to make it available to a larger audience, but was developed internally since 2013.
@@ -91,17 +91,17 @@ From our research experience, common features between the different tele-health 
 
 To address those common features, OpenTera was designed with an architecture based as much as possible on recognized standards and best practices.
 
-There are many open-source solutions that can be integrated and could solve the identified needs, but none of those would 
+There are many open-source solutions that can be integrated and could solve the identified needs, but none of those would
 fit those needs completely and would require customization at some level that can quickly gets limitative or complicated.
 
 
 
-- Ease of use through a web browser (for participants) is mandatory. Use participant's mobile or desktop devices. Avoid complicated installation of apps and login / password / registration. 
+- Ease of use through a web browser (for participants) is mandatory. Use participant's mobile or desktop devices. Avoid complicated installation of apps and login / password / registration.
 - Avoid long list of "friends" for communication where we need to click the right person and start a conference.
 - Use unique link to authenticate, automate the start of sessions with clinicians.
 - Explain Asynchronous / Synchonous sessions.
 
-- Applications are hard to install in healthcare applications and distribution over the web is easier. 
+- Applications are hard to install in healthcare applications and distribution over the web is easier.
 - Network access is complicated, need to minimize non standard ports for easier access.
 - Need central and secured place to put assets and manage backups.
 - Not duplicating the Electronic Health/Medical Record (EHR/EMR) and avoid storing sensitive information if possible.
@@ -130,13 +130,19 @@ TODO:  Maybe we should focus on open source rehab solutions
 https://www.goodfirms.co/telemedicine-software/
 
 
-- OpenRehab : Des applications (style app store) sur différents rehab
-- VERA : 
+- [OpenRehab](https://github.com/RegoResearch/OpenRehab) : Des applications (style app store) sur différents rehab
+- VERA :
 - RemoVRT
 - RAPAEL
-- REHAB 
+- REHAB
 - https://openfeasyo.org/
-- Intelehealth
+- [Intelehealth](https://github.com/Intelehealth)
+- [OpenPT]()
+- [PhysiTrack]()
+- [RehApp]()
+- [RehabMe](https://github.com/djvolz/RehabMe) -->DEPRECATED
+- [PhysioCam]()
+
 
 - Serious games
 Focus on live sessions with clinician.
