@@ -23,9 +23,27 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install system dependencies
+    - name: Install System Dependencies
       run: |
-        sudo apt-get install cmake protobuf-compiler wget
+        sudo apt-get install cmake protobuf-compiler wget redis-server postgresql nginx
+
+    - name: Run System Services
+      run: |
+        sudo systemctl enable postgresql
+        sudo systemctl start postgresql
+
+    - name: Create Database Tables
+      run: |
+        sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'opentera';"
+        sudo -u postgres psql -c "create database opentera;"
+        sudo -u postgres psql -c "create user TeraAgent with encrypted password 'tera';"
+        sudo -u postgres psql -c "grant all privileges on database opentera to TeraAgent;"
+        sudo -u postgres psql -c "ALTER USER TeraAgent WITH PASSWORD 'tera';"
+        sudo -u postgres psql -c "create database openteralogs;"
+        sudo -u postgres psql -c "grant all privileges on database openteralogs to TeraAgent;"
+        sudo -u postgres psql -c "create database openterafiles;"
+        sudo -u postgres psql -c "grant all privileges on database openterafiles to TeraAgent;"
+        sudo -u postgres psql -c "\l"
 
     - name: Install Miniconda3
       run: |
@@ -38,13 +56,37 @@ jobs:
       run: |
         cmake .
         make python-all
+        echo "OPENTERA_PYTHON=$(echo $PWD/python/env/python-3.10/bin/python)" >> $GITHUB_ENV
+        echo "PYTHONPATH=$(echo $PWD/python)" >> $GITHUB_ENV
 
-    - name: Generate documentation
+    - name: Generate Self Signed TLS Certificates
+      working-directory: teraserver/python
+      run: |
+        $OPENTERA_PYTHON CreateCertificates.py
+
+    - name: Run NGINX Reverse Proxy
+      working-directory: teraserver/python/config
+      run: |
+        mkdir logs
+        ./start_nginx.sh
+
+    - name: Start TeraServer With Tests Enabled
+      working-directory: teraserver/python
+      run: |
+        $OPENTERA_PYTHON TeraServer.py --enable_tests=1 &
+        sleep 10
+
+    - name: Generate base documentation
       working-directory: docs
       run: |
         pip install -r requirements.txt
         make html
         touch _build/html/.nojekyll
+
+    - name: Update API json documentation
+      working-directory: docs/services/teraserver/api
+      run: |
+        wget https://localhost:40075/doc/api/swagger.json
 
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.7.1
