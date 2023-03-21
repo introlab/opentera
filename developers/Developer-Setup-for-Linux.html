@@ -18,7 +18,9 @@
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Getting Started for Developers - Mac OS" href="Developer-Setup-for-Mac.html" />
+    <link rel="prev" title="Getting Started for Developers - Windows 10" href="Developer-Setup-for-Windows.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,11 +42,62 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../Home.html">Welcome to the OpenTera Wiki!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../installation.html">Installation for developers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Windows.html">Getting Started for Developers - Windows 10</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Getting Started for Developers - Ubuntu-based Linux distros</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pre-requisites">Pre-requisites</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#installing-git-cmake-and-nodejs">Installing git, cmake and nodejs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#installing-miniconda">Installing Miniconda</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#installing-postgresql">Installing PostgreSQL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#installing-redis-server">Installing Redis Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#installing-and-running-nginx">Installing (and running) NGINX</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#installing-qt-creator">Installing Qt Creator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#environment-setup">Environment setup</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#creating-users">Creating users</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-databases">Creating databases</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#starting-the-main-opentera-service">Starting the main OpenTera service</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Mac.html">Getting Started for Developers - Mac OS</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html#login">Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Message wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -61,6 +114,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../installation.html">Installation</a></li>
       <li class="breadcrumb-item active">Getting Started for Developers - Ubuntu-based Linux distros</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/developers/Developer-Setup-for-Linux.md.txt" rel="nofollow"> View page source</a>
@@ -78,10 +132,10 @@
 <p>To get started on Linux, the following components are needed:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://git-scm.com">Git</a> required to get the code.</p></li>
-<li><p><a class="reference external" href="https://cmake.org">CMake</a> required to build the python environment and <a class="reference internal" href="#Translations"><span class="xref myst">translations</span></a>.</p></li>
+<li><p><a class="reference external" href="https://cmake.org">CMake</a> required to build the python environment and <a class="reference internal" href="Translations.html"><span class="doc std std-doc">translations</span></a>.</p></li>
 <li><p><a class="reference external" href="https://conda.io/miniconda.html">Miniconda 3</a> required to build the python environment</p></li>
-<li><p><a class="reference external" href="https://www.postgresql.org/download/">PostgreSQL</a> for the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database backend</span></a></p></li>
-<li><p><a class="reference external" href="https://github.com/tporadowski/redis/releases">Redis Server</a> for the <a class="reference internal" href="#Internal-services-communication-module"><span class="xref myst">internal communication system</span></a></p></li>
+<li><p><a class="reference external" href="https://www.postgresql.org/download/">PostgreSQL</a> for the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database backend</span></a></p></li>
+<li><p><a class="reference external" href="https://github.com/tporadowski/redis/releases">Redis Server</a> for the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication system</span></a></p></li>
 <li><p><a class="reference external" href="https://nginx.org/en/download.html">NGINX</a> for the system routing</p></li>
 <li><p><a class="reference external" href="https://nodejs.org">Node.js</a> required for the <a class="reference internal" href="#Videorehab-Service"><span class="xref myst">VideoRehab service</span></a></p></li>
 <li><p>(Optional) <a class="reference external" href="https://www.qt.io/download">Qt Creator</a> for a UI to execute the <code class="docutils literal notranslate"><span class="pre">cmake</span></code> command</p></li>
@@ -146,11 +200,11 @@ When installing Qt, only the Qt Creator is needed for this project. You would, h
 </pre></div>
 </div>
 <p><strong>3. Databases setup</strong></p>
-<p>While the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database structure</span></a> by itself will be auto-generated the first time OpenTera is run, the databases will need to have been created beforehand.</p>
+<p>While the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database structure</span></a> by itself will be auto-generated the first time OpenTera is run, the databases will need to have been created beforehand.</p>
 <ol class="arabic simple">
 <li><p>Open the pgAdmin interface.</p></li>
 <li><p>Login to the database manager using the password specified at the installation
-<img alt=" " src="developers/images/Windows/PGAdmin_pw.PNG" /></p></li>
+<img alt=" " src="../_images/PGAdmin_pw.PNG" /></p></li>
 <li><p>On the left side, expand the “Servers” section. If required, enter the password again.</p></li>
 </ol>
 <p>The pgAdmin interface will then be ready for the next steps.</p>
@@ -208,7 +262,7 @@ When installing Qt, only the Qt Creator is needed for this project. You would, h
 <li><p>In the <code class="docutils literal notranslate"><span class="pre">Virtualenv</span></code> tab, choose the existing environment. Change the interpreter to the following :
 <code class="docutils literal notranslate"><span class="pre">...\teraserver\python\env\python-3.8\python.exe</span></code><br />
 The end result should look like this :<br />
-<img alt=" " src="developers/images/Windows/PyCharm.PNG" /></p></li>
+<img alt=" " src="../_images/PyCharm.PNG" /></p></li>
 </ol>
 <p><strong>6. Self-signed certificates generation</strong>
 Self-signed certificates should be generated for the development server and to sign device certificates.</p>
@@ -226,7 +280,10 @@ Self-signed certificates should be generated for the development server and to s
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Developer-Setup-for-Windows.html" class="btn btn-neutral float-left" title="Getting Started for Developers - Windows 10" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Developer-Setup-for-Mac.html" class="btn btn-neutral float-right" title="Getting Started for Developers - Mac OS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

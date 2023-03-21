@@ -87,7 +87,7 @@ While the [database structure](Database-Structure) by itself will be auto-genera
 
 The pgAdmin interface will then be ready for the next steps.
 
-  #### Creating users
+### Creating users
 A single user, `teraagent` with the default password `tera` will need to be created before creating the required databases. A different user and/or a different password could be used, but the [configuration files](Configuration-files) will need to be adjusted accordingly.
   
   1. Right-click on the `Login/Group Roles` section in the left tree of the pgAdmin interface
@@ -100,7 +100,7 @@ A single user, `teraagent` with the default password `tera` will need to be crea
 
 The `teraagent` user should have been created.
 
-  #### Creating databases
+### Creating databases
 Each system service will requires its own database. The default database that needs to be created are as follow:
 * `opentera`, the [main OpenTera service](TeraServer-Service) database
 * `openterafiles`, the database for the [file transfer](FileTransfer-Service) service

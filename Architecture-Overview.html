@@ -18,7 +18,9 @@
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Security" href="Security.html" />
+    <link rel="prev" title="About OpenTera" href="Home.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,11 +42,63 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Home.html">About OpenTera</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">OpenTera Architecture Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#core-module-opentera-teraserver">Core module (OpenTera - TeraServer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#modules">Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#login-and-usermanager-module">Login and UserManager module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#login-module">Login module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#usermanager-module">UserManager module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#websockets-module">Websockets module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rest-api-module">REST API module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#database-module">Database module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#services-module">Services module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#system-services">System services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#file-transfer-service">File transfer service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logging-service">Logging service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#videorehab-service">Videorehab service</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#external-services">External services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#clients">Clients</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Security.html">Security</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation for developers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html#login">Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Message wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -79,54 +133,54 @@
 <hr class="docutils" />
 <section id="core-module-opentera-teraserver">
 <h2>Core module (OpenTera - TeraServer)<a class="headerlink" href="#core-module-opentera-teraserver" title="Permalink to this heading"></a></h2>
-<p>The core module is simply the manager of all the other components of the system. Internally, it is itself represented as a service, especially when it comes to <a class="reference internal" href="Access-levels-for-user-types.html"><span class="doc std std-doc">access and roles</span></a>.</p>
+<p>The core module is simply the manager of all the other components of the system. Internally, it is itself represented as a service, especially when it comes to <a class="reference internal" href="#Access-levels-for-user-types"><span class="xref myst">access and roles</span></a>.</p>
 <p>OpenTera server is fully written in Python, and the main script (TeraServer.py) basically starts and configure the components of the system based on the <a class="reference internal" href="Configuration-files.html"><span class="doc std std-doc">configuration file</span></a>.</p>
-<p>More information on this module can be found <a class="reference internal" href="TeraServer-Service.html"><span class="doc std std-doc">here</span></a>.</p>
+<p>More information on this module can be found <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">here</span></a>.</p>
 </section>
 <hr class="docutils" />
 <section id="modules">
 <h2>Modules<a class="headerlink" href="#modules" title="Permalink to this heading"></a></h2>
-<p>Components that are used internally by the core module and do not need to be directly referenced or accessed by other services in the system are called modules. Each of the specific module has a defined role and can communicate with other modules or services in the system using the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal services communication module</span></a>.</p>
+<p>Components that are used internally by the core module and do not need to be directly referenced or accessed by other services in the system are called modules. Each of the specific module has a defined role and can communicate with other modules or services in the system using the <a class="reference internal" href="#Internal-services-communication-module"><span class="xref myst">internal services communication module</span></a>.</p>
 <section id="login-and-usermanager-module">
 <h3>Login and UserManager module<a class="headerlink" href="#login-and-usermanager-module" title="Permalink to this heading"></a></h3>
-<p>As hinted by their names, those modules provides the required login validation check and keep a registry of currently logged-in users, participants and devices. See <a class="reference internal" href="Login-and-authentication.html"><span class="doc std std-doc">Login and authentication</span></a> for further information on the available login types and sequence.</p>
+<p>As hinted by their names, those modules provides the required login validation check and keep a registry of currently logged-in users, participants and devices. See <a class="reference internal" href="#Login-and-authentication"><span class="xref myst">Login and authentication</span></a> for further information on the available login types and sequence.</p>
 <section id="login-module">
 <h4>Login module<a class="headerlink" href="#login-module" title="Permalink to this heading"></a></h4>
 <p>Simply put, this module provides authentication for the various main user types in the platform (users, participants, devices and services). It is in charge to generate temporary access token (if that mechanism is used) and invalidates them when they expire.</p>
 </section>
 <section id="usermanager-module">
 <h4>UserManager module<a class="headerlink" href="#usermanager-module" title="Permalink to this heading"></a></h4>
-<p>This module is a registry of user, participants and devices states (online, busy, status). By subscribing and publishing into various topics (see <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">Internal services communication module</span></a>), this module monitors topics generated by the <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websockets</span></a> to toggle states. It also support a remote process call interface (RPC) to query the various information in the registry.</p>
+<p>This module is a registry of user, participants and devices states (online, busy, status). By subscribing and publishing into various topics (see <a class="reference internal" href="#Internal-services-communication-module"><span class="xref myst">Internal services communication module</span></a>), this module monitors topics generated by the <a class="reference internal" href="#Websockets-communication"><span class="xref myst">websockets</span></a> to toggle states. It also support a remote process call interface (RPC) to query the various information in the registry.</p>
 <p>More information on this module can be found <a class="reference internal" href="UserManager-module.html"><span class="doc std std-doc">here</span></a>.</p>
 </section>
 </section>
 <section id="websockets-module">
 <h3>Websockets module<a class="headerlink" href="#websockets-module" title="Permalink to this heading"></a></h3>
 <p>This module manages the websockets connection, from authentication to communication to and from each of them. It is based on the <a class="reference external" href="https://twistedmatrix.com/">Twisted engine</a> and provides the required factories and event to properly handle websocket connections.</p>
-<p>In the OpenTera platform, websockets are used in a one-way communication channel to send <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">messages</span></a> from the server to the clients. Client communication with the server uses the <a class="reference internal" href="#API"><span class="xref myst">Main OpenTera REST API</span></a>.</p>
-<p>More information on this module can be found <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">here</span></a>.</p>
+<p>In the OpenTera platform, websockets are used in a one-way communication channel to send <a class="reference internal" href="#Messages-structure"><span class="xref myst">messages</span></a> from the server to the clients. Client communication with the server uses the <a class="reference internal" href="#API"><span class="xref myst">Main OpenTera REST API</span></a>.</p>
+<p>More information on this module can be found <a class="reference internal" href="#Websockets-communication"><span class="xref myst">here</span></a>.</p>
 </section>
 <section id="rest-api-module">
 <h3>REST API module<a class="headerlink" href="#rest-api-module" title="Permalink to this heading"></a></h3>
 <p>This module, based on the <a class="reference external" href="https://flask.palletsprojects.com">Flask web framework</a>, provides the <a class="reference internal" href="#API"><span class="xref myst">Main OpenTera REST API</span></a> that clients can use to request and update information from the server.</p>
-<p>Various <a class="reference internal" href="Login-and-authentication.html"><span class="doc std std-doc">authentication schemes</span></a> can be used to access restricted API calls. Depending on the <a class="reference internal" href="Access-levels-for-user-types.html"><span class="doc std std-doc">roles</span></a> of the requester, return values will either be filtered to include only accessible items or fully denied.</p>
+<p>Various <a class="reference internal" href="#Login-and-authentication"><span class="xref myst">authentication schemes</span></a> can be used to access restricted API calls. Depending on the <a class="reference internal" href="#Access-levels-for-user-types"><span class="xref myst">roles</span></a> of the requester, return values will either be filtered to include only accessible items or fully denied.</p>
 <p>More information on this module and API can be found <a class="reference internal" href="#API"><span class="xref myst">here</span></a>.</p>
 </section>
 <section id="database-module">
 <h3>Database module<a class="headerlink" href="#database-module" title="Permalink to this heading"></a></h3>
-<p>This module manages access to the various <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database objects</span></a>. When requesting information from the database, functions in that module ensure filtering of the returned values (or builds an appropriate query to filter directly in the database) so that the requester access levels are properly handled.</p>
-<p>More information on the database structure can be found <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">here</span></a>.</p>
+<p>This module manages access to the various <a class="reference internal" href="#Database-Structure"><span class="xref myst">database objects</span></a>. When requesting information from the database, functions in that module ensure filtering of the returned values (or builds an appropriate query to filter directly in the database) so that the requester access levels are properly handled.</p>
+<p>More information on the database structure can be found <a class="reference internal" href="#Database-Structure"><span class="xref myst">here</span></a>.</p>
 </section>
 <section id="services-module">
 <h3>Services module<a class="headerlink" href="#services-module" title="Permalink to this heading"></a></h3>
-<p>This module wraps the services by setting up the basic <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication protocols</span></a> for each of the system services. It also launches those services.</p>
+<p>This module wraps the services by setting up the basic <a class="reference internal" href="#Internal-services-communication-module"><span class="xref myst">internal communication protocols</span></a> for each of the system services. It also launches those services.</p>
 <p>This module can also automatically launch external services as stand-alone processes.</p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="system-services">
 <h2>System services<a class="headerlink" href="#system-services" title="Permalink to this heading"></a></h2>
-<p>Those services are features that are shared by modules and external services. Each of them serves a specific purpose and will run in a separate process. Communication between modules and services will be done using the <a class="reference internal" href="#API"><span class="xref myst">Main OpenTera REST API</span></a> and the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication protocols - subscribe-publish</span></a>.</p>
+<p>Those services are features that are shared by modules and external services. Each of them serves a specific purpose and will run in a separate process. Communication between modules and services will be done using the <a class="reference internal" href="#API"><span class="xref myst">Main OpenTera REST API</span></a> and the <a class="reference internal" href="#Internal-services-communication-module"><span class="xref myst">internal communication protocols - subscribe-publish</span></a>.</p>
 <section id="file-transfer-service">
 <h3>File transfer service<a class="headerlink" href="#file-transfer-service" title="Permalink to this heading"></a></h3>
 <p>The file transfer service is a service that manages file transfers (upload and download) within OpenTera. It allows other services to upload files in a central repository. While specific services can also implements file storage and indexing, this service can be used to quickly reuse components.</p>
@@ -134,7 +188,7 @@
 </section>
 <section id="logging-service">
 <h3>Logging service<a class="headerlink" href="#logging-service" title="Permalink to this heading"></a></h3>
-<p>The logging service acts as a central log repository. Using messages with the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication protocols - subscribe-publish</span></a>, every module and service interacting with OpenTera can log information in that service. More specifically, the service process the <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">LogEvent</span></a> message.</p>
+<p>The logging service acts as a central log repository. Using messages with the <a class="reference internal" href="#Internal-services-communication-module"><span class="xref myst">internal communication protocols - subscribe-publish</span></a>, every module and service interacting with OpenTera can log information in that service. More specifically, the service process the <a class="reference internal" href="#Messages-structure"><span class="xref myst">LogEvent</span></a> message.</p>
 <p>More information on this service can be found <a class="reference internal" href="Logging-Service.html"><span class="doc std std-doc">here</span></a>.</p>
 </section>
 <section id="videorehab-service">
@@ -164,7 +218,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Home.html" class="btn btn-neutral float-left" title="About OpenTera" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Security.html" class="btn btn-neutral float-right" title="Security" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

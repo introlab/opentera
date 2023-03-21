@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TeraServer &mdash; OpenTera 1.2.0 documentation</title>
+  <title>TeraServer Service &mdash; OpenTera 1.2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -18,9 +18,7 @@
         <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Access Roles" href="OpenTera_AccessRoles.html" />
-    <link rel="prev" title="Services" href="../services.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -55,24 +53,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation for developers</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../services.html">Services</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">TeraServer</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="OpenTera_AccessRoles.html">Access Roles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/API.html">Using REST API</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/api_doc.html">API Documentation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#teraserver-service">TeraServer Service</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#main-script">Main script</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#configuration">Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#default-port-and-location">Default port and location</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#web-urls">Web URLs</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../services.html">Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
@@ -107,10 +90,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../services.html">Services</a></li>
-      <li class="breadcrumb-item active">TeraServer</li>
+      <li class="breadcrumb-item active">TeraServer Service</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/services/teraserver/teraserver.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/services/teraserver/TeraServer-Service.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -118,40 +100,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="teraserver">
-<h1>TeraServer<a class="headerlink" href="#teraserver" title="Permalink to this heading"></a></h1>
-<div class="toctree-wrapper compound">
-</div>
-<section id="teraserver-service">
-<h2>TeraServer Service<a class="headerlink" href="#teraserver-service" title="Permalink to this heading"></a></h2>
+  <section id="teraserver-service">
+<h1>TeraServer Service<a class="headerlink" href="#teraserver-service" title="Permalink to this heading"></a></h1>
 <p>The TeraServer service is the core service of the OpenTera platform. It runs the different <a class="reference internal" href="#Architecture_Overview"><span class="xref myst">modules</span></a> of the platform. An OpenTera server cannot exist without that service!</p>
 <section id="main-script">
-<h3>Main script<a class="headerlink" href="#main-script" title="Permalink to this heading"></a></h3>
+<h2>Main script<a class="headerlink" href="#main-script" title="Permalink to this heading"></a></h2>
 <p>The TeraServer service can be launched by running the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/TeraServer.py">TeraServer.py</a> script.</p>
 </section>
 <section id="configuration">
-<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h3>
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
 <p>Configuration files for the TeraServer service are described <a class="reference internal" href="#Configuration-files"><span class="xref myst">here</span></a>.</p>
 </section>
 <section id="default-port-and-location">
-<h3>Default port and location<a class="headerlink" href="#default-port-and-location" title="Permalink to this heading"></a></h3>
+<h2>Default port and location<a class="headerlink" href="#default-port-and-location" title="Permalink to this heading"></a></h2>
 <p>By default, the service will listen to port 4040 (non-ssl) and will be at the root of the web server url (/).</p>
 </section>
 <section id="web-urls">
-<h3>Web URLs<a class="headerlink" href="#web-urls" title="Permalink to this heading"></a></h3>
+<h2>Web URLs<a class="headerlink" href="#web-urls" title="Permalink to this heading"></a></h2>
 <p><strong>About page</strong> - by default at https://127.0.0.1:40075/about. Will display the about page of the server, including the version and possible <a class="reference external" href="https://github.com/introlab/openteraplus">OpenTeraPlus</a> client versions available to download</p>
 <p><strong>Doc page</strong> - by default at https://127.0.0.1:400075/doc. Will display the <a class="reference internal" href="#API"><span class="xref myst">REST API</span></a> documentation and test system. Useful to test queries manually.</p>
-</section>
 </section>
 </section>
 
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../services.html" class="btn btn-neutral float-left" title="Services" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="OpenTera_AccessRoles.html" class="btn btn-neutral float-right" title="Access Roles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

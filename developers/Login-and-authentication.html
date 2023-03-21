@@ -5,20 +5,22 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Authentication &mdash; OpenTera 1.2.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
+    <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Message wrappers" href="Messages-structure.html" />
+    <link rel="prev" title="Basic features of the internal communication module" href="Internal-services-communication-module.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -29,22 +31,57 @@
 
           
           
-          <a href="index.html" class="icon icon-home">
+          <a href="../index.html" class="icon icon-home">
             OpenTera
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation for developers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Authentication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#user-api">User API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#participant-api">Participant API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#device-api">Device API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#service-api">Service API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#login">Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Message wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -53,17 +90,17 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">OpenTera</a>
+          <a href="../index.html">OpenTera</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Authentication</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/Login-and-authentication.md.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/developers/Login-and-authentication.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -83,7 +120,7 @@
 <section id="user-api">
 <h2>User API<a class="headerlink" href="#user-api" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>HTTP Basic Auth</strong>: Using username and password authentication, the requester can be identified and allowed (or not) to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications for security purpose when <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">deploying to a server</span></a></p></li>
+<li><p><strong>HTTP Basic Auth</strong>: Using username and password authentication, the requester can be identified and allowed (or not) to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications for security purpose when <a class="reference internal" href="#Deployment"><span class="xref myst">deploying to a server</span></a></p></li>
 <li><p><strong>Token Bearer</strong>: Using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header in a request, it is possible to use a token for authentication instead of the standard username-password authentication:</p>
 <ul>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">&lt;type&gt;</span></code> value must be set to <code class="docutils literal notranslate"><span class="pre">OpenTera</span></code> and the <code class="docutils literal notranslate"><span class="pre">&lt;credentials&gt;</span></code> must contain a valid token.</p></li>
@@ -96,7 +133,7 @@
 <section id="participant-api">
 <h2>Participant API<a class="headerlink" href="#participant-api" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>HTTP Basic Auth</strong>: Using username and password authentication, the requester can be identified and allowed (or not) to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications for security purpose when <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">deploying to a server</span></a>.</p>
+<li><p><strong>HTTP Basic Auth</strong>: Using username and password authentication, the requester can be identified and allowed (or not) to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications for security purpose when <a class="reference internal" href="#Deployment"><span class="xref myst">deploying to a server</span></a>.</p>
 <ul>
 <li><p><strong>For participants, that authentication scheme is optional</strong>. If no username and password are defined or if the <code class="docutils literal notranslate"><span class="pre">participant_login_enabled</span></code> is set to <code class="docutils literal notranslate"><span class="pre">false</span></code> for a specific participant (see <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database objects</span></a>, this scheme will not work.</p></li>
 </ul>
@@ -151,7 +188,7 @@
 <h1>Login<a class="headerlink" href="#login" title="Permalink to this heading"></a></h1>
 <p>Even if the replies can vary a little depending on the <a class="reference internal" href="#API"><span class="xref myst">API level</span></a> being accessed, the login process is similar in each case. The login process is needed to get the <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket</span></a>, basic information about the logged on object and to get a dynamic token, if required, depending on the API level (see above).</p>
 <p>Depending on the authentication scheme and the application, the login process might be optional. Without logging in, as long as the authentication scheme is respected, all API calls can proceed.</p>
-<p><strong>Important note</strong>: A user, participant or device will not come online in regards to the <a class="reference internal" href="UserManager-module.html"><span class="doc std std-doc">User Manager Module</span></a> unless a <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket connection</span></a> is established. This is by design and by the fact that the REST API, by definition, is a stateless and asynchronous system, and thus OpenTera doesn’t have any way to know if a user, participant or device is still there at the other end.</p>
+<p><strong>Important note</strong>: A user, participant or device will not come online in regards to the <a class="reference internal" href="#UserManager-module"><span class="xref myst">User Manager Module</span></a> unless a <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket connection</span></a> is established. This is by design and by the fact that the REST API, by definition, is a stateless and asynchronous system, and thus OpenTera doesn’t have any way to know if a user, participant or device is still there at the other end.</p>
 <p>The login process can be summarized as:</p>
 <ol class="arabic simple">
 <li><p>Make a request with the correct authentication scheme to the <code class="docutils literal notranslate"><span class="pre">login</span></code> <a class="reference internal" href="#API"><span class="xref myst">API</span></a></p></li>
@@ -164,7 +201,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Internal-services-communication-module.html" class="btn btn-neutral float-left" title="Basic features of the internal communication module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Messages-structure.html" class="btn btn-neutral float-right" title="Message wrappers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

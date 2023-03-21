@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenTera Service access roles &mdash; OpenTera 1.2.0 documentation</title>
+  <title>Access Roles &mdash; OpenTera 1.2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -42,26 +42,57 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Security.html">Security</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation for developers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../Home.html">Welcome to the OpenTera Wiki!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OpenTera_Services.html">OpenTera Services Structure</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../services.html">Services</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../Service-Creation.html">Creating a new service based on OpenTera</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../Services-Access.html">Services Access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../OpenTera_Services.html">OpenTera Services Structure</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="teraserver.html">TeraServer</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">OpenTera Service access roles</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Access Roles</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#users">Users</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data-access">Data access</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#features">Features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#participants">Participants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#devices">Devices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#services">Services</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="api/API.html">REST API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/API.html">Using REST API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/api_doc.html">API Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="teraserver.html#teraserver-service">TeraServer Service</a></li>
 </ul>
 </li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Login-and-authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Login-and-authentication.html#login">Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Messages-structure.html">Message wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Websockets-communication.html">Websockets management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -80,7 +111,7 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../services.html">Services</a></li>
           <li class="breadcrumb-item"><a href="teraserver.html">TeraServer</a></li>
-      <li class="breadcrumb-item active">OpenTera Service access roles</li>
+      <li class="breadcrumb-item active">Access Roles</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/services/teraserver/OpenTera_AccessRoles.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -90,12 +121,20 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="opentera-service-access-roles">
-<h1>OpenTera Service access roles<a class="headerlink" href="#opentera-service-access-roles" title="Permalink to this heading"></a></h1>
+  <section id="access-roles">
+<h1>Access Roles<a class="headerlink" href="#access-roles" title="Permalink to this heading"></a></h1>
+<p>OpenTera access to <a class="reference internal" href="#API"><span class="xref myst">REST API</span></a> is limited depending on the role the currently logged on usertype (user, participant, device, service) has for a specific service.</p>
+<p>Since the core module of OpenTera (TeraServer) is basically a service by itself, it defines its own access levels based on projects and sites objects (see <a class="reference internal" href="#Database-Structure"><span class="xref myst">database objects</span></a> for more information on those objects). Thus, it adheres to the <a class="reference internal" href="#Services-Access"><span class="xref myst">service-role model</span></a>.</p>
+<p>As users, participants, devices and services only have access to their particular API, roles are not defined the same depending on the API.</p>
+<p>The tables below use this legend:</p>
+<p><img alt=" True" src="../../_images/on_.png" /> : Role has access to that feature</p>
+<p><img alt="False" src="../../_images/off.png" /> : Role doesn’t has access to that feature</p>
+<p><img alt="Limit" src="../../_images/lim.png" /> : Role has limited access to this feature. Typically, in case of an update, only certain fields can be modified.</p>
+<hr class="docutils" />
+<section id="users">
+<h2>Users<a class="headerlink" href="#users" title="Permalink to this heading"></a></h2>
 <p>This table shows the various features that are available according the user groups access level, and for super admin access.</p>
-<p><img alt=" True" src="../../_images/on_1.png" /> : Role has access to that feature</p>
-<p><img alt="False" src="../../_images/off1.png" /> : Role doesn’t has access to that feature</p>
-<p><img alt="Limit" src="../../_images/lim1.png" /> : Role has limited access to this feature. Typically, in case of an update, only certain fields can be modified.</p>
+</section>
 <section id="data-access">
 <h2>Data access<a class="headerlink" href="#data-access" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
@@ -110,354 +149,354 @@
 </thead>
 <tbody>
 <tr class="row-even"><td class="text-left"><p><strong>Assets</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Assets</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Assets</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Assets</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Devices</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Devices</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Devices</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="Limit" src="../../_images/lim1.png" /></p></td>
-<td class="text-center"><p><img alt="Limit" src="../../_images/lim1.png" /></p></td>
-<td class="text-center"><p><img alt="Limit" src="../../_images/lim1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="Limit" src="../../_images/lim.png" /></p></td>
+<td class="text-center"><p><img alt="Limit" src="../../_images/lim.png" /></p></td>
+<td class="text-center"><p><img alt="Limit" src="../../_images/lim.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Devices</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Participant Groups</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Participant Groups</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Participant Groups</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Participant Groups</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Participants</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Participants</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Participants</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Participants</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Projects</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Projects</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="Limit" src="../../_images/lim1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="Limit" src="../../_images/lim.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Projects</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Projects</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Services</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Services</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Services</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Services</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Sessions</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Sessions</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Sessions</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Sessions</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Sessions Types</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Sessions Types</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Sessions Types</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Sessions Types</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Sessions Events</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Sessions Events</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Sessions Events</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Sessions Events</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Sites</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Sites</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="Limit" src="../../_images/lim1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="Limit" src="../../_images/lim.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Sites</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Sites</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>System Services</strong></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>System Service: Logger</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Users</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/lim1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/lim.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Users</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Users</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/lim1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/lim.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Users</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/lim1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/lim.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>User Groups</strong>: Create</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>User Groups</strong>: Read</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>User Groups</strong>: Update</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>User Groups</strong>: Delete</p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt="False" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt="False" src="../../_images/off.png" /></p></td>
 </tr>
 </tbody>
 </table>
@@ -480,130 +519,130 @@
 </thead>
 <tbody>
 <tr class="row-even"><td class="text-left"><p><strong>Data entry forms request</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Device - Participant assignation</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Device - Project assignation</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Device - Site assignation</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Login</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Logout</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Online users list</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Online participants list</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Manage project access</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Manage services roles</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Manage site access</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Service configuration (self)</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Service configuration (others)</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Service - Project assignation</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Session Type - Device Type assignation</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Session Type - Project assignation</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/off1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/off.png" /></p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Statistics module</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>Managing sessions start/stop/resume</strong></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
-<td class="text-center"><p><img alt=" True" src="../../_images/on_1.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
+<td class="text-center"><p><img alt=" True" src="../../_images/on_.png" /></p></td>
 </tr>
 </tbody>
 </table>
@@ -611,6 +650,24 @@
 <p>[2] Super admins always have a <strong>Site Role: Admin</strong> on all sites in the system</p>
 <p>[3] Any user group with a role in a project automatically have a <strong>Site Role: User</strong> access</p>
 <p>[4] Any user group with a <strong>Site Role: Admin</strong> automatically have a <strong>Project Role: Admin</strong></p>
+</section>
+<hr class="docutils" />
+<section id="participants">
+<h2>Participants<a class="headerlink" href="#participants" title="Permalink to this heading"></a></h2>
+<p>Access roles for participants are quite simpler than the users access roles. A participant only has access to objects that are directly linked to them. For example, a participant can only query the devices and sessions that are associated to it.</p>
+<p>No write access is provided as of now to those objects, while this will change in the future.</p>
+</section>
+<hr class="docutils" />
+<section id="devices">
+<h2>Devices<a class="headerlink" href="#devices" title="Permalink to this heading"></a></h2>
+<p>A device only has access to objects that are directly linked to them. For example, a device can only query the participants associated to it or the sessions into which the device was involved.</p>
+<p>Similarly, a device can only create data related to an object linked to it. For example, it can only create assets for a session into which it was involved.</p>
+</section>
+<hr class="docutils" />
+<section id="services">
+<h2>Services<a class="headerlink" href="#services" title="Permalink to this heading"></a></h2>
+<p>Services don’t have specific roles. As they likely require more access than a user, a participant or a device, they don’t have any specific limitation based on roles on what they can do with their API.</p>
+<p>Of course, not all objects are exposed with the service API, and <a class="reference internal" href="#Login-and-authentification"><span class="xref myst">login and authentication mecanisms</span></a> are still required to access that API to limit access to those features.</p>
 </section>
 </section>
 

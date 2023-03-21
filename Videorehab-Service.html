@@ -40,11 +40,40 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Security.html">Security</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation for developers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html#login">Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Message wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -77,7 +106,7 @@
 <p>When requested to launch a video rehab session, this service will spawn a <code class="docutils literal notranslate"><span class="pre">Node</span></code> process for each of the session, creating isolated sessions and ensuring that only the invitees can access that session.</p>
 <section id="main-script">
 <h2>Main script<a class="headerlink" href="#main-script" title="Permalink to this heading"></a></h2>
-<p>The VideoRehab service can be launched by running the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/services/VideoRehabService/VideoRehabService.py">VideoRehabService.py</a> script. As a system service, it is also launched automatically when running the <a class="reference internal" href="TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a></p>
+<p>The VideoRehab service can be launched by running the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/services/VideoRehabService/VideoRehabService.py">VideoRehabService.py</a> script. As a system service, it is also launched automatically when running the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a></p>
 </section>
 <section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
@@ -87,7 +116,7 @@
 <p>The <code class="docutils literal notranslate"><span class="pre">WebRTC</span></code> section in the configuration file specifies the parameters required to launch the WebRTC framework.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">hostname</span></code>: the <strong>external</strong> hostname that will be used to connect to the WebRTC signaling server (Open-EasyRTC). It is important to use the external url, since that hostname will be sent and used by the clients (browsers) to establish the WebRTC connection.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">external_port</span></code>: the <strong>external</strong> port on which the WebRTC signaling server can be reached. In its default configuration, it is set to the same port as the <a class="reference internal" href="TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a> (40075)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">external_port</span></code>: the <strong>external</strong> port on which the WebRTC signaling server can be reached. In its default configuration, it is set to the same port as the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a> (40075)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">local_base_port</span></code>: the <strong>internal</strong> port on which the WebRTC signaling server will listen. This is the base port: each new session will listen to a port number on the range <code class="docutils literal notranslate"><span class="pre">local_base_port</span></code> to <code class="docutils literal notranslate"><span class="pre">local_base_port</span> <span class="pre">+</span> <span class="pre">max_sessions</span></code>. Since the NGINX router will probably redirects the external connection to the appropriate internal port (see below), there is no need to open those ports externally.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">max_sessions</span></code>: the maximum number of parallel sessions. This is linked to the local port ranges that could be opened (see <code class="docutils literal notranslate"><span class="pre">local_base_port</span></code>), but can also be used to limit the load of a specific server.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">working_directory</span></code>: the base directory for the signaling server</p></li>
@@ -98,7 +127,7 @@
 </section>
 <section id="service-setup">
 <h2>Service setup<a class="headerlink" href="#service-setup" title="Permalink to this heading"></a></h2>
-<p>As this service relies on Node.js and external scripts, it is required to setup the environment of that service before using it. See <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">server deployment</span></a> and the <a class="reference internal" href="Developers.html"><span class="doc std std-doc">developers</span></a> sections for more information on how to properly setup that environment.</p>
+<p>As this service relies on Node.js and external scripts, it is required to setup the environment of that service before using it. See <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">server deployment</span></a> and the <a class="reference internal" href="#Developers"><span class="xref myst">developers</span></a> sections for more information on how to properly setup that environment.</p>
 </section>
 <section id="default-port-and-location">
 <h2>Default port and location<a class="headerlink" href="#default-port-and-location" title="Permalink to this heading"></a></h2>
@@ -120,7 +149,7 @@
 </section>
 <section id="rpc-api">
 <h2>RPC API<a class="headerlink" href="#rpc-api" title="Permalink to this heading"></a></h2>
-<p>This service uses the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">asynchronous communication system</span></a>, but also provides the following RPC API:</p>
+<p>This service uses the <a class="reference internal" href="#Internal-services-communication-module"><span class="xref myst">asynchronous communication system</span></a>, but also provides the following RPC API:</p>
 <section id="session-manage">
 <h3><code class="docutils literal notranslate"><span class="pre">session_manage</span></code><a class="headerlink" href="#session-manage" title="Permalink to this heading"></a></h3>
 <section id="description">
@@ -176,15 +205,15 @@
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">status</span></code></strong> (string): the status of the action command:</p>
 <ul>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">error</span></code></strong>: an error occurred. See the field <code class="docutils literal notranslate"><span class="pre">error_text</span></code> for a description of the error.</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">started</span></code></strong>: the session was properly started. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database model</span></a>), with the following added fields:</p>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">started</span></code></strong>: the session was properly started. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database model</span></a>), with the following added fields:</p>
 <ul>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">session_url_users</span></code>, <code class="docutils literal notranslate"><span class="pre">session_url_participants</span></code>, <code class="docutils literal notranslate"><span class="pre">session_url_devices</span></code></strong>: the URLs used to connect to the session for users, participants and devices.</p></li>
 </ul>
 </li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">stopped</span></code></strong>: the session was properly stopped. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">invited</span></code></strong>: the invitations for the session were properly sent. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">removed</span></code></strong>: the specified invitees were properly removed from the session. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">OK</span></code></strong>: the session invitation reply was properly managed. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">stopped</span></code></strong>: the session was properly stopped. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database model</span></a>).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">invited</span></code></strong>: the invitations for the session were properly sent. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database model</span></a>).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">removed</span></code></strong>: the specified invitees were properly removed from the session. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database model</span></a>).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">OK</span></code></strong>: the session invitation reply was properly managed. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database model</span></a>).</p></li>
 </ul>
 </li>
 </ul>

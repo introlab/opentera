@@ -18,7 +18,9 @@
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration files" href="Configuration-files.html" />
+    <link rel="prev" title="Security" href="Security.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,11 +42,50 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Security.html">Security</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deploying OpenTera on a server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pre-requisites">Pre-requisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#postgresql">Postgresql</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#nginx-configuration">nginx configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#service-configuration">Service configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation for developers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html#login">Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Message wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -77,10 +118,10 @@
 <section id="pre-requisites">
 <h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this heading"></a></h2>
 <p>This section configures the depending packages and software before installing the main OpenTera server.</p>
-<hr class="docutils" />
+<hr>
 <section id="postgresql">
 <h3>Postgresql<a class="headerlink" href="#postgresql" title="Permalink to this heading"></a></h3>
-<hr class="docutils" />
+<hr>
 <ol class="arabic">
 <li><p>Install Postgresql package: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">postgresql</span></code></p></li>
 <li><p>Change default <code class="docutils literal notranslate"><span class="pre">postgres</span></code> user password for a more secure installation:</p>
@@ -104,11 +145,9 @@
 </li>
 <li><p>Don’t forget to quit the postgres console: <code class="docutils literal notranslate"><span class="pre">\q</span></code></p></li>
 </ol>
-</section>
-<hr class="docutils" />
-<section id="redis">
-<h3>Redis<a class="headerlink" href="#redis" title="Permalink to this heading"></a></h3>
-<hr class="docutils" />
+<hr>
+### Redis
+<hr>
 <ol class="arabic">
 <li><p>Install redis server: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">redis-server</span></code></p></li>
 <li><p>(Optional, but strongly recommended) Setup a password to the redis server instance:</p>
@@ -119,66 +158,46 @@ Save, close and restart the redis server: `sudo systemctl restart redis.service`
 </div>
 </li>
 </ol>
-</section>
-<hr class="docutils" />
-<section id="nginx">
-<h3>nginx<a class="headerlink" href="#nginx" title="Permalink to this heading"></a></h3>
-<hr class="docutils" />
-<p>Only basic configuration is done here - specific OpenTera configuration is done below</p>
+<hr>
+### nginx
+<hr>
+Only basic configuration is done here - specific OpenTera configuration is done below
 <ol class="arabic simple">
 <li><p>Install nginx: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">nginx</span></code></p></li>
 </ol>
-</section>
-<hr class="docutils" />
-<section id="python-environment-using-miniconda">
-<h3>Python environment (using miniconda)<a class="headerlink" href="#python-environment-using-miniconda" title="Permalink to this heading"></a></h3>
-<hr class="docutils" />
-<ol class="arabic simple">
-<li><p>Follow the instructions <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html">here­</a> to download and install miniconda</p></li>
-<li><p>When requested, execute the <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">init</span></code> command</p></li>
-<li><p>Close your shell and restart it again</p></li>
-</ol>
-</section>
-<hr class="docutils" />
-<section id="build-environment">
-<h3>Build environment<a class="headerlink" href="#build-environment" title="Permalink to this heading"></a></h3>
-<hr class="docutils" />
-<ol class="arabic simple">
-<li><p>Install git: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">git</span></code></p></li>
-<li><p>Install cmake: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">cmake</span></code></p></li>
-<li><p>Install g++: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">g++</span></code></p></li>
-<li><p>Install nodejs / npm: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">npm</span></code></p></li>
-</ol>
-</section>
-</section>
-<hr class="docutils" />
-<section id="opentera-installation">
-<h2>OpenTera installation<a class="headerlink" href="#opentera-installation" title="Permalink to this heading"></a></h2>
+<hr>
+### Python environment (using miniconda)
+<hr>
+1. Follow the instructions [here­](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) to download and install miniconda
+2. When requested, execute the `conda init` command
+3. Close your shell and restart it again
+<hr>
+### Build environment
+<hr>
+1. Install git: `sudo apt-get install git`
+2. Install cmake: `sudo apt-get install cmake`
+3. Install g++: `sudo apt-get install g++`
+4. Install nodejs / npm: `sudo apt-get install npm`
+<hr>
+## OpenTera installation
 <p>This section proceeds to the installation of the OpenTera server</p>
-<hr class="docutils" />
-<section id="installation">
-<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h3>
-<hr class="docutils" />
-<ol class="arabic">
-<li><p>Fetch the OpenTera code with submodules using git: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">--recurse-submodules</span> <span class="pre">https://github.com/introlab/opentera.git</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">opentera/teraserver</span></code> (or the location that you cloned the project)</p></li>
-<li><p>Initialize cmake environment: <code class="docutils literal notranslate"><span class="pre">cmake</span> <span class="pre">.</span></code></p></li>
-<li><p>Generate python environment using make: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">python-all</span></code></p></li>
-<li><p>Generate nodejs environment for VideoRehab service:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">opentera</span><span class="o">/</span><span class="n">teraserver</span><span class="o">/</span><span class="n">easyrtc</span>
-<span class="n">npm</span> <span class="n">install</span>
-</pre></div>
-</div>
-</li>
-</ol>
-</section>
-<hr class="docutils" />
-<section id="configuration">
-<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h3>
-<hr class="docutils" />
-<section id="config-files">
-<h4>Config files<a class="headerlink" href="#config-files" title="Permalink to this heading"></a></h4>
-<p>There is a few config files to edit. You should edit each of them and put the correct parameters, according to your setup and the passwords you’ve set previously. Here is the list of the files:</p>
+<hr>
+### Installation
+<hr>
+1. Fetch the OpenTera code with submodules using git: `git clone --recurse-submodules https://github.com/introlab/opentera.git`
+2. `cd opentera/teraserver` (or the location that you cloned the project)
+3. Initialize cmake environment: `cmake .`
+4. Generate python environment using make: `make python-all`
+5. Generate nodejs environment for VideoRehab service:
+    ```
+    cd opentera/teraserver/easyrtc
+    npm install
+    ```
+<hr>
+### Configuration
+<hr>
+#### Config files
+There is a few config files to edit. You should edit each of them and put the correct parameters, according to your setup and the passwords you've set previously. Here is the list of the files:
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">teraserver/python/config/TeraServerConfig.ini</span></code>: the main config file. “port” and “hostname” shouldn’t be changed.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">teraserver/python/config/nginx.conf</span></code>: nginx config file. Unless listening to a different port and setting correct ssl certificates, nothing should be changed in that file.</p></li>
@@ -186,7 +205,6 @@ Save, close and restart the redis server: `sudo systemctl restart redis.service`
 <li><p><code class="docutils literal notranslate"><span class="pre">teraserver/python/services/LoggingService/LoggingService.json</span></code>: the logging service configuration.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">teraserver/python/services/VideoRehabService/VideoRehabService.json</span></code>: make sure to set the “WebRTC - hostname” value to the external server address.</p></li>
 </ul>
-</section>
 <section id="nginx-configuration">
 <h4>nginx configuration<a class="headerlink" href="#nginx-configuration" title="Permalink to this heading"></a></h4>
 <ol class="arabic simple">
@@ -230,28 +248,20 @@ Save, close and restart the redis server: `sudo systemctl restart redis.service`
 <li><p>Enable service: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">systemctl</span> <span class="pre">enable</span> <span class="pre">opentera.service</span></code></p></li>
 <li><p>Start service: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">systemctl</span> <span class="pre">start</span> <span class="pre">opentera.service</span></code></p></li>
 </ol>
+<hr>
+## Post installation
+Optional post installation steps.
+<hr>
+### Local TURN/STUN server
+<hr>
+TODO. coturn setup instructions.
+<hr>
+### SSL certificate with LetsEncrypt
+<hr>
+1. Install certbot agent: `sudo apt-get install certbot`
+2. Install nginx plugin: `sudo apt-get install python3-certbot-nginx`
+3. Run certbot: `sudo certbot --nginx -d (your_host_name)`
 </section>
-</section>
-</section>
-<hr class="docutils" />
-<section id="post-installation">
-<h2>Post installation<a class="headerlink" href="#post-installation" title="Permalink to this heading"></a></h2>
-<p>Optional post installation steps.</p>
-<hr class="docutils" />
-<section id="local-turn-stun-server">
-<h3>Local TURN/STUN server<a class="headerlink" href="#local-turn-stun-server" title="Permalink to this heading"></a></h3>
-<hr class="docutils" />
-<p>TODO. coturn setup instructions.</p>
-</section>
-<hr class="docutils" />
-<section id="ssl-certificate-with-letsencrypt">
-<h3>SSL certificate with LetsEncrypt<a class="headerlink" href="#ssl-certificate-with-letsencrypt" title="Permalink to this heading"></a></h3>
-<hr class="docutils" />
-<ol class="arabic simple">
-<li><p>Install certbot agent: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">certbot</span></code></p></li>
-<li><p>Install nginx plugin: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python3-certbot-nginx</span></code></p></li>
-<li><p>Run certbot: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">certbot</span> <span class="pre">--nginx</span> <span class="pre">-d</span> <span class="pre">(your_host_name)</span></code></p></li>
-</ol>
 </section>
 </section>
 </section>
@@ -259,7 +269,10 @@ Save, close and restart the redis server: `sudo systemctl restart redis.service`
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Security.html" class="btn btn-neutral float-left" title="Security" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Configuration-files.html" class="btn btn-neutral float-right" title="Configuration files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

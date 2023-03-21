@@ -40,11 +40,40 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Security.html">Security</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation for developers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html#login">Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Message wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -76,7 +105,7 @@
 <p>The file transfer service is provided as a generic file repository service. While other services can also store and manage their own assets (files), this service could also be used instead of implementing a local file manager.</p>
 <section id="main-script">
 <h2>Main script<a class="headerlink" href="#main-script" title="Permalink to this heading"></a></h2>
-<p>The File Transfer service can be launched by running the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/services/FileTransferService/FileTransferService.py">FileTransferService.py</a> script. As a system service, it is also launched automatically when running the <a class="reference internal" href="TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a></p>
+<p>The File Transfer service can be launched by running the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/services/FileTransferService/FileTransferService.py">FileTransferService.py</a> script. As a system service, it is also launched automatically when running the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a></p>
 </section>
 <section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>

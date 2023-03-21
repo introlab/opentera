@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to OpenTera’s documentation! &mdash; OpenTera 1.2.0 documentation</title>
+  <title>About OpenTera &mdash; OpenTera 1.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Welcome to the OpenTera Wiki!" href="Home.html" /> 
+    <link rel="next" title="About OpenTera" href="Home.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,11 +41,40 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Security.html">Security</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation for developers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html#login">Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Message wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -62,7 +91,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Welcome to OpenTera’s documentation!</li>
+      <li class="breadcrumb-item active">About OpenTera</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -72,89 +101,140 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="welcome-to-opentera-s-documentation">
-<h1>Welcome to OpenTera’s documentation!<a class="headerlink" href="#welcome-to-opentera-s-documentation" title="Permalink to this heading"></a></h1>
+  <section id="about-opentera">
+<h1>About OpenTera<a class="headerlink" href="#about-opentera" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Home.html#what-is-opentera">What is OpenTera?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Home.html#what-can-opentera-do-for-you">What can OpenTera do for you?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Home.html#references-and-links">References and links</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
-<li class="toctree-l2"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="services/OpenTera_Services.html#general-structure-and-definition">General structure and definition</a></li>
-<li class="toctree-l3"><a class="reference internal" href="services/OpenTera_Services.html#communication-mecanisms">Communication mecanisms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="services/OpenTera_Services.html#system-services">System services</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="services/OpenTera_Services.html#teraserver-service">TeraServer service</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="services/OpenTera_Services.html#services-access-roles">Services Access roles</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="services/OpenTera_Services.html#access-roles-association">Access roles association</a></li>
-<li class="toctree-l4"><a class="reference internal" href="services/OpenTera_Services.html#opentera-projects-and-sites-roles">OpenTera projects and sites roles</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="services/OpenTera_Services.html#services-and-projects-association">Services and projects association</a></li>
-<li class="toctree-l3"><a class="reference internal" href="services/OpenTera_Services.html#services-configuration">Services configuration</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="services/teraserver/teraserver.html">TeraServer</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="services/teraserver/OpenTera_AccessRoles.html">OpenTera Service access roles</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="services/teraserver/OpenTera_AccessRoles.html#data-access">Data access</a></li>
-<li class="toctree-l4"><a class="reference internal" href="services/teraserver/OpenTera_AccessRoles.html#features">Features</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="services/teraserver/api/API.html">REST API</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="services/teraserver/api/API.html#general-structure">General structure</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="services/teraserver/api/API.html#on-a-need-to-know-basis">On a need-to-know basis</a></li>
-<li class="toctree-l5"><a class="reference internal" href="services/teraserver/api/API.html#api-levels">API levels</a></li>
-<li class="toctree-l5"><a class="reference internal" href="services/teraserver/api/API.html#documentation">Documentation</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="services/teraserver/api/API.html#request-basics">Request basics</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="services/teraserver/api/API.html#get">GET</a></li>
-<li class="toctree-l5"><a class="reference internal" href="services/teraserver/api/API.html#post">POST</a></li>
-<li class="toctree-l5"><a class="reference internal" href="services/teraserver/api/API.html#delete">DELETE</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="services/teraserver/api/API.html#further-explanation-on-some-of-the-api-functions">Further explanation on some of the API functions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="services/teraserver/api/api_doc.html">API Documentation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="services/teraserver/api/api_doc.html#user">user</a></li>
-<li class="toctree-l4"><a class="reference internal" href="services/teraserver/api/api_doc.html#device">device</a></li>
-<li class="toctree-l4"><a class="reference internal" href="services/teraserver/api/api_doc.html#participant">participant</a></li>
-<li class="toctree-l4"><a class="reference internal" href="services/teraserver/api/api_doc.html#service">service</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
 </div>
-</section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<hr class="docutils" />
+<p><a class="reference external" href="https://github.com/introlab/opentera/actions"><img alt="Actions Status" src="https://github.com/introlab/opentera/actions/workflows/python-package-pypi.yml/badge.svg" /></a></p>
+<p>OpenTera is a micro-services based backend primarily built to support research projects. Focusing on years in the research field, common features between the different projects emerged:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+<li><p>Data structure: The need to store data in a structured way to ease data analysis</p></li>
+<li><p>Ecological data capture: The need to collect data not only in a laboratory or controlled environment, but also in the home</p></li>
+<li><p>Project adaptability: The need to develop projects specific dashboards while reusing as much as possible of what was done before to reduce development time</p></li>
+<li><p>Security: The need to store and transfer data in a secure and controlled way</p></li>
 </ul>
+<p>To address those common features, OpenTera was designed with an architecture based as much as possible on recognized standards and best practices.</p>
+<section id="what-can-opentera-do-for-you">
+<h2>What can OpenTera do for you?<a class="headerlink" href="#what-can-opentera-do-for-you" title="Permalink to this heading"></a></h2>
+<p>In its essence, OpenTera provides an adaptable data structure on which you can base your developments. With its modular and service-based design, it is possible to tailor specific needs based on the OpenTera framework.</p>
+<p>Applications of the OpenTera backend are not limited to research projects, and could also be applied in a clinical environment, where clinicians have to communicate with patients. Such fields include but are not limited to: tele-rehabilibation (physical, social, mental), robotic tele-operation and remote activity monitoring.</p>
+<p>The OpenTera micro-services structure allows:</p>
+<ul class="simple">
+<li><p>Management of several sites, users, projects, participants, groups of participants, connected devices, sessions, data sources, assets in a structured manner.</p>
+<ul>
+<li><p>We developed a Qt management tool called <a class="reference external" href="https://github.com/introlab/openteraplus">OpenTeraPlus</a>, which is also under developement.</p></li>
+<li><p>A web management interface will be developed in the future.</p></li>
+</ul>
+</li>
+<li><p>Easy and secure deployment on any cloud, dedicated or embedded platform(such as a Raspberry Pi, AWS, Azure)</p></li>
+<li><p>Easy to use for elderly participants (no configuration, interfaces adapted to clients needs).</p></li>
+<li><p>Better collaboration / dissemination for open code.</p></li>
+<li><p>Support for several current and future research projects:</p>
+<ul>
+<li><p><a class="reference external" href="https://regroupementinter.com/">INTER</a> - Tele-Actimetry: connected watches, portable capture devices.</p></li>
+<li><p><a class="reference external" href="https://regroupementinter.com/">INTER</a> - Tele-Rehabilitation: videoconference, management of rehabilitation sessions for participants using tele-rehabilitation.</p></li>
+<li><p><a class="reference external" href="https://regroupementinter.com/">INTER</a> - Active desk: Management of active desks and data visualization in the form of a dashboard.</p></li>
+<li><p><a class="reference external" href="https://regroupementinter.com/">INTER</a> - <a class="reference external" href="https://github.com/introlab/OpenIMU">OpenIMU</a>, <a class="reference external" href="https://github.com/introlab/OpenIMU-MiniLogger">OpenIMU-MiniLogger</a>: Capture, visualization and analysis of data from inertial measurement units.</p></li>
+<li><p><a class="reference external" href="https://agewell-nce.ca/research/research-programs-and-projects">AGEWELL</a> (SMART, <a class="reference external" href="https://github.com/introlab/MOvITPlus">MOvIT+</a>): Tele-presence and assistance of elderly people at home by a mobile robot, and power wheelchairs instrumentation and usage monitoring.</p></li>
+</ul>
+</li>
+</ul>
+<p>You are welcome to participate in this effort. Leave us comments or report <a class="reference external" href="https://github.com/introlab/opentera/issues">Issues</a>.</p>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Dominic Létourneau, ing. M.Sc.A., IntRoLab, Université de Sherbrooke (&#64;doumdi)</p></li>
+<li><p>Simon Brière, ing. M.Sc.A., CDRV, Université de Sherbrooke (&#64;sbriere)</p></li>
+<li><p>François Michaud, ing. Ph.D., IntRoLab, Université de Sherbrooke</p></li>
+<li><p>Michel Tousignant, pht, Ph.D., CDRV, Université de Sherbrooke</p></li>
+</ul>
+</section>
+<section id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Philippe Arsenault</p></li>
+<li><p>Cédric Godin</p></li>
+<li><p>Marc-Antoine Maheux</p></li>
+<li><p>Cynthia Vilanova</p></li>
+</ul>
+</section>
+<section id="publication-s">
+<h2>Publication(s)<a class="headerlink" href="#publication-s" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Panchea, A.M., Létourneau, D., Brière, S. et al., <a class="reference external" href="https://rdcu.be/cHzmf">OpenTera: A microservice architecture solution for rapid prototyping of robotic solutions to COVID-19 challenges in care facilities</a>,  Health Technol. 12, 583–596 (2022)</p></li>
+</ul>
+</section>
+<section id="videos">
+<h2>Videos<a class="headerlink" href="#videos" title="Permalink to this heading"></a></h2>
+<section id="opentera-telehealth-platform">
+<h3>OpenTera Telehealth Platform<a class="headerlink" href="#opentera-telehealth-platform" title="Permalink to this heading"></a></h3>
+<p><a class="reference external" href="https://youtu.be/s5XVIDCP8_s"><img alt="OpenTera Telehealth Platform" src="https://img.youtube.com/vi/s5XVIDCP8_s/maxresdefault.jpg" /></a></p>
+</section>
+<section id="opentera-clinical-telehealth-software">
+<h3>OpenTera+ Clinical Telehealth Software<a class="headerlink" href="#opentera-clinical-telehealth-software" title="Permalink to this heading"></a></h3>
+<p><a class="reference external" href="https://youtu.be/4YMKSUE6xJs"><img alt="OpenTera+ Clinical Telehealth Software" src="https://img.youtube.com/vi/4YMKSUE6xJs/maxresdefault.jpg" /></a></p>
+</section>
+</section>
+<section id="documentation-and-getting-started">
+<h2>Documentation and getting started<a class="headerlink" href="#documentation-and-getting-started" title="Permalink to this heading"></a></h2>
+<p>Detailled information is available in the <a class="reference external" href="https://introlab.github.io/opentera/">docs</a></p>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this heading"></a></h2>
+<p>OpenTera is licensed under <a class="reference external" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License 2.0</a> .</p>
+</section>
+<section id="related-open-source-projects">
+<h2>Related Open Source Projects<a class="headerlink" href="#related-open-source-projects" title="Permalink to this heading"></a></h2>
+<section id="general">
+<h3>General<a class="headerlink" href="#general" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/introlab/openteraplus">OpenTeraPlus Desktop Application</a></p></li>
+<li><p><a class="reference external" href="https://github.com/introlab/opentera-webportal-service">OpenTera WebPortal Service</a></p></li>
+</ul>
+</section>
+<section id="robots">
+<h3>Robots<a class="headerlink" href="#robots" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/introlab/webrtc-native-build">WebRTC Native Libraries</a></p></li>
+<li><p><a class="reference external" href="https://github.com/introlab/opentera-webrtc">OpenTera WebRTC Libraries</a></p></li>
+<li><p><a class="reference external" href="https://github.com/introlab/opentera-webrtc-ros">OpenTera WebRTC ROS Client and Nodes</a></p></li>
+<li><p><a class="reference external" href="https://github.com/introlab/opentera-teleop-service">OpenTera Teleoperation Service</a></p></li>
+<li><p><a class="reference external" href="https://github.com/introlab/opentera-webrtc-teleop-frontend">OpenTera WebRTC Teleoperation Frontend</a></p></li>
+</ul>
+</section>
+</section>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading"></a></h2>
+<p>OpenTera is based or uses the following Open Source technologies :</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.python.org">Python 3.8+, PSFL (BSD like)</a></p></li>
+<li><p><a class="reference external" href="http://flask.pocoo.org">Flask, BSD</a></p></li>
+<li><p><a class="reference external" href="https://redislabs.com/why-redis/">Redis, BSD</a></p></li>
+<li><p><a class="reference external" href="https://github.com/fiorix/txredisapi">txredisapi, Apache License 2.0</a></p></li>
+<li><p><a class="reference external" href="https://www.sqlalchemy.org">SQLAlchemy, MIT</a></p></li>
+<li><p><a class="reference external" href="https://twistedmatrix.com">Twisted, MIT</a></p></li>
+<li><p><a class="reference external" href="https://www.postgresql.org">PostgreSQL,  PostgreSQL License(MIT/BSD like)</a></p></li>
+<li><p><a class="reference external" href="https://nodejs.org/en/">Node.js, Node license</a></p></li>
+</ul>
+</section>
+<section id="id1">
+<h2><a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Home.html" class="btn btn-neutral float-right" title="Welcome to the OpenTera Wiki!" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Home.html" class="btn btn-neutral float-right" title="About OpenTera" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

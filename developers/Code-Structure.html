@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code structure &mdash; OpenTera 1.2.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Database Structure" href="Database-Structure.html" />
+    <link rel="prev" title="Creating a new service based on OpenTera" href="../services/Service-Creation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenTera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation for developers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Code structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#root">Root</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#source-folder">Source folder</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#opentera-source-code-structure"><span class="xref myst">OpenTera source code structure</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html#login">Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Message wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenTera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Code structure</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/developers/Code-Structure.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="code-structure">
+<h1>Code structure<a class="headerlink" href="#code-structure" title="Permalink to this heading"></a></h1>
+<p>The OpenTera project is logically organized into folders based on the <a class="reference internal" href="#Architecture-Overview"><span class="xref myst">architecture</span></a> of the platform.</p>
+<section id="root">
+<h2>Root<a class="headerlink" href="#root" title="Permalink to this heading"></a></h2>
+<p>At the root of the project:</p>
+<ul class="simple">
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/docker"><code class="docutils literal notranslate"><span class="pre">docker</span></code></a></strong> containing the <a class="reference external" href="https://www.docker.com/">docker</a> files used to <a class="reference internal" href="#Deployment"><span class="xref myst">deploy in a docker environment</span></a></p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver"><code class="docutils literal notranslate"><span class="pre">teraserver</span></code></a></strong> containing the OpenTera source files</p></li>
+</ul>
+</section>
+<section id="source-folder">
+<h2><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver">Source folder</a><a class="headerlink" href="#source-folder" title="Permalink to this heading"></a></h2>
+<p>The base source folder contains the following folders:</p>
+<ul class="simple">
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/docs"><code class="docutils literal notranslate"><span class="pre">docs</span></code></a></strong> containing the current database graph and other more dynamic documentation elements not covered in this wiki</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/easyrtc"><code class="docutils literal notranslate"><span class="pre">easyrtc</span></code></a></strong> containing the <a class="reference internal" href="#Videorehab-Service"><span class="xref myst">video rehab service</span></a> web files used by the WebRTC subsystem</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/linux"><code class="docutils literal notranslate"><span class="pre">linux</span></code></a></strong> containing sample services files to be used when <a class="reference internal" href="#Deployment"><span class="xref myst">deploying on a server</span></a></p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python"><code class="docutils literal notranslate"><span class="pre">python</span></code></a></strong> containing the main OpenTera source code (see below)</p></li>
+</ul>
+<section id="opentera-source-code-structure">
+<h3><a class="reference internal" href="#TeraServer-Service"><span class="xref myst">OpenTera source code structure</span></a><a class="headerlink" href="#opentera-source-code-structure" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/alembic"><code class="docutils literal notranslate"><span class="pre">alembic</span></code></a></strong> containing the <a class="reference external" href="https://alembic.sqlalchemy.org">Alembic</a> versions used when upgrading the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database structure</span></a></p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/certificates"><code class="docutils literal notranslate"><span class="pre">certificates</span></code></a></strong> used to store signing certificates for devices and, optionally, external certificates used by NGINX</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/config"><code class="docutils literal notranslate"><span class="pre">config</span></code></a></strong> containing the NGINX config files</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/docker"><code class="docutils literal notranslate"><span class="pre">docker</span></code></a></strong> containing the <a class="reference external" href="https://www.docker.com/">docker</a> files used to <a class="reference internal" href="#Deployment"><span class="xref myst">deploy in a docker environment</span></a></p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/env"><code class="docutils literal notranslate"><span class="pre">env</span></code></a></strong> containing the <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file used to <a class="reference internal" href="Developers.html"><span class="doc std std-doc">generate the python environment</span></a>. Will also holds the generated environment.</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/examples"><code class="docutils literal notranslate"><span class="pre">examples</span></code></a></strong> containing some python client examples</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/modules"><code class="docutils literal notranslate"><span class="pre">modules</span></code></a></strong> containing the source codes of each of the <a class="reference internal" href="#Architecture-Overview"><span class="xref myst">various modules part of the OpenTera platform</span></a>.</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/opentera"><code class="docutils literal notranslate"><span class="pre">opentera</span></code></a></strong> containing the common classes that can be needed for the various <a class="reference internal" href="#Architecture-Overview"><span class="xref myst">services</span></a> and useful when <a class="reference internal" href="#Service-Creation"><span class="xref myst">creating new services</span></a>. This folder contains the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database models</span></a>, the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication module</span></a> and the <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">communication messages structure</span></a>.</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/services"><code class="docutils literal notranslate"><span class="pre">services</span></code></a></strong> containing the various <a class="reference internal" href="#Architecture-Overview"><span class="xref myst">system services</span></a> of the OpenTera platform.</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/static"><code class="docutils literal notranslate"><span class="pre">static</span></code></a> and <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/templates"><code class="docutils literal notranslate"><span class="pre">templates</span></code></a></strong> containing the static assets and templates to display the server information page (“about”) and <a class="reference internal" href="#API"><span class="xref myst">API</span></a> documentation page.</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/tests"><code class="docutils literal notranslate"><span class="pre">tests</span></code></a></strong> containing the <a class="reference internal" href="Running-tests.html"><span class="doc std std-doc">unit tests</span></a> used in the development process.</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/tools"><code class="docutils literal notranslate"><span class="pre">tools</span></code></a></strong> containing stand-alone scripts that can be used as various tools (such as importing data from another system)</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/translations"><code class="docutils literal notranslate"><span class="pre">translations</span></code></a></strong> containing the <a class="reference internal" href="Translations.html"><span class="doc std std-doc">translations files</span></a> of the system</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../services/Service-Creation.html" class="btn btn-neutral float-left" title="Creating a new service based on OpenTera" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Database-Structure.html" class="btn btn-neutral float-right" title="Database Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Simon Brière, Dominic Létourneau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

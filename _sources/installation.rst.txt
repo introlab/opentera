@@ -5,7 +5,7 @@ Installation
    :maxdepth: 2
    :caption: Installation
 
-   Developer-Setup-for-Windows
-   Developer-Setup-for-Linux
-   Developer-Setup-for-Mac
+   developers/Developer-Setup-for-Windows
+   developers/Developer-Setup-for-Linux
+   developers/Developer-Setup-for-Mac
 

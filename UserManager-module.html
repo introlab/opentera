@@ -40,11 +40,40 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Security.html">Security</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation for developers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html#login">Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Message wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -71,12 +100,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <p>The user manager module acts as a central registry for the various connected user types (users, participants, devices). It tracks their current status in the system and can be queried using the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">RPC</span></a> communication system.</p>
+  <p>The user manager module acts as a central registry for the various connected user types (users, participants, devices). It tracks their current status in the system and can be queried using the <a class="reference internal" href="#Internal-services-communication-module"><span class="xref myst">RPC</span></a> communication system.</p>
 <section id="states-and-tracked-information">
 <h1>States and tracked information<a class="headerlink" href="#states-and-tracked-information" title="Permalink to this heading"></a></h1>
 <ul class="simple">
-<li><p><strong>Online</strong> state indicates that the specific object type (user, participant, device) has an active <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket connection</span></a>. If the object hasn’t established any persistent connection (when only using the <a class="reference internal" href="#API"><span class="xref myst">REST API</span></a> for example), it will <strong>not appear online</strong>. It monitors the <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">UserEvent, DeviceEvent and ParticipantEvent messages</span></a> to update this state.</p></li>
-<li><p><strong>Busy</strong> state indicated that the specific object type (user, participant, device) is currently in an active live session. It monitors the <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">JoinSessionEvent, StopSessionEvent, LeaveSessionEvent and JoinSessionReplyEvent</span></a> to update this state.</p></li>
+<li><p><strong>Online</strong> state indicates that the specific object type (user, participant, device) has an active <a class="reference internal" href="#Websockets-communication"><span class="xref myst">websocket connection</span></a>. If the object hasn’t established any persistent connection (when only using the <a class="reference internal" href="#API"><span class="xref myst">REST API</span></a> for example), it will <strong>not appear online</strong>. It monitors the <a class="reference internal" href="#Messages-structure"><span class="xref myst">UserEvent, DeviceEvent and ParticipantEvent messages</span></a> to update this state.</p></li>
+<li><p><strong>Busy</strong> state indicated that the specific object type (user, participant, device) is currently in an active live session. It monitors the <a class="reference internal" href="#Messages-structure"><span class="xref myst">JoinSessionEvent, StopSessionEvent, LeaveSessionEvent and JoinSessionReplyEvent</span></a> to update this state.</p></li>
 <li><p><strong>Status</strong> state provide additional information related to an object, such as battery level or specific position in an environment. This is currently implemented as a JSON formatted string, so that each object can provides various status states depending on their type and needs.</p></li>
 </ul>
 </section>

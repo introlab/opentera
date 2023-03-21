@@ -18,7 +18,9 @@
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Deploying OpenTera on a server" href="Deployment.html" />
+    <link rel="prev" title="OpenTera Architecture Overview" href="Architecture-Overview.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,11 +42,48 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Security</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#logins-and-system-access">Logins and system access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ssl-certificates">SSL certificates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#websocket-communication">Websocket communication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#video-sessions">Video sessions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#divide-and-conquer">Divide and conquer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#in-conclusion">In conclusion</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation for developers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html#login">Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Message wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -77,20 +116,20 @@
 <p>This page presents a brief overview of the security elements that have been put in place in the OpenTera platform.</p>
 <section id="logins-and-system-access">
 <h2>Logins and system access<a class="headerlink" href="#logins-and-system-access" title="Permalink to this heading"></a></h2>
-<p>As presented in the <a class="reference internal" href="Login-and-authentication.html"><span class="doc std std-doc">login and authentication</span></a> section, sensitive parts of the system are secured with a need to authenticate. Furthermore, <a class="reference internal" href="Access-levels-for-user-types.html"><span class="doc std std-doc">access roles</span></a> are defined to further filter out information that cannot be accessed by an end-user that doesn’t have the required access.</p>
+<p>As presented in the <a class="reference internal" href="#Login-and-authentication"><span class="xref myst">login and authentication</span></a> section, sensitive parts of the system are secured with a need to authenticate. Furthermore, <a class="reference internal" href="#Access-levels-for-user-types"><span class="xref myst">access roles</span></a> are defined to further filter out information that cannot be accessed by an end-user that doesn’t have the required access.</p>
 <p>All of that filtering is done on server-side, preventing the clients to even have access to data they are not allowed to.</p>
 <p>While token-based authentication can be used, those tokens are encrypted and validated by the server against tampering, and static tokens have a very limited used (typically to login), requiring the need to use a dynamic token. Thus, in case of a security breach, the static tokens can be easily changed with minimal impact.</p>
 </section>
 <section id="ssl-certificates">
 <h2>SSL certificates<a class="headerlink" href="#ssl-certificates" title="Permalink to this heading"></a></h2>
 <p>All communication occurring from and to the server are encrypted using SSL certificates. Since a single point of entry is used (<a class="reference external" href="https://www.nginx.com/">NGINX</a>), the certificates only needs to be maintained and updated there, easing server maintenance without having to update each of the services and modules certificates individually.</p>
-<p>Except in <a class="reference internal" href="Login-and-authentication.html"><span class="doc std std-doc">special cases</span></a>, the certificates are not used to authenticate the clients, only to encrypt data transfer and to authenticate the server.</p>
+<p>Except in <a class="reference internal" href="#Login-and-authentication"><span class="xref myst">special cases</span></a>, the certificates are not used to authenticate the clients, only to encrypt data transfer and to authenticate the server.</p>
 <p>While self-signed certificates can be used in local and development setup, on a <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">production server</span></a>, certificate-authority issued certificates should be used, especially since most web browsers (and operating systems) refuse to accept self-signed certificates.</p>
 </section>
 <section id="websocket-communication">
 <h2>Websocket communication<a class="headerlink" href="#websocket-communication" title="Permalink to this heading"></a></h2>
 <p>Secure websockets are used and all communication occurring over them are encrypted using the same SSL certificates as above.</p>
-<p>In the <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket connection</span></a> with a client, the websocket listens only for 60 seconds before closing and will be tied to internal session id of the client requesting a websocket, preventing another client to connect on that particular websocket.</p>
+<p>In the <a class="reference internal" href="#Websockets-communication"><span class="xref myst">websocket connection</span></a> with a client, the websocket listens only for 60 seconds before closing and will be tied to internal session id of the client requesting a websocket, preventing another client to connect on that particular websocket.</p>
 </section>
 <section id="video-sessions">
 <h2>Video sessions<a class="headerlink" href="#video-sessions" title="Permalink to this heading"></a></h2>
@@ -116,7 +155,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Architecture-Overview.html" class="btn btn-neutral float-left" title="OpenTera Architecture Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Deployment.html" class="btn btn-neutral float-right" title="Deploying OpenTera on a server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
