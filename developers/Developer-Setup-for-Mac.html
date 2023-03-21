@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started for Developers - Mac OS &mdash; OpenTera 1.2.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenTera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Home.html">Welcome to the OpenTera Wiki!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenTera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting Started for Developers - Mac OS</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/developers/Developer-Setup-for-Mac.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started-for-developers-mac-os">
+<h1>Getting Started for Developers - Mac OS<a class="headerlink" href="#getting-started-for-developers-mac-os" title="Permalink to this heading"></a></h1>
+<section id="pre-requisites">
+<h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this heading"></a></h2>
+<p>To get started on Mac, the following components are needed:</p>
+<ul class="simple">
+<li><p>Latest version of Xcode from the App Store</p></li>
+<li><p><a class="reference external" href="https://git-scm.com">Git</a> required to get the code.</p></li>
+<li><p><a class="reference external" href="https://cmake.org">CMake</a> required to build the python environment and <a class="reference internal" href="#Translations"><span class="xref myst">translations</span></a>.</p></li>
+<li><p><a class="reference external" href="https://conda.io/miniconda.html">Miniconda 3</a> required to build the python environment</p></li>
+<li><p><a class="reference external" href="https://www.postgresql.org/download/">PostgreSQL</a> for the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database backend</span></a></p></li>
+<li><p><a class="reference external" href="https://redislabs.com/">Redis Server</a> for the <a class="reference internal" href="#Internal-services-communication-module"><span class="xref myst">internal communication system</span></a></p></li>
+<li><p><a class="reference external" href="https://nginx.org/en/download.html">NGINX</a> for the system routing</p></li>
+<li><p><a class="reference external" href="https://nodejs.org">Node.js</a> required for the <a class="reference internal" href="#Videorehab-Service"><span class="xref myst">VideoRehab service</span></a></p></li>
+<li><p>(Optional) <a class="reference external" href="https://www.qt.io/download">Qt Creator</a> for a UI to execute the <code class="docutils literal notranslate"><span class="pre">cmake</span></code> command</p></li>
+<li><p>(Optional) <a class="reference external" href="https://www.jetbrains.com/pycharm/">PyCharm</a> for a integrated development environment (IDE) (very recommended, though you could, in theory, use any other IDE or text editor)</p></li>
+</ul>
+<section id="installing-xcode">
+<h3>Installing Xcode<a class="headerlink" href="#installing-xcode" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>Visit <a class="reference external" href="https://apps.apple.com/us/app/xcode/id497799835">the App Store</a> and download the latest Xcode version.</p></li>
+</ul>
+</section>
+<section id="install-homebrew-package-manager">
+<h3>Install Homebrew package manager<a class="headerlink" href="#install-homebrew-package-manager" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>Visit <a class="reference external" href="https://brew.sh/">The Homebrew Page</a> and follow the installation procedure.</p></li>
+</ul>
+</section>
+<section id="installing-git-cmake-and-nodejs">
+<h3>Installing git, cmake and nodejs<a class="headerlink" href="#installing-git-cmake-and-nodejs" title="Permalink to this heading"></a></h3>
+<p>Git is already installed with Xcode. CMake and nodejs can be installed with brew by running the following command in a terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>install<span class="w"> </span>nodejs<span class="w"> </span>cmake
+</pre></div>
+</div>
+</section>
+<section id="installing-miniconda">
+<h3>Installing Miniconda<a class="headerlink" href="#installing-miniconda" title="Permalink to this heading"></a></h3>
+<p>Download and install the latest <a class="reference external" href="https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/macos.html">Miniconda with Python 3.8 for OSX</a>.</p>
+<blockquote>
+<div><p>Make sure you have an installation in the ~/miniconda3 directory.</p>
+</div></blockquote>
+</section>
+<section id="installing-postgresql">
+<h3>Installing PostgreSQL<a class="headerlink" href="#installing-postgresql" title="Permalink to this heading"></a></h3>
+<p>Download and install the latest <a class="reference external" href="https://www.enterprisedb.com/downloads/postgres-postgresql-downloads">PostgreSQL Server</a>.
+Alternatively you can also install it with brew by following <a class="reference external" href="https://wiki.postgresql.org/wiki/Homebrew">these instructions</a>.</p>
+</section>
+<section id="installing-redis-server">
+<h3>Installing Redis Server<a class="headerlink" href="#installing-redis-server" title="Permalink to this heading"></a></h3>
+<p>Simply execute the following command (homebrew must be installed first):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>update
+brew<span class="w"> </span>install<span class="w"> </span>redis
+brew<span class="w"> </span>services<span class="w"> </span>start<span class="w"> </span>redis
+</pre></div>
+</div>
+<p>If you are setting a user and a password, you will need to adjust the <a class="reference internal" href="#Configuration-files"><span class="xref myst">configuration files</span></a> accordingly.</p>
+</section>
+<section id="installing-and-running-nginx">
+<h3>Installing (and running) NGINX<a class="headerlink" href="#installing-and-running-nginx" title="Permalink to this heading"></a></h3>
+<p>Simply execute the following command (homebrew must be installed first):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>install<span class="w"> </span>nginx
+</pre></div>
+</div>
+<p>The nginx server can be started manually when required with the shell script <code class="docutils literal notranslate"><span class="pre">start_nginx.sh</span></code> provided <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/config">here</a>.</p>
+</section>
+<section id="installing-qt-creator">
+<h3>Installing Qt Creator<a class="headerlink" href="#installing-qt-creator" title="Permalink to this heading"></a></h3>
+<p>While this step is optional, it could ease the environment building process.
+When installing Qt, only the Qt Creator is needed for this project. You would, however, include CMake from there or a supported Qt environment if you’re planning to also setup a development environment for <a class="reference external" href="https://github.com/introlab/openteraplus">OpenTeraPlus</a></p>
+</section>
+</section>
+<section id="environment-setup">
+<h2>Environment setup<a class="headerlink" href="#environment-setup" title="Permalink to this heading"></a></h2>
+<p><strong>1. Get the code!</strong></p>
+<p>To get started with this project and develop, clone the project in a working directory.</p>
+<p>If you need a stable branch, you should clone the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch. Otherwise, it is recommended to start and clone the <code class="docutils literal notranslate"><span class="pre">dev</span></code> branch. If using a command line interface, the following command should be used, replacing the <code class="docutils literal notranslate"><span class="pre">&lt;branch&gt;</span></code> tag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="o">--</span><span class="n">recursive</span> <span class="o">-</span><span class="n">b</span> <span class="o">&lt;</span><span class="n">branch</span><span class="o">&gt;</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">introlab</span><span class="o">/</span><span class="n">opentera</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p><strong>2. Generate the Python environment</strong></p>
+<p>CMake is used to generate the python environment. While, in theory, you could create a virtual environment by yourself using the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/env/requirements.txt"><code class="docutils literal notranslate"><span class="pre">requirements</span></code></a> file, it is easier to simply use the cmake tool.</p>
+<p>If you are using Qt Creator and that the CMake tool is properly set up, you should simply be able to <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">CMake</span></code> and then <code class="docutils literal notranslate"><span class="pre">Build</span></code> the project. Make sure that the target <code class="docutils literal notranslate"><span class="pre">python-all</span></code> is specified as the environment will not be properly generated otherwise.</p>
+<p>On a command line interface, the following commands should be used (while in the <code class="docutils literal notranslate"><span class="pre">&lt;base</span> <span class="pre">folder&gt;/teraserver</span></code> directory):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake</span>
+<span class="n">cmake</span> <span class="o">--</span><span class="n">build</span> <span class="o">--</span><span class="n">target</span> <span class="n">python</span><span class="o">-</span><span class="nb">all</span>
+</pre></div>
+</div>
+<p><strong>3. Databases setup</strong></p>
+<p>While the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database structure</span></a> by itself will be auto-generated the first time OpenTera is run, the databases will need to have been created beforehand.</p>
+<ol class="arabic simple">
+<li><p>Open the pgAdmin interface.</p></li>
+<li><p>Login to the database manager using the password specified at the installation
+<img alt=" " src="developers/images/Windows/PGAdmin_pw.PNG" /></p></li>
+<li><p>On the left side, expand the “Servers” section. If required, enter the password again.</p></li>
+</ol>
+<p>The pgAdmin interface will then be ready for the next steps.</p>
+<section id="creating-users">
+<h3>Creating users<a class="headerlink" href="#creating-users" title="Permalink to this heading"></a></h3>
+<p>A single user, <code class="docutils literal notranslate"><span class="pre">teraagent</span></code> with the default password <code class="docutils literal notranslate"><span class="pre">tera</span></code> will need to be created before creating the required databases. A different user and/or a different password could be used, but the <a class="reference internal" href="#Configuration-files"><span class="xref myst">configuration files</span></a> will need to be adjusted accordingly.</p>
+<ol class="arabic simple">
+<li><p>Right-click on the <code class="docutils literal notranslate"><span class="pre">Login/Group</span> <span class="pre">Roles</span></code> section in the left tree of the pgAdmin interface</p></li>
+<li><p>Select <code class="docutils literal notranslate"><span class="pre">Create...</span></code> and then <code class="docutils literal notranslate"><span class="pre">Login/Group</span> <span class="pre">Role...</span></code></p></li>
+<li><p>Fill the following informations in the dialog:</p></li>
+</ol>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">General</span></code> - <code class="docutils literal notranslate"><span class="pre">Name</span></code>: teraagent</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Definition</span></code> - <code class="docutils literal notranslate"><span class="pre">Password</span></code>: tera</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Privileges</span></code> - <code class="docutils literal notranslate"><span class="pre">Can</span> <span class="pre">login</span></code>: On</p></li>
+</ul>
+<ol class="arabic simple" start="4">
+<li><p>Save the dialog</p></li>
+</ol>
+<p>The <code class="docutils literal notranslate"><span class="pre">teraagent</span></code> user should have been created.</p>
+</section>
+<section id="creating-databases">
+<h3>Creating databases<a class="headerlink" href="#creating-databases" title="Permalink to this heading"></a></h3>
+<p>Each system service will requires its own database. The default database that needs to be created are as follow:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">opentera</span></code>, the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a> database</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">openterafiles</span></code>, the database for the <a class="reference internal" href="#FileTransfer-Service"><span class="xref myst">file transfer</span></a> service</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">openteralogs</span></code>, the database for the <a class="reference internal" href="#Logging-Service"><span class="xref myst">logging service</span></a></p></li>
+</ul>
+<p>The steps to create a database are as follow. Those steps should be repeated for each database to create.</p>
+<ol class="arabic simple">
+<li><p>In pgAdmin, under <code class="docutils literal notranslate"><span class="pre">Servers</span></code>, right-click on the correct server instance (for example <code class="docutils literal notranslate"><span class="pre">PostgreSQL</span> <span class="pre">13</span></code>).</p></li>
+<li><p>Select <code class="docutils literal notranslate"><span class="pre">Create...</span></code> and `Database…”</p></li>
+<li><p>Fill the following informations in the dialog:</p></li>
+</ol>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">General</span></code> - <code class="docutils literal notranslate"><span class="pre">Database</span></code>: name of the database to create (see above)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">General</span></code> - <code class="docutils literal notranslate"><span class="pre">Owner</span></code>: teraagent</p></li>
+</ul>
+<ol class="arabic simple" start="4">
+<li><p>Save the dialog</p></li>
+</ol>
+<p><strong>4. Videorehab service setup</strong></p>
+<p>That service requires a node.js environment to be set up.</p>
+<ol class="arabic simple">
+<li><p>In a command line console, <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">&lt;base</span> <span class="pre">folder&gt;/teraserver/easyrtc</span></code></p></li>
+<li><p>Run the <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">install</span></code> command</p></li>
+</ol>
+<p>The node.js environment should then be properly installed.</p>
+<p><strong>5. PyCharm setup (if required)</strong></p>
+<p>If using PyCharm, the correct Python interpreter and environment will need to be set up before being able to properly run the server.</p>
+<ol class="arabic simple">
+<li><p>Open PyCharm, loading the project from <code class="docutils literal notranslate"><span class="pre">&lt;base</span> <span class="pre">folder&gt;/teraserver/python</span></code></p></li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">Files</span> <span class="pre">-&gt;</span> <span class="pre">Settings-&gt;</span> <span class="pre">Project</span> <span class="pre">:</span> <span class="pre">python</span> <span class="pre">-&gt;</span> <span class="pre">Python</span> <span class="pre">Interpreter</span></code>, click on the <code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">all</span></code> option in the selection bar.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">Virtualenv</span></code> tab, choose the existing environment. Change the interpreter to the following :
+<code class="docutils literal notranslate"><span class="pre">...\teraserver\python\env\python-3.8\python</span></code><br />
+The end result should look like this :<br />
+<img alt=" " src="developers/images/Windows/PyCharm.PNG" /></p></li>
+</ol>
+<p><strong>6. Self-signed certificates generation</strong>
+Self-signed certificates should be generated for the development server and to sign device certificates.</p>
+<p>This can simply be done by running the <code class="docutils literal notranslate"><span class="pre">CreatesCertificates.py</span></code> script (directly in PyCharm if configured)</p>
+</section>
+</section>
+<section id="starting-the-main-opentera-service">
+<h2>Starting the main OpenTera service<a class="headerlink" href="#starting-the-main-opentera-service" title="Permalink to this heading"></a></h2>
+<p>If all the configuration was properly done, you should now be able to run the main script, <code class="docutils literal notranslate"><span class="pre">TeraServer.py</span></code>.</p>
+<p>Don’t forget to start the NGINX router beforehand and any other component that were not set to auto-run or as a service.</p>
+<p>If all went well, you should be able to see the <code class="docutils literal notranslate"><span class="pre">About</span></code> page in your browser: <a class="reference external" href="https://localhost:40075/about">https://localhost:40075/about</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Simon Brière, Dominic Létourneau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

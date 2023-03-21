@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deploying OpenTera on a server &mdash; OpenTera 1.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenTera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenTera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Deploying OpenTera on a server</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Deployment.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="deploying-opentera-on-a-server">
+<h1>Deploying OpenTera on a server<a class="headerlink" href="#deploying-opentera-on-a-server" title="Permalink to this heading"></a></h1>
+<p>Those setup instructions suppose a pre-installed and configured Ubuntu 20.04 server installation, either in a virtual machine or on a physical machine.</p>
+<section id="pre-requisites">
+<h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this heading"></a></h2>
+<p>This section configures the depending packages and software before installing the main OpenTera server.</p>
+<hr class="docutils" />
+<section id="postgresql">
+<h3>Postgresql<a class="headerlink" href="#postgresql" title="Permalink to this heading"></a></h3>
+<hr class="docutils" />
+<ol class="arabic">
+<li><p>Install Postgresql package: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">postgresql</span></code></p></li>
+<li><p>Change default <code class="docutils literal notranslate"><span class="pre">postgres</span></code> user password for a more secure installation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="n">psql</span>
+<span class="n">ALTER</span> <span class="n">USER</span> <span class="n">postgres</span> <span class="n">PASSWORD</span> <span class="s1">&#39;TypeThePasswordHere&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>(Optional) Setup a local pgAdmin instance to connect to postgresql database (optionally using a SSH tunnel)</p></li>
+<li><p>Create <code class="docutils literal notranslate"><span class="pre">teraagent</span></code> user in database (or name of your choice, but will have to be adjusted in the config section below):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">USER</span> <span class="n">teraagent</span> <span class="n">WITH</span> <span class="n">ENCRYPTED</span> <span class="n">PASSWORD</span> <span class="s1">&#39;TypeUserPasswordHere&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create required database and assign <code class="docutils literal notranslate"><span class="pre">teraagent</span></code> user to them:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">DATABASE</span> <span class="n">opentera</span> <span class="n">WITH</span> <span class="n">OWNER</span><span class="o">=</span><span class="n">teraagent</span><span class="p">;</span>
+<span class="n">CREATE</span> <span class="n">DATABASE</span> <span class="n">openterafiles</span> <span class="n">WITH</span> <span class="n">OWNER</span><span class="o">=</span><span class="n">teraagent</span><span class="p">;</span>
+<span class="n">CREATE</span> <span class="n">DATABASE</span> <span class="n">openteralogs</span> <span class="n">WITH</span> <span class="n">OWNER</span><span class="o">=</span><span class="n">teraagent</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Don’t forget to quit the postgres console: <code class="docutils literal notranslate"><span class="pre">\q</span></code></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="redis">
+<h3>Redis<a class="headerlink" href="#redis" title="Permalink to this heading"></a></h3>
+<hr class="docutils" />
+<ol class="arabic">
+<li><p>Install redis server: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">redis-server</span></code></p></li>
+<li><p>(Optional, but strongly recommended) Setup a password to the redis server instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>`sudo nano /etc/redis/redis.conf`
+Edit the line `requirepass` and set your password
+Save, close and restart the redis server: `sudo systemctl restart redis.service`
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="nginx">
+<h3>nginx<a class="headerlink" href="#nginx" title="Permalink to this heading"></a></h3>
+<hr class="docutils" />
+<p>Only basic configuration is done here - specific OpenTera configuration is done below</p>
+<ol class="arabic simple">
+<li><p>Install nginx: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">nginx</span></code></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="python-environment-using-miniconda">
+<h3>Python environment (using miniconda)<a class="headerlink" href="#python-environment-using-miniconda" title="Permalink to this heading"></a></h3>
+<hr class="docutils" />
+<ol class="arabic simple">
+<li><p>Follow the instructions <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html">here­</a> to download and install miniconda</p></li>
+<li><p>When requested, execute the <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">init</span></code> command</p></li>
+<li><p>Close your shell and restart it again</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="build-environment">
+<h3>Build environment<a class="headerlink" href="#build-environment" title="Permalink to this heading"></a></h3>
+<hr class="docutils" />
+<ol class="arabic simple">
+<li><p>Install git: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">git</span></code></p></li>
+<li><p>Install cmake: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">cmake</span></code></p></li>
+<li><p>Install g++: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">g++</span></code></p></li>
+<li><p>Install nodejs / npm: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">npm</span></code></p></li>
+</ol>
+</section>
+</section>
+<hr class="docutils" />
+<section id="opentera-installation">
+<h2>OpenTera installation<a class="headerlink" href="#opentera-installation" title="Permalink to this heading"></a></h2>
+<p>This section proceeds to the installation of the OpenTera server</p>
+<hr class="docutils" />
+<section id="installation">
+<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h3>
+<hr class="docutils" />
+<ol class="arabic">
+<li><p>Fetch the OpenTera code with submodules using git: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">--recurse-submodules</span> <span class="pre">https://github.com/introlab/opentera.git</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">opentera/teraserver</span></code> (or the location that you cloned the project)</p></li>
+<li><p>Initialize cmake environment: <code class="docutils literal notranslate"><span class="pre">cmake</span> <span class="pre">.</span></code></p></li>
+<li><p>Generate python environment using make: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">python-all</span></code></p></li>
+<li><p>Generate nodejs environment for VideoRehab service:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">opentera</span><span class="o">/</span><span class="n">teraserver</span><span class="o">/</span><span class="n">easyrtc</span>
+<span class="n">npm</span> <span class="n">install</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h3>
+<hr class="docutils" />
+<section id="config-files">
+<h4>Config files<a class="headerlink" href="#config-files" title="Permalink to this heading"></a></h4>
+<p>There is a few config files to edit. You should edit each of them and put the correct parameters, according to your setup and the passwords you’ve set previously. Here is the list of the files:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">teraserver/python/config/TeraServerConfig.ini</span></code>: the main config file. “port” and “hostname” shouldn’t be changed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">teraserver/python/config/nginx.conf</span></code>: nginx config file. Unless listening to a different port and setting correct ssl certificates, nothing should be changed in that file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">teraserver/python/services/FileTransferService/FileTransferService.json</span></code>: the file transfer service configuration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">teraserver/python/services/LoggingService/LoggingService.json</span></code>: the logging service configuration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">teraserver/python/services/VideoRehabService/VideoRehabService.json</span></code>: make sure to set the “WebRTC - hostname” value to the external server address.</p></li>
+</ul>
+</section>
+<section id="nginx-configuration">
+<h4>nginx configuration<a class="headerlink" href="#nginx-configuration" title="Permalink to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p>Create nginx configuration file: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">nano</span> <span class="pre">/etc/nginx/sites-available/opentera</span></code></p></li>
+<li><p>Copy the <code class="docutils literal notranslate"><span class="pre">server</span></code> section (only) from the <code class="docutils literal notranslate"><span class="pre">teraserver/python/config/nginx.conf</span></code> file.</p></li>
+<li><p>Edit the <code class="docutils literal notranslate"><span class="pre">ssl_certificate</span></code>, <code class="docutils literal notranslate"><span class="pre">ssl_certificate_key</span></code>, <code class="docutils literal notranslate"><span class="pre">ssl_client_certificate</span></code> to point to your correct SSL setup.</p></li>
+<li><p>Edit the <code class="docutils literal notranslate"><span class="pre">include</span> <span class="pre">opentera.conf</span></code> line with the full path to the <code class="docutils literal notranslate"><span class="pre">opentera.conf</span></code> file, for example: <code class="docutils literal notranslate"><span class="pre">/home/baseuser/opentera/teraserver/python/config/opentera.conf;</span></code></p></li>
+<li><p>Enable the site by creating a symbolic link into the sites-enabled folder: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">ln</span> <span class="pre">-s</span> <span class="pre">/etc/nginx/sites-available/opentera</span> <span class="pre">/etc/nginx/sites-enabled/</span></code></p></li>
+<li><p>Restart the nginx server: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">systemctl</span> <span class="pre">restart</span> <span class="pre">nginx</span></code></p></li>
+</ol>
+</section>
+<section id="service-configuration">
+<h4>Service configuration<a class="headerlink" href="#service-configuration" title="Permalink to this heading"></a></h4>
+<p>TO ensure that OpenTera will run automatically and after a reboot, a systemd service can be created.</p>
+<ol class="arabic simple">
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">/lib/systemd/system/opentera.service</span></code> file with the following content:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Unit</span><span class="p">]</span>
+<span class="n">Description</span><span class="o">=</span><span class="n">OpenTeraServer</span>
+<span class="n">After</span><span class="o">=</span><span class="n">network</span><span class="o">-</span><span class="n">online</span><span class="o">.</span><span class="n">target</span>
+
+<span class="p">[</span><span class="n">Service</span><span class="p">]</span>
+<span class="n">User</span><span class="o">=**</span><span class="n">PUT</span> <span class="n">THE</span> <span class="n">EXECUTING</span> <span class="n">USER</span> <span class="n">HERE</span><span class="o">**</span>
+<span class="n">Group</span><span class="o">=**</span><span class="n">PUT</span> <span class="n">THE</span> <span class="n">EXECUTING</span> <span class="n">GROUP</span> <span class="n">HERE</span><span class="o">**</span>
+<span class="n">Environment</span><span class="o">=</span><span class="n">PYTHONPATH</span><span class="o">=**</span><span class="p">(</span><span class="n">path</span> <span class="n">to</span> <span class="n">opentera</span><span class="p">)</span><span class="o">**/</span><span class="n">opentera</span><span class="o">/</span><span class="n">teraserver</span><span class="o">/</span><span class="n">python</span>
+<span class="n">ExecStart</span><span class="o">=**</span><span class="p">(</span><span class="n">path</span> <span class="n">to</span> <span class="n">opentera</span><span class="p">)</span><span class="o">**/</span><span class="n">opentera</span><span class="o">/</span><span class="n">teraserver</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">env</span><span class="o">/</span><span class="n">python</span><span class="o">-</span><span class="mf">3.8</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">python3</span> <span class="o">**</span><span class="p">(</span><span class="n">path</span> <span class="n">to</span> <span class="n">opentera</span><span class="p">)</span><span class="o">**/</span><span class="n">opentera</span><span class="o">/</span><span class="n">teraserver</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">TeraServer</span><span class="o">.</span><span class="n">py</span>
+<span class="n">WorkingDirectory</span><span class="o">=**</span><span class="p">(</span><span class="n">path</span> <span class="n">to</span> <span class="n">opentera</span><span class="p">)</span><span class="o">**/</span><span class="n">opentera</span><span class="o">/</span><span class="n">teraserver</span><span class="o">/</span><span class="n">python</span>
+<span class="n">StandardOutput</span><span class="o">=</span><span class="n">syslog</span><span class="o">+</span><span class="n">console</span>
+<span class="n">StandardError</span><span class="o">=</span><span class="n">syslog</span><span class="o">+</span><span class="n">console</span>
+<span class="n">Restart</span><span class="o">=</span><span class="n">always</span>
+<span class="n">RestartSec</span><span class="o">=</span><span class="mi">10</span><span class="n">s</span>
+<span class="n">KillMode</span><span class="o">=</span><span class="n">process</span>
+<span class="n">KillSignal</span><span class="o">=</span><span class="n">SIGINT</span>
+
+<span class="p">[</span><span class="n">Install</span><span class="p">]</span>
+<span class="n">WantedBy</span><span class="o">=</span><span class="n">multi</span><span class="o">-</span><span class="n">user</span><span class="o">.</span><span class="n">target</span>
+
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Enable service: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">systemctl</span> <span class="pre">enable</span> <span class="pre">opentera.service</span></code></p></li>
+<li><p>Start service: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">systemctl</span> <span class="pre">start</span> <span class="pre">opentera.service</span></code></p></li>
+</ol>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="post-installation">
+<h2>Post installation<a class="headerlink" href="#post-installation" title="Permalink to this heading"></a></h2>
+<p>Optional post installation steps.</p>
+<hr class="docutils" />
+<section id="local-turn-stun-server">
+<h3>Local TURN/STUN server<a class="headerlink" href="#local-turn-stun-server" title="Permalink to this heading"></a></h3>
+<hr class="docutils" />
+<p>TODO. coturn setup instructions.</p>
+</section>
+<hr class="docutils" />
+<section id="ssl-certificate-with-letsencrypt">
+<h3>SSL certificate with LetsEncrypt<a class="headerlink" href="#ssl-certificate-with-letsencrypt" title="Permalink to this heading"></a></h3>
+<hr class="docutils" />
+<ol class="arabic simple">
+<li><p>Install certbot agent: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">certbot</span></code></p></li>
+<li><p>Install nginx plugin: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python3-certbot-nginx</span></code></p></li>
+<li><p>Run certbot: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">certbot</span> <span class="pre">--nginx</span> <span class="pre">-d</span> <span class="pre">(your_host_name)</span></code></p></li>
+</ol>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Simon Brière, Dominic Létourneau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

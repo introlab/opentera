@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>States and tracked information &mdash; OpenTera 1.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenTera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenTera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">States and tracked information</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/UserManager-module.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <p>The user manager module acts as a central registry for the various connected user types (users, participants, devices). It tracks their current status in the system and can be queried using the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">RPC</span></a> communication system.</p>
+<section id="states-and-tracked-information">
+<h1>States and tracked information<a class="headerlink" href="#states-and-tracked-information" title="Permalink to this heading"></a></h1>
+<ul class="simple">
+<li><p><strong>Online</strong> state indicates that the specific object type (user, participant, device) has an active <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket connection</span></a>. If the object hasn’t established any persistent connection (when only using the <a class="reference internal" href="#API"><span class="xref myst">REST API</span></a> for example), it will <strong>not appear online</strong>. It monitors the <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">UserEvent, DeviceEvent and ParticipantEvent messages</span></a> to update this state.</p></li>
+<li><p><strong>Busy</strong> state indicated that the specific object type (user, participant, device) is currently in an active live session. It monitors the <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">JoinSessionEvent, StopSessionEvent, LeaveSessionEvent and JoinSessionReplyEvent</span></a> to update this state.</p></li>
+<li><p><strong>Status</strong> state provide additional information related to an object, such as battery level or specific position in an environment. This is currently implemented as a JSON formatted string, so that each object can provides various status states depending on their type and needs.</p></li>
+</ul>
+</section>
+<section id="rpc-functions">
+<h1>RPC functions<a class="headerlink" href="#rpc-functions" title="Permalink to this heading"></a></h1>
+<p>The user manager module can be queried using RPC calls. The following functions are available:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">online_users</span></code></strong>: returns a list of <code class="docutils literal notranslate"><span class="pre">user_uuid</span></code> of each of the currently online users</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">busy_users</span></code></strong>: returns a list of <code class="docutils literal notranslate"><span class="pre">user_uuid</span></code> of each of the currently busy users</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">status_users</span></code></strong>: return a list of <code class="docutils literal notranslate"><span class="pre">user_uuid</span></code> associated with a dictionary with 2 keys: <code class="docutils literal notranslate"><span class="pre">online</span></code> (bool) indicating if the user is currently online or not and <code class="docutils literal notranslate"><span class="pre">busy</span></code> (bool) indicating if the user is currently busy or not</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">online_participants</span></code></strong>: returns a list of <code class="docutils literal notranslate"><span class="pre">participant_uuid</span></code> of each of the currently online participants</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">busy_participants</span></code></strong>: returns a list of <code class="docutils literal notranslate"><span class="pre">participant_uuid</span></code> of each of the currently busy participants</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">status_participants</span></code></strong>: return a list of <code class="docutils literal notranslate"><span class="pre">participant_uuid</span></code> associated with a dictionary with 2 keys: <code class="docutils literal notranslate"><span class="pre">online</span></code> (bool) indicating if the participant is currently online or not and <code class="docutils literal notranslate"><span class="pre">busy</span></code> (bool) indicating if the participant is currently busy or not</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">online_devices</span></code></strong>: returns a list of <code class="docutils literal notranslate"><span class="pre">device_uuid</span></code> of each of the currently online devices</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">busy_devices</span></code></strong>: returns a list of <code class="docutils literal notranslate"><span class="pre">device_uuid</span></code> of each of the currently busy devices</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">status_devices</span></code></strong>: return a list of <code class="docutils literal notranslate"><span class="pre">device_uuid</span></code> associated with a dictionary with 2 keys: <code class="docutils literal notranslate"><span class="pre">online</span></code> (bool) indicating if the device is currently online or not, <code class="docutils literal notranslate"><span class="pre">busy</span></code> (bool) indicating if the device is currently busy or not and <code class="docutils literal notranslate"><span class="pre">status</span></code> (str) a JSON formatted string containing the status of the device</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">update_device_status</span></code></strong>: a function to update the status of the device. Inputs: <code class="docutils literal notranslate"><span class="pre">uuid</span></code> (str) - the <code class="docutils literal notranslate"><span class="pre">device_uuid</span></code> of the device to update status, <code class="docutils literal notranslate"><span class="pre">status</span></code> (str) - the JSON formatted string of the status of that device and <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> (int) - the timestamp of this status update (or the time at which the status was updated)</p></li>
+</ul>
+<p>Code definition of those functions can be found <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/modules/UserManagerModule/UserManagerModule.py#L34">here</a></p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Simon Brière, Dominic Létourneau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

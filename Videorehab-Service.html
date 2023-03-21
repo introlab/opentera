@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VideoRehab Service &mdash; OpenTera 1.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenTera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenTera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">VideoRehab Service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Videorehab-Service.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="videorehab-service">
+<h1>VideoRehab Service<a class="headerlink" href="#videorehab-service" title="Permalink to this heading"></a></h1>
+<p>The VideoRehab service is one of the system service in the OpenTera platform. Its role is to provide the required framework for video rehabilitation sessions. Based on <a class="reference external" href="https://webrtc.org/">WebRTC</a>, an adaptation for rehabilitation sessions is provided, providing an adapted user-interface for such usage. Implementation uses <a class="reference external" href="https://nodejs.org">Node.js</a> and <a class="reference external" href="https://github.com/open-easyrtc/open-easyrtc">Open-EasyRTC</a>.</p>
+<p>When requested to launch a video rehab session, this service will spawn a <code class="docutils literal notranslate"><span class="pre">Node</span></code> process for each of the session, creating isolated sessions and ensuring that only the invitees can access that session.</p>
+<section id="main-script">
+<h2>Main script<a class="headerlink" href="#main-script" title="Permalink to this heading"></a></h2>
+<p>The VideoRehab service can be launched by running the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/services/VideoRehabService/VideoRehabService.py">VideoRehabService.py</a> script. As a system service, it is also launched automatically when running the <a class="reference internal" href="TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a></p>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<p>Configuration file for the VideoRehab service is similar to the basic <a class="reference internal" href="Configuration-files.html"><span class="doc std std-doc">configuration files</span></a>. It however adds a specific section for that service, and removes the <code class="docutils literal notranslate"><span class="pre">Database</span></code> since no database is used in that service.</p>
+<section id="webrtc-configuration-section">
+<h3>WebRTC configuration section<a class="headerlink" href="#webrtc-configuration-section" title="Permalink to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">WebRTC</span></code> section in the configuration file specifies the parameters required to launch the WebRTC framework.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hostname</span></code>: the <strong>external</strong> hostname that will be used to connect to the WebRTC signaling server (Open-EasyRTC). It is important to use the external url, since that hostname will be sent and used by the clients (browsers) to establish the WebRTC connection.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">external_port</span></code>: the <strong>external</strong> port on which the WebRTC signaling server can be reached. In its default configuration, it is set to the same port as the <a class="reference internal" href="TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a> (40075)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">local_base_port</span></code>: the <strong>internal</strong> port on which the WebRTC signaling server will listen. This is the base port: each new session will listen to a port number on the range <code class="docutils literal notranslate"><span class="pre">local_base_port</span></code> to <code class="docutils literal notranslate"><span class="pre">local_base_port</span> <span class="pre">+</span> <span class="pre">max_sessions</span></code>. Since the NGINX router will probably redirects the external connection to the appropriate internal port (see below), there is no need to open those ports externally.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_sessions</span></code>: the maximum number of parallel sessions. This is linked to the local port ranges that could be opened (see <code class="docutils literal notranslate"><span class="pre">local_base_port</span></code>), but can also be used to limit the load of a specific server.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">working_directory</span></code>: the base directory for the signaling server</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">executable</span></code>: the executable to launch. Since we are using Node.js, the executable should be <code class="docutils literal notranslate"><span class="pre">node</span></code>, but since, in theory, another signaling server could be used or if the executable is different because of system configuration, this parameter is available in the configuration file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">script</span></code>: the parameters to pass to the executable. By default, it is <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/easyrtc/server.js"><code class="docutils literal notranslate"><span class="pre">script.js</span></code></a>, which is the base script used by this service. However, if a custom or another script is needed, this is the parameter to update!</p></li>
+</ul>
+</section>
+</section>
+<section id="service-setup">
+<h2>Service setup<a class="headerlink" href="#service-setup" title="Permalink to this heading"></a></h2>
+<p>As this service relies on Node.js and external scripts, it is required to setup the environment of that service before using it. See <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">server deployment</span></a> and the <a class="reference internal" href="Developers.html"><span class="doc std std-doc">developers</span></a> sections for more information on how to properly setup that environment.</p>
+</section>
+<section id="default-port-and-location">
+<h2>Default port and location<a class="headerlink" href="#default-port-and-location" title="Permalink to this heading"></a></h2>
+<p>By default, the service will listen to port 4070 (non-ssl) and will be at the <code class="docutils literal notranslate"><span class="pre">/rehab</span></code> path on the base server URL.</p>
+</section>
+<section id="web-urls">
+<h2>Web URLs<a class="headerlink" href="#web-urls" title="Permalink to this heading"></a></h2>
+<p>As each session will spawn in a different process and listen on a different internal (local) port, the Web URLs for that service are dynamic, which contribute to the overall <a class="reference internal" href="Security.html"><span class="doc std std-doc">security</span></a> of the OpenTera platform.</p>
+<p>The base service is located at the <code class="docutils literal notranslate"><span class="pre">/rehab</span></code> path, while each of the video rehab sessions are located at the <code class="docutils literal notranslate"><span class="pre">/webrtc</span></code> path.</p>
+<p>To properly route an external URLs to the correct port, a NGINX rule was defined to include the local port in the URL and redirect it to the correct listening server. This takes the form of, for example, <code class="docutils literal notranslate"><span class="pre">https://127.0.0.1:40075/webrtc/8081/</span></code> which will redirect the request to the server listening on the internal port 8081.</p>
+</section>
+<section id="rest-api">
+<h2>REST API<a class="headerlink" href="#rest-api" title="Permalink to this heading"></a></h2>
+<p>This service doesn’t expose any REST API.</p>
+</section>
+<section id="web-frontend">
+<h2>Web Frontend<a class="headerlink" href="#web-frontend" title="Permalink to this heading"></a></h2>
+<p>The web frontends are provided and managed by the Node.js express server. The base files are located <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/easyrtc/protected">here</a>. Included javascript files and assets are located <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/easyrtc/static">here</a>.</p>
+</section>
+<section id="rpc-api">
+<h2>RPC API<a class="headerlink" href="#rpc-api" title="Permalink to this heading"></a></h2>
+<p>This service uses the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">asynchronous communication system</span></a>, but also provides the following RPC API:</p>
+<section id="session-manage">
+<h3><code class="docutils literal notranslate"><span class="pre">session_manage</span></code><a class="headerlink" href="#session-manage" title="Permalink to this heading"></a></h3>
+<section id="description">
+<h4>Description<a class="headerlink" href="#description" title="Permalink to this heading"></a></h4>
+<p>This function controls a session by allowing to start, stop, add and remove participants from it.</p>
+</section>
+<section id="parameters">
+<h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h4>
+<p>A <code class="docutils literal notranslate"><span class="pre">session_manage</span></code> JSON formatted input string (format: <code class="docutils literal notranslate"><span class="pre">session_manage</span> <span class="pre">{action:</span> <span class="pre">'',</span> <span class="pre">...</span> <span class="pre">}</span></code>) with the following fields and structure:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">action</span></code></strong> (string): the action that the service is required to take. The following actions are currently available:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">start</span></code>: starts a new session</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stop</span></code>: stops an active session</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">invite</span></code>: sends an invitation to users, participants or devices in session in progress</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">remove</span></code>: removes a user, participant or device from a session in progress</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">invite_reply</span></code>: manages a session invitation reply</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">id_session</span></code></strong> (int): the ID of the session to which to apply the action. If using the <code class="docutils literal notranslate"><span class="pre">start</span></code> action, a value of <code class="docutils literal notranslate"><span class="pre">id_session=0</span></code> can be used to create a totally new session. Otherwise, the specified session will be used. <strong>This is a required parameter for each action</strong>.</p></li>
+<li><p>**<code class="docutils literal notranslate"><span class="pre">parameters</span></code> (string): Optional field containing session parameters.</p></li>
+</ul>
+</section>
+<section id="specific-fields-for-start-action">
+<h4>Specific fields for <code class="docutils literal notranslate"><span class="pre">start</span></code> action<a class="headerlink" href="#specific-fields-for-start-action" title="Permalink to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">id_creator_user</span></code></strong> (int): the ID of the user that created that session. For now, only users can create a video rehab session, though this might change in the future. Required only when creating a new session (<code class="docutils literal notranslate"><span class="pre">id_session</span></code> == 0).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">id_session_type</span></code></strong> (int): the ID of the session type of that session. Required only when creating a new session (<code class="docutils literal notranslate"><span class="pre">id_session</span></code> == 0).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">session_participants</span></code>, <code class="docutils literal notranslate"><span class="pre">session_users</span></code>, <code class="docutils literal notranslate"><span class="pre">session_devices</span></code></strong> (list): the participants, users and devices UUID to invite to that session.</p></li>
+</ul>
+</section>
+<section id="specific-fields-for-invite-and-remove-action">
+<h4>Specific fields for <code class="docutils literal notranslate"><span class="pre">invite</span></code> and <code class="docutils literal notranslate"><span class="pre">remove</span></code> action<a class="headerlink" href="#specific-fields-for-invite-and-remove-action" title="Permalink to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">session_participants</span></code>, <code class="docutils literal notranslate"><span class="pre">session_users</span></code>, <code class="docutils literal notranslate"><span class="pre">session_devices</span></code></strong> (list): the participants, users and devices UUID to invite to that session or to remove from.</p></li>
+</ul>
+</section>
+<section id="specific-fields-for-invite-reply-action">
+<h4>Specific fields for <code class="docutils literal notranslate"><span class="pre">invite_reply</span></code> action<a class="headerlink" href="#specific-fields-for-invite-reply-action" title="Permalink to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">parameters</span></code></strong> (dict): a dictionary of parameters to send in the <a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/JoinSessionReplyEvent.proto">JoinSessionReplyEvent</a> message:</p>
+<ul>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">reply_code</span></code></strong>: the reply code (value)</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">reply_msg</span></code></strong>: a message to send with the reply. Optional.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="return-value">
+<h4>Return value<a class="headerlink" href="#return-value" title="Permalink to this heading"></a></h4>
+<p>The return value will be a dictionary with the following fields:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">status</span></code></strong> (string): the status of the action command:</p>
+<ul>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">error</span></code></strong>: an error occurred. See the field <code class="docutils literal notranslate"><span class="pre">error_text</span></code> for a description of the error.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">started</span></code></strong>: the session was properly started. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database model</span></a>), with the following added fields:</p>
+<ul>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">session_url_users</span></code>, <code class="docutils literal notranslate"><span class="pre">session_url_participants</span></code>, <code class="docutils literal notranslate"><span class="pre">session_url_devices</span></code></strong>: the URLs used to connect to the session for users, participants and devices.</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">stopped</span></code></strong>: the session was properly stopped. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">invited</span></code></strong>: the invitations for the session were properly sent. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">removed</span></code></strong>: the specified invitees were properly removed from the session. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">OK</span></code></strong>: the session invitation reply was properly managed. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Simon Brière, Dominic Létourneau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenTera Architecture Overview &mdash; OpenTera 1.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenTera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenTera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">OpenTera Architecture Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Architecture-Overview.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="opentera-architecture-overview">
+<h1>OpenTera Architecture Overview<a class="headerlink" href="#opentera-architecture-overview" title="Permalink to this heading"></a></h1>
+<p>The following diagram presents the global OpenTera software architecture.</p>
+<p><img alt=" " src="_images/OpenTera_Global.png" /></p>
+<p>A modular architecture based on open-source projects and standards is used. Each of the component of that architecture is described below.</p>
+<hr class="docutils" />
+<section id="core-module-opentera-teraserver">
+<h2>Core module (OpenTera - TeraServer)<a class="headerlink" href="#core-module-opentera-teraserver" title="Permalink to this heading"></a></h2>
+<p>The core module is simply the manager of all the other components of the system. Internally, it is itself represented as a service, especially when it comes to <a class="reference internal" href="Access-levels-for-user-types.html"><span class="doc std std-doc">access and roles</span></a>.</p>
+<p>OpenTera server is fully written in Python, and the main script (TeraServer.py) basically starts and configure the components of the system based on the <a class="reference internal" href="Configuration-files.html"><span class="doc std std-doc">configuration file</span></a>.</p>
+<p>More information on this module can be found <a class="reference internal" href="TeraServer-Service.html"><span class="doc std std-doc">here</span></a>.</p>
+</section>
+<hr class="docutils" />
+<section id="modules">
+<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this heading"></a></h2>
+<p>Components that are used internally by the core module and do not need to be directly referenced or accessed by other services in the system are called modules. Each of the specific module has a defined role and can communicate with other modules or services in the system using the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal services communication module</span></a>.</p>
+<section id="login-and-usermanager-module">
+<h3>Login and UserManager module<a class="headerlink" href="#login-and-usermanager-module" title="Permalink to this heading"></a></h3>
+<p>As hinted by their names, those modules provides the required login validation check and keep a registry of currently logged-in users, participants and devices. See <a class="reference internal" href="Login-and-authentication.html"><span class="doc std std-doc">Login and authentication</span></a> for further information on the available login types and sequence.</p>
+<section id="login-module">
+<h4>Login module<a class="headerlink" href="#login-module" title="Permalink to this heading"></a></h4>
+<p>Simply put, this module provides authentication for the various main user types in the platform (users, participants, devices and services). It is in charge to generate temporary access token (if that mechanism is used) and invalidates them when they expire.</p>
+</section>
+<section id="usermanager-module">
+<h4>UserManager module<a class="headerlink" href="#usermanager-module" title="Permalink to this heading"></a></h4>
+<p>This module is a registry of user, participants and devices states (online, busy, status). By subscribing and publishing into various topics (see <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">Internal services communication module</span></a>), this module monitors topics generated by the <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websockets</span></a> to toggle states. It also support a remote process call interface (RPC) to query the various information in the registry.</p>
+<p>More information on this module can be found <a class="reference internal" href="UserManager-module.html"><span class="doc std std-doc">here</span></a>.</p>
+</section>
+</section>
+<section id="websockets-module">
+<h3>Websockets module<a class="headerlink" href="#websockets-module" title="Permalink to this heading"></a></h3>
+<p>This module manages the websockets connection, from authentication to communication to and from each of them. It is based on the <a class="reference external" href="https://twistedmatrix.com/">Twisted engine</a> and provides the required factories and event to properly handle websocket connections.</p>
+<p>In the OpenTera platform, websockets are used in a one-way communication channel to send <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">messages</span></a> from the server to the clients. Client communication with the server uses the <a class="reference internal" href="#API"><span class="xref myst">Main OpenTera REST API</span></a>.</p>
+<p>More information on this module can be found <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">here</span></a>.</p>
+</section>
+<section id="rest-api-module">
+<h3>REST API module<a class="headerlink" href="#rest-api-module" title="Permalink to this heading"></a></h3>
+<p>This module, based on the <a class="reference external" href="https://flask.palletsprojects.com">Flask web framework</a>, provides the <a class="reference internal" href="#API"><span class="xref myst">Main OpenTera REST API</span></a> that clients can use to request and update information from the server.</p>
+<p>Various <a class="reference internal" href="Login-and-authentication.html"><span class="doc std std-doc">authentication schemes</span></a> can be used to access restricted API calls. Depending on the <a class="reference internal" href="Access-levels-for-user-types.html"><span class="doc std std-doc">roles</span></a> of the requester, return values will either be filtered to include only accessible items or fully denied.</p>
+<p>More information on this module and API can be found <a class="reference internal" href="#API"><span class="xref myst">here</span></a>.</p>
+</section>
+<section id="database-module">
+<h3>Database module<a class="headerlink" href="#database-module" title="Permalink to this heading"></a></h3>
+<p>This module manages access to the various <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database objects</span></a>. When requesting information from the database, functions in that module ensure filtering of the returned values (or builds an appropriate query to filter directly in the database) so that the requester access levels are properly handled.</p>
+<p>More information on the database structure can be found <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">here</span></a>.</p>
+</section>
+<section id="services-module">
+<h3>Services module<a class="headerlink" href="#services-module" title="Permalink to this heading"></a></h3>
+<p>This module wraps the services by setting up the basic <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication protocols</span></a> for each of the system services. It also launches those services.</p>
+<p>This module can also automatically launch external services as stand-alone processes.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="system-services">
+<h2>System services<a class="headerlink" href="#system-services" title="Permalink to this heading"></a></h2>
+<p>Those services are features that are shared by modules and external services. Each of them serves a specific purpose and will run in a separate process. Communication between modules and services will be done using the <a class="reference internal" href="#API"><span class="xref myst">Main OpenTera REST API</span></a> and the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication protocols - subscribe-publish</span></a>.</p>
+<section id="file-transfer-service">
+<h3>File transfer service<a class="headerlink" href="#file-transfer-service" title="Permalink to this heading"></a></h3>
+<p>The file transfer service is a service that manages file transfers (upload and download) within OpenTera. It allows other services to upload files in a central repository. While specific services can also implements file storage and indexing, this service can be used to quickly reuse components.</p>
+<p>More information on this service can be found <a class="reference internal" href="FileTransfer-Service.html"><span class="doc std std-doc">here</span></a>.</p>
+</section>
+<section id="logging-service">
+<h3>Logging service<a class="headerlink" href="#logging-service" title="Permalink to this heading"></a></h3>
+<p>The logging service acts as a central log repository. Using messages with the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication protocols - subscribe-publish</span></a>, every module and service interacting with OpenTera can log information in that service. More specifically, the service process the <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">LogEvent</span></a> message.</p>
+<p>More information on this service can be found <a class="reference internal" href="Logging-Service.html"><span class="doc std std-doc">here</span></a>.</p>
+</section>
+<section id="videorehab-service">
+<h3>Videorehab service<a class="headerlink" href="#videorehab-service" title="Permalink to this heading"></a></h3>
+<p>As many external service might need a videoconferencing application, this service is included in the core OpenTera server. Based on <a class="reference external" href="https://webrtc.org/">WebRTC</a>, an adaptation for rehabilitation sessions is provided, providing an adapted user-interface for such usage. Implementation uses <a class="reference external" href="https://nodejs.org">Node.js</a> and <a class="reference external" href="https://github.com/open-easyrtc/open-easyrtc">Open-EasyRTC</a>.</p>
+<p>More information on this service can be found <a class="reference internal" href="Videorehab-Service.html"><span class="doc std std-doc">here</span></a>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="external-services">
+<h2>External services<a class="headerlink" href="#external-services" title="Permalink to this heading"></a></h2>
+<p>OpenTera is built as an extensible system onto which various services to address specific needs can be added.</p>
+<p>As of now, there’s many such services in development, not all of them being public-ready. To name a few:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/introlab/opentera-teleop-service">Robot teleoperation service</a>, which aims to provide an integrated robot teleoperation system in OpenTera</p></li>
+<li><p><a class="reference external" href="https://github.com/introlab/opentera-webportal-service">Web portal</a>, which aims to provide a customized portal for participants (with personalized shortcuts to other OpenTera services or external websites) and for users (to provide a web dashboard of a project).</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="clients">
+<h2>Clients<a class="headerlink" href="#clients" title="Permalink to this heading"></a></h2>
+<p>External communication between clients, whether they are web front-ends or compiled software, is done using <a class="reference external" href="https://www.nginx.com/">NGINX</a> that acts as a router between every services, exposing only a single port, and acts as a central encryption and management of certificates.</p>
+<p>More information on security and routing can be found <a class="reference internal" href="Security.html"><span class="doc std std-doc">here</span></a> and in each of the services and modules.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Simon Brière, Dominic Létourneau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

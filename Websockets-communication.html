@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Websockets management &mdash; OpenTera 1.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenTera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenTera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Websockets management</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Websockets-communication.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <p>Websockets are used within OpenTera to send <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">messages and events</span></a> from the server to the client.</p>
+<p>While a websocket can be used as a bidirectional communication channel, the websocket is only used in a unidirectional channel from the server to the client in OpenTera.</p>
+<p>All websocket communication is encrypted using SSL certificates.</p>
+<section id="websockets-management">
+<h1>Websockets management<a class="headerlink" href="#websockets-management" title="Permalink to this heading"></a></h1>
+<p>Internally, websockets are managed by the <a class="reference external" href="https://twistedmatrix.com/">Twisted engine</a> and a protocol has been defined for user, participant and device websockets. This allows to manage differently the connections depending on the base object type.</p>
+<p>An automatic ping mechanism ensures that data is transmitted over the websocket at each 10 seconds to detect inactive clients or badly closed connection. If no reply is received by this mechanism, the webconnect channel will be automatically closed.</p>
+</section>
+<section id="establishing-a-websocket-connection">
+<h1>Establishing a websocket connection<a class="headerlink" href="#establishing-a-websocket-connection" title="Permalink to this heading"></a></h1>
+<p>The websocket url to connect to will depend on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">object type</span></a>. To get that url, a <code class="docutils literal notranslate"><span class="pre">login</span></code> query must be made to the correct <a class="reference internal" href="#API"><span class="xref myst">REST API</span></a>. See <a class="reference internal" href="Login-and-authentication.html"><span class="doc std std-doc">Login and authentication</span></a> for more information on the login process.</p>
+<p>The returned url will be valid for 60 seconds. If no connection is established within that time frame, the url will have to be requested again.</p>
+</section>
+<section id="communication-over-the-websocket">
+<h1>Communication over the websocket<a class="headerlink" href="#communication-over-the-websocket" title="Permalink to this heading"></a></h1>
+<p>All data sent from the server to the client will be formatted in a <a class="reference external" href="https://developers.google.com/protocol-buffers">protocol buffers (protobuf)</a> serialized data format. The dictionary of messages and events is documented <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">here</span></a>.</p>
+<p>Internally, each websocket connection will subscribe to specific events using the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal services communication module</span></a>. The list of those events is defined according to the type of websocket. As with all communication within OpenTera, information will be filtered to only transmit the data that the associated object to that websocket has <a class="reference internal" href="Access-levels-for-user-types.html"><span class="doc std std-doc">access</span></a>.</p>
+<ul class="simple">
+<li><p><strong>User websocket</strong>: All database events, <a class="reference internal" href="UserManager-module.html"><span class="doc std std-doc">user manager module</span></a> events, session events, device events, participant events, user events, direct events. Filtering occurs in the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/modules/UserEventManager.py">UserEventManager</a> class.</p></li>
+<li><p><strong>Participant websocket</strong>: Device events, participants event (self only), session events, direct events. Filtering occurs in the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/modules/ParticipantEventManager.py">ParticipantEventManager</a> class.</p></li>
+<li><p><strong>Device websocket</strong>: Device events (self only), participants event, session events, direct events. Filtering occurs in the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/modules/DeviceEventManager.py">DeviceEventManager</a> class.</p></li>
+</ul>
+<p>Direct events are always enabled by default on each of the websocket type, allowing to directly send an event or a message to a connected client, if that client type and uuid is known. See <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">here</span></a> for more information on how to use the publish system to communicate with a connected client directly.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Simon Brière, Dominic Létourneau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

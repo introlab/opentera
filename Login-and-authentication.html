@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Authentication &mdash; OpenTera 1.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenTera
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Home.html">Welcome to the OpenTera Wiki!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenTera</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Authentication</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Login-and-authentication.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <p>In OpenTera, login and authentication are 2 separate concept.</p>
+<ul class="simple">
+<li><p><strong>Authentication</strong> refers to the process of having sufficient credentials to access the <a class="reference internal" href="#API"><span class="xref myst">REST API</span></a>. Multiple authentication schemes are supported (see below)</p></li>
+<li><p><strong>Login</strong> refers to the process of calling the appropriate login API, gets the current (temporary) token for the authentication and, optionally, opens a <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket connection</span></a> to receive <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">messages and events</span></a>.</p></li>
+</ul>
+<hr class="docutils" />
+<section id="authentication">
+<h1>Authentication<a class="headerlink" href="#authentication" title="Permalink to this heading"></a></h1>
+<p>Supported authentication depends on the <a class="reference internal" href="#API"><span class="xref myst">API level</span></a> that is accessed.</p>
+<section id="user-api">
+<h2>User API<a class="headerlink" href="#user-api" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>HTTP Basic Auth</strong>: Using username and password authentication, the requester can be identified and allowed (or not) to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications for security purpose when <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">deploying to a server</span></a></p></li>
+<li><p><strong>Token Bearer</strong>: Using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header in a request, it is possible to use a token for authentication instead of the standard username-password authentication:</p>
+<ul>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">&lt;type&gt;</span></code> value must be set to <code class="docutils literal notranslate"><span class="pre">OpenTera</span></code> and the <code class="docutils literal notranslate"><span class="pre">&lt;credentials&gt;</span></code> must contain a valid token.</p></li>
+<li><p>User token can be obtained with a call to the <code class="docutils literal notranslate"><span class="pre">login</span></code> API (see below). <strong>Currently, users can’t log only using a token</strong>. To get the initial token, an HTTP Basic Auth scheme must be used.</p></li>
+<li><p>User tokens are set to expire after 1 hour, and a new token can be obtained before expiration by calling the <code class="docutils literal notranslate"><span class="pre">refreshtoken</span></code> API.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="participant-api">
+<h2>Participant API<a class="headerlink" href="#participant-api" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>HTTP Basic Auth</strong>: Using username and password authentication, the requester can be identified and allowed (or not) to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications for security purpose when <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">deploying to a server</span></a>.</p>
+<ul>
+<li><p><strong>For participants, that authentication scheme is optional</strong>. If no username and password are defined or if the <code class="docutils literal notranslate"><span class="pre">participant_login_enabled</span></code> is set to <code class="docutils literal notranslate"><span class="pre">false</span></code> for a specific participant (see <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database objects</span></a>, this scheme will not work.</p></li>
+</ul>
+</li>
+<li><p><strong>Token Bearer</strong>: Using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header in a request, it is possible to use a token for authentication instead of the standard username-password authentication:</p>
+<ul>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">&lt;type&gt;</span></code> value must be set to <code class="docutils literal notranslate"><span class="pre">OpenTera</span></code> and the <code class="docutils literal notranslate"><span class="pre">&lt;credentials&gt;</span></code> must contain a valid token.</p></li>
+<li><p>A permanent login token can be used to obtain a valid dynamic (temporary) token for further queries. This allows a participant to login without having a username-password scheme with some restrictions (see below). The permanent token for a participant is automatically generated if <code class="docutils literal notranslate"><span class="pre">participant_token_enabled</span></code> is set in the <code class="docutils literal notranslate"><span class="pre">TeraParticipant</span></code> <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database object</span></a></p>
+<ul>
+<li><p>If the initial <code class="docutils literal notranslate"><span class="pre">login</span></code> API call is done with the permanent token of a participant instead of a standard username-password scheme, the available API calls are quite limited.</p></li>
+<li><p>In the case where the initial <code class="docutils literal notranslate"><span class="pre">login</span></code> scheme is done with the participant permanent token, a dynamic token is not generated and thus can’t be used for further calls.</p></li>
+<li><p>In the API functions, the <code class="docutils literal notranslate"><span class="pre">role</span></code> parameter is used to check the access level. If the required role is set to <code class="docutils literal notranslate"><span class="pre">full</span></code>, a dynamic token will be required and the permanent token will not work. If the required role is set to <code class="docutils literal notranslate"><span class="pre">limited</span></code>, the permanent token will work to access that API function. For example, <code class="docutils literal notranslate"><span class="pre">&#64;participant_multi_auth.login_required(role='limited')</span></code> will allow the decorated function to be called with a permanent token.</p></li>
+</ul>
+</li>
+<li><p>Participants dynamic token can be obtained with a call to the <code class="docutils literal notranslate"><span class="pre">login</span></code> API (see below) with a username-password scheme.</p></li>
+<li><p>Participants tokens are set to expire after 1 hour, and a new token can be obtained before expiration by calling the <code class="docutils literal notranslate"><span class="pre">refreshtoken</span></code> API.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="device-api">
+<h2>Device API<a class="headerlink" href="#device-api" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Token Bearer</strong>: Using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header in a request, it is possible to use a token for authentication for devices:</p>
+<ul>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">&lt;type&gt;</span></code> value must be set to <code class="docutils literal notranslate"><span class="pre">OpenTera</span></code> and the <code class="docutils literal notranslate"><span class="pre">&lt;credentials&gt;</span></code> must contain a valid token.</p></li>
+<li><p>A device token is permanent: the device will use the same token for every request. It must be stored somewhere safe on the device. See <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc"><code class="docutils literal notranslate"><span class="pre">TeraDevice</span></code></span></a></p></li>
+<li><p>Only an enabled device (<code class="docutils literal notranslate"><span class="pre">device_enabled</span></code> in the <code class="docutils literal notranslate"><span class="pre">TeraDevice</span></code> database object) will be able to authenticate.</p></li>
+</ul>
+</li>
+<li><p><strong>Token request argument</strong>: Instead of using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header, it is also possible to append the token to a request by using the <code class="docutils literal notranslate"><span class="pre">token</span></code> argument.</p></li>
+<li><p><strong>Certificates</strong>: <strong>TO BE DOCUMENTED SOON</strong></p></li>
+</ul>
+</section>
+<section id="service-api">
+<h2>Service API<a class="headerlink" href="#service-api" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Token Bearer</strong>: Using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header in a request, it is possible to use a token for authentication for services:</p>
+<ul>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">&lt;type&gt;</span></code> value must be set to <code class="docutils literal notranslate"><span class="pre">OpenTera</span></code> and the <code class="docutils literal notranslate"><span class="pre">&lt;credentials&gt;</span></code> must contain a valid token.</p></li>
+<li><p>A service token is permanent: the service will use the same token for every request. See <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc"><code class="docutils literal notranslate"><span class="pre">TeraService</span></code></span></a></p></li>
+<li><p>Only an service device (<code class="docutils literal notranslate"><span class="pre">service_enabled</span></code> in the <code class="docutils literal notranslate"><span class="pre">TeraService</span></code> database object) will be able to authenticate.</p></li>
+</ul>
+</li>
+<li><p><strong>Token request argument</strong>: Instead of using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header, it is also possible to append the token to a request by using the <code class="docutils literal notranslate"><span class="pre">token</span></code> argument.</p></li>
+<li><p><strong>Certificates</strong>: <strong>TO BE DOCUMENTED SOON</strong></p></li>
+</ul>
+<hr class="docutils" />
+</section>
+</section>
+<section id="login">
+<h1>Login<a class="headerlink" href="#login" title="Permalink to this heading"></a></h1>
+<p>Even if the replies can vary a little depending on the <a class="reference internal" href="#API"><span class="xref myst">API level</span></a> being accessed, the login process is similar in each case. The login process is needed to get the <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket</span></a>, basic information about the logged on object and to get a dynamic token, if required, depending on the API level (see above).</p>
+<p>Depending on the authentication scheme and the application, the login process might be optional. Without logging in, as long as the authentication scheme is respected, all API calls can proceed.</p>
+<p><strong>Important note</strong>: A user, participant or device will not come online in regards to the <a class="reference internal" href="UserManager-module.html"><span class="doc std std-doc">User Manager Module</span></a> unless a <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket connection</span></a> is established. This is by design and by the fact that the REST API, by definition, is a stateless and asynchronous system, and thus OpenTera doesn’t have any way to know if a user, participant or device is still there at the other end.</p>
+<p>The login process can be summarized as:</p>
+<ol class="arabic simple">
+<li><p>Make a request with the correct authentication scheme to the <code class="docutils literal notranslate"><span class="pre">login</span></code> <a class="reference internal" href="#API"><span class="xref myst">API</span></a></p></li>
+<li><p>If the object type is enabled (see <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database objects</span></a>) and if the login credentials are valid, a return value containing at least the <code class="docutils literal notranslate"><span class="pre">_name</span></code>, the <code class="docutils literal notranslate"><span class="pre">_uuid</span></code> and the <code class="docutils literal notranslate"><span class="pre">websocket_url</span></code> will be returned. See the <a class="reference internal" href="#API"><span class="xref myst">REST API</span></a> for the specific return values for each of the specific <code class="docutils literal notranslate"><span class="pre">login</span></code> functions</p></li>
+<li><p>Optionally, the client may connect to the <code class="docutils literal notranslate"><span class="pre">websocket_url</span></code>. There is a 60 seconds window to establish the connection, otherwise it will be denied. That url can only be used once: once a client is connected, it will not be available for further connections.</p></li>
+</ol>
+<p>While recommended, a call to the <code class="docutils literal notranslate"><span class="pre">logout</span></code> is optional. When logging out, clean-up and dynamic token disabling will occur. If a websocket connection has been established, it will not close automatically - the client will need to close that connection after or before the <code class="docutils literal notranslate"><span class="pre">logout</span></code> call.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Simon Brière, Dominic Létourneau.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
