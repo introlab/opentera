@@ -13,7 +13,7 @@ Welcome to OpenTera's documentation!
    Home
    installation
    api
-   services
+   services/services
 
 
 Indices and tables
