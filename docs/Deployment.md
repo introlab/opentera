@@ -6,11 +6,11 @@ Those setup instructions suppose a pre-installed and configured Ubuntu 20.04 ser
 
 This section configures the depending packages and software before installing the main OpenTera server.
 
-***
+<hr>
 
 ### Postgresql
 
-***
+<hr>
 
 1. Install Postgresql package: `sudo apt-get install postgresql`
 2. Change default `postgres` user password for a more secure installation: 
@@ -31,9 +31,9 @@ This section configures the depending packages and software before installing th
     ```
 6. Don't forget to quit the postgres console: `\q`
 
-***
+<hr>
 ### Redis
-***
+<hr>
 
 1. Install redis server: `sudo apt-get install redis-server`
 2. (Optional, but strongly recommended) Setup a password to the redis server instance: 
@@ -43,36 +43,36 @@ This section configures the depending packages and software before installing th
     Save, close and restart the redis server: `sudo systemctl restart redis.service`
     ```
 
-***
+<hr>
 ### nginx
-***
+<hr>
 Only basic configuration is done here - specific OpenTera configuration is done below
 
 1. Install nginx: `sudo apt-get install nginx`
 
-***
+<hr>
 ### Python environment (using miniconda)
-***
+<hr>
 1. Follow the instructions [here­](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) to download and install miniconda
 2. When requested, execute the `conda init` command
 3. Close your shell and restart it again
 
-***
+<hr>
 ### Build environment
-***
+<hr>
 1. Install git: `sudo apt-get install git`
 2. Install cmake: `sudo apt-get install cmake`
 3. Install g++: `sudo apt-get install g++`
 4. Install nodejs / npm: `sudo apt-get install npm`
 
-***
+<hr>
 ## OpenTera installation
 
 This section proceeds to the installation of the OpenTera server
 
-***
+<hr>
 ### Installation
-***
+<hr>
 1. Fetch the OpenTera code with submodules using git: `git clone --recurse-submodules https://github.com/introlab/opentera.git`
 2. `cd opentera/teraserver` (or the location that you cloned the project)
 3. Initialize cmake environment: `cmake .`
@@ -83,9 +83,9 @@ This section proceeds to the installation of the OpenTera server
     npm install
     ```
 
-***
+<hr>
 ### Configuration
-***
+<hr>
 #### Config files
 There is a few config files to edit. You should edit each of them and put the correct parameters, according to your setup and the passwords you've set previously. Here is the list of the files:
 
@@ -133,18 +133,18 @@ WantedBy=multi-user.target
 2. Enable service: `sudo systemctl enable opentera.service`
 3. Start service: `sudo systemctl start opentera.service`
 
-***
+<hr>
 ## Post installation
 Optional post installation steps.
 
-***
+<hr>
 ### Local TURN/STUN server
-***
+<hr>
 TODO. coturn setup instructions.
 
-***
+<hr>
 ### SSL certificate with LetsEncrypt
-***
+<hr>
 1. Install certbot agent: `sudo apt-get install certbot`
 2. Install nginx plugin: `sudo apt-get install python3-certbot-nginx`
 3. Run certbot: `sudo certbot --nginx -d (your_host_name)`

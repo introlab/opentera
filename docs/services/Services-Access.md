@@ -1,3 +1,3 @@
 # Services Access
 
-![ ](../images/Linux/coming_soon.PNG)
+![ ](../images/coming_soon.PNG)

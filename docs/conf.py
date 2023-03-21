@@ -29,8 +29,6 @@ html_theme_options = {
     'navigation_depth': -1
 }
 
-html_static_path = ['_static']
-
 source_suffix = {
     '.rst': 'restructuredtext',
     '.md': 'markdown',

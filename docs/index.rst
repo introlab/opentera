@@ -1,23 +1,54 @@
-.. OpenTera documentation master file, created by
-   sphinx-quickstart on Tue Mar 21 08:54:27 2023.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+About OpenTera
+==============
+.. toctree::
+   :maxdepth: 5
+   :hidden:
+   :caption: Introduction
 
-Welcome to OpenTera's documentation!
-====================================
+   Home
+   Architecture-Overview
+   Security
 
 .. toctree::
    :maxdepth: 5
-   :caption: Contents:
+   :hidden:
+   :caption: Getting started
 
-   Home
-   installation
+   Deployment
+   Configuration-files
+   Installation for developers <installation>
+
+.. toctree::
+   :hidden:
+   :caption: Services and Modules
+
+   services/OpenTera_Services.md
    services/services
 
+.. toctree::
+   :hidden:
+   :caption: Developers
 
-Indices and tables
-==================
+   developers/Developers
+   services/Service-Creation
+   developers/Code-Structure
+   developers/Database-Structure
+   developers/Form-Structure
+   developers/Internal-services-communication-module
+   developers/Login-and-authentication
+   developers/Messages-structure
+   services/Services-Access
+   developers/Websockets-communication
+   developers/Running-tests
+   developers/Translations
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. include:: Home.rst
+   :start-after: About OpenTera
+
+..
+   Indices and tables
+   ==================
+
+   * :ref:`genindex`
+   * :ref:`modindex`
+   * :ref:`search`

@@ -65,7 +65,7 @@ You are welcome to participate in this effort. Leave us comments or report [Issu
 
 ## Documentation and getting started
 
-Detailled information is available in the [wiki](https://github.com/introlab/opentera/wiki)
+Detailled information is available in the [docs](https://introlab.github.io/opentera/)
 
 ## License
 
