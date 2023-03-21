@@ -1,4 +1,4 @@
-name: gen-doc-and-release
+name: gen-doc-and-deploy-to-github-pages
 
 on:
   push:
