@@ -25,7 +25,7 @@ jobs:
 
     - name: Install System Dependencies
       run: |
-        sudo apt-get install cmake protobuf-compiler wget redis-server postgresql nginx
+        sudo apt-get install cmake protobuf-compiler wget curl redis-server postgresql nginx
 
     - name: Run System Services
       run: |
@@ -86,7 +86,7 @@ jobs:
     - name: Update API json documentation
       working-directory: docs/services/teraserver/api
       run: |
-        wget -O --no-check-certificate https://localhost:40075/api/swagger.json
+        curl -O --insecure https://localhost:40075/api/swagger.json
 
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.7.1
