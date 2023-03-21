@@ -86,7 +86,7 @@ jobs:
     - name: Update API json documentation
       working-directory: docs/services/teraserver/api
       run: |
-        wget --no-check-certificate https://localhost:40075/api/swagger.json
+        wget -O --no-check-certificate https://localhost:40075/api/swagger.json
 
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.7.1
