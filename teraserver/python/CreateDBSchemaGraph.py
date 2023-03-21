@@ -52,4 +52,4 @@ if __name__ == '__main__':
                                 rankdir='TB',  # From left to right (instead of top to bottom)
                                 concentrate=True  # Don't try to join the relation lines together
                                 )
-    graph.write_png('../docs/database/opentera_dbschema.png')   # write out the file
+    graph.write_png('../../docs/teraserver/database/opentera_dbschema.png')   # write out the file
