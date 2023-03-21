@@ -5,5 +5,6 @@ TeraServer
    :maxdepth: 2
    :caption: TeraServer
 
-   api/api
    OpenTera_AccessRoles.md
+   api/API.md
+   api/api_doc
