@@ -11,8 +11,8 @@ Welcome to OpenTera's documentation!
    :caption: Contents:
 
    Home
-
-
+   
+   api
 
 
 Indices and tables
