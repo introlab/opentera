@@ -42,7 +42,9 @@ jobs:
     - name: Generate documentation
       working-directory: docs
       run: |
-        $HOME/miniconda3/bin/conda activate ../teraserver/python/env/python-3.10
+        $HOME/miniconda3/bin/conda init bash
+        source $HOME/.bashrc
+        conda activate ../teraserver/python/env/python-3.10
         pip install -r requirements.txt
         make html
 
