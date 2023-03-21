@@ -44,6 +44,7 @@ jobs:
       run: |
         pip install -r requirements.txt
         make html
+        touch _build/html/.nojekyll
 
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.7.1
