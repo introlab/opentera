@@ -12,7 +12,6 @@ Welcome to OpenTera's documentation!
 
    Home
    installation
-   api
    services/services
 
 

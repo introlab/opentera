@@ -8,7 +8,7 @@ Services
 
    Service-Creation
    Services-Access
-
+   OpenTera_Services.md
 
 .. toctree::
    :maxdepth: 2
