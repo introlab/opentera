@@ -1,0 +1,86 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    networks:
+      - app-network
+ 
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes: 
+      - cache:/data
+    networks:
+      - app-network
+
+  cert-generator:
+    build: 
+      context: ../../
+      dockerfile: ./docker/dev/certificates/Dockerfile
+    image: opentera-cert-generator
+    volumes:
+      - certificates:/teraserver/python/certificates
+
+  proxy:
+    image: nginx
+    restart: always
+    volumes:
+      - ../../teraserver/python/config/opentera.conf:/etc/nginx/opentera.conf
+      - ../../teraserver/python/config/nginx.conf:/etc/nginx/nginx.conf
+      - certificates:/etc/certificates
+      - nginx-logs:/etc/nginx/logs
+    depends_on:
+      - cert-generator
+
+    ports:
+      - '40075:40075'
+    networks:
+      - app-network
+
+  opentera-server:
+    build: 
+      context: ../../
+      dockerfile: ./docker/dev/teraserver/Dockerfile
+    image: opentera-server
+    restart: always
+    volumes:
+      - certificates:/teraserver/python/certificates
+      - opentera-config:/teraserver/python/config
+    networks:
+      - app-network
+    depends_on:
+      - cert-generator
+      - proxy
+      - cache
+      - db
+
+volumes:
+  db:
+    driver: local
+
+  cache:
+    driver: local
+
+  certificates:
+    driver: local
+
+  nginx-logs: 
+    driver: local
+
+  opentera-config:
+    driver: local
+
+networks:
+  app-network:
