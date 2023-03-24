@@ -60,7 +60,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deploying OpenTera on a server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation for developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -69,20 +69,16 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Authentication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html#login">Login</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Message wrappers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Login &amp; Authentification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Internal messages structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Running-tests.html">Running Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
 </ul>
 
@@ -116,20 +112,20 @@
 <p>This page presents a brief overview of the security elements that have been put in place in the OpenTera platform.</p>
 <section id="logins-and-system-access">
 <h2>Logins and system access<a class="headerlink" href="#logins-and-system-access" title="Permalink to this heading"></a></h2>
-<p>As presented in the <a class="reference internal" href="#Login-and-authentication"><span class="xref myst">login and authentication</span></a> section, sensitive parts of the system are secured with a need to authenticate. Furthermore, <a class="reference internal" href="#Access-levels-for-user-types"><span class="xref myst">access roles</span></a> are defined to further filter out information that cannot be accessed by an end-user that doesn’t have the required access.</p>
+<p>As presented in the <a class="reference internal" href="developers/Login-and-authentication.html"><span class="doc std std-doc">login and authentication</span></a> section, sensitive parts of the system are secured with a need to authenticate. Furthermore, <a class="reference internal" href="services/teraserver/OpenTera_AccessRoles.html"><span class="doc std std-doc">access roles</span></a> are defined to further filter out information that cannot be accessed by an end-user that doesn’t have the required access.</p>
 <p>All of that filtering is done on server-side, preventing the clients to even have access to data they are not allowed to.</p>
 <p>While token-based authentication can be used, those tokens are encrypted and validated by the server against tampering, and static tokens have a very limited used (typically to login), requiring the need to use a dynamic token. Thus, in case of a security breach, the static tokens can be easily changed with minimal impact.</p>
 </section>
 <section id="ssl-certificates">
 <h2>SSL certificates<a class="headerlink" href="#ssl-certificates" title="Permalink to this heading"></a></h2>
 <p>All communication occurring from and to the server are encrypted using SSL certificates. Since a single point of entry is used (<a class="reference external" href="https://www.nginx.com/">NGINX</a>), the certificates only needs to be maintained and updated there, easing server maintenance without having to update each of the services and modules certificates individually.</p>
-<p>Except in <a class="reference internal" href="#Login-and-authentication"><span class="xref myst">special cases</span></a>, the certificates are not used to authenticate the clients, only to encrypt data transfer and to authenticate the server.</p>
+<p>Except in <a class="reference internal" href="developers/Login-and-authentication.html"><span class="doc std std-doc">special cases</span></a>, the certificates are not used to authenticate the clients, only to encrypt data transfer and to authenticate the server.</p>
 <p>While self-signed certificates can be used in local and development setup, on a <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">production server</span></a>, certificate-authority issued certificates should be used, especially since most web browsers (and operating systems) refuse to accept self-signed certificates.</p>
 </section>
 <section id="websocket-communication">
 <h2>Websocket communication<a class="headerlink" href="#websocket-communication" title="Permalink to this heading"></a></h2>
 <p>Secure websockets are used and all communication occurring over them are encrypted using the same SSL certificates as above.</p>
-<p>In the <a class="reference internal" href="#Websockets-communication"><span class="xref myst">websocket connection</span></a> with a client, the websocket listens only for 60 seconds before closing and will be tied to internal session id of the client requesting a websocket, preventing another client to connect on that particular websocket.</p>
+<p>In the <a class="reference internal" href="developers/Websockets-communication.html"><span class="doc std std-doc">websocket connection</span></a> with a client, the websocket listens only for 60 seconds before closing and will be tied to internal session id of the client requesting a websocket, preventing another client to connect on that particular websocket.</p>
 </section>
 <section id="video-sessions">
 <h2>Video sessions<a class="headerlink" href="#video-sessions" title="Permalink to this heading"></a></h2>
@@ -138,7 +134,7 @@
 <li><p>By using <a class="reference external" href="https://www.webrtc.org">WebRTC</a>, <strong>peer-to-peer connections are used</strong>, preventing video, audio and data information to transit over a third-party server. This server only acts as a signaling server to put peers in communications with each others. In the rare case that a TURN server might be required to relay information between peers, it would not have the key to decrypt and access the information it relays.</p></li>
 <li><p>Each video sessions are <strong>started on a different process</strong>. There is not a singular process on the server that would separate sessions into “rooms” or any similar software concepts. By using different process, this prevents possible data leaking: as each session runs by itself without knowing or having access to data in the other sessions, unless an invitation is sent to join that session, it is impossible to know what’s going on in each of them.</p></li>
 <li><p>Each video sessions are <em>dynamically created</em>. As opposed to standard online videoconferencing systems where a link for a specific meeting needs to be sent in advance to each invitees, OpenTera requires that each invitees logs to the system, and then invites them to a video session. This ease the use of the system in general for the participants (not having to receive many “meetings” invitation), but also makes a video session volatile and only present on the system for the time it is running.</p></li>
-<li><p>In a similar way, each video session is <strong>secured by an access key</strong> and <strong>runs on a different port</strong>. While the last element is a side effect of the video sessions running in different process, it provides a welcome variability in the sessions URLs (see the <a class="reference internal" href="Videorehab-Service.html"><span class="doc std std-doc">Video Rehab Service</span></a> for more information). Each session access key is a 128 bit unique ID that changes with each session and is sent only to the invitees. Thus, a hacker trying to join an out-going session would have to match the session port and the session access key, combined with the fact that this combination is valid for a limited time (the time the session is ongoing), would required a lot of computing resources to hack into a session… or be very very lucky! And in the improbable case such a hack would happen, the users would just have to close and start a new session to start anew.</p></li>
+<li><p>In a similar way, each video session is <strong>secured by an access key</strong> and <strong>runs on a different port</strong>. While the last element is a side effect of the video sessions running in different process, it provides a welcome variability in the sessions URLs (see the <a class="reference internal" href="services/Videorehab-Service.html"><span class="doc std std-doc">Video Rehab Service</span></a> for more information). Each session access key is a 128 bit unique ID that changes with each session and is sent only to the invitees. Thus, a hacker trying to join an out-going session would have to match the session port and the session access key, combined with the fact that this combination is valid for a limited time (the time the session is ongoing), would required a lot of computing resources to hack into a session… or be very very lucky! And in the improbable case such a hack would happen, the users would just have to close and start a new session to start anew.</p></li>
 </ul>
 </section>
 <section id="divide-and-conquer">

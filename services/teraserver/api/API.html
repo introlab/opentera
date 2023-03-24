@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="API Documentation" href="api_doc.html" />
-    <link rel="prev" title="Access Roles" href="../OpenTera_AccessRoles.html" /> 
+    <link rel="prev" title="User Manager Module" href="../UserManager-module.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,7 +52,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Deployment.html">Deploying OpenTera on a server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation for developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developers/Developers.html">Developers setup guide</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul class="current">
@@ -60,6 +60,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../services.html">Services</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../teraserver.html">TeraServer</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../OpenTera_AccessRoles.html">Access Roles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../UserManager-module.html">User Manager Module</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Using REST API</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#general-structure">General structure</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="#on-a-need-to-know-basis">On a need-to-know basis</a></li>
@@ -80,25 +81,24 @@
 <li class="toctree-l3"><a class="reference internal" href="../teraserver.html#teraserver-service">TeraServer Service</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../FileTransfer-Service.html">File Transfer Service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Logging-Service.html">Logging Service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Videorehab-Service.html">VideoRehab Service</a></li>
 </ul>
 </li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../developers/Developers.html">Developers setup guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developers/Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../developers/Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../developers/Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../developers/Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developers/Login-and-authentication.html">Authentication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developers/Login-and-authentication.html#login">Login</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developers/Messages-structure.html">Message wrappers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developers/Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developers/Login-and-authentication.html">Login &amp; Authentification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developers/Messages-structure.html">Internal messages structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developers/Websockets-communication.html">Websockets management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developers/Websockets-communication.html">Websockets communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developers/Running-tests.html">Running Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../developers/Translations.html">Translations</a></li>
 </ul>
 
@@ -133,19 +133,19 @@
 <p>OpenTera REST API is served by a <a class="reference external" href="https://flask.palletsprojects.com">Flask</a> web server.</p>
 <section id="general-structure">
 <h2>General structure<a class="headerlink" href="#general-structure" title="Permalink to this heading"></a></h2>
-<p>OpenTera REST API main purpose is to interact with the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database objects</span></a>, to control the server itself, query information and to do various actions related to the modules and system services.</p>
+<p>OpenTera REST API main purpose is to interact with the <a class="reference internal" href="../../../developers/Database-Structure.html"><span class="doc std std-doc">database objects</span></a>, to control the server itself, query information and to do various actions related to the modules and system services.</p>
 <p>Since OpenTera is based on a micro-service architecture, each service can expose (or not) their own REST API. Only the OpenTera API is described here, as various services might implement other scheme and features.</p>
 <section id="on-a-need-to-know-basis">
 <h3>On a need-to-know basis<a class="headerlink" href="#on-a-need-to-know-basis" title="Permalink to this heading"></a></h3>
-<p>Every return value coming from the API will be filtered and checked against the requester <a class="reference internal" href="#Access-levels-for-user-types"><span class="xref myst">access level</span></a>. For example, a user querying for projects will only have projects that it can access, other projects being filtered out at the server level. This ensure that data cannot leak by making a general query.</p>
+<p>Every return value coming from the API will be filtered and checked against the requester <a class="reference internal" href="../OpenTera_AccessRoles.html"><span class="doc std std-doc">access level</span></a>. For example, a user querying for projects will only have projects that it can access, other projects being filtered out at the server level. This ensure that data cannot leak by making a general query.</p>
 <p>Data API is also structured on a need-to-know basis, meaning that the requester has to make individual queries (or add the appropriate parameters to each query) to have the information it needs. There is no complete data dump API that would return everything needed by a client with a single query (which would also be very client specific, as no client implementation requires the exact same information).</p>
 </section>
 <section id="api-levels">
 <h3>API levels<a class="headerlink" href="#api-levels" title="Permalink to this heading"></a></h3>
 <p>There is 4 API levels in OpenTera: user API, participant API, device API and service API. A separation of those API was done in order to better control what each of these base user types can access.</p>
-<p>Each API request can require <a class="reference internal" href="#Login-and-authentication"><span class="xref myst">authentication</span></a>, or can be fully opened, depending on the specific calls.</p>
+<p>Each API request can require <a class="reference internal" href="../../../developers/Login-and-authentication.html"><span class="doc std std-doc">authentication</span></a>, or can be fully opened, depending on the specific calls.</p>
 <ul class="simple">
-<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/modules/FlaskModule/API/user"><code class="docutils literal notranslate"><span class="pre">User</span> <span class="pre">API</span></code></a></strong> controls all that the users can do with OpenTera. Since most of the operations are initiated by users, this is the largest API, as every <a class="reference internal" href="#Database-Structure"><span class="xref myst">database objects</span></a> is somehow accessible using this API.</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/modules/FlaskModule/API/user"><code class="docutils literal notranslate"><span class="pre">User</span> <span class="pre">API</span></code></a></strong> controls all that the users can do with OpenTera. Since most of the operations are initiated by users, this is the largest API, as every <a class="reference internal" href="../../../developers/Database-Structure.html"><span class="doc std std-doc">database objects</span></a> is somehow accessible using this API.</p></li>
 <li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/modules/FlaskModule/API/participant"><code class="docutils literal notranslate"><span class="pre">Participant</span> <span class="pre">API</span></code></a></strong> controls all that the participants can do to interact with OpenTera. For security reasons, the features available here are limited and only the required ones are exposed.</p></li>
 <li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/modules/FlaskModule/API/device"><code class="docutils literal notranslate"><span class="pre">Device</span> <span class="pre">API</span></code></a></strong> controls all that the devices can do to interact with OpenTera. Similarly to the participant API, the features available here are limited, and such is the returned information.</p></li>
 <li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/modules/FlaskModule/API/service"><code class="docutils literal notranslate"><span class="pre">Service</span> <span class="pre">API</span></code></a></strong> is a API that is only accessible by services. As such, return values are less limited than using one of the other API, though only features useful to services are implemented in that API.</p></li>
@@ -168,9 +168,9 @@
 <p>All return values of the GET API are JSON-formatted string, and may include lists, dictionaries and any combination of those.</p>
 <p>Some common parameters are standardized and used between all the GET API:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">id_*</span></code> referring to a specific id. The end part of the id is the name of that <a class="reference internal" href="#Database-Structure"><span class="xref myst">database object</span></a>. For example, <code class="docutils literal notranslate"><span class="pre">id_site</span></code> would refer to a specific site.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id_*</span></code> referring to a specific id. The end part of the id is the name of that <a class="reference internal" href="../../../developers/Database-Structure.html"><span class="doc std std-doc">database object</span></a>. For example, <code class="docutils literal notranslate"><span class="pre">id_site</span></code> would refer to a specific site.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">list</span></code> indicating that the return value should only contains minimal information. What is minimal information depends on each function and objects, but usually, the minimal information is only what is needed to display the returned information in a list.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">with_*</span></code> indicating that further information will be returned in the reply. When querying <a class="reference internal" href="#Database-Structure"><span class="xref myst">database objects</span></a>, this usually corresponds to <code class="docutils literal notranslate"><span class="pre">joins</span></code> between the various objects.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">with_*</span></code> indicating that further information will be returned in the reply. When querying <a class="reference internal" href="../../../developers/Database-Structure.html"><span class="doc std std-doc">database objects</span></a>, this usually corresponds to <code class="docutils literal notranslate"><span class="pre">joins</span></code> between the various objects.</p></li>
 </ul>
 </section>
 <section id="post">
@@ -178,12 +178,12 @@
 <p>When posting data to update or create new information, some structural convention must be respected:</p>
 <ul class="simple">
 <li><p>Posted data should be in JSON format and in the <code class="docutils literal notranslate"><span class="pre">json</span></code> part of the request</p></li>
-<li><p>A list of dictionary is needed (even if posting a single value) for the POST functions to properly works. The dictionary should have a key corresponding to the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database object name</span></a> needing update, followed by a dictionary of values to update. For example, if a project should be created, the following JSON could be used:</p></li>
+<li><p>A list of dictionary is needed (even if posting a single value) for the POST functions to properly works. The dictionary should have a key corresponding to the <a class="reference internal" href="../../../developers/Database-Structure.html"><span class="doc std std-doc">database object name</span></a> needing update, followed by a dictionary of values to update. For example, if a project should be created, the following JSON could be used:</p></li>
 </ul>
 <p><code class="docutils literal notranslate"><span class="pre">['project':</span> <span class="pre">{</span> <span class="pre">id_project:</span> <span class="pre">0,</span> <span class="pre">id_site:</span> <span class="pre">1,</span> <span class="pre">project_name:</span> <span class="pre">'Doc</span> <span class="pre">Project'}]</span></code></p>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">id_*</span></code> value needs to be set to <code class="docutils literal notranslate"><span class="pre">0</span></code> if creating a new data. Otherwise, it will need to be put to the correct value of the object being updated</p></li>
-<li><p>Names of the keys in the object dictionary, if that object is a <a class="reference internal" href="#Database-Structure"><span class="xref myst">database object</span></a>, should be properties of the model. Thus, it is easy to find what values can be posted by looking at the definition of each objects (or the documentation of the specific API).</p></li>
+<li><p>Names of the keys in the object dictionary, if that object is a <a class="reference internal" href="../../../developers/Database-Structure.html"><span class="doc std std-doc">database object</span></a>, should be properties of the model. Thus, it is easy to find what values can be posted by looking at the definition of each objects (or the documentation of the specific API).</p></li>
 </ul>
 </section>
 <section id="delete">
@@ -196,9 +196,9 @@
 <p>Some API functions have a specific purpose that goes beyond the scope of the standard definition, and are described below.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">/api/device/register</span></code> allows a device to register itself into OpenTera. The device can request a certificate from the server if the content-type of the request is set to <code class="docutils literal notranslate"><span class="pre">application/octet-stream</span></code>. Otherwise, a device token will be generated and returned to the device. In any case, the device won’t be able to log in and access the device API before a user enables the device and assign it to at least one project. This function is also rate limited (currently to 10 requests per minute) to prevent mass creation of devices.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">*/refresh_token</span></code> allows to get a dynamic token using a previous dynamic token, if such <a class="reference internal" href="#Login-and-authentication"><span class="xref myst">authentication scheme</span></a> is used and available for that API.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">*/login</span></code> and <code class="docutils literal notranslate"><span class="pre">*/logout</span></code> allow the login and logout process to occurs. See <a class="reference internal" href="#Login-and-authentication"><span class="xref myst">login and authentication</span></a> for more information.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/api/user/forms</span></code> allows to query a <a class="reference internal" href="#Form-Structure"><span class="xref myst">form structure</span></a> corresponding to the specified object type.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*/refresh_token</span></code> allows to get a dynamic token using a previous dynamic token, if such <a class="reference internal" href="../../../developers/Login-and-authentication.html"><span class="doc std std-doc">authentication scheme</span></a> is used and available for that API.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*/login</span></code> and <code class="docutils literal notranslate"><span class="pre">*/logout</span></code> allow the login and logout process to occurs. See <a class="reference internal" href="../../../developers/Login-and-authentication.html"><span class="doc std std-doc">login and authentication</span></a> for more information.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/api/user/forms</span></code> allows to query a <a class="reference internal" href="../../../developers/Form-Structure.html"><span class="doc std std-doc">form structure</span></a> corresponding to the specified object type.</p></li>
 </ul>
 </section>
 </section>
@@ -207,7 +207,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../OpenTera_AccessRoles.html" class="btn btn-neutral float-left" title="Access Roles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../UserManager-module.html" class="btn btn-neutral float-left" title="User Manager Module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="api_doc.html" class="btn btn-neutral float-right" title="API Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

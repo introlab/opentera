@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Basic features of the internal communication module &mdash; OpenTera 1.2.0 documentation</title>
+  <title>Inter-service communication &mdash; OpenTera 1.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,7 +19,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Authentication" href="Login-and-authentication.html" />
+    <link rel="next" title="Login &amp; Authentification" href="Login-and-authentication.html" />
     <link rel="prev" title="Internal Form Structure" href="Form-Structure.html" /> 
 </head>
 
@@ -52,7 +52,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation for developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -61,32 +61,31 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Basic features of the internal communication module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#get-set-scheme-asynchronous-communication">Get / Set scheme (Asynchronous communication)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#publish-subscribe-scheme-asynchronous-communication">Publish / Subscribe scheme (Asynchronous communication)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#topic-naming-convention">Topic naming convention</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Inter-service communication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-features-of-the-internal-communication-module">Basic features of the internal communication module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#get-set-scheme-asynchronous-communication">Get / Set scheme (Asynchronous communication)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#publish-subscribe-scheme-asynchronous-communication">Publish / Subscribe scheme (Asynchronous communication)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#topic-naming-convention">Topic naming convention</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#remote-procedure-call-rpc-synchronous-communication">Remote Procedure Call (RPC) (Synchronous communication)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#declaring-a-remotely-callable-procedure">Declaring a remotely callable procedure</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#calling-a-remote-procedure-function">Calling a remote procedure (function)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#remote-procedure-call-rpc-synchronous-communication">Remote Procedure Call (RPC) (Synchronous communication)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#declaring-a-remotely-callable-procedure">Declaring a remotely callable procedure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#calling-a-remote-procedure-function">Calling a remote procedure (function)</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Authentication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html#login">Login</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Message wrappers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Internal messages structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Running Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
 </ul>
 
@@ -104,7 +103,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Basic features of the internal communication module</li>
+      <li class="breadcrumb-item active">Inter-service communication</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/developers/Internal-services-communication-module.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -114,14 +113,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <p>Internal communication between modules and services (system or external) is done using a <a class="reference external" href="https://redis.io/">Redis</a> server and database.</p>
+  <section id="inter-service-communication">
+<h1>Inter-service communication<a class="headerlink" href="#inter-service-communication" title="Permalink to this heading"></a></h1>
+<p>Internal communication between modules and services (system or external) is done using a <a class="reference external" href="https://redis.io/">Redis</a> server and database.</p>
 <section id="basic-features-of-the-internal-communication-module">
-<h1>Basic features of the internal communication module<a class="headerlink" href="#basic-features-of-the-internal-communication-module" title="Permalink to this heading"></a></h1>
+<h2>Basic features of the internal communication module<a class="headerlink" href="#basic-features-of-the-internal-communication-module" title="Permalink to this heading"></a></h2>
 <p>The internal communication module allows to exchange data between service and modules running in different process and, potentially, on a different server.</p>
 <p>Two modes are supported by the current implementation: asynchronous communication where data will published and received by the different subscribers in a non-blocking way, and a synchronous communication scheme where a call to a function on a remote service / module will block until a reply is received (or a time-out occurs).</p>
 <p>Implementation is done in the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/opentera/redis/RedisClient.py">RedisClient</a> and <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/opentera/redis/RedisRPCClient.py">RedisClientRPC</a>. An instance of those class should be instantiated by each service requiring the use of this module.</p>
 <section id="get-set-scheme-asynchronous-communication">
-<h2>Get / Set scheme (Asynchronous communication)<a class="headerlink" href="#get-set-scheme-asynchronous-communication" title="Permalink to this heading"></a></h2>
+<h3>Get / Set scheme (Asynchronous communication)<a class="headerlink" href="#get-set-scheme-asynchronous-communication" title="Permalink to this heading"></a></h3>
 <p>This scheme allows to set variables in the Redis system that could be read by the various services. Typically, a service will write a value and another one will read that value when needed.</p>
 <p>Currently, no synchronization mechanism was implemented and only one service should write any variable values to prevent conflicts. If a more dynamic system is required, the publish / subscribe scheme should probably be used instead.</p>
 <p>Static variables are defined in the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/opentera/redis/RedisVars.py">RedisVars</a> class and are commented there.</p>
@@ -129,10 +130,10 @@
 <p>As of now, dynamic variables names are used to authorize or not an incoming <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket</span></a> connection. In that case, when a <a class="reference internal" href="Login-and-authentication.html"><span class="doc std std-doc">login</span></a> is requested, the current session id is stored in the Redis database and used to validate that the websocket is allowed to connect.</p>
 </section>
 <section id="publish-subscribe-scheme-asynchronous-communication">
-<h2>Publish / Subscribe scheme (Asynchronous communication)<a class="headerlink" href="#publish-subscribe-scheme-asynchronous-communication" title="Permalink to this heading"></a></h2>
+<h3>Publish / Subscribe scheme (Asynchronous communication)<a class="headerlink" href="#publish-subscribe-scheme-asynchronous-communication" title="Permalink to this heading"></a></h3>
 <p>Using “topics”, the internal services communication allows for a publish / subscribe scheme where a publisher (for example, a service or a module updating the online status of an user) will update a specific topic name and where a subscriber (for example, a service who wants to do something when an user gets offline) can receive an event when that specific topic value is changed.</p>
 <section id="topic-naming-convention">
-<h3>Topic naming convention<a class="headerlink" href="#topic-naming-convention" title="Permalink to this heading"></a></h3>
+<h4>Topic naming convention<a class="headerlink" href="#topic-naming-convention" title="Permalink to this heading"></a></h4>
 <p>While in theory any topic name could be used, a convention was defined for the OpenTera to help debug and trace what is happening in the system, and prevent duplicate topic names with the same purpose. Depending on the publisher, the topic name will always have that structure:</p>
 <p><code class="docutils literal notranslate"><span class="pre">module.&lt;module_name&gt;.messages</span></code> for published <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">messages</span></a> originating from the module &lt;module_name&gt;</p>
 <p><code class="docutils literal notranslate"><span class="pre">module.&lt;module_name&gt;.events</span></code> for <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">events</span></a> needed to be received by the module &lt;module_name&gt; (which could also be managed by any subscriber)</p>
@@ -144,18 +145,18 @@
 </section>
 </section>
 <section id="remote-procedure-call-rpc-synchronous-communication">
-<h2>Remote Procedure Call (RPC) (Synchronous communication)<a class="headerlink" href="#remote-procedure-call-rpc-synchronous-communication" title="Permalink to this heading"></a></h2>
+<h3>Remote Procedure Call (RPC) (Synchronous communication)<a class="headerlink" href="#remote-procedure-call-rpc-synchronous-communication" title="Permalink to this heading"></a></h3>
 <p>A service or a module can expose some functions that may be called by other modules and services. By providing a synchronous communication scheme, a caller may block until the remote function has been properly completed and then manage the return values, if needed.</p>
 <p>In the Redis database, the remote procedure calls will be handled by the topic:</p>
 <p><code class="docutils literal notranslate"><span class="pre">service.&lt;service_key&gt;.rpc</span></code> where &lt;service_key&gt; is the service key implementing the function needed to be called</p>
 <section id="declaring-a-remotely-callable-procedure">
-<h3>Declaring a remotely callable procedure<a class="headerlink" href="#declaring-a-remotely-callable-procedure" title="Permalink to this heading"></a></h3>
+<h4>Declaring a remotely callable procedure<a class="headerlink" href="#declaring-a-remotely-callable-procedure" title="Permalink to this heading"></a></h4>
 <p>Currently, there is no way for a service to explicitly declare the list of their callable functions. The main reason for this is that the service will only receive a Redis event from the publish / subscribe on the specified topic above, and will have to handle the value of that topic to reply to it and/or execute what’s requested.</p>
 <p>The received message for an RPC request in the topic will be a <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">RPCMessage</span></a>, which will be parsed by the receiving service. The procedure can then return any JSON formatted reply, which will be forwarded to the caller.</p>
-<p>Each of the service having a callable procedure thus need to document somehow their exposed RPC API. For the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">core service</span></a> and the system services, the RPC API is documented in this wiki.</p>
+<p>Each of the service having a callable procedure thus need to document somehow their exposed RPC API. For the <a class="reference internal" href="../services/teraserver/TeraServer-Service.html"><span class="doc std std-doc">core service</span></a> and the system services, the RPC API is documented in this wiki.</p>
 </section>
 <section id="calling-a-remote-procedure-function">
-<h3>Calling a remote procedure (function)<a class="headerlink" href="#calling-a-remote-procedure-function" title="Permalink to this heading"></a></h3>
+<h4>Calling a remote procedure (function)<a class="headerlink" href="#calling-a-remote-procedure-function" title="Permalink to this heading"></a></h4>
 <p>Knowing a service available procedure, the call can simply be made by using <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/opentera/redis/RedisRPCClient.py">RedisClientRPC</a>:</p>
 <p><code class="docutils literal notranslate"><span class="pre">call</span></code> (for a call to a module) or <code class="docutils literal notranslate"><span class="pre">call_service</span></code> (for a call to a service). The <code class="docutils literal notranslate"><span class="pre">function_name</span></code> argument will represent the name of the remote function to call, and the <code class="docutils literal notranslate"><span class="pre">args</span></code> will be an array of arguments to send to that function. Currently, only the following argument types are supported:</p>
 <ul class="simple">
@@ -169,13 +170,14 @@
 </section>
 </section>
 </section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="Form-Structure.html" class="btn btn-neutral float-left" title="Internal Form Structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Login-and-authentication.html" class="btn btn-neutral float-right" title="Authentication" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Login-and-authentication.html" class="btn btn-neutral float-right" title="Login &amp; Authentification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

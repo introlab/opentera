@@ -1,5 +1,3 @@
-About OpenTera
-==============
 .. toctree::
    :maxdepth: 5
    :hidden:
@@ -16,7 +14,7 @@ About OpenTera
 
    Deployment
    Configuration-files
-   Installation for developers <installation>
+   developers/Developers
 
 .. toctree::
    :hidden:
@@ -29,8 +27,8 @@ About OpenTera
    :hidden:
    :caption: Developers
 
-   developers/Developers
-   services/Service-Creation
+
+   developers/Service-Creation
    developers/Code-Structure
    developers/Database-Structure
    developers/Form-Structure
@@ -43,7 +41,6 @@ About OpenTera
    developers/Translations
 
 .. include:: Home.rst
-   :start-after: About OpenTera
 
 ..
    Indices and tables

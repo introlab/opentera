@@ -50,7 +50,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../Deployment.html">Deploying OpenTera on a server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation for developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Developers.html">Developers setup guide</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -59,20 +59,16 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Developers.html">Developers setup guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Login-and-authentication.html">Authentication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Login-and-authentication.html#login">Login</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Messages-structure.html">Message wrappers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Login-and-authentication.html">Login &amp; Authentification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Messages-structure.html">Internal messages structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Websockets-communication.html">Websockets management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Websockets-communication.html">Websockets communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Running-tests.html">Running Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Translations.html">Translations</a></li>
 </ul>
 
@@ -102,14 +98,14 @@
              
   <section id="teraserver-service">
 <h1>TeraServer Service<a class="headerlink" href="#teraserver-service" title="Permalink to this heading"></a></h1>
-<p>The TeraServer service is the core service of the OpenTera platform. It runs the different <a class="reference internal" href="#Architecture_Overview"><span class="xref myst">modules</span></a> of the platform. An OpenTera server cannot exist without that service!</p>
+<p>The TeraServer service is the core service of the OpenTera platform. It runs the different <a class="reference internal" href="../../Architecture-Overview.html"><span class="doc std std-doc">modules</span></a> of the platform. An OpenTera server cannot exist without that service!</p>
 <section id="main-script">
 <h2>Main script<a class="headerlink" href="#main-script" title="Permalink to this heading"></a></h2>
 <p>The TeraServer service can be launched by running the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/TeraServer.py">TeraServer.py</a> script.</p>
 </section>
 <section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
-<p>Configuration files for the TeraServer service are described <a class="reference internal" href="#Configuration-files"><span class="xref myst">here</span></a>.</p>
+<p>Configuration files for the TeraServer service are described <a class="reference internal" href="../../Configuration-files.html"><span class="doc std std-doc">here</span></a>.</p>
 </section>
 <section id="default-port-and-location">
 <h2>Default port and location<a class="headerlink" href="#default-port-and-location" title="Permalink to this heading"></a></h2>
@@ -118,7 +114,7 @@
 <section id="web-urls">
 <h2>Web URLs<a class="headerlink" href="#web-urls" title="Permalink to this heading"></a></h2>
 <p><strong>About page</strong> - by default at https://127.0.0.1:40075/about. Will display the about page of the server, including the version and possible <a class="reference external" href="https://github.com/introlab/openteraplus">OpenTeraPlus</a> client versions available to download</p>
-<p><strong>Doc page</strong> - by default at https://127.0.0.1:400075/doc. Will display the <a class="reference internal" href="#API"><span class="xref myst">REST API</span></a> documentation and test system. Useful to test queries manually.</p>
+<p><strong>Doc page</strong> - by default at https://127.0.0.1:400075/doc. Will display the <a class="reference internal" href="api/API.html"><span class="doc std std-doc">REST API</span></a> documentation and test system. Useful to test queries manually.</p>
 </section>
 </section>
 

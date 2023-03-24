@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Creating a new service based on OpenTera" href="../services/Service-Creation.html" />
-    <link rel="prev" title="API Documentation" href="../services/teraserver/api/api_doc.html" /> 
+    <link rel="next" title="Getting Started for Developers - Windows 10" href="Developer-Setup-for-Windows.html" />
+    <link rel="prev" title="Configuration files" href="../Configuration-files.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -49,10 +49,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation for developers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developers setup guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Windows.html">Getting Started for Developers - Windows 10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Mac.html">Getting Started for Developers - Mac OS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -60,25 +65,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Developers setup guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#what-you-will-need">What you will need?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#specific-platform-setup-guides">Specific platform setup guides</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Authentication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html#login">Login</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Message wrappers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Internal messages structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Running Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
 </ul>
 
@@ -98,7 +95,7 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Developers setup guide</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/developers/Developers.md.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/developers/Developers.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -108,52 +105,36 @@
              
   <section id="developers-setup-guide">
 <h1>Developers setup guide<a class="headerlink" href="#developers-setup-guide" title="Permalink to this heading"></a></h1>
-<section id="what-you-will-need">
-<h2>What you will need?<a class="headerlink" href="#what-you-will-need" title="Permalink to this heading"></a></h2>
-<p>OpenTera uses cross-platform languages, allowing development to occur on multiple platform, be it Windows, Mac or Linux.</p>
+<div class="toctree-wrapper compound">
+</div>
+<p>## What you will need?
+OpenTera uses cross-platform languages, allowing development to occur on multiple platform, be it Windows, Mac or Linux.</p>
 <p>Using standard modules and technology is useful to maintain such a project over long term, but it also brings some complexity to building up a development setup. Whatever your platform of choice, you’ll need the following tools:</p>
 <ul class="simple">
-<li><p><strong>A Python environment</strong>, Python being the language used to develop the backend</p>
-<ul>
-<li><p><a class="reference external" href="https://conda.io/miniconda.html">Miniconda</a> is used to setup the Python environment</p></li>
-<li><p><a class="reference external" href="https://cmake.org/">CMake</a> tool is used to automate the environment building and translations management</p></li>
-<li><p><a class="reference external" href="https://www.qt.io/product/development-tools">QT Creator</a> is recommended to simplify the build process, but not required</p></li>
-<li><p><a class="reference external" href="https://www.jetbrains.com/pycharm/">PyCharm</a> is used as the IDE for Python, recommended, but not required as you can use any IDE you like</p></li>
+<li><p><strong>A Python environment</strong>, Python being the language used to develop the backend
+* [Miniconda](<a class="reference external" href="https://conda.io/miniconda.html">https://conda.io/miniconda.html</a>) is used to setup the Python environment
+* [CMake](<a class="reference external" href="https://cmake.org/">https://cmake.org/</a>) tool is used to automate the environment building and translations management
+* [QT Creator](<a class="reference external" href="https://www.qt.io/product/development-tools">https://www.qt.io/product/development-tools</a>) is recommended to simplify the build process, but not required
+* [PyCharm](<a class="reference external" href="https://www.jetbrains.com/pycharm/">https://www.jetbrains.com/pycharm/</a>) is used as the IDE for Python, recommended, but not required as you can use any IDE you like</p></li>
+<li><p><strong>A Postgresql database</strong>
+* [Postgresql](<a class="reference external" href="https://www.postgresql.org/">https://www.postgresql.org/</a>). While OpenTera being based on [SQL Alchemy](<a class="reference external" href="https://www.sqlalchemy.org/">https://www.sqlalchemy.org/</a>) could, in theory, be used with other SQL database types (such as MySQL), the open nature of this project and of Postgresql made it the suggested database system. Thus, no support is currently explicitly provided for other databases type.</p></li>
+<li><p><strong>Redis server</strong>
+* [Redis](<a class="reference external" href="https://redis.io/">https://redis.io/</a>) is used to provide a common storage for publish/subscribe mechanism between modules and services</p></li>
+<li><p><strong>NGINX</strong>
+* [NGINX](<a class="reference external" href="https://www.nginx.com/">https://www.nginx.com/</a>) is used to redirect requests to the appropriate service and to expose only one external port. It could also be used as a load-balancing server if required</p></li>
 </ul>
-</li>
-<li><p><strong>A Postgresql database</strong></p>
-<ul>
-<li><p><a class="reference external" href="https://www.postgresql.org/">Postgresql</a>. While OpenTera being based on <a class="reference external" href="https://www.sqlalchemy.org/">SQL Alchemy</a> could, in theory, be used with other SQL database types (such as MySQL), the open nature of this project and of Postgresql made it the suggested database system. Thus, no support is currently explicitly provided for other databases type.</p></li>
-</ul>
-</li>
-<li><p><strong>Redis server</strong></p>
-<ul>
-<li><p><a class="reference external" href="https://redis.io/">Redis</a> is used to provide a common storage for publish/subscribe mechanism between modules and services</p></li>
-</ul>
-</li>
-<li><p><strong>NGINX</strong></p>
-<ul>
-<li><p><a class="reference external" href="https://www.nginx.com/">NGINX</a> is used to redirect requests to the appropriate service and to expose only one external port. It could also be used as a load-balancing server if required</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="specific-platform-setup-guides">
-<h2>Specific platform setup guides<a class="headerlink" href="#specific-platform-setup-guides" title="Permalink to this heading"></a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="Developer-Setup-for-Windows.html"><span class="doc std std-doc">Developer Setup for Windows</span></a></p></li>
-<li><p><a class="reference internal" href="Developer-Setup-for-Mac.html"><span class="doc std std-doc">Developer Setup for MAC</span></a></p></li>
-<li><p><a class="reference internal" href="Developer-Setup-for-Linux.html"><span class="doc std std-doc">Developer Setup for Linux</span></a></p></li>
-</ul>
-</section>
+<p>## Specific platform setup guides</p>
+<p>### [Developer Setup for Windows](Developer-Setup-for-Windows)
+### [Developer Setup for MAC](Developer-Setup-for-Mac)
+### [Developer Setup for Linux](Developer-Setup-for-Linux)</p>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../services/teraserver/api/api_doc.html" class="btn btn-neutral float-left" title="API Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../services/Service-Creation.html" class="btn btn-neutral float-right" title="Creating a new service based on OpenTera" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../Configuration-files.html" class="btn btn-neutral float-left" title="Configuration files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Developer-Setup-for-Windows.html" class="btn btn-neutral float-right" title="Getting Started for Developers - Windows 10" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

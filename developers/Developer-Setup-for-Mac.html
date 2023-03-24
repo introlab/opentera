@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="OpenTera Services Structure" href="../services/OpenTera_Services.html" />
-    <link rel="prev" title="Getting Started for Developers - Ubuntu-based Linux distros" href="Developer-Setup-for-Linux.html" /> 
+    <link rel="next" title="Getting Started for Developers - Ubuntu-based Linux distros" href="Developer-Setup-for-Linux.html" />
+    <link rel="prev" title="Getting Started for Developers - Windows 10" href="Developer-Setup-for-Windows.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,9 +52,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../installation.html">Installation for developers</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="Developers.html">Developers setup guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Windows.html">Getting Started for Developers - Windows 10</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Getting Started for Developers - Mac OS</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pre-requisites">Pre-requisites</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#installing-xcode">Installing Xcode</a></li>
@@ -75,6 +74,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#starting-the-main-opentera-service">Starting the main OpenTera service</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
 </ul>
 </li>
 </ul>
@@ -85,20 +85,16 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Authentication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html#login">Login</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Message wrappers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Internal messages structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Running Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
 </ul>
 
@@ -116,7 +112,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../installation.html">Installation</a></li>
+          <li class="breadcrumb-item"><a href="Developers.html">Developers setup guide</a></li>
       <li class="breadcrumb-item active">Getting Started for Developers - Mac OS</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/developers/Developer-Setup-for-Mac.md.txt" rel="nofollow"> View page source</a>
@@ -140,7 +136,7 @@
 <li><p><a class="reference external" href="https://www.postgresql.org/download/">PostgreSQL</a> for the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database backend</span></a></p></li>
 <li><p><a class="reference external" href="https://redislabs.com/">Redis Server</a> for the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication system</span></a></p></li>
 <li><p><a class="reference external" href="https://nginx.org/en/download.html">NGINX</a> for the system routing</p></li>
-<li><p><a class="reference external" href="https://nodejs.org">Node.js</a> required for the <a class="reference internal" href="#Videorehab-Service"><span class="xref myst">VideoRehab service</span></a></p></li>
+<li><p><a class="reference external" href="https://nodejs.org">Node.js</a> required for the <a class="reference internal" href="../services/Videorehab-Service.html"><span class="doc std std-doc">VideoRehab service</span></a></p></li>
 <li><p>(Optional) <a class="reference external" href="https://www.qt.io/download">Qt Creator</a> for a UI to execute the <code class="docutils literal notranslate"><span class="pre">cmake</span></code> command</p></li>
 <li><p>(Optional) <a class="reference external" href="https://www.jetbrains.com/pycharm/">PyCharm</a> for a integrated development environment (IDE) (very recommended, though you could, in theory, use any other IDE or text editor)</p></li>
 </ul>
@@ -183,7 +179,7 @@ brew<span class="w"> </span>install<span class="w"> </span>redis
 brew<span class="w"> </span>services<span class="w"> </span>start<span class="w"> </span>redis
 </pre></div>
 </div>
-<p>If you are setting a user and a password, you will need to adjust the <a class="reference internal" href="#Configuration-files"><span class="xref myst">configuration files</span></a> accordingly.</p>
+<p>If you are setting a user and a password, you will need to adjust the <a class="reference internal" href="../Configuration-files.html"><span class="doc std std-doc">configuration files</span></a> accordingly.</p>
 </section>
 <section id="installing-and-running-nginx">
 <h3>Installing (and running) NGINX<a class="headerlink" href="#installing-and-running-nginx" title="Permalink to this heading"></a></h3>
@@ -226,18 +222,17 @@ When installing Qt, only the Qt Creator is needed for this project. You would, h
 <p>The pgAdmin interface will then be ready for the next steps.</p>
 <section id="creating-users">
 <h3>Creating users<a class="headerlink" href="#creating-users" title="Permalink to this heading"></a></h3>
-<p>A single user, <code class="docutils literal notranslate"><span class="pre">teraagent</span></code> with the default password <code class="docutils literal notranslate"><span class="pre">tera</span></code> will need to be created before creating the required databases. A different user and/or a different password could be used, but the <a class="reference internal" href="#Configuration-files"><span class="xref myst">configuration files</span></a> will need to be adjusted accordingly.</p>
+<p>A single user, <code class="docutils literal notranslate"><span class="pre">teraagent</span></code> with the default password <code class="docutils literal notranslate"><span class="pre">tera</span></code> will need to be created before creating the required databases. A different user and/or a different password could be used, but the <a class="reference internal" href="../Configuration-files.html"><span class="doc std std-doc">configuration files</span></a> will need to be adjusted accordingly.</p>
 <ol class="arabic simple">
 <li><p>Right-click on the <code class="docutils literal notranslate"><span class="pre">Login/Group</span> <span class="pre">Roles</span></code> section in the left tree of the pgAdmin interface</p></li>
 <li><p>Select <code class="docutils literal notranslate"><span class="pre">Create...</span></code> and then <code class="docutils literal notranslate"><span class="pre">Login/Group</span> <span class="pre">Role...</span></code></p></li>
-<li><p>Fill the following informations in the dialog:</p></li>
-</ol>
+<li><p>Fill the following informations in the dialog:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">General</span></code> - <code class="docutils literal notranslate"><span class="pre">Name</span></code>: teraagent</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Definition</span></code> - <code class="docutils literal notranslate"><span class="pre">Password</span></code>: tera</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Privileges</span></code> - <code class="docutils literal notranslate"><span class="pre">Can</span> <span class="pre">login</span></code>: On</p></li>
 </ul>
-<ol class="arabic simple" start="4">
+</li>
 <li><p>Save the dialog</p></li>
 </ol>
 <p>The <code class="docutils literal notranslate"><span class="pre">teraagent</span></code> user should have been created.</p>
@@ -246,21 +241,17 @@ When installing Qt, only the Qt Creator is needed for this project. You would, h
 <h3>Creating databases<a class="headerlink" href="#creating-databases" title="Permalink to this heading"></a></h3>
 <p>Each system service will requires its own database. The default database that needs to be created are as follow:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">opentera</span></code>, the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a> database</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">openterafiles</span></code>, the database for the <a class="reference internal" href="#FileTransfer-Service"><span class="xref myst">file transfer</span></a> service</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">openteralogs</span></code>, the database for the <a class="reference internal" href="#Logging-Service"><span class="xref myst">logging service</span></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">opentera</span></code>, the <a class="reference internal" href="../services/teraserver/TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a> database</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">openterafiles</span></code>, the database for the <a class="reference internal" href="../services/FileTransfer-Service.html"><span class="doc std std-doc">file transfer</span></a> service</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">openteralogs</span></code>, the database for the <a class="reference internal" href="../services/Logging-Service.html"><span class="doc std std-doc">logging service</span></a></p></li>
 </ul>
 <p>The steps to create a database are as follow. Those steps should be repeated for each database to create.</p>
 <ol class="arabic simple">
 <li><p>In pgAdmin, under <code class="docutils literal notranslate"><span class="pre">Servers</span></code>, right-click on the correct server instance (for example <code class="docutils literal notranslate"><span class="pre">PostgreSQL</span> <span class="pre">13</span></code>).</p></li>
 <li><p>Select <code class="docutils literal notranslate"><span class="pre">Create...</span></code> and `Database…”</p></li>
-<li><p>Fill the following informations in the dialog:</p></li>
-</ol>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">General</span></code> - <code class="docutils literal notranslate"><span class="pre">Database</span></code>: name of the database to create (see above)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">General</span></code> - <code class="docutils literal notranslate"><span class="pre">Owner</span></code>: teraagent</p></li>
-</ul>
-<ol class="arabic simple" start="4">
+<li><p>Fill the following informations in the dialog:
+* <code class="docutils literal notranslate"><span class="pre">General</span></code> - <code class="docutils literal notranslate"><span class="pre">Database</span></code>: name of the database to create (see above)
+* <code class="docutils literal notranslate"><span class="pre">General</span></code> - <code class="docutils literal notranslate"><span class="pre">Owner</span></code>: teraagent</p></li>
 <li><p>Save the dialog</p></li>
 </ol>
 <p><strong>4. Videorehab service setup</strong></p>
@@ -297,8 +288,8 @@ Self-signed certificates should be generated for the development server and to s
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Developer-Setup-for-Linux.html" class="btn btn-neutral float-left" title="Getting Started for Developers - Ubuntu-based Linux distros" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../services/OpenTera_Services.html" class="btn btn-neutral float-right" title="OpenTera Services Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Developer-Setup-for-Windows.html" class="btn btn-neutral float-left" title="Getting Started for Developers - Windows 10" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Developer-Setup-for-Linux.html" class="btn btn-neutral float-right" title="Getting Started for Developers - Ubuntu-based Linux distros" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

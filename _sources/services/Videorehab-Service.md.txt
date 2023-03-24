@@ -4,17 +4,17 @@ The VideoRehab service is one of the system service in the OpenTera platform. It
 When requested to launch a video rehab session, this service will spawn a `Node` process for each of the session, creating isolated sessions and ensuring that only the invitees can access that session.
 
 ## Main script
-The VideoRehab service can be launched by running the [VideoRehabService.py](https://github.com/introlab/opentera/blob/main/teraserver/python/services/VideoRehabService/VideoRehabService.py) script. As a system service, it is also launched automatically when running the [main OpenTera service](TeraServer-Service)
+The VideoRehab service can be launched by running the [VideoRehabService.py](https://github.com/introlab/opentera/blob/main/teraserver/python/services/VideoRehabService/VideoRehabService.py) script. As a system service, it is also launched automatically when running the [main OpenTera service](teraserver/TeraServer-Service)
 
 ## Configuration
-Configuration file for the VideoRehab service is similar to the basic [configuration files](Configuration-files). It however adds a specific section for that service, and removes the `Database` since no database is used in that service.
+Configuration file for the VideoRehab service is similar to the basic [configuration files](../Configuration-files). It however adds a specific section for that service, and removes the `Database` since no database is used in that service.
 
 ### WebRTC configuration section
 The `WebRTC` section in the configuration file specifies the parameters required to launch the WebRTC framework.
 
 * `hostname`: the **external** hostname that will be used to connect to the WebRTC signaling server (Open-EasyRTC). It is important to use the external url, since that hostname will be sent and used by the clients (browsers) to establish the WebRTC connection.
 
-* `external_port`: the **external** port on which the WebRTC signaling server can be reached. In its default configuration, it is set to the same port as the [main OpenTera service](TeraServer-Service) (40075)
+* `external_port`: the **external** port on which the WebRTC signaling server can be reached. In its default configuration, it is set to the same port as the [main OpenTera service](teraserver/TeraServer-Service) (40075)
 
 * `local_base_port`: the **internal** port on which the WebRTC signaling server will listen. This is the base port: each new session will listen to a port number on the range `local_base_port` to `local_base_port + max_sessions`. Since the NGINX router will probably redirects the external connection to the appropriate internal port (see below), there is no need to open those ports externally.
 
@@ -27,13 +27,13 @@ The `WebRTC` section in the configuration file specifies the parameters required
 * `script`: the parameters to pass to the executable. By default, it is [`script.js`](https://github.com/introlab/opentera/blob/main/teraserver/easyrtc/server.js), which is the base script used by this service. However, if a custom or another script is needed, this is the parameter to update!
 
 ## Service setup
-As this service relies on Node.js and external scripts, it is required to setup the environment of that service before using it. See [server deployment](Deployment) and the [developers](Developers) sections for more information on how to properly setup that environment.
+As this service relies on Node.js and external scripts, it is required to setup the environment of that service before using it. See [server deployment](../Deployment) and the [developers](../developers/Developers) sections for more information on how to properly setup that environment.
 
 ## Default port and location
 By default, the service will listen to port 4070 (non-ssl) and will be at the `/rehab` path on the base server URL.
 
 ## Web URLs
-As each session will spawn in a different process and listen on a different internal (local) port, the Web URLs for that service are dynamic, which contribute to the overall [security](Security) of the OpenTera platform.
+As each session will spawn in a different process and listen on a different internal (local) port, the Web URLs for that service are dynamic, which contribute to the overall [security](../Security) of the OpenTera platform.
 
 The base service is located at the `/rehab` path, while each of the video rehab sessions are located at the `/webrtc` path.
 
@@ -46,7 +46,7 @@ This service doesn't expose any REST API.
 The web frontends are provided and managed by the Node.js express server. The base files are located [here](https://github.com/introlab/opentera/tree/main/teraserver/easyrtc/protected). Included javascript files and assets are located [here](https://github.com/introlab/opentera/tree/main/teraserver/easyrtc/static).
 
 ## RPC API
-This service uses the [asynchronous communication system](Internal-services-communication-module), but also provides the following RPC API:
+This service uses the [asynchronous communication system](../developers/Internal-services-communication-module), but also provides the following RPC API:
 
 ### `session_manage`
 #### Description
@@ -83,9 +83,9 @@ A `session_manage` JSON formatted input string (format: `session_manage {action:
 The return value will be a dictionary with the following fields:
 * **`status`** (string): the status of the action command:
   * **`error`**: an error occurred. See the field `error_text` for a description of the error.
-  * **`started`**: the session was properly started. A `session` field contains a JSON formatted string of the session (based on the [database model](Database-Structure)), with the following added fields:
+  * **`started`**: the session was properly started. A `session` field contains a JSON formatted string of the session (based on the [database model](../developers/Database-Structure)), with the following added fields:
     * **`session_url_users`, `session_url_participants`, `session_url_devices`**: the URLs used to connect to the session for users, participants and devices.
-  * **`stopped`**: the session was properly stopped. A `session` field contains a JSON formatted string of the session (based on the [database model](Database-Structure)).
-  * **`invited`**: the invitations for the session were properly sent. A `session` field contains a JSON formatted string of the session (based on the [database model](Database-Structure)).
-  * **`removed`**: the specified invitees were properly removed from the session. A `session` field contains a JSON formatted string of the session (based on the [database model](Database-Structure)).
-  * **`OK`**: the session invitation reply was properly managed. A `session` field contains a JSON formatted string of the session (based on the [database model](Database-Structure)).
+  * **`stopped`**: the session was properly stopped. A `session` field contains a JSON formatted string of the session (based on the [database model](../developers/Database-Structure)).
+  * **`invited`**: the invitations for the session were properly sent. A `session` field contains a JSON formatted string of the session (based on the [database model](../developers/Database-Structure)).
+  * **`removed`**: the specified invitees were properly removed from the session. A `session` field contains a JSON formatted string of the session (based on the [database model](../developers/Database-Structure)).
+  * **`OK`**: the session invitation reply was properly managed. A `session` field contains a JSON formatted string of the session (based on the [database model](../developers/Database-Structure)).

@@ -5,20 +5,22 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VideoRehab Service &mdash; OpenTera 1.2.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
+    <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Creating a new service based on OpenTera" href="../developers/Service-Creation.html" />
+    <link rel="prev" title="Logging Service" href="Logging-Service.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -29,11 +31,11 @@
 
           
           
-          <a href="index.html" class="icon icon-home">
+          <a href="../index.html" class="icon icon-home">
             OpenTera
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -42,38 +44,64 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Home.html">About OpenTera</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Architecture-Overview.html">OpenTera Architecture Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation for developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Developers.html">Developers setup guide</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="OpenTera_Services.html">OpenTera Services Structure</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="services.html">Services</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="teraserver/teraserver.html">TeraServer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FileTransfer-Service.html">File Transfer Service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Logging-Service.html">Logging Service</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">VideoRehab Service</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#main-script">Main script</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#webrtc-configuration-section">WebRTC configuration section</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#service-setup">Service setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#default-port-and-location">Default port and location</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-urls">Web URLs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rest-api">REST API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-frontend">Web Frontend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rpc-api">RPC API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#session-manage"><code class="docutils literal notranslate"><span class="pre">session_manage</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#description">Description</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#specific-fields-for-start-action">Specific fields for <code class="docutils literal notranslate"><span class="pre">start</span></code> action</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#specific-fields-for-invite-and-remove-action">Specific fields for <code class="docutils literal notranslate"><span class="pre">invite</span></code> and <code class="docutils literal notranslate"><span class="pre">remove</span></code> action</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#specific-fields-for-invite-reply-action">Specific fields for <code class="docutils literal notranslate"><span class="pre">invite_reply</span></code> action</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#return-value">Return value</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Authentication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html#login">Login</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Message wrappers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Login-and-authentication.html">Login &amp; Authentification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Messages-structure.html">Internal messages structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Websockets-communication.html">Websockets communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Running-tests.html">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -82,17 +110,18 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">OpenTera</a>
+          <a href="../index.html">OpenTera</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="services.html">Services</a></li>
       <li class="breadcrumb-item active">VideoRehab Service</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/Videorehab-Service.md.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/services/Videorehab-Service.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -106,17 +135,17 @@
 <p>When requested to launch a video rehab session, this service will spawn a <code class="docutils literal notranslate"><span class="pre">Node</span></code> process for each of the session, creating isolated sessions and ensuring that only the invitees can access that session.</p>
 <section id="main-script">
 <h2>Main script<a class="headerlink" href="#main-script" title="Permalink to this heading"></a></h2>
-<p>The VideoRehab service can be launched by running the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/services/VideoRehabService/VideoRehabService.py">VideoRehabService.py</a> script. As a system service, it is also launched automatically when running the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a></p>
+<p>The VideoRehab service can be launched by running the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/services/VideoRehabService/VideoRehabService.py">VideoRehabService.py</a> script. As a system service, it is also launched automatically when running the <a class="reference internal" href="teraserver/TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a></p>
 </section>
 <section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
-<p>Configuration file for the VideoRehab service is similar to the basic <a class="reference internal" href="Configuration-files.html"><span class="doc std std-doc">configuration files</span></a>. It however adds a specific section for that service, and removes the <code class="docutils literal notranslate"><span class="pre">Database</span></code> since no database is used in that service.</p>
+<p>Configuration file for the VideoRehab service is similar to the basic <a class="reference internal" href="../Configuration-files.html"><span class="doc std std-doc">configuration files</span></a>. It however adds a specific section for that service, and removes the <code class="docutils literal notranslate"><span class="pre">Database</span></code> since no database is used in that service.</p>
 <section id="webrtc-configuration-section">
 <h3>WebRTC configuration section<a class="headerlink" href="#webrtc-configuration-section" title="Permalink to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">WebRTC</span></code> section in the configuration file specifies the parameters required to launch the WebRTC framework.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">hostname</span></code>: the <strong>external</strong> hostname that will be used to connect to the WebRTC signaling server (Open-EasyRTC). It is important to use the external url, since that hostname will be sent and used by the clients (browsers) to establish the WebRTC connection.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">external_port</span></code>: the <strong>external</strong> port on which the WebRTC signaling server can be reached. In its default configuration, it is set to the same port as the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a> (40075)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">external_port</span></code>: the <strong>external</strong> port on which the WebRTC signaling server can be reached. In its default configuration, it is set to the same port as the <a class="reference internal" href="teraserver/TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a> (40075)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">local_base_port</span></code>: the <strong>internal</strong> port on which the WebRTC signaling server will listen. This is the base port: each new session will listen to a port number on the range <code class="docutils literal notranslate"><span class="pre">local_base_port</span></code> to <code class="docutils literal notranslate"><span class="pre">local_base_port</span> <span class="pre">+</span> <span class="pre">max_sessions</span></code>. Since the NGINX router will probably redirects the external connection to the appropriate internal port (see below), there is no need to open those ports externally.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">max_sessions</span></code>: the maximum number of parallel sessions. This is linked to the local port ranges that could be opened (see <code class="docutils literal notranslate"><span class="pre">local_base_port</span></code>), but can also be used to limit the load of a specific server.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">working_directory</span></code>: the base directory for the signaling server</p></li>
@@ -127,7 +156,7 @@
 </section>
 <section id="service-setup">
 <h2>Service setup<a class="headerlink" href="#service-setup" title="Permalink to this heading"></a></h2>
-<p>As this service relies on Node.js and external scripts, it is required to setup the environment of that service before using it. See <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">server deployment</span></a> and the <a class="reference internal" href="#Developers"><span class="xref myst">developers</span></a> sections for more information on how to properly setup that environment.</p>
+<p>As this service relies on Node.js and external scripts, it is required to setup the environment of that service before using it. See <a class="reference internal" href="../Deployment.html"><span class="doc std std-doc">server deployment</span></a> and the <a class="reference internal" href="../developers/Developers.html"><span class="doc std std-doc">developers</span></a> sections for more information on how to properly setup that environment.</p>
 </section>
 <section id="default-port-and-location">
 <h2>Default port and location<a class="headerlink" href="#default-port-and-location" title="Permalink to this heading"></a></h2>
@@ -135,7 +164,7 @@
 </section>
 <section id="web-urls">
 <h2>Web URLs<a class="headerlink" href="#web-urls" title="Permalink to this heading"></a></h2>
-<p>As each session will spawn in a different process and listen on a different internal (local) port, the Web URLs for that service are dynamic, which contribute to the overall <a class="reference internal" href="Security.html"><span class="doc std std-doc">security</span></a> of the OpenTera platform.</p>
+<p>As each session will spawn in a different process and listen on a different internal (local) port, the Web URLs for that service are dynamic, which contribute to the overall <a class="reference internal" href="../Security.html"><span class="doc std std-doc">security</span></a> of the OpenTera platform.</p>
 <p>The base service is located at the <code class="docutils literal notranslate"><span class="pre">/rehab</span></code> path, while each of the video rehab sessions are located at the <code class="docutils literal notranslate"><span class="pre">/webrtc</span></code> path.</p>
 <p>To properly route an external URLs to the correct port, a NGINX rule was defined to include the local port in the URL and redirect it to the correct listening server. This takes the form of, for example, <code class="docutils literal notranslate"><span class="pre">https://127.0.0.1:40075/webrtc/8081/</span></code> which will redirect the request to the server listening on the internal port 8081.</p>
 </section>
@@ -149,7 +178,7 @@
 </section>
 <section id="rpc-api">
 <h2>RPC API<a class="headerlink" href="#rpc-api" title="Permalink to this heading"></a></h2>
-<p>This service uses the <a class="reference internal" href="#Internal-services-communication-module"><span class="xref myst">asynchronous communication system</span></a>, but also provides the following RPC API:</p>
+<p>This service uses the <a class="reference internal" href="../developers/Internal-services-communication-module.html"><span class="doc std std-doc">asynchronous communication system</span></a>, but also provides the following RPC API:</p>
 <section id="session-manage">
 <h3><code class="docutils literal notranslate"><span class="pre">session_manage</span></code><a class="headerlink" href="#session-manage" title="Permalink to this heading"></a></h3>
 <section id="description">
@@ -205,15 +234,15 @@
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">status</span></code></strong> (string): the status of the action command:</p>
 <ul>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">error</span></code></strong>: an error occurred. See the field <code class="docutils literal notranslate"><span class="pre">error_text</span></code> for a description of the error.</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">started</span></code></strong>: the session was properly started. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database model</span></a>), with the following added fields:</p>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">started</span></code></strong>: the session was properly started. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="../developers/Database-Structure.html"><span class="doc std std-doc">database model</span></a>), with the following added fields:</p>
 <ul>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">session_url_users</span></code>, <code class="docutils literal notranslate"><span class="pre">session_url_participants</span></code>, <code class="docutils literal notranslate"><span class="pre">session_url_devices</span></code></strong>: the URLs used to connect to the session for users, participants and devices.</p></li>
 </ul>
 </li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">stopped</span></code></strong>: the session was properly stopped. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database model</span></a>).</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">invited</span></code></strong>: the invitations for the session were properly sent. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database model</span></a>).</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">removed</span></code></strong>: the specified invitees were properly removed from the session. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database model</span></a>).</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">OK</span></code></strong>: the session invitation reply was properly managed. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="#Database-Structure"><span class="xref myst">database model</span></a>).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">stopped</span></code></strong>: the session was properly stopped. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="../developers/Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">invited</span></code></strong>: the invitations for the session were properly sent. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="../developers/Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">removed</span></code></strong>: the specified invitees were properly removed from the session. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="../developers/Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">OK</span></code></strong>: the session invitation reply was properly managed. A <code class="docutils literal notranslate"><span class="pre">session</span></code> field contains a JSON formatted string of the session (based on the <a class="reference internal" href="../developers/Database-Structure.html"><span class="doc std std-doc">database model</span></a>).</p></li>
 </ul>
 </li>
 </ul>
@@ -225,7 +254,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Logging-Service.html" class="btn btn-neutral float-left" title="Logging Service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../developers/Service-Creation.html" class="btn btn-neutral float-right" title="Creating a new service based on OpenTera" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

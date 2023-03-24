@@ -52,7 +52,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation for developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -61,8 +61,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Database Structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#database-objects">Database objects</a></li>
@@ -81,15 +80,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Authentication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html#login">Login</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Message wrappers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Internal messages structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Running Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
 </ul>
 
@@ -123,28 +119,28 @@
 <section id="database-objects">
 <h2>Database objects<a class="headerlink" href="#database-objects" title="Permalink to this heading"></a></h2>
 <p>The following image shows the different objects used in OpenTera and their relationship to each other.
-<img alt="OpenTera Database Objects" src="developers/images/OpenTera_Objects.png" />
+<img alt="OpenTera Database Objects" src="../_images/OpenTera_Objects.png" />
 There are 4 objects that are considered to be core objects (or user types):</p>
 <ul class="simple">
-<li><p><strong>Users</strong>: the main users of the platform. In a typical application, they are the ones who will need to visualize the data, create and manage participants, projects and sites and interact with the other core objects. As such, they have access to almost every database objects from their <a class="reference internal" href="#API"><span class="xref myst">API</span></a>, depending on their <a class="reference internal" href="#Access-levels-for-user-types"><span class="xref myst">access levels</span></a>.</p></li>
-<li><p><strong>Participants</strong>: the participants who receive a service from the OpenTera platform. Managed by one or multiple users, they are usually the ones who interact with the system, but have a very limited access to the platform. They <a class="reference internal" href="#API"><span class="xref myst">API</span></a> is limited by design, and they can only interact with objects that are directly related to them.</p></li>
+<li><p><strong>Users</strong>: the main users of the platform. In a typical application, they are the ones who will need to visualize the data, create and manage participants, projects and sites and interact with the other core objects. As such, they have access to almost every database objects from their <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">API</span></a>, depending on their <a class="reference internal" href="../services/teraserver/OpenTera_AccessRoles.html"><span class="doc std std-doc">access levels</span></a>.</p></li>
+<li><p><strong>Participants</strong>: the participants who receive a service from the OpenTera platform. Managed by one or multiple users, they are usually the ones who interact with the system, but have a very limited access to the platform. They <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">API</span></a> is limited by design, and they can only interact with objects that are directly related to them.</p></li>
 <li><p><strong>Devices</strong>: devices represents physical devices, whether sensors, robots or any other devices, that can feed data into OpenTera or be used in a session by a participant. Similar to the participants, they can only interact with objects directly related to them. Each device has an associated <strong>device type</strong> which can categorize each device and be used to implement specific behavior based on that type.</p></li>
 <li><p><strong>Services</strong>: services are the main components of OpenTera. A service can be defined as a stand-alone software interacting with OpenTera in multiple ways, and providing specific features, data analysis, data storage, data visualization and controls to meet the needs of specific projects. Services usually run on the same server, but that is not a requirement.</p></li>
 </ul>
 <p>The other objects are the following:</p>
 <ul class="simple">
-<li><p><strong>Sites</strong>: a site can represents a physical site, a team that shares common projects or any logical association making sense in the context of use of the platform. Each site can have one or more projects associated to it. In the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a>, <a class="reference internal" href="#Services-Access"><span class="xref myst">access roles</span></a> are defined as such that an usergroup can be ‘admin’ or ‘user’ in a site, granting different <a class="reference internal" href="#Access-levels-for-user-types"><span class="xref myst">access level</span></a> depending on that role.</p></li>
-<li><p><strong>Projects</strong>: each project can represent either a project, a group of participants with a common categorization, a team or any logical association making sense in the context of use of the platform. Each participant must be associated to a project. In the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a>, <a class="reference internal" href="#Services-Access"><span class="xref myst">access roles</span></a> are defined as such that an usergroup can be ‘admin’ or ‘user’ in a project, granting different <a class="reference internal" href="#Access-levels-for-user-types"><span class="xref myst">access level</span></a> depending on that role.</p></li>
+<li><p><strong>Sites</strong>: a site can represents a physical site, a team that shares common projects or any logical association making sense in the context of use of the platform. Each site can have one or more projects associated to it. In the <a class="reference internal" href="../services/teraserver/TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a>, <a class="reference internal" href="../services/Services-Access.html"><span class="doc std std-doc">access roles</span></a> are defined as such that an usergroup can be ‘admin’ or ‘user’ in a site, granting different <a class="reference internal" href="../services/teraserver/OpenTera_AccessRoles.html"><span class="doc std std-doc">access level</span></a> depending on that role.</p></li>
+<li><p><strong>Projects</strong>: each project can represent either a project, a group of participants with a common categorization, a team or any logical association making sense in the context of use of the platform. Each participant must be associated to a project. In the <a class="reference internal" href="../services/teraserver/TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a>, <a class="reference internal" href="../services/Services-Access.html"><span class="doc std std-doc">access roles</span></a> are defined as such that an usergroup can be ‘admin’ or ‘user’ in a project, granting different <a class="reference internal" href="../services/teraserver/OpenTera_AccessRoles.html"><span class="doc std std-doc">access level</span></a> depending on that role.</p></li>
 <li><p><strong>Groups</strong>: a group is a logical way to organize participants. A participant doesn’t need to be part of a group, and their use is optional. Groups are similar to file folders.</p></li>
 <li><p><strong>Sessions</strong>: sessions are the main organizational units for collected data. Whatever the kind of data is an event, a device data or any other, must be associated to a session. A session can includes participants, users and devices as invitees, and can involve or not a particular service.</p></li>
 <li><p><strong>Assets</strong>: assets represent various data files, be it device data, pictures, videos or any other kind of data. Usually, an asset involve storage of a physical file, though it might also represents a processing result or a report. Each asset needs to be associated to a session.</p></li>
 <li><p><strong>Events</strong>: events happens in a session. They can include, to only name a few, session start/stop, specific time stamping and/or invitees leaving or joining a session. Events are timestamped and associated to a session.</p></li>
 <li><p><strong>Tests</strong>: “<em>Work in progress</em>” tests represents evaluation and answers to specific questions. They are attached to a session and can be filled out in a session, before or after that session. The client is in charge of displayed a test based on its <a class="reference internal" href="Form-Structure.html"><span class="doc std std-doc">structure</span></a>.</p></li>
 <li><p><strong>Service configs</strong>: specific configuration of a service that will be sent to it when a session requesting that service is created. This can be a general configuration, or a specific configuration linked to an installation (be it hardware or software) ID. For example, the currently video source could be used as a specific configuration as it is machine dependent (whether or not the camera is available or not on that system).</p></li>
-<li><p><strong>Service roles</strong>: the roles that a specific service can have. Those roles can be assigned to user groups, participant groups or devices. See <a class="reference internal" href="#Services-Access"><span class="xref myst">service access</span></a> for more information about service roles.</p></li>
-<li><p><strong>Session types</strong>: each session needs to be of a specific type. The session type can be used to simply categorize a session, but can also specify some session parameters to adjust the layout of the session, or some features available in that session (for example, to allow video recording in a session using the <a class="reference internal" href="#Videorehab-Service"><span class="xref myst">video rehab</span></a> service).</p></li>
+<li><p><strong>Service roles</strong>: the roles that a specific service can have. Those roles can be assigned to user groups, participant groups or devices. See <a class="reference internal" href="../services/Services-Access.html"><span class="doc std std-doc">service access</span></a> for more information about service roles.</p></li>
+<li><p><strong>Session types</strong>: each session needs to be of a specific type. The session type can be used to simply categorize a session, but can also specify some session parameters to adjust the layout of the session, or some features available in that session (for example, to allow video recording in a session using the <a class="reference internal" href="../services/Videorehab-Service.html"><span class="doc std std-doc">video rehab</span></a> service).</p></li>
 <li><p><strong>User preferences</strong>: preferences can be stored on the server for each specific client. This allows to have the same preferences on each of the specific installation of that client, even if not on the current system.</p></li>
-<li><p><strong>User groups</strong>: user groups define which <a class="reference internal" href="#Services-Access"><span class="xref myst">access</span></a> are available for users of that group. In the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a>, such access are linked to <a class="reference internal" href="#Access-levels-for-user-types"><span class="xref myst">site and project roles</span></a>. A user can be part of multiple user groups. When computing access, the higher access level always overcome the lower access level.</p></li>
+<li><p><strong>User groups</strong>: user groups define which <a class="reference internal" href="../services/Services-Access.html"><span class="doc std std-doc">access</span></a> are available for users of that group. In the <a class="reference internal" href="../services/teraserver/TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a>, such access are linked to <a class="reference internal" href="../services/teraserver/OpenTera_AccessRoles.html"><span class="doc std std-doc">site and project roles</span></a>. A user can be part of multiple user groups. When computing access, the higher access level always overcome the lower access level.</p></li>
 </ul>
 </section>
 <section id="database-schema">
@@ -175,7 +171,7 @@ There are 4 objects that are considered to be core objects (or user types):</p>
 <h3>Naming convention<a class="headerlink" href="#naming-convention" title="Permalink to this heading"></a></h3>
 <p>The following naming convention is used when defining a new model:</p>
 <ul class="simple">
-<li><p>Model name starts with a service identifier (for example <code class="docutils literal notranslate"><span class="pre">Tera</span></code> is used for the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a>), followed by the data object name</p></li>
+<li><p>Model name starts with a service identifier (for example <code class="docutils literal notranslate"><span class="pre">Tera</span></code> is used for the <a class="reference internal" href="../services/teraserver/TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a>), followed by the data object name</p></li>
 <li><p>Underlying table name starts with a <code class="docutils literal notranslate"><span class="pre">t_</span></code> value, and contains the object name. If spaces are required, they are replaced with <code class="docutils literal notranslate"><span class="pre">_</span></code></p></li>
 <li><p>A main <code class="docutils literal notranslate"><span class="pre">id</span></code> needs to be defined for each object. That <code class="docutils literal notranslate"><span class="pre">id</span></code> should start with <code class="docutils literal notranslate"><span class="pre">id_</span></code> followed by the object name</p></li>
 <li><p>Related <code class="docutils literal notranslate"><span class="pre">ids</span></code> coming from the relationships also follow the above convention</p></li>
@@ -193,7 +189,7 @@ There are 4 objects that are considered to be core objects (or user types):</p>
 <p>Inside the Database module, a database manager was created to manage the database connection, to generate <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">events</span></a> when database objects are edited and to provide access verification on objects when required. The database manager also creates the default database (when detecting that some tables are not present) and database upgrade (using <a class="reference external" href="https://alembic.sqlalchemy.org">Alembic</a>).</p>
 <section id="access-verification">
 <h3>Access verification<a class="headerlink" href="#access-verification" title="Permalink to this heading"></a></h3>
-<p>Instead of manipulating database objects directly, an additional layer was build to filter queries and thus restrain the information returned depending on the <a class="reference internal" href="#Access-levels-for-user-types"><span class="xref myst">access levels</span></a>. Those access objects are available directly inside the <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/modules/DatabaseModule">Database module</a></p>
+<p>Instead of manipulating database objects directly, an additional layer was build to filter queries and thus restrain the information returned depending on the <a class="reference internal" href="../services/teraserver/OpenTera_AccessRoles.html"><span class="doc std std-doc">access levels</span></a>. Those access objects are available directly inside the <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/modules/DatabaseModule">Database module</a></p>
 </section>
 </section>
 </section>

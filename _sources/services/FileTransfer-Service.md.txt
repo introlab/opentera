@@ -2,10 +2,10 @@
 The file transfer service is provided as a generic file repository service. While other services can also store and manage their own assets (files), this service could also be used instead of implementing a local file manager.
 
 ## Main script
-The File Transfer service can be launched by running the [FileTransferService.py](https://github.com/introlab/opentera/blob/main/teraserver/python/services/FileTransferService/FileTransferService.py) script. As a system service, it is also launched automatically when running the [main OpenTera service](TeraServer-Service)
+The File Transfer service can be launched by running the [FileTransferService.py](https://github.com/introlab/opentera/blob/main/teraserver/python/services/FileTransferService/FileTransferService.py) script. As a system service, it is also launched automatically when running the [main OpenTera service](teraserver/TeraServer-Service)
 
 ## Configuration
-Configuration files for the file transfer service are similar to the basic [configuration files](Configuration-files). They however add a specific section for that service.
+Configuration files for the file transfer service are similar to the basic [configuration files](../Configuration-files). They however add a specific section for that service.
 
 ### FileTransfer config section
 `upload_directory`: the relative or full path to store transferred files.
@@ -74,4 +74,4 @@ Lastly, you can click on the ``Code`` section and get snippets in any languages 
 Refer to the documentation at https://127.0.0.1:40075/file/doc
 
 ## Web URLs (if enabled)
-**Doc page** - by default at https://127.0.0.1:40075/file/doc. Will display the [REST API](API) documentation and test system. Useful to test queries manually.
+**Doc page** - by default at https://127.0.0.1:40075/file/doc. Will display the [REST API](teraserver/api/API) documentation and test system. Useful to test queries manually.

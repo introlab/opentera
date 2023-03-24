@@ -5,20 +5,22 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>File Transfer Service &mdash; OpenTera 1.2.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
+    <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Logging Service" href="Logging-Service.html" />
+    <link rel="prev" title="API Documentation" href="teraserver/api/api_doc.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -29,11 +31,11 @@
 
           
           
-          <a href="index.html" class="icon icon-home">
+          <a href="../index.html" class="icon icon-home">
             OpenTera
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -42,38 +44,50 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Home.html">About OpenTera</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Architecture-Overview.html">OpenTera Architecture Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Home.html">About OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation for developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Developers.html">Developers setup guide</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="OpenTera_Services.html">OpenTera Services Structure</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="services.html">Services</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="teraserver/teraserver.html">TeraServer</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">File Transfer Service</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#main-script">Main script</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#filetransfer-config-section">FileTransfer config section</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#default-port-and-location">Default port and location</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code-snippets-and-examples-for-post-get-and-delete">Code snippets and examples for POST, GET and DELETE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-urls-if-enabled">Web URLs (if enabled)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Logging-Service.html">Logging Service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Videorehab-Service.html">VideoRehab Service</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Authentication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html#login">Login</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Message wrappers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html#specific-events-messages">Specific events messages</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html#communication-over-the-websocket">Communication over the websocket</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Database-Structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Form-Structure.html">Internal Form Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Login-and-authentication.html">Login &amp; Authentification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Messages-structure.html">Internal messages structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Websockets-communication.html">Websockets communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Running-tests.html">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Translations.html">Translations</a></li>
 </ul>
 
         </div>
@@ -82,17 +96,18 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">OpenTera</a>
+          <a href="../index.html">OpenTera</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="services.html">Services</a></li>
       <li class="breadcrumb-item active">File Transfer Service</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/FileTransfer-Service.md.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/services/FileTransfer-Service.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -105,11 +120,11 @@
 <p>The file transfer service is provided as a generic file repository service. While other services can also store and manage their own assets (files), this service could also be used instead of implementing a local file manager.</p>
 <section id="main-script">
 <h2>Main script<a class="headerlink" href="#main-script" title="Permalink to this heading"></a></h2>
-<p>The File Transfer service can be launched by running the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/services/FileTransferService/FileTransferService.py">FileTransferService.py</a> script. As a system service, it is also launched automatically when running the <a class="reference internal" href="#TeraServer-Service"><span class="xref myst">main OpenTera service</span></a></p>
+<p>The File Transfer service can be launched by running the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/services/FileTransferService/FileTransferService.py">FileTransferService.py</a> script. As a system service, it is also launched automatically when running the <a class="reference internal" href="teraserver/TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a></p>
 </section>
 <section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
-<p>Configuration files for the file transfer service are similar to the basic <a class="reference internal" href="Configuration-files.html"><span class="doc std std-doc">configuration files</span></a>. They however add a specific section for that service.</p>
+<p>Configuration files for the file transfer service are similar to the basic <a class="reference internal" href="../Configuration-files.html"><span class="doc std std-doc">configuration files</span></a>. They however add a specific section for that service.</p>
 <section id="filetransfer-config-section">
 <h3>FileTransfer config section<a class="headerlink" href="#filetransfer-config-section" title="Permalink to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">upload_directory</span></code>: the relative or full path to store transferred files.</p>
@@ -169,14 +184,17 @@ that is updated when you launch the login GET request.</p>
 </section>
 <section id="web-urls-if-enabled">
 <h2>Web URLs (if enabled)<a class="headerlink" href="#web-urls-if-enabled" title="Permalink to this heading"></a></h2>
-<p><strong>Doc page</strong> - by default at https://127.0.0.1:40075/file/doc. Will display the <a class="reference internal" href="#API"><span class="xref myst">REST API</span></a> documentation and test system. Useful to test queries manually.</p>
+<p><strong>Doc page</strong> - by default at https://127.0.0.1:40075/file/doc. Will display the <a class="reference internal" href="teraserver/api/API.html"><span class="doc std std-doc">REST API</span></a> documentation and test system. Useful to test queries manually.</p>
 </section>
 </section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="teraserver/api/api_doc.html" class="btn btn-neutral float-left" title="API Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Logging-Service.html" class="btn btn-neutral float-right" title="Logging Service" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

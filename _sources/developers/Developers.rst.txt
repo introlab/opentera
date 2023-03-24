@@ -1,4 +1,13 @@
-# Developers setup guide
+Developers setup guide
+======================
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: TeraServer
+
+   Developer-Setup-for-Windows.md
+   Developer-Setup-for-Mac.md
+   Developer-Setup-for-Linux.md
 
 ## What you will need?
 OpenTera uses cross-platform languages, allowing development to occur on multiple platform, be it Windows, Mac or Linux.
@@ -19,6 +28,6 @@ Using standard modules and technology is useful to maintain such a project over 
 
 ## Specific platform setup guides
 
-* [Developer Setup for Windows](Developer-Setup-for-Windows)
-* [Developer Setup for MAC](Developer-Setup-for-Mac)
-* [Developer Setup for Linux](Developer-Setup-for-Linux)
+### [Developer Setup for Windows](Developer-Setup-for-Windows)
+### [Developer Setup for MAC](Developer-Setup-for-Mac)
+### [Developer Setup for Linux](Developer-Setup-for-Linux)

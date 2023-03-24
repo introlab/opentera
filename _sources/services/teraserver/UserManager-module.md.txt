@@ -1,10 +1,11 @@
-The user manager module acts as a central registry for the various connected user types (users, participants, devices). It tracks their current status in the system and can be queried using the [RPC](Internal-services-communication-module) communication system.
+# User Manager Module
+The user manager module acts as a central registry for the various connected user types (users, participants, devices). It tracks their current status in the system and can be queried using the [RPC](../../developers/Internal-services-communication-module) communication system.
 
 ## States and tracked information
 
-* **Online** state indicates that the specific object type (user, participant, device) has an active [websocket connection](Websockets-communication). If the object hasn't established any persistent connection (when only using the [REST API](API) for example), it will **not appear online**. It monitors the [UserEvent, DeviceEvent and ParticipantEvent messages](Messages-structure) to update this state.
+* **Online** state indicates that the specific object type (user, participant, device) has an active [websocket connection](../../developers/Websockets-communication). If the object hasn't established any persistent connection (when only using the [REST API](api/API) for example), it will **not appear online**. It monitors the [UserEvent, DeviceEvent and ParticipantEvent messages](../../developers/Messages-structure) to update this state.
 
-* **Busy** state indicated that the specific object type (user, participant, device) is currently in an active live session. It monitors the [JoinSessionEvent, StopSessionEvent, LeaveSessionEvent and JoinSessionReplyEvent](Messages-structure) to update this state.
+* **Busy** state indicated that the specific object type (user, participant, device) is currently in an active live session. It monitors the [JoinSessionEvent, StopSessionEvent, LeaveSessionEvent and JoinSessionReplyEvent](../../developers/Messages-structure) to update this state.
 
 * **Status** state provide additional information related to an object, such as battery level or specific position in an environment. This is currently implemented as a JSON formatted string, so that each object can provides various status states depending on their type and needs.
 

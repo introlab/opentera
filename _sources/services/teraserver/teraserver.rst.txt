@@ -7,6 +7,7 @@ TeraServer
    :caption: TeraServer
 
    OpenTera_AccessRoles.md
+   UserManager-module.md
    Using REST API <api/API.md>
    api/api_doc
 

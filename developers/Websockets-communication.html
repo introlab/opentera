@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Websockets management &mdash; OpenTera 1.2.0 documentation</title>
+  <title>Websockets communication &mdash; OpenTera 1.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,7 +19,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="Running-tests.html" />
+    <link rel="next" title="Running Unit Tests" href="Running-tests.html" />
     <link rel="prev" title="Services Access" href="../services/Services-Access.html" /> 
 </head>
 
@@ -52,7 +52,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation for developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -61,20 +61,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Service-Creation.html">Creating a new service based on OpenTera</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Basic features of the internal communication module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Authentication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html#login">Login</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Message wrappers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html#specific-events-messages">Specific events messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Internal messages structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Websockets management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#communication-over-the-websocket">Communication over the websocket</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Websockets communication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#websockets-management">Websockets management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#establishing-a-websocket-connection">Establishing a websocket connection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#communication-over-the-websocket">Communication over the websocket</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Running Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
 </ul>
 
@@ -92,7 +93,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Websockets management</li>
+      <li class="breadcrumb-item active">Websockets communication</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/developers/Websockets-communication.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -102,29 +103,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <p>Websockets are used within OpenTera to send <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">messages and events</span></a> from the server to the client.</p>
+  <section id="websockets-communication">
+<h1>Websockets communication<a class="headerlink" href="#websockets-communication" title="Permalink to this heading"></a></h1>
+<p>Websockets are used within OpenTera to send <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">messages and events</span></a> from the server to the client.</p>
 <p>While a websocket can be used as a bidirectional communication channel, the websocket is only used in a unidirectional channel from the server to the client in OpenTera.</p>
 <p>All websocket communication is encrypted using SSL certificates.</p>
 <section id="websockets-management">
-<h1>Websockets management<a class="headerlink" href="#websockets-management" title="Permalink to this heading"></a></h1>
+<h2>Websockets management<a class="headerlink" href="#websockets-management" title="Permalink to this heading"></a></h2>
 <p>Internally, websockets are managed by the <a class="reference external" href="https://twistedmatrix.com/">Twisted engine</a> and a protocol has been defined for user, participant and device websockets. This allows to manage differently the connections depending on the base object type.</p>
 <p>An automatic ping mechanism ensures that data is transmitted over the websocket at each 10 seconds to detect inactive clients or badly closed connection. If no reply is received by this mechanism, the webconnect channel will be automatically closed.</p>
 </section>
 <section id="establishing-a-websocket-connection">
-<h1>Establishing a websocket connection<a class="headerlink" href="#establishing-a-websocket-connection" title="Permalink to this heading"></a></h1>
-<p>The websocket url to connect to will depend on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">object type</span></a>. To get that url, a <code class="docutils literal notranslate"><span class="pre">login</span></code> query must be made to the correct <a class="reference internal" href="#API"><span class="xref myst">REST API</span></a>. See <a class="reference internal" href="Login-and-authentication.html"><span class="doc std std-doc">Login and authentication</span></a> for more information on the login process.</p>
+<h2>Establishing a websocket connection<a class="headerlink" href="#establishing-a-websocket-connection" title="Permalink to this heading"></a></h2>
+<p>The websocket url to connect to will depend on the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">object type</span></a>. To get that url, a <code class="docutils literal notranslate"><span class="pre">login</span></code> query must be made to the correct <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">REST API</span></a>. See <a class="reference internal" href="Login-and-authentication.html"><span class="doc std std-doc">Login and authentication</span></a> for more information on the login process.</p>
 <p>The returned url will be valid for 60 seconds. If no connection is established within that time frame, the url will have to be requested again.</p>
 </section>
 <section id="communication-over-the-websocket">
-<h1>Communication over the websocket<a class="headerlink" href="#communication-over-the-websocket" title="Permalink to this heading"></a></h1>
+<h2>Communication over the websocket<a class="headerlink" href="#communication-over-the-websocket" title="Permalink to this heading"></a></h2>
 <p>All data sent from the server to the client will be formatted in a <a class="reference external" href="https://developers.google.com/protocol-buffers">protocol buffers (protobuf)</a> serialized data format. The dictionary of messages and events is documented <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">here</span></a>.</p>
-<p>Internally, each websocket connection will subscribe to specific events using the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal services communication module</span></a>. The list of those events is defined according to the type of websocket. As with all communication within OpenTera, information will be filtered to only transmit the data that the associated object to that websocket has <a class="reference internal" href="#Access-levels-for-user-types"><span class="xref myst">access</span></a>.</p>
+<p>Internally, each websocket connection will subscribe to specific events using the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal services communication module</span></a>. The list of those events is defined according to the type of websocket. As with all communication within OpenTera, information will be filtered to only transmit the data that the associated object to that websocket has <a class="reference internal" href="../services/teraserver/OpenTera_AccessRoles.html"><span class="doc std std-doc">access</span></a>.</p>
 <ul class="simple">
-<li><p><strong>User websocket</strong>: All database events, <a class="reference internal" href="#UserManager-module"><span class="xref myst">user manager module</span></a> events, session events, device events, participant events, user events, direct events. Filtering occurs in the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/modules/UserEventManager.py">UserEventManager</a> class.</p></li>
+<li><p><strong>User websocket</strong>: All database events, <a class="reference internal" href="../services/teraserver/UserManager-module.html"><span class="doc std std-doc">user manager module</span></a> events, session events, device events, participant events, user events, direct events. Filtering occurs in the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/modules/UserEventManager.py">UserEventManager</a> class.</p></li>
 <li><p><strong>Participant websocket</strong>: Device events, participants event (self only), session events, direct events. Filtering occurs in the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/modules/ParticipantEventManager.py">ParticipantEventManager</a> class.</p></li>
 <li><p><strong>Device websocket</strong>: Device events (self only), participants event, session events, direct events. Filtering occurs in the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/modules/DeviceEventManager.py">DeviceEventManager</a> class.</p></li>
 </ul>
 <p>Direct events are always enabled by default on each of the websocket type, allowing to directly send an event or a message to a connected client, if that client type and uuid is known. See <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">here</span></a> for more information on how to use the publish system to communicate with a connected client directly.</p>
+</section>
 </section>
 
 
@@ -132,7 +136,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../services/Services-Access.html" class="btn btn-neutral float-left" title="Services Access" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Running-tests.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Running-tests.html" class="btn btn-neutral float-right" title="Running Unit Tests" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

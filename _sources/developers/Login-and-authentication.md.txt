@@ -1,6 +1,8 @@
+# Login & Authentification
+
 In OpenTera, login and authentication are 2 separate concept.
 
-* **Authentication** refers to the process of having sufficient credentials to access the [REST API](API). Multiple authentication schemes are supported (see below)
+* **Authentication** refers to the process of having sufficient credentials to access the [REST API](../services/teraserver/api/API). Multiple authentication schemes are supported (see below)
 
 * **Login** refers to the process of calling the appropriate login API, gets the current (temporary) token for the authentication and, optionally, opens a [websocket connection](Websockets-communication) to receive [messages and events](Messages-structure).
 
@@ -8,10 +10,10 @@ In OpenTera, login and authentication are 2 separate concept.
 
 ## Authentication
 
-Supported authentication depends on the [API level](API) that is accessed.
+Supported authentication depends on the [API level](../services/teraserver/api/API) that is accessed.
 
 ### User API
-* **HTTP Basic Auth**: Using username and password authentication, the requester can be identified and allowed (or not) to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications for security purpose when [deploying to a server](Deployment)
+* **HTTP Basic Auth**: Using username and password authentication, the requester can be identified and allowed (or not) to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications for security purpose when [deploying to a server](../Deployment)
 
 * **Token Bearer**: Using the HTTP `Authorization` header in a request, it is possible to use a token for authentication instead of the standard username-password authentication:
   * The `<type>` value must be set to `OpenTera` and the `<credentials>` must contain a valid token. 
@@ -19,7 +21,7 @@ Supported authentication depends on the [API level](API) that is accessed.
   * User tokens are set to expire after 1 hour, and a new token can be obtained before expiration by calling the `refreshtoken` API.
 
 ### Participant API
-* **HTTP Basic Auth**: Using username and password authentication, the requester can be identified and allowed (or not) to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications for security purpose when [deploying to a server](Deployment). 
+* **HTTP Basic Auth**: Using username and password authentication, the requester can be identified and allowed (or not) to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications for security purpose when [deploying to a server](../Deployment). 
   * **For participants, that authentication scheme is optional**. If no username and password are defined or if the `participant_login_enabled` is set to `false` for a specific participant (see [database objects](Database-Structure), this scheme will not work.
 
 * **Token Bearer**: Using the HTTP `Authorization` header in a request, it is possible to use a token for authentication instead of the standard username-password authentication:
@@ -54,15 +56,15 @@ Supported authentication depends on the [API level](API) that is accessed.
 ***
 
 ## Login
-Even if the replies can vary a little depending on the [API level](API) being accessed, the login process is similar in each case. The login process is needed to get the [websocket](Websockets-communication), basic information about the logged on object and to get a dynamic token, if required, depending on the API level (see above).
+Even if the replies can vary a little depending on the [API level](../services/teraserver/api/API) being accessed, the login process is similar in each case. The login process is needed to get the [websocket](Websockets-communication), basic information about the logged on object and to get a dynamic token, if required, depending on the API level (see above).
 
 Depending on the authentication scheme and the application, the login process might be optional. Without logging in, as long as the authentication scheme is respected, all API calls can proceed.
 
-**Important note**: A user, participant or device will not come online in regards to the [User Manager Module](UserManager-module) unless a [websocket connection](Websockets-communication) is established. This is by design and by the fact that the REST API, by definition, is a stateless and asynchronous system, and thus OpenTera doesn't have any way to know if a user, participant or device is still there at the other end.
+**Important note**: A user, participant or device will not come online in regards to the [User Manager Module](../services/teraserver/UserManager-module) unless a [websocket connection](Websockets-communication) is established. This is by design and by the fact that the REST API, by definition, is a stateless and asynchronous system, and thus OpenTera doesn't have any way to know if a user, participant or device is still there at the other end.
 
 The login process can be summarized as:
-1. Make a request with the correct authentication scheme to the `login` [API](API)
-2. If the object type is enabled (see [database objects](Database-Structure)) and if the login credentials are valid, a return value containing at least the `_name`, the `_uuid` and the `websocket_url` will be returned. See the [REST API](API) for the specific return values for each of the specific `login` functions
+1. Make a request with the correct authentication scheme to the `login` [API](../services/teraserver/api/API)
+2. If the object type is enabled (see [database objects](Database-Structure)) and if the login credentials are valid, a return value containing at least the `_name`, the `_uuid` and the `websocket_url` will be returned. See the [REST API](../services/teraserver/api/API) for the specific return values for each of the specific `login` functions
 3. Optionally, the client may connect to the `websocket_url`. There is a 60 seconds window to establish the connection, otherwise it will be denied. That url can only be used once: once a client is connected, it will not be available for further connections.
 
 While recommended, a call to the `logout` is optional. When logging out, clean-up and dynamic token disabling will occur. If a websocket connection has been established, it will not close automatically - the client will need to close that connection after or before the `logout` call.
