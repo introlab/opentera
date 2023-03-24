@@ -1,9 +1,9 @@
 # Configuration files
-Each service, including the core module, [TeraServer](TeraServer-Service), has an associated config file.
+Each service, including the core module, [TeraServer](services/teraserver/TeraServer-Service), has an associated config file.
 
 The details of those files are presented in each of the service. 
 
-For the core module, [TeraServer](TeraServer-Service), there are 2 configuration files: the main configuration file and the NGINX configuration files.
+For the core module, [TeraServer](services/teraserver/TeraServer-Service), there are 2 configuration files: the main configuration file and the NGINX configuration files.
 
 ## Core module - Configuration file 
 The development configuration file can be found [here](https://github.com/introlab/opentera/blob/main/teraserver/python/config/TeraServerConfig.ini). It is a JSON-formatted file, separated in different sections. The following describe the required sections, and the parameters in each of them.
@@ -22,7 +22,7 @@ The development configuration file can be found [here](https://github.com/introl
 The other parameters still left in the config file are deprecated and will be removed soon, if not already.
 
 ### Database section
-`db_type` - the type of database used. This parameter, while in this config file, is currently unused since only [PostgreSQL](https://www.postgresql.org/) database are used right now (except for [tests](Running-tests), which use a local [SqlLite](https://www.sqlite.org) database).
+`db_type` - the type of database used. This parameter, while in this config file, is currently unused since only [PostgreSQL](https://www.postgresql.org/) database are used right now (except for [unit tests](developers/Running-tests), which use a local [SqlLite](https://www.sqlite.org) database).
 
 `name` - the name of the database used by the core module.
 
@@ -30,7 +30,7 @@ The other parameters still left in the config file are deprecated and will be re
 
 `port` - the port to connect to the database server. Default should be 5432 for PostgreSQL database.
 
-`username` & `password` - the username and password used to connect to the database server. **Please ensure that the user has full access to the database**, as errors will occur. See [database structure](Database-Structure) for more information on how to create the initial database.
+`username` & `password` - the username and password used to connect to the database server. **Please ensure that the user has full access to the database**, as errors will occur. See [database structure](developers/Database-Structure) for more information on how to create the initial database.
 
 ### Redis section
 `hostname`- hostname (URL) hosting the [Redis](https://redis.io/) server. In a typical scenario, the Redis server will be running as localhost (127.0.0.1).

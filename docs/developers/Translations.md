@@ -1,3 +1,3 @@
 # Translations
 
-![ ](images/coming_soon.PNG)
+![ ](../images/coming_soon.PNG)

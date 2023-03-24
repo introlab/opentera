@@ -4,7 +4,7 @@ OpenTera was built with security considerations. While the platform isn't meant 
 This page presents a brief overview of the security elements that have been put in place in the OpenTera platform.
 
 ## Logins and system access
-As presented in the [login and authentication](Login-and-authentication) section, sensitive parts of the system are secured with a need to authenticate. Furthermore, [access roles](Access-levels-for-user-types) are defined to further filter out information that cannot be accessed by an end-user that doesn't have the required access.
+As presented in the [login and authentication](developers/Login-and-authentication) section, sensitive parts of the system are secured with a need to authenticate. Furthermore, [access roles](services/teraserver/OpenTera_AccessRoles) are defined to further filter out information that cannot be accessed by an end-user that doesn't have the required access.
 
 All of that filtering is done on server-side, preventing the clients to even have access to data they are not allowed to.
 
@@ -13,14 +13,14 @@ While token-based authentication can be used, those tokens are encrypted and val
 ## SSL certificates
 All communication occurring from and to the server are encrypted using SSL certificates. Since a single point of entry is used ([NGINX](https://www.nginx.com/)), the certificates only needs to be maintained and updated there, easing server maintenance without having to update each of the services and modules certificates individually.
 
-Except in [special cases](Login-and-authentication), the certificates are not used to authenticate the clients, only to encrypt data transfer and to authenticate the server.
+Except in [special cases](developers/Login-and-authentication), the certificates are not used to authenticate the clients, only to encrypt data transfer and to authenticate the server.
 
 While self-signed certificates can be used in local and development setup, on a [production server](Deployment), certificate-authority issued certificates should be used, especially since most web browsers (and operating systems) refuse to accept self-signed certificates.
 
 ## Websocket communication
 Secure websockets are used and all communication occurring over them are encrypted using the same SSL certificates as above.
 
-In the [websocket connection](Websockets-communication) with a client, the websocket listens only for 60 seconds before closing and will be tied to internal session id of the client requesting a websocket, preventing another client to connect on that particular websocket.
+In the [websocket connection](developers/Websockets-communication) with a client, the websocket listens only for 60 seconds before closing and will be tied to internal session id of the client requesting a websocket, preventing another client to connect on that particular websocket.
 
 ## Video sessions
 Many layers of security have been added in the video sessions to properly secure them:
@@ -30,7 +30,7 @@ Many layers of security have been added in the video sessions to properly secure
 
 * Each video sessions are *dynamically created*. As opposed to standard online videoconferencing systems where a link for a specific meeting needs to be sent in advance to each invitees, OpenTera requires that each invitees logs to the system, and then invites them to a video session. This ease the use of the system in general for the participants (not having to receive many "meetings" invitation), but also makes a video session volatile and only present on the system for the time it is running.
 
-* In a similar way, each video session is **secured by an access key** and **runs on a different port**. While the last element is a side effect of the video sessions running in different process, it provides a welcome variability in the sessions URLs (see the [Video Rehab Service](Videorehab-Service) for more information). Each session access key is a 128 bit unique ID that changes with each session and is sent only to the invitees. Thus, a hacker trying to join an out-going session would have to match the session port and the session access key, combined with the fact that this combination is valid for a limited time (the time the session is ongoing), would required a lot of computing resources to hack into a session... or be very very lucky! And in the improbable case such a hack would happen, the users would just have to close and start a new session to start anew.
+* In a similar way, each video session is **secured by an access key** and **runs on a different port**. While the last element is a side effect of the video sessions running in different process, it provides a welcome variability in the sessions URLs (see the [Video Rehab Service](services/Videorehab-Service) for more information). Each session access key is a 128 bit unique ID that changes with each session and is sent only to the invitees. Thus, a hacker trying to join an out-going session would have to match the session port and the session access key, combined with the fact that this combination is valid for a limited time (the time the session is ongoing), would required a lot of computing resources to hack into a session... or be very very lucky! And in the improbable case such a hack would happen, the users would just have to close and start a new session to start anew.
 
 ## Divide and conquer
 The OpenTera approach is to be as modular as possible. Thus, all components, be them the database, internal communication module, services and file storage, are designed to be hosted, if needed, on different servers. If an high-security environment is needed for example, each of the components could be physically separated, and if a server becomes compromised, not all data would be.

@@ -6,3 +6,6 @@ Services
    :caption: Services
 
    teraserver/teraserver
+   FileTransfer-Service.md
+   Logging-Service.md
+   Videorehab-Service.md
