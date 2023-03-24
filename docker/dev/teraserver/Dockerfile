@@ -22,21 +22,25 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh
 RUN bash ~/nodesource_setup.sh
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
 
-
 # Add directory from host
-ADD ../../../../teraserver ./teraserver
+ADD ../../../../teraserver /root/teraserver
+
+# Install node-js signaling server
+WORKDIR /root/teraserver/easyrtc
+RUN ["/bin/bash", "-c", "npm install"] 
 
 
 # Build environment
-WORKDIR ./teraserver
+WORKDIR /root/teraserver
 RUN ["/bin/bash", "-c", "cmake ."]
 RUN ["/bin/bash", "-c", "make python-all"]
 
-ENV PYTHON3_EXEC ./teraserver/python/env/python-3.10/bin/python3
+ENV PYTHON3_EXEC /root/teraserver/python/env/python-3.10/bin/python3
 
-
+# Set Python path
+ENV PYTHONPATH /root/teraserver/python
 
 # RUN SERVER
-WORKDIR ./teraserver/python
-CMD ["python", "TeraServer.py"]
+WORKDIR /root/teraserver/python
+CMD $PYTHON3_EXEC TeraServer.py
 

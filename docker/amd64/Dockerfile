@@ -81,6 +81,7 @@ ENV OPENTERA_CONFIG_PATH /opentera/teraserver/python/config/TeraServerConfig.ini
 
 # Create nginx logs directory
 RUN mkdir -p config/logs
+
 # Set Python path
 ENV PYTHONPATH /opentera/teraserver/python
 
