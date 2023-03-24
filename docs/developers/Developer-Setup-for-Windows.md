@@ -7,7 +7,7 @@ To get started on Windows, the following components are needed:
 * [PostgreSQL](https://www.postgresql.org/download/) for the [database backend](Database-Structure)
 * [Redis Server](https://github.com/tporadowski/redis/releases) for the [internal communication system](Internal-services-communication-module)
 * [NGINX](https://nginx.org/en/download.html) for the system routing
-* [Node.js](https://nodejs.org) required for the [VideoRehab service](Videorehab-Service)
+* [Node.js](https://nodejs.org) required for the [VideoRehab service](../services/Videorehab-Service)
 * [OpenSSL](https://slproweb.com/products/Win32OpenSSL.html) required to generate device certificates and for self-signed certificate generation. The "light" version is sufficient if using the linked website for download.
 * (Optional) [Qt Creator](https://www.qt.io/download) for a UI to execute the `cmake` command
 * (Optional) [PyCharm](https://www.jetbrains.com/pycharm/) for a development UI (very recommended, though you could, in theory, use any other IDE or text editor)
@@ -18,16 +18,16 @@ Install every pre-requisite, making sure to consider the specific install option
 In the install process, please make sure to install Miniconda "Just for me" and into the "home" directory (path should look like: `C:\Users\<username>\miniconda3`). This is important as the `cmakefiles` used to generate the environment will look into that folder for Miniconda.
 
 ### Installing PostgreSQL
-The install process is straightforward. The `postgresql` should be noted as the port if the defaults are not used. [Configuration files](Configuration-files) will need to be adjusted accordingly.
+The install process is straightforward. The `postgresql` should be noted as the port if the defaults are not used. [Configuration files](../Configuration-files) will need to be adjusted accordingly.
 
 Stack Builder is not required for the simple setup.
 
-The PostgreSQL should be run as a system service, though you could also manually launch it before running the [OpenTera main script](TeraServer-Service).
+The PostgreSQL should be run as a system service, though you could also manually launch it before running the [OpenTera main script](../services/teraserver/TeraServer-Service).
 
 ### Installing Redis Server
-Make sure to install the server as a service or to properly manually launch it before running the [OpenTera main script](TeraServer-Service).
+Make sure to install the server as a service or to properly manually launch it before running the [OpenTera main script](../services/teraserver/TeraServer-Service).
 
-If you are setting a user and a password, you will need to adjust the [configuration files](Configuration-files) accordingly.
+If you are setting a user and a password, you will need to adjust the [configuration files](../Configuration-files) accordingly.
 
 ### Installing (and running) NGINX
 NGINX for Windows doesn't provide an installer. Installation should be done manually by extracting the archive in a specific folder (such as `C:\nginx`). Note that path for further use.
@@ -87,30 +87,30 @@ While the [database structure](Database-Structure) by itself will be auto-genera
 The pgAdmin interface will then be ready for the next steps.
 
 ### Creating users
-A single user, `teraagent` with the default password `tera` will need to be created before creating the required databases. A different user and/or a different password could be used, but the [configuration files](Configuration-files) will need to be adjusted accordingly.
+A single user, `teraagent` with the default password `tera` will need to be created before creating the required databases. A different user and/or a different password could be used, but the [configuration files](../Configuration-files) will need to be adjusted accordingly.
   
   1. Right-click on the `Login/Group Roles` section in the left tree of the pgAdmin interface
   2. Select `Create...` and then `Login/Group Role...`
   3. Fill the following informations in the dialog:
-  * `General` - `Name`: teraagent
-  * `Definition` - `Password`: tera
-  * `Privileges` - `Can login`: On
+     * `General` - `Name`: teraagent
+     * `Definition` - `Password`: tera
+     * `Privileges` - `Can login`: On
   4. Save the dialog
 
 The `teraagent` user should have been created.
 
 ### Creating databases
 Each system service will requires its own database. The default database that needs to be created are as follow:
-* `opentera`, the [main OpenTera service](TeraServer-Service) database
-* `openterafiles`, the database for the [file transfer](FileTransfer-Service) service
-* `openteralogs`, the database for the [logging service](Logging-Service)
+* `opentera`, the [main OpenTera service](../services/teraserver/TeraServer-Service) database
+* `openterafiles`, the database for the [file transfer](../services/FileTransfer-Service) service
+* `openteralogs`, the database for the [logging service](../services/Logging-Service)
 
 The steps to create a database are as follow. Those steps should be repeated for each database to create.
   1. In pgAdmin, under `Servers`, right-click on the correct server instance (for example `PostgreSQL 13`).
   2. Select `Create...` and `Database..."
   3.  Fill the following informations in the dialog:
-  * `General` - `Database`: name of the database to create (see above)
-  * `General` - `Owner`: teraagent
+     * `General` - `Database`: name of the database to create (see above)
+     * `General` - `Owner`: teraagent
   4. Save the dialog
 
 **4. Videorehab service setup**

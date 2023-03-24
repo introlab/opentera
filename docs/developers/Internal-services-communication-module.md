@@ -1,3 +1,5 @@
+# Inter-service communication
+
 Internal communication between modules and services (system or external) is done using a [Redis](https://redis.io/) server and database.
 
 ## Basic features of the internal communication module
@@ -52,7 +54,7 @@ Currently, there is no way for a service to explicitly declare the list of their
 
 The received message for an RPC request in the topic will be a [RPCMessage](Messages-structure), which will be parsed by the receiving service. The procedure can then return any JSON formatted reply, which will be forwarded to the caller.
 
-Each of the service having a callable procedure thus need to document somehow their exposed RPC API. For the [core service](TeraServer-Service) and the system services, the RPC API is documented in this wiki.
+Each of the service having a callable procedure thus need to document somehow their exposed RPC API. For the [core service](../services/teraserver/TeraServer-Service) and the system services, the RPC API is documented in this wiki.
 
 #### Calling a remote procedure (function)
 Knowing a service available procedure, the call can simply be made by using [RedisClientRPC](https://github.com/introlab/opentera/blob/main/teraserver/python/opentera/redis/RedisRPCClient.py):

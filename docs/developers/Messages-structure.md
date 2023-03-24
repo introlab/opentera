@@ -1,3 +1,5 @@
+# Internal messages structure
+
 [Communication between the various modules and service](Internal-services-communication-module) and [between the server and the clients](Websockets-communication) is based on standardized messages and events. All of the messages and events are serialized and defined with the [protocol buffers (probuf)](https://developers.google.com/protocol-buffers) mechanism.
 
 Since clients could be implemented in any language and will need to reuse the messages structure, an external repository, [opentera-messages](https://github.com/introlab/opentera_messages), is used for that purpose.
@@ -65,7 +67,7 @@ Those events are generated or used to communicate with some of the modules and s
 Event generated when a database change (update, delete, create) occurred. Also see the [database objects](Database-Structure) for the model names.
 
 #### [`LogEvent`](https://github.com/introlab/opentera_messages/blob/master/proto/LogEvent.proto)
-Event sent to the [logging service](Logging-Service) to add a system log in the log archive.
+Event sent to the [logging service](../services/Logging-Service) to add a system log in the log archive.
 
 #### [`RPCMessage`](https://github.com/introlab/opentera_messages/blob/master/proto/RPCMessage.proto)
 Event used to make [remote procedure calls (RPC)](Internal-services-communication-module) with another service.

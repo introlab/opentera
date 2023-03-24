@@ -14,10 +14,10 @@ release = '1.2.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['myst_parser', 'sphinx_rtd_theme', 'sphinxcontrib.openapi']
+extensions = ['myst_parser', 'sphinx_rtd_theme', 'sphinxcontrib.openapi', 'sphinx.ext.autosummary']
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'venv']
 
 
 

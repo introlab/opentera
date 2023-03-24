@@ -1,7 +1,7 @@
 # Internal Form Structure
 To ease [database structure](Database-Structure) updates, a form definition language was created to serialize the various data entry points to prevent each client to be updated each time a new field is added (or changed) on the OpenTera platform.
 
-By querying the [form API](API), a client can request a form structure definition for a specific data type. Furthermore, when that form definition contains lists, that [API](API) can also be used to filter only relevant data for the current context.
+By querying the [form API](../services/teraserver/api/API), a client can request a form structure definition for a specific data type. Furthermore, when that form definition contains lists, that [API](../services/teraserver/api/API) can also be used to filter only relevant data for the current context.
 
 Forms are serialized using JSON-formatted strings. Implementation on the OpenTera server can be found in the [`TeraForm`](https://github.com/introlab/opentera/blob/main/teraserver/python/opentera/forms/TeraForm.py), and the implementation for each data type can be found in the [`forms`](https://github.com/introlab/opentera/tree/main/teraserver/python/opentera/forms) folder.
 

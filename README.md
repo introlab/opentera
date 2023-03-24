@@ -1,4 +1,4 @@
-# OpenTera
+# About OpenTera
 
 [![Actions Status](https://github.com/introlab/opentera/actions/workflows/python-package-pypi.yml/badge.svg)](https://github.com/introlab/opentera/actions)
 
