@@ -56,8 +56,12 @@ services:
     image: opentera-server
     restart: always
     volumes:
-      - certificates:/teraserver/python/certificates
-      - opentera-config:/teraserver/python/config
+      - ./teraserver/TeraServerConfig.ini:/root/teraserver/python/config/TeraServerConfig.ini
+      - ./teraserver/FileTransferService.json:/root/teraserver/python/services/FileTransferService/FileTransferService.json
+      - ./teraserver/LoggingService.json:/root/teraserver/python/services/LoggingService/LoggingService.json
+      - ./teraserver/VideoRehabService.json://root/teraserver/python/services/VideoRehabService/VideoRehabService.json
+      - certificates:/root/teraserver/python/certificates
+      - opentera-config:/root/teraserver/python/config
     networks:
       - app-network
     depends_on:
