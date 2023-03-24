@@ -6,11 +6,11 @@
 		"debug_mode": false
 	},
 	"Backend": {
-		"hostname": "127.0.0.1",
+		"hostname": "opentera-server",
 		"port": 40075
 	},
 	"Redis": {
-	    "hostname": "127.0.0.1",
+	    "hostname": "cache",
 	    "port": 6379,
 	    "db": 0,
 	    "username": "",

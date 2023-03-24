@@ -37,8 +37,8 @@ services:
     image: nginx
     restart: always
     volumes:
-      - ../../teraserver/python/config/opentera.conf:/etc/nginx/opentera.conf
-      - ../../teraserver/python/config/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/opentera.conf:/etc/nginx/opentera.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - certificates:/etc/certificates
       - nginx-logs:/etc/nginx/logs
     depends_on:
@@ -59,9 +59,9 @@ services:
       - ./teraserver/TeraServerConfig.ini:/root/teraserver/python/config/TeraServerConfig.ini
       - ./teraserver/FileTransferService.json:/root/teraserver/python/services/FileTransferService/FileTransferService.json
       - ./teraserver/LoggingService.json:/root/teraserver/python/services/LoggingService/LoggingService.json
-      - ./teraserver/VideoRehabService.json://root/teraserver/python/services/VideoRehabService/VideoRehabService.json
-      - certificates:/root/teraserver/python/certificates
-      - opentera-config:/root/teraserver/python/config
+      - ./teraserver/VideoRehabService.json:/root/teraserver/python/services/VideoRehabService/VideoRehabService.json
+      # - certificates:/root/teraserver/python/certificates
+      # - opentera-config:/root/teraserver/python/config
     networks:
       - app-network
     depends_on:
