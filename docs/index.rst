@@ -28,17 +28,17 @@
    :caption: Developers
 
 
-   developers/Service-Creation
    developers/Code-Structure
+   developers/Service-Creation
    developers/Database-Structure
    developers/Form-Structure
+   developers/Messages-structure
    developers/Internal-services-communication-module
    developers/Login-and-authentication
-   developers/Messages-structure
    services/Services-Access
-   developers/Websockets-communication
    developers/Running-tests
    developers/Translations
+   developers/Websockets-communication
 
 .. include:: Home.rst
 

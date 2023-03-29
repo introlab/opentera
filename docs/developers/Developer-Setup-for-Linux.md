@@ -97,7 +97,7 @@ The `teraagent` user should have been created.
 
 ### Creating databases
 Each system service will requires its own database. The default database that needs to be created are as follow:
-* `opentera`, the [main OpenTera service](../services/teraserver/TeraServer-Service) database
+* `opentera`, the [main OpenTera service](../services/teraserver/teraserver.rst) database
 * `openterafiles`, the database for the [file transfer](../services/FileTransfer-Service) service
 * `openteralogs`, the database for the [logging service](../services/Logging-Service)
 
